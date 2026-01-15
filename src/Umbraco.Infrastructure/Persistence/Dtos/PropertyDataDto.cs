@@ -17,6 +17,8 @@ internal sealed class PropertyDataDto
     public const int VarcharLength = 512;
     public const int SegmentLength = 256;
 
+    internal const string ReferenceColumnName = "PropertyTypeId"; // should be PropertyTypeId, but for database compatibility we keep it like this
+
     private const string LanguageIdColumnName = "languageId";
     private const string SegmentColumnName = "segment";
 
@@ -76,7 +78,7 @@ internal sealed class PropertyDataDto
     public string? TextValue { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.PropertyTypeId))]
+    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
     public PropertyTypeDto? PropertyTypeDto { get; set; }
 
     [Ignore]

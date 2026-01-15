@@ -82,11 +82,11 @@ public class UserGroupDto
     public int? StartMediaId { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserGroup2AppDto.UserGroupId))]
+    [Reference(ReferenceType.Many, ReferenceMemberName = UserGroup2AppDto.ReferenceMemberName)]
     public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserGroup2LanguageDto.UserGroupId))]
+    [Reference(ReferenceType.Many, ReferenceMemberName = UserGroup2LanguageDto.ReferenceMemberName)]
     public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
 
     [ResultColumn]

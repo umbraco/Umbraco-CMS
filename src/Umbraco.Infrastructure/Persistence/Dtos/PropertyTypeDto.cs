@@ -16,6 +16,9 @@ internal class PropertyTypeDto
     public const string DataTypeIdColumnName = "dataTypeId";
     public const string ContentTypeIdColumnName = "contentTypeId";
 
+    internal const string ReferenceColumnName = "DataTypeId"; // should be DataTypeIdColumnName, but for database compatibility we keep it like this
+    internal const string ReferencePropertyTypeGroupIdColumnName = "PropertyTypeGroupId"; // should be PropertyTypeGroupIdColumnName, but for database compatibility we keep it like this
+
     private string? _alias;
 
     [Column(PrimaryKeyColumnName)]
@@ -80,7 +83,7 @@ internal class PropertyTypeDto
     public byte Variations { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.DataTypeId))]
+    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
     public DataTypeDto DataTypeDto { get; set; } = null!;
 
     [Column("UniqueId")]

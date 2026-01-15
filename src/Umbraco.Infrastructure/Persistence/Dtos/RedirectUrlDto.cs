@@ -12,11 +12,11 @@ internal sealed class RedirectUrlDto
     public const string TableName = Constants.DatabaseSchema.Tables.RedirectUrl;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    private const string ContentKeyName = "contentKey";
-    private const string CreateDateUtcName = "createDateUtc";
-    private const string UrlName = "url";
-    private const string CultureName = "culture";
-    private const string UrlHashName = "urlHash";
+    private const string ContentKeyColumnName = "contentKey";
+    private const string CreateDateUtcColumnName = "createDateUtc";
+    private const string UrlColumnName = "url";
+    private const string CultureColumnName = "culture";
+    private const string UrlHashColumnName = "urlHash";
 
     public RedirectUrlDto() => CreateDateUtc = DateTime.UtcNow;
 
@@ -33,28 +33,28 @@ internal sealed class RedirectUrlDto
     [ResultColumn]
     public int ContentId { get; set; }
 
-    [Column(ContentKeyName)]
+    [Column(ContentKeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [ForeignKey(typeof(NodeDto), Column = NodeDto.KeyColumnName)]
     public Guid ContentKey { get; set; }
 
-    [Column(CreateDateUtcName)]
+    [Column(CreateDateUtcColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_culture_hash", ForColumns = CreateDateUtcName, IncludeColumns = $"{CultureName},{UrlName},{UrlHashName},{ContentKeyName}")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_culture_hash", ForColumns = CreateDateUtcColumnName, IncludeColumns = $"{CultureColumnName},{UrlColumnName},{UrlHashColumnName},{ContentKeyColumnName}")]
     public DateTime CreateDateUtc { get; set; }
 
-    [Column(UrlName)]
+    [Column(UrlColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string Url { get; set; } = null!;
 
-    [Column(CultureName)]
+    [Column(CultureColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Culture { get; set; }
 
-    [Column(UrlHashName)]
+    [Column(UrlHashColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = $"{UrlHashName}, {ContentKeyName}, {CultureName}, {CreateDateUtcName}")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = $"{UrlHashColumnName}, {ContentKeyColumnName}, {CultureColumnName}, {CreateDateUtcColumnName}")]
     [Length(40)]
     public string UrlHash { get; set; } = null!;
 }

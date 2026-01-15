@@ -15,19 +15,19 @@ internal sealed class DocumentCultureVariationDto
     // Public constants to bind properties between DTOs
     public const string PublishedColumnName = "published";
 
-    private const string LanguageIdName = "languageId";
-    private const string NodeIdName = "nodeId";
+    private const string LanguageIdColumnName = "languageId";
+    private const string NodeIdColumnName = "nodeId";
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column(NodeIdName)]
+    [Column(NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{NodeIdName},{LanguageIdName}")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{NodeIdColumnName},{LanguageIdColumnName}")]
     public int NodeId { get; set; }
 
-    [Column(LanguageIdName)]
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }

@@ -12,14 +12,14 @@ public class User2ClientIdDto
     public const string TableName = Constants.DatabaseSchema.Tables.User2ClientId;
     public const string PrimaryKeyColumnName = "userId";
 
-    private const string ClientIdName = "clientId";
+    private const string ClientIdColumnName = "clientId";
 
     [Column(PrimaryKeyColumnName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2ClientId", OnColumns = $"{PrimaryKeyColumnName}, {ClientIdName}")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2ClientId", OnColumns = $"{PrimaryKeyColumnName}, {ClientIdColumnName}")]
     [ForeignKey(typeof(UserDto))]
     public int UserId { get; set; }
 
-    [Column(ClientIdName)]
+    [Column(ClientIdColumnName)]
     [Length(255)]
     public string? ClientId { get; set; }
 }

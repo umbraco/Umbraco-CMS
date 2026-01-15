@@ -10,6 +10,8 @@ public class Webhook2EventsDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Events;
 
+    internal const string ReferenceMemberName = "WebhookId"; // should be WebhookIdColumnName, but for database compatibility we keep it like this
+
     private const string WebhookIdColumnName = "webhookId";
     private const string EventColumnName = "event";
 

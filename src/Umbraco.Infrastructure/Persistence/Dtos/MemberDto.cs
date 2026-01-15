@@ -76,10 +76,10 @@ internal sealed class MemberDto
     public DateTime? LastPasswordChangeDate { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentDto.NodeId))]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ContentDto.ReferenceMemberName)]
     public ContentDto ContentDto { get; set; } = null!;
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentVersionDto.NodeId))]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ContentVersionDto.ReferenceColumnName)]
     public ContentVersionDto ContentVersionDto { get; set; } = null!;
 }
