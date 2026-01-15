@@ -35,6 +35,8 @@ export class UmbPickerInputContext<
 	#modalRoute = new UmbStringState<string | undefined>(undefined);
 	public readonly modalRoute = this.#modalRoute.asObservable();
 
+	#modalData?: Partial<PickerModalConfigType>;
+
 	/**
 	 * Define a maximum amount of selected items in this input, for this input to be valid.
 	 * @returns {number} The maximum number of items required.
@@ -118,6 +120,24 @@ export class UmbPickerInputContext<
 		return this.modalAlias;
 	}
 
+	/**
+	 * Sets modal data that will be used as base configuration for both direct openPicker() calls and modal route setup.
+	 * @param {Partial<PickerModalConfigType>} modalData The modal data to store.
+	 * @memberof UmbPickerInputContext
+	 */
+	setModalData(modalData?: Partial<PickerModalConfigType>) {
+		this.#modalData = modalData;
+	}
+
+	/**
+	 * Gets the stored modal data.
+	 * @returns {Partial<PickerModalConfigType> | undefined} The stored modal data.
+	 * @memberof UmbPickerInputContext
+	 */
+	getModalData(): Partial<PickerModalConfigType> | undefined {
+		return this.#modalData;
+	}
+
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
 
@@ -169,7 +189,6 @@ export class UmbPickerInputContext<
 		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias)
 			.addUniquePaths(['picker'])
 			.onSetup(() => {
-				// TODO: we need to handle the same picker data as passed to the open method as well.
 				return {
 					data: this.#getPickerModalDataArgs(),
 					value: this.#getPickerModalValueArgs(),
@@ -184,10 +203,11 @@ export class UmbPickerInputContext<
 			});
 	}
 
-	#getPickerModalDataArgs(pickerData?: Partial<PickerModalConfigType>) {
+	#getPickerModalDataArgs(modalData?: Partial<PickerModalConfigType>) {
 		return {
 			multiple: this._max === 1 ? false : true,
-			...pickerData,
+			...this.#modalData,
+			...modalData,
 		};
 	}
 
