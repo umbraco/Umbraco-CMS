@@ -654,12 +654,23 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // We have to look up the content types we want to add to composition, since we keep a full reference.
         if (add.Any())
         {
+            // Track property aliases that have been removed from the content type (we need this when detecting clashes of property
+            // aliases from compositions; it's OK to add a clashing one if it's clashing with something that is going to be removed).
+            var removedPropertyAliases = GetRemovedPropertyAliases(contentType, model);
+
             IContentTypeComposition[] contentTypesToAdd = allContentTypeCompositions.Where(c => add.Contains(c.Key)).ToArray();
             foreach (IContentTypeComposition contentTypeToAdd in contentTypesToAdd)
             {
-                contentType.AddContentType(contentTypeToAdd);
+                contentType.AddContentType(contentTypeToAdd, removedPropertyAliases);
             }
         }
+    }
+
+    private static string[] GetRemovedPropertyAliases(TContentType contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        string[] currentPropertyAliases = [.. contentType.PropertyTypes.Select(x => x.Alias)];
+        string[] targetPropertyAliases = [.. model.Properties.Select(x => x.Alias)];
+        return currentPropertyAliases.Except(targetPropertyAliases, StringComparer.InvariantCultureIgnoreCase).ToArray();
     }
 
     private static void UpdateParentContentType(
