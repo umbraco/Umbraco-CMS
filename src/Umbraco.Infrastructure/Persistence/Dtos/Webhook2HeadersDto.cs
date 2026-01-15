@@ -10,6 +10,8 @@ public class Webhook2HeadersDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Headers;
 
+    internal const string ReferenceMemberName = "WebhookId"; // should be WebhookIdColumnName, but for database compatibility we keep it like this
+
     private const string WebhookIdColumnName = "webhookId";
     private const string KeyColumnName = "Key";
     private const string ValueColumnName = "Value";

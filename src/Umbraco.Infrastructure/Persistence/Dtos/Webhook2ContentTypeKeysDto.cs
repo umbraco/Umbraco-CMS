@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class Webhook2ContentTypeKeysDto
 {
+    internal const string ReferenceMemberName = "WebhookId"; // should be WebhookIdColumnName, but for database compatibility we keep it like this
+
     private const string WebhookIdColumnName = "webhookId";
     private const string ContentTypeKeyColumnName = "entityKey";
 

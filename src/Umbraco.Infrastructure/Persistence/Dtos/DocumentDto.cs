@@ -12,7 +12,6 @@ public class DocumentDto
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-
     // Public constants to bind properties between DTOs
     public const string PublishedColumnName = "published";
 
@@ -44,7 +43,7 @@ public class DocumentDto
     // [NullSetting(NullSetting = NullSettings.Null)] // is documentVersionDto.TemplateId for the published version
     // public int? PublishTemplateId { get; set; }
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentDto.NodeId))]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ContentDto.ReferenceMemberName)]
     public ContentDto ContentDto { get; set; } = null!;
 
     // although a content has many content versions,

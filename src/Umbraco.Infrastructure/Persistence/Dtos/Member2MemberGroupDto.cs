@@ -12,14 +12,14 @@ internal sealed class Member2MemberGroupDto
     public const string TableName = Constants.DatabaseSchema.Tables.Member2MemberGroup;
     public const string PrimaryKeyColumnName = "Member";
 
-    private const string MemberGroupName = "MemberGroup";
+    private const string MemberGroupColumnName = "MemberGroup";
 
     [Column(PrimaryKeyColumnName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsMember2MemberGroup", OnColumns = $"{PrimaryKeyColumnName}, {MemberGroupName}")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsMember2MemberGroup", OnColumns = $"{PrimaryKeyColumnName}, {MemberGroupColumnName}")]
     [ForeignKey(typeof(MemberDto))]
     public int Member { get; set; }
 
-    [Column(MemberGroupName)]
+    [Column(MemberGroupColumnName)]
     [ForeignKey(typeof(NodeDto))]
     public int MemberGroup { get; set; }
 }
