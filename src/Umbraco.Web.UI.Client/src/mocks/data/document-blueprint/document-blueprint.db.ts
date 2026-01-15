@@ -40,6 +40,7 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprint
 		name: model.name,
 		parent: model.parent,
 		flags: model.flags,
+		noAccess: model.noAccess,
 	};
 };
 
@@ -77,6 +78,7 @@ const createMockDocumentBlueprintMapper = (
 			};
 		}),
 		flags: [],
+		noAccess: false,
 	};
 };
 
