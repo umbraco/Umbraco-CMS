@@ -45,6 +45,7 @@ export class UmbServerModelValidatorContext extends UmbContextBase implements Um
 
 	async askServerForValidation(data: unknown, requestPromise: Promise<UmbDataSourceResponse<string>>): Promise<void> {
 		this.#context?.messages.removeMessagesByType('server');
+		this.#context?.messages.removeMessagesByType('client');
 
 		this.#isValid = false;
 		this.#validatePromiseReject?.();
