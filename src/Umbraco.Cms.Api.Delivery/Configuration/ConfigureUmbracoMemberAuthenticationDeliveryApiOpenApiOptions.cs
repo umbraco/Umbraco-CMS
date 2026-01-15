@@ -31,11 +31,11 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiOpenApiOptions : ICo
         }
 
         // add security requirements for content API operations
-        options.AddDocumentTransformer<DeliveryApiSecurityFilter>();
-        options.AddOperationTransformer<DeliveryApiSecurityFilter>();
+        options.AddDocumentTransformer<DeliveryApiSecurityTransformer>();
+        options.AddOperationTransformer<DeliveryApiSecurityTransformer>();
     }
 
-    private sealed class DeliveryApiSecurityFilter : IOpenApiOperationTransformer, IOpenApiDocumentTransformer
+    private sealed class DeliveryApiSecurityTransformer : IOpenApiOperationTransformer, IOpenApiDocumentTransformer
     {
         public Task TransformAsync(
             OpenApiDocument document,
