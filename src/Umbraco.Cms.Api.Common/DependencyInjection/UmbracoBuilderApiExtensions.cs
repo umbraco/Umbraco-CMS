@@ -56,11 +56,29 @@ public static class UmbracoBuilderApiExtensions
     {
         services.AddOpenApi(apiName);
         services.ConfigureOptions<TConfigureOptions>();
+
+        services.AddOpenApiDocumentToUi(apiName, apiTitle);
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds an OpenAPI document to the OpenAPI UI document selector dropdown.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
+    /// <param name="documentName">The name/identifier of the OpenAPI document.</param>
+    /// <param name="documentTitle">The title to display in the UI dropdown. Defaults to <paramref name="documentName"/> if not specified.</param>
+    /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
+    public static IServiceCollection AddOpenApiDocumentToUi(
+        this IServiceCollection services,
+        string documentName,
+        string? documentTitle = null)
+    {
         services.AddOptions<SwaggerUIOptions>()
             .Configure<IOptions<UmbracoOpenApiOptions>>((swaggerUiOptions, openApiOptions) =>
             {
-                var openApiRoute = openApiOptions.Value.RouteTemplate.Replace("{documentName}", apiName).EnsureStartsWith("/");
-                swaggerUiOptions.SwaggerEndpoint(openApiRoute, apiTitle);
+                var openApiRoute = openApiOptions.Value.RouteTemplate.Replace("{documentName}", documentName).EnsureStartsWith("/");
+                swaggerUiOptions.SwaggerEndpoint(openApiRoute, documentTitle ?? documentName);
                 swaggerUiOptions.ConfigObject.Urls = swaggerUiOptions.ConfigObject.Urls.OrderBy(x => x.Name);
             });
 
