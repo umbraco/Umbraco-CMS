@@ -21,7 +21,7 @@ internal class HasScheduleFlagProvider : IFlagProvider
     private readonly IIdKeyMap _keyMap;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="HasScheduleSignProvider"/> class.
+    /// Initializes a new instance of the <see cref="HasScheduleFlagProvider"/> class.
     /// </summary>
     public HasScheduleFlagProvider(IContentService contentService, IIdKeyMap keyMap)
     {
