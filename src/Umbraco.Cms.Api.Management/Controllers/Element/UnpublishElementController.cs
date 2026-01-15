@@ -1,7 +1,6 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
@@ -15,16 +14,13 @@ public class UnpublishElementController : ElementControllerBase
 {
     private readonly IElementPublishingService _elementPublishingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
     public UnpublishElementController(
         IElementPublishingService elementPublishingService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _elementPublishingService = elementPublishingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _documentPresentationFactory = documentPresentationFactory;
     }
 
     [HttpPut("{id:guid}/unpublish")]

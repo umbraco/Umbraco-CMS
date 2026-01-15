@@ -16,11 +16,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Element}")]
-// TODO ELEMENTS: backoffice authorization policies
-[RequireDocumentTreeRootAccess]
+[RequireElementTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Element))]
-// TODO ELEMENTS: backoffice authorization policies
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessElements)]
 public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementRecycleBinItemResponseModel>
 {
     private readonly IEntityService _entityService;

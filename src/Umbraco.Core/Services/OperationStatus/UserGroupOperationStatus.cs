@@ -22,4 +22,5 @@ public enum UserGroupOperationStatus
     Unauthorized,
     AdminGroupCannotBeEmpty,
     UserNotInGroup,
+    ElementStartNodeKeyNotFound,
 }

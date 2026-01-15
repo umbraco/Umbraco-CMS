@@ -361,5 +361,14 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.DeleteFromRecycleBin.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.ChildUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.RootUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.SiblingUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
