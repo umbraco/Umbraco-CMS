@@ -34,6 +34,7 @@ public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, Docum
         mapper.Define<IContent, DocumentVersionResponseModel>((_, _) => new DocumentVersionResponseModel(), Map);
     }
 
+    // Umbraco.Code.MapAll -Flags
     private void Map(IContent source, DocumentVersionResponseModel target, MapperContext context)
     {
         target.Id = source.VersionId.ToGuid(); // this is a magic guid since versions do not have Guids in the DB

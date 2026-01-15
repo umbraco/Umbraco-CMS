@@ -89,8 +89,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDistributedJobRepository, DistributedJobRepository>();
         builder.Services.AddUnique<IElementRepository, ElementRepository>();
         builder.Services.AddUnique<IElementContainerRepository, ElementContainerRepository>();
-        // TODO ELEMENTS: implement versioning
-        // builder.Services.AddUnique<IElementVersionRepository, ElementVersionRepository>();
+        builder.Services.AddUnique<IElementVersionRepository, ElementVersionRepository>();
 
         return builder;
     }

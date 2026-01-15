@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("nodeId", AutoIncrement = false)]
 [ExplicitColumns]
-public sealed class ElementDto
+public sealed class ElementDto : INodeDto
 {
-    private const string TableName = Constants.DatabaseSchema.Tables.Element;
+    internal const string TableName = Constants.DatabaseSchema.Tables.Element;
 
     [Column("nodeId")]
     [PrimaryKeyColumn(AutoIncrement = false)]

@@ -10,22 +10,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IContentService : IPublishableContentService<IContent>
 {
-    #region Rollback
-
-    /// <summary>
-    ///     Rolls back the content to a specific version.
-    /// </summary>
-    /// <param name="id">The id of the content node.</param>
-    /// <param name="versionId">The version id to roll back to.</param>
-    /// <param name="culture">An optional culture to roll back.</param>
-    /// <param name="userId">The identifier of the user who is performing the roll back.</param>
-    /// <remarks>
-    ///     <para>When no culture is specified, all cultures are rolled back.</para>
-    /// </remarks>
-    OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    #endregion
-
     #region Blueprints
 
     /// <summary>
@@ -178,40 +162,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="content">The document.</param>
     /// <returns>The ancestor documents.</returns>
     IEnumerable<IContent> GetAncestors(IContent content);
-
-    /// <summary>
-    ///     Gets all versions of a document.
-    /// </summary>
-    /// <param name="id">The identifier of the document.</param>
-    /// <returns>The document versions.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<IContent> GetVersions(int id);
-
-    /// <summary>
-    ///     Gets all versions of a document.
-    /// </summary>
-    /// <param name="id">The identifier of the document.</param>
-    /// <param name="skip">The number of versions to skip.</param>
-    /// <param name="take">The number of versions to take.</param>
-    /// <returns>The document versions.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take);
-
-    /// <summary>
-    ///     Gets top versions of a document.
-    /// </summary>
-    /// <param name="id">The identifier of the document.</param>
-    /// <param name="topRows">The number of top versions to get.</param>
-    /// <returns>The version identifiers.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<int> GetVersionIds(int id, int topRows);
-
-    /// <summary>
-    ///     Gets a version of a document.
-    /// </summary>
-    /// <param name="versionId">The version identifier.</param>
-    /// <returns>The document version, or null if not found.</returns>
-    IContent? GetVersion(int versionId);
 
     /// <summary>
     ///     Gets root-level documents.
