@@ -94,13 +94,16 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 		if (file?.status !== UmbFileDropzoneItemStatus.COMPLETE) return;
 
-		this._file = file;
+		// Brief delay to show completion state before switching to cropper UI
+		setTimeout(() => {
+			this._file = file;
 
-		this.value = assignToFrozenObject(this.value ?? DefaultValue, {
-			temporaryFileId: file.temporaryFile?.temporaryUnique,
-		});
+			this.value = assignToFrozenObject(this.value ?? DefaultValue, {
+				temporaryFileId: file.temporaryFile?.temporaryUnique,
+			});
 
-		this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
+		}, 750);
 	}
 
 	#onRemove = () => {
