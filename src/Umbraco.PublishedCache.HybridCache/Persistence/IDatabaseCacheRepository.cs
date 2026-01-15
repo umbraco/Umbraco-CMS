@@ -15,9 +15,9 @@ internal interface IDatabaseCacheRepository
 
     /// <summary>
     /// Gets a single cache node for a document key.
+    /// </summary>
     /// <param name="key">The document key.</param>
     /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
-    /// </summary>
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
 
     /// <summary>
