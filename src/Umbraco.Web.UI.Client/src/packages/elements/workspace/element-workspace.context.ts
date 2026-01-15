@@ -1,9 +1,9 @@
-import { UmbElementPropertyDatasetContext } from '../property-dataset-context/element-property-dataset-context.js';
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/constants.js';
 import type { UmbElementDetailRepository } from '../repository/index.js';
 import type { UmbElementDetailModel, UmbElementVariantModel } from '../types.js';
+import { UmbElementWorkspacePropertyDatasetContext } from './property-dataset-context/element-workspace-property-dataset-context.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from './constants.js';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -127,8 +127,8 @@ export class UmbElementWorkspaceContext
 	public createPropertyDatasetContext(
 		host: UmbControllerHost,
 		variantId: UmbVariantId,
-	): UmbElementPropertyDatasetContext {
-		return new UmbElementPropertyDatasetContext(host, this, variantId);
+	): UmbElementWorkspacePropertyDatasetContext {
+		return new UmbElementWorkspacePropertyDatasetContext(host, this, variantId);
 	}
 
 	override resetState(): void {
