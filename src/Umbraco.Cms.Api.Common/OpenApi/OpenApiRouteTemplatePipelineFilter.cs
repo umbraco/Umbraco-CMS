@@ -8,7 +8,7 @@ using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
+internal class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
 {
     public OpenApiRouteTemplatePipelineFilter(string name)
         : base(name)
