@@ -42063,16 +42063,6 @@
               "$ref": "#/components/schemas/MediaTypeCompositionModel"
             }
           },
-          "collection": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ]
-          },
           "parent": {
             "oneOf": [
               {
@@ -42113,6 +42103,16 @@
           },
           "variesBySegment": {
             "type": "boolean"
+          },
+          "collection": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "isElement": {
             "type": "boolean"
@@ -42738,6 +42738,12 @@
           },
           "alias": {
             "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "icon": {
             "type": [
@@ -50132,7 +50138,8 @@
         "required": [
           "allowPasswordReset",
           "versionCheckPeriod",
-          "allowLocalLogin"
+          "allowLocalLogin",
+          "umbracoCssPath"
         ],
         "type": "object",
         "properties": {
@@ -50145,6 +50152,9 @@
           },
           "allowLocalLogin": {
             "type": "boolean"
+          },
+          "umbracoCssPath": {
+            "type": "string"
           }
         }
       },
@@ -52129,6 +52139,12 @@
           "alias": {
             "type": "string"
           },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "icon": {
             "type": [
               "null",
@@ -52532,6 +52548,12 @@
           },
           "alias": {
             "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "icon": {
             "type": [

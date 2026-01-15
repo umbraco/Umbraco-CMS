@@ -268,7 +268,6 @@ export type CreateMediaTypePropertyTypeRequestModel = {
 export type CreateMediaTypeRequestModel = {
     allowedMediaTypes: Array<MediaTypeSortModel>;
     compositions: Array<MediaTypeCompositionModel>;
-    collection?: null | ReferenceByIdModel;
     parent?: null | ReferenceByIdModel;
     id?: null | string;
     alias: string;
@@ -278,6 +277,7 @@ export type CreateMediaTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
+    collection?: null | ReferenceByIdModel;
     isElement: boolean;
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
@@ -415,6 +415,7 @@ export type CreateUserGroupRequestModel = {
     id?: null | string;
     name: string;
     alias: string;
+    description?: null | string;
     icon?: null | string;
     sections: Array<string>;
     languages: Array<string>;
@@ -2839,6 +2840,7 @@ export type UpdateUserDataRequestModel = {
 export type UpdateUserGroupRequestModel = {
     name: string;
     alias: string;
+    description?: null | string;
     icon?: null | string;
     sections: Array<string>;
     languages: Array<string>;
@@ -2943,6 +2945,7 @@ export type UserGroupResponseModel = {
     aliasCanBeChanged: boolean;
     name: string;
     alias: string;
+    description?: null | string;
     icon?: null | string;
     sections: Array<string>;
     languages: Array<string>;
