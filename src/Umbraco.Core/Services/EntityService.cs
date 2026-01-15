@@ -773,9 +773,6 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys)
     {
-        Type? entityType = objectType.GetClrType();
-        GetObjectType(entityType);
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAllPaths(objectType.GetGuid(), keys);
