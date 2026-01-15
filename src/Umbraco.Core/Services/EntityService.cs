@@ -784,9 +784,6 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys)
     {
-        Type? entityType = objectType.GetClrType();
-        GetObjectType(entityType);
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAllPaths(objectType.GetGuid(), keys);
@@ -892,7 +889,7 @@ public class EntityService : RepositoryService, IEntityService
 
             if (take == 0)
             {
-                totalRecords = CountChildren(parentId, childObjectTypes, filter: filter);
+                totalRecords = CountChildren(parentId, childObjectTypes, trashed, filter);
                 return Array.Empty<IEntitySlim>();
             }
 

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("nodeId", AutoIncrement = false)]
 [ExplicitColumns]
-public class DocumentDto
+public class DocumentDto : INodeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
 
@@ -15,7 +15,7 @@ public class DocumentDto
     // Public constants to bind properties between DTOs
     public const string PublishedColumnName = "published";
 
-    [Column("nodeId")]
+    [Column(INodeDto.NodeIdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
