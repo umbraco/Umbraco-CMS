@@ -209,7 +209,7 @@
 		"test:examples:dev": "npm run generate:check-const-test && web-test-runner --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\"",
 		"test:examples:watch": "npm run generate:check-const-test && web-test-runner --watch --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\"",
 		"test:examples:browser": "npm run generate:check-const-test && web-test-runner --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\" --manual",
-		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
+		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile ./vscode-html-custom-data.json",
 		"wc-analyze": "wca **/*.element.ts --outFile ./custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
