@@ -215,62 +215,6 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.pagination.setCurrentPageNumber(next);
 	}
 
-	/**
-	 * Prevents click events on tree items marked as no-access.
-	 * This ensures users cannot navigate to or interact with items they don't have permission to access.
-	 *
-	 * IMPORTANT: Only blocks clicks on THIS item's content, not on child tree items.
-	 * Child tree items are rendered in this item's slot when expanded, and users must be able
-	 * to click them to navigate to deeper accessible nodes (e.g., when start node is a grandchild).
-	 *
-	 * Works in conjunction with the `_noAccess` property which child classes should update.
-	 */
-	#handleClick = (event: MouseEvent) => {
-		if (this._noAccess) {
-			// Check if the click originated from a child tree item element
-			// Use this element's tag name to find any tree item of the same type
-			const target = event.target as HTMLElement;
-			const clickedTreeItem = target.closest(this.tagName.toLowerCase());
-
-			// If the closest tree item is not this element, it's a child - allow the click
-			if (clickedTreeItem && clickedTreeItem !== this) {
-				return; // Allow clicks on child tree items
-			}
-
-			// Otherwise, block the click (it's on this noAccess item)
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
-
-	/**
-	 * Prevents keyboard activation (Enter/Space) on tree items marked as no-access.
-	 * This ensures keyboard-only users cannot navigate to items they don't have permission to access.
-	 *
-	 * IMPORTANT: Only blocks keyboard activation on THIS item, not on focused child tree items.
-	 * Child tree items can receive focus and keyboard navigation should work on them even if
-	 * they're nested under a noAccess parent.
-	 *
-	 * Works in conjunction with the `_noAccess` property which child classes should update.
-	 */
-	#handleKeydown = (event: KeyboardEvent) => {
-		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
-			// Check if the event originated from a child tree item element
-			// Use this element's tag name to find any tree item of the same type
-			const target = event.target as HTMLElement;
-			const focusedTreeItem = target.closest(this.tagName.toLowerCase());
-
-			// If the closest tree item is not this element, it's a child - allow the keyboard action
-			if (focusedTreeItem && focusedTreeItem !== this) {
-				return; // Allow keyboard navigation on child tree items
-			}
-
-			// Otherwise, block the keyboard action (it's on this noAccess item)
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
-
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	override render() {
@@ -283,10 +227,8 @@ export abstract class UmbTreeItemElementBase<
 				@hide-children=${this._onHideChildren}
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
-				@click=${this.#handleClick}
-				@keydown=${this.#handleKeydown}
 				?active=${this._isActive}
-				?disabled=${this._isSelectableContext && !this._isSelectable}
+				?disabled=${(this._isSelectableContext && !this._isSelectable) || this._noAccess}
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
@@ -294,7 +236,7 @@ export abstract class UmbTreeItemElementBase<
 				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term(caretLabelKey) + ' ' + this._label}
 				label=${ifDefined(this._label)}
-				href=${ifDefined(this._isSelectableContext ? undefined : this._href)}
+				href=${ifDefined(this._isSelectableContext || this._noAccess ? undefined : this._href)}
 				.renderExpandSymbol=${this._renderExpandSymbol}>
 				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
@@ -435,23 +377,6 @@ export abstract class UmbTreeItemElementBase<
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
-			}
-
-			/**
-			 * No Access Styling
-			 * Applied when _noAccess property is true (reflected as [no-access] attribute).
-			 * Child classes opt-in by observing their context's noAccess observable.
-			 * See _noAccess property documentation for usage pattern.
-			 */
-			:host([no-access]) {
-				cursor: not-allowed;
-			}
-			:host([no-access]) #label {
-				opacity: 0.6;
-				font-style: italic;
-			}
-			:host([no-access]) umb-icon {
-				opacity: 0.6;
 			}
 		`,
 	];
