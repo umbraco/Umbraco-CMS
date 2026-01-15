@@ -34,11 +34,27 @@ public class MediaUrlFactoryTests
     }
 
     [Test]
-    public void CreateUrls_WithRecycleBinProtectionEnabled_ReturnsUrlWithDeletedSuffix()
+    public void CreateUrls_WithRecycleBinProtectionEnabled_AndMediaNotTrashed_ReturnsUrlWithoutDeletedSuffix()
     {
         // Arrange
         var factory = CreateFactory(enableMediaRecycleBinProtection: true);
-        var media = CreateMediaWithUrl(MediaPath);
+        var media = CreateMediaWithUrl(MediaPath, trashed: false);
+
+        // Act
+        var result = factory.CreateUrls(media).ToList();
+
+        // Assert
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].Url);
+        Assert.IsNull(result[0].Culture);
+    }
+
+    [Test]
+    public void CreateUrls_WithRecycleBinProtectionEnabled_AndMediaTrashed_ReturnsUrlWithDeletedSuffix()
+    {
+        // Arrange
+        var factory = CreateFactory(enableMediaRecycleBinProtection: true);
+        var media = CreateMediaWithUrl(MediaPath, trashed: true);
 
         // Act
         var result = factory.CreateUrls(media).ToList();
@@ -46,6 +62,22 @@ public class MediaUrlFactoryTests
         // Assert
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual($"{BaseUrl}/media/image{Constants.Conventions.Media.TrashedMediaSuffix}.jpg", result[0].Url);
+        Assert.IsNull(result[0].Culture);
+    }
+
+    [Test]
+    public void CreateUrls_WithRecycleBinProtectionDisabled_AndMediaTrashed_ReturnsUrlWithoutDeletedSuffix()
+    {
+        // Arrange
+        var factory = CreateFactory(enableMediaRecycleBinProtection: false);
+        var media = CreateMediaWithUrl(MediaPath, trashed: true);
+
+        // Act
+        var result = factory.CreateUrls(media).ToList();
+
+        // Assert
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].Url);
         Assert.IsNull(result[0].Culture);
     }
 
@@ -184,22 +216,23 @@ public class MediaUrlFactoryTests
         return mock.Object;
     }
 
-    private static IMedia CreateMediaWithUrl(string? mediaPath, Guid? key = null)
+    private static IMedia CreateMediaWithUrl(string? mediaPath, Guid? key = null, bool trashed = false)
     {
         var urlMappings = mediaPath != null
             ? [(PropertyAlias, mediaPath)]
             : Array.Empty<(string, string)>();
 
-        return CreateMedia(key ?? Guid.NewGuid(), urlMappings);
+        return CreateMedia(key ?? Guid.NewGuid(), urlMappings, trashed);
     }
 
     private static IMedia CreateMediaWithMultipleUrls(params (string Alias, string Path)[] urlMappings)
-        => CreateMedia(Guid.NewGuid(), urlMappings);
+        => CreateMedia(Guid.NewGuid(), urlMappings, trashed: false);
 
-    private static IMedia CreateMedia(Guid key, (string Alias, string Path)[] urlMappings)
+    private static IMedia CreateMedia(Guid key, (string Alias, string Path)[] urlMappings, bool trashed = false)
     {
         var mediaMock = new Mock<IMedia>();
         mediaMock.SetupGet(m => m.Key).Returns(key);
+        mediaMock.SetupGet(m => m.Trashed).Returns(trashed);
 
         var propertiesMock = new Mock<IPropertyCollection>();
 
