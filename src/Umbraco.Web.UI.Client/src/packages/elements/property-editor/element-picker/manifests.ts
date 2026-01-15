@@ -1,18 +1,44 @@
 ﻿import { manifest as schemaManifest } from './Umbraco.ElementPicker.js';
+import { UMB_PICKER_DATA_SOURCE_TYPE } from '@umbraco-cms/backoffice/picker-data-source';
+import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
+
+const dataSource: ManifestPropertyEditorDataSource = {
+	type: 'propertyEditorDataSource',
+	alias: 'Umb.PropertyEditorDataSource.Element',
+	dataSourceType: UMB_PICKER_DATA_SOURCE_TYPE,
+	name: 'Element Property Data Source',
+	api: () => import('./element-tree-data-source.js'),
+	meta: {
+		label: 'Elements',
+		description: 'Umbraco Elements data source for property editors.',
+		icon: 'icon-plugin',
+	},
+};
 
 const propertyEditorUi: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.ElementPicker',
 	name: 'Element Picker Property Editor UI',
-	element: () => import('./property-editor-ui-element-picker.element.js'),
+	element: () => import('./element-picker-property-editor-ui.element.js'),
 	meta: {
 		label: schemaManifest.name,
 		propertyEditorSchemaAlias: schemaManifest.alias,
-		icon: 'icon-page-add',
+		icon: 'icon-plugin',
 		group: 'pickers',
 		supportsReadOnly: true,
+		settings: {
+			properties: [
+				{
+					alias: 'validationLimit',
+					label: 'Amount',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
+					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
+					weight: 100,
+				},
+			],
+		},
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, schemaManifest];
+export const manifests: Array<UmbExtensionManifest> = [dataSource, propertyEditorUi, schemaManifest];
