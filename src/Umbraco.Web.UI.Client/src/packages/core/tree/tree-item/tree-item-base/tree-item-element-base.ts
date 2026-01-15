@@ -35,6 +35,29 @@ export abstract class UmbTreeItemElementBase<
 	protected _item?: TreeItemModelType;
 
 	/**
+	 * @internal
+	 * Indicates whether the user has no access to this tree item.
+	 * This property is reflected as an attribute for styling purposes.
+	 *
+	 * **Usage Pattern (opt-in):**
+	 * Child classes that support access restrictions should observe their context's `noAccess` observable
+	 * and update this property. The base class provides the property, styling, and interaction prevention,
+	 * but does not subscribe to the observable to avoid forcing all tree item types to implement it.
+	 *
+	 * **Example (in child class api setter):**
+	 * ```typescript
+	 * this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
+	 * ```
+	 *
+	 * **Why not in the base interface?**
+	 * Adding `noAccess` to `UmbTreeItemContext` would be a breaking change, forcing all tree item
+	 * implementations (users, members, data types, etc.) to provide this property even when access
+	 * restrictions don't apply to them.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
+	protected _noAccess = false;
+
+	/**
 	 * @param item - The item from which to extract flags.
 	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
 	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
@@ -205,7 +228,7 @@ export abstract class UmbTreeItemElementBase<
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
 				?active=${this._isActive}
-				?disabled=${this._isSelectableContext && !this._isSelectable}
+				?disabled=${(this._isSelectableContext && !this._isSelectable) || this._noAccess}
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
@@ -213,7 +236,7 @@ export abstract class UmbTreeItemElementBase<
 				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term(caretLabelKey) + ' ' + this._label}
 				label=${ifDefined(this._label)}
-				href=${ifDefined(this._isSelectableContext ? undefined : this._href)}
+				href=${ifDefined(this._isSelectableContext || this._noAccess ? undefined : this._href)}
 				.renderExpandSymbol=${this._renderExpandSymbol}>
 				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
