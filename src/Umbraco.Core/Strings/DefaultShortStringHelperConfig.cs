@@ -48,12 +48,12 @@ public class DefaultShortStringHelperConfig
 
         culture = culture ?? string.Empty;
 
-        if (_configs.ContainsKey(culture) == false)
+        if (_configs.TryGetValue(culture, out Dictionary<CleanStringType, Config>? configForCulture) == false)
         {
-            _configs[culture] = new Dictionary<CleanStringType, Config>();
+            configForCulture = _configs[culture] = new Dictionary<CleanStringType, Config>();
         }
 
-        _configs[culture][stringRole] = config;
+        configForCulture[stringRole] = config;
         return this;
     }
 
@@ -134,37 +134,32 @@ public class DefaultShortStringHelperConfig
         culture = culture ?? string.Empty;
         stringType = stringType & CleanStringType.RoleMask;
 
-        Dictionary<CleanStringType, Config> config;
-        if (_configs.ContainsKey(culture))
+        if (_configs.TryGetValue(culture, out Dictionary<CleanStringType, Config>? configForCulture))
         {
-            config = _configs[culture];
-
             // have we got a config for _that_ role?
-            if (config.ContainsKey(stringType))
+            if (configForCulture.TryGetValue(stringType, out Config? configForStringType))
             {
-                return config[stringType];
+                return configForStringType;
             }
 
             // have we got a generic config for _all_ roles?
-            if (config.ContainsKey(CleanStringType.RoleMask))
+            if (configForCulture.TryGetValue(CleanStringType.RoleMask, out Config? configForRoleMask))
             {
-                return config[CleanStringType.RoleMask];
+                return configForRoleMask;
             }
         }
-        else if (_configs.ContainsKey(DefaultCulture))
+        else if (_configs.TryGetValue(DefaultCulture, out Dictionary<CleanStringType, Config>? configForDefaultCulture))
         {
-            config = _configs[DefaultCulture];
-
             // have we got a config for _that_ role?
-            if (config.ContainsKey(stringType))
+            if (configForDefaultCulture.TryGetValue(stringType, out Config? configForStringType))
             {
-                return config[stringType];
+                return configForStringType;
             }
 
             // have we got a generic config for _all_ roles?
-            if (config.ContainsKey(CleanStringType.RoleMask))
+            if (configForDefaultCulture.TryGetValue(CleanStringType.RoleMask, out Config? configForRoleMask))
             {
-                return config[CleanStringType.RoleMask];
+                return configForRoleMask;
             }
         }
 

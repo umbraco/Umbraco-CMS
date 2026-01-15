@@ -4,6 +4,7 @@ public static partial class Constants
 {
     public static class Telemetry
     {
+        // TODO (V18): Convert these static fields to const to comply with SA1401 (fields should be private)
         public static string RootCount = "RootCount";
         public static string DomainCount = "DomainCount";
         public static string ExamineIndexCount = "ExamineIndexCount";
@@ -21,8 +22,6 @@ public static partial class Constants
         public static string OsLanguage = "OsLanguage";
         public static string WebServer = "WebServer";
         public static string ModelsBuilderMode = "ModelBuilderMode";
-        [Obsolete($"UmbracoPath is no longer configurable, scheduled for removal in V12")]
-        public static string CustomUmbracoPath = "CustomUmbracoPath";
         public static string AspEnvironment = "AspEnvironment";
         public static string IsDebug = "IsDebug";
         public static string DatabaseProvider = "DatabaseProvider";

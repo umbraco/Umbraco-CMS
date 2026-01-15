@@ -1,6 +1,6 @@
 import { umbExtensionsRegistry } from '../../registry.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, repeat, customElement, property, state, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
@@ -39,13 +39,13 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot .type=${['my-extension-type','another-extension-type']}></umb-extension-slot>
 	 */
 	@property({ type: String })
-	public get type(): string | string[] | undefined {
-		return this.#type;
-	}
 	public set type(value: string | string[] | undefined) {
 		if (value === this.#type) return;
 		this.#type = value;
 		this.#observeExtensions();
+	}
+	public get type(): string | string[] | undefined {
+		return this.#type;
 	}
 	#type?: string | string[] | undefined;
 
@@ -58,13 +58,13 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot type="my-extension-type" .filter=${(ext) => ext.meta.anyPropToFilter === 'foo'}></umb-extension-slot>
 	 */
 	@property({ type: Object, attribute: false })
-	public get filter(): (manifest: any) => boolean {
-		return this.#filter;
-	}
 	public set filter(value: (manifest: any) => boolean) {
 		if (value === this.#filter) return;
 		this.#filter = value;
 		this.#observeExtensions();
+	}
+	public get filter(): (manifest: any) => boolean {
+		return this.#filter;
 	}
 	#filter: (manifest: any) => boolean = () => true;
 
@@ -77,16 +77,28 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot type="my-extension-type" .props=${{foo: 'bar'}}></umb-extension-slot>
 	 */
 	@property({ type: Object, attribute: false })
-	get props(): Record<string, unknown> | undefined {
-		return this.#props;
-	}
 	set props(newVal: Record<string, unknown> | undefined) {
 		this.#props = newVal;
 		if (this.#extensionsController) {
 			this.#extensionsController.properties = newVal;
 		}
 	}
+	get props(): Record<string, unknown> | undefined {
+		return this.#props;
+	}
 	#props?: Record<string, unknown> = {};
+
+	@property({ type: Object, attribute: false })
+	set events(newVal: Record<string, (event: Event) => void> | undefined) {
+		this.#events = newVal;
+		if (this.#extensionsController) {
+			this.#addEventListenersToExtensionElement();
+		}
+	}
+	get events(): Record<string, (event: Event) => void> | undefined {
+		return this.#events;
+	}
+	#events?: Record<string, (event: Event) => void> = {};
 
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement?: string;
@@ -95,7 +107,16 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public renderMethod?: (
 		extension: UmbExtensionElementInitializer,
 		index: number,
-	) => TemplateResult | HTMLElement | null | undefined;
+	) => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
+
+	@property({ attribute: false })
+	public fallbackRenderMethod?: () =>
+		| TemplateResult
+		| TemplateResult<1>
+		| HTMLElement
+		| null
+		| undefined
+		| typeof nothing;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -104,6 +125,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 	override disconnectedCallback(): void {
 		// _permitted is reset as the extensionsController fires a callback on destroy.
+		this.#removeEventListenersFromExtensionElement();
 		this.#attached = false;
 		this.#extensionsController?.destroy();
 		this.#extensionsController = undefined;
@@ -121,27 +143,64 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				this.filter,
 				(extensionControllers) => {
 					this._permitted = extensionControllers;
+					this.#addEventListenersToExtensionElement();
 				},
 				undefined, // We can leave the alias undefined as we destroy this our selfs.
 				this.defaultElement,
+				{
+					single: this.single,
+				},
 			);
 			this.#extensionsController.properties = this.#props;
 		}
 	}
 
 	override render() {
+		// First renders something once _permitted is set, this is to avoid flickering. [NL]
 		return this._permitted
 			? this._permitted.length > 0
-				? this.single
-					? this.#renderExtension(this._permitted[0], 0)
-					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
-				: html`<slot></slot>`
-			: '';
+				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
+				: this.#renderNothing()
+			: nothing;
+	}
+
+	#renderNothing() {
+		return this.fallbackRenderMethod ? this.fallbackRenderMethod() : html`<slot></slot>`;
 	}
 
 	#renderExtension = (ext: UmbExtensionElementInitializer, i: number) => {
 		return this.renderMethod ? this.renderMethod(ext, i) : ext.component;
 	};
+
+	#addEventListenersToExtensionElement() {
+		this._permitted?.forEach((initializer) => {
+			const component = initializer.component as HTMLElement;
+			if (!component) return;
+
+			const events = this.#events;
+			if (!events) return;
+
+			this.#removeEventListenersFromExtensionElement();
+
+			Object.entries(events).forEach(([eventName, handler]) => {
+				component.addEventListener(eventName, handler);
+			});
+		});
+	}
+
+	#removeEventListenersFromExtensionElement() {
+		this._permitted?.forEach((initializer) => {
+			const component = initializer.component as HTMLElement;
+			if (!component) return;
+
+			const events = this.#events;
+			if (!events) return;
+
+			Object.entries(events).forEach(([eventName, handler]) => {
+				component.removeEventListener(eventName, handler);
+			});
+		});
+	}
 
 	static override styles = css`
 		:host {

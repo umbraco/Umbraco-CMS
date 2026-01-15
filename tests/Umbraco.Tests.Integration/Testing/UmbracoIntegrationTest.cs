@@ -19,9 +19,10 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
-
+using Umbraco.Cms.Web.Common.Cache;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -59,6 +60,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
     protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
 
+    protected IIdKeyMap IdKeyMap => Services.GetRequiredService<IIdKeyMap>();
+
     protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
     protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
@@ -87,7 +90,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     public void TearDownAsync()
     {
         _host.StopAsync();
-        Services.DisposeIfDisposable();
+        (Services as IDisposable)?.Dispose();
     }
 
     /// <summary>
@@ -150,12 +153,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
         var typeLoader = services.AddTypeLoader(
             GetType().Assembly,
-            hostingEnvironment,
             TestHelper.ConsoleLoggerFactory,
             AppCaches.NoCache,
             Configuration,
             TestHelper.Profiler);
-        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache);
 
         builder.AddConfiguration()
             .AddUmbracoCore()
@@ -181,9 +183,58 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         services.AddMvc();
 
         CustomTestSetup(builder);
+        ExecuteBuilderAttributes(builder);
+
+        // custom helper services that might be moved out of tests eventually to benefit the community
+        services.AddSingleton<IContentEditingModelFactory, ContentEditingModelFactory>();
+        services.AddUnique<IRepositoryCacheVersionAccessor, RepositoryCacheVersionAccessor>();
 
         builder.Build();
     }
+
+    private void ExecuteBuilderAttributes(IUmbracoBuilder builder)
+    {
+        Type? testClassType = GetTestClassType()
+            ?? throw new Exception($"Could not find test class for {TestContext.CurrentContext.Test.FullName} in order to execute builder attributes.");
+
+        // Execute builder attributes defined on method.
+        foreach (ConfigureBuilderAttribute builderAttribute in GetConfigureBuilderAttributes<ConfigureBuilderAttribute>(testClassType))
+        {
+            builderAttribute.Execute(builder);
+        }
+
+        // Execute builder attributes defined on method with param value pass through from test case.
+        foreach (ConfigureBuilderTestCaseAttribute builderAttribute in GetConfigureBuilderAttributes<ConfigureBuilderTestCaseAttribute>(testClassType))
+        {
+            builderAttribute.Execute(builder);
+        }
+    }
+
+    private static Type? GetTestClassType()
+    {
+        string testClassName = TestContext.CurrentContext.Test.ClassName;
+
+        // Try resolving the type name directly (which will work for tests in this assembly).
+        Type testClass = Type.GetType(testClassName);
+        if (testClass is not null)
+        {
+            return testClass;
+        }
+
+        // Try scanning the loaded assemblies to see if we can find the class by full name. This will be necessary
+        // for integration test projects using the base classess provided by Umbraco.
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        return assemblies
+            .SelectMany(a => a.GetTypes().Where(t => t.FullName == testClassName))
+            .FirstOrDefault();
+    }
+
+    private static IEnumerable<TAttribute> GetConfigureBuilderAttributes<TAttribute>(Type testClassType)
+        where TAttribute : Attribute =>
+        testClassType
+            .GetMethods().First(m => m.Name == TestContext.CurrentContext.Test.MethodName)
+            .GetCustomAttributes(typeof(TAttribute), true)
+            .Cast<TAttribute>();
 
     /// <summary>
     ///     Hook for altering UmbracoBuilder setup

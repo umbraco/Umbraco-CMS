@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Web.Common.Validators;
 /// <summary>
 /// Ensures we bypass object graph validation for rendering models.
 /// </summary>
-internal class BypassRenderingModelValidationMetadataProvider : IValidationMetadataProvider
+internal sealed class BypassRenderingModelValidationMetadataProvider : IValidationMetadataProvider
 {
     public void CreateValidationMetadata(ValidationMetadataProviderContext context)
     {

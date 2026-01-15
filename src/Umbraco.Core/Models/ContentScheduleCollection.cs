@@ -64,7 +64,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire)
     {
         var schedule = new ContentScheduleCollection();
-        schedule.Add(string.Empty, release, expire);
+        schedule.Add(Constants.System.InvariantCulture, release, expire);
         return schedule;
     }
 
@@ -98,7 +98,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// </summary>
     /// <param name="releaseDate"></param>
     /// <param name="expireDate"></param>
-    public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(string.Empty, releaseDate, expireDate);
+    public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(Constants.System.InvariantCulture, releaseDate, expireDate);
 
     /// <summary>
     ///     Adds a new schedule for a culture
@@ -170,13 +170,39 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         }
     }
 
+    public void RemoveIfExists(string culture, ContentScheduleAction action)
+    {
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
+            change.Culture == culture
+            && change.Action == action);
+        if (changeToRemove is not null)
+        {
+            Remove(changeToRemove);
+        }
+    }
+
+    public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action)
+    {
+        // we need to remove the old one as ContentSchedule.Date is immutable
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
+            change.Culture == culture
+            && change.Action == action);
+
+        if (changeToRemove is not null)
+        {
+            Remove(changeToRemove);
+        }
+
+        Add(new ContentSchedule(culture, dateTime, action));
+    }
+
     /// <summary>
     ///     Clear all of the scheduled change type for invariant content
     /// </summary>
     /// <param name="action"></param>
     /// <param name="changeDate">If specified, will clear all entries with dates less than or equal to the value</param>
     public void Clear(ContentScheduleAction action, DateTime? changeDate = null) =>
-        Clear(string.Empty, action, changeDate);
+        Clear(Constants.System.InvariantCulture, action, changeDate);
 
     /// <summary>
     ///     Clear all of the scheduled change type for the culture
@@ -226,7 +252,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// </summary>
     /// <returns></returns>
     public IEnumerable<ContentSchedule> GetSchedule(ContentScheduleAction? action = null) =>
-        GetSchedule(string.Empty, action);
+        GetSchedule(Constants.System.InvariantCulture, action);
 
     /// <summary>
     ///     Gets the schedule for a culture

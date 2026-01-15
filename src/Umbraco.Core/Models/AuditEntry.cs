@@ -12,17 +12,26 @@ public class AuditEntry : EntityBase, IAuditEntry
 {
     private string? _affectedDetails;
     private int _affectedUserId;
+    private Guid? _affectedUserKey;
     private string? _eventDetails;
     private string? _eventType;
     private string? _performingDetails;
     private string? _performingIp;
     private int _performingUserId;
+    private Guid? _performingUserKey;
 
     /// <inheritdoc />
     public int PerformingUserId
     {
         get => _performingUserId;
         set => SetPropertyValueAndDetectChanges(value, ref _performingUserId, nameof(PerformingUserId));
+    }
+
+    /// <inheritdoc />
+    public Guid? PerformingUserKey
+    {
+        get => _performingUserKey;
+        set => SetPropertyValueAndDetectChanges(value, ref _performingUserKey, nameof(PerformingUserKey));
     }
 
     /// <inheritdoc />
@@ -40,7 +49,7 @@ public class AuditEntry : EntityBase, IAuditEntry
     }
 
     /// <inheritdoc />
-    public DateTime EventDateUtc
+    public DateTime EventDate
     {
         get => CreateDate;
         set => CreateDate = value;
@@ -51,6 +60,13 @@ public class AuditEntry : EntityBase, IAuditEntry
     {
         get => _affectedUserId;
         set => SetPropertyValueAndDetectChanges(value, ref _affectedUserId, nameof(AffectedUserId));
+    }
+
+    /// <inheritdoc />
+    public Guid? AffectedUserKey
+    {
+        get => _affectedUserKey;
+        set => SetPropertyValueAndDetectChanges(value, ref _affectedUserKey, nameof(AffectedUserKey));
     }
 
     /// <inheritdoc />

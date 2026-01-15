@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -11,6 +10,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
 {
+    protected const string TextpageContentTypeKey = "1D3A8E6E-2EA9-4CC1-B229-1AEE19821522";
+
     protected const string TextpageKey = "B58B3AD4-62C2-4E27-B1BE-837BD7C533E0";
     protected const string SubPageKey = "07EABF4A-5C62-4662-9F2A-15BBB488BCA5";
     protected const string SubPage2Key = "0EED78FC-A6A8-4587-AB18-D3AFE212B1C4";
@@ -18,6 +19,8 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
     protected const string TrashedKey = "EAE9EE57-FFE4-4841-8586-1B636C43A3D4";
 
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    protected IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     protected IFileService FileService => GetRequiredService<IFileService>();
 
@@ -46,7 +49,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
         ContentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
+        ContentType.Key = new Guid(TextpageContentTypeKey);
         ContentTypeService.Save(ContentType);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
@@ -57,7 +60,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         Subpage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 1", Textpage.Id);
         Subpage.Key = new Guid(SubPageKey);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(Subpage, -1, contentSchedule);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055

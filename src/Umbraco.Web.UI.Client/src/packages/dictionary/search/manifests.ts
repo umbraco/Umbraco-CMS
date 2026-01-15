@@ -1,5 +1,6 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_SEARCH_PROVIDER_ALIAS } from './constants.js';
+import { manifests as globalSearchManifests } from './global-search/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,9 +14,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		name: 'Dictionary Search Result Item ',
+		name: 'Dictionary Search Result Item',
 		alias: 'Umb.SearchResultItem.Dictionary',
 		type: 'searchResultItem',
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 	},
+	...globalSearchManifests,
 ];

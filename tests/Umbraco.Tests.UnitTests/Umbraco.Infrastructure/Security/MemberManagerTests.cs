@@ -8,14 +8,13 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -87,7 +86,8 @@ public class MemberManagerTests
             new Mock<ILogger<UserManager<MemberIdentityUser>>>().Object,
             _mockPasswordConfiguration.Object,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IHttpContextAccessor>());
+            Mock.Of<IHttpContextAccessor>(),
+            Mock.Of<IPublishedModelFactory>());
 
         validator.Setup(v => v.ValidateAsync(
                 userManager,
@@ -113,7 +113,7 @@ public class MemberManagerTests
     }
 
     [Test]
-    public async Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
+    public Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
     {
         // arrange
         var sut = CreateSut();
@@ -124,6 +124,7 @@ public class MemberManagerTests
 
         // act
         Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
+        return Task.CompletedTask;
     }
 
     [Test]
@@ -268,7 +269,7 @@ public class MemberManagerTests
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(fakeMember);
         _mockMemberService
-            .Setup(x => x.Save(fakeMember, Constants.Security.SuperUserId))
+            .Setup(x => x.Save(fakeMember, It.IsAny<PublishNotificationSaveOptions>(), Constants.Security.SuperUserId))
             .Returns(Attempt.Succeed<OperationResult?>(null));
 
     }

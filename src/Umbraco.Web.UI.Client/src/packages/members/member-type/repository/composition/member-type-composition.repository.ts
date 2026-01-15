@@ -1,11 +1,11 @@
-import { UmbMemberTypeCompositionServerDataSource } from './member-type-composition.server.data-source.js';
-import type { UmbContentTypeCompositionRepository } from '@umbraco-cms/backoffice/content-type';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbMemberTypeAvailableCompositionRequestModel,
 	UmbMemberTypeCompositionCompatibleModel,
 	UmbMemberTypeCompositionReferenceModel,
-} from '@umbraco-cms/backoffice/member-type';
+} from '../../types.js';
+import { UmbMemberTypeCompositionServerDataSource } from './member-type-composition.server.data-source.js';
+import type { UmbContentTypeCompositionRepository } from '@umbraco-cms/backoffice/content-type';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMemberTypeCompositionRepository

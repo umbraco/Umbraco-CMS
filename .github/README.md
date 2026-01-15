@@ -1,11 +1,12 @@
 # [Umbraco CMS](https://umbraco.com)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) 
-![Mastodon Follow](https://img.shields.io/mastodon/follow/110661369750014952?domain=https%3A%2F%2Fumbracocommunity.social)
-[![Chat about Umbraco on Discord](https://img.shields.io/discord/869656431308189746?logo=discord&logoColor=fff)](https://discord.gg/umbraco) 
-[![Read what's going on in the Umbraco Discord chat now](https://img.shields.io/badge/read-discord-blue)](https://discord-chats.umbraco.com) 
+[![NuGet Version](https://img.shields.io/nuget/v/Umbraco.Cms)](https://www.nuget.org/packages/Umbraco.Cms)
 [![Build status](https://img.shields.io/azure-devops/build/umbraco/Umbraco%2520Cms/301?logo=azurepipelines&label=Azure%20Pipelines)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=301) 
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) 
+[![Forum](https://img.shields.io/badge/help-forum-blue)](https://forum.umbraco.com) 
+[![Chat about Umbraco on Discord](https://img.shields.io/discord/869656431308189746?logo=discord&logoColor=fff)](https://discord.gg/umbraco) 
+![Mastodon Follow](https://img.shields.io/mastodon/follow/110661369750014952?domain=https%3A%2F%2Fumbracocommunity.social)
 
 
 ### Umbraco is a free and open source .NET content management system. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social. 
@@ -37,9 +38,17 @@ Some important documentation links to get you started:
 - [Getting to know Umbraco](https://docs.umbraco.com/umbraco-cms/fundamentals/get-to-know-umbraco)
 - [Tutorials for creating a basic website and customizing the editing experience](https://docs.umbraco.com/umbraco-cms/tutorials/overview)
 
+## Backoffice Preview
+
+Want to see the latest backoffice UI in action? Check out our live preview:
+
+**[backofficepreview.umbraco.com](https://backofficepreview.umbraco.com/)**
+
+This preview is automatically deployed from the main branch and showcases the latest backoffice features and improvements.  It runs from mock data and persistent edits are not supported.
+
 ## Get help
 
-If you need a bit of feedback while building your Umbraco projects, we are [chatty on Discord](https://discord.umbraco.com). Our Discord server serves both a social space but also has channels for questions and answers. Feel free to lurk or join in with your own questions. Or just post your daily Wordle score, up to you!
+If you need a bit of feedback while building your Umbraco projects, we are [chatty on Discord](https://discord.umbraco.com). Our Discord server serves as a social space for all Umbracians. If you have any questions or need some help with a problem, head over to our [dedicated forum](https://forum.umbraco.com/) where the Umbraco Community will be happy to help. 
 
 ## Looking to contribute back to Umbraco?
 
@@ -51,3 +60,4 @@ You came to the right place! Our GitHub repository is available for all kinds of
 Umbraco is contribution-focused and community-driven. If you want to contribute back to the Umbraco source code, please check out our [guide to contributing](CONTRIBUTING.md).
 
 ### Tip: You should not run Umbraco from source code found here. Umbraco is extremely extensible and can do whatever you need. Instead, [install Umbraco as noted above](#looking-to-install-umbraco) and then [extend it any way you want to](https://docs.umbraco.com/umbraco-cms/extending/).
+

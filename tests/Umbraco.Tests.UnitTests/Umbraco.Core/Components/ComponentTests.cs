@@ -77,7 +77,7 @@ public class ComponentTests
             Mock.Of<ILogger<MediaFileManager>>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IServiceProvider>(),
-            Options.Create(new ContentSettings()));
+            Mock.Of<Lazy<ICoreScopeProvider>>());
         var eventAggregator = Mock.Of<IEventAggregator>();
         var scopeProvider = new ScopeProvider(
             new AmbientScopeStack(),

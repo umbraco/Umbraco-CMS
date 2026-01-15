@@ -1,12 +1,12 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbMultipleColorPickerInputElement } from '@umbraco-cms/backoffice/components';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-color-swatches-editor
@@ -27,7 +27,7 @@ export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement
 
 	#onChange(event: CustomEvent & { target: UmbMultipleColorPickerInputElement }) {
 		this.value = event.target.items;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

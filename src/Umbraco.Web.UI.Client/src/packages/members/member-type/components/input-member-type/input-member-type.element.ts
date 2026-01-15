@@ -1,9 +1,12 @@
 import { UmbMemberTypePickerInputContext } from './input-member-type.context.js';
-import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+
+import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-member-type')
 export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -73,6 +76,9 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 	@state()
 	private _items?: Array<UmbUniqueItemModel>;
 
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
 	#pickerContext = new UmbMemberTypePickerInputContext(this);
 
 	constructor() {
@@ -92,6 +98,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 	}
 
 	protected override getFormElement() {
@@ -109,13 +116,13 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._statuses) return;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => this.#renderItem(status),
 				)}
 			</uui-ref-list>
 		`;
@@ -134,14 +141,37 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 		`;
 	}
 
-	#renderItem(item: UmbUniqueItemModel) {
-		if (!item.unique) return;
+	#renderItem(status: UmbRepositoryItemsStatus) {
+		const unique = status.unique;
+		const item = this._items?.find((x) => x.unique === unique);
+		const isError = status.state.type === 'error';
+
+		// For error state, use umb-entity-item-ref
+		if (isError) {
+			return html`
+				<umb-entity-item-ref
+					id=${unique}
+					?error=${true}
+					.errorMessage=${status.state.error}
+					.errorDetail=${unique}
+					?standalone=${this.max === 1}>
+					<uui-action-bar slot="actions">
+						<uui-button
+							label=${this.localize.term('general_remove')}
+							@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
+					</uui-action-bar>
+				</umb-entity-item-ref>
+			`;
+		}
+
+		// For successful items, use the member type specific component
+		if (!item?.unique) return nothing;
 		return html`
 			<uui-ref-node-document-type name=${this.localize.string(item.name)}>
 				${when(item.icon, () => html`<umb-icon slot="icon" name=${item.icon!}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique!)}
+						@click=${() => this.#pickerContext.requestRemoveItem(unique)}
 						label="Remove Member Type ${item.name}"
 						>${this.localize.term('general_remove')}</uui-button
 					>

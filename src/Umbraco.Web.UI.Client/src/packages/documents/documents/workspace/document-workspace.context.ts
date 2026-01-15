@@ -1,53 +1,47 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import type { UmbDocumentVariantPublishModel, UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../repository/index.js';
+import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
-	UMB_DOCUMENT_COLLECTION_ALIAS,
-	UMB_DOCUMENT_ENTITY_TYPE,
-	UMB_DOCUMENT_PUBLISH_MODAL,
-	UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL,
-	UMB_DOCUMENT_SAVE_MODAL,
-	UMB_DOCUMENT_SCHEDULE_MODAL,
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_DOCUMENT_COLLECTION_ALIAS,
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_SAVE_MODAL,
+	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_USER_PERMISSION_DOCUMENT_CREATE,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../constants.js';
-import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
-import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
-import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
-import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
+import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { umbPeekError } from '@umbraco-cms/backoffice/notification';
+import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
+import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import {
-	type UmbPublishableWorkspaceContext,
+	UmbEntityRestoredFromRecycleBinEvent,
+	UmbEntityTrashedEvent,
+	UmbIsTrashedEntityContext,
+} from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
+import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbServerModelValidatorContext } from '@umbraco-cms/backoffice/validation';
-import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import {
-	UmbContentDetailWorkspaceContextBase,
-	type UmbContentCollectionWorkspaceContext,
-	type UmbContentWorkspaceContext,
-} from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
-
 export class UmbDocumentWorkspaceContext
 	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
@@ -55,37 +49,106 @@ export class UmbDocumentWorkspaceContext
 		ContentTypeModel,
 		UmbDocumentVariantModel
 	>
-	implements
-		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContext,
-		UmbContentCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
+	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>
 {
-	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
-
-	#serverValidation = new UmbServerModelValidatorContext(this);
-	#validationRepository?: UmbDocumentValidationRepository;
-
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
+
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
+
+	/*
+	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
+	 */
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
-	readonly urls = this._data.createObservablePartOfCurrent((data) => data?.urls || []);
+
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
+
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#localize = new UmbLocalizationController(this);
+	#previewWindow?: WindowProxy | null = null;
+	#previewWindowDocumentId?: string | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			workspaceAlias: UMB_DOCUMENT_WORKSPACE_ALIAS,
+			collectionAlias: UMB_DOCUMENT_COLLECTION_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
+			contentValidationRepository: UmbDocumentValidationRepository,
+			skipValidationOnSubmit: false,
+			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
+			const config = await context?.getDocumentConfiguration();
+			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
+
+			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
+			if (!allowSegmentCreation) {
+				new UmbDeprecation({
+					deprecated: 'The "AllowNonExistingSegmentsCreation" setting is deprecated.',
+					removeInVersion: '19.0.0',
+					solution: 'This functionality will be moved to a client-side extension.',
+				}).warn();
+			}
+
+			this._variantOptionsFilter = (variantOption) => {
+				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
+
+				// Do not allow creating a segment variant
+				if (!allowSegmentCreation && isNotCreatedSegmentVariant) {
+					return false;
+				}
+
+				return true;
+			};
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = actionEventContext;
+			this.#addEventListeners();
+		});
+
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
+
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				if (isNew === undefined) return;
+				if (isNew) {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						'You do not have permission to create documents.',
+					);
+				} else {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						'You do not have permission to update documents.',
+					);
+				}
+			},
+			null,
+		);
+
+		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
 		this.routes.setRoutes([
 			{
@@ -103,6 +166,7 @@ export class UmbDocumentWorkspaceContext
 						documentTypeUnique,
 						blueprintUnique,
 					);
+
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -118,7 +182,6 @@ export class UmbDocumentWorkspaceContext
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
-
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -129,36 +192,61 @@ export class UmbDocumentWorkspaceContext
 			{
 				path: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-workspace-editor.element.js'),
-				setup: (_component, info) => {
+				setup: async (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
-					this.load(unique);
+					await this.load(unique);
 				},
 			},
 		]);
 	}
 
-	override async load(unique: string) {
-		const response = await super.load(unique);
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
 
-		if (response.data) {
-			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [verb],
+				},
+				onChange: (permitted: boolean) => {
+					this.#handleUserPermissionChange(verb, permitted, message);
+				},
+			},
+		]);
+	}
+
+	override resetState(): void {
+		super.resetState();
+		this.#isTrashedContext.setIsTrashed(false);
+	}
+
+	protected override async _loadSegmentsFor(unique: string): Promise<void> {
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
 		}
-
-		return response;
+		const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+			skip: 0,
+			take: 9999,
+		});
+		this._segments.setValue(data?.items ?? []);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
-			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
+			const { data } = await blueprintRepository.scaffoldByUnique(blueprintUnique);
+
+			if (!data) throw new Error('Blueprint data is missing');
 
 			return this.createScaffold({
 				parent,
 				preset: {
-					documentType: data?.documentType,
-					values: data?.values,
-					variants: data?.variants as Array<UmbDocumentVariantModel>,
+					documentType: data.documentType,
+					values: data.values,
+					variants: data.variants as Array<UmbDocumentVariantModel>,
 				},
 			});
 		}
@@ -168,12 +256,12 @@ export class UmbDocumentWorkspaceContext
 			preset: {
 				documentType: {
 					unique: documentTypeUnique,
-					collection: null,
 				},
 			},
 		});
 	}
 
+	/** @deprecated will be removed in v.18 */
 	getCollectionAlias() {
 		return UMB_DOCUMENT_COLLECTION_ALIAS;
 	}
@@ -206,256 +294,83 @@ export class UmbDocumentWorkspaceContext
 		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
 
-	/**
-	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
-	 */
-	public override requestSubmit() {
-		return this._handleSubmit();
+	protected override async _handleSave() {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
+		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
+		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
+		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
+		await super._handleSave();
 	}
 
-	// Because we do not make validation prevent submission this also submits the workspace. [NL]
-	public override invalidSubmit() {
-		return this._handleSubmit();
+	public async saveAndPreview(urlProviderAlias?: string): Promise<void> {
+		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
 	}
 
-	async #handleSaveAndPreview() {
+	async #handleSaveAndPreview(urlProviderAlias: string) {
+		if (!urlProviderAlias) throw new Error('Url provider alias is missing');
+
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		let culture = UMB_INVARIANT_CULTURE;
+		let firstVariantId = UmbVariantId.CreateInvariant();
 
 		// Save document (the active variant) before previewing.
 		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
-			culture = selected[0];
-			const variantIds = [UmbVariantId.FromString(culture)];
+			firstVariantId = UmbVariantId.FromString(selected[0]);
+			const variantIds = [firstVariantId];
 			const saveData = await this._data.constructData(variantIds);
-			await this._runMandatoryValidationForSaveData(saveData);
-			await this._performCreateOrUpdate(variantIds, saveData);
+
+			// Run mandatory validation (checks for name, etc.)
+			await this.runMandatoryValidationForSaveData(saveData, variantIds);
+
+			// Ask server to validate and show validation tooltips (like the Save action does)
+			await this.askServerToValidate(saveData, variantIds);
+
+			// Perform save
+			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Tell the server that we're entering preview mode.
-		await new UmbDocumentPreviewRepository(this).enter();
-
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
-
-		const previewUrl = new URL(appContext.getBackofficePath() + '/preview', appContext.getServerUrl());
-		previewUrl.searchParams.set('id', unique);
-
-		if (culture && culture !== UMB_INVARIANT_CULTURE) {
-			previewUrl.searchParams.set('culture', culture);
+		// Check if preview window is still open and showing the same document
+		// If so, just focus it and let SignalR handle the refresh
+		try {
+			if (this.#previewWindow && !this.#previewWindow.closed && this.#previewWindowDocumentId === unique) {
+				this.#previewWindow.focus();
+				return;
+			}
+		} catch {
+			// Window reference is stale, continue to create new preview session
+			this.#previewWindow = null;
+			this.#previewWindowDocumentId = null;
 		}
 
-		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
-		previewWindow?.focus();
-	}
-
-	async #handleSaveAndPublish() {
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-
-		let variantIds: Array<UmbVariantId> = [];
-
-		const { options, selected } = await this._determineVariantOptions();
-
-		// If there is only one variant, we don't need to open the modal.
-		if (options.length === 0) {
-			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
-			variantIds.push(UmbVariantId.Create(options[0]));
-		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const result = await modalManagerContext
-				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
-					data: {
-						options,
-						pickableFilter: this._readOnlyLanguageVariantsFilter,
-					},
-					value: { selection: selected },
-				})
-				.onSubmit()
-				.catch(() => undefined);
-
-			if (!result?.selection.length || !unique) return;
-
-			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
-		}
-
-		const saveData = await this._data.constructData(variantIds);
-		await this._runMandatoryValidationForSaveData(saveData);
-
-		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
-		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
-
-		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
-		if (this.getIsNew()) {
-			const parent = this.getParent();
-			if (!parent) throw new Error('Parent is not set');
-			this.#serverValidation.askServerForValidation(
-				saveData,
-				this.#validationRepository.validateCreate(saveData, parent.unique),
-			);
-		} else {
-			this.#serverValidation.askServerForValidation(
-				saveData,
-				this.#validationRepository.validateSave(saveData, variantIds),
-			);
-		}
-
-		// TODO: Only validate the specified selection.. [NL]
-		return this.validateAndSubmit(
-			async () => {
-				return this.#performSaveAndPublish(variantIds, saveData);
-			},
-			async () => {
-				// If data of the selection is not valid Then just save:
-				await this._performCreateOrUpdate(variantIds, saveData);
-				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				// TODO: Get rid of the save notification.
-				// TODO: Translate this message [NL]
-				notificationContext.peek('danger', {
-					data: { message: 'Document was not published, but we saved it for you.' },
-				});
-				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				return await Promise.reject();
-			},
-		);
-	}
-
-	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-
-		await this._performCreateOrUpdate(variantIds, saveData);
-
-		const { error } = await this.publishingRepository.publish(
+		// Preview not open, create new preview session and open window
+		const previewRepository = new UmbPreviewRepository(this);
+		const previewUrlData = await previewRepository.getPreviewUrl(
 			unique,
-			variantIds.map((variantId) => ({ variantId })),
+			urlProviderAlias,
+			firstVariantId.culture ?? undefined,
+			firstVariantId.segment ?? undefined,
 		);
 
-		if (!error) {
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			eventContext.dispatchEvent(event);
-
-			this._closeModal();
+		if (previewUrlData.url) {
+			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
+			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
+			previewUrl.searchParams.set('rnd', Date.now().toString());
+			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
+			this.#previewWindowDocumentId = unique;
+			this.#previewWindow?.focus();
+			return;
 		}
-	}
 
-	public async publish() {
-		throw new Error('Method not implemented.');
-	}
-
-	public async saveAndPreview(): Promise<void> {
-		return this.#handleSaveAndPreview();
-	}
-
-	public async saveAndPublish(): Promise<void> {
-		return this.#handleSaveAndPublish();
-	}
-
-	public async schedule() {
-		const { options, selected } = await this._determineVariantOptions();
-
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
-				data: {
-					options,
-					pickableFilter: this._readOnlyLanguageVariantsFilter,
-				},
-				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
-			})
-			.onSubmit()
-			.catch(() => undefined);
-
-		if (!result?.selection.length) return;
-
-		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
-		const variants =
-			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
-				variantId: UmbVariantId.FromString(x.unique),
-				schedule: x.schedule,
-			})) ?? [];
-
-		if (!variants.length) return;
-
-		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
-
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-		await this.publishingRepository.publish(unique, variants);
-	}
-
-	public async unpublish() {
-		const unique = this.getUnique();
-		const entityType = this.getEntityType();
-		if (!unique) throw new Error('Unique is missing');
-		if (!entityType) throw new Error('Entity type is missing');
-
-		// TODO: remove meta
-		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
-	}
-
-	public async publishWithDescendants() {
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-
-		const entityType = this.getEntityType();
-		if (!entityType) throw new Error('Entity type is missing');
-
-		const { options, selected } = await this._determineVariantOptions();
-
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
-				data: {
-					options,
-					pickableFilter: this._readOnlyLanguageVariantsFilter,
-				},
-				value: { selection: selected },
-			})
-			.onSubmit()
-			.catch(() => undefined);
-
-		if (!result?.selection.length) return;
-
-		// Map to variantIds
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
-
-		if (!variantIds.length) return;
-
-		const { error } = await this.publishingRepository.publishWithDescendants(
-			unique,
-			variantIds,
-			result.includeUnpublishedDescendants ?? false,
-		);
-
-		if (!error) {
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-
-			// request reload of this entity
-			const structureEvent = new UmbRequestReloadStructureForEntityEvent({
-				entityType,
-				unique,
+		if (previewUrlData.message) {
+			umbPeekError(this._host, {
+				color: 'danger',
+				headline: this.#localize.term('general_preview'),
+				message: previewUrlData.message,
 			});
-
-			// request reload of the children
-			const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType,
-				unique,
-			});
-
-			eventContext.dispatchEvent(structureEvent);
-			eventContext.dispatchEvent(childrenEvent);
+			throw new Error(previewUrlData.message);
 		}
 	}
 
@@ -464,6 +379,68 @@ export class UmbDocumentWorkspaceContext
 		variantId: UmbVariantId,
 	): UmbDocumentPropertyDatasetContext {
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
+	}
+
+	async #handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
+		if (permitted) {
+			this.readOnlyGuard?.removeRule(identifier);
+			return;
+		}
+
+		this.readOnlyGuard?.addRule({
+			unique: identifier,
+			message,
+			/* This guard is a bit backwards. The rule is permitted to be read-only.
+			If the user does not have permission, we set it to true = permitted to be read-only. */
+			permitted: true,
+		});
+	}
+
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.addEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
+		);
+	}
+
+	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
+		const unique = this.getUnique();
+		const entityType = this.getEntityType();
+		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
+		this.reload();
+	};
+
+	#onTrashStateChange(isTrashed?: boolean) {
+		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
+
+		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
+
+		if (!isTrashed) {
+			this.readOnlyGuard.removeRule(guardUnique);
+			return;
+		}
+
+		const rule: UmbVariantGuardRule = {
+			unique: guardUnique,
+			permitted: true,
+		};
+
+		// TODO: Change to use property write guard when it supports making the name read-only.
+		this.readOnlyGuard.addRule(rule);
+	}
+
+	public override destroy(): void {
+		this.#removeEventListeners();
+		super.destroy();
 	}
 }
 

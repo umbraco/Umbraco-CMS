@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+// TODO (V16): Make internal sealed.
 public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentationFactory
 {
     private readonly HealthChecksSettings _healthChecksSettings;
@@ -40,13 +41,13 @@ public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentation
         return groups;
     }
 
-    public HealthCheckGroupWithResultResponseModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup)
+    public async Task<HealthCheckGroupWithResultResponseModel> CreateHealthCheckGroupWithResultViewModelAsync(IGrouping<string?, HealthCheck> healthCheckGroup)
     {
         var healthChecks = new List<HealthCheckWithResultPresentationModel>();
 
         foreach (HealthCheck healthCheck in healthCheckGroup)
         {
-            healthChecks.Add(CreateHealthCheckWithResultViewModel(healthCheck));
+            healthChecks.Add(await CreateHealthCheckWithResultViewModelAsync(healthCheck));
         }
 
         var healthCheckGroupViewModel = new HealthCheckGroupWithResultResponseModel
@@ -57,11 +58,11 @@ public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentation
         return healthCheckGroupViewModel;
     }
 
-    public HealthCheckWithResultPresentationModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck)
+    public async Task<HealthCheckWithResultPresentationModel> CreateHealthCheckWithResultViewModelAsync(HealthCheck healthCheck)
     {
         _logger.LogDebug($"Running health check: {healthCheck.Name}");
 
-        IEnumerable<HealthCheckStatus> results = healthCheck.GetStatus().Result;
+        IEnumerable<HealthCheckStatus> results = await healthCheck.GetStatusAsync();
 
         var healthCheckViewModel = new HealthCheckWithResultPresentationModel
         {

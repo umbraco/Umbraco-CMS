@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -32,14 +32,13 @@ test('can create content with the content picker datatype', {tag: '@smoke'}, asy
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.addContentPicker(contentPickerName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -59,10 +58,9 @@ test('can publish content with the content picker data type', async ({umbracoApi
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addContentPicker(contentPickerName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -92,7 +90,7 @@ test('can open content picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can choose start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
+test('can create content with content picker without ignore start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomContentPicker';
   const childContentPickerDocumentTypeName = 'ChildDocumentTypeForContentPicker';
@@ -111,18 +109,19 @@ test('can choose start node for the content picker in the content', async ({umbr
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.addContentPicker(childContentPickerName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isContentNameVisible(childContentPickerName);
-  await umbracoUi.content.isContentNameVisible(contentPickerName, false);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.document.ensureNameNotExists(childContentPickerName);
+  await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
 });
 
-test.skip('can ignore user start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
+test('can create content with content picker with ignore start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomContentPicker';
   const childContentPickerDocumentTypeName = 'ChildDocumentTypeForContentPicker';
@@ -141,15 +140,16 @@ test.skip('can ignore user start node for the content picker in the content', as
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.addContentPicker(childContentPickerName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isContentNameVisible(childContentPickerName);
-  await umbracoUi.content.isContentNameVisible(contentPickerName);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.document.ensureNameNotExists(childContentPickerName);
+  await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
 });
 
 test('can remove content picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -164,11 +164,30 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeContentPicker(contentPickerName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });
 
+// This test for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/21130
+test('can remove a not-found content picker', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
+  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId);
+  await umbracoApi.document.delete(contentPickerId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.removeNotFoundItem(contentPickerId);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
+});

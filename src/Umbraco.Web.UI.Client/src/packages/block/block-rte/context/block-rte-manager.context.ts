@@ -14,15 +14,23 @@ export class UmbBlockRteManagerContext<
 	removeOneLayout(contentKey: string) {
 		this._layouts.removeOne(contentKey);
 	}
+	removeManyLayouts(contentKeys: Array<string>) {
+		this._layouts.remove(contentKeys);
+	}
 
-	create(
+	/**
+	 * @param contentElementTypeKey
+	 * @param partialLayoutEntry
+	 * @param _originData
+	 */
+	async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this, do not remove. [NL]
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 		_originData?: UmbBlockRteWorkspaceOriginData,
 	) {
-		const data = super._createBlockData(contentElementTypeKey, partialLayoutEntry);
+		const data = await super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 
 		// Find block type.
 		const blockType = this.getBlockTypes().find((x) => x.contentElementTypeKey === contentElementTypeKey);

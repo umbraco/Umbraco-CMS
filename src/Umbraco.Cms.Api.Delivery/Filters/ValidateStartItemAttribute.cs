@@ -12,7 +12,7 @@ internal sealed class ValidateStartItemAttribute : TypeFilterAttribute
     {
     }
 
-    private class ValidateStartItemFilter : IActionFilter
+    private sealed class ValidateStartItemFilter : IActionFilter
     {
         private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
 

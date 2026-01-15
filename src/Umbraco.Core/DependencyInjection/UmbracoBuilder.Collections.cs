@@ -1,6 +1,8 @@
+using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DynamicRoot.Origin;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
@@ -11,6 +13,8 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.ServerEvents;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Webhooks;
@@ -38,8 +42,6 @@ public static partial class UmbracoBuilderExtensions
             .Append<ContentFinderByPageIdQuery>()
             .Append<ContentFinderByUrlNew>()
             .Append<ContentFinderByKeyPath>()
-            .Append<ContentFinderByIdPath>()
-            /*.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder */
             .Append<ContentFinderByUrlAlias>()
             .Append<ContentFinderByRedirectUrl>();
         builder.EditorValidators().Add(() => builder.TypeLoader.GetTypes<IEditorValidator>());
@@ -90,7 +92,21 @@ public static partial class UmbracoBuilderExtensions
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
-        builder.WebhookEvents().AddCms(true);
+
+        WebhookPayloadType webhookPayloadType = Constants.Webhooks.DefaultPayloadType;
+
+        // IntelliSense indicates that GetSection cannot return null. However, in certain unit test setups,
+        // the configuration may not be fully initialized, leading to GetSection returning null. This null
+        // check ensures that the code behaves correctly in such scenarios and prevents potential null
+        // reference exceptions during testing.
+        if (builder.Config.GetSection(Constants.Configuration.ConfigWebhookPayloadType)?.Value is not null)
+        {
+            webhookPayloadType = builder.Config.GetValue<WebhookPayloadType>(Constants.Configuration.ConfigWebhookPayloadType);
+        }
+
+        builder.WebhookEvents().AddCms(true, webhookPayloadType);
+
+        builder.ContentTypeFilters();
     }
 
     /// <summary>
@@ -106,6 +122,9 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static ContentFinderCollectionBuilder ContentFinders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+
+    public static EventSourceAuthorizerCollectionBuilder EventSourceAuthorizers(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<EventSourceAuthorizerCollectionBuilder>();
 
     /// <summary>
     /// Gets the editor validators collection builder.
@@ -242,4 +261,11 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static ContentIndexHandlerCollectionBuilder ContentIndexHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentIndexHandlerCollectionBuilder>();
+
+    /// <summary>
+    /// Gets the content type filters collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    public static ContentTypeFilterCollectionBuilder ContentTypeFilters(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<ContentTypeFilterCollectionBuilder>();
 }

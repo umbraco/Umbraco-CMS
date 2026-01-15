@@ -1,21 +1,22 @@
+import type { UmbInputMemberGroupElement } from '../../components/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-ui-member-group-picker
  */
 @customElement('umb-property-editor-ui-member-group-picker')
-export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	public value?: string;
-
+export class UmbPropertyEditorUIMemberGroupPickerElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -32,16 +33,24 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-member-group')!);
+	}
 
 	@state()
-	_min = 0;
+	private _min = 0;
 
 	@state()
-	_max = Infinity;
+	private _max = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMemberGroupElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -50,8 +59,9 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 				.min=${this._min}
 				.max=${this._max}
 				.value=${this.value}
-				?showOpenButton=${true}
 				@change=${this.#onChange}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				?readonly=${this.readonly}></umb-input-member-group>
 		`;
 	}

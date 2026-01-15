@@ -17,6 +17,7 @@ public static partial class Constants
         /// </summary>
         public const string AcceptPreviewCookieName = "UMB-WEBSITE-PREVIEW-ACCEPT";
 
+        [Obsolete("InstallerCookieName is no longer used and will be removed in Umbraco 19.")]
         public const string InstallerCookieName = "umb_installId";
 
         /// <summary>
@@ -57,6 +58,7 @@ public static partial class Constants
         /// </summary>
         public const string ManagementApiPath = "/management/api/";
         public const string BackofficeSignalRHub = "/backofficeHub";
+        public const string ServerEventSignalRHub = "/serverEventHub";
 
         public static class Routing
         {

@@ -79,10 +79,14 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             return new PagedModel<Guid>();
         }
 
-        Guid[] items = results
-            .Where(r => r.Values.ContainsKey(ItemIdFieldName))
-            .Select(r => Guid.Parse(r.Values[ItemIdFieldName]))
-            .ToArray();
+        List<Guid> items = [];
+        foreach (ISearchResult result in results)
+        {
+            if (result.Values.TryGetValue(ItemIdFieldName, out string? value))
+            {
+                items.Add(Guid.Parse(value));
+            }
+        }
 
         return new PagedModel<Guid>(results.TotalItemCount, items);
     }

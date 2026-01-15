@@ -1,5 +1,5 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -7,70 +7,61 @@ import type {
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Document that fetches data from the server
  * @class UmbDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocumentDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbDocumentServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
+export class UmbDocumentServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbDocumentDetailModel>
+{
 	/**
 	 * Creates a new Document scaffold
 	 * @param preset
 	 * @returns { UmbDocumentDetailModel }
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(preset: Partial<UmbDocumentDetailModel> = {}) {
-		const data: UmbDocumentDetailModel = {
+	async createScaffold(preset: UmbDeepPartialObject<UmbDocumentDetailModel> = {}) {
+		let documentTypeIcon: string | null = null;
+		let documentTypeCollection: UmbReferenceByUnique | null = null;
+
+		const documentTypeUnique = preset.documentType?.unique;
+
+		if (!documentTypeUnique) {
+			throw new Error('Document type unique is missing');
+		}
+
+		// TODO: investigate if we can use the repository here instead
+		const { data } = await new UmbDocumentTypeDetailServerDataSource(this).read(documentTypeUnique);
+		documentTypeIcon = data?.icon ?? null;
+		documentTypeCollection = data?.collection ?? null;
+
+		const defaultData: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			urls: [],
 			template: null,
 			documentType: {
-				unique: '',
-				collection: null,
-				icon: null,
+				unique: documentTypeUnique,
+				collection: documentTypeCollection,
+				icon: documentTypeIcon,
 			},
 			isTrashed: false,
 			values: [],
 			variants: [],
-			...preset,
+			flags: [],
 		};
 
-		return { data };
-	}
+		const scaffold = umbDeepMerge(preset, defaultData);
 
-	/**
-	 * Creates a new variant scaffold.
-	 * @returns A new variant scaffold.
-	 */
-	/*
-	// TDOD: remove if not used
-	createVariantScaffold(): UmbDocumentVariantModel {
-		return {
-			state: null,
-			culture: null,
-			segment: null,
-			name: '',
-			publishDate: null,
-			createDate: null,
-			updateDate: null,
-		};
+		return { data: scaffold };
 	}
-	*/
 
 	/**
 	 * Fetches a Document with the given id from the server
@@ -81,7 +72,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentService.getDocumentById({ id: unique }));
+		const { data, error } = await tryExecute(this, DocumentService.getDocumentById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -94,9 +85,10 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
-					alias: value.alias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
+					alias: value.alias,
 					value: value.value,
 				};
 			}),
@@ -109,12 +101,9 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
-				};
-			}),
-			urls: data.urls.map((url) => {
-				return {
-					culture: url.culture || null,
-					url: url.url,
+					scheduledPublishDate: variant.scheduledPublishDate || null,
+					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
+					flags: variant.flags,
 				};
 			}),
 			template: data.template ? { unique: data.template.id } : null,
@@ -124,6 +113,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
+			flags: data.flags,
 		};
 
 		return { data: document };
@@ -141,7 +131,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		if (!model.unique) throw new Error('Document unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentRequestModel = {
+		const body: CreateDocumentRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
@@ -150,15 +140,15 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
+		const { data, error } = await tryExecute(
+			this,
 			DocumentService.postDocument({
-				requestBody,
+				body: body,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as any);
 		}
 
 		return { error };
@@ -174,17 +164,17 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentRequestModel = {
+		const body: UpdateDocumentRequestModel = {
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};
 
-		const { error } = await tryExecuteAndNotify(
-			this.#host,
+		const { error } = await tryExecute(
+			this,
 			DocumentService.putDocumentById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body: body,
 			}),
 		);
 
@@ -203,6 +193,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentById({ id: unique }));
+		return tryExecute(this, DocumentService.deleteDocumentById({ path: { id: unique } }));
 	}
 }

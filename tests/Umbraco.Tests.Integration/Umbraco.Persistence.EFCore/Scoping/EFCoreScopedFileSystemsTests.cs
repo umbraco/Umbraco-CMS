@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
+internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => ClearFiles(IOHelper);

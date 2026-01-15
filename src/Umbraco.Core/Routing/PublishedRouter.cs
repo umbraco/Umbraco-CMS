@@ -136,6 +136,7 @@ public class PublishedRouter : IPublishedRouter
             builder.SetDomain(request.Domain);
         }
         builder.SetCulture(request.Culture);
+        builder.SetSegment(request.Segment);
 
         // set to the new content (or null if specified)
         builder.SetPublishedContent(publishedContent);
@@ -181,7 +182,7 @@ public class PublishedRouter : IPublishedRouter
         }
 
         // set the culture -- again, 'cos it might have changed in the event handler
-        SetVariationContext(result.Culture);
+        SetVariationContext(result.Culture, result.Segment);
 
         return result;
     }
@@ -205,15 +206,15 @@ public class PublishedRouter : IPublishedRouter
         return request.Build();
     }
 
-    private void SetVariationContext(string? culture)
+    private void SetVariationContext(string? culture, string? segment)
     {
         VariationContext? variationContext = _variationContextAccessor.VariationContext;
-        if (variationContext != null && variationContext.Culture == culture)
+        if (variationContext != null && variationContext.Culture == culture && variationContext.Segment == segment)
         {
             return;
         }
 
-        _variationContextAccessor.VariationContext = new VariationContext(culture);
+        _variationContextAccessor.VariationContext = new VariationContext(culture, segment);
     }
 
     private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder, bool skipContentFinders = false)
@@ -226,7 +227,7 @@ public class PublishedRouter : IPublishedRouter
         }
 
         // set the culture
-        SetVariationContext(builder.Culture);
+        SetVariationContext(builder.Culture, builder.Segment);
 
         var foundContentByFinders = false;
 
@@ -261,7 +262,7 @@ public class PublishedRouter : IPublishedRouter
             HandleWildcardDomains(builder);
 
             // set the culture  -- again, 'cos it might have changed due to a finder or wildcard domain
-            SetVariationContext(builder.Culture);
+            SetVariationContext(builder.Culture, builder.Segment);
         }
 
         // trigger the routing request (used to be called Prepared) event - at that point it is still possible to change about anything
@@ -278,7 +279,7 @@ public class PublishedRouter : IPublishedRouter
     {
         var found = FindAndSetDomain(request);
         HandleWildcardDomains(request);
-        SetVariationContext(request.Culture);
+        SetVariationContext(request.Culture, request.Segment);
         return found;
     }
 
@@ -286,7 +287,7 @@ public class PublishedRouter : IPublishedRouter
     public bool UpdateVariationContext(Uri uri)
     {
         DomainAndUri? domain = FindDomain(uri, out _);
-        SetVariationContext(domain?.Culture);
+        SetVariationContext(domain?.Culture, null);
         return domain?.Culture is not null;
     }
 
@@ -439,7 +440,7 @@ public class PublishedRouter : IPublishedRouter
             return false;
         }
 
-        var pos = alias.IndexOf('/');
+        var pos = alias.IndexOf('/', StringComparison.Ordinal);
         if (pos > 0)
         {
             // recurse

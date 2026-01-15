@@ -53,6 +53,7 @@ export class UmbMediaDashboardElement extends UmbLitElement {
 					},
 					{
 						path: '',
+						pathMatch: 'full',
 						redirectTo: 'collection',
 					},
 					{

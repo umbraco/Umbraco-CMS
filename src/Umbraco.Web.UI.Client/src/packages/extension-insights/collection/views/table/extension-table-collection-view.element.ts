@@ -11,6 +11,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
+		hideIcon: true,
 	};
 
 	@state()
@@ -34,6 +35,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 
@@ -83,6 +85,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 							.value=${{
 								entityType: extension.entityType,
 								unique: extension.unique,
+								name: extension.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],

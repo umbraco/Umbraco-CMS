@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class ConsentServiceTests : UmbracoIntegrationTest
+internal sealed class ConsentServiceTests : UmbracoIntegrationTest
 {
     private IConsentService ConsentService => GetRequiredService<IConsentService>();
 
@@ -72,7 +72,11 @@ public class ConsentServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(consents.Any(x => x.Source == "user/1236"));
 
         // can revoke
-        consent = ConsentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Revoked,
+        consent = ConsentService.RegisterConsent(
+            "user/1234",
+            "app1",
+            "do-something",
+            ConsentState.Revoked,
             "no comment");
 
         consents = ConsentService.LookupConsent("user/1234", "app1", "do-something").ToArray();
@@ -100,8 +104,12 @@ public class ConsentServiceTests : UmbracoIntegrationTest
 
         // cannot be stupid
         Assert.Throws<ArgumentException>(() =>
-            ConsentService.RegisterConsent("user/1234", "app1", "do-something",
-                ConsentState.Granted | ConsentState.Revoked, "no comment"));
+            ConsentService.RegisterConsent(
+                "user/1234",
+                "app1",
+                "do-something",
+                ConsentState.Granted | ConsentState.Revoked,
+                "no comment"));
     }
 
     [Test]

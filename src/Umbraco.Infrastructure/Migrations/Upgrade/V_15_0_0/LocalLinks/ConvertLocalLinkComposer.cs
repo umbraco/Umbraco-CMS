@@ -13,5 +13,7 @@ public class ConvertLocalLinkComposer : IComposer
         builder.Services.AddSingleton<ITypedLocalLinkProcessor, LocalLinkBlockGridProcessor>();
         builder.Services.AddSingleton<ITypedLocalLinkProcessor, LocalLinkRteProcessor>();
         builder.Services.AddSingleton<LocalLinkProcessor>();
+        builder.Services.AddSingleton<LocalLinkProcessorForFaultyLinks>();
+        builder.Services.AddSingleton<LocalLinkMigrationTracker>();
     }
 }

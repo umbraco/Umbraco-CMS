@@ -1,10 +1,13 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -23,7 +26,9 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly FlagProviderCollection _flagProviderCollection;
 
+    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18")]
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
@@ -31,6 +36,25 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider,
         IIdKeyMap idKeyMap)
+        : this(
+            umbracoMapper,
+            documentUrlFactory,
+            templateService,
+            publicAccessService,
+            timeProvider,
+            idKeyMap,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
+    }
+
+    public DocumentPresentationFactory(
+        IUmbracoMapper umbracoMapper,
+        IDocumentUrlFactory documentUrlFactory,
+        ITemplateService templateService,
+        IPublicAccessService publicAccessService,
+        TimeProvider timeProvider,
+        IIdKeyMap idKeyMap,
+        FlagProviderCollection flagProviderCollection)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
@@ -38,16 +62,15 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
         _idKeyMap = idKeyMap;
+        _flagProviderCollection = flagProviderCollection;
     }
 
-    public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
+    public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
     {
-        DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
+        PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
 
-        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
-
-        Guid? templateKey = content.TemplateId.HasValue
-            ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
+        Guid? templateKey = content.PublishTemplateId.HasValue
+            ? _templateService.GetAsync(content.PublishTemplateId.Value).Result?.Key
             : null;
 
         responseModel.Template = templateKey.HasValue
@@ -57,14 +80,13 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
-    public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
+    public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)
     {
-        PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
+        DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
+        _umbracoMapper.Map(schedule, responseModel);
 
-        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
-
-        Guid? templateKey = content.PublishTemplateId.HasValue
-            ? _templateService.GetAsync(content.PublishTemplateId.Value).Result?.Key
+        Guid? templateKey = content.TemplateId.HasValue
+            ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
             : null;
 
         responseModel.Template = templateKey.HasValue
@@ -92,6 +114,8 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
+        PopulateFlagsOnDocuments(responseModel);
+
         return responseModel;
     }
 
@@ -112,87 +136,95 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         if (entity.Variations.VariesByCulture() is false)
         {
-            yield return new()
+            var model = new DocumentVariantItemResponseModel()
             {
                 Name = entity.Name ?? string.Empty,
                 State = DocumentVariantStateHelper.GetState(entity, null),
                 Culture = null,
             };
+
+            PopulateFlagsOnVariants(model);
+            yield return model;
             yield break;
         }
 
         foreach (KeyValuePair<string, string> cultureNamePair in entity.CultureNames)
         {
-            yield return new()
+            var model = new DocumentVariantItemResponseModel()
             {
                 Name = cultureNamePair.Value,
                 Culture = cultureNamePair.Key,
                 State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
             };
+
+            PopulateFlagsOnVariants(model);
+            yield return model;
         }
     }
 
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
-    public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
+    public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
     {
-        var contentScheduleCollection = new ContentScheduleCollection();
-        var culturesToPublishImmediately = new HashSet<string>();
+        var model = new List<CulturePublishScheduleModel>();
+
         foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
         {
-            if (cultureAndScheduleRequestModel.Schedule is null || (cultureAndScheduleRequestModel.Schedule.PublishTime is null && cultureAndScheduleRequestModel.Schedule.UnpublishTime is null))
+            if (cultureAndScheduleRequestModel.Schedule is null)
             {
-                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? "*"); // API have `null` for invariant, but service layer has "*".
+                model.Add(new CulturePublishScheduleModel
+                {
+                    Culture = cultureAndScheduleRequestModel.Culture
+                              ?? Constants.System.InvariantCulture // API have `null` for invariant, but service layer has "*".
+                });
                 continue;
             }
 
-            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null)
+            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
             {
-                if (cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? "*",
-                    cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
-                    ContentScheduleAction.Release));
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, model);
             }
-            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null)
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
             {
-                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? "*",
-                    cultureAndScheduleRequestModel.Schedule.UnpublishTime.Value.UtcDateTime,
-                    ContentScheduleAction.Expire));
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, model);
             }
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, model);
+            }
+
+            model.Add(new CulturePublishScheduleModel
+            {
+                Culture = cultureAndScheduleRequestModel.Culture,
+                Schedule = new ContentScheduleModel
+                {
+                    PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
+                    UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
+                },
+            });
         }
-        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, new CultureAndScheduleModel()
+
+        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
+    }
+
+    private void PopulateFlagsOnDocuments(DocumentItemResponseModel model)
+    {
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
         {
-            Schedules = contentScheduleCollection,
-            CulturesToPublishImmediately = culturesToPublishImmediately,
-        });
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
+        }
+    }
+
+    private void PopulateFlagsOnVariants(DocumentVariantItemResponseModel model)
+    {
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentVariantItemResponseModel>()))
+        {
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
+        }
     }
 }

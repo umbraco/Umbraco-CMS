@@ -36,7 +36,6 @@ public class UserSettingsFactory : IUserSettingsFactory
 
     private IEnumerable<ConsentLevelModel> CreateConsentLevelModels() =>
         Enum.GetValues<TelemetryLevel>()
-            .ToList()
             .Select(level => new ConsentLevelModel
             {
                 Level = level,

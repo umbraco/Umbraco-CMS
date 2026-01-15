@@ -50,11 +50,14 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				(option) => option.unique,
 				(option) =>
 					html`<uui-button
+						class="create-member-type"
 						compact
 						label=${option.label}
 						href="section/member-management/workspace/member/create/${option.unique}">
-						<uui-icon name=${option.icon}></uui-icon>
-						<span style="margin-left: var(--uui-size-space-2)">${option.label}</span>
+						<div>
+							<umb-icon name=${option.icon}></umb-icon>
+							<span>${option.label}</span>
+						</div>
 					</uui-button>`,
 			)}
 		`;
@@ -83,6 +86,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				--uui-button-content-align: left;
+			}
+
+			uui-button.create-member-type > div {
+				display: flex;
+				align-items: center;
+				gap: 5px;
 			}
 		`,
 	];

@@ -1,3 +1,4 @@
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using Umbraco.Cms.Core.Media;
@@ -5,6 +6,10 @@ using Size = System.Drawing.Size;
 
 namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 
+/// <summary>
+///     Extracts image dimensions using ImageSharp, with support for EXIF orientation.
+/// </summary>
+/// <seealso cref="IImageDimensionExtractor" />
 public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
 {
     private readonly Configuration _configuration;

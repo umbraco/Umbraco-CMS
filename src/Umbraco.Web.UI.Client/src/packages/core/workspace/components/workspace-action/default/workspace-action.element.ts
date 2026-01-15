@@ -1,51 +1,42 @@
-import type { UmbWorkspaceAction } from '../workspace-action.interface.js';
 import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceActionMenuItem,
 	MetaWorkspaceActionDefaultKind,
+	UmbWorkspaceActionArgs,
+	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
+import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	type UmbExtensionElementAndApiInitializer,
-	UmbExtensionsElementAndApiInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
-
-import '../../workspace-action-menu/index.js';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbAction } from '@umbraco-cms/backoffice/action';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement<
 	MetaType extends MetaWorkspaceActionDefaultKind = MetaWorkspaceActionDefaultKind,
-	ApiType extends UmbWorkspaceAction<MetaType> = UmbWorkspaceAction<MetaType>,
+	ApiType extends UmbWorkspaceActionDefaultKind<MetaType> = UmbWorkspaceActionDefaultKind<MetaType>,
 > extends UmbLitElement {
 	#manifest?: ManifestWorkspaceAction<MetaType>;
 	#api?: ApiType;
-	#extensionsController?: UmbExtensionsElementAndApiInitializer<
+	protected _extensionsController?: UmbExtensionsElementAndApiInitializer<
 		ManifestWorkspaceActionMenuItem,
 		'workspaceActionMenuItem',
 		ManifestWorkspaceActionMenuItem
 	>;
 
-	@state()
-	private _buttonState?: UUIButtonState;
-
-	@state()
-	_href?: string;
-
-	@state()
-	_isDisabled = false;
-
 	@property({ type: Object, attribute: false })
 	public set manifest(value: ManifestWorkspaceAction<MetaType> | undefined) {
 		if (!value) return;
 		const oldValue = this.#manifest;
-		this.#manifest = value;
-		if (oldValue !== this.#manifest) {
+		if (oldValue !== value) {
+			this.#manifest = value;
+			this._href = value?.meta.href;
+			this._additionalOptions = value?.meta.additionalOptions;
 			this.#createAliases();
-			this.requestUpdate('manifest', oldValue);
 		}
 	}
 	public get manifest() {
@@ -56,10 +47,12 @@ export class UmbWorkspaceActionElement<
 	public set api(api: ApiType | undefined) {
 		this.#api = api;
 
-		// TODO: Fix so when we use a HREF it does not refresh the page?
 		this.#api?.getHref?.().then((href) => {
-			this._href = href;
-			// TODO: Do we need to update the component here? [NL]
+			this._href = href ?? this.manifest?.meta.href;
+		});
+
+		this.#api?.hasAdditionalOptions?.().then((additionalOptions) => {
+			this._additionalOptions = additionalOptions ?? this.manifest?.meta.additionalOptions;
 		});
 
 		this.#observeIsDisabled();
@@ -68,8 +61,26 @@ export class UmbWorkspaceActionElement<
 		return this.#api;
 	}
 
+	protected _actionApi?: UmbAction<UmbWorkspaceActionArgs<MetaType>>;
+
+	protected _buttonLabel?: string;
+
 	@state()
-	private _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
+	private _buttonState?: UUIButtonState;
+
+	@state()
+	private _additionalOptions?: boolean;
+
+	@state()
+	private _href?: string;
+
+	@state()
+	private _isDisabled = false;
+
+	@state()
+	protected _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
+
+	#buttonStateResetTimeoutId: number | null = null;
 
 	/**
 	 * Create a list of original and overwritten aliases of workspace actions for the action.
@@ -83,30 +94,42 @@ export class UmbWorkspaceActionElement<
 			// TODO: This works on one level for now, which will be enough for the current use case. However, you can overwrite the overwrites, so we need to make this recursive. Perhaps we could move this to the extensions initializer.
 			// Add overwrites so that we can show any previously registered actions on the original workspace action
 			if (this.#manifest.overwrites) {
-				for (const alias of this.#manifest.overwrites) {
+				const overwrites = Array.isArray(this.#manifest.overwrites)
+					? this.#manifest.overwrites
+					: [this.#manifest.overwrites];
+				for (const alias of overwrites) {
 					aliases.add(alias);
 				}
 			}
 		}
 
-		this.#observeExtensions(Array.from(aliases));
+		this.observeExtensions(Array.from(aliases));
 	}
 
-	private async _onClick(event: MouseEvent) {
+	async #onClick(event: MouseEvent) {
 		if (this._href) {
 			event.stopPropagation();
 		}
+		// If its a link or has additional options, then we do not want to display state on the button. [NL]
+		if (!this._href) {
+			if (!this._additionalOptions) {
+				this._buttonState = 'waiting';
+			}
 
-		this._buttonState = 'waiting';
-
-		try {
-			if (!this.#api) throw new Error('No api defined');
-			await this.#api.execute();
-			this._buttonState = 'success';
-		} catch {
-			this._buttonState = 'failed';
+			try {
+				const api = this._actionApi ?? this.#api;
+				if (!api) throw new Error('No api defined');
+				await api.execute();
+				this._buttonState = 'success';
+				this.#initButtonStateReset();
+			} catch (reason) {
+				if (reason) {
+					console.warn(reason);
+				}
+				this._buttonState = 'failed';
+				this.#initButtonStateReset();
+			}
 		}
-
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
@@ -120,9 +143,26 @@ export class UmbWorkspaceActionElement<
 		);
 	}
 
-	#observeExtensions(aliases: string[]): void {
-		this.#extensionsController?.destroy();
-		this.#extensionsController = new UmbExtensionsElementAndApiInitializer<
+	#initButtonStateReset() {
+		/* When the button has additional options, we do not show the waiting state.
+    Therefore, we need to ensure the button state is reset, so we are able to show the success state again. */
+		this.#clearButtonStateResetTimeout();
+
+		this.#buttonStateResetTimeoutId = window.setTimeout(() => {
+			this._buttonState = undefined;
+		}, 2000);
+	}
+
+	#clearButtonStateResetTimeout() {
+		if (this.#buttonStateResetTimeoutId !== null) {
+			clearTimeout(this.#buttonStateResetTimeoutId);
+			this.#buttonStateResetTimeoutId = null;
+		}
+	}
+
+	protected observeExtensions(aliases: string[]): void {
+		this._extensionsController?.destroy();
+		this._extensionsController = new UmbExtensionsElementAndApiInitializer<
 			ManifestWorkspaceActionMenuItem,
 			'workspaceActionMenuItem',
 			ManifestWorkspaceActionMenuItem
@@ -130,50 +170,50 @@ export class UmbWorkspaceActionElement<
 			this,
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem',
-			ExtensionApiArgsMethod,
-			(action) => {
-				return Array.isArray(action.forWorkspaceActions)
-					? action.forWorkspaceActions.some((alias) => aliases.includes(alias))
-					: aliases.includes(action.forWorkspaceActions);
-			},
-			(extensionControllers) => {
-				this._items = extensionControllers;
+			(manifest) => [{ meta: manifest.meta }],
+			(action) => stringOrStringArrayIntersects(action.forWorkspaceActions, aliases),
+			(actions) => {
+				this._items = actions;
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 		);
 	}
 
 	#renderButton() {
+		const label = this.localize.string(this._buttonLabel || this.#manifest?.meta.label || this.#manifest?.name || '');
 		return html`
 			<uui-button
-				id="action-button"
-				.href=${this._href}
-				@click=${this._onClick}
-				look=${this.#manifest?.meta.look || 'default'}
-				color=${this.#manifest?.meta.color || 'default'}
-				label=${ifDefined(
-					this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
-				)}
+				data-mark="workspace-action:${this.#manifest?.alias}"
+				color=${this.#manifest?.meta.color ?? 'default'}
+				look=${this.#manifest?.meta.look ?? 'default'}
+				label=${this._additionalOptions ? label + '…' : label}
 				.disabled=${this._isDisabled}
-				.state=${this._buttonState}></uui-button>
+				.href=${this._href}
+				.state=${this._buttonState}
+				@click=${this.#onClick}></uui-button>
 		`;
 	}
 
 	#renderActionMenu() {
 		return html`
 			<umb-workspace-action-menu
-				.items=${this._items}
-				color="${this.#manifest?.meta.color || 'default'}"
-				look="${this.#manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
+				color=${this.#manifest?.meta.color ?? 'default'}
+				look=${this.#manifest?.meta.look ?? 'default'}
+				.items=${this._items}></umb-workspace-action-menu>
 		`;
 	}
 
 	override render() {
 		return when(
 			this._items.length,
-			() => html` <uui-button-group> ${this.#renderButton()} ${this.#renderActionMenu()} </uui-button-group> `,
+			() => html`<uui-button-group>${this.#renderButton()}${this.#renderActionMenu()}</uui-button-group>`,
 			() => this.#renderButton(),
 		);
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#clearButtonStateResetTimeout();
 	}
 }
 
@@ -183,13 +223,4 @@ declare global {
 	interface HTMLElementTagNameMap {
 		'umb-workspace-action': UmbWorkspaceActionElement;
 	}
-}
-
-/**
- *
- * @param manifest
- * @returns An array of arguments to pass to the extension API initializer.
- */
-function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
-	return [{ meta: manifest.meta }];
 }

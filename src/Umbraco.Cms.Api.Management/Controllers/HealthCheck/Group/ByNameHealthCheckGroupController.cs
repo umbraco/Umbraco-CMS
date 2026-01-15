@@ -25,13 +25,14 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <summary>
     ///     Gets a health check group with all its health checks by a group name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the group.</param>
     /// <returns>The health check group or not found result.</returns>
     [HttpGet("{name}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupPresentationModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByName(
+    public Task<IActionResult> ByName(
         CancellationToken cancellationToken,
         string name)
     {
@@ -42,9 +43,9 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
 
         if (group is null)
         {
-            return HealthCheckGroupNotFound();
+            return Task.FromResult(HealthCheckGroupNotFound());
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<HealthCheckGroupPresentationModel>(group)));
+        return Task.FromResult<IActionResult>(Ok(_umbracoMapper.Map<HealthCheckGroupPresentationModel>(group)));
     }
 }

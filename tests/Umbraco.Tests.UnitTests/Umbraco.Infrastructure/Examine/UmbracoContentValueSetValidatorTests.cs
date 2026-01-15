@@ -1,16 +1,14 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Examine;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine;
 
@@ -24,7 +22,10 @@ public class UmbracoContentValueSetValidatorTests
             false,
             true,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IScopeProvider>());
+            Mock.Of<IScopeProvider>(),
+            null,
+            null,
+            null);
 
         var result =
             validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
@@ -48,7 +49,10 @@ public class UmbracoContentValueSetValidatorTests
             false,
             true,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IScopeProvider>());
+            Mock.Of<IScopeProvider>(),
+            null,
+            null,
+            null);
 
         var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
@@ -68,7 +72,9 @@ public class UmbracoContentValueSetValidatorTests
             true,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>(),
-            555);
+            555,
+            null,
+            null);
 
         var result =
             validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
@@ -170,7 +176,9 @@ public class UmbracoContentValueSetValidatorTests
             true,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>(),
-            includeItemTypes: new List<string> { "include-content" });
+            null,
+            new List<string> { "include-content" },
+            null);
 
         var result = validator.Validate(ValueSet.FromObject(
             "555",
@@ -201,7 +209,9 @@ public class UmbracoContentValueSetValidatorTests
             true,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>(),
-            excludeItemTypes: new List<string> { "exclude-content" });
+            null,
+            null,
+            new List<string> { "exclude-content" });
 
         var result = validator.Validate(ValueSet.FromObject(
             "555",
@@ -232,8 +242,9 @@ public class UmbracoContentValueSetValidatorTests
             true,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>(),
-            includeItemTypes: new List<string> { "include-content", "exclude-content" },
-            excludeItemTypes: new List<string> { "exclude-content" });
+            null,
+            new List<string> { "include-content", "exclude-content" },
+            new List<string> { "exclude-content" });
 
         var result = validator.Validate(ValueSet.FromObject(
             "555",
@@ -270,7 +281,10 @@ public class UmbracoContentValueSetValidatorTests
             true,
             false,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IScopeProvider>());
+            Mock.Of<IScopeProvider>(),
+            null,
+            null,
+            null);
 
         var result =
             validator.Validate(ValueSet.FromObject(
@@ -310,7 +324,10 @@ public class UmbracoContentValueSetValidatorTests
             true,
             false,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IScopeProvider>());
+            Mock.Of<IScopeProvider>(),
+            null,
+            null,
+            null);
 
         var result =
             validator.Validate(ValueSet.FromObject(
@@ -337,7 +354,10 @@ public class UmbracoContentValueSetValidatorTests
             true,
             true,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IScopeProvider>());
+            Mock.Of<IScopeProvider>(),
+            null,
+            null,
+            null);
 
         var result =
             validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
@@ -373,7 +393,10 @@ public class UmbracoContentValueSetValidatorTests
             true,
             true,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IScopeProvider>());
+            Mock.Of<IScopeProvider>(),
+            null,
+            null,
+            null);
 
         var result = validator.Validate(new ValueSet(
             "555",
@@ -443,7 +466,10 @@ public class UmbracoContentValueSetValidatorTests
             false,
             false,
             publicAccessService.Object,
-            Mock.Of<IScopeProvider>());
+            Mock.Of<IScopeProvider>(),
+            null,
+            null,
+            null);
 
         var result =
             validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));

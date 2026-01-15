@@ -3,7 +3,7 @@ import './document-save-modal.element.js';
 import { UmbDocumentVariantState } from '../../types.js';
 import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import type { UmbDocumentSaveModalElement } from './document-save-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentSaveModalData = {
@@ -20,6 +20,9 @@ const modalData: UmbDocumentSaveModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -42,6 +45,9 @@ const modalData: UmbDocumentSaveModalData = {
 				createDate: '2021-08-25T14:00:00Z',
 				publishDate: null,
 				updateDate: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -64,6 +70,9 @@ const modalData: UmbDocumentSaveModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -82,7 +91,7 @@ const modalValue: UmbDocumentSaveModalValue = {
 };
 
 const meta: Meta<UmbDocumentSaveModalElement> = {
-	title: 'Workspaces/Document/Modals/Save',
+	title: 'Entity/Document/Modals/Save',
 	component: 'umb-document-save-modal',
 	id: 'umb-document-save-modal',
 	args: {
@@ -115,6 +124,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: [],
 					},
 					language: {
 						entityType: 'language',
@@ -137,6 +147,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: [],
 					},
 					language: {
 						entityType: 'language',
@@ -160,4 +171,4 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentSaveModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};

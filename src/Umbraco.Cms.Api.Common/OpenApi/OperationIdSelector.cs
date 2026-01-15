@@ -16,9 +16,6 @@ public class OperationIdSelector : IOperationIdSelector
     public OperationIdSelector(IEnumerable<IOperationIdHandler> operationIdHandlers)
         => _operationIdHandlers = operationIdHandlers;
 
-    [Obsolete("Use overload that only takes ApiDescription instead. This will be removed in Umbraco 15.")]
-    public virtual string? OperationId(ApiDescription apiDescription, ApiVersioningOptions apiVersioningOptions) => OperationId(apiDescription);
-
     public virtual string? OperationId(ApiDescription apiDescription)
     {
         IOperationIdHandler? handler = _operationIdHandlers.FirstOrDefault(h => h.CanHandle(apiDescription));

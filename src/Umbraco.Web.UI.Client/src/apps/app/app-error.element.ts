@@ -1,6 +1,6 @@
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -26,7 +26,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 	 * The error to display
 	 * @attr
 	 */
-	@property()
+	@property({ attribute: false })
 	error?: unknown;
 
 	/**
@@ -133,7 +133,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 		}
 	}
 
-	#renderProblemDetails = (problemDetails: ProblemDetails) => html`
+	#renderProblemDetails = (problemDetails: UmbProblemDetails) => html`
 		<p><strong>${problemDetails.title}</strong></p>
 		<p>${problemDetails.detail}</p>
 		<pre>${problemDetails.stack}</pre>
@@ -145,7 +145,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 		<pre>${error.stack}</pre>
 	`;
 
-	#isProblemDetails(error: unknown): error is ProblemDetails {
+	#isProblemDetails(error: unknown): error is UmbProblemDetails {
 		return typeof error === 'object' && error !== null && 'detail' in error && 'title' in error;
 	}
 

@@ -23,7 +23,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	@state()
-	_filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
+	private _filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
 
 	@property({ type: String })
 	public get unique(): string | null | undefined {
@@ -37,14 +37,15 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	@state()
-	_props: Partial<UmbEntityActionArgs<unknown>> = {};
+	private _props: Partial<UmbEntityActionArgs<unknown>> = {};
 
 	@state()
-	_apiArgs?: UmbApiConstructorArgumentsMethodType<
+	private _apiArgs?: UmbApiConstructorArgumentsMethodType<
 		ManifestEntityAction<MetaEntityAction>,
 		[UmbEntityActionArgs<MetaEntityAction>]
 	>;
 
+	// TODO: Ideally this is provided on a higher level, as in the Tree-item, Workspace, Collection-Row, etc [NL]
 	#entityContext = new UmbEntityContext(this);
 
 	#generateApiArgs() {
@@ -59,6 +60,12 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		};
 	}
 
+	override focus() {
+		this.#firstEntityAction?.focus();
+	}
+
+	#firstEntityAction?: HTMLElement;
+
 	#hasRenderedOnce?: boolean;
 	override render() {
 		return this._filter
@@ -70,15 +77,8 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						.apiArgs=${this._apiArgs}
 						.renderMethod=${(ext: any, i: number) => {
 							if (!this.#hasRenderedOnce && i === 0) {
-								// TODO: Replace this block:
-								ext.component?.updateComplete.then(async () => {
-									const menuitem = ext.component?.shadowRoot?.querySelector('uui-menu-item');
-									menuitem?.updateComplete.then(async () => {
-										menuitem?.shadowRoot?.querySelector('#label-button')?.focus?.();
-									});
-								});
-								// end of block, with this, when this PR is part of UI Lib: https://github.com/umbraco/Umbraco.UI/pull/789
-								// ext.component?.focus();
+								this.#firstEntityAction = ext.component;
+								this.#firstEntityAction?.focus();
 								this.#hasRenderedOnce = true;
 							}
 							return ext.component;
@@ -90,6 +90,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
+				--uui-menu-item-indent: 0;
 				--uui-menu-item-flat-structure: 1;
 			}
 		`,

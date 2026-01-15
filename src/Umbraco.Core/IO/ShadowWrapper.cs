@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO;
 
-internal class ShadowWrapper : IFileSystem, IFileProviderFactory
+internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
 {
     private const string ShadowFsPath = "ShadowFs";
 
@@ -80,6 +80,8 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
     public Stream OpenFile(string path) => FileSystem.OpenFile(path);
 
     public void DeleteFile(string path) => FileSystem.DeleteFile(path);
+
+    public void MoveFile(string source, string target) => FileSystem.MoveFile(source, target);
 
     public bool FileExists(string path) => FileSystem.FileExists(path);
 

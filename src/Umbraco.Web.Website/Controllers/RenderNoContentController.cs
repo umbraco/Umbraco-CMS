@@ -1,56 +1,50 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Website.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers;
 
 public class RenderNoContentController : Controller
 {
-    private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-
-    [Obsolete("Please use constructor that takes an IHostingEnvironment instead")]
-    public RenderNoContentController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IIOHelper ioHelper,
-        IOptionsSnapshot<GlobalSettings> globalSettings)
-    : this(umbracoContextAccessor, globalSettings, StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>())
-    {
-    }
+    private readonly GlobalSettings _globalSettings;
+    private readonly IDocumentUrlService _urlService;
 
     [ActivatorUtilitiesConstructor]
     public RenderNoContentController(
-        IUmbracoContextAccessor umbracoContextAccessor,
+        IHostingEnvironment hostingEnvironment,
         IOptionsSnapshot<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
+        IDocumentUrlService urlService)
     {
-        _umbracoContextAccessor =
-            umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-        _hostingEnvironment = hostingEnvironment;
+        _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+        _urlService = urlService;
+    }
+
+    [Obsolete("Scheduled for removal in Umbraco 18")]
+    public RenderNoContentController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IHostingEnvironment hostingEnvironment,
+        IOptionsSnapshot<GlobalSettings> globalSettings)
+    : this(hostingEnvironment, globalSettings, StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
     }
 
     public ActionResult Index()
     {
-        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        IPublishedContentCache? store = umbracoContext.Content;
-        if (store?.HasContent() ?? false)
+        if (_urlService.HasAny())
         {
             // If there is actually content, go to the root.
             return Redirect("~/");
         }
 
-        var model = new NoNodesViewModel { UmbracoPath = _hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath) };
+        var model = new NoNodesViewModel { UmbracoPath = _hostingEnvironment.GetBackOfficePath() };
 
         return View(_globalSettings.NoNodesViewPath, model);
     }

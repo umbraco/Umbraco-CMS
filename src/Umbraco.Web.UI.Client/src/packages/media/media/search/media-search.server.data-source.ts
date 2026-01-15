@@ -1,16 +1,18 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
-import type { UmbMediaSearchItemModel } from './types.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbMediaSearchItemModel, UmbMediaSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbMediaSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMediaSearchItemModel> {
+export class UmbMediaSearchServerDataSource
+	implements UmbSearchDataSource<UmbMediaSearchItemModel, UmbMediaSearchRequestArgs>
+{
 	#host: UmbControllerHost;
 
 	/**
@@ -24,16 +26,22 @@ export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMe
 
 	/**
 	 * Get a list of versions for a data
-	 * @param args
+	 * @param {UmbMediaSearchRequestArgs}args - The arguments for the search
 	 * @returns {*}
 	 * @memberof UmbMediaSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+	async search(args: UmbMediaSearchRequestArgs) {
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.getItemMediaSearch({
-				query: args.query,
-				parentId: args.searchFrom?.unique || undefined,
+				query: {
+					allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
+					culture: args.culture || undefined,
+					parentId: args.searchFrom?.unique || undefined,
+					query: args.query,
+					trashed: args.includeTrashed,
+					dataTypeId: args.dataTypeUnique,
+				},
 			}),
 		);
 
@@ -42,7 +50,7 @@ export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMe
 				return {
 					entityType: UMB_MEDIA_ENTITY_TYPE,
 					hasChildren: item.hasChildren,
-					href: '/section/media/workspace/media/edit/' + item.id,
+					href: 'section/media/workspace/media/edit/' + item.id,
 					isTrashed: item.isTrashed,
 					unique: item.id,
 					mediaType: {

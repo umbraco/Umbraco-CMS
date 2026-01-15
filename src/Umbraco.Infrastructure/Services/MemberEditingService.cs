@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -19,6 +22,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
     private readonly ILogger<MemberEditingService> _logger;
     private readonly IMemberGroupService _memberGroupService;
+    private readonly SecuritySettings _securitySettings;
 
     public MemberEditingService(
         IMemberService memberService,
@@ -28,7 +32,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         ITwoFactorLoginService twoFactorLoginService,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ILogger<MemberEditingService> logger,
-        IMemberGroupService memberGroupService)
+        IMemberGroupService memberGroupService,
+        IOptions<SecuritySettings> securitySettings)
     {
         _memberService = memberService;
         _memberTypeService = memberTypeService;
@@ -38,20 +43,27 @@ internal sealed class MemberEditingService : IMemberEditingService
         _passwordChanger = passwordChanger;
         _logger = logger;
         _memberGroupService = memberGroupService;
+        _securitySettings = securitySettings.Value;
     }
 
-    public async Task<IMember?> GetAsync(Guid key)
-        => await Task.FromResult(_memberService.GetByKey(key));
+    public Task<IMember?> GetAsync(Guid key)
+        => Task.FromResult(_memberService.GetById(key));
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
-        => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
+        MemberCreateModel createModel) =>
+        await ValidateMember(createModel, null, createModel.Password, createModel.ContentTypeKey);
+
+
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MemberUpdateModel updateModel)
     {
         IMember? member = _memberService.GetById(key);
-        return member is not null
-            ? await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key)
-            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        if (member is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        }
+
+        return await ValidateMember(updateModel, key, updateModel.NewPassword, member.ContentType.Key);
     }
 
     public async Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
@@ -72,12 +84,16 @@ internal sealed class MemberEditingService : IMemberEditingService
             return Attempt.FailWithStatus(status, new MemberCreateResult());
         }
 
+        // this should be validated already so it's OK to throw an exception here
+        var memberName = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                         ?? throw new ArgumentException("Expected an invariant variant for the member name.", nameof(createModel));
+
         var identityMember = MemberIdentityUser.CreateNew(
             createModel.Username,
             createModel.Email,
             memberType.Alias,
             createModel.IsApproved,
-            createModel.InvariantName,
+            memberName,
             createModel.Key);
 
         IdentityResult createResult = await _memberManager.CreateAsync(identityMember, createModel.Password);
@@ -86,8 +102,8 @@ internal sealed class MemberEditingService : IMemberEditingService
             return IdentityMemberCreationFailed(createResult, status);
         }
 
-        IMember member = _memberService.GetByEmail(createModel.Email)
-                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by email.");
+        IMember member = _memberService.GetByUsername(createModel.Username)
+                          ?? throw new InvalidOperationException("Member creation succeeded, but member could not be found by username.");
 
         var updateRolesResult = await UpdateRoles(createModel.Roles, identityMember);
         if (updateRolesResult is false)
@@ -110,7 +126,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     {
         var status = new MemberEditingStatus();
 
-        IMember? member = _memberService.GetByKey(key);
+        IMember? member = _memberService.GetById(key);
         if (member is null)
         {
             status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotFound;
@@ -119,12 +135,11 @@ internal sealed class MemberEditingService : IMemberEditingService
 
         if (user.HasAccessToSensitiveData() is false)
         {
-            // handle sensitive data. certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
-            if (member.IsLockedOut != updateModel.IsLockedOut || member.IsApproved != updateModel.IsApproved)
-            {
-                status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotAllowed;
-                return Attempt.FailWithStatus(status, new MemberUpdateResult());
-            }
+            // Handle sensitive data. Certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
+            // The client won't have received these, so will always be false.
+            // We should reset them back to their original values before proceeding with the update.
+            updateModel.IsApproved = member.IsApproved;
+            updateModel.IsLockedOut = member.IsLockedOut;
         }
 
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
@@ -213,14 +228,89 @@ internal sealed class MemberEditingService : IMemberEditingService
                 contentDeleteResult.Result);
     }
 
+        private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
+    {
+        var validationErrors = new List<PropertyValidationError>();
+        MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(model, memberKey, password);
+        if (validationStatus is not MemberEditingOperationStatus.Success)
+        {
+            validationErrors.Add(MapStatusToPropertyValidationError(validationStatus));
+        }
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> propertyValidation = await _memberContentEditingService.ValidateAsync(model, memberTypeKey);
+
+        if (propertyValidation.Success is false)
+        {
+            if (propertyValidation.Status is ContentEditingOperationStatus.ContentTypeNotFound)
+            {
+                return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
+            }
+            else
+            {
+                validationErrors.AddRange(propertyValidation.Result.ValidationErrors);
+            }
+        }
+
+        var result = new ContentValidationResult { ValidationErrors = validationErrors };
+        return result.ValidationErrors.Any() is false
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
+    }
+
+    private PropertyValidationError MapStatusToPropertyValidationError(MemberEditingOperationStatus memberEditingOperationStatus)
+    {
+        string alias;
+        string[] errorMessages;
+        switch (memberEditingOperationStatus)
+        {
+            case MemberEditingOperationStatus.InvalidName:
+                alias = "name";
+                errorMessages = ["Invalid or empty name"];
+                break;
+            case MemberEditingOperationStatus.InvalidPassword:
+                alias = "password";
+                errorMessages = ["Invalid password"];
+                break;
+            case MemberEditingOperationStatus.InvalidUsername:
+                alias = "username";
+                errorMessages = ["Invalid username"];
+                break;
+            case MemberEditingOperationStatus.InvalidEmail:
+                alias = "email";
+                errorMessages = ["Invalid email"];
+                break;
+            case MemberEditingOperationStatus.DuplicateUsername:
+                alias = "username";
+                errorMessages = ["Duplicate username"];
+                break;
+            case MemberEditingOperationStatus.DuplicateEmail:
+                alias = "email";
+                errorMessages = ["Duplicate email"];
+                break;
+            default:
+                alias = string.Empty;
+                errorMessages = [];
+                break;
+        }
+
+        return new PropertyValidationError { Alias = alias, Culture = null, Segment = null, ErrorMessages = errorMessages, JsonPath = string.Empty };
+    }
+
     private async Task<MemberEditingOperationStatus> ValidateMemberDataAsync(MemberEditingModelBase model, Guid? memberKey, string? password)
     {
-        if (model.InvariantName.IsNullOrWhiteSpace())
+        if (model.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name.IsNullOrWhiteSpace() is not false)
         {
             return MemberEditingOperationStatus.InvalidName;
         }
 
         if (model.Username.IsNullOrWhiteSpace())
+        {
+            return MemberEditingOperationStatus.InvalidUsername;
+        }
+
+        // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create
+        // as the setting is applied to the BackOfficeIdentityOptions, but we need to check ourselves for updates.
+        var allowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
+        if (model.Username.Any(c => allowedUserNameCharacters.Contains(c) == false))
         {
             return MemberEditingOperationStatus.InvalidUsername;
         }
@@ -245,10 +335,13 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
-        IMember? byEmail = _memberService.GetByEmail(model.Email);
-        if (byEmail is not null && byEmail.Key != memberKey)
+        if (_securitySettings.MemberRequireUniqueEmail)
         {
-            return MemberEditingOperationStatus.DuplicateEmail;
+            IMember? byEmail = _memberService.GetByEmail(model.Email);
+            if (byEmail is not null && byEmail.Key != memberKey)
+            {
+                return MemberEditingOperationStatus.DuplicateEmail;
+            }
         }
 
         return MemberEditingOperationStatus.Success;

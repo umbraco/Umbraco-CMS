@@ -9,7 +9,7 @@ export interface UmbWorkspaceAction<ArgsMetaType = never> extends UmbAction<UmbW
 	 * The href location, the action will act as a link.
 	 * @returns {Promise<string | undefined>}
 	 */
-	getHref(): Promise<string | undefined>;
+	getHref?(): Promise<string | undefined>;
 
 	/**
 	 * The `execute` method, the action will act as a button.

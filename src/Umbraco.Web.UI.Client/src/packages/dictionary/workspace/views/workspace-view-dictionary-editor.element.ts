@@ -1,12 +1,10 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../dictionary-workspace.context-token.js';
 import type { UmbDictionaryDetailModel } from '../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
@@ -21,10 +19,6 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 
 	@state()
 	private _currentUserHasAccessToAllLanguages?: boolean = false;
-
-	get #dictionaryName() {
-		return typeof this._dictionary?.name !== 'undefined' ? sanitizeHTML(this._dictionary.name) : '...';
-	}
 
 	readonly #languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 	#workspaceContext?: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
@@ -77,19 +71,17 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	}
 
 	#onTextareaChange(e: Event) {
-		if (e instanceof UUITextareaEvent) {
-			const target = e.composedPath()[0] as UUITextareaElement;
-			const translation = (target.value as string).toString();
-			const isoCode = target.getAttribute('name')!;
+		const target = e.composedPath()[0] as UUITextareaElement;
+		const translation = (target.value as string).toString();
+		const isoCode = target.getAttribute('name')!;
 
-			this.#workspaceContext?.setPropertyValue(isoCode, translation);
-		}
+		this.#workspaceContext?.setPropertyValue(isoCode, translation);
 	}
 
 	override render() {
 		return html`
 			<uui-box>
-				${this.localize.term('dictionaryItem_description', this.#dictionaryName)}
+				<umb-localize key="dictionaryItem_description" .args=${[this._dictionary?.name ?? '...']}></umb-localize>
 				${repeat(
 					this._languages,
 					(item) => item.unique,
@@ -109,7 +101,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 				slot="editor"
 				name=${language.unique}
 				label="translation"
-				@change=${this.#onTextareaChange}
+				@input=${this.#onTextareaChange}
 				.value=${translation?.translation ?? ''}
 				?readonly=${this.#isReadOnly(language.unique)}></uui-textarea>
 		</umb-property-layout>`;

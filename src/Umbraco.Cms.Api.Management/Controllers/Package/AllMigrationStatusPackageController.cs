@@ -1,8 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
@@ -14,17 +17,31 @@ namespace Umbraco.Cms.Api.Management.Controllers.Package;
 public class AllMigrationStatusPackageController : PackageControllerBase
 {
     private readonly IPackagingService _packagingService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IPackagePresentationFactory _packagePresentationFactory;
 
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V18.")]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper)
+        : this(packagingService, StaticServiceProvider.Instance.GetRequiredService<IPackagePresentationFactory>())
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V18.")]
+    public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper, IPackagePresentationFactory packagePresentationFactory)
+        : this(packagingService, packagePresentationFactory)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public AllMigrationStatusPackageController(IPackagingService packagingService, IPackagePresentationFactory packagePresentationFactory)
     {
         _packagingService = packagingService;
-        _umbracoMapper = umbracoMapper;
+        _packagePresentationFactory = packagePresentationFactory;
     }
 
     /// <summary>
     ///     Gets a paginated list of the migration status of each installed package.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the installed packages migration status.</returns>
@@ -38,11 +55,7 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     {
         PagedModel<InstalledPackage> migrationPlans = await _packagingService.GetInstalledPackagesFromMigrationPlansAsync(skip, take);
 
-        var viewModel = new PagedViewModel<PackageMigrationStatusResponseModel>
-        {
-            Total = migrationPlans.Total,
-            Items = _umbracoMapper.MapEnumerable<InstalledPackage, PackageMigrationStatusResponseModel>(migrationPlans.Items)
-        };
+        PagedViewModel<PackageMigrationStatusResponseModel> viewModel = _packagePresentationFactory.CreatePackageMigrationStatusResponseModel(migrationPlans);
 
         return Ok(viewModel);
     }

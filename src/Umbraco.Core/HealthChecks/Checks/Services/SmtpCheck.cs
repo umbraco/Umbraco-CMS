@@ -34,7 +34,7 @@ public class SmtpCheck : HealthCheck
     /// <summary>
     ///     Get the status for this health check
     /// </summary>
-    public override Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+    public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
         Task.FromResult(CheckSmtpSettings().Yield());
 
     /// <summary>
@@ -55,7 +55,8 @@ public class SmtpCheck : HealthCheck
                     using (var writer = new StreamWriter(stream))
                     using (var reader = new StreamReader(stream))
                     {
-                        writer.WriteLine("EHLO " + host);
+                        writer.Write("EHLO ");
+                        writer.WriteLine(host);
                         writer.Flush();
                         reader.ReadLine();
                         return true;

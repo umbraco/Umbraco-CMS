@@ -467,9 +467,9 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         }
     }
 
-    public ContentTypeBase DeepCloneWithResetIdentities(string alias)
+    public IContentTypeBase DeepCloneWithResetIdentities(string alias)
     {
-        var clone = (ContentTypeBase)DeepClone();
+        var clone = (IContentTypeBase)DeepClone();
         clone.Alias = alias;
         clone.Key = Guid.Empty;
         foreach (PropertyGroup propertyGroup in clone.PropertyGroups)

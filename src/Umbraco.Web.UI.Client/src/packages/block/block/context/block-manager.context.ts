@@ -15,9 +15,16 @@ import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/documen
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbPropertyValuePresetVariantBuilderController,
+	type UmbPropertyTypePresetModel,
+	type UmbPropertyTypePresetModelTypeModel,
+} from '@umbraco-cms/backoffice/property';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -28,7 +35,7 @@ export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginDataType extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
-> extends UmbContextBase<UmbBlockManagerContext> {
+> extends UmbContextBase {
 	get contentTypesLoaded() {
 		return Promise.all(this.#contentTypeRequests);
 	}
@@ -70,7 +77,8 @@ export abstract class UmbBlockManagerContext<
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
+	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
 
 	readonly #exposes = new UmbArrayState(
 		<Array<UmbBlockExposeModel>>[],
@@ -98,36 +106,85 @@ export abstract class UmbBlockManagerContext<
 		return this.#blockTypes.value;
 	}
 
+	/**
+	 * Set all layouts.
+	 * @param {Array<BlockLayoutType>} layouts - All layouts.
+	 */
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
-	getLayouts() {
+
+	/**
+	 * Get all layouts.
+	 * @returns {Array<BlockLayoutType>} - All layouts.
+	 */
+	getLayouts(): Array<BlockLayoutType> {
 		return this._layouts.getValue();
 	}
+
+	/**
+	 * Set all contents.
+	 * @param {Array<UmbBlockDataModel>} contents - All contents.
+	 */
 	setContents(contents: Array<UmbBlockDataModel>) {
 		this.#contents.setValue(contents);
 	}
-	getContents() {
+
+	/**
+	 * Get all contents.
+	 * @returns {Array<UmbBlockDataModel>} - All contents.
+	 */
+	getContents(): Array<UmbBlockDataModel> {
 		return this.#contents.value;
 	}
+
+	/**
+	 * Set all settings.
+	 * @param {Array<UmbBlockDataModel>} settings - All settings.
+	 */
 	setSettings(settings: Array<UmbBlockDataModel>) {
 		this.#settings.setValue(settings);
 	}
+
+	/**
+	 * Get all settings.
+	 * @returns {Array<UmbBlockDataModel>} - All settings.
+	 */
+	getSettings(): Array<UmbBlockDataModel> {
+		return this.#settings.value;
+	}
+
+	/**
+	 * Set all exposes.
+	 * @param {Array<UmbBlockExposeModel>} exposes - All exposes.
+	 */
 	setExposes(exposes: Array<UmbBlockExposeModel>) {
 		this.#exposes.setValue(exposes);
+	}
+
+	/**
+	 * Get all exposes.
+	 * @returns {Array<UmbBlockExposeModel>} - All exposes.
+	 */
+	getExposes(): Array<UmbBlockExposeModel> {
+		return this.#exposes.value;
 	}
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 
-		this.observe(this.blockTypes, (blockTypes) => {
-			blockTypes.forEach((x) => {
-				this.#ensureContentType(x.contentElementTypeKey);
-				if (x.settingsElementTypeKey) {
-					this.#ensureContentType(x.settingsElementTypeKey);
-				}
-			});
-		});
+		this.observe(
+			this.blockTypes,
+			(blockTypes) => {
+				blockTypes.forEach((x) => {
+					this.#ensureContentType(x.contentElementTypeKey);
+					if (x.settingsElementTypeKey) {
+						this.#ensureContentType(x.settingsElementTypeKey);
+					}
+				});
+			},
+			null,
+		);
 	}
 
 	async #ensureContentType(unique: string) {
@@ -186,20 +243,57 @@ export abstract class UmbBlockManagerContext<
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
+
 	currentExposeOf(contentKey: string) {
-		const variantId = this.getVariantId();
-		if (!variantId) return;
 		return mergeObservables(
 			[this.#exposes.asObservablePart((source) => source.filter((x) => x.contentKey === contentKey)), this.variantId],
-			([exposes, variantId]) => (variantId ? exposes.find((x) => variantId.compare(x)) : undefined),
+			([exposes, variantId]) => {
+				if (!variantId) {
+					return undefined;
+				}
+
+				const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+				if (!contentTypeKey) {
+					return false;
+				}
+				const contentStructure = this.getStructure(contentTypeKey);
+				if (!contentStructure) {
+					throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
+				}
+
+				const varyByCulture = contentStructure.getVariesByCulture();
+				const varyBySegment = contentStructure.getVariesBySegment();
+				const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+
+				return exposes.find((x) => blockVariantId.compare(x));
+			},
 		);
 	}
 
 	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
 		if (!variantId) return;
-		return this.#exposes.asObservablePart((source) =>
-			source.some((x) => x.contentKey === contentKey && variantId.compare(x)),
-		);
+
+		const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+		if (!contentTypeKey) {
+			// Not created yet and therefor not exposed.
+			// (This currently does not give any trouble,
+			// but this is not returning a observable,
+			// meaning one trying to observe this would
+			// not be updated when it is exposed. But it
+			// is not a problem currently. [NL])
+			return;
+		}
+		const contentStructure = this.getStructure(contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
+		}
+		const varyByCulture = contentStructure.getVariesByCulture();
+		const varyBySegment = contentStructure.getVariesBySegment();
+		const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+
+		return this.#exposes.asObservablePart((exposes) => {
+			return exposes.some((x) => x.contentKey === contentKey && blockVariantId.compare(x));
+		});
 	}
 
 	getBlockTypeOf(contentTypeKey: string) {
@@ -208,8 +302,11 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentKey: string) {
 		return this.#contents.value.find((x) => x.key === contentKey);
 	}
+	getSettingsOf(settingsKey: string) {
+		return this.#settings.value.find((x) => x.key === settingsKey);
+	}
 	// originData param is used by some implementations. [NL] should be here, do not remove it.
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	setOneLayout(layoutData: BlockLayoutType, _originData?: BlockOriginDataType) {
 		this._layouts.appendOne(layoutData);
 	}
@@ -230,6 +327,14 @@ export abstract class UmbBlockManagerContext<
 	removeOneSettings(settingsKey: string) {
 		this.#settings.removeOne(settingsKey);
 	}
+
+	removeManyContent(contentKeys: Array<string>) {
+		this.#contents.remove(contentKeys);
+	}
+	removeManySettings(settingsKeys: Array<string>) {
+		this.#settings.remove(settingsKeys);
+	}
+
 	removeExposesOf(contentKey: string) {
 		this.#exposes.filter((x) => x.contentKey !== contentKey);
 	}
@@ -257,13 +362,13 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	abstract create(
+	abstract createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		originData?: BlockOriginDataType,
-	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
+	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
-	public createBlockSettingsData(contentElementTypeKey: string) {
+	public async createBlockSettingsData(contentElementTypeKey: string) {
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
 			throw new Error(`Cannot create block settings, missing block type for ${contentElementTypeKey}`);
@@ -272,6 +377,8 @@ export abstract class UmbBlockManagerContext<
 			throw new Error(`Cannot create block settings, missing settings element type for ${contentElementTypeKey}`);
 		}
 
+		// TODO: Handle presets here [NL]
+
 		return {
 			key: UmbId.new(),
 			contentTypeKey: blockType.settingsElementTypeKey,
@@ -279,15 +386,78 @@ export abstract class UmbBlockManagerContext<
 		};
 	}
 
-	protected _createBlockElementData(key: string, elementTypeKey: string) {
+	protected async _createBlockElementData(key: string, contentTypeKey: string) {
+		//
+		const appLanguage = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		if (!appLanguage) {
+			throw new Error('Could not retrieve app language context.');
+		}
+
+		const contentStructure = this.getStructure(contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot create Preset for Block, missing content structure for ${contentTypeKey}`);
+		}
+
+		// Set culture and segment for all values:
+		const cutlures = contentStructure.variesByCulture ? await appLanguage.getCultures() : [];
+		if (cutlures.length === 0) {
+			throw new Error('Could not retrieve app cultures.');
+		}
+		// TODO: Receive the segments from somewhere. [NL]
+		const segments: Array<string> | undefined = contentStructure.variesBySegment ? [] : undefined;
+
+		const repo = new UmbDataTypeDetailRepository(this);
+
+		const propertyTypes = await contentStructure.getContentTypeProperties();
+		const valueDefinitions = await Promise.all(
+			propertyTypes.map(async (property) => {
+				// TODO: Implement caching for data-type requests. [NL]
+				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
+				// This means if its not loaded this will never resolve and the error below will never happen.
+				if (!dataType) {
+					throw new Error(`DataType of "${property.dataType.unique}" not found.`);
+				}
+				if (!dataType.editorUiAlias) {
+					throw new Error(`DataType of "${property.dataType.unique}" did not have a editorUiAlias.`);
+				}
+
+				return {
+					alias: property.alias,
+					propertyEditorUiAlias: dataType.editorUiAlias,
+					propertyEditorSchemaAlias: dataType.editorAlias,
+					config: dataType.values,
+					typeArgs: {
+						variesByCulture: property.variesByCulture,
+						variesBySegment: property.variesBySegment,
+					} as UmbPropertyTypePresetModelTypeModel,
+				} as UmbPropertyTypePresetModel;
+			}),
+		);
+
+		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
+		controller.setCultures(cutlures);
+		if (segments) {
+			controller.setSegments(segments);
+		}
+		const values = await controller.create(valueDefinitions, {
+			entityType: 'block',
+			entityUnique: key,
+			entityTypeUnique: contentTypeKey,
+		});
+
+		// Set culture and segment for all values:
+
 		return {
-			key: key,
-			contentTypeKey: elementTypeKey,
-			values: [],
+			key,
+			contentTypeKey,
+			values,
 		};
 	}
 
-	protected _createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>) {
+	protected async _createBlockData(
+		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
@@ -300,12 +470,12 @@ export abstract class UmbBlockManagerContext<
 			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
 
-		const content = this._createBlockElementData(layout.contentKey, contentElementTypeKey);
+		const content = await this._createBlockElementData(layout.contentKey, contentElementTypeKey);
 		let settings: UmbBlockDataModel | undefined = undefined;
 
 		if (blockType.settingsElementTypeKey) {
 			layout.settingsKey = UmbId.new();
-			settings = this._createBlockElementData(layout.settingsKey, blockType.settingsElementTypeKey);
+			settings = await this._createBlockElementData(layout.settingsKey, blockType.settingsElementTypeKey);
 		}
 
 		return {
@@ -326,7 +496,7 @@ export abstract class UmbBlockManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 		_originData: BlockOriginDataType,
 	) {
 		// Create content entry:
@@ -342,21 +512,39 @@ export abstract class UmbBlockManagerContext<
 		}
 
 		// Expose inserted block:
-		this.contentTypesLoaded.then(() => {
-			const contentStructure = this.getStructure(content.contentTypeKey);
-			if (!contentStructure) {
-				throw new Error(`Cannot expose block, missing content structure for ${content.contentTypeKey}`);
+		this.#setInitialBlockExpose(content);
+	}
+
+	async #setInitialBlockExpose(content: UmbBlockDataModel) {
+		await this.contentTypesLoaded;
+		const contentStructure = this.getStructure(content.contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot expose block, missing content structure for ${content.contentTypeKey}`);
+		}
+		const variantId = this.getVariantId();
+		if (!variantId) {
+			throw new Error(`Cannot expose block, missing variantId`);
+		}
+
+		const varyByCulture = contentStructure.getVariesByCulture();
+		const varyBySegment = contentStructure.getVariesBySegment();
+		const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+		this.setOneExpose(content.key, blockVariantId);
+
+		if (varyByCulture) {
+			// get all mandatory cultures:
+			const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+			if (!appLanguageContext) {
+				throw new Error('Could not retrieve app language context.');
 			}
-			const variantId = this.getVariantId();
-			if (!variantId) {
-				throw new Error(`Cannot expose block, missing variantId`);
-			}
-			const blockVariantId = variantId.toVariant(
-				contentStructure.getVariesByCulture(),
-				contentStructure.getVariesBySegment(),
-			);
-			this.setOneExpose(content.key, blockVariantId);
-		});
+			const mandatoryLanguages = await appLanguageContext.getMandatoryLanguages();
+			mandatoryLanguages.forEach((x) => {
+				// No need to insert the same expose twice:
+				if (blockVariantId.culture !== x.unique) {
+					this.setOneExpose(content.key, new UmbVariantId(x.unique));
+				}
+			});
+		}
 	}
 
 	protected removeBlockKey(contentKey: string) {

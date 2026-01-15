@@ -1,25 +1,31 @@
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
 import type { UmbPickerContext } from '../picker.context.js';
+import { UmbDefaultPickerSearchResultItemElement } from './result-item/default/default-picker-search-result-item.element.js';
 import type { ManifestPickerSearchResultItem } from './result-item/picker-search-result-item.extension.js';
-import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDefaultPickerSearchResultItemContext } from './result-item/default/default-picker-search-result-item.context.js';
+import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
-const elementName = 'umb-picker-search-result';
-@customElement(elementName)
+type PickableFilterMethodType<T extends UmbSearchResultItemModel = UmbSearchResultItemModel> = (item: T) => boolean;
+
+@customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
-	_query?: UmbSearchRequestArgs;
+	private _query?: UmbSearchRequestArgs;
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@state()
-	_items: UmbEntityModel[] = [];
+	private _items: UmbItemModel[] = [];
 
 	@state()
-	_isSearchable: boolean = false;
+	private _isSearchable: boolean = false;
+
+	@property({ attribute: false })
+	pickableFilter: PickableFilterMethodType = () => true;
 
 	#pickerContext?: UmbPickerContext;
 
@@ -28,10 +34,18 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
 			this.#pickerContext = context;
-			this.observe(this.#pickerContext.search.searchable, (isSearchable) => (this._isSearchable = isSearchable));
-			this.observe(this.#pickerContext.search.query, (query) => (this._query = query));
-			this.observe(this.#pickerContext.search.searching, (query) => (this._searching = query));
-			this.observe(this.#pickerContext.search.resultItems, (items) => (this._items = items));
+			this.observe(
+				this.#pickerContext?.search.searchable,
+				(isSearchable) => (this._isSearchable = isSearchable ?? false),
+				'obsSearchable',
+			);
+			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query), 'obsQuery');
+			this.observe(
+				this.#pickerContext?.search.searching,
+				(query) => (this._searching = query ?? false),
+				'obsSearching',
+			);
+			this.observe(this.#pickerContext?.search.resultItems, (items) => (this._items = items ?? []), 'obsResultItems');
 		});
 	}
 
@@ -55,18 +69,30 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 		return html`<small>No result for <strong>"${this._query?.query}"</strong>.</small>`;
 	}
 
-	#renderResultItem(item: UmbEntityModel) {
+	#renderResultItem(item: UmbSearchResultItemModel) {
 		return html`
 			<umb-extension-with-api-slot
 				type="pickerSearchResultItem"
 				.filter=${(manifest: ManifestPickerSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
-				.elementProps=${{ item }}></umb-extension-with-api-slot>
+				.elementProps=${{
+					item,
+					disabled: this.pickableFilter ? !this.pickableFilter(item) : undefined,
+				}}
+				.fallbackRenderMethod=${() => this.#renderFallbackResultItem(item)}></umb-extension-with-api-slot>
 		`;
+	}
+
+	#renderFallbackResultItem(item: UmbSearchResultItemModel) {
+		const element = new UmbDefaultPickerSearchResultItemElement();
+		element.item = item;
+		element.disabled = this.pickableFilter ? !this.pickableFilter(item) : undefined;
+		new UmbDefaultPickerSearchResultItemContext(element);
+		return element;
 	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPickerSearchResultElement;
+		'umb-picker-search-result': UmbPickerSearchResultElement;
 	}
 }

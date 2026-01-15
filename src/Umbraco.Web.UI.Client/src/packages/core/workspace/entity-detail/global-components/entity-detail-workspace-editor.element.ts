@@ -14,6 +14,9 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	private _isLoading = false;
 
 	@state()
+	private _isForbidden = false;
+
+	@state()
 	private _exists = false;
 
 	@state()
@@ -27,19 +30,34 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
 			this.observe(this.#context?.entityType, (entityType) => (this._entityType = entityType));
-			this.observe(this.#context?.loading.isOn, (isLoading) => (this._isLoading = isLoading));
+			this.observe(this.#context?.loading.isOn, (isLoading) => (this._isLoading = isLoading ?? false));
+			this.observe(this.#context?.forbidden.isOn, (isForbidden) => (this._isForbidden = isForbidden ?? false));
 			this.observe(this.#context?.data, (data) => (this._exists = !!data));
 			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
 		});
 	}
 
-	protected override render() {
-		return html` ${!this._exists && !this._isLoading
-				? html`<umb-entity-detail-not-found entity-type=${ifDefined(this._entityType)}></umb-entity-detail-not-found>`
-				: nothing}
+	#renderForbidden() {
+		if (!this._isLoading && this._isForbidden) {
+			return html`<umb-entity-detail-forbidden
+				entity-type=${ifDefined(this._entityType)}></umb-entity-detail-forbidden>`;
+		}
+		return nothing;
+	}
 
-			<!-- TODO: It is currently on purpose that the workspace editor is always in the DOM, even when it doesn't have data. 
-			 We currently rely on the entity actions to be available to execute, and we ran into an issue when the entity got deleted; then the DOM got cleared, and the delete action couldn't complete. 
+	#renderNotFound() {
+		if (!this._isLoading && !this._exists) {
+			return html`<umb-entity-detail-not-found
+				entity-type=${ifDefined(this._entityType)}></umb-entity-detail-not-found>`;
+		}
+		return nothing;
+	}
+
+	protected override render() {
+		return html` ${this.#renderForbidden()} ${this.#renderNotFound()}
+
+			<!-- TODO: It is currently on purpose that the workspace editor is always in the DOM, even when it doesn't have data.
+			 We currently rely on the entity actions to be available to execute, and we ran into an issue when the entity got deleted; then the DOM got cleared, and the delete action couldn't complete.
 			 We need to look into loading the entity actions in the workspace context instead so we don't rely on the DOM.
 		 -->
 			<umb-workspace-editor
@@ -54,7 +72,9 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 
 	#renderEntityActions() {
 		if (this._isNew) return nothing;
-		return html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`;
+		return html`<umb-workspace-entity-action-menu
+			slot="action-menu"
+			data-mark="workspace:action-menu"></umb-workspace-entity-action-menu>`;
 	}
 
 	static override styles = [

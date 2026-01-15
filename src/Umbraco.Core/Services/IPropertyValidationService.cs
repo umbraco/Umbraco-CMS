@@ -17,9 +17,6 @@ public interface IPropertyValidationService
     /// </summary>
     bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext);
 
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*");
-
     /// <summary>
     ///     Validates a property value.
     /// </summary>
@@ -40,19 +37,4 @@ public interface IPropertyValidationService
         IPropertyType propertyType,
         object? postedValue,
         PropertyValidationContext validationContext);
-
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    IEnumerable<ValidationResult> ValidatePropertyValue(
-        IDataEditor editor,
-        IDataType dataType,
-        object? postedValue,
-        bool isRequired,
-        string? validationRegExp,
-        string? isRequiredMessage,
-        string? validationRegExpMessage);
-
-    [Obsolete("Please use the overload that accepts a PropertyValidationContext. Will be removed in V16.")]
-    IEnumerable<ValidationResult> ValidatePropertyValue(
-        IPropertyType propertyType,
-        object? postedValue);
 }

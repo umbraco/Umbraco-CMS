@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Umbraco.Cms.Core.IO;
 
-internal class ShadowFileSystem : IFileSystem
+internal sealed partial class ShadowFileSystem : IFileSystem
 {
     private readonly IFileSystem _sfs;
 
@@ -91,7 +91,7 @@ internal class ShadowFileSystem : IFileSystem
         var normPath = NormPath(path);
         if (Nodes.TryGetValue(normPath, out ShadowNode? sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
         {
-            throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            throw new InvalidOperationException($"A file at path '{path}' already exists");
         }
 
         var parts = normPath.Split(Constants.CharArrays.ForwardSlash);
@@ -165,6 +165,60 @@ internal class ShadowFileSystem : IFileSystem
         }
 
         Nodes[NormPath(path)] = new ShadowNode(true, false);
+    }
+
+    public void MoveFile(string source, string target, bool overrideIfExists = true)
+    {
+        var normSource = NormPath(source);
+        var normTarget = NormPath(target);
+        if (Nodes.TryGetValue(normSource, out ShadowNode? sf) == false || sf.IsDir || sf.IsDelete)
+        {
+            if (Inner.FileExists(source) == false)
+            {
+                throw new FileNotFoundException("Source file does not exist.");
+            }
+        }
+
+        if (Nodes.TryGetValue(normTarget, out ShadowNode? tf) && tf.IsExist && (tf.IsDir || overrideIfExists == false))
+        {
+            throw new IOException($"A file at path '{target}' already exists");
+        }
+
+        var parts = normTarget.Split(Constants.CharArrays.ForwardSlash);
+        for (var i = 0; i < parts.Length - 1; i++)
+        {
+            var dirPath = string.Join("/", parts.Take(i + 1));
+            if (Nodes.TryGetValue(dirPath, out ShadowNode? sd))
+            {
+                if (sd.IsFile)
+                {
+                    throw new InvalidOperationException("Invalid path.");
+                }
+
+                if (sd.IsDelete)
+                {
+                    Nodes[dirPath] = new ShadowNode(false, true);
+                }
+            }
+            else
+            {
+                if (Inner.DirectoryExists(dirPath))
+                {
+                    continue;
+                }
+
+                if (Inner.FileExists(dirPath))
+                {
+                    throw new InvalidOperationException("Invalid path.");
+                }
+
+                Nodes[dirPath] = new ShadowNode(false, true);
+            }
+        }
+
+        _sfs.MoveFile(normSource, normTarget, overrideIfExists);
+        Nodes[normSource] = new ShadowNode(true, false);
+        Nodes[normTarget] = new ShadowNode(false, false);
     }
 
     public bool FileExists(string path)
@@ -241,7 +295,7 @@ internal class ShadowFileSystem : IFileSystem
         var normPath = NormPath(path);
         if (Nodes.TryGetValue(normPath, out ShadowNode? sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
         {
-            throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            throw new InvalidOperationException($"A file at path '{path}' already exists");
         }
 
         var parts = normPath.Split(Constants.CharArrays.ForwardSlash);
@@ -392,14 +446,28 @@ internal class ShadowFileSystem : IFileSystem
     }
 
     // copied from System.Web.Util.Wildcard internal
-    internal class WildcardExpression
+    internal sealed partial class WildcardExpression
     {
-        private static readonly Regex MetaRegex = new("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
-        private static readonly Regex QuestRegex = new("\\?");
-        private static readonly Regex StarRegex = new("\\*");
-        private static readonly Regex CommaRegex = new(",");
-        private static readonly Regex SlashRegex = new("(?=/)");
-        private static readonly Regex BackslashRegex = new("(?=[\\\\:])");
+        private static readonly Regex MetaRegex = GetMetaRegex();
+
+        [GeneratedRegex("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]")]
+        private static partial Regex GetMetaRegex();
+
+        private static readonly Regex QuestRegex = GetQuestRegex();
+
+        [GeneratedRegex("\\?")]
+        private static partial Regex GetQuestRegex();
+
+        private static readonly Regex StarRegex = GetStarRegex();
+
+        [GeneratedRegex("\\*")]
+        private static partial Regex GetStarRegex();
+
+        private static readonly Regex CommaRegex = GetCommaRegex();
+
+        [GeneratedRegex(",")]
+        private static partial Regex GetCommaRegex();
+
         private readonly bool _caseInsensitive;
         private readonly string _pattern;
         private Regex? _regex;
@@ -454,7 +522,7 @@ internal class ShadowFileSystem : IFileSystem
         }
     }
 
-    private class ShadowNode
+    private sealed class ShadowNode
     {
         public ShadowNode(bool isDelete, bool isdir)
         {

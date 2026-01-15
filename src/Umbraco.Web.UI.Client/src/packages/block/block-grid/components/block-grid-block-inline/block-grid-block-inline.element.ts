@@ -1,25 +1,19 @@
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
-import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../../context/block-grid-entries.context-token.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import '../block-grid-areas-container/index.js';
-import '../ref-grid-block/index.js';
-import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-import {
-	type UMB_BLOCK_WORKSPACE_CONTEXT,
-	UMB_BLOCK_WORKSPACE_ALIAS,
-	type UmbBlockDataType,
-} from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbExtensionApiInitializer,
-	UmbExtensionsApiInitializer,
-	type UmbApiConstructorArgumentsMethodType,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
+import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
+import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UMB_BLOCK_WORKSPACE_CONTEXT, UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -30,6 +24,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	//
 	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+	#variantId: UmbVariantId | undefined;
 	#contentKey?: string;
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
@@ -43,14 +38,23 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
 	@state()
-	_inlineProperty?: UmbPropertyTypeModel;
+	private _inlineProperty?: UmbPropertyTypeModel;
+
+	@state()
+	private _inlinePropertyDataPath?: string;
 
 	@state()
 	private _ownerContentTypeName?: string;
@@ -64,7 +68,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
-				this.#blockContext.unique,
+				this.#blockContext?.unique,
 				(contentKey) => {
 					this.#contentKey = contentKey;
 					this.#load();
@@ -72,17 +76,19 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				'observeContentKey',
 			);
 		});
+
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
-			this.#parentUnique = entriesContext.getParentUnique();
-			this.#areaKey = entriesContext.getAreaKey();
+			this.#parentUnique = entriesContext?.getParentUnique();
+			this.#areaKey = entriesContext?.getAreaKey();
 		});
+
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			UMB_BLOCK_WORKSPACE_ALIAS,
 			apiArgsCreator,
 			(permitted, ctrl) => {
-				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE | undefined;
 				if (permitted && context) {
 					// Risky business, cause here we are lucky that it seems to be consumed and set before this is called and there for this is acceptable for now. [NL]
 					if (this.#parentUnique === undefined || this.#areaKey === undefined) {
@@ -101,6 +107,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						this.#workspaceContext.content.structure.contentTypeProperties,
 						(contentTypeProperties) => {
 							this._inlineProperty = contentTypeProperties[0];
+							this.#generatePropertyDataPath();
 						},
 						'observeProperties',
 					);
@@ -116,9 +123,10 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					this.observe(
 						context.variantId,
 						async (variantId) => {
+							this.#variantId = variantId;
+							this.#generatePropertyDataPath();
 							if (variantId) {
 								context.content.setup(this, variantId);
-								// TODO: Support segment name?
 								const culture = variantId.culture;
 								if (culture) {
 									const languageRepository = new UmbLanguageItemRepository(this);
@@ -131,10 +139,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						'observeVariant',
 					);
 
-					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
-						this,
-						this.#workspaceContext,
-					]);
+					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this.#workspaceContext]);
 				}
 			},
 		);
@@ -143,6 +148,16 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	#load() {
 		if (!this.#workspaceContext || !this.#contentKey) return;
 		this.#workspaceContext.load(this.#contentKey);
+	}
+
+	#generatePropertyDataPath() {
+		if (!this.#variantId || !this._inlineProperty) return;
+		const property = this._inlineProperty;
+		this._inlinePropertyDataPath = `$.values[${UmbDataPathPropertyValueQuery({
+			alias: property.alias,
+			culture: property.variesByCulture ? this.#variantId!.culture : null,
+			segment: property.variesBySegment ? this.#variantId!.segment : null,
+		})}].value`;
 	}
 
 	#expose = () => {
@@ -163,33 +178,47 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				</div>
 			</span>
+			${when(
+				this.unpublished,
+				() => html`
+					<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
+						<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+					</uui-tag>
+				`,
+			)}
 		`;
 	}
 
 	#renderInside() {
 		if (this.unpublished === true) {
-			return html`<uui-button id="exposeButton" @click=${this.#expose}
-				><uui-icon name="icon-add"></uui-icon>
-				<umb-localize
-					key="blockEditor_createThisFor"
-					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
-			></uui-button>`;
+			return html`
+				<uui-button id="exposeButton" @click=${this.#expose}>
+					<uui-icon name="icon-add"></uui-icon>
+					<umb-localize
+						key="blockEditor_createThisFor"
+						.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize>
+				</uui-button>
+			`;
 		} else {
-			return html`<div id="inside">
-				<umb-property-type-based-property
-					.property=${this._inlineProperty}
-					slot="areas"></umb-property-type-based-property>
-				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
-			</div>`;
+			return html`
+				<div id="inside" draggable="false">
+					<umb-property-type-based-property
+						.property=${this._inlineProperty}
+						.dataPath=${this._inlinePropertyDataPath ?? ''}
+						slot="areas"></umb-property-type-based-property>
+					<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
+				</div>
+			`;
 		}
 	}
 
@@ -205,7 +234,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 			#exposeButton {
 				width: 100%;
-				min-height: var(--uui-size-layout-3);
+				min-height: var(--uui-size-16);
 			}
 
 			#host {
@@ -239,7 +268,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				border-color: var(--uui-color-disabled-standalone);
 			}
 
-			:host([unpublished]) #open-part {
+			:host([unpublished]) #open-part #content {
 				opacity: 0.6;
 			}
 
@@ -303,6 +332,13 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 			#name {
 				font-weight: 700;
+			}
+
+			uui-tag {
+				margin-left: 0.5em;
+				margin-bottom: -0.3em;
+				margin-top: -0.3em;
+				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

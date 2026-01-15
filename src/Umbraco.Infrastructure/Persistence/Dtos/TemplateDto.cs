@@ -4,11 +4,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Template)]
+[TableName(TableName)]
 [PrimaryKey("pk")]
 [ExplicitColumns]
-internal class TemplateDto
+internal sealed class TemplateDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.Template;
+
     [Column("pk")]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }

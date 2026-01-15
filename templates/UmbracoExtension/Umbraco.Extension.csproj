@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc Condition="'$(SupportPagesAndViews)' == 'True'">true</AddRazorSupportForMvc>
@@ -24,7 +24,7 @@
     <PackageReference Include="Umbraco.Cms.Api.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageReference Include="Umbraco.Cms.Api.Management" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <!-- Dont include the client folder as part of packaging nuget build -->
     <Content Remove="Client\**" />
@@ -32,5 +32,9 @@
     <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->
     <None Include="Client\public\umbraco-package.json" Pack="false" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

@@ -16,11 +16,6 @@ namespace Umbraco.Cms.Web.Common.Mvc;
 /// </remarks>
 public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
 {
-    private readonly GlobalSettings _globalSettings;
-
-    public UmbracoMvcConfigureOptions(IOptions<GlobalSettings> globalSettings)
-        => _globalSettings = globalSettings.Value;
-
     /// <inheritdoc />
     public void Configure(MvcOptions options)
     {

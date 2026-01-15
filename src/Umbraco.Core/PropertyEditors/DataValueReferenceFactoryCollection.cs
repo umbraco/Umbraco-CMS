@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -12,13 +13,15 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     // TODO: We could further reduce circular dependencies with PropertyEditorCollection by not having IDataValueReference implemented
     // by property editors and instead just use the already built in IDataValueReferenceFactory and/or refactor that into a more normal collection
 
+    private readonly ILogger<DataValueReferenceFactoryCollection> _logger;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DataValueReferenceFactoryCollection" /> class.
     /// </summary>
     /// <param name="items">The items.</param>
-    public DataValueReferenceFactoryCollection(Func<IEnumerable<IDataValueReferenceFactory>> items)
-        : base(items)
-    { }
+    /// <param name="logger">The logger.</param>
+    public DataValueReferenceFactoryCollection(Func<IEnumerable<IDataValueReferenceFactory>> items, ILogger<DataValueReferenceFactoryCollection> logger)
+        : base(items) => _logger = logger;
 
     /// <summary>
     /// Gets all unique references from the specified properties.
@@ -33,7 +36,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         var references = new HashSet<UmbracoEntityReference>();
 
         // Group by property editor alias to avoid duplicate lookups and optimize value parsing
-        foreach (var propertyValuesByPropertyEditorAlias in properties.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Values))
+        foreach (IGrouping<string, IReadOnlyCollection<IPropertyValue>> propertyValuesByPropertyEditorAlias in properties.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Values))
         {
             if (!propertyEditors.TryGet(propertyValuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
             {
@@ -48,7 +51,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
                 values.Add(propertyValue.PublishedValue);
             }
 
-            references.UnionWith(GetReferences(dataEditor, values));
+            references.UnionWith(GetReferences(dataEditor, values, propertyValuesByPropertyEditorAlias.Key));
         }
 
         return references;
@@ -74,14 +77,18 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// The references.
     /// </returns>
     public ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values) =>
-        GetReferencesEnumerable(dataEditor, values).ToHashSet();
-    private IEnumerable<UmbracoEntityReference> GetReferencesEnumerable(IDataEditor dataEditor, IEnumerable<object?> values)
+        GetReferencesEnumerable(dataEditor, values, null).ToHashSet();
+
+    private ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values, string propertyEditorAlias) =>
+        GetReferencesEnumerable(dataEditor, values, propertyEditorAlias).ToHashSet();
+
+    private IEnumerable<UmbracoEntityReference> GetReferencesEnumerable(IDataEditor dataEditor, IEnumerable<object?> values, string? propertyEditorAlias)
     {
         // TODO: We will need to change this once we support tracking via variants/segments
         // for now, we are tracking values from ALL variants
         if (dataEditor.GetValueEditor() is IDataValueReference dataValueReference)
         {
-            foreach (UmbracoEntityReference reference in values.SelectMany(dataValueReference.GetReferences))
+            foreach (UmbracoEntityReference reference in GetReferencesFromPropertyValues(values, dataValueReference, propertyEditorAlias))
             {
                 yield return reference;
             }
@@ -91,7 +98,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         // implementation of GetReferences in IDataValueReference.
         // Allows developers to add support for references by a
         // package /property editor that did not implement IDataValueReference themselves
-                foreach (IDataValueReferenceFactory dataValueReferenceFactory in this)
+        foreach (IDataValueReferenceFactory dataValueReferenceFactory in this)
         {
             // Check if this value reference is for this datatype/editor
             // Then call it's GetReferences method - to see if the value stored
@@ -107,16 +114,38 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         }
     }
 
-    /// <summary>
-    /// Gets all relation type aliases that are automatically tracked.
-    /// </summary>
-    /// <param name="propertyEditors">The property editors.</param>
-    /// <returns>
-    /// All relation type aliases that are automatically tracked.
-    /// </returns>
-    [Obsolete("Use GetAllAutomaticRelationTypesAliases. This will be removed in Umbraco 15.")]
-    public ISet<string> GetAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors) =>
-        GetAllAutomaticRelationTypesAliases(propertyEditors);
+    private IEnumerable<UmbracoEntityReference> GetReferencesFromPropertyValues(IEnumerable<object?> values, IDataValueReference dataValueReference, string? propertyEditorAlias)
+    {
+        var result = new List<UmbracoEntityReference>();
+        foreach (var value in values)
+        {
+            // When property editors on data types are changed, we could have values that are incompatible with the new editor.
+            // Leading to issues such as:
+            // - https://github.com/umbraco/Umbraco-CMS/issues/17628
+            // - https://github.com/umbraco/Umbraco-CMS/issues/17725
+            // Although some changes like this are not intended to be compatible, we should handle them gracefully and not
+            // error in retrieving references, which would prevent manipulating or deleting the content that uses the data type.
+            try
+            {
+                IEnumerable<UmbracoEntityReference> references = dataValueReference.GetReferences(value);
+                result.AddRange(references);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception but don't throw, continue with the next value.
+                _logger.LogError(
+                    ex,
+                    "Error getting references from value {Value} with data editor {DataEditor} and property editor alias {PropertyEditorAlias}.",
+                    value,
+                    dataValueReference.GetType().FullName,
+                    propertyEditorAlias ?? "n/a");
+                throw;
+            }
+        }
+
+        return result;
+    }
+
     public ISet<string> GetAllAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
     {
         // Always add default automatic relation types
@@ -126,23 +155,6 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         foreach (IDataEditor dataEditor in propertyEditors)
         {
             automaticRelationTypeAliases.UnionWith(GetAutomaticRelationTypesAliases(dataEditor));
-        }
-
-        return automaticRelationTypeAliases;
-    }
-    [Obsolete("Use non-obsolete GetAutomaticRelationTypesAliases. This will be removed in Umbraco 15.")]
-    public ISet<string> GetAutomaticRelationTypesAliases(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
-    {
-        // Always add default automatic relation types
-        var automaticRelationTypeAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
-
-        // Only add relation types that are used in the properties
-        foreach (IProperty property in properties)
-        {
-            if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
-            {
-                automaticRelationTypeAliases.UnionWith(GetAutomaticRelationTypesAliasesEnumerable(dataEditor));
-            }
         }
 
         return automaticRelationTypeAliases;

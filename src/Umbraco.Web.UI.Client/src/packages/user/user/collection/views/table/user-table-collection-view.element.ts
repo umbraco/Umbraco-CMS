@@ -51,6 +51,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 
@@ -68,6 +69,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
+	@state()
+	private _itemHrefs: Map<string, string> = new Map();
+
 	#collectionContext?: UmbUserCollectionContext;
 
 	constructor() {
@@ -76,14 +80,15 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
-				this.#collectionContext.selection.selection,
-				(selection) => (this._selection = selection),
+				this.#collectionContext?.selection.selection,
+				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
 			);
 			this.observe(
-				this.#collectionContext.items,
-				(items) => {
-					this._users = items;
+				this.#collectionContext?.items,
+				async (items) => {
+					this._users = items ?? [];
+					await this.#updateItemHrefs();
 					this.#observeUserGroups();
 				},
 				'umbCollectionItemsObserver',
@@ -98,9 +103,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		];
 		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsUniques);
 		this.observe(
-			asObservable(),
+			asObservable?.(),
 			(userGroups) => {
-				this._userGroupItems = userGroups;
+				this._userGroupItems = userGroups ?? [];
 				this.#createTableItems();
 			},
 			'umbUserGroupItemsObserver',
@@ -113,6 +118,17 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 				return this._userGroupItems.find((x) => x.unique === reference.unique)?.name;
 			})
 			.join(', ');
+	}
+
+	async #updateItemHrefs() {
+		const hrefs = new Map<string, string>();
+		for (const user of this._users) {
+			const href = await this.#collectionContext?.requestItemHref?.(user);
+			if (href && user.unique) {
+				hrefs.set(user.unique, href);
+			}
+		}
+		this._itemHrefs = hrefs;
 	}
 
 	#createTableItems() {
@@ -128,6 +144,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 							name: user.name,
 							avatarUrls: user.avatarUrls,
 							kind: user.kind,
+							href: user.unique ? this._itemHrefs.get(user.unique) : undefined,
 						},
 					},
 					{
@@ -150,6 +167,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 							.value=${{
 								entityType: user.entityType,
 								unique: user.unique,
+								name: user.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],

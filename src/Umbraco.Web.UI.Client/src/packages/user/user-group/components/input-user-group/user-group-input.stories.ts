@@ -1,29 +1,18 @@
 import type { UmbUserGroupInputElement } from './user-group-input.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+
 import './user-group-input.element.js';
 
 const meta: Meta<UmbUserGroupInputElement> = {
-	title: 'User Group/Components/User Group Input',
+	title: 'Entity/User Group/Components/User Group Input',
 	component: 'umb-user-group-input',
-	argTypes: {
-		// modalType: {
-		// 	control: 'inline-radio',
-		// 	options: ['dialog', 'sidebar'],
-		// 	defaultValue: 'sidebar',
-		// 	description: 'The type of modal to use when selecting user groups',
-		// },
-		// modalSize: {
-		// 	control: 'select',
-		// 	options: ['small', 'medium', 'large', 'full'],
-		// 	defaultValue: 'small',
-		// 	description: 'The size of the modal to use when selecting user groups, only applicable to sidebar not dialog',
-		// },
-	},
+	render: () => html`<umb-user-group-input></umb-user-group-input>`,
 };
 
 export default meta;
 type Story = StoryObj<UmbUserGroupInputElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

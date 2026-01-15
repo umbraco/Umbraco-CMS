@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
@@ -25,15 +26,17 @@ public class AuditEntryBuilder<TParent>
 {
     private string _affectedDetails;
     private int? _affectedUserId;
+    private Guid? _affectedUserKey;
     private DateTime? _createDate;
     private DateTime? _deleteDate;
-    private DateTime? _eventDateUtc;
+    private DateTime? _eventDate;
     private string _eventDetails;
     private string _eventType;
     private int? _id;
     private Guid? _key;
     private string _performingDetails;
     private string _performingIp;
+    private Guid? _performingUserKey;
     private int? _performingUserId;
     private DateTime? _updateDate;
 
@@ -84,6 +87,12 @@ public class AuditEntryBuilder<TParent>
         return this;
     }
 
+    public AuditEntryBuilder<TParent> WithAffectedUserKey(Guid? affectedUserKey)
+    {
+        _affectedUserKey = affectedUserKey;
+        return this;
+    }
+
     public AuditEntryBuilder<TParent> WithEventDetails(string eventDetails)
     {
         _eventDetails = eventDetails;
@@ -110,7 +119,7 @@ public class AuditEntryBuilder<TParent>
 
     public AuditEntryBuilder<TParent> WithEventDate(DateTime eventDateUtc)
     {
-        _eventDateUtc = eventDateUtc;
+        _eventDate = eventDateUtc;
         return this;
     }
 
@@ -120,21 +129,29 @@ public class AuditEntryBuilder<TParent>
         return this;
     }
 
+    public AuditEntryBuilder<TParent> WithPerformingUserKey(Guid? performingUserKey)
+    {
+        _performingUserKey = performingUserKey;
+        return this;
+    }
+
     public override IAuditEntry Build()
     {
         var id = _id ?? 0;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var deleteDate = _deleteDate;
         var affectedDetails = _affectedDetails ?? Guid.NewGuid().ToString();
         var affectedUserId = _affectedUserId ?? -1;
+        var affectedUserKey = _affectedUserKey ?? Constants.Security.SuperUserKey;
         var eventDetails = _eventDetails ?? Guid.NewGuid().ToString();
         var eventType = _eventType ?? "umbraco/user";
         var performingDetails = _performingDetails ?? Guid.NewGuid().ToString();
         var performingIp = _performingIp ?? "127.0.0.1";
-        var eventDateUtc = _eventDateUtc ?? DateTime.UtcNow;
+        var eventDate = _eventDate ?? DateTime.UtcNow;
         var performingUserId = _performingUserId ?? -1;
+        var performingUserKey = _performingUserKey ?? Constants.Security.SuperUserKey;
 
         return new AuditEntry
         {
@@ -145,12 +162,14 @@ public class AuditEntryBuilder<TParent>
             DeleteDate = deleteDate,
             AffectedDetails = affectedDetails,
             AffectedUserId = affectedUserId,
+            AffectedUserKey = affectedUserKey,
             EventDetails = eventDetails,
             EventType = eventType,
             PerformingDetails = performingDetails,
             PerformingIp = performingIp,
-            EventDateUtc = eventDateUtc,
-            PerformingUserId = performingUserId
+            EventDate = eventDate,
+            PerformingUserId = performingUserId,
+            PerformingUserKey = performingUserKey,
         };
     }
 }

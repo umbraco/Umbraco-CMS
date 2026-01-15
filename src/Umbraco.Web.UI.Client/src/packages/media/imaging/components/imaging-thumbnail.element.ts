@@ -1,8 +1,10 @@
 import { UmbImagingCropMode } from '../types.js';
 import { UmbImagingRepository } from '../imaging.repository.js';
-import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-imaging-thumbnail')
 export class UmbImagingThumbnailElement extends UmbLitElement {
@@ -10,8 +12,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * The unique identifier for the media item.
 	 * @description This is also known as the media key and is used to fetch the resource.
 	 */
-	@property()
-	unique = '';
+	@property({ type: String })
+	unique?: string;
 
 	/**
 	 * The width of the thumbnail in pixels.
@@ -32,19 +34,19 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @description The mode determines how the image is cropped.
 	 * @enum {UmbImagingCropMode}
 	 */
-	@property()
+	@property({ type: String })
 	mode: UmbImagingCropMode = UmbImagingCropMode.MIN;
 
 	/**
 	 * The alt text for the thumbnail.
 	 */
-	@property()
+	@property({ type: String })
 	alt = '';
 
 	/**
 	 * The fallback icon for the thumbnail.
 	 */
-	@property()
+	@property({ type: String })
 	icon = 'icon-picture';
 
 	/**
@@ -52,11 +54,17 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
 	 */
-	@property()
+	@property({ type: String })
 	loading: (typeof HTMLImageElement)['prototype']['loading'] = 'lazy';
 
+	/**
+	 * External loading state (e.g., when parent is waiting for metadata)
+	 */
+	@property({ type: Boolean, reflect: false, attribute: 'external-loading' })
+	externalLoading = false;
+
 	@state()
-	private _isLoading = true;
+	private _isLoading = false;
 
 	@state()
 	private _thumbnailUrl = '';
@@ -66,7 +74,11 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	#intersectionObserver?: IntersectionObserver;
 
 	override render() {
-		return html` ${this.#renderThumbnail()} ${when(this._isLoading, () => this.#renderLoading())} `;
+		return when(
+			this.externalLoading || this._isLoading,
+			() => this.#renderLoading(),
+			() => this.#renderThumbnail(),
+		);
 	}
 
 	override connectedCallback() {
@@ -77,11 +89,13 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 				if (entries[0].isIntersecting) {
 					this.#generateThumbnailUrl();
 					this.#intersectionObserver?.disconnect();
+					this.#observeActionEvent();
 				}
 			});
 			this.#intersectionObserver.observe(this);
 		} else {
 			this.#generateThumbnailUrl();
+			this.#observeActionEvent();
 		}
 	}
 
@@ -90,33 +104,42 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 		this.#intersectionObserver?.disconnect();
 	}
 
+	/**
+	 * Observes the action events for the current media item.
+	 * Reloads the thumbnail when the media item is updated.
+	 * Note: Call this only when the media item is in view or otherwise is supposed to be loaded already.
+	 */
+	#observeActionEvent() {
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
+			actionEventContext?.addEventListener(UmbEntityUpdatedEvent.TYPE, (event) => {
+				if (event instanceof UmbEntityUpdatedEvent && event.getUnique() === this.unique) {
+					this.#generateThumbnailUrl();
+				}
+			});
+		});
+	}
+
 	#renderLoading() {
-		return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		return html`<uui-loader-circle id="loader"></uui-loader-circle>`;
 	}
 
 	#renderThumbnail() {
-		if (this._isLoading) return nothing;
-
 		return when(
 			this._thumbnailUrl,
-			() =>
-				html`<img
-					id="figure"
-					src="${this._thumbnailUrl}"
-					alt="${this.alt}"
-					loading="${this.loading}"
-					draggable="false" />`,
-			() => html`<umb-icon id="icon" name="${this.icon}"></umb-icon>`,
+			(url) => html`<img id="figure" src=${url} alt=${this.alt} loading=${this.loading} draggable="false" />`,
+			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>`,
 		);
 	}
 
 	async #generateThumbnailUrl() {
-		const { data } = await this.#imagingRepository.requestThumbnailUrls(
-			[this.unique],
-			this.height,
-			this.width,
-			this.mode,
-		);
+		if (!this.unique) return;
+		this._isLoading = true;
+
+		const { data } = await this.#imagingRepository.requestResizedItems([this.unique], {
+			height: this.height,
+			width: this.width,
+			mode: this.mode,
+		});
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';
 		this._isLoading = false;
@@ -137,11 +160,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			}
 
 			#loader {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100%;
-				width: 100%;
+				font-size: 2em;
+				margin-bottom: 1em;
 			}
 
 			#figure {

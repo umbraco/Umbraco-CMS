@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class UserServiceCrudTests
+internal sealed partial class UserServiceCrudTests
 {
     [Test]
     public async Task Delete_Returns_Not_Found_If_Not_Found()
@@ -33,7 +33,7 @@ public partial class UserServiceCrudTests
         Assert.IsTrue(creationResult.Success);
         var createdUser = creationResult.Result.CreatedUser;
 
-        createdUser!.LastLoginDate = DateTime.Now;
+        createdUser!.LastLoginDate = DateTime.UtcNow;
         userService.Save(createdUser);
 
         var result = await userService.DeleteAsync(Constants.Security.SuperUserKey, createdUser.Key);

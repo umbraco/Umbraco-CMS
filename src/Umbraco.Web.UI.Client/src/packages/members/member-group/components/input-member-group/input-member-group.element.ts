@@ -1,17 +1,20 @@
 import type { UmbMemberGroupItemModel } from '../../types.js';
 import { UmbMemberGroupPickerInputContext } from './input-member-group.context.js';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-member-group')
-export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, typeof UmbLitElement>(
 	UmbLitElement,
+	undefined,
 ) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -50,7 +53,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -72,7 +75,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -83,15 +86,13 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 		return this.#pickerContext.getSelection();
 	}
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
-
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
+		super.value = selectionString;
 	}
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
@@ -121,11 +122,23 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	}
 	#readonly = false;
 
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+	@property({ type: String })
+	requiredMessage?: string;
+
 	@state()
 	private _editMemberGroupPath = '';
 
 	@state()
 	private _items?: Array<UmbMemberGroupItemModel>;
+
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
 	#pickerContext = new UmbMemberGroupPickerInputContext(this);
 
@@ -142,6 +155,12 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 			});
 
 		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
+
+		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
 			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
@@ -155,6 +174,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observeItems');
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 	}
 
 	protected override getFormElement() {
@@ -167,8 +187,8 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 		});
 	}
 
-	#removeItem(item: UmbMemberGroupItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#removeItem(unique: string) {
+		this.#pickerContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -176,13 +196,62 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._statuses) return;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
+
+						// For error state, use umb-entity-item-ref
+						if (isError) {
+							return html`
+								<umb-entity-item-ref
+									id=${unique}
+									?error=${true}
+									.errorMessage=${status.state.error}
+									.errorDetail=${unique}
+									?readonly=${this.readonly}
+									?standalone=${this.max === 1}>
+									${when(
+										!this.readonly,
+										() => html`
+											<uui-action-bar slot="actions">
+												<uui-button
+													label=${this.localize.term('general_remove')}
+													@click=${() => this.#removeItem(unique)}></uui-button>
+											</uui-action-bar>
+										`,
+									)}
+								</umb-entity-item-ref>
+							`;
+						}
+
+						// For successful items, use uui-ref-node
+						if (!item) return nothing;
+						return html`
+							<uui-ref-node
+								name=${item.name}
+								id=${unique}
+								href="${this._editMemberGroupPath}edit/${unique}"
+								?readonly=${this.readonly}>
+								<uui-action-bar slot="actions">
+									${when(
+										!this.readonly,
+										() =>
+											html`<uui-button
+												@click=${() => this.#removeItem(unique)}
+												label=${this.localize.term('general_remove')}></uui-button>`,
+									)}
+								</uui-action-bar>
+								<umb-icon slot="icon" name="icon-users"></umb-icon>
+							</uui-ref-node>
+						`;
+					},
 				)}
 			</uui-ref-list>
 		`;
@@ -200,27 +269,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 				label=${this.localize.term('general_choose')}
 				?disabled=${this.readonly}></uui-button>`;
 		}
-	}
-
-	#renderItem(item: UmbMemberGroupItemModel) {
-		if (!item.unique) return nothing;
-		return html`
-			<uui-ref-node
-				name=${item.name}
-				id=${item.unique}
-				href="${this._editMemberGroupPath}edit/${item.unique}"
-				?readonly=${this.readonly}>
-				<uui-action-bar slot="actions"> ${this.#renderRemoveButton(item)} </uui-action-bar>
-				<umb-icon slot="icon" name="icon-users"></umb-icon>
-			</uui-ref-node>
-		`;
-	}
-
-	#renderRemoveButton(item: UmbMemberGroupItemModel) {
-		if (this.readonly) return nothing;
-		return html`<uui-button
-			@click=${() => this.#removeItem(item)}
-			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
 	static override styles = [

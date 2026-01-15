@@ -1,10 +1,10 @@
 import { UMB_DATA_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbDataTypeTreeServerDataSource } from './data-type-tree.server.data-source.js';
+import { UmbDataTypeTreeServerDataSource } from './server-data-source/data-type-tree.server.data-source.js';
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from './data-type-tree.store.context-token.js';
 import type { UmbDataTypeTreeItemModel, UmbDataTypeTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDataTypeTreeRepository
 	extends UmbTreeRepositoryBase<UmbDataTypeTreeItemModel, UmbDataTypeTreeRootModel>
@@ -15,7 +15,7 @@ export class UmbDataTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data: UmbDataTypeTreeRootModel = {

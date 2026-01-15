@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Extensions;
 
@@ -21,6 +23,7 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     private readonly LinkParser _linkParser;
     private readonly UriUtility _uriUtility;
     private readonly IPublishedRouter _publishedRouter;
+    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
     /// <summary>
     /// Constructor.
@@ -29,16 +32,19 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     /// <param name="linkParser">The link parser.</param>
     /// <param name="uriUtility">The Uri utility.</param>
     /// <param name="publishedRouter">The published router.</param>
+    /// <param name="umbracoContextAccessor">The umbraco context accessor.</param>
     public UmbracoVirtualPageRoute(
         EndpointDataSource endpointDataSource,
         LinkParser linkParser,
         UriUtility uriUtility,
-        IPublishedRouter publishedRouter)
+        IPublishedRouter publishedRouter,
+        IUmbracoContextAccessor umbracoContextAccessor)
     {
         _endpointDataSource = endpointDataSource;
         _linkParser = linkParser;
         _uriUtility = uriUtility;
         _publishedRouter = publishedRouter;
+        _umbracoContextAccessor = umbracoContextAccessor;
     }
 
     /// <summary>
@@ -157,7 +163,8 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         requestBuilder.SetPublishedContent(publishedContent);
         _publishedRouter.RouteDomain(requestBuilder);
 
-        return requestBuilder.Build();
+        // Ensure the culture and domain is set correctly for the published request
+        return await _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(Core.Routing.RouteDirection.Inbound));
     }
 
     /// <summary>
@@ -170,6 +177,12 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     public async Task SetRouteValues(HttpContext httpContext, IPublishedContent publishedContent, ControllerActionDescriptor controllerActionDescriptor)
     {
         IPublishedRequest publishedRequest = await CreatePublishedRequest(httpContext, publishedContent);
+
+        // Ensure the published request is set to the UmbracoContext
+        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+        {
+            umbracoContext.PublishedRequest = publishedRequest;
+        }
 
         var umbracoRouteValues = new UmbracoRouteValues(
             publishedRequest,

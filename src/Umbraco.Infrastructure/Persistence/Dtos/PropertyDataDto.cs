@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Extensions;
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class PropertyDataDto
+internal sealed class PropertyDataDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyData;
     public const int VarcharLength = 512;
@@ -122,7 +122,7 @@ internal class PropertyDataDto
             PropertyTypeDto = PropertyTypeDto,
         };
 
-    protected bool Equals(PropertyDataDto other) => Id == other.Id;
+    private bool Equals(PropertyDataDto other) => Id == other.Id;
 
     public override bool Equals(object? other) =>
         !ReferenceEquals(null, other) // other is not null

@@ -8,9 +8,10 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
-	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
+	extends UmbContextBase
 	implements UmbSubmittableWorkspaceContext
 {
 	public readonly workspaceAlias: string;
@@ -18,8 +19,9 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
-	//public readonly validation = new UmbValidationContext(this);
 	#validationContexts: Array<UmbValidationController> = [];
+
+	public readonly view = new UmbViewContext(this, null);
 
 	/**
 	 * Appends a validation context to the workspace.
@@ -31,7 +33,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	#submitPromise: Promise<void> | undefined;
 	#submitResolve: (() => void) | undefined;
-	#submitReject: (() => void) | undefined;
+	#submitReject: ((reason?: any) => void) | undefined;
 
 	abstract readonly unique: Observable<string | null | undefined>;
 
@@ -53,17 +55,23 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.workspaceAlias = workspaceAlias;
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
-			(this.modalContext as UmbModalContext) = context;
+			(this.modalContext as UmbModalContext | undefined) = context;
+		});
+
+		this.view.shortcuts.addOne({
+			key: 's',
+			modifier: true,
+			action: () => this.requestSubmit(),
+			label: '#general_submit',
 		});
 	}
 
 	protected resetState() {
-		//this.validation.reset();
 		this.#validationContexts.forEach((context) => context.reset());
 		this.#isNew.setValue(undefined);
 	}
 
-	getIsNew() {
+	public getIsNew() {
 		return this.#isNew.getValue();
 	}
 
@@ -75,19 +83,32 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
 	 * @returns Promise that resolves to void when the validation is complete.
 	 */
-	async validate(): Promise<Array<void>> {
-		//return this.validation.validate();
-		return Promise.all(this.#validationContexts.map((context) => context.validate()));
+	public async validate(): Promise<Array<void>> {
+		return await Promise.all(this.#validationContexts.map((context) => context.validate()));
 	}
 
-	async requestSubmit(): Promise<void> {
+	public async requestSubmit(): Promise<void> {
 		return this.validateAndSubmit(
 			() => this.submit(),
-			() => this.invalidSubmit(),
+			(reason?: any) => this.invalidSubmit(reason),
 		);
 	}
 
-	protected async validateAndSubmit(onValid: () => Promise<void>, onInvalid: () => Promise<void>): Promise<void> {
+	protected async _validateAndLog(): Promise<void> {
+		await this.validate().catch(async () => {
+			// TODO: Implement developer-mode logging here. [NL]
+			console.warn(
+				'Validation failed because of these validation messages still begin present: ',
+				this.#validationContexts.flatMap((x) => x.messages.getMessages()),
+			);
+			return Promise.reject();
+		});
+	}
+
+	public async validateAndSubmit(
+		onValid: () => Promise<void>,
+		onInvalid: (reason?: any) => Promise<void>,
+	): Promise<void> {
 		if (this.#submitPromise) {
 			return this.#submitPromise;
 		}
@@ -95,23 +116,23 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this.validate().then(
+		this._validateAndLog().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
-			async () => {
-				onInvalid().then(this.#resolveSubmit, this.#rejectSubmit);
+			async (error) => {
+				onInvalid(error).then(this.#resolveSubmit, this.#rejectSubmit);
 			},
 		);
 
-		return this.#submitPromise;
+		return await this.#submitPromise;
 	}
 
-	#rejectSubmit = () => {
+	#rejectSubmit = (error: any) => {
 		if (this.#submitPromise) {
 			// TODO: Capture the validation contexts messages on open, and then reset to them in this case. [NL]
 
-			this.#submitReject?.();
+			this.#submitReject?.(error);
 			this.#submitPromise = undefined;
 			this.#submitResolve = undefined;
 			this.#submitReject = undefined;
@@ -148,8 +169,19 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
 	protected abstract submit(): Promise<void>;
-	protected invalidSubmit(): Promise<void> {
-		return Promise.reject();
+	protected invalidSubmit(reason?: any): Promise<void> {
+		return Promise.reject(reason);
+	}
+
+	override destroy(): void {
+		this.#isNew.destroy();
+		this.routes.destroy();
+		super.destroy();
+		this.#submitPromise = undefined;
+		this.#submitResolve = undefined;
+		this.#submitReject = undefined;
+		this.#validationContexts.forEach((context) => context.destroy());
+		this.#validationContexts = [];
 	}
 }
 

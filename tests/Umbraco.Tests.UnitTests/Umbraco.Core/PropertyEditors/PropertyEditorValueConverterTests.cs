@@ -77,7 +77,7 @@ public class PropertyEditorValueConverterTests
     [TestCase(null, new string[] { })]
     public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
     {
-        var converter = new CheckboxListValueConverter(new SystemTextJsonSerializer());
+        var converter = new CheckboxListValueConverter(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
         var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, value, false);
 
         Assert.AreEqual(expected, result);
@@ -92,18 +92,23 @@ public class PropertyEditorValueConverterTests
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(123))
-            .Returns(new PublishedDataType(123, "test",
-                new Lazy<object>(() => new DropDownFlexibleConfiguration { Multiple = true })));
+            .Returns(new PublishedDataType(123, "test", "test", new Lazy<object>(() => new DropDownFlexibleConfiguration { Multiple = true })));
 
         var publishedPropType = new PublishedPropertyType(
-            new PublishedContentType(Guid.NewGuid(), 1234, "test", PublishedItemType.Content,
-                Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
+            new PublishedContentType(
+                Guid.NewGuid(),
+                1234,
+                "test",
+                PublishedItemType.Content,
+                Enumerable.Empty<string>(),
+                Enumerable.Empty<PublishedPropertyType>(),
+                ContentVariation.Nothing),
             new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
             new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()),
             Mock.Of<IPublishedModelFactory>(),
             mockPublishedContentTypeFactory.Object);
 
-        var converter = new FlexibleDropdownPropertyValueConverter(new SystemTextJsonSerializer());
+        var converter = new FlexibleDropdownPropertyValueConverter(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
         var inter = converter.ConvertSourceToIntermediate(null, publishedPropType, value, false);
         var result =
             converter.ConvertIntermediateToObject(null, publishedPropType, PropertyCacheLevel.Unknown, inter, false);

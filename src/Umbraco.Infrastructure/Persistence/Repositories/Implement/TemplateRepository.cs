@@ -22,26 +22,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the Template Repository
 /// </summary>
-internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITemplateRepository
+internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITemplateRepository
 {
-    private readonly IIOHelper _ioHelper;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
-
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<TemplateRepository> logger,
         FileSystems fileSystems,
-        IIOHelper ioHelper,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
-        : base(scopeAccessor, cache, logger)
+        IOptionsMonitor<RuntimeSettings> runtimeSettings,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
-        _ioHelper = ioHelper;
         _shortStringHelper = shortStringHelper;
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
@@ -88,30 +91,34 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
     }
 
     protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ITemplate, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ITemplate, int>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            RepositoryCacheVersionService,
+            CacheSyncService,
+            GetEntityId,
+            /*expires:*/ false);
 
     private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
     {
-        //look up the simple template definitions that have a master template assigned, this is used
+        // look up the simple template definitions that have a master template assigned, this is used
         // later to populate the template item's properties
         Sql<ISqlContext> childIdsSql = SqlContext.Sql()
-            .Select("nodeId,alias,parentID")
+            .Select<TemplateDto>(t => t.NodeId, t => t.Alias)
+            .AndSelect<NodeDto>(n => n.ParentId)
             .From<TemplateDto>()
             .InnerJoin<NodeDto>()
-            .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-            //lookup axis's
-            .Where(
-                "umbracoNode." + SqlContext.SqlSyntax.GetQuotedColumnName("id") +
-                " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
-                new
-                {
-                    parentIds = templates.Select(x => x.NodeDto.ParentId),
-                    childIds = templates.Select(x => x.NodeId)
-                });
+            .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+
+            // lookup axis's
+            .WhereInOr<NodeDto, NodeDto>(
+                n => n.NodeId,
+                n2 => n2.ParentId,
+                templates.Select(x => x.NodeDto.ParentId),
+                templates.Select(x => x.NodeId));
 
         IEnumerable<EntitySlim> childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
-            .Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias});
+            .Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias });
 
         return childIds;
     }
@@ -127,7 +134,10 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
     /// <returns></returns>
     private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
     {
-        Template template = TemplateFactory.BuildEntity(_shortStringHelper, dto, axisDefinitions,
+        Template template = TemplateFactory.BuildEntity(
+            _shortStringHelper,
+            dto,
+            axisDefinitions,
             file => GetFileContent((Template)file, false));
 
         if (dto.NodeDto.ParentId > 0)
@@ -208,7 +218,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         return string.Empty;
     }
 
-    private string? GetFileContent(ITemplate template, IFileSystem? fs, string filename, bool init)
+    private static string? GetFileContent(ITemplate template, IFileSystem? fs, string filename, bool init)
     {
         // do not update .UpdateDate as that would make it dirty (side-effect)
         // unless initializing, because we have to do it once
@@ -229,7 +239,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         return init ? null : GetFileContent(fs, filename);
     }
 
-    private string? GetFileContent(IFileSystem? fs, string filename)
+    private static string? GetFileContent(IFileSystem? fs, string filename)
     {
         if (fs is null)
         {
@@ -311,7 +321,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
 
         if (ids?.Any() ?? false)
         {
-            sql.Where("umbracoNode.id in (@ids)", new {ids});
+            sql.Where($"{QuoteTableName("umbracoNode")}.id in (@ids)", new { ids });
         }
         else
         {
@@ -329,7 +339,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = (ids?.Any() ?? false
                 ? GetAxisDefinitions(dtos.ToArray())
-                : dtos.Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias}))
+                : dtos.Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias }))
             .ToArray();
 
         return dtos.Select(d => MapFromDto(d, childIds));
@@ -376,23 +386,25 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var nodeId = QuoteColumnName("nodeId");
+        var umbracoNode = QuoteTableName(NodeDto.TableName);
         var list = new List<string>
         {
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "UPDATE " + Constants.DatabaseSchema.Tables.DocumentVersion +
-            " SET templateId = NULL WHERE templateId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Template + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {nodeId} = @id",
+            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentVersion)}
+                SET {QuoteColumnName("templateId")} = NULL WHERE {QuoteColumnName("templateId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentType)} WHERE {QuoteColumnName("templateNodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Template)} WHERE {nodeId} = @id",
+            $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;
     }
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
+    private Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
 
     protected override void PersistNewItem(ITemplate entity)
     {
@@ -477,10 +489,10 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         }
 
         //Get TemplateDto from db to get the Primary key of the entity
-        TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new {entity.Id});
+        TemplateDto templateDto = Database.Single<TemplateDto>($"WHERE {QuoteColumnName("nodeId")} = @Id", new { entity.Id });
 
         //Save updated entity to db
-        template.UpdateDate = DateTime.Now;
+        template.UpdateDate = DateTime.UtcNow;
         TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
         Database.Update(dto.NodeDto);
         Database.Update(dto);
@@ -541,20 +553,20 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         {
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new {id = GetEntityId(descendant)});
+                Database.Execute(delete, new { id = GetEntityId(descendant) });
             }
         }
 
         //now we can delete this one
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new {id = GetEntityId(entity)});
+            Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
         var viewName = string.Concat(entity.Alias, ".cshtml");
         _viewsFileSystem?.DeleteFile(viewName);
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     #endregion
@@ -627,7 +639,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         return descendants;
     }
 
-    private void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string masterAlias)
+    private static void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string masterAlias)
     {
         ITemplate[]? c = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
         if (c is null || c.Any() == false)

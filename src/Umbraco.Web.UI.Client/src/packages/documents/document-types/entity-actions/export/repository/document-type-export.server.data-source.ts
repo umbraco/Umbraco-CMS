@@ -1,6 +1,6 @@
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Export Document Server Data Source
@@ -27,6 +27,6 @@ export class UmbExportDocumentTypeServerDataSource {
 	async export(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(this.#host, DocumentTypeService.getDocumentTypeByIdExport({ id: unique }));
+		return tryExecute(this.#host, DocumentTypeService.getDocumentTypeByIdExport({ path: { id: unique } }));
 	}
 }

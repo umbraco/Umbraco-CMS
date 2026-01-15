@@ -17,6 +17,7 @@ export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbMediaTreeItemVariantModel>;
+	createDate: string;
 }
 
 export interface UmbMediaTreeRootModel extends UmbTreeRootModel {
@@ -26,6 +27,8 @@ export interface UmbMediaTreeRootModel extends UmbTreeRootModel {
 export interface UmbMediaTreeItemVariantModel {
 	name: string;
 	culture: string | null;
+	// Notice: Media variant flags are not yet implemented in the backend.
+	//flags: Array<UmbEntityFlag>;
 }
 
 export interface UmbMediaTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {

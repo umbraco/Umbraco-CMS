@@ -1,10 +1,11 @@
 import { UMB_UFM_CONTEXT } from '../contexts/ufm.context.js';
-import { nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbUfmElementBase extends UmbLitElement {
 	#filterFuncArgs?: Array<{ alias: string; args: Array<string> }>;
+
+	#ufmContext?: typeof UMB_UFM_CONTEXT.TYPE;
 
 	@property()
 	public set filters(value: string | undefined) {
@@ -26,8 +27,6 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 	@state()
 	value?: unknown;
 
-	#ufmContext?: typeof UMB_UFM_CONTEXT.TYPE;
-
 	constructor() {
 		super();
 
@@ -37,15 +36,24 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this.#ufmContext) return nothing;
+		if (!this.isConnected) return;
 
 		let values = Array.isArray(this.value) ? this.value : [this.value];
+
 		if (this.#filterFuncArgs) {
+			const missing = new Set<string>();
+
 			for (const item of this.#filterFuncArgs) {
-				const filter = this.#ufmContext.getFilterByAlias(item.alias);
+				const filter = this.#ufmContext?.getFilterByAlias(item.alias);
 				if (filter) {
 					values = values.map((value) => filter(value, ...item.args));
+				} else {
+					missing.add(item.alias);
 				}
+			}
+
+			if (missing.size > 0) {
+				console.warn(`UFM filters with aliases "${Array.from(missing).join('", "')}" were not found.`);
 			}
 		}
 

@@ -1,10 +1,8 @@
-import type {
-	UmbNotificationOptions,
-	UmbNotificationColor,
-	UmbNotificationDefaultData,
-} from './notification.context.js';
+import type { UmbNotificationOptions, UmbNotificationColor, UmbNotificationDefaultData } from './types.js';
 import type { UUIToastNotificationElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+
+const DEFAULT_LAYOUT = 'umb-notification-layout-default';
 
 /**
  * @class UmbNotificationHandler
@@ -17,10 +15,9 @@ export class UmbNotificationHandler {
 
 	private _defaultColor: UmbNotificationColor = 'default';
 	private _defaultDuration = 6000;
-	private _defaultLayout = 'umb-notification-layout-default';
 
 	public key: string;
-	public element: any;
+	public element!: UUIToastNotificationElement;
 	public color: UmbNotificationColor;
 	public duration: number | null;
 
@@ -34,22 +31,12 @@ export class UmbNotificationHandler {
 		this.color = options.color || this._defaultColor;
 		this.duration = options.duration !== undefined ? options.duration : this._defaultDuration;
 
-		this._elementName = options.elementName || this._defaultLayout;
+		this._elementName = options.elementName || DEFAULT_LAYOUT;
 		this._data = options.data;
 
 		this._closePromise = new Promise((res) => {
 			this._closeResolver = res;
 		});
-
-		this._createElement();
-	}
-
-	/**
-	 * @private
-	 * @memberof UmbNotificationHandler
-	 */
-	private _createElement() {
-		if (!this._elementName) return;
 
 		const notification: UUIToastNotificationElement = document.createElement('uui-toast-notification');
 

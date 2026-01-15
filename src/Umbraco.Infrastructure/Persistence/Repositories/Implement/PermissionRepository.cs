@@ -23,11 +23,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     like the normal repository pattern but the standard repository Get commands don't apply and will throw
 ///     <see cref="NotImplementedException" />
 /// </remarks>
-internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, ContentPermissionSet>
+internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, ContentPermissionSet>
     where TEntity : class, IEntity
 {
-    public PermissionRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PermissionRepository<TEntity>> logger)
-        : base(scopeAccessor, cache, logger)
+    public PermissionRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<PermissionRepository<TEntity>> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -69,17 +79,19 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         }
         else
         {
-            foreach (IEnumerable<int> entityGroup in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount -
-                                                                    userGroupIds.Length))
+            foreach (IEnumerable<int> entityGroup in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount - userGroupIds.Length))
             {
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<int> userGroupsIdsAsList = [.. userGroupIds];
                 Sql<ISqlContext> sql = Sql()
                     .Select<UserGroup2GranularPermissionDto>("gp").AndSelect("ug.id as userGroupId, en.id as entityId")
                     .From<UserGroupDto>("ug")
                     .InnerJoin<UserGroup2GranularPermissionDto>("gp")
-                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && userGroupIds.Contains(right.Id), "gp", "ug")
+                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && userGroupsIdsAsList.Contains(right.Id), "gp", "ug")
                     .InnerJoin<NodeDto>("en")
                     .On<UserGroup2GranularPermissionDto, NodeDto>((left, right) => left.UniqueId == right.UniqueId, "gp", "en")
-                    .Where<NodeDto>(en =>  entityGroup.Contains(en.NodeId), "en");
+                    .Where<NodeDto>(en => entityGroup.Contains(en.NodeId), "en");
 
                 List<UserGroup2GranularPermissionWithIdsDto> permissions =
                     AmbientScope.Database.Fetch<UserGroup2GranularPermissionWithIdsDto>(sql);

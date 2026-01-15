@@ -1,9 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -17,15 +21,35 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
 {
     private readonly IContentListViewService _contentListViewService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IDocumentCollectionPresentationFactory _documentCollectionPresentationFactory;
 
+    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper)
-        : base(mapper)
+        IUmbracoMapper mapper,
+        IDocumentCollectionPresentationFactory documentCollectionPresentationFactory,
+        FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
     {
         _contentListViewService = contentListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _documentCollectionPresentationFactory = documentCollectionPresentationFactory;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
+    public ByKeyDocumentCollectionController(
+        IContentListViewService contentListViewService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUmbracoMapper mapper,
+        IDocumentCollectionPresentationFactory documentCollectionPresentationFactory)
+        : this(
+            contentListViewService,
+            backOfficeSecurityAccessor,
+            mapper,
+            documentCollectionPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
     }
 
     [HttpGet("{id:guid}")]
@@ -55,8 +79,12 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
             skip,
             take);
 
-        return collectionAttempt.Success
-            ? CollectionResult(collectionAttempt.Result!)
-            : CollectionOperationStatusResult(collectionAttempt.Status);
+        if (collectionAttempt.Success is false)
+        {
+            return CollectionOperationStatusResult(collectionAttempt.Status);
+        }
+
+        List<DocumentCollectionResponseModel> collectionResponseModels = await _documentCollectionPresentationFactory.CreateCollectionModelAsync(collectionAttempt.Result!);
+        return CollectionResult(collectionResponseModels, collectionAttempt.Result!.Items.Total);
     }
 }

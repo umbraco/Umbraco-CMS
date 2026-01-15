@@ -1,13 +1,17 @@
 import { UmbContentPickerDynamicRootRepository } from './dynamic-root/repository/index.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_ANCESTORS_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -19,25 +23,14 @@ import './components/input-content/index.js';
 
 type UmbContentPickerValueType = UmbInputContentElement['selection'];
 
-const elementName = 'umb-property-editor-ui-content-picker';
-
 /**
  * @element umb-property-editor-ui-content-picker
  */
-@customElement(elementName)
+@customElement('umb-property-editor-ui-content-picker')
 export class UmbPropertyEditorUIContentPickerElement
 	extends UmbFormControlMixin<UmbContentPickerValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	@property({ type: Array })
-	public override set value(value: UmbContentPickerValueType | undefined) {
-		this.#value = value;
-	}
-	public override get value(): UmbContentPickerValueType | undefined {
-		return this.#value;
-	}
-	#value?: UmbContentPickerValueType = [];
-
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -46,33 +39,40 @@ export class UmbPropertyEditorUIContentPickerElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	@property({ type: Boolean })
+	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
-	_type: UmbContentPickerSource['type'] = 'content';
+	private _type: UmbContentPickerSource['type'] = 'content';
 
 	@state()
-	_min = 0;
+	private _min = 0;
 
 	@state()
-	_minMessage = '';
+	private _minMessage = '';
 
 	@state()
-	_max = Infinity;
+	private _max = Infinity;
 
 	@state()
-	_maxMessage = '';
+	private _maxMessage = '';
 
 	@state()
-	_allowedContentTypeUniques?: string | null;
+	private _allowedContentTypeUniques?: string | null;
 
 	@state()
-	_showOpenButton?: boolean;
+	private _rootUnique?: string | null;
 
 	@state()
-	_rootUnique?: string | null;
+	private _rootEntityType?: string;
 
 	@state()
-	_rootEntityType?: string;
+	private _invalidData?: UmbContentPickerValueType;
+
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
@@ -83,7 +83,21 @@ export class UmbPropertyEditorUIContentPickerElement
 		member: UMB_MEMBER_ENTITY_TYPE,
 	};
 
+	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbContentPicker',
+	});
+
+	constructor() {
+		super();
+
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
+		});
+	}
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
+
 		if (!config) return;
 
 		const startNode = config.getValueByAlias<UmbContentPickerSource>('startNode');
@@ -92,21 +106,21 @@ export class UmbPropertyEditorUIContentPickerElement
 			this._rootUnique = startNode.id;
 			this._rootEntityType = this.#entityTypeDictionary[startNode.type];
 			this.#dynamicRoot = startNode.dynamicRoot;
+
+			// NOTE: Filter out any items that do not match the entity type. [LK]
+			this._invalidData = this.value?.filter((x) => x.type !== this._rootEntityType);
+			if (this._invalidData?.length) {
+				this.readonly = true;
+			}
 		}
 
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
-		this._showOpenButton = config.getValueByAlias('showOpenButton');
 
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
-
-		// NOTE: Run validation immediately, to notify if the value is outside of min/max range. [LK]
-		if (this._min > 0 || this._max < Infinity) {
-			this.checkValidity();
-		}
 	}
 
 	#parseInt(value: unknown, fallback: number): number {
@@ -114,9 +128,21 @@ export class UmbPropertyEditorUIContentPickerElement
 		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
-	override firstUpdated() {
+	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.firstUpdated(changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
+
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property (Content Picker) has been misconfigured, 'minNumber' is greater than 'maxNumber'. Please correct your data type configuration.`,
+				this,
+			);
+		}
+	}
+
+	override focus() {
+		return this.shadowRoot?.querySelector<UmbInputContentElement>('umb-input-content')?.focus();
 	}
 
 	async #setPickerRootUnique() {
@@ -124,11 +150,9 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
-		const menuStructureWorkspaceContext = (await this.getContext('UmbMenuStructureWorkspaceContext')) as any;
-		const structure = (await this.observe(menuStructureWorkspaceContext.structure, () => {})?.asPromise()) as any[];
-		const [parentUnique, unique] = structure?.slice(-2).map((x) => x.unique) ?? [];
-
-		if (!unique) return;
+		const ancestorsContext = await this.getContext(UMB_ANCESTORS_ENTITY_CONTEXT);
+		const ancestors = ancestorsContext?.getAncestors();
+		const [parentUnique, unique] = ancestors?.slice(-2).map((x) => x.unique) ?? [];
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
@@ -138,7 +162,31 @@ export class UmbPropertyEditorUIContentPickerElement
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
 		this.value = event.target.selection;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	async #onRemoveInvalidData() {
+		await umbConfirmModal(this, {
+			color: 'danger',
+			headline: '#contentPicker_unsupportedRemove',
+			content: '#defaultdialogs_confirmSure',
+			confirmLabel: '#actions_remove',
+		});
+
+		this.value = this.value?.filter((x) => x.type === this._rootEntityType);
+		this._invalidData = undefined;
+		this.readonly = false;
+	}
+
+	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputContentElement;
+		const interactionMemories = target.interactionMemories;
+
+		if (interactionMemories && interactionMemories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
 	}
 
 	override render() {
@@ -157,17 +205,73 @@ export class UmbPropertyEditorUIContentPickerElement
 				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
-				?showOpenButton=${this._showOpenButton}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}></umb-input-content>
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
+				@change=${this.#onChange}
+				.interactionMemories=${this._interactionMemories}
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
+			</umb-input-content>
+			${this.#renderInvalidData()}
 		`;
 	}
+
+	#renderInvalidData() {
+		if (!this._invalidData?.length) return nothing;
+
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		const groupby = Object.groupBy(this._invalidData, (x) => x.type);
+		const grouped = Object.keys(groupby)
+			.sort((a, b) => a.localeCompare(b))
+			.map((key) => ({ key, items: groupby[key] }));
+
+		const toPickerType = (type: string): UmbContentPickerSourceType => {
+			return type === UMB_DOCUMENT_ENTITY_TYPE ? 'content' : (type as UmbContentPickerSourceType);
+		};
+
+		return html`
+			<div id="messages">
+				${repeat(
+					grouped,
+					(group) => group.key,
+					(group) => html`
+						<p>
+							<umb-localize key="contentPicker_unsupportedHeadline" .args=${[group.key]}>
+								<strong>Unsupported ${group.key} items</strong><br />
+								The following content is no longer supported in this Editor.
+							</umb-localize>
+						</p>
+						<umb-input-content readonly .selection=${group.items} .type=${toPickerType(group.key)}></umb-input-content>
+						<p>
+							<umb-localize key="contentPicker_unsupportedMessage">
+								If you still require this content, please contact your administrator. Otherwise you can remove it.
+							</umb-localize>
+						</p>
+						<uui-button
+							color="danger"
+							look="outline"
+							label=${this.localize.term('contentPicker_unsupportedRemove')}
+							@click=${this.#onRemoveInvalidData}></uui-button>
+					`,
+				)}
+			</div>
+		`;
+	}
+
+	static override readonly styles = [
+		css`
+			#messages {
+				color: var(--uui-color-danger-standalone);
+			}
+		`,
+	];
 }
 
 export { UmbPropertyEditorUIContentPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUIContentPickerElement;
+		'umb-property-editor-ui-content-picker': UmbPropertyEditorUIContentPickerElement;
 	}
 }

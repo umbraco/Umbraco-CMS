@@ -1,16 +1,4 @@
-export type UmbObjectWithVariantProperties = {
-	culture: string | null;
-	segment: string | null;
-};
-
-/**
- *
- * @param variant
- */
-export function variantPropertiesObjectToString(variant: UmbObjectWithVariantProperties): string {
-	// Currently a direct copy of the toString method of variantId.
-	return (variant.culture || UMB_INVARIANT_CULTURE) + (variant.segment ? `_${variant.segment}` : '');
-}
+import type { UmbObjectWithVariantProperties } from './types.js';
 
 export const UMB_INVARIANT_CULTURE = 'invariant';
 
@@ -32,9 +20,12 @@ export class UmbVariantId {
 	}
 
 	public static FromString(str: string): UmbVariantId {
-		const split = str.split('_');
-		const culture = split[0] === UMB_INVARIANT_CULTURE ? null : split[0];
-		const segment = split[1] ?? null;
+		const firstUnderscoreIndex = str.indexOf('_');
+		let culture: string | null = firstUnderscoreIndex === -1 ? str : str.substring(0, firstUnderscoreIndex);
+		culture = culture === UMB_INVARIANT_CULTURE ? null : culture;
+
+		const segment = firstUnderscoreIndex === -1 ? null : str.substring(firstUnderscoreIndex + 1) || null;
+
 		return Object.freeze(new UmbVariantId(culture, segment));
 	}
 
@@ -79,6 +70,10 @@ export class UmbVariantId {
 		return this.culture === null && this.segment === null;
 	}
 
+	public clone(): UmbVariantId {
+		return new UmbVariantId(this.culture, this.segment);
+	}
+
 	public toObject(): UmbObjectWithVariantProperties {
 		return { culture: this.culture, segment: this.segment };
 	}
@@ -89,6 +84,14 @@ export class UmbVariantId {
 	public toCultureInvariant(): UmbVariantId {
 		return Object.freeze(new UmbVariantId(null, this.segment));
 	}
+
+	public toCulture(culture: string | null): UmbVariantId {
+		return Object.freeze(new UmbVariantId(culture, this.segment));
+	}
+	public toSegment(segment: string | null): UmbVariantId {
+		return Object.freeze(new UmbVariantId(this.culture, segment));
+	}
+
 	public toVariant(varyByCulture?: boolean, varyBySegment?: boolean): UmbVariantId {
 		return Object.freeze(new UmbVariantId(varyByCulture ? this.culture : null, varyBySegment ? this.segment : null));
 	}

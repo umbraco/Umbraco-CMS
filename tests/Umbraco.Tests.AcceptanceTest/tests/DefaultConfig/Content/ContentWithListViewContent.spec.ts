@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -33,13 +33,12 @@ test('can create content with the list view data type', async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -58,10 +57,9 @@ test('can publish content with the list view data type', async ({umbracoApi, umb
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -80,11 +78,10 @@ test('can create content with a child in the list', async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.content.clickCreateContentWithName(childDocumentTypeName);
-  await umbracoUi.content.enterNameInContainer(childContentName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.enterContentName(childContentName);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 });
@@ -102,12 +99,13 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickSaveAndPublishButton();
+  // Currently necessary
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -131,11 +129,10 @@ test('can not publish child in a list when parent is not published', async ({umb
 
   // Act
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
   // Content created, but not published
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
   await umbracoUi.content.isErrorNotificationVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -157,9 +154,9 @@ test('child is removed from list after child content is deleted', async ({umbrac
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
-  await umbracoUi.content.clickTrashButton();
+  await umbracoUi.content.clickTrashActionMenuOption();
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
@@ -201,23 +198,24 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
   const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
-  const publishData = {"publishSchedules": [{"culture": null}]};
-  await umbracoApi.document.publish(documentId, publishData);
+  await umbracoApi.document.publish(documentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickPublishSelectedListItems();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
   const childContentData = await umbracoApi.document.getByName(childContentName);
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-test('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
+// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
+test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -232,6 +230,7 @@ test('can not publish child content from list when parent is not published', asy
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickPublishSelectedListItems();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
@@ -248,9 +247,8 @@ test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) =>
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
   const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   const childDocumentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
-  const publishData = {"publishSchedules": [{"culture": null}]};
-  await umbracoApi.document.publish(documentId, publishData);
-  await umbracoApi.document.publish(childDocumentId, publishData);
+  await umbracoApi.document.publish(documentId);
+  await umbracoApi.document.publish(childDocumentId);
   const childContentDataBeforeUnpublished = await umbracoApi.document.getByName(childContentName);
   expect(childContentDataBeforeUnpublished.variants[0].state).toBe('Published');
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -262,7 +260,7 @@ test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickConfirmToUnpublishButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   const childContentData = await umbracoApi.document.getByName(childContentName);
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
@@ -284,10 +282,13 @@ test('can duplicate child content in list', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickDuplicateToSelectedListItems();
-  await umbracoUi.content.selectDocumentWithNameAtRoot(secondDocumentName);
+  await umbracoUi.content.openCaretButtonForName('Content');
+  await umbracoUi.content.clickModalMenuItemWithName(secondDocumentName);
+  await umbracoUi.content.clickChooseModalButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesFirstItemInListViewHaveName(childContentName);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
   await umbracoUi.content.doesFirstItemInListViewHaveName(childContentName);
@@ -314,10 +315,13 @@ test('can move child content in list', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickMoveToSelectedListItems();
-  await umbracoUi.content.selectDocumentWithNameAtRoot(secondDocumentName);
+  await umbracoUi.content.openCaretButtonForName('Content');
+  await umbracoUi.content.clickModalMenuItemWithName(secondDocumentName);
+  await umbracoUi.content.clickChooseModalButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
   await umbracoUi.content.doesFirstItemInListViewHaveName(childContentName);
@@ -344,7 +348,7 @@ test('can trash child content in list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
   await umbracoUi.content.isItemVisibleInRecycleBin(childContentName);

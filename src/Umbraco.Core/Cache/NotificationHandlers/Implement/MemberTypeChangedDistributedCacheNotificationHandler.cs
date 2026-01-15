@@ -19,6 +19,11 @@ public sealed class MemberTypeChangedDistributedCacheNotificationHandler : Conte
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     protected override void Handle(IEnumerable<ContentTypeChange<IMemberType>> entities)
+        => Handle(entities, new Dictionary<string, object?>());
+
+    /// <inheritdoc />
+    protected override void Handle(IEnumerable<ContentTypeChange<IMemberType>> entities, IDictionary<string, object?> state)
         => _distributedCache.RefreshContentTypeCache(entities);
 }

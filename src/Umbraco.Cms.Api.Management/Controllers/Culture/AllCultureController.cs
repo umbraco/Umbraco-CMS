@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +28,7 @@ public class AllCultureController : CultureControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<CultureReponseModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<CultureReponseModel>> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
+    public Task<PagedViewModel<CultureReponseModel>> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         CultureInfo[] all = _cultureService.GetValidCultureInfos();
 
@@ -38,6 +38,6 @@ public class AllCultureController : CultureControllerBase
             Total = all.Length
         };
 
-        return await Task.FromResult(viewModel);
+        return Task.FromResult(viewModel);
     }
 }

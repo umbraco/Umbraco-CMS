@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 [AppendEventMessages]
+[DisableBrowserCache]
 [Produces("application/json")]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
@@ -54,7 +56,7 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
     ///     Creates a 403 Forbidden result.
     /// </summary>
     /// <remarks>
-    ///     Use this method instead of <see cref="ManagementApiControllerBase.Forbid()"/> on the controller base.
+    ///     Use this method instead of the controller base class's Forbid() method.
     ///     This method ensures that a proper 403 Forbidden status code is returned to the client.
     /// </remarks>
     // Duplicate code copied between Management API and Delivery API.

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-public class MediaServiceTests : UmbracoIntegrationTest
+internal sealed class MediaServiceTests : UmbracoIntegrationTest
 {
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
@@ -72,7 +72,9 @@ public class MediaServiceTests : UmbracoIntegrationTest
             // get the event arg type
             var eventArgType = e.EventHandlerType.GenericTypeArguments[1];
 
-            var found = EventNameExtractor.FindEvent(typeof(MediaService), eventArgType,
+            var found = EventNameExtractor.FindEvent(
+                typeof(MediaService),
+                eventArgType,
                 EventNameExtractor.MatchIngNames);
             if (!found.Success && found.Result.Error == EventNameExtractorError.Ambiguous)
             {
@@ -100,13 +102,15 @@ public class MediaServiceTests : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (provider.CreateScope())
         {
+            var filter = provider.CreateQuery<IMedia>()
+                .Where(x => new List<int> { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId));
+
             var result = MediaService.GetPagedChildren(
                 -1,
                 0,
                 11,
                 out var total,
-                provider.CreateQuery<IMedia>()
-                    .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
+                filter,
                 Ordering.By("SortOrder"));
             Assert.AreEqual(11, result.Count());
             Assert.AreEqual(20, total);
@@ -116,8 +120,7 @@ public class MediaServiceTests : UmbracoIntegrationTest
                 1,
                 11,
                 out total,
-                provider.CreateQuery<IMedia>()
-                    .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
+                filter,
                 Ordering.By("SortOrder"));
             Assert.AreEqual(9, result.Count());
             Assert.AreEqual(20, total);

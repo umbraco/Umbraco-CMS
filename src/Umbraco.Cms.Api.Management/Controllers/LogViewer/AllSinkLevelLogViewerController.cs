@@ -24,13 +24,14 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     /// <summary>
     ///     Gets a paginated list of all loggers' levels.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the configured loggers and their level.</returns>
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LoggerResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(
+    public Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
@@ -45,6 +46,6 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
             Items = _umbracoMapper.MapEnumerable<KeyValuePair<string, LogLevel>, LoggerResponseModel>(logLevels.Skip(skip).Take(take))
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Task.FromResult<ActionResult<PagedViewModel<LoggerResponseModel>>>(Ok(viewModel));
     }
 }

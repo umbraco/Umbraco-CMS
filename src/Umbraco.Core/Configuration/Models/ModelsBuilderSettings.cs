@@ -16,13 +16,15 @@ public class ModelsBuilderSettings
     internal const string StaticModelsDirectory = "~/umbraco/models";
     internal const bool StaticAcceptUnsafeModelsDirectory = false;
     internal const int StaticDebugLevel = 0;
+    internal const bool StaticIncludeVersionNumberInGeneratedModels = true;
+    internal const bool StaticGenerateVirtualProperties = true;
     private bool _flagOutOfDateModels = true;
 
     /// <summary>
     ///     Gets or sets a value for the models mode.
     /// </summary>
     [DefaultValue(StaticModelsMode)]
-    public ModelsMode ModelsMode { get; set; } = Enum.Parse<ModelsMode>(StaticModelsMode);
+    public string ModelsMode { get; set; } = StaticModelsMode;
 
     /// <summary>
     ///     Gets or sets a value for models namespace.
@@ -34,23 +36,9 @@ public class ModelsBuilderSettings
     /// <summary>
     ///     Gets or sets a value indicating whether we should flag out-of-date models.
     /// </summary>
-    /// <remarks>
-    ///     Models become out-of-date when data types or content types are updated. When this
-    ///     setting is activated the ~/umbraco/models/PureLive/ood.txt file is then created. When models are
-    ///     generated through the dashboard, the files is cleared. Default value is <c>false</c>.
-    /// </remarks>
     public bool FlagOutOfDateModels
     {
-        get
-        {
-            if (ModelsMode == ModelsMode.Nothing ||ModelsMode.IsAuto())
-            {
-                return false;
-
-            }
-
-            return _flagOutOfDateModels;
-        }
+        get => ModelsMode == Constants.ModelsBuilder.ModelsModes.SourceCodeManual && _flagOutOfDateModels;
 
         set => _flagOutOfDateModels = value;
     }
@@ -78,4 +66,25 @@ public class ModelsBuilderSettings
     /// <remarks>0 means minimal (safe on live site), anything else means more and more details (maybe not safe).</remarks>
     [DefaultValue(StaticDebugLevel)]
     public int DebugLevel { get; set; } = StaticDebugLevel;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the version number should be included in generated models.
+    /// </summary>
+    /// <remarks>
+    ///     By default this is written to the <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/> output in
+    ///     generated code for each property of the model. This can be useful for debugging purposes but isn't essential,
+    ///     and it has the causes the generated code to change every time Umbraco is upgraded. In turn, this leads
+    ///     to unnecessary code file changes that need to be checked into source control. Default is <c>true</c>.
+    /// </remarks>
+    [DefaultValue(StaticIncludeVersionNumberInGeneratedModels)]
+    public bool IncludeVersionNumberInGeneratedModels { get; set; } = StaticIncludeVersionNumberInGeneratedModels;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to mark all properties in the generated models as virtual.
+    /// </summary>
+    /// <remarks>
+    ///     Virtual properties will not work with Hot Reload when running dotnet watch.
+    /// </remarks>
+    [DefaultValue(StaticGenerateVirtualProperties)]
+    public bool GenerateVirtualProperties { get; set; } = StaticGenerateVirtualProperties;
 }

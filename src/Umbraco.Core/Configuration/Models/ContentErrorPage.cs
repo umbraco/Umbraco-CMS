@@ -37,7 +37,7 @@ public class ContentErrorPage : ValidatableEntryBase
     [Required]
     public string Culture { get; set; } = null!;
 
-    internal override bool IsValid() =>
+    internal sealed override bool IsValid() =>
         base.IsValid() &&
         (HasContentId ^ HasContentKey);
 }

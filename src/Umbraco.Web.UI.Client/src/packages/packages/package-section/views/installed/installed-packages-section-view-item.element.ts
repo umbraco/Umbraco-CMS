@@ -1,7 +1,7 @@
 import { html, css, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { PackageService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -30,9 +30,6 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 
 	@property({ type: Boolean, attribute: false })
 	hasPendingMigrations = false;
-
-	@property({ attribute: 'custom-icon' })
-	customIcon?: string;
 
 	@state()
 	private _migrationButtonState?: UUIButtonState;
@@ -93,22 +90,20 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 
 		await umbConfirmModal(this, {
 			color: 'positive',
-			headline: `Run migrations for ${this.name}?`,
-			content: `Do you want to start run migrations for ${this.name}`,
-			confirmLabel: 'Run migrations',
+			headline: this.name,
+			content: this.localize.term('packager_packageMigrationsConfirmText'),
 		});
 
 		this._migrationButtonState = 'waiting';
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this,
-			PackageService.postPackageByNameRunMigration({ name: this.name }),
+			PackageService.postPackageByNameRunMigration({ path: { name: this.name } }),
 		);
 
 		if (error) return;
 
 		this.#notificationContext?.peek('positive', {
 			data: {
-				headline: 'Migrations completed',
 				message: this.localize.term('packager_packageMigrationsComplete'),
 			},
 		});
@@ -124,8 +119,8 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 						name=${ifDefined(this.name)}
 						version="${ifDefined(this.version ?? undefined)}"
 						@open=${this.#onConfigure}
-						?disabled="${!this._packageView}">
-						${this.customIcon ? html`<umb-icon slot="icon" name=${this.customIcon}></umb-icon>` : nothing}
+						?readonly="${!this._packageView}">
+						<umb-icon slot="icon" name="icon-command"></umb-icon>
 						<div slot="tag">
 							${this.hasPendingMigrations
 								? html`<uui-button
@@ -133,9 +128,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 										.state=${this._migrationButtonState}
 										color="warning"
 										look="primary"
-										label=${this.localize.term('packageMigrationsRun')}>
-										Run pending migrations
-									</uui-button>`
+										label=${this.localize.term('packager_packageMigrationsRun')}></uui-button>`
 								: nothing}
 						</div>
 					</uui-ref-node-package>

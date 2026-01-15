@@ -1,3 +1,6 @@
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_CURRENT_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS } from '@umbraco-cms/backoffice/user';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'userProfileApp',
@@ -23,7 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionUserPermission',
+				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
 				match: 'Umb.Section.Users',
 			},
 		],
@@ -39,5 +42,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_changePassword',
 			icon: 'lock',
 		},
+		conditions: [
+			{
+				alias: UMB_CURRENT_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS,
+			},
+		],
 	},
 ];

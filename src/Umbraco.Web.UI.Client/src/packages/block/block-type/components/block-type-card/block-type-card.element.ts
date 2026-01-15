@@ -5,20 +5,19 @@ import {
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
-	#init: Promise<void>;
+	#init: Promise<unknown>;
 	#serverUrl: string = '';
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
 	);
 
 	@property({ type: String })
@@ -66,27 +65,32 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	private _elementTypeKey?: string;
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	@state()
-	_description?: string;
+	private _description?: string;
 
 	@state()
-	_fallbackIcon?: string | null;
+	private _fallbackIcon?: string | null;
 
 	constructor() {
 		super();
 
-		this.#init = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
-			this.#serverUrl = appContext.getServerUrl();
-		});
+		this.#init = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		}).asPromise({ preventTimeout: true });
 
-		this.observe(this.#itemManager.items, (items) => {
-			const item = items[0];
-			if (item) {
+		this.observe(this.#itemManager.statuses, async (statuses) => {
+			const status = statuses[0];
+			if (status?.state.type === 'success') {
+				const item = await this.#itemManager.getItemByUnique(status.unique);
 				this._fallbackIcon = item.icon;
 				this._name = item.name ? this.localize.string(item.name) : this.localize.term('general_unknown');
 				this._description = this.localize.string(item.description);
+			} else if (status?.state.type === 'error') {
+				this._fallbackIcon = 'icon-alert';
+				this._name = this.localize.term('blockEditor_elementTypeDoesNotExistHeadline');
+				this._description = this.localize.term('blockEditor_elementTypeDoesNotExistDescription');
 			}
 		});
 	}

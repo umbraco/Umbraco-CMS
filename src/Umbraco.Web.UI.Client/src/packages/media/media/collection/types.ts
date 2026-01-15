@@ -1,5 +1,6 @@
-import type { UmbFileDropzoneItemStatus } from '../dropzone/types.js';
+import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
+import type { UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 
 export interface UmbMediaCollectionFilterModel extends UmbCollectionFilterModel {
 	unique?: string;
@@ -9,7 +10,7 @@ export interface UmbMediaCollectionFilterModel extends UmbCollectionFilterModel 
 	userDefinedProperties: Array<{ alias: string; header: string; isSystem: boolean }>;
 }
 
-export interface UmbMediaCollectionItemModel {
+export interface UmbMediaCollectionItemModel extends UmbEntityWithFlags {
 	unique: string;
 	entityType: string;
 	contentTypeAlias?: string;
@@ -23,6 +24,10 @@ export interface UmbMediaCollectionItemModel {
 	values?: Array<{ alias: string; value: string }>;
 	url?: string;
 	status?: UmbFileDropzoneItemStatus;
+	/**
+	 * The progress of the item in percentage.
+	 */
+	progress?: number;
 }
 
 export interface UmbEditableMediaCollectionItemModel {

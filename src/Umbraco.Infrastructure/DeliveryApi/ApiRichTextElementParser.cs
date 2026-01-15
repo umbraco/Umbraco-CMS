@@ -1,7 +1,7 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
@@ -34,9 +34,6 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         _apiElementBuilder = apiElementBuilder;
         _logger = logger;
     }
-
-    [Obsolete($"Please use the overload that accepts {nameof(RichTextBlockModel)}. Will be removed in V15.")]
-    public IRichTextElement? Parse(string html) => Parse(html, null);
 
     public IRichTextElement? Parse(string html, RichTextBlockModel? richTextBlockModel)
     {
@@ -102,8 +99,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         // - non-#comment nodes
         // - non-#text nodes
         // - non-empty #text nodes
+        // - empty #text between inline elements (see #17037) but not #text with only newlines (see #19388)
         HtmlNode[] childNodes = element.ChildNodes
-            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || string.IsNullOrWhiteSpace(c.InnerText) is false))
+            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || IsNonEmptyElement(c)))
             .ToArray();
 
         var tag = TagName(element);
@@ -124,16 +122,19 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         return createElement(tag, attributes, childElements);
     }
 
-    private string TagName(HtmlNode htmlNode) => htmlNode.Name;
+    private static bool IsNonEmptyElement(HtmlNode htmlNode) =>
+        string.IsNullOrWhiteSpace(htmlNode.InnerText) is false || htmlNode.InnerText.Any(c => c != '\n' && c != '\r');
+
+    private static string TagName(HtmlNode htmlNode) => htmlNode.Name;
 
     private void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, Dictionary<string, object> attributes)
     {
-        if (attributes.ContainsKey("href") is false || attributes["href"] is not string href)
+        if (attributes.TryGetValue("href", out object? hrefAttribute) is false || hrefAttribute is not string href)
         {
             return;
         }
 
-        if (attributes.ContainsKey("type") is false || attributes["type"] is not string type)
+        if (attributes.TryGetValue("type", out object? typeAttribute) is false || typeAttribute is not string type)
         {
             type = "unknown";
         }
@@ -143,18 +144,27 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             mediaCache,
             href,
             type,
-            route =>
+            (route, content) =>
             {
+                attributes["destinationId"] = content.Key.ToString("D");
+                attributes["destinationType"] = content.ContentType.Alias;
+                attributes["linkType"] = nameof(LinkType.Content);
                 attributes["route"] = route;
                 attributes.Remove("href");
             },
-            url => attributes["href"] = url,
+            (url, media) =>
+            {
+                attributes["destinationId"] = media.Key.ToString("D");
+                attributes["destinationType"] = media.ContentType.Alias;
+                attributes["linkType"] = nameof(LinkType.Media);
+                attributes["href"] = url;
+            },
             () => attributes.Remove("href"));
     }
 
     private void ReplaceLocalImages(IPublishedMediaCache mediaCache, string tag, Dictionary<string, object> attributes)
     {
-        if (tag is not "img" || attributes.ContainsKey("data-udi") is false || attributes["data-udi"] is not string dataUdi)
+        if (tag is not "img" || attributes.TryGetValue("data-udi", out object? dataUdiAttribute) is false || dataUdiAttribute is not string dataUdi)
         {
             return;
         }
@@ -166,9 +176,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         });
     }
 
-    private void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
+    private static void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
     {
-        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey(BlockContentKeyAttribute) is false || attributes[BlockContentKeyAttribute] is not string dataKey)
+        if (tag.StartsWith("umb-rte-block") is false || attributes.TryGetValue(BlockContentKeyAttribute, out object? blockContentKeyAttribute) is false || blockContentKeyAttribute is not string dataKey)
         {
             return;
         }

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -11,11 +10,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class PublicAccessService : RepositoryService, IPublicAccessService
+internal sealed class PublicAccessService : RepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
     private readonly IContentService _contentService;
+    private readonly IIdKeyMap _idKeyMap;
 
     public PublicAccessService(
         ICoreScopeProvider provider,
@@ -23,12 +23,14 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         IEventMessagesFactory eventMessagesFactory,
         IPublicAccessRepository publicAccessRepository,
         IEntityService entityService,
-        IContentService contentService)
+        IContentService contentService,
+        IIdKeyMap idKeyMap)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _publicAccessRepository = publicAccessRepository;
         _entityService = entityService;
         _contentService = contentService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -63,13 +65,8 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     {
         // Get all ids in the path for the content item and ensure they all
         // parse to ints that are not -1.
-        var ids = contentPath.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : -1)
-            .Where(x => x != -1)
-            .ToList();
-
-        // start with the deepest id
-        ids.Reverse();
+        // Start with the deepest id.
+        IEnumerable<int> ids = contentPath.GetIdsFromPathReversed().Where(x => x != -1);
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -77,7 +74,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var entries = _publicAccessRepository.GetMany().ToList();
             foreach (var id in ids)
             {
-                PublicAccessEntry? found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
+                PublicAccessEntry? found = entries.Find(x => x.ProtectedNodeId == id);
                 if (found != null)
                 {
                     return found;
@@ -282,7 +279,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             return Attempt.FailWithStatus(PublicAccessOperationStatus.NoAllowedEntities, result);
         }
 
-        if(entry.MemberUserNames.Any() && entry.MemberGroupNames.Any())
+        if (entry.MemberUserNames.Any() && entry.MemberGroupNames.Any())
         {
             return Attempt.FailWithStatus(PublicAccessOperationStatus.AmbiguousRule, result);
         }
@@ -379,6 +376,23 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         }
 
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
+    }
+
+    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyWithoutAncestorsAsync(Guid key)
+    {
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> result = await GetEntryByContentKeyAsync(key);
+        if (result.Success is false || result.Result is null)
+        {
+            return result;
+        }
+
+        Attempt<Guid> idToKeyAttempt = _idKeyMap.GetKeyForId(result.Result.ProtectedNodeId, UmbracoObjectTypes.Document);
+        if (idToKeyAttempt.Success is false || idToKeyAttempt.Result != key)
+        {
+            return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null);
+        }
+
+        return result;
     }
 
     public async Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key)

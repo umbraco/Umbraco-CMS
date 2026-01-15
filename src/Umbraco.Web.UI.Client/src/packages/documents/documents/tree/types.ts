@@ -7,8 +7,11 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 
-export interface UmbDocumentTreeItemModel extends UmbTreeItemModel {
+export interface UmbDocumentTreeItemModel extends Omit<UmbTreeItemModel, 'flags'>, UmbEntityWithFlags {
+	ancestors: Array<UmbEntityModel>;
 	entityType: UmbDocumentEntityType;
 	noAccess: boolean;
 	isTrashed: boolean;
@@ -18,6 +21,7 @@ export interface UmbDocumentTreeItemModel extends UmbTreeItemModel {
 		icon: string;
 		collection: UmbReferenceByUnique | null;
 	};
+	createDate: string;
 	variants: Array<UmbDocumentTreeItemVariantModel>;
 }
 
@@ -30,6 +34,7 @@ export interface UmbDocumentTreeItemVariantModel {
 	culture: string | null;
 	segment: string | null;
 	state: DocumentVariantStateModel | null; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
+	flags: Array<UmbEntityFlag>;
 }
 
 export interface UmbDocumentTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,7 @@ public class NotificationService : INotificationService
 {
     // manage notifications
     // ideally, would need to use IBackgroundTasks - but they are not part of Core!
-    private static readonly object Locker = new();
+    private static readonly Lock Locker = new();
 
     private readonly IContentService _contentService;
     private readonly ContentSettings _contentSettings;
@@ -241,20 +242,14 @@ public class NotificationService : INotificationService
         }
     }
 
-    /// <summary>
-    ///     Creates a new notification
-    /// </summary>
-    /// <param name="user"></param>
-    /// <param name="entity"></param>
-    /// <param name="action">The action letter - note: this is a string for future compatibility</param>
-    /// <returns></returns>
-    public Notification CreateNotification(IUser user, IEntity entity, string action)
+    /// <inheritdoc/>
+    public bool TryCreateNotification(IUser user, IEntity entity, string action, [NotNullWhen(true)] out Notification? notification)
     {
         using (ICoreScope scope = _uowProvider.CreateCoreScope())
         {
-            Notification notification = _notificationsRepository.CreateNotification(user, entity, action);
+            var result = _notificationsRepository.TryCreateNotification(user, entity, action, out notification);
             scope.Complete();
-            return notification;
+            return result;
         }
     }
 
@@ -374,47 +369,7 @@ public class NotificationService : INotificationService
         // build summary
         var summary = new StringBuilder();
 
-        if (content.ContentType.VariesByNothing())
-        {
-            if (!_contentSettings.Notifications.DisableHtmlEmail)
-            {
-                // create the HTML summary for invariant content
-
-                // list all of the property values like we used to
-                summary.Append("<table style=\"width: 100 %; \">");
-                foreach (IProperty p in content.Properties)
-                {
-                    // TODO: doesn't take into account variants
-                    var newText = p.GetValue() != null ? p.GetValue()?.ToString() : string.Empty;
-                    var oldText = newText;
-
-                    // check if something was changed and display the changes otherwise display the fields
-                    if (oldDoc?.Properties.Contains(p.PropertyType.Alias) ?? false)
-                    {
-                        IProperty? oldProperty = oldDoc.Properties[p.PropertyType.Alias];
-                        oldText = oldProperty?.GetValue() != null ? oldProperty.GetValue()?.ToString() : string.Empty;
-
-                        // replace HTML with char equivalent
-                        ReplaceHtmlSymbols(ref oldText);
-                        ReplaceHtmlSymbols(ref newText);
-                    }
-
-                    // show the values
-                    summary.Append("<tr>");
-                    summary.Append(
-                        "<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;border-bottom: 1px solid #CCC'>");
-                    summary.Append(newText);
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
-                }
-
-                summary.Append("</table>");
-            }
-        }
-        else if (content.ContentType.VariesByCulture())
+        if (content.ContentType.VariesByCulture())
         {
             // it's variant, so detect what cultures have changed
             if (!_contentSettings.Notifications.DisableHtmlEmail)
@@ -454,8 +409,43 @@ public class NotificationService : INotificationService
         }
         else
         {
-            // not supported yet...
-            throw new NotSupportedException();
+            if (!_contentSettings.Notifications.DisableHtmlEmail)
+            {
+                // create the HTML summary for invariant content
+
+                // list all of the property values like we used to
+                summary.Append("<table style=\"width: 100 %; \">");
+                foreach (IProperty p in content.Properties)
+                {
+                    // TODO: doesn't take into account variants
+                    var newText = p.GetValue() != null ? p.GetValue()?.ToString() : string.Empty;
+                    var oldText = newText;
+
+                    // check if something was changed and display the changes otherwise display the fields
+                    if (oldDoc?.Properties.Contains(p.PropertyType.Alias) ?? false)
+                    {
+                        IProperty? oldProperty = oldDoc.Properties[p.PropertyType.Alias];
+                        oldText = oldProperty?.GetValue() != null ? oldProperty.GetValue()?.ToString() : string.Empty;
+
+                        // replace HTML with char equivalent
+                        ReplaceHtmlSymbols(ref oldText);
+                        ReplaceHtmlSymbols(ref newText);
+                    }
+
+                    // show the values
+                    summary.Append("<tr>");
+                    summary.Append(
+                        "<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
+                    summary.Append(p.PropertyType.Name);
+                    summary.Append("</th>");
+                    summary.Append("<td style='text-align: left; vertical-align: top;border-bottom: 1px solid #CCC'>");
+                    summary.Append(newText);
+                    summary.Append("</td>");
+                    summary.Append("</tr>");
+                }
+
+                summary.Append("</table>");
+            }
         }
 
         var protocol = _globalSettings.UseHttps ? "https" : "http";
@@ -562,7 +552,7 @@ public class NotificationService : INotificationService
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug("Begin processing notifications.");
                 }
@@ -574,9 +564,9 @@ public class NotificationService : INotificationService
                     {
                         try
                         {
-                            _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
+                            _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification, false, null).GetAwaiter()
                                 .GetResult();
-                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            if (_logger.IsEnabled(LogLevel.Debug))
                             {
                                 _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                             }
@@ -607,7 +597,7 @@ public class NotificationService : INotificationService
         }
     }
 
-    private class NotificationRequest
+    private sealed class NotificationRequest
     {
         public NotificationRequest(EmailMessage mail, string? action, string? userName, string? email)
         {

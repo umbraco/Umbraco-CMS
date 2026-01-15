@@ -17,7 +17,7 @@ public class NoopProfiler : IProfiler
     /// <inheritdoc/>
     public bool IsEnabled => false;
 
-    private class VoidDisposable : DisposableObjectSlim
+    private sealed class VoidDisposable : DisposableObjectSlim
     {
         protected override void DisposeResources()
         {

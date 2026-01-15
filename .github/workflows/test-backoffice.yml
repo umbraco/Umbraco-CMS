@@ -3,16 +3,18 @@ name: Test Backoffice
 on:
   push:
     branches:
-      - contrib
+      - main
       - release/*
       - v*/dev
+      - v*/main
     paths:
       - src/Umbraco.Web.UI.Client/**
   pull_request:
     branches:
-      - contrib
+      - main
       - release/*
       - v*/dev
+      - v*/main
     paths:
       - src/Umbraco.Web.UI.Client/**
 
@@ -40,7 +42,11 @@ jobs:
           cache: npm
           cache-dependency-path: ./src/Umbraco.Web.UI.Client/package-lock.json
       - run: npm ci --no-audit --no-fund --prefer-offline
+      - name: Check for circular dependencies
+        run: node devops/circular/index.js src
       - run: npm run lint:errors
+      - run: npm run generate:tsconfig
+      - run: npm run generate:icons
       - run: npm run build:for:cms
       - run: npm run check:paths
       - run: npm run generate:jsonschema:dist

@@ -8,18 +8,16 @@ import {
 	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
-	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectControllerAlias,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbLanguageDetailModel, UmbLanguageDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbLanguageDetailModel, UmbLanguageDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
-
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -51,14 +49,6 @@ export class UmbLanguageWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	setName(name: string) {
-		this._data.updateCurrent({ name });
-	}
-
-	getName() {
-		return this._data.getCurrent()?.name;
 	}
 
 	setCulture(unique: string) {

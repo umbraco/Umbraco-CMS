@@ -6,6 +6,7 @@ public enum ContentEditingOperationStatus
     CancelledByNotification,
     ContentTypeNotFound,
     ContentTypeCultureVarianceMismatch,
+    ContentTypeSegmentVarianceMismatch,
     NotFound,
     ParentNotFound,
     ParentInvalid,
@@ -21,4 +22,6 @@ public enum ContentEditingOperationStatus
     DuplicateKey,
     DuplicateName,
     Unknown,
+    CannotDeleteWhenReferenced,
+    CannotMoveToRecycleBinWhenReferenced,
 }

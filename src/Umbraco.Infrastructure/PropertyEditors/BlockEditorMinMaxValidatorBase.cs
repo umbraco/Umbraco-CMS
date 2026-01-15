@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -16,12 +16,32 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockEditorMinMaxValidatorBase{TValue, TLayout}"/> class.
+    /// </summary>
     protected BlockEditorMinMaxValidatorBase(ILocalizedTextService textService) => TextService = textService;
 
+    /// <summary>
+    /// Gets the <see cref="ILocalizedTextService"/>
+    /// </summary>
     protected ILocalizedTextService TextService { get; }
 
+    /// <inheritdoc/>
     public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext);
 
+    // internal method so we can test for specific error messages being returned without keeping strings in sync
+    internal static string BuildErrorMessage(
+        ILocalizedTextService textService,
+        int? maxNumberOfBlocks,
+        int numberOfBlocks)
+        => textService.Localize(
+            "validation",
+            "entriesExceed",
+            [maxNumberOfBlocks.ToString(), (numberOfBlocks - maxNumberOfBlocks).ToString(),]);
+
+    /// <summary>
+    /// Validates the number of blocks are within the configured minimum and maximum values.
+    /// </summary>
     protected IEnumerable<ValidationResult> ValidateNumberOfBlocks(BlockEditorData<TValue, TLayout>? blockEditorData, int? min, int? max)
     {
         var numberOfBlocks = blockEditorData?.Layout?.Count() ?? 0;
@@ -35,19 +55,16 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
                     TextService.Localize(
                         "validation",
                         "entriesShort",
-                        new[] { min.ToString(), (min - numberOfBlocks).ToString(), }),
-                    new[] { "minCount" });
+                        [min.ToString(), (min - numberOfBlocks).ToString(),]),
+                    ["value"]);
             }
         }
 
         if (blockEditorData != null && max.HasValue && numberOfBlocks > max)
         {
             yield return new ValidationResult(
-                TextService.Localize(
-                    "validation",
-                    "entriesExceed",
-                    new[] { max.ToString(), (numberOfBlocks - max).ToString(), }),
-                new[] { "maxCount" });
+                BuildErrorMessage(TextService, max, numberOfBlocks),
+                ["value"]);
         }
     }
 }

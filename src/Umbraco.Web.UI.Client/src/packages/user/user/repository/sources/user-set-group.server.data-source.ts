@@ -1,6 +1,6 @@
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Data Type items that fetches data from the server
@@ -30,10 +30,10 @@ export class UmbUserSetGroupsServerDataSource {
 		if (!userIds) throw new Error('User ids are missing');
 		if (!userGroupIds) throw new Error('User group ids are missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.postUserSetUserGroups({
-				requestBody: {
+				body: {
 					userIds: userIds.map((id) => ({ id })),
 					userGroupIds: userGroupIds.map((id) => ({ id })),
 				},

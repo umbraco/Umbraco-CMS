@@ -1,3 +1,5 @@
+import { UMB_CURRENT_USER_ALLOW_MFA_CONDITION_ALIAS } from '../conditions/allow-mfa/constants.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'currentUserAction',
@@ -9,11 +11,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: '#user_configureTwoFactor',
 			icon: 'icon-rectangle-ellipsis',
-			look: 'secondary',
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.User.AllowMfaAction',
+				alias: UMB_CURRENT_USER_ALLOW_MFA_CONDITION_ALIAS,
 			},
 		],
 	},

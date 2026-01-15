@@ -25,9 +25,8 @@ for (const checkbox of checkboxList) {
     const checkboxValue = checkbox.value;
     const dataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, checkboxValue);
     const templateId = await umbracoApi.template.createTemplateWithDisplayingMulitpleStringValue(templateName, AliasHelper.toAlias(propertyName));
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, checkboxValue, dataTypeId, templateId, propertyName, documentTypeName);
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const contentURL = contentData.urls[0].url;
+    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, checkboxValue, dataTypeId, templateId, propertyName, documentTypeName);
+    const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
     // Act
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);

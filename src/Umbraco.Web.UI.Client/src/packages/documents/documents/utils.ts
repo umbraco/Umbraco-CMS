@@ -8,6 +8,7 @@ const variantStatesOrder = {
 	[DocumentVariantStateModel.PUBLISHED]: 1,
 	[DocumentVariantStateModel.DRAFT]: 2,
 	[DocumentVariantStateModel.NOT_CREATED]: 3,
+	[DocumentVariantStateModel.TRASHED]: 4,
 };
 
 const getVariantStateOrderValue = (variant?: UmbDocumentVariantOptionModel['variant']) => {
@@ -36,4 +37,13 @@ export const sortVariants = (a: VariantType, b: VariantType) => {
 	const compareName = (a: VariantType, b: VariantType) => a.variant?.name.localeCompare(b.variant?.name || '') || 99;
 
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
+};
+
+export const TimeOptions: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric',
 };

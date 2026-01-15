@@ -1,4 +1,4 @@
-import type { ManifestTree } from './extensions/index.js';
+import type { ManifestTree } from './extensions/types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -17,6 +17,13 @@ export class UmbTreeElement extends UmbExtensionElementAndApiSlotElementBase<Man
 		// @ts-ignore
 		// TODO: make base interface for a tree element
 		return this._element?.getSelection?.() ?? [];
+	}
+
+	getExpansion() {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: make base interface for a tree element
+		return this._element?.getExpansion?.() ?? [];
 	}
 }
 

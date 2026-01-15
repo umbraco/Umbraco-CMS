@@ -1,6 +1,9 @@
-import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
+import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
+import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
+import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -16,18 +19,15 @@ import {
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
-import {
-	UMB_BLOCK_ENTRIES_CONTEXT,
-	UMB_BLOCK_MANAGER_CONTEXT,
-	type UmbBlockWorkspaceOriginData,
-	UMB_BLOCK_ENTRY_CONTEXT,
-} from '@umbraco-cms/backoffice/block';
+import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_CONTEXT, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
+
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbSubmittableWorkspaceContextBase<LayoutDataType>
 	implements UmbRoutableWorkspaceContext
@@ -61,12 +61,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
 	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
-	readonly content = new UmbBlockElementManager(this, 'contentData');
-
-	readonly settings = new UmbBlockElementManager(this, 'settingsData');
+	readonly content = new UmbBlockElementManager(this, 'contentData', UMB_BLOCK_WORKSPACE_VIEW_CONTENT);
+	readonly settings = new UmbBlockElementManager(this, 'settingsData', UMB_BLOCK_WORKSPACE_VIEW_SETTINGS);
 
 	#name = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#name.asObservable();
+
+	#labelRender = new UmbUfmVirtualRenderController(this);
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
@@ -74,12 +75,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		window.addEventListener('willchangestate', this.#onWillNavigate);
 
 		this.addValidationContext(this.content.validation);
 		this.addValidationContext(this.settings.validation);
@@ -87,108 +90,34 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
 			this.#originData = context?.data.originData;
-			context.onSubmit().catch(this.#modalRejected);
-		}).asPromise();
+			context?.onSubmit().catch(this.#modalRejected);
+		}).asPromise({ preventTimeout: true });
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;
-
-			this.observe(
-				manager.liveEditingMode,
-				(liveEditingMode) => {
-					this.#liveEditingMode = liveEditingMode ?? false;
-				},
-				'observeLiveEditingMode',
-			);
-
-			this.observe(
-				observeMultiple([
-					manager.variantId,
-					this.content.structure.variesByCulture,
-					this.content.structure.variesBySegment,
-				]),
-				([variantId, variesByCulture, variesBySegment]) => {
-					if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
-					if (!variesBySegment && !variesByCulture) {
-						variantId = UmbVariantId.CreateInvariant();
-					} else if (!variesBySegment) {
-						variantId = variantId.toSegmentInvariant();
-					} else if (!variesByCulture) {
-						variantId = variantId.toCultureInvariant();
-					}
-
-					this.#variantId.setValue(variantId);
-				},
-				'observeVariantIds',
-			);
-
-			this.removeUmbControllerByAlias('observeHasExpose');
-			this.observe(
-				observeMultiple([this.contentKey, this.variantId]),
-				([contentKey, variantId]) => {
-					if (!contentKey || !variantId) return;
-
-					this.observe(
-						manager.hasExposeOf(contentKey, variantId),
-						(exposed) => {
-							this.#exposed.setValue(exposed);
-						},
-						'observeHasExpose',
-					);
-				},
-				'observeContentKeyAndVariantId',
-			);
-
-			this.observe(
-				observeMultiple([manager.readOnlyState.isReadOnly, this.variantId]),
-				([isReadOnly, variantId]) => {
-					const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-					if (variantId === undefined) return;
-
-					if (isReadOnly) {
-						const state = {
-							unique,
-							variantId,
-							message: '',
-						};
-
-						this.readOnlyState?.addState(state);
-					} else {
-						this.readOnlyState?.removeState(unique);
-					}
-				},
-				'observeIsReadOnly',
-			);
-
-			this.observe(
-				this.content.contentTypeId,
-				(contentTypeId) => {
-					this.observe(
-						contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
-						(blockType) => {
-							if (blockType?.editorSize) {
-								this.setEditorSize(blockType.editorSize);
-							}
-						},
-						'observeBlockType',
-					);
-				},
-				'observeContentTypeId',
-			);
+			this.#gotManager();
 		});
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.#name.setValue(context.getName());
-		});
+		this.observe(
+			this.variantId,
+			(variantId) => {
+				this.content.setVariantId(variantId);
+				this.settings.setVariantId(variantId);
+			},
+			null,
+		);
 
-		this.observe(this.variantId, (variantId) => {
-			this.content.setVariantId(variantId);
-			this.settings.setVariantId(variantId);
-		});
+		this.observe(
+			observeMultiple([this.content.values, this.settings.values]),
+			async ([contentValues, settingsValues]) => {
+				this.#renderLabel(contentValues, settingsValues);
+			},
+			'observeContentForLabelRender',
+		);
 
 		this.routes.setRoutes([
 			{
@@ -216,6 +145,188 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		]);
 	}
 
+	#gotManager() {
+		if (!this.#blockManager) return;
+		const manager = this.#blockManager;
+
+		this.observe(
+			manager.liveEditingMode,
+			(liveEditingMode) => {
+				this.#liveEditingMode = liveEditingMode ?? false;
+			},
+			'observeLiveEditingMode',
+		);
+
+		this.observe(
+			observeMultiple([
+				manager.variantId,
+				this.content.structure.variesByCulture,
+				this.content.structure.variesBySegment,
+			]),
+			([variantId, variesByCulture, variesBySegment]) => {
+				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
+
+				if (!variesBySegment && !variesByCulture) {
+					variantId = UmbVariantId.CreateInvariant();
+				} else if (!variesBySegment) {
+					variantId = variantId.toSegmentInvariant();
+				} else if (!variesByCulture) {
+					variantId = variantId.toCultureInvariant();
+				}
+
+				this.#variantId.setValue(variantId);
+			},
+			'observeVariantIds',
+		);
+
+		this.removeUmbControllerByAlias('observeHasExpose');
+		this.observe(
+			observeMultiple([this.contentKey, this.variantId]),
+			([contentKey, variantId]) => {
+				if (!contentKey || !variantId) return;
+
+				this.observe(
+					manager.hasExposeOf(contentKey, variantId),
+					(exposed) => {
+						this.#exposed.setValue(exposed ?? false);
+					},
+					'observeHasExpose',
+				);
+			},
+			'observeContentKeyAndVariantId',
+		);
+
+		this.observe(
+			// TODO: Again we need to parse on all variants....
+			manager.readOnlyState.isPermittedForObservableVariant(this.variantId),
+			(isReadOnly) => {
+				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
+
+				if (isReadOnly) {
+					const rule = {
+						unique,
+						variantId: this.#variantId.getValue(),
+					};
+
+					this.readOnlyGuard?.addRule(rule);
+				} else {
+					this.readOnlyGuard?.removeRule(unique);
+				}
+			},
+			'observeIsReadOnly',
+		);
+
+		this.observe(
+			this.content.contentTypeId,
+			(contentTypeId) => {
+				this.observe(
+					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
+					async (blockType) => {
+						if (blockType?.editorSize) {
+							const editorConfig = manager.getEditorConfiguration();
+							const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
+							if (!useInlineEditing) {
+								this.setEditorSize(blockType.editorSize);
+							}
+						}
+
+						await this.content.structure.whenLoaded();
+						this.#gotLabel(blockType?.label ?? this.content.structure.getOwnerContentTypeName());
+					},
+					'observeBlockType',
+				);
+			},
+			'observeContentTypeId',
+		);
+	}
+
+	#gotLabel(label: string | undefined) {
+		if (label) {
+			this.#labelRender.markdown = label;
+			this.#renderLabel(this.content.getValues(), this.settings.getValues());
+		}
+	}
+
+	async #renderLabel(
+		contentValues: Array<UmbBlockDataValueModel> | undefined,
+		settingsValues: Array<UmbBlockDataValueModel> | undefined,
+	) {
+		const valueObject = {} as Record<string, unknown>;
+		if (contentValues) {
+			for (const property of contentValues) {
+				valueObject[property.alias] = property.value;
+			}
+		}
+
+		if (settingsValues) {
+			valueObject['$settings'] = settingsValues;
+		}
+
+		// TODO: Look to add support for `$index`, requires wiring up the block-entry with the workspace. [LK]
+		//valueObject['$index'] = 0;
+
+		this.#labelRender.value = valueObject;
+
+		// Await one animation frame:
+		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
+		const label = this.#labelRender.toString();
+		const title = `${prefix} ${label}`;
+		this.#name.setValue(title);
+
+		if (this.#modalContext) {
+			this.view.setTitle(title);
+		}
+	}
+
+	#allowNavigateAway = false;
+	#onWillNavigate = async (e: CustomEvent) => {
+		const newUrl = e.detail.url;
+
+		if (this.#allowNavigateAway) {
+			return true;
+		}
+
+		if (this._checkWillNavigateAway(newUrl) && this.getHasUnpersistedChanges()) {
+			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
+			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
+			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
+			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
+			e.preventDefault();
+			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
+			const modal = modalManager?.open(this, UMB_DISCARD_CHANGES_MODAL);
+			if (modal) {
+				try {
+					// navigate to the new url when discarding changes
+					await modal.onSubmit();
+					this.#allowNavigateAway = true;
+					history.pushState({}, '', e.detail.url);
+					return true;
+				} catch {
+					return false;
+				}
+			} else {
+				console.error('No modal manager found!');
+			}
+		}
+
+		return true;
+	};
+
+	/**
+	 * Check if the workspace is about to navigate away.
+	 * @protected
+	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
+	 * @returns {boolean} true if the workspace is navigating away.
+	 * @memberof UmbEntityWorkspaceContextBase
+	 */
+	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
+		if (newUrl instanceof URL) {
+			newUrl = newUrl.href;
+		}
+		return !newUrl.includes(this.routes.getActiveLocalPath());
+	}
+
 	setEditorSize(editorSize: UUIModalSidebarSize) {
 		this.#modalContext?.setModalSize(editorSize);
 	}
@@ -229,6 +340,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#initialSettings = undefined;
 		this.content.resetState();
 		this.settings.resetState();
+		this.#allowNavigateAway = false;
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
@@ -414,7 +526,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	getName() {
-		return 'block name content element type here...';
+		return '';
+	}
+
+	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.content.getHasUnpersistedChanges() || this.settings.getHasUnpersistedChanges();
 	}
 
 	/**
@@ -456,6 +576,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		const settingsData = this.settings.getData();
+		this.content.setPersistedData(contentData);
+		if (settingsData) {
+			this.settings.setPersistedData(settingsData);
+		}
 
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
@@ -479,6 +603,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#expose(layoutData.contentKey);
 		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	#reportValidation() {
+		this.content.validation.report();
+		this.settings.validation.report();
 	}
 
 	expose() {
@@ -520,6 +651,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	public override destroy(): void {
 		super.destroy();
+		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		this.#layout?.destroy();
 		this.#name?.destroy();
 		this.#layout = undefined as any;

@@ -3,6 +3,7 @@
 
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -17,13 +18,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RelationTypeRepositoryTest : UmbracoIntegrationTest
+internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => CreateTestData();
 
     private RelationTypeRepository CreateRepository(ICoreScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     [Test]
     public void Can_Perform_Add_On_RelationTypeRepository()
@@ -100,7 +101,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var relationType = repository.Get(8) as IRelationTypeWithIsDependency;
+            var relationType = repository.Get(9) as IRelationTypeWithIsDependency;
 
             // Assert
             Assert.That(relationType, Is.Not.Null);
@@ -130,7 +131,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(relationTypes, Is.Not.Null);
             Assert.That(relationTypes.Any(), Is.True);
             Assert.That(relationTypes.Any(x => x == null), Is.False);
-            Assert.That(relationTypes.Count(), Is.EqualTo(8));
+            Assert.That(relationTypes.Count(), Is.EqualTo(9));
         }
     }
 
@@ -165,7 +166,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var exists = repository.Exists(3);
-            var doesntExist = repository.Exists(9);
+            var doesntExist = repository.Exists(99);
 
             // Assert
             Assert.That(exists, Is.True);
@@ -240,7 +241,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
         ICoreScopeProvider provider = ScopeProvider;
         using (var scope = provider.CreateCoreScope())
         {
-            var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
+            var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             repository.Save(relateContent); // Id 2
             repository.Save(relateContentType); // Id 3

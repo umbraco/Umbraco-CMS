@@ -15,23 +15,33 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
+internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
 {
     private readonly IEventMessagesFactory _eventMessagesFactory;
 
-    public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger,
-        IEventMessagesFactory eventMessagesFactory)
-        : base(scopeAccessor, cache, logger) =>
+    public MemberGroupRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MemberGroupRepository> logger,
+        IEventMessagesFactory eventMessagesFactory,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService) =>
         _eventMessagesFactory = eventMessagesFactory;
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
+    private Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
 
     public IMemberGroup? Get(Guid uniqueId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where<NodeDto>(x => x.UniqueId == uniqueId);
 
-        NodeDto? dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+        NodeDto? dto = Database.FirstOrDefault<NodeDto>(sql);
 
         return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
     }
@@ -79,7 +89,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
     public IEnumerable<IMemberGroup> GetMemberGroupsForMember(int memberId)
     {
         Sql<ISqlContext> sql = Sql()
-            .Select("umbracoNode.*")
+            .SelectAll()
             .From<NodeDto>()
             .InnerJoin<Member2MemberGroupDto>()
             .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
@@ -94,14 +104,14 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
     public IEnumerable<IMemberGroup> GetMemberGroupsForMember(string? username)
     {
         Sql<ISqlContext>? sql = Sql()
-            .Select("un.*")
-            .From("umbracoNode AS un")
-            .InnerJoin("cmsMember2MemberGroup")
-            .On("cmsMember2MemberGroup.MemberGroup = un.id")
-            .InnerJoin("cmsMember")
-            .On("cmsMember.nodeId = cmsMember2MemberGroup.Member")
-            .Where("un.nodeObjectType=@objectType", new { objectType = NodeObjectTypeId })
-            .Where("cmsMember.LoginName=@loginName", new { loginName = username });
+            .Select($"{QuoteTableName(NodeDto.TableName)}.*")
+            .From<NodeDto>()
+            .InnerJoin<Member2MemberGroupDto>()
+            .On<Member2MemberGroupDto, NodeDto>((g, n) => g.MemberGroup == n.NodeId)
+            .InnerJoin<MemberDto>()
+            .On<MemberDto, Member2MemberGroupDto>((m, g) => m.NodeId == g.Member)
+            .Where<NodeDto>(n => n.NodeObjectType == NodeObjectTypeId)
+            .Where<MemberDto>(m => m.LoginName == username);
 
         return Database.Fetch<NodeDto>(sql)
             .DistinctBy(dto => dto.NodeId)
@@ -119,7 +129,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { id });
 
-        NodeDto? dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+        NodeDto? dto = Database.FirstOrDefault<NodeDto>(sql);
 
         return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
     }
@@ -163,22 +173,24 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new[]
+        Sql<ISqlContext> sql = Sql();
+
+        var inClause = $" IN (SELECT {QuoteTableName("umbracoUserGroup")}.{QuoteColumnName("key")} FROM {QuoteTableName("umbracoUserGroup")} WHERE id = @id)";
+        return new List<string>
         {
-            "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoRelation WHERE parentId = @id",
-            "DELETE FROM umbracoRelation WHERE childId = @id",
-            "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-            "DELETE FROM cmsMember2MemberGroup WHERE MemberGroup = @id",
-            "DELETE FROM umbracoNode WHERE id = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUser2NodeNotify")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2Permission")} WHERE {QuoteColumnName("userGroupKey")}{inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2GranularPermission")} WHERE {QuoteColumnName("userGroupKey")}{inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("parentId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("childId")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsTagRelationship")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsMember2MemberGroup")} WHERE {QuoteColumnName("MemberGroup")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id",
         };
-        return list;
     }
 
     protected override void PersistNewItem(IMemberGroup entity)
@@ -218,10 +230,10 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             .SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-            .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+            .WhereIn<NodeDto>(n => n.Text, roleNames);
         IEnumerable<string?> existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
         IEnumerable<string?> missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
-        MemberGroup[] missingGroups = missingRoles.Select(x => new MemberGroup { Name = x }).ToArray();
+        MemberGroup[] missingGroups = [.. missingRoles.Select(x => new MemberGroup { Name = x })];
 
         EventMessages evtMsgs = _eventMessagesFactory.Get();
         if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(missingGroups, evtMsgs)))
@@ -244,16 +256,18 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
         if (replace)
         {
             // delete all assigned groups first
-            Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds)", new { memberIds });
+            Sql<ISqlContext> delSql = Sql()
+                .Delete<Member2MemberGroupDto>()
+                .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds);
+            Database.Execute(delSql);
 
-            currentlyAssigned = Array.Empty<AssignedRolesDto>();
+            currentlyAssigned = [];
         }
         else
         {
             // get the groups that are currently assigned to any of these members
             Sql<ISqlContext> assignedSql = Sql()
-                .Select(
-                    $"{SqlSyntax.GetQuotedColumnName("text")},{SqlSyntax.GetQuotedColumnName("Member")},{SqlSyntax.GetQuotedColumnName("MemberGroup")}")
+                .Select($"{QuoteColumnName("text")},{QuoteColumnName("Member")},{QuoteColumnName("MemberGroup")}")
                 .From<NodeDto>()
                 .InnerJoin<Member2MemberGroupDto>()
                 .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
@@ -285,24 +299,21 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
 
     private void DissociateRolesInternal(int[] memberIds, string[] roleNames)
     {
-        Sql<ISqlContext>? existingSql = Sql()
+        Sql<ISqlContext> existingSql = Sql()
             .SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-            .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+            .WhereIn<NodeDto>(w => w.Text, roleNames);
         var existingRolesIds = Database.Fetch<NodeDto>(existingSql).Select(x => x.NodeId).ToArray();
 
-        Database.Execute(
-            "DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds) AND MemberGroup IN (@memberGroups)",
-            new
-            {
-                /*memberIds =*/
-                memberIds,
-                memberGroups = existingRolesIds,
-            });
+        Sql<ISqlContext> delSql = Sql()
+            .Delete<Member2MemberGroupDto>()
+            .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds)
+            .WhereIn<Member2MemberGroupDto>(x => x.MemberGroup, existingRolesIds);
+        Database.Execute(delSql);
     }
 
-    private class AssignedRolesDto
+    private sealed class AssignedRolesDto
     {
         [Column("text")]
         public string? RoleName { get; set; }

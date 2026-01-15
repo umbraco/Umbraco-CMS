@@ -418,7 +418,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
     // ReSharper disable ClassNeverInstantiated.Local
     // ReSharper disable UnusedAutoPropertyAccessor.Local
-    private class TypedIdDto
+    private sealed class TypedIdDto
     {
         public int Id { get; set; }
 

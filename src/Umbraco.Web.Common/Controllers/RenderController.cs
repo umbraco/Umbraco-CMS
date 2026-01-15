@@ -58,10 +58,11 @@ public class RenderController : UmbracoPageController, IRenderController
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
         {
             _logger.LogDebug(
-            "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}",
+            "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}, Segment={Segment}",
             pcr.PublishedContent?.Id ?? -1,
             pcr.ResponseStatusCode,
-            pcr.Culture);
+            pcr.Culture,
+            pcr.Segment);
         }
 
         UmbracoRouteResult routeStatus = pcr.GetRouteResult();
@@ -111,7 +112,7 @@ public class RenderController : UmbracoPageController, IRenderController
     /// </remarks>
     protected override IActionResult CurrentTemplate<T>(T model)
     {
-        if (EnsurePhsyicalViewExists(UmbracoRouteValues.TemplateName) == false)
+        if (EnsurePhysicalViewExists(UmbracoRouteValues.TemplateName) == false)
         {
             // no physical template file was found
             return new PublishedContentNotFoundResult(UmbracoContext);

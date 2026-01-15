@@ -1,6 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -8,6 +11,28 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 
 public abstract class SystemTextJsonSerializerBase : IJsonSerializer
 {
+    private readonly IJsonSerializerEncoderFactory _jsonSerializerEncoderFactory;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SystemTextJsonSerializerBase" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    protected SystemTextJsonSerializerBase()
+        : this(
+              StaticServiceProvider.Instance.GetRequiredService<IJsonSerializerEncoderFactory>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SystemTextJsonSerializerBase"/> class.
+    /// </summary>
+    /// <param name="jsonSerializerEncoderFactory">The <see cref="IJsonSerializerEncoderFactory"/> for creating the <see cref="JavaScriptEncoder"/>.</param>
+    protected SystemTextJsonSerializerBase(IJsonSerializerEncoderFactory jsonSerializerEncoderFactory)
+        => _jsonSerializerEncoderFactory = jsonSerializerEncoderFactory;
+
+    /// <summary>
+    /// Gets the <see cref="System.Text.Json.JsonSerializerOptions"/>.
+    /// </summary>
     protected abstract JsonSerializerOptions JsonSerializerOptions { get; }
 
     /// <inheritdoc />

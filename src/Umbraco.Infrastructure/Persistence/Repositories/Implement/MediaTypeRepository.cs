@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -16,17 +17,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IMediaType" />
 /// </summary>
-internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
+internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
     public MediaTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<MediaTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper)
-        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IIdKeyMap idKeyMap,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            commonRepository,
+            languageRepository,
+            shortStringHelper,
+            repositoryCacheVersionService,
+            idKeyMap,
+            cacheSyncService)
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     protected override bool SupportsPublishing => MediaType.SupportsPublishingConst;
@@ -34,7 +52,7 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MediaType;
 
     protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached
@@ -88,13 +106,13 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
-        l.Add("DELETE FROM umbracoNode WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsContentType")} WHERE {QuoteColumnName("nodeId")} = @id");
+        l.Add($"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id");
         return l;
     }
 
@@ -120,10 +138,11 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
             NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
-            var maxSortOrder =
-                Database.ExecuteScalar<int>(
-                    "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            Sql<ISqlContext> sql = Sql()
+                .SelectMax<NodeDto>(x => x.SortOrder, 0)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
+            var maxSortOrder = Database.ExecuteScalar<int>(sql);
             entity.SortOrder = maxSortOrder + 1;
         }
 

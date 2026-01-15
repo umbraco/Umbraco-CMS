@@ -6,7 +6,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-content-picker-source-type
@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	}
 
 	@state()
-	private sourceType: string = 'content';
+	private _sourceType: string = 'content';
 
 	#initialized: boolean = false;
 
@@ -55,11 +55,11 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 				if (startNode?.type) {
 					// If we had a sourceType before, we can see this as a change and not the initial value,
 					// so let's reset the value, so we don't carry over content-types to the new source type.
-					if (this.#initialized && this.sourceType !== startNode.type) {
+					if (this.#initialized && this._sourceType !== startNode.type) {
 						this.#setValue([]);
 					}
 
-					this.sourceType = startNode.type;
+					this._sourceType = startNode.type;
 
 					if (!this.#initialized) {
 						this.#initialized = true;
@@ -71,7 +71,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	}
 
 	#onChange(event: CustomEvent) {
-		switch (this.sourceType) {
+		switch (this._sourceType) {
 			case 'content':
 				this.#setValue((<UmbInputDocumentTypeElement>event.target).selection);
 				break;
@@ -90,7 +90,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 
 	#setValue(value: string[]) {
 		this.value = value.join(',');
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -98,7 +98,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	}
 
 	#renderType() {
-		switch (this.sourceType) {
+		switch (this._sourceType) {
 			case 'content':
 				return this.#renderTypeContent();
 			case 'media':

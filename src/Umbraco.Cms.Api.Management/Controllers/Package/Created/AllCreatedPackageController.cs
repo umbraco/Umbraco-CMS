@@ -25,6 +25,7 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Gets a paginated list of all created packages.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the created packages.</returns>
@@ -44,6 +45,6 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
             Items = _umbracoMapper.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(createdPackages.Items)
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }

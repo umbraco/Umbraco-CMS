@@ -1,42 +1,29 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <inheritdoc/>
 public class PropertyTypeUsageService : IPropertyTypeUsageService
 {
     private readonly IPropertyTypeUsageRepository _propertyTypeUsageRepository;
-    private readonly IContentTypeService _contentTypeService;
     private readonly ICoreScopeProvider _scopeProvider;
 
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    // TODO (V18): Remove IContentTypeService parameter from constructor.
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyTypeUsageService"/> class.
+    /// </summary>
     public PropertyTypeUsageService(
         IPropertyTypeUsageRepository propertyTypeUsageRepository,
-        ICoreScopeProvider scopeProvider): this(propertyTypeUsageRepository, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(), scopeProvider)
-    {
-
-    }
-
-    public PropertyTypeUsageService(
-        IPropertyTypeUsageRepository propertyTypeUsageRepository,
+#pragma warning disable IDE0060 // Remove unused parameter
         IContentTypeService contentTypeService,
+#pragma warning restore IDE0060 // Remove unused parameter
         ICoreScopeProvider scopeProvider)
     {
         _propertyTypeUsageRepository = propertyTypeUsageRepository;
-        _contentTypeService = contentTypeService;
         _scopeProvider = scopeProvider;
-    }
-
-    /// <inheritdoc/>
-    [Obsolete("Please use HasSavedPropertyValuesAsync. Scheduled for removable in Umbraco 15.")]
-    public bool HasSavedPropertyValues(string propertyTypeAlias)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-
-        return _propertyTypeUsageRepository.HasSavedPropertyValues(propertyTypeAlias);
     }
 
     /// <inheritdoc/>

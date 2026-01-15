@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,12 +11,13 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Help;
 
+[Obsolete("This is no longer used and will be removed in v19")]
 [ApiVersion("1.0")]
 public class GetHelpController : HelpControllerBase
 {
     private readonly ILogger<GetHelpController> _logger;
     private readonly IJsonSerializer _jsonSerializer;
-    private HelpPageSettings _helpPageSettings;
+    private readonly HelpPageSettings _helpPageSettings;
 
     public GetHelpController(
         IOptionsMonitor<HelpPageSettings> helpPageSettings,
@@ -26,10 +27,7 @@ public class GetHelpController : HelpControllerBase
         _logger = logger;
         _jsonSerializer = jsonSerializer;
         _helpPageSettings = helpPageSettings.CurrentValue;
-        helpPageSettings.OnChange(UpdateHelpPageSettings);
     }
-
-    private void UpdateHelpPageSettings(HelpPageSettings settings) => _helpPageSettings = settings;
 
     [HttpGet]
     [MapToApiVersion("1.0")]
@@ -82,6 +80,5 @@ public class GetHelpController : HelpControllerBase
         return Ok(PagedViewModel<HelpPageResponseModel>.Empty());
     }
 
-    private bool IsAllowedUrl(string? url) =>
-        _helpPageSettings.HelpPageUrlAllowList is null || _helpPageSettings.HelpPageUrlAllowList.Contains(url);
+    private bool IsAllowedUrl(string? url) => url is null || _helpPageSettings.HelpPageUrlAllowList.Contains(url);
 }

@@ -1,20 +1,21 @@
-import { UmbMediaUrlRepository } from '../../repository/index.js';
 import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
-import type { UmbCropModel } from '../../types.js';
-import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
+import { UmbMediaUrlRepository } from '../../url/index.js';
+import type { UmbCropModel, UmbMediaItemModel } from '../../types.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
+import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type {
 	UmbImageCropperEditorModalData,
 	UmbImageCropperEditorModalValue,
 } from './image-cropper-editor-modal.token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import './components/image-cropper-editor-field.element.js';
 
-/** TODO Make some of the components from property editor image cropper reuseable for this modal... */
+import '../../components/input-upload-field/file-upload-preview.element.js';
 
 @customElement('umb-image-cropper-editor-modal')
 export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
@@ -42,7 +43,14 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	private _editMediaPath = '';
 
 	@state()
-	private _pickableFilter?: (item: any) => boolean;
+	private _pickableFilter?: (item: UmbMediaItemModel) => boolean;
+
+	@state()
+	private _isCroppable = false;
+
+	#config = new UmbTemporaryFileConfigRepository(this);
+
+	#imageFileTypes?: Array<string>;
 
 	#modalManager?: UmbModalManagerContext;
 
@@ -72,14 +80,32 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this._crops = this.data?.cropOptions ?? [];
 		this._pickableFilter = this.data?.pickableFilter;
 
+		this.#observeAcceptedFileTypes();
 		this.#getSrc();
+	}
+
+	async #observeAcceptedFileTypes() {
+		await this.#config.initialized;
+		this.observe(
+			this.#config.part('imageFileTypes'),
+			(imageFileTypes) => (this.#imageFileTypes = imageFileTypes),
+			'_observeFileTypes',
+		);
 	}
 
 	async #getSrc() {
 		const { data } = await this.#urlRepository.requestItems([this._unique]);
 		const item = data?.[0];
 
-		if (!item?.url) return;
+		if (!item?.url) {
+			this._isCroppable = false;
+			this._imageCropperValue = undefined;
+			return;
+		}
+
+		if (item.extension && this.#imageFileTypes?.includes(item.extension)) {
+			this._isCroppable = true;
+		}
 
 		/**
 		 * Combine the crops from the property editor with the stored crops and ignore any invalid crops
@@ -108,8 +134,18 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const data = await modal?.onSubmit().catch(() => null);
 		if (!data) return;
 
-		this._unique = data.selection[0];
+		const selected = data.selection[0];
+
+		if (!selected) {
+			throw new Error('No media selected');
+		}
+
+		this._unique = selected;
+
 		this.value = { ...this.value, unique: this._unique };
+
+		this._isCroppable = false;
+
 		this.#getSrc();
 	}
 
@@ -128,7 +164,13 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
-				${this.#renderBody()}
+				<div id="layout">
+					${when(
+						this._isCroppable,
+						() => this.#renderImageCropper(),
+						() => this.#renderFilePreview(),
+					)}
+				</div>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -141,30 +183,61 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#renderBody() {
+	#renderActions() {
 		return html`
-			<div id="layout">
-				<umb-image-cropper-editor-field
-					.value=${this._imageCropperValue}
-					?hideFocalPoint=${this._hideFocalPoint}
-					@change=${this.#onChange}>
-					<div id="actions" slot="actions">
-						<uui-button compact @click=${this.#openMediaPicker} label=${this.localize.term('mediaPicker_changeMedia')}>
-							<uui-icon name="icon-search"></uui-icon>${this.localize.term('mediaPicker_changeMedia')}
-						</uui-button>
-						<uui-button
-							compact
-							href=${this._editMediaPath + 'edit/' + this._unique}
-							label=${this.localize.term('mediaPicker_openMedia')}>
-							<uui-icon name="icon-out"></uui-icon>${this.localize.term('mediaPicker_openMedia')}
-						</uui-button>
-					</div>
-				</umb-image-cropper-editor-field>
+			<uui-button compact label=${this.localize.term('mediaPicker_changeMedia')} @click=${this.#openMediaPicker}>
+				<uui-icon name="icon-search"></uui-icon>
+				<umb-localize key="mediaPicker_changeMedia">Change Media Item</umb-localize>
+			</uui-button>
+			<uui-button
+				compact
+				label=${this.localize.term('mediaPicker_openMedia')}
+				href=${this._editMediaPath + 'edit/' + this._unique}>
+				<uui-icon name="icon-out"></uui-icon>
+				<umb-localize key="mediaPicker_openMedia">Open in Media Library</umb-localize>
+			</uui-button>
+		`;
+	}
+
+	#renderImageCropper() {
+		if (!this._imageCropperValue) return nothing;
+		return html`
+			<umb-image-cropper-editor-field
+				.value=${this._imageCropperValue}
+				?hideFocalPoint=${this._hideFocalPoint}
+				@change=${this.#onChange}>
+				<div slot="actions">${this.#renderActions()}</div>
+			</umb-image-cropper-editor-field>
+		`;
+	}
+
+	#renderFilePreview() {
+		return html`
+			<div id="main">
+				${when(
+					this._imageCropperValue?.src,
+					(path) => html`<umb-file-upload-preview .path=${path}></umb-file-upload-preview>`,
+					() => this.#renderFileNotFound(),
+				)}
+			</div>
+			<div id="actions">${this.#renderActions()}</div>
+		`;
+	}
+
+	#renderFileNotFound() {
+		const args = [this.localize.term('general_media')];
+		return html`
+			<div class="uui-text">
+				<h4>
+					<umb-localize key="entityDetail_notFoundTitle" .args=${args}>Item not found</umb-localize>
+				</h4>
+				<umb-localize key="entityDetail_notFoundDescription">The requested item could not be found.</umb-localize>
 			</div>
 		`;
 	}
 
 	static override styles = [
+		UmbTextStyles,
 		css`
 			#layout {
 				height: 100%;
@@ -172,34 +245,41 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 				flex-direction: column;
 				justify-content: space-between;
 			}
+
 			umb-image-cropper-editor-field {
-				flex-grow: 1;
+				flex: 1;
+			}
+
+			#main {
+				flex: 1;
+				background-color: var(--uui-color-surface);
+				outline: 1px solid var(--uui-color-border);
 			}
 
 			#actions {
-				display: inline-flex;
-				gap: var(--uui-size-space-3);
-			}
-			uui-icon {
-				padding-right: var(--uui-size-3);
-			}
-
-			#options {
 				display: flex;
-				justify-content: center;
+				margin-top: 0.5rem;
+
+				uui-icon {
+					padding-right: var(--uui-size-1);
+				}
 			}
 
-			img {
-				max-width: 80%;
-				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
-				background-size: 10px 10px;
-				background-repeat: repeat;
+			.uui-text {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				height: 100%;
 			}
 		`,
 	];
 }
 
+/** @deprecated Should be exported as `element` only; to be removed in Umbraco 18. */
 export default UmbImageCropperEditorModalElement;
+
+export { UmbImageCropperEditorModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

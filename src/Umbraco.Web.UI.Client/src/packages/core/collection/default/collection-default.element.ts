@@ -23,6 +23,8 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-collection-default')
 export class UmbCollectionDefaultElement extends UmbLitElement {
+	#collectionContext?: UmbDefaultCollectionContext;
+
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
@@ -30,19 +32,41 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	private _hasItems = false;
 
 	@state()
-	private _isDoneLoading = false;
+	private _emptyLabel?: string;
 
-	#collectionContext?: UmbDefaultCollectionContext<any, any>;
+	@state()
+	private _initialLoadDone = false;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_COLLECTION_CONTEXT, async (context) => {
 			this.#collectionContext = context;
+			this.#observeIsLoading();
 			this.#observeCollectionRoutes();
 			this.#observeTotalItems();
-			await this.#collectionContext?.requestCollection();
-			this._isDoneLoading = true;
+			this.#getEmptyStateLabel();
+			this.#collectionContext?.loadCollection();
 		});
+	}
+
+	#observeIsLoading() {
+		if (!this.#collectionContext) return;
+		let hasBeenLoading = false;
+
+		this.observe(
+			this.#collectionContext.loading,
+			(isLoading) => {
+				// We need to know when the initial loading has been done, to not show the empty state before that.
+				// We can't just check if there are items, because there might be none.
+				// So we check if it has been loading, and then when it stops loading we know the initial load is done.
+				if (isLoading) {
+					hasBeenLoading = true;
+				} else if (hasBeenLoading) {
+					this._initialLoadDone = true;
+				}
+			},
+			'umbCollectionIsLoadingObserver',
+		);
 	}
 
 	#observeCollectionRoutes() {
@@ -69,6 +93,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		);
 	}
 
+	#getEmptyStateLabel() {
+		this._emptyLabel = this.#collectionContext?.getEmptyLabel();
+	}
+
 	override render() {
 		return this._routes
 			? html`
@@ -93,14 +121,17 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderContent() {
-		return html` ${this.renderPagination()} ${this.renderSelectionActions()} `;
+		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
 	}
 
 	#renderEmptyState() {
-		if (!this._isDoneLoading) return nothing;
-		return html` <div id="empty-state" class="uui-text">
-			<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
-		</div>`;
+		if (!this._initialLoadDone) return nothing;
+
+		return html`
+			<div id="empty-state" class="uui-text">
+				<h4>${this.localize.string(this._emptyLabel)}</h4>
+			</div>
+		`;
 	}
 
 	static override styles = [
@@ -126,11 +157,19 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				height: 80%;
 				align-content: center;
 				text-align: center;
+				opacity: 0;
+				animation: fadeIn 200ms 200ms forwards;
 			}
 
 			router-slot {
 				width: 100%;
 				height: 100%;
+			}
+
+			@keyframes fadeIn {
+				100% {
+					opacity: 100%;
+				}
 			}
 		`,
 	];

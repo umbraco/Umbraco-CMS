@@ -1,16 +1,28 @@
 import './confirm-modal.element.js';
 
 import type { UmbConfirmModalElement } from './confirm-modal.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 
-export default {
-	title: 'API/Modals/Layouts/Confirm',
+const meta: Meta<UmbConfirmModalElement> = {
+	title: 'Extension Type/Modal/Confirm',
 	component: 'umb-confirm-modal',
 	id: 'umb-confirm-modal',
+	args: {
+		data: {
+			headline: '[Headline]',
+			content: html`[Content]`,
+			color: 'positive',
+			cancelLabel: '[Cancel button]',
+			confirmLabel: '[Confirm button]',
+		},
+	},
 } as Meta;
+
+export default meta;
+type Story = StoryObj<UmbConfirmModalElement>;
 
 const positiveData: UmbConfirmModalData = {
 	headline: 'Publish with descendants',
@@ -19,12 +31,11 @@ const positiveData: UmbConfirmModalData = {
 	confirmLabel: 'Publish',
 };
 
-export const Positive: StoryFn<UmbConfirmModalElement> = () => html`
-	<!-- TODO: figure out if generics are allowed for properties:
-	https://github.com/runem/lit-analyzer/issues/149
-	https://github.com/runem/lit-analyzer/issues/163 -->
-	<umb-confirm-modal .data=${positiveData as any}></umb-confirm-modal>
-`;
+export const Positive: Story = {
+	args: {
+		data: positiveData,
+	},
+};
 
 const dangerData: UmbConfirmModalData = {
 	color: 'danger',
@@ -33,9 +44,8 @@ const dangerData: UmbConfirmModalData = {
 	confirmLabel: 'Delete',
 };
 
-export const Danger: StoryFn<UmbConfirmModalElement> = () => html`
-	<!-- TODO: figure out if generics are allowed for properties:
-	https://github.com/runem/lit-analyzer/issues/149
-	https://github.com/runem/lit-analyzer/issues/163 -->
-	<umb-confirm-modal .data=${dangerData as any}></umb-confirm-modal>
-`;
+export const Danger: Story = {
+	args: {
+		data: dangerData,
+	},
+};

@@ -1,14 +1,10 @@
-using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
 
@@ -17,22 +13,31 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     private readonly IOperationIdSelector _operationIdSelector;
     private readonly ISchemaIdSelector _schemaIdSelector;
     private readonly ISubTypesSelector _subTypesSelector;
-
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
-    public ConfigureUmbracoSwaggerGenOptions(
-        IOperationIdSelector operationIdSelector,
-        ISchemaIdSelector schemaIdSelector)
-        : this(operationIdSelector, schemaIdSelector, StaticServiceProvider.Instance.GetRequiredService<ISubTypesSelector>())
-    { }
+    private readonly IDocumentInclusionSelector _documentInclusionSelector;
 
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,
         ISchemaIdSelector schemaIdSelector,
-        ISubTypesSelector subTypesSelector)
+        ISubTypesSelector subTypesSelector,
+        IDocumentInclusionSelector documentInclusionSelector)
     {
         _operationIdSelector = operationIdSelector;
         _schemaIdSelector = schemaIdSelector;
         _subTypesSelector = subTypesSelector;
+        _documentInclusionSelector = documentInclusionSelector;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public ConfigureUmbracoSwaggerGenOptions(
+        IOperationIdSelector operationIdSelector,
+        ISchemaIdSelector schemaIdSelector,
+        ISubTypesSelector subTypesSelector)
+        : this(
+              operationIdSelector,
+              schemaIdSelector,
+              subTypesSelector,
+              StaticServiceProvider.Instance.GetRequiredService<IDocumentInclusionSelector>())
+    {
     }
 
     public void Configure(SwaggerGenOptions swaggerGenOptions)
@@ -47,19 +52,11 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
             });
 
         swaggerGenOptions.CustomOperationIds(description => _operationIdSelector.OperationId(description));
-        swaggerGenOptions.DocInclusionPredicate((name, api) =>
-        {
-            if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
-                && controllerActionDescriptor.MethodInfo.HasMapToApiAttribute(name))
-            {
-                return true;
-            }
-
-            ApiVersionMetadata apiVersionMetadata = api.ActionDescriptor.GetApiVersionMetadata();
-            return apiVersionMetadata.Name == name
-                   || (string.IsNullOrEmpty(apiVersionMetadata.Name) && name == DefaultApiConfiguration.ApiName);
-        });
-        swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
+        swaggerGenOptions.DocInclusionPredicate(_documentInclusionSelector.Include);
+        swaggerGenOptions.TagActionsBy(api =>
+            api.GroupName is null
+                ? []
+                : new[] { api.GroupName });
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);

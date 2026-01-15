@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
@@ -31,7 +30,12 @@ public class PublishedValueFallback : IPublishedValueFallback
     /// <inheritdoc />
     public bool TryGetValue<T>(IPublishedProperty property, string? culture, string? segment, Fallback fallback, T? defaultValue, out T? value)
     {
-        _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, property.Alias, ref culture, ref segment);
+
+        if (TryGetValueForDefaultSegment(property, culture, segment, out value))
+        {
+            return true;
+        }
 
         foreach (var f in fallback)
         {
@@ -79,7 +83,12 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, alias, ref culture, ref segment);
+
+        if (TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
+        {
+            return true;
+        }
 
         foreach (var f in fallback)
         {
@@ -125,8 +134,13 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedPropertyType? propertyType = content.ContentType.GetPropertyType(alias);
         if (propertyType != null)
         {
-            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment);
+            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, alias, ref culture, ref segment);
             noValueProperty = content.GetProperty(alias);
+        }
+
+        if (propertyType != null && TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
+        {
+            return true;
         }
 
         // note: we don't support "recurse & language" which would walk up the tree,
@@ -180,6 +194,30 @@ public class PublishedValueFallback : IPublishedValueFallback
         new NotSupportedException(
             $"Fallback {GetType().Name} does not support fallback code '{fallback}' at {level} level.");
 
+    private bool TryGetValueForDefaultSegment<T>(IPublishedElement content, string alias, string? culture, string? segment, out T? value)
+    {
+        IPublishedProperty? property = content.GetProperty(alias);
+        if (property is not null)
+        {
+            return TryGetValueForDefaultSegment(property, culture, segment, out value);
+        }
+
+        value = default;
+        return false;
+    }
+
+    private bool TryGetValueForDefaultSegment<T>(IPublishedProperty property, string? culture, string? segment, out T? value)
+    {
+        if (segment.IsNullOrWhiteSpace() is false && property.HasValue(culture, segment: string.Empty))
+        {
+            value = property.Value<T>(this, culture, segment: string.Empty);
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+
     // tries to get a value, recursing the tree
     // because we recurse, content may not even have the a property with the specified alias (but only some ancestor)
     // in case no value was found, noValueProperty contains the first property that was found (which does not have a value)
@@ -188,7 +226,7 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedProperty? property; // if we are here, content's property has no value
         do
         {
-            content = content?.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
+            content = content?.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
             IPublishedPropertyType? propertyType = content?.ContentType.GetPropertyType(alias);
 
@@ -196,7 +234,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             {
                 culture = null;
                 segment = null;
-                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment);
+                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, alias, ref culture, ref segment);
             }
 
             property = content?.GetProperty(alias);
@@ -279,7 +317,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             }
 
             var culture2 = language2.IsoCode;
-            T? culture2Value = getValue(culture2, segment);
+            T? culture2Value = TryGetExplicitlyContextualizedValue(getValue, culture2, segment);
             if (culture2Value != null)
             {
                 value = culture2Value;
@@ -291,25 +329,26 @@ public class PublishedValueFallback : IPublishedValueFallback
     }
 
     private bool TryGetValueWithDefaultLanguageFallback<T>(IPublishedProperty property, string? culture, string? segment, out T? value)
-    {
-        value = default;
-
-        if (culture.IsNullOrWhiteSpace())
-        {
-            return false;
-        }
-
-        string? defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
-        if (culture.InvariantEquals(defaultCulture) == false && property.HasValue(defaultCulture, segment))
-        {
-            value = property.Value<T>(this, defaultCulture, segment);
-            return true;
-        }
-
-        return false;
-    }
+        => TryGetValueWithDefaultLanguageFallback(
+            (actualCulture, actualSegment)
+                => property.HasValue(actualCulture, actualSegment)
+                    ? property.Value<T>(this, actualCulture, actualSegment)
+                    : default,
+            culture,
+            segment,
+            out value);
 
     private bool TryGetValueWithDefaultLanguageFallback<T>(IPublishedElement element, string alias, string? culture, string? segment, out T? value)
+        => TryGetValueWithDefaultLanguageFallback(
+            (actualCulture, actualSegment)
+                => element.HasValue(alias, actualCulture, actualSegment)
+                    ? element.Value<T>(this, alias, actualCulture, actualSegment)
+                    : default,
+            culture,
+            segment,
+            out value);
+
+    private bool TryGetValueWithDefaultLanguageFallback<T>(TryGetValueForCultureAndSegment<T> getValue, string? culture, string? segment, out T? value)
     {
         value = default;
 
@@ -318,14 +357,39 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        string? defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
-        if (culture.InvariantEquals(defaultCulture) == false && element.HasValue(alias, defaultCulture, segment))
+        var defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
+        if (defaultCulture.IsNullOrWhiteSpace())
         {
-            value = element.Value<T>(this, alias, defaultCulture, segment);
-            return true;
+            return false;
         }
 
-        return false;
+        if (culture.InvariantEquals(defaultCulture))
+        {
+            return false;
+        }
+
+        T? fallbackValue = TryGetExplicitlyContextualizedValue(getValue, defaultCulture, segment);
+        if (fallbackValue == null)
+        {
+            return false;
+        }
+
+        value = fallbackValue;
+        return true;
+    }
+
+    private T? TryGetExplicitlyContextualizedValue<T>(TryGetValueForCultureAndSegment<T> getValue, string culture, string? segment)
+    {
+        VariationContext? current = _variationContextAccessor.VariationContext;
+        try
+        {
+            _variationContextAccessor.VariationContext = new VariationContext(culture, segment);
+            return getValue(culture, segment);
+        }
+        finally
+        {
+            _variationContextAccessor.VariationContext = current;
+        }
     }
 
     private delegate T? TryGetValueForCultureAndSegment<out T>(string actualCulture, string? actualSegment);

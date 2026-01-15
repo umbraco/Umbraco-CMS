@@ -1,5 +1,6 @@
 import { ensureLocalPath } from './ensure-local-path.function.js';
-import { UMB_STORAGE_REDIRECT_URL } from '@umbraco-cms/backoffice/auth';
+
+export const UMB_STORAGE_REDIRECT_URL = 'umb:auth:redirect';
 
 /**
  * Retrieve the stored path from the session storage.
@@ -28,4 +29,21 @@ export function setStoredPath(path: string): void {
 		return;
 	}
 	sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, url.toString());
+}
+
+/**
+ * Redirect the user to the stored path or the base path if not available.
+ * If the basePath matches the start of the stored path, the browser will replace the state instead of redirecting.
+ * @param {string} basePath - The base path to redirect to if no stored path is available.
+ * @param {boolean} force - If true, will redirect using Location
+ */
+export function redirectToStoredPath(basePath: string, force = false): void {
+	const url = retrieveStoredPath();
+	const isBackofficePath = url?.pathname.startsWith(basePath) ?? false;
+
+	if (isBackofficePath && !force) {
+		history.replaceState(null, '', url?.toString() ?? '');
+	} else {
+		window.location.href = url?.toString() ?? basePath;
+	}
 }

@@ -32,6 +32,18 @@ public abstract class ContentFinderByIdentifierPathBase
         }
     }
 
+    protected void ResolveAndSetSegmentOnRequest(IPublishedRequestBuilder frequest)
+    {
+        var segmentFromQuerystring = _requestAccessor.GetQueryStringValue("segment");
+
+        // Check if we have a segment in the query string
+        if (!string.IsNullOrEmpty(segmentFromQuerystring))
+        {
+            // We're assuming it will match a segment
+            frequest.SetSegment(segmentFromQuerystring);
+        }
+    }
+
     protected Task<bool> LogAndReturnFailure()
     {
         if (_logger.IsEnabled(LogLevel.Debug))

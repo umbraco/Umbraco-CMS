@@ -32,6 +32,7 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     /// <summary>
     ///     Executes a given action from a HealthCheck.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="action">The action to be executed.</param>
     /// <returns>The result of a health check after the health check action is performed.</returns>
     [HttpPost("execute-action")]
@@ -61,8 +62,8 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
             return BadRequest(invalidModelProblem);
         }
 
-        HealthCheckStatus result = healthCheck.ExecuteAction(_umbracoMapper.Map<HealthCheckAction>(action)!);
+        HealthCheckStatus result = await healthCheck.ExecuteActionAsync(_umbracoMapper.Map<HealthCheckAction>(action)!);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result)));
+        return Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result));
     }
 }

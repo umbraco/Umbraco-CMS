@@ -1,6 +1,8 @@
+using System.Collections;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -21,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
 ///     <para>Returns <see cref="IEntitySlim" /> objects, i.e. lightweight representation of entities.</para>
 /// </remarks>
-internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
+internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 {
     public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
         : base(scopeAccessor, appCaches)
@@ -54,34 +56,73 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return Database.ExecuteScalar<int>(sql);
     }
 
-    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, ISet<Guid> objectTypes,
-        long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IUmbracoEntity>? filter, Ordering? ordering) =>
+    /// <summary>
+    /// Retrieves a paginated collection of entities that match the specified query and object types.
+    /// </summary>
+    /// <param name="query">The query used to filter the entities to be retrieved.</param>
+    /// <param name="objectTypes">A set of object type GUIDs that specify the types of entities to include in the results.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of entities to include in each page.</param>
+    /// <param name="totalRecords">When the method returns, contains the total number of records that match the query and object types.</param>
+    /// <param name="filter">An optional additional query to further filter the results. If <see langword="null"/>, no additional filtering
+    /// is applied.</param>
+    /// <param name="ordering">An optional ordering specification to determine the sort order of the results. If <see langword="null"/>, the
+    /// default ordering is applied.</param>
+    /// <returns>A collection of entities that match the specified query, object types, and optional filters, limited to the
+    /// specified page size.</returns>
+    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, ISet<Guid> objectTypes, long pageIndex, int pageSize, out long totalRecords, IQuery<IUmbracoEntity>? filter, Ordering? ordering) =>
         GetPagedResultsByQuery(query, objectTypes.ToArray(), pageIndex, pageSize, out totalRecords, filter, ordering);
 
 
-    // get a page of entities
-    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes,
-        long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IUmbracoEntity>? filter, Ordering? ordering, Action<Sql<ISqlContext>>? sqlCustomization = null)
+    /// <summary>
+    /// Retrieves a paginated collection of entities based on the specified query and parameters.
+    /// </summary>
+    /// <remarks>This method supports querying for content, media, and member entities. The results are
+    /// ordered by the specified <paramref name="ordering"/> if provided, and always include a fallback ordering by node
+    /// ID to ensure consistent results.</remarks>
+    /// <param name="query">The query used to filter the entities.</param>
+    /// <param name="objectTypes">An array of object type GUIDs to filter the entities by type.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of entities to include in each page.</param>
+    /// <param name="totalRecords">When the method returns, contains the total number of records matching the query.</param>
+    /// <param name="filter">An optional additional query filter to further refine the results. Can be <see langword="null"/>.</param>
+    /// <param name="ordering">An optional ordering specification to determine the sort order of the results. Can be <see langword="null"/>.</param>
+    /// <param name="sqlCustomization">An optional action to customize the underlying SQL query. Can be <see langword="null"/>.</param>
+    /// <returns>A collection of entities that match the specified query and parameters. The collection will contain up to
+    /// <paramref name="pageSize"/> entities, or fewer if there are not enough matching entities.</returns>
+    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(
+        IQuery<IUmbracoEntity> query,
+        Guid[] objectTypes,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering? ordering,
+        Action<Sql<ISqlContext>>? sqlCustomization = null)
     {
         var isContent = objectTypes.Any(objectType =>
             objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
         var isMedia = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Media);
         var isMember = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Member);
 
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, s =>
-        {
-            sqlCustomization?.Invoke(s);
-
-            if (filter != null)
+        Sql<ISqlContext> sql = GetBaseWhere(
+            isContent,
+            isMedia,
+            isMember,
+            false,
+            s =>
             {
-                foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+                sqlCustomization?.Invoke(s);
+
+                if (filter != null)
                 {
-                    s.Where(filterClause.Item1, filterClause.Item2);
+                    foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+                    {
+                        s.Where(filterClause.Item1, filterClause.Item2);
+                    }
                 }
-            }
-        }, objectTypes);
+            },
+            objectTypes);
 
         ordering ??= Ordering.ByDefault();
 
@@ -95,14 +136,11 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             ApplyOrdering(ref sql, ordering);
         }
 
-        // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
-        // no matter what we always must have node id ordered at the end
-        sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
-
         // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
         var pageIndexToFetch = pageIndex + 1;
         IEnumerable<BaseDto> dtos;
         Page<GenericContentEntityDto>? page = Database.Page<GenericContentEntityDto>(pageIndexToFetch, pageSize, sql);
+
         dtos = page.Items;
         totalRecords = page.TotalItems;
 
@@ -144,6 +182,184 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
         return entity;
     }
+
+    /// <inheritdoc/>
+    public IEnumerable<IEntitySlim> GetSiblings(
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        Sql<ISqlContext> mainSql = SiblingsSql(
+            false,
+            objectTypes,
+            targetKey,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        if (keys is null || keys.Count == 0)
+        {
+            return [];
+        }
+
+        // To re-use this method we need to provide a single object type. By convention for folder based trees, we provide the primary object type last.
+        return PerformGetAll(objectTypes.ToArray(), ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<IEntitySlim> GetTrashedSiblings(
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        Sql<ISqlContext>? mainSql = SiblingsSql(
+            true,
+            objectTypes,
+            targetKey,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        if (keys is null || keys.Count == 0)
+        {
+            return [];
+        }
+
+        // To re-use this method we need to provide a single object type. By convention for folder based trees, we provide the primary object type last.
+        return PerformGetAll(objectTypes.ToArray(), ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+    private Sql<ISqlContext> SiblingsSql(
+        bool isTrashed,
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
+        // without us also having to do a nested query for the parent ID too.
+        Sql<ISqlContext> parentIdQuery = Sql()
+            .Select<NodeDto>(x => x.ParentId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == targetKey);
+        var parentId = Database.ExecuteScalar<int>(parentIdQuery);
+
+        Sql<ISqlContext> orderingSql = Sql();
+        ApplyOrdering(ref orderingSql, ordering);
+
+        // Get all children of the parent node which are not trashed and match the provided object types.
+        // Order by SortOrder, and assign each a row number.
+        // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
+        Sql<ISqlContext> rowNumberSql = Sql()
+            .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
+            .AndSelect<NodeDto>(n => n.UniqueId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == isTrashed)
+            .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+
+        // Apply the filter if provided.
+        if (filter != null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                rowNumberSql.Where(filterClause.Item1, filterClause.Item2);
+            }
+        }
+
+        // By applying additional where clauses with parameters containing an unknown number of elements, the position of the parameters in
+        // the final query for before and after positions will increase. So we need to calculate the offset based on the provided values.
+        int beforeAfterParameterIndexOffset = GetBeforeAfterParameterOffset(objectTypes, filter);
+
+        // Find the specific row number of the target node.
+        // We need this to determine the bounds of the row numbers to select.
+        Sql<ISqlContext> targetRowSql = Sql()
+            .Select("rn")
+            .From().AppendSubQuery(rowNumberSql, "Target")
+            .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
+
+        // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
+        // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
+        IEnumerable<object> beforeArguments = targetRowSql.Arguments.Concat([before]);
+        IEnumerable<object> afterArguments = targetRowSql.Arguments.Concat([after]);
+
+        // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
+        const int BeforeAfterParameterIndex = 3;
+        var beforeAfterParameterIndex = BeforeAfterParameterIndex + beforeAfterParameterIndexOffset;
+        var beforeArgumentsArray = beforeArguments.ToArray();
+        var afterArgumentsArray = afterArguments.ToArray();
+
+        totalBefore = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, beforeArgumentsArray, true);
+        totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
+
+        return Sql()
+            .Select("UniqueId")
+            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
+            .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
+            .OrderBy("rn");
+    }
+
+    private static int GetBeforeAfterParameterOffset(ISet<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
+    {
+        int beforeAfterParameterIndexOffset = 0;
+
+        // Increment for each object type.
+        beforeAfterParameterIndexOffset += objectTypes.Count;
+
+        // Increment for the provided filter.
+        if (filter != null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                // We need to offset by one for each non-array parameter in the filter clause.
+                // If a query is created using Contains or some other set based operation, we'll get both the collection and the
+                // items in the collection provided in the where clauses. It's only the latter that count for applying parameters
+                // to the SQL statement, and hence we should only offset by them.
+                beforeAfterParameterIndexOffset += filterClause.Item2.Count(x => x.GetType().GetInterface(nameof(IEnumerable)) is null);
+            }
+        }
+
+        return beforeAfterParameterIndexOffset;
+    }
+
+    private long GetNumberOfSiblingsOutsideSiblingRange(
+        Sql<ISqlContext> rowNumberSql,
+        Sql<ISqlContext> targetRowSql,
+        int parameterIndex,
+        object[] arguments,
+        bool getBefore)
+    {
+        Sql<ISqlContext>? sql = Sql()
+            .SelectCount()
+            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
+        return Database.ExecuteScalar<long>(sql);
+    }
+
 
     public IEntitySlim? Get(Guid key, Guid objectTypeId)
     {
@@ -216,6 +432,20 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return GetEntities(sql, isContent, isMedia, isMember);
     }
 
+    private IEnumerable<IEntitySlim> PerformGetAll(
+        Guid[] objectTypes,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter = null)
+    {
+        var isContent = objectTypes.Contains(Constants.ObjectTypes.Document) ||
+                        objectTypes.Contains(Constants.ObjectTypes.DocumentBlueprint);
+        var isMedia = objectTypes.Contains(Constants.ObjectTypes.Media);
+        var isMember = objectTypes.Contains(Constants.ObjectTypes.Member);
+
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypes, ordering, filter);
+        return GetEntities(sql, isContent, isMedia, isMember);
+    }
+
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[]? ids) =>
         ids?.Any() ?? false
             ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
@@ -277,7 +507,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     public int ReserveId(Guid key)
     {
-        NodeDto node;
+        NodeDto? node;
 
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Select<NodeDto>()
@@ -285,7 +515,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Constants.ObjectTypes.IdReservation);
 
         node = Database.SingleOrDefault<NodeDto>(sql);
-        if (node != null)
+        if (node is not null)
         {
             throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
         }
@@ -295,7 +525,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             UniqueId = key,
             Text = "RESERVED.ID",
             NodeObjectType = Constants.ObjectTypes.IdReservation,
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
             UserId = null,
             ParentId = -1,
             Level = 1,
@@ -394,7 +624,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     #region Sql
 
-    protected Sql<ISqlContext> GetVariantInfos(IEnumerable<int> ids) =>
+    private Sql<ISqlContext> GetVariantInfos(IEnumerable<int> ids) =>
         Sql()
             .Select<NodeDto>(x => x.NodeId)
             .AndSelect<LanguageDto>(x => x.IsoCode)
@@ -429,7 +659,11 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             .OrderBy<LanguageDto>(x => x.Id);
 
     // gets the full sql for a given object type and a given unique id
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         Guid uniqueId)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, uniqueId);
@@ -437,7 +671,11 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     }
 
     // gets the full sql for a given object type and a given node id
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         int nodeId)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, nodeId);
@@ -445,20 +683,50 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     }
 
     // gets the full sql for a given object type, with a given filter
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
     }
 
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter)
+        => GetFullSqlForEntityType(isContent, isMedia, isMember, [objectType], ordering, filter);
+
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid[] objectTypes,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter)
+    {
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, objectTypes);
+        AddGroupBy(isContent, isMedia, isMember, sql, false);
+        ApplyOrdering(ref sql, ordering);
+
+        return sql;
+    }
+
+    private Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, bool isCount = false)
+        => GetBase(isContent, isMedia, isMember, filter, [], isCount);
+
     // gets the base SELECT + FROM [+ filter] sql
     // always from the 'current' content version
-    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter,
-        bool isCount = false)
+    private Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, Guid[] objectTypes, bool isCount = false)
     {
         Sql<ISqlContext> sql = Sql();
-
+        ISqlSyntaxProvider syntax = SqlContext.SqlSyntax;
         if (isCount)
         {
             sql.SelectCount();
@@ -466,11 +734,31 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         else
         {
             sql
-                .Select<NodeDto>(x => x.NodeId, x => x.Trashed, x => x.ParentId, x => x.UserId, x => x.Level,
+                .Select<NodeDto>(
+                    x => x.NodeId,
+                    x => x.Trashed,
+                    x => x.ParentId,
+                    x => x.UserId,
+                    x => x.Level,
                     x => x.Path)
-                .AndSelect<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType,
-                    x => x.CreateDate)
-                .Append(", COUNT(child.id) AS children");
+                .AndSelect<NodeDto>(
+                    x => x.SortOrder,
+                    x => x.UniqueId,
+                    x => x.Text,
+                    x => x.NodeObjectType,
+                    x => x.CreateDate);
+
+            if (objectTypes.Length == 0)
+            {
+                sql.Append($", COUNT(child.{syntax.GetQuotedColumnName("id")}) AS children");
+            }
+            else
+            {
+                // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
+                // Upper-case is necessary for SQLite, and also works for SQL Server.
+                var objectTypesForInClause = string.Join("','", objectTypes.Select(x => x.ToString().ToUpperInvariant()));
+                sql.Append($", SUM(CASE WHEN child.{syntax.GetQuotedColumnName("nodeObjectType")} IN ('{objectTypesForInClause}') THEN 1 ELSE 0 END) AS children");
+            }
 
             if (isContent || isMedia || isMember)
             {
@@ -506,7 +794,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             sql
                 .LeftJoin<ContentVersionDto>()
                 .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-                .LeftJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .LeftJoin<ContentDto>()
+                .On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .LeftJoin<ContentTypeDto>()
                 .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
                 .LeftJoin<NodeDto>("ContentTypeNode")
@@ -542,10 +831,15 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     // gets the base SELECT + FROM [+ filter] + WHERE sql
     // for a given object type, with a given filter
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount,
-        Action<Sql<ISqlContext>>? filter, Guid[] objectTypes)
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Action<Sql<ISqlContext>>? filter,
+        Guid[] objectTypes)
     {
-        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, filter, isCount);
+        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, filter, objectTypes, isCount);
         if (objectTypes.Length > 0)
         {
             sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
@@ -556,7 +850,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given node id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, int id)
+    private Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, int id)
     {
         Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.NodeId == id);
@@ -565,7 +859,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given unique id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid uniqueId)
+    private Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid uniqueId)
     {
         Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.UniqueId == uniqueId);
@@ -574,21 +868,35 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and node id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Guid objectType,
         int nodeId) =>
         GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.NodeId == nodeId && x.NodeObjectType == objectType);
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and unique id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Guid objectType,
         Guid uniqueId) =>
         GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.UniqueId == uniqueId && x.NodeObjectType == objectType);
 
     // gets the GROUP BY / ORDER BY sql
     // required in order to count children
-    protected Sql<ISqlContext> AddGroupBy(bool isContent, bool isMedia, bool isMember, Sql<ISqlContext> sql,
+    private Sql<ISqlContext> AddGroupBy(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Sql<ISqlContext> sql,
         bool defaultSort)
     {
         sql
@@ -647,20 +955,25 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
         Ordering? runner = ordering;
 
+        Direction lastDirection = Direction.Ascending;
+        bool orderingIncludesNodeId = false;
         do
         {
 
             switch (runner.OrderBy?.ToUpperInvariant())
             {
                 case "NODEOBJECTTYPE":
-                    orderBy = $"UPPER({SqlSyntax.GetQuotedColumn(NodeDto.TableName, "nodeObjectType")})";
+                    orderBy = SqlSyntax.OrderByGuid(NodeDto.TableName, "nodeObjectType");
                     break;
                 case "PATH":
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
-
+                case "NODEID":
+                    orderBy = runner.OrderBy;
+                    orderingIncludesNodeId = true;
+                    break;
                 default:
-                    orderBy = runner.OrderBy ?? string.Empty;
+                    orderBy = QuoteColumnName(runner.OrderBy) ?? string.Empty;
                     break;
             }
 
@@ -673,11 +986,25 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                 sql.OrderByDescending(orderBy);
             }
 
+            lastDirection = runner.Direction;
+
             runner = runner.Next;
         }
         while (runner is not null);
 
-
+        // If we haven't already included the node Id in the order by clause, order by node Id as well to ensure consistent results
+        // when the provided sort yields entities with the same value.
+        if (orderingIncludesNodeId is false)
+        {
+            if (lastDirection == Direction.Ascending)
+            {
+                sql.OrderBy<NodeDto>(x => x.NodeId);
+            }
+            else
+            {
+                sql.OrderByDescending<NodeDto>(x => x.NodeId);
+            }
+        }
     }
 
     #endregion
@@ -687,7 +1014,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a generic content item which could be either a document, media or a member
     /// </summary>
-    private class GenericContentEntityDto : DocumentEntityDto
+    private sealed class GenericContentEntityDto : DocumentEntityDto
     {
         public string? MediaPath { get; set; }
     }
@@ -706,7 +1033,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a media item with its media path info
     /// </summary>
-    private class MediaEntityDto : BaseDto
+    private sealed class MediaEntityDto : BaseDto
     {
         public string? MediaPath { get; set; }
     }
@@ -714,7 +1041,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a member item
     /// </summary>
-    private class MemberEntityDto : BaseDto
+    private sealed class MemberEntityDto : BaseDto
     {
     }
 
@@ -797,8 +1124,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     private static void BuildEntity(EntitySlim entity, BaseDto dto)
     {
         entity.Trashed = dto.Trashed;
-        entity.CreateDate = dto.CreateDate;
-        entity.UpdateDate = dto.VersionDate;
+        entity.CreateDate = dto.CreateDate.EnsureUtc();
+        entity.UpdateDate = dto.VersionDate.EnsureUtc();
         entity.CreatorId = dto.UserId ?? Constants.Security.UnknownUserId;
         entity.Id = dto.NodeId;
         entity.Key = dto.UniqueId;
@@ -822,7 +1149,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ListViewKey = dto.ListView;
     }
 
-    private MediaEntitySlim BuildMediaEntity(BaseDto dto)
+    private static MediaEntitySlim BuildMediaEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MediaEntitySlim();
@@ -841,7 +1168,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
+    private static DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new DocumentEntitySlim();
@@ -858,7 +1185,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private MemberEntitySlim BuildMemberEntity(BaseDto dto)
+    private static MemberEntitySlim BuildMemberEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MemberEntitySlim();

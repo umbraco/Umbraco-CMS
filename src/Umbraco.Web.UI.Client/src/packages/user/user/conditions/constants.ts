@@ -5,3 +5,4 @@ export * from './allow-enable/constants.js';
 export * from './allow-external-login/constants.js';
 export * from './allow-mfa/constants.js';
 export * from './allow-unlock/constants.js';
+export * from './is-default-kind/constants.js';

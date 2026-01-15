@@ -10,7 +10,7 @@ public partial class ContentEditingServiceTests
     [TestCase(false)]
     public async Task Can_DeleteFromRecycleBin_If_InsideRecycleBin(bool variant)
     {
-        var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
+        var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
         await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
 
         var result = await ContentEditingService.DeleteFromRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
@@ -34,7 +34,7 @@ public partial class ContentEditingServiceTests
     [TestCase(false)]
     public async Task Cannot_Delete_FromRecycleBin_If_Not_In_Recycle_Bin(bool variant)
     {
-        var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
+        var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
 
         var result = await ContentEditingService.DeleteFromRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);

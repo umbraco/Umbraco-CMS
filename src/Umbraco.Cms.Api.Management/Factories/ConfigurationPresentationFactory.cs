@@ -1,4 +1,3 @@
-﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
@@ -7,7 +6,6 @@ using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Services;
 
@@ -35,21 +33,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         _segmentSettings = segmentSettings.Value;
     }
 
-    [Obsolete("Use the constructor with all dependencies")]
-    public ConfigurationPresentationFactory(
-        IReservedFieldNamesService reservedFieldNamesService,
-        IOptions<ContentSettings> contentSettings,
-        IOptions<SegmentSettings> segmentSettings)
-    : this(
-        reservedFieldNamesService,
-        contentSettings,
-        segmentSettings,
-        StaticServiceProvider.Instance.GetRequiredService<IOptions<DataTypesSettings>>(),
-        StaticServiceProvider.Instance.GetRequiredService<UmbracoFeatures>()
-            )
-    {
-    }
-
     public DocumentConfigurationResponseModel CreateDocumentConfigurationResponseModel() =>
         new()
         {
@@ -57,7 +40,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
             AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
             AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
-            ReservedFieldNames = _reservedFieldNamesService.GetDocumentReservedFieldNames(),
         };
 
     public DocumentTypeConfigurationResponseModel CreateDocumentTypeConfigurationResponseModel() =>
@@ -70,10 +52,7 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         };
 
     public MemberConfigurationResponseModel CreateMemberConfigurationResponseModel() =>
-        new()
-        {
-            ReservedFieldNames = _reservedFieldNamesService.GetMemberReservedFieldNames(),
-        };
+        new();
 
     public MemberTypeConfigurationResponseModel CreateMemberTypeConfigurationResponseModel() =>
         new()
@@ -86,7 +65,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            ReservedFieldNames = _reservedFieldNamesService.GetMediaReservedFieldNames(),
         };
 
     public MediaTypeConfigurationResponseModel CreateMediaTypeConfigurationResponseModel() =>

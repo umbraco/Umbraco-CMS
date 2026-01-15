@@ -1,17 +1,18 @@
-import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
 import type { UmbInputMediaTypeElement } from '../../../components/input-media-type/input-media-type.element.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from '../../media-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
+import type {
+	UmbContentTypeSortModel,
+	UmbInputContentTypeCollectionConfigurationElement,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-media-type-workspace-view-structure')
 export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#workspaceContext?: UmbMediaTypeWorkspaceContext;
+	#workspaceContext?: typeof UMB_MEDIA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _allowedAtRoot?: boolean;
@@ -25,7 +26,6 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext(UMB_MEDIA_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
 			this._observeMediaType();
@@ -97,14 +97,14 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collections')}">
 					<div slot="description">${this.localize.term('contentTypeEditor_collectionsDescription')}</div>
 					<div slot="editor">
-						<umb-input-collection-configuration
+						<umb-input-content-type-collection-configuration
 							default-value="3a0156c4-3b8c-4803-bdc1-6871faa83fff"
 							.value=${this._collection}
 							@change=${(e: CustomEvent) => {
-								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
+								const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });
 							}}>
-						</umb-input-collection-configuration>
+						</umb-input-content-type-collection-configuration>
 					</div>
 				</umb-property-layout>
 			</uui-box>

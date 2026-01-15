@@ -27,26 +27,68 @@ public class RefresherTests
         Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
     }
 
-    [Test]
-    public void ContentCacheRefresherCanDeserializeJsonPayload()
+    [TestCase(TreeChangeTypes.None, false)]
+    [TestCase(TreeChangeTypes.RefreshAll, true)]
+    [TestCase(TreeChangeTypes.RefreshBranch, false)]
+    [TestCase(TreeChangeTypes.Remove, true)]
+    [TestCase(TreeChangeTypes.RefreshNode, false)]
+    public void ContentCacheRefresherCanDeserializeJsonPayload(TreeChangeTypes changeTypes, bool blueprint)
     {
+        var key = Guid.NewGuid();
         ContentCacheRefresher.JsonPayload[] source =
         {
             new ContentCacheRefresher.JsonPayload()
             {
                 Id = 1234,
-                Key = Guid.NewGuid(),
-                ChangeTypes = TreeChangeTypes.None
+                Key = key,
+                ChangeTypes = changeTypes,
+                Blueprint = blueprint
             }
         };
 
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<ContentCacheRefresher.JsonPayload[]>(json);
 
-        Assert.AreEqual(source[0].Id, payload[0].Id);
-        Assert.AreEqual(source[0].Key, payload[0].Key);
-        Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
-        Assert.AreEqual(source[0].Blueprint, payload[0].Blueprint);
+        Assert.AreEqual(1234, payload[0].Id);
+        Assert.AreEqual(key, payload[0].Key);
+        Assert.AreEqual(changeTypes, payload[0].ChangeTypes);
+        Assert.AreEqual(blueprint, payload[0].Blueprint);
+        Assert.IsNull(payload[0].PublishedCultures);
+        Assert.IsNull(payload[0].UnpublishedCultures);
+    }
+
+    [Test]
+    public void ContentCacheRefresherCanDeserializeJsonPayloadWithCultures()
+    {
+        var key = Guid.NewGuid();
+        ContentCacheRefresher.JsonPayload[] source =
+        {
+            new ContentCacheRefresher.JsonPayload()
+            {
+                Id = 1234,
+                Key = key,
+                PublishedCultures = ["en-US", "da-DK"],
+                UnpublishedCultures = ["de-DE"]
+            }
+        };
+
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<ContentCacheRefresher.JsonPayload[]>(json);
+
+        Assert.IsNotNull(payload[0].PublishedCultures);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, payload[0].PublishedCultures.Length);
+            Assert.AreEqual("en-US", payload[0].PublishedCultures.First());
+            Assert.AreEqual("da-DK", payload[0].PublishedCultures.Last());
+        });
+
+        Assert.IsNotNull(payload[0].UnpublishedCultures);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, payload[0].UnpublishedCultures.Length);
+            Assert.AreEqual("de-DE", payload[0].UnpublishedCultures.First());
+        });
     }
 
     [Test]

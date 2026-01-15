@@ -57,7 +57,7 @@ public class ConvertersTests
         var converters =
             registerFactory.GetRequiredService<PropertyValueConverterCollection>();
 
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType1 = new DataType(
             new VoidEditor(
@@ -93,12 +93,14 @@ public class ConvertersTests
             elementType1,
             Guid.NewGuid(),
             new Dictionary<string, object> { { "prop1", "val1" } },
-            false);
+            false,
+            new VariationContext());
         var element2 = new PublishedElement(
             elementType2,
             Guid.NewGuid(),
             new Dictionary<string, object> { { "prop2", "1003" } },
-            false);
+            false,
+            new VariationContext());
         var cnt1 = new InternalPublishedContent(contentType1)
         {
             Id = 1003,
@@ -186,7 +188,7 @@ public class ConvertersTests
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Elements;
 
-        public override object ConvertSourceToIntermediate(
+        public override object? ConvertSourceToIntermediate(
             IPublishedElement owner,
             IPublishedPropertyType propertyType,
             object source,

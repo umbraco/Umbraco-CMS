@@ -4,6 +4,7 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Extensions;
@@ -140,7 +141,9 @@ public static class DistributedCacheExtensions
             Id = x.Item.Id,
             Key = x.Item.Key,
             ChangeTypes = x.ChangeTypes,
-            Blueprint = x.Item.Blueprint
+            Blueprint = x.Item.Blueprint,
+            PublishedCultures = x.PublishedCultures?.ToArray(),
+            UnpublishedCultures = x.UnpublishedCultures?.ToArray()
         });
 
         dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
@@ -150,11 +153,49 @@ public static class DistributedCacheExtensions
 
     #region MemberCacheRefresher
 
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, false)));
+        => dc.RefreshMemberCache(members, new Dictionary<string, object?>());
 
+    public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members, IDictionary<string, object?> state)
+        => dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
+            GetPayloads(members, state, false));
+
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     public static void RemoveMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, true)));
+        => dc.RemoveMemberCache(members, new Dictionary<string, object?>());
+
+    public static void RemoveMemberCache(this DistributedCache dc, IEnumerable<IMember> members, IDictionary<string, object?> state)
+        => dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
+            GetPayloads(members, state, true));
+
+    // Internal for unit test.
+    internal static IEnumerable<MemberCacheRefresher.JsonPayload> GetPayloads(IEnumerable<IMember> members, IDictionary<string, object?> state, bool removed)
+        => members
+            .DistinctBy(x => (x.Id, x.Username))
+            .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed)
+            {
+                PreviousUsername = GetPreviousUsername(x, state)
+            });
+
+    private static string? GetPreviousUsername(IMember x, IDictionary<string, object?> state)
+    {
+        if (state.TryGetValue(MemberSavedNotification.PreviousUsernameStateKey, out object? previousUserNames) is false)
+        {
+            return null;
+        }
+
+        if (previousUserNames is not IDictionary<Guid, string> previousUserNamesDictionary)
+        {
+            return null;
+        }
+
+        return previousUserNamesDictionary.TryGetValue(x.Key, out string? previousUsername)
+            ? previousUsername
+            : null;
+    }
 
     #endregion
 

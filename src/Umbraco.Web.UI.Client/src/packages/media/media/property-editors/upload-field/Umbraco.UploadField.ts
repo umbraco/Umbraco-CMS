@@ -11,7 +11,9 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'fileExtensions',
 					label: 'Accepted file extensions',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
+					description:
+						'Insert one extension per line, for example `jpg`.\n\nYou can also use mime types, for example `image/*` or `application/pdf`.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.AcceptedUploadTypes',
 				},
 			],
 		},

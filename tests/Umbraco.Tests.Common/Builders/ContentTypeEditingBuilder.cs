@@ -192,7 +192,7 @@ public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTy
             .Build();
     }
 
-        public static ContentTypeCreateModel CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(string alias = "test", string name = "TestName", string variantPropertyAlias = "variant", string variantPropertyName = "Variant", string invariantAlias = "invariant", string invariantName = "Invariant")
+    public static ContentTypeCreateModel CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(string alias = "test", string name = "TestName", string variantPropertyAlias = "variant", string variantPropertyName = "Variant", string invariantAlias = "invariant", string invariantName = "Invariant")
     {
         var containerKey = Guid.NewGuid();
         var builder = new ContentTypeEditingBuilder();

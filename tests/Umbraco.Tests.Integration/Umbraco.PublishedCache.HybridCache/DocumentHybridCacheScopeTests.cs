@@ -1,18 +1,27 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models.ContentPublishing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEditing
+internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEditing
 {
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+    }
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
@@ -25,7 +34,10 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
         }
 
         // Act
@@ -40,7 +52,9 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
         }
 
         // Act
@@ -55,7 +69,10 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (var scope = CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
             scope.Complete();
         }
 
@@ -71,7 +88,10 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (var scope = CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
             scope.Complete();
         }
 
@@ -80,5 +100,30 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
 
         // Published page should not be in cache, as we rolled scope back.
         Assert.IsNotNull(publishedPage);
+    }
+
+    [Test]
+    public async Task Can_Save_And_Publish_In_Same_Scope()
+    {
+        var key = Guid.NewGuid();
+        using (var scope = CoreScopeProvider.CreateCoreScope())
+        {
+            Textpage.Key = key;
+            var result = await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
+            Assert.IsTrue(result);
+            var publishResult = await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                new List<CulturePublishScheduleModel>
+                {
+                    new() { Culture = "*" },
+                },
+                Constants.Security.SuperUserKey);
+            Assert.IsTrue(publishResult.Success);
+
+            scope.Complete();
+        }
+
+        var published = await PublishedContentHybridCache.GetByIdAsync(key);
+        Assert.IsNotNull(published);
     }
 }

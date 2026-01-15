@@ -322,66 +322,6 @@ public interface IUserService : IMembershipUserService
     /// </returns>
     IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
-    #region User groups
-
-    /// <summary>
-    ///     Gets all UserGroups or those specified as parameters
-    /// </summary>
-    /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
-    /// <returns>An enumerable list of <see cref="IUserGroup" /></returns>
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids);
-
-    /// <summary>
-    ///     Gets a UserGroup by its Alias
-    /// </summary>
-    /// <param name="alias">Alias of the UserGroup to retrieve</param>
-    /// <returns>
-    ///     <see cref="IUserGroup" />
-    /// </returns>
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] alias);
-
-    /// <summary>
-    ///     Gets a UserGroup by its Alias
-    /// </summary>
-    /// <param name="name">Name of the UserGroup to retrieve</param>
-    /// <returns>
-    ///     <see cref="IUserGroup" />
-    /// </returns>
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    IUserGroup? GetUserGroupByAlias(string name);
-
-    /// <summary>
-    ///     Gets a UserGroup by its Id
-    /// </summary>
-    /// <param name="id">Id of the UserGroup to retrieve</param>
-    /// <returns>
-    ///     <see cref="IUserGroup" />
-    /// </returns>
-    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
-    IUserGroup? GetUserGroupById(int id);
-
-    /// <summary>
-    ///     Saves a UserGroup
-    /// </summary>
-    /// <param name="userGroup">UserGroup to save</param>
-    /// <param name="userIds">
-    ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
-    ///     than all users will be removed from this group and only these users will be added
-    /// </param>
-    [Obsolete("Use IUserGroupService.CreateAsync and IUserGroupService.UpdateAsync instead, scheduled for removal in V15.")]
-    void Save(IUserGroup userGroup, int[]? userIds = null);
-
-    /// <summary>
-    ///     Deletes a UserGroup
-    /// </summary>
-    /// <param name="userGroup">UserGroup to delete</param>
-    [Obsolete("Use IUserGroupService.DeleteAsync instead, scheduled for removal in V15.")]
-    void DeleteUserGroup(IUserGroup userGroup);
-
-    #endregion
-
     /// <summary>
     ///     Verifies the reset code sent from the reset password mail for a given user.
     /// </summary>

@@ -23,11 +23,16 @@ public class ContentSettings
     internal const string StaticLoginLogoImage = "assets/logo_light.svg";
     internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
     internal const string StaticBackOfficeLogo = "assets/logo.svg";
+    internal const string StaticBackOfficeLogoAlternative = "assets/logo_blue.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticShowDomainWarnings = true;
+    internal const bool StaticShowUnroutableContentWarnings = true;
+
+    // TODO (V18): Consider enabling this by default and documenting as a behavioural breaking change.
+    private const bool StaticEnableMediaRecycleBinProtection = false;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -48,7 +53,7 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of error pages.
     /// </summary>
-    public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
+    public IEnumerable<ContentErrorPage> Error404Collection { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets a value for the preview badge mark-up.
@@ -87,8 +92,17 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the path to the backoffice logo.
     /// </summary>
+    /// <remarks>The alternative version of this logo can be found at <see cref="BackOfficeLogoAlternative"/>.</remarks>
     [DefaultValue(StaticBackOfficeLogo)]
     public string BackOfficeLogo { get; set; } = StaticBackOfficeLogo;
+
+    /// <summary>
+    ///     Gets or sets a value for the path to the alternative backoffice logo, which can be shown
+    ///     on top of a light background.
+    /// </summary>
+    /// <remarks>This is the alternative version to the regular logo found at <see cref="BackOfficeLogo"/>.</remarks>
+    [DefaultValue(StaticBackOfficeLogoAlternative)]
+    public string BackOfficeLogoAlternative { get; set; } = StaticBackOfficeLogoAlternative;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
@@ -123,22 +137,40 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
     /// </summary>
-    public string[] AllowedUploadedFileExtensions { get; set; } = Array.Empty<string>();
+    public ISet<string> AllowedUploadedFileExtensions { get; set; } = new HashSet<string>();
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
     /// </summary>
     [DefaultValue(StaticDisallowedUploadFiles)]
-    public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
+    public ISet<string> DisallowedUploadedFileExtensions { get; set; } = new HashSet<string>(StaticDisallowedUploadFiles.Split(Constants.CharArrays.Comma));
 
     /// <summary>
     /// Gets or sets the allowed external host for media. If empty only relative paths are allowed.
     /// </summary>
-    public string[] AllowedMediaHosts { get; set; } = Array.Empty<string>();
+    public ISet<string> AllowedMediaHosts { get; set; } = new HashSet<string>();
 
     /// <summary>
     /// Gets or sets a value indicating whether to show domain warnings.
     /// </summary>
     [DefaultValue(StaticShowDomainWarnings)]
     public bool ShowDomainWarnings { get; set; } = StaticShowDomainWarnings;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to show unroutable content warnings.
+    /// </summary>
+    [DefaultValue(StaticShowUnroutableContentWarnings)]
+    public bool ShowUnroutableContentWarnings { get; set; } = StaticShowUnroutableContentWarnings;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable or disable the recycle bin protection for media.
+    /// </summary>
+    /// <remarks>
+    /// When set to true, this will:
+    ///  - Rename media moved to the recycle bin to have a .deleted suffice (e.g. image.jpg will be renamed to image.deleted.jpg).
+    ///  - On restore, the media file will be renamed back to its original name.
+    ///  - A middleware component will be enabled to prevent access to media files in the recycle bin unless the user is authenticated with access to the media section.
+    /// </remarks>
+    [DefaultValue(StaticEnableMediaRecycleBinProtection)]
+    public bool EnableMediaRecycleBinProtection { get; set; } = StaticEnableMediaRecycleBinProtection;
 }

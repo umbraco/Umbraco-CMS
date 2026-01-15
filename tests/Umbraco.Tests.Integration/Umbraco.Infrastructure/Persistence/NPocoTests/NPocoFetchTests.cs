@@ -1,22 +1,19 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-public class NPocoFetchTests : UmbracoIntegrationTest
+internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 {
     [SetUp]
-    protected void SeedDatabase()
+    public void SeedDatabase()
     {
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -493,9 +490,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class Thing4Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
         // reference is required else FetchOneToMany aggregation does not happen
         // not sure ColumnName nor ReferenceMemberName make much sense here
@@ -508,9 +507,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class Thing5Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
         [Column("groupCount")]
         [ResultColumn] // not included in insert/update, not sql-generated
@@ -542,9 +543,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class ThingA2Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]
@@ -556,19 +559,24 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class ThingA3Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
     }
 
     [TableName("zbThingA12")]
     [ExplicitColumns]
     public class ThingA12Dto
     {
-        [Column("thing1id")] public int Thing1Id { get; set; }
+        [Column("thing1id")]
+        public int Thing1Id { get; set; }
 
-        [Column("thing2id")] public int Thing2Id { get; set; }
+        [Column("thing2id")]
+        public int Thing2Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { FileSystemFolderModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Temp mock model until they are moved to msw

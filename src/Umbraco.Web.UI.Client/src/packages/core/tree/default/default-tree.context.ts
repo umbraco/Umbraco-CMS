@@ -1,61 +1,63 @@
+import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
+import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
+import { UmbTreeItemChildrenManager } from '../tree-item/tree-item-children.manager.js';
+import { UmbTreeItemTargetExpansionManager } from '../tree-item/tree-item-expansion.manager.js';
+import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
+import type { ManifestTree } from '../extensions/types.js';
+import type { UmbTreeContext } from '../tree.context.interface.js';
+import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
-import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
-import type { UmbTreeContext } from '../tree-context.interface.js';
+import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
-import type { ManifestTree } from '../extensions/index.js';
-import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
-import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbPaginationManager, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	type UmbEntityActionEvent,
-} from '@umbraco-cms/backoffice/entity-action';
-import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
 		TreeRootType extends UmbTreeRootModel,
 		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 	>
-	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>>
-	implements UmbTreeContext
+	extends UmbContextBase
+	implements UmbTreeContext<TreeItemType, TreeRootType, RequestArgsType>
 {
-	#additionalRequestArgs = new UmbObjectState<Partial<RequestArgsType> | object>({});
-	public readonly additionalRequestArgs = this.#additionalRequestArgs.asObservable();
-
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
-	treeRoot = this.#treeRoot.asObservable();
-
-	#rootItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
-	rootItems = this.#rootItems.asObservable();
+	public readonly treeRoot = this.#treeRoot.asObservable();
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
-	public readonly selection = new UmbSelectionManager(this._host);
-	public readonly pagination = new UmbPaginationManager();
+	public readonly selection = new UmbSelectionManager(this);
+	public readonly expansion = new UmbTreeExpansionManager(this);
 
 	#hideTreeRoot = new UmbBooleanState(false);
-	hideTreeRoot = this.#hideTreeRoot.asObservable();
+	public readonly hideTreeRoot = this.#hideTreeRoot.asObservable();
 
-	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
-	startNode = this.#startNode.asObservable();
+	#expandTreeRoot = new UmbBooleanState(undefined);
+	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
-	#foldersOnly = new UmbBooleanState(false);
-	foldersOnly = this.#foldersOnly.asObservable();
+	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType, RequestArgsType>(this);
+	public readonly rootItems = this.#treeItemChildrenManager.children;
+	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
+	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
+	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
+	public readonly startNode = this.#treeItemChildrenManager.startNode;
+	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
+	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
+	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
+	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
+
+	#treeItemExpansionManager = new UmbTreeItemTargetExpansionManager<TreeItemType, TreeRootType>(this, {
+		childrenManager: this.#treeItemChildrenManager,
+		targetPaginationManager: this.targetPagination,
+	});
+
+	readonly activeManager = new UmbTreeItemActiveManager(this);
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
-	#actionEventContext?: UmbActionEventContext;
-
-	#paging = {
-		skip: 0,
-		take: 50,
-	};
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -69,32 +71,8 @@ export class UmbDefaultTreeContext<
 	});
 
 	constructor(host: UmbControllerHost) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		super(host, UMB_TREE_CONTEXT);
-		this.pagination.setPageSize(this.#paging.take);
-		this.#consumeContexts();
-
-		// listen for page changes on the pagination manager
-		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-
-		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
-		there might be a better way to do this through a tree item parent context.
-		It does not look like there is a way to have a "dynamic" parent context that will stop when a
-		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
-		const hostElement = this.getHostElement();
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
-			const treeRoot = this.#treeRoot.getValue();
-			const unique = treeRoot?.unique;
-
-			if (event.detail.unique === unique) {
-				event.stopPropagation();
-				this.loadTree();
-			}
-		});
-
+		this.#treeItemChildrenManager.setTakeSize(50);
 		// always load the tree root because we need the root entity to reload the entire tree
 		this.#loadTreeRoot();
 	}
@@ -121,13 +99,18 @@ export class UmbDefaultTreeContext<
 		return this.#manifest;
 	}
 
-	// TODO: getManifest, could be refactored to use the getter method [NL]
 	/**
 	 * Returns the manifest.
 	 * @returns {ManifestTree}
 	 * @memberof UmbDefaultTreeContext
+	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
 		return this.#manifest;
 	}
 
@@ -144,74 +127,66 @@ export class UmbDefaultTreeContext<
 	public loadTree = debounce(() => this.#debouncedLoadTree(), 100);
 
 	/**
+	 * Reloads the tree in its current expansion state
+	 * @memberof UmbDefaultTreeContext
+	 */
+	// TODO: debouncing the load tree method because multiple props can be set at the same time
+	// that would trigger multiple loadTree calls. This is a temporary solution to avoid that.
+	public reloadTree = debounce(() => this.#debouncedLoadTree(true), 100);
+
+	/**
 	 * Reloads the tree
 	 * @memberof UmbDefaultTreeContext
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadMore = () => this.#debouncedLoadTree(true);
+	public loadMore = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
 
-	#debouncedLoadTree(reload = false) {
-		if (this.getStartNode()) {
-			this.#loadRootItems(reload);
-			return;
-		}
+	/**
+	 * Load previous items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
 
+	/**
+	 * Load next items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
+
+	async #debouncedLoadTree(reload = false) {
+		await this.#init;
+
+		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
-		if (hideTreeRoot) {
-			this.#loadRootItems(reload);
-			return;
+		if (hasStartNode || hideTreeRoot) {
+			if (reload) {
+				this.#treeItemChildrenManager.reloadChildren();
+			} else {
+				this.#treeItemChildrenManager.loadChildren();
+			}
+		} else {
+			this.#loadTreeRoot(reload);
 		}
 	}
 
-	async #loadTreeRoot() {
+	async #loadTreeRoot(reload = false) {
 		await this.#init;
 
 		const { data } = await this.#repository!.requestTreeRoot();
 
 		if (data) {
 			this.#treeRoot.setValue(data);
+			this.#treeItemChildrenManager.setTreeItem(data);
+			this.#treeItemExpansionManager.setTreeItem(data);
 			this.pagination.setTotalItems(1);
-		}
-	}
 
-	async #loadRootItems(loadMore = false) {
-		await this.#init;
-
-		const skip = loadMore ? this.#paging.skip : 0;
-		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
-
-		// If we have a start node get children of that instead of the root
-		const startNode = this.getStartNode();
-		const foldersOnly = this.#foldersOnly.getValue();
-		const additionalArgs = this.#additionalRequestArgs.getValue();
-
-		const { data } = startNode?.unique
-			? await this.#repository!.requestTreeItemsOf({
-					...additionalArgs,
-					parent: {
-						unique: startNode.unique,
-						entityType: startNode.entityType,
-					},
-					foldersOnly,
-					skip,
-					take,
-				})
-			: await this.#repository!.requestTreeRootItems({
-					...additionalArgs,
-					foldersOnly,
-					skip,
-					take,
-				});
-
-		if (data) {
-			if (loadMore) {
-				const currentItems = this.#rootItems.getValue();
-				this.#rootItems.setValue([...currentItems, ...data.items]);
-			} else {
-				this.#rootItems.setValue(data.items);
+			if (!reload) {
+				if (this.getExpandTreeRoot()) {
+					this.#toggleTreeRootExpansion(true);
+				}
 			}
-
-			this.pagination.setTotalItems(data.total);
 		}
 	}
 
@@ -223,7 +198,7 @@ export class UmbDefaultTreeContext<
 	setHideTreeRoot(hideTreeRoot: boolean) {
 		this.#hideTreeRoot.setValue(hideTreeRoot);
 		// we need to reset the tree if this config changes
-		this.#resetTree();
+		this.#clearTree();
 		this.loadTree();
 	}
 
@@ -232,7 +207,7 @@ export class UmbDefaultTreeContext<
 	 * @returns {boolean}
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getHideTreeRoot() {
+	getHideTreeRoot(): boolean {
 		return this.#hideTreeRoot.getValue();
 	}
 
@@ -242,9 +217,9 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
-		this.#startNode.setValue(startNode);
+		this.#treeItemChildrenManager.setStartNode(startNode);
 		// we need to reset the tree if this config changes
-		this.#resetTree();
+		this.#clearTree();
 		this.loadTree();
 	}
 
@@ -253,8 +228,8 @@ export class UmbDefaultTreeContext<
 	 * @returns {UmbTreeStartNode} - The start node
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getStartNode() {
-		return this.#startNode.getValue();
+	getStartNode(): UmbTreeStartNode | undefined {
+		return this.#treeItemChildrenManager.getStartNode();
 	}
 
 	/**
@@ -263,9 +238,9 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setFoldersOnly(foldersOnly: boolean) {
-		this.#foldersOnly.setValue(foldersOnly);
+		this.#treeItemChildrenManager.setFoldersOnly(foldersOnly);
 		// we need to reset the tree if this config changes
-		this.#resetTree();
+		this.#clearTree();
 		this.loadTree();
 	}
 
@@ -274,8 +249,8 @@ export class UmbDefaultTreeContext<
 	 * @returns {boolean} - Whether to show only folders
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getFoldersOnly() {
-		return this.#foldersOnly.getValue();
+	getFoldersOnly(): boolean {
+		return this.#treeItemChildrenManager.getFoldersOnly();
 	}
 
 	/**
@@ -283,52 +258,69 @@ export class UmbDefaultTreeContext<
 	 * @param args
 	 */
 	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
-		this.#additionalRequestArgs.setValue({ ...this.#additionalRequestArgs.getValue(), ...args });
-		this.#resetTree();
+		this.#treeItemChildrenManager.setAdditionalRequestArgs(args);
+		this.#clearTree();
 		this.loadTree();
 	}
 
 	public getAdditionalRequestArgs() {
-		return this.#additionalRequestArgs.getValue();
+		return this.#treeItemChildrenManager.getAdditionalRequestArgs();
 	}
 
-	#resetTree() {
+	/**
+	 * Sets the expansion state
+	 * @param {UmbTreeExpansionModel} data - The expansion state
+	 * @returns {void}
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setExpansion(data: UmbTreeExpansionModel): void {
+		this.expansion.setExpansion(data);
+	}
+
+	/**
+	 * Gets the expansion state
+	 * @returns {UmbTreeExpansionModel} - The expansion state
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getExpansion(): UmbTreeExpansionModel {
+		return this.expansion.getExpansion();
+	}
+
+	/**
+	 * Sets the expandTreeRoot config
+	 * @param {boolean} expandTreeRoot - Whether to expand the tree root
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setExpandTreeRoot(expandTreeRoot: boolean) {
+		this.#expandTreeRoot.setValue(expandTreeRoot);
+		this.#toggleTreeRootExpansion(expandTreeRoot);
+	}
+
+	/**
+	 * Gets the expandTreeRoot config
+	 * @returns {boolean | undefined} - Whether to expand the tree root
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getExpandTreeRoot(): boolean | undefined {
+		return this.#expandTreeRoot.getValue();
+	}
+
+	#toggleTreeRootExpansion(expand: boolean) {
+		const treeRoot = this.#treeRoot.getValue();
+		if (!treeRoot) return;
+		const treeRootEntity = { entityType: treeRoot.entityType, unique: treeRoot.unique };
+
+		if (expand) {
+			this.expansion.expandItem(treeRootEntity);
+		} else {
+			this.expansion.collapseItem(treeRootEntity);
+		}
+	}
+
+	#clearTree() {
 		this.#treeRoot.setValue(undefined);
-		this.#rootItems.setValue([]);
-		this.pagination.clear();
+		this.#treeItemChildrenManager.clear();
 	}
-
-	#consumeContexts() {
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext = instance;
-
-			this.#actionEventContext.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-		});
-	}
-
-	#onPageChange = (event: UmbChangeEvent) => {
-		const target = event.target as UmbPaginationManager;
-		this.#paging.skip = target.getSkip();
-		this.loadMore();
-	};
 
 	#observeRepository(repositoryAlias?: string) {
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
@@ -337,35 +329,12 @@ export class UmbDefaultTreeContext<
 			this,
 			umbExtensionsRegistry,
 			repositoryAlias,
-			[this._host],
+			[this],
 			(permitted, ctrl) => {
 				this.#repository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();
 			},
 		);
-	}
-
-	#onReloadRequest = (event: UmbEntityActionEvent) => {
-		// Only handle root request here. Items are handled by the tree item context
-		const treeRoot = this.#treeRoot.getValue();
-		if (treeRoot === undefined) return;
-		if (event.getUnique() !== treeRoot.unique) return;
-		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.loadTree();
-	};
-
-	override destroy(): void {
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadChildrenOfEntityEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadChildrenOfEntityEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
-		super.destroy();
 	}
 }
 

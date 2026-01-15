@@ -3,7 +3,7 @@ import type { UmbDataTypeSearchItemModel } from './data-type.search-provider.js'
 import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -29,17 +29,17 @@ export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<Um
 	 * @memberof UmbDataTypeSearchServerDataSource
 	 */
 	async search(args: UmbSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DataTypeService.getItemDataTypeSearch({
-				query: args.query,
+				query: { query: args.query },
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbDataTypeSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/settings/workspace/data-type/edit/' + item.id,
+					href: 'section/settings/workspace/data-type/edit/' + item.id,
 					entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,

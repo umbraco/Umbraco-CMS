@@ -21,10 +21,9 @@ test('can create a media type with allow at root enabled', {tag: '@smoke'}, asyn
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickStructureTab();
   await umbracoUi.mediaType.clickAllowAtRootButton();
-  await umbracoUi.mediaType.clickSaveButton();
+  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.mediaType.isSuccessNotificationVisible();
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   expect(mediaTypeData.allowedAsRoot).toBeTruthy();
 });
@@ -37,12 +36,11 @@ test('can create a media type with an allowed child node type', {tag: '@smoke'},
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickStructureTab();
   await umbracoUi.mediaType.clickChooseButton();
-  await umbracoUi.mediaType.clickButtonWithName(mediaTypeName);
+  await umbracoUi.mediaType.clickModalMenuItemWithName(mediaTypeName);
   await umbracoUi.mediaType.clickAllowedChildNodesButton();
-  await umbracoUi.mediaType.clickSaveButton();
+  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.mediaType.isSuccessNotificationVisible();
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   expect(mediaTypeData.allowedMediaTypes[0].mediaType.id).toBe(mediaTypeData.id);
 });
@@ -58,13 +56,12 @@ test('can create a media type with multiple allowed child nodes types', async ({
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickStructureTab();
   await umbracoUi.mediaType.clickChooseButton();
-  await umbracoUi.mediaType.clickButtonWithName(mediaTypeName);
-  await umbracoUi.mediaType.clickButtonWithName(secondMediaTypeName);
+  await umbracoUi.mediaType.clickModalMenuItemWithName(mediaTypeName);
+  await umbracoUi.mediaType.clickModalMenuItemWithName(secondMediaTypeName);
   await umbracoUi.mediaType.clickAllowedChildNodesButton();
-  await umbracoUi.mediaType.clickSaveButton();
+  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.mediaType.isSuccessNotificationVisible();
   expect(await umbracoApi.mediaType.doesMediaTypeContainAllowedChildNodeIds(mediaTypeName, [mediaTypeId, secondMediaTypeId])).toBeTruthy();
 
   // Clean
@@ -83,10 +80,9 @@ test('can delete an allowed child note from a media type', {tag: '@smoke'}, asyn
   await umbracoUi.mediaType.clickStructureTab();
   await umbracoUi.mediaType.clickRemoveButtonForName(childNodeName);
   await umbracoUi.mediaType.clickConfirmRemoveButton();
-  await umbracoUi.mediaType.clickSaveButton();
+  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.mediaType.isSuccessNotificationVisible();
   const mediaTypeData = await umbracoApi.mediaType.getByName(childNodeName);
   expect(mediaTypeData.allowedMediaTypes.length).toBe(0);
 
@@ -104,12 +100,11 @@ test('can configure a collection for a media type', async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickStructureTab();
-  await umbracoUi.mediaType.clickConfigureAsACollectionButton();
+  await umbracoUi.mediaType.clickAddCollectionButton();
   await umbracoUi.mediaType.clickTextButtonWithName(collectionDataTypeName);
-  await umbracoUi.mediaType.clickSaveButton();
+  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.mediaType.isSuccessNotificationVisible();
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   expect(mediaTypeData.collection.id).toEqual(collectionDataTypeId);
 

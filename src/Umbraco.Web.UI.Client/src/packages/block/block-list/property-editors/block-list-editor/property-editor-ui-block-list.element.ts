@@ -3,28 +3,31 @@ import { UmbBlockListEntriesContext } from '../../context/block-list-entries.con
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
-import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	extractJsonQueryProps,
+	UmbFormControlMixin,
+	UmbValidationContext,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+} from '@umbraco-cms/backoffice/validation';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import {
-	UmbBlockElementDataValidationPathTranslator,
-	type UmbBlockLayoutBaseModel,
-} from '@umbraco-cms/backoffice/block';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '../../components/block-list-entry/index.js';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -51,34 +54,32 @@ export class UmbPropertyEditorUIBlockListElement
 	});
 
 	readonly #validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
-	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
-
-	private _value: UmbBlockListValueModel = {
-		layout: {},
-		contentData: [],
-		settingsData: [],
-		expose: [],
-	};
+	#lastValue: UmbBlockListValueModel | undefined = undefined;
 
 	@property({ attribute: false })
 	public override set value(value: UmbBlockListValueModel | undefined) {
+		this.#lastValue = value;
+
+		if (!value) {
+			super.value = undefined;
+			return;
+		}
+
 		const buildUpValue: Partial<UmbBlockListValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
 		buildUpValue.expose ??= [];
-		this._value = buildUpValue as UmbBlockListValueModel;
+		super.value = buildUpValue as UmbBlockListValueModel;
 
-		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
-		this.#managerContext.setContents(this._value.contentData);
-		this.#managerContext.setSettings(this._value.settingsData);
-		this.#managerContext.setExposes(this._value.expose);
+		this.#managerContext.setLayouts(super.value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
+		this.#managerContext.setContents(super.value.contentData);
+		this.#managerContext.setSettings(super.value.settingsData);
+		this.#managerContext.setExposes(super.value.expose);
 	}
 	public override get value(): UmbBlockListValueModel | undefined {
-		return this._value;
+		return super.value;
 	}
 
 	@state()
@@ -98,8 +99,6 @@ export class UmbPropertyEditorUIBlockListElement
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
-		// TODO:
-		//config.useSingleBlockMode, not done jet
 
 		this.#managerContext.setEditorConfiguration(config);
 
@@ -110,6 +109,8 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#managerContext.contentTypesLoaded.then(() => {
 				const firstContentTypeName = this.#managerContext.getContentTypeNameOf(blocks[0].contentElementTypeKey);
 				this._createButtonLabel = this.localize.term('blockEditor_addThis', this.localize.string(firstContentTypeName));
+
+				// If we are in a invariant context:
 			});
 		}
 	}
@@ -119,20 +120,27 @@ export class UmbPropertyEditorUIBlockListElement
 	 * @type {boolean}
 	 * @default
 	 */
-	@property({ type: Boolean, reflect: true })
 	public set readonly(value) {
 		this.#readonly = value;
 
 		if (this.#readonly) {
 			this.#sorter.disable();
+			this.#managerContext.readOnlyState.fallbackToPermitted();
 		} else {
 			this.#sorter.enable();
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
 		}
 	}
 	public get readonly() {
 		return this.#readonly;
 	}
 	#readonly = false;
+
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage?: string | undefined;
 
 	@state()
 	private _limitMin?: number;
@@ -151,109 +159,223 @@ export class UmbPropertyEditorUIBlockListElement
 	readonly #managerContext = new UmbBlockListManagerContext(this);
 	readonly #entriesContext = new UmbBlockListEntriesContext(this);
 
+	@state()
+	private _notSupportedVariantSetting?: boolean;
+
+	@state()
+	private _isSortMode = false;
+
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
+			if (context) {
+				this.observe(
+					observeMultiple([
+						this.#managerContext.blockTypes,
+						context.structure.variesByCulture,
+						context.structure.variesBySegment,
+					]),
+					async ([blockTypes, variesByCulture, variesBySegment]) => {
+						if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
+							// check if any of the Blocks varyByCulture or Segment and then display a warning.
+							const promises = await Promise.all(
+								blockTypes.map(async (blockType) => {
+									const elementType = blockType.contentElementTypeKey;
+									await this.#managerContext.contentTypesLoaded;
+									const structure = await this.#managerContext.getStructure(elementType);
+									if (variesByCulture === false && structure?.getVariesByCulture() === true) {
+										// If block varies by culture but document does not.
+										return true;
+									} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
+										// If block varies by segment but document does not.
+										return true;
+									}
+									return false;
+								}),
+							);
+							this._notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
+
+							if (this._notSupportedVariantSetting) {
+								this.#validationContext.messages.addMessage(
+									'config',
+									'$',
+									'#blockEditor_blockVariantConfigurationNotSupported',
+									'blockConfigurationNotSupported',
+								);
+							}
+						}
+					},
+					'blockTypeConfigurationCheck',
+				);
+			} else {
+				this.removeUmbControllerByAlias('blockTypeConfigurationCheck');
+			}
+		}).passContextAliasMatches();
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(
-				context.dataPath,
-				(dataPath) => {
-					// Translate paths for content/settings:
-					this.#contentDataPathTranslator?.destroy();
-					this.#settingsDataPathTranslator?.destroy();
-					if (dataPath) {
-						// Set the data path for the local validation context:
-						this.#validationContext.setDataPath(dataPath);
+			this.#gotPropertyContext(context);
+		});
 
-						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
+		// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
+		this.observe(
+			this.#managerContext.layouts,
+			(layouts) => {
+				const validationMessagesToRemove: string[] = [];
+				const contentKeys = layouts.map((x) => x.contentKey);
+				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
+					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
+					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
+					const key = extractJsonQueryProps(message.path).key;
+					if (key && contentKeys.indexOf(key) === -1) {
+						validationMessagesToRemove.push(message.key);
 					}
-				},
-				'observeDataPath',
-			);
+				});
 
-			this.observe(
-				context?.alias,
-				(alias) => {
-					this.#managerContext.setPropertyAlias(alias);
-				},
-				'observePropertyAlias',
-			);
-
-			this.observe(
-				observeMultiple([
-					this.#managerContext.layouts,
-					this.#managerContext.contents,
-					this.#managerContext.settings,
-					this.#managerContext.exposes,
-				]).pipe(debounceTime(20)),
-				([layouts, contents, settings, exposes]) => {
-					this._value = {
-						...this._value,
-						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-						contentData: contents,
-						settingsData: settings,
-						expose: exposes,
-					};
-					context.setValue(this._value);
-				},
-				'motherObserver',
-			);
-
-			// If the current property is readonly all inner block content should also be readonly.
-			this.observe(
-				observeMultiple([context.isReadOnly, context.variantId]),
-				([isReadOnly, variantId]) => {
-					const unique = 'UMB_PROPERTY_EDITOR_UI';
-					if (variantId === undefined) return;
-
-					if (isReadOnly) {
-						const state = {
-							unique,
-							variantId,
-							message: '',
-						};
-
-						this.#managerContext.readOnlyState.addState(state);
-					} else {
-						this.#managerContext.readOnlyState.removeState(unique);
+				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
+				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
+					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
+					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
+					const key = extractJsonQueryProps(message.path).key;
+					if (key && settingsKeys.indexOf(key) === -1) {
+						validationMessagesToRemove.push(message.key);
 					}
+				});
+
+				// Remove the messages after the loop to prevent changing the array while iterating over it.
+				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
+			},
+			null,
+		);
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
 				},
-				'observeIsReadOnly',
+				'observeContextualVariantId',
 			);
 		});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context.getVariantId());
-		});
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => '#validation_entriesShort',
+			() =>
+				this.localize.term(
+					'validation_entriesShort',
+					this._limitMin,
+					(this._limitMin ?? 0) - this.#entriesContext.getLength(),
+				),
 			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => '#validation_entriesExceed',
+			() =>
+				this.localize.term(
+					'validation_entriesExceed',
+					this._limitMax,
+					this.#entriesContext.getLength() - (this._limitMax || 0),
+				),
 			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
 		);
 
-		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
-			this._layouts = layouts;
-			// Update sorter.
-			this.#sorter.setModel(layouts);
-			// Update manager:
-			this.#managerContext.setLayouts(layouts);
-		});
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !!this.mandatory && this.#entriesContext.getLength() === 0,
+		);
 
-		this.observe(this.#managerContext.blockTypes, (blockTypes) => {
-			this._blocks = blockTypes;
-		});
+		this.observe(
+			this.#entriesContext.layoutEntries,
+			(layouts) => {
+				this._layouts = layouts;
+				// Update sorter.
+				this.#sorter.setModel(layouts);
+				// Update manager:
+				this.#managerContext.setLayouts(layouts);
+			},
+			null,
+		);
 
-		this.observe(this.#entriesContext.catalogueRouteBuilder, (routeBuilder) => {
-			this._catalogueRouteBuilder = routeBuilder;
-		});
+		this.observe(
+			this.#managerContext.blockTypes,
+			(blockTypes) => {
+				this._blocks = blockTypes;
+			},
+			null,
+		);
+
+		this.observe(
+			this.#entriesContext.catalogueRouteBuilder,
+			(routeBuilder) => {
+				this._catalogueRouteBuilder = routeBuilder;
+			},
+			null,
+		);
+	}
+
+	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE | undefined) {
+		this.observe(
+			context?.dataPath,
+			(dataPath) => {
+				if (dataPath) {
+					// Set the data path for the local validation context:
+					this.#validationContext.setDataPath(dataPath);
+					this.#validationContext.autoReport();
+				}
+			},
+			'observeDataPath',
+		);
+
+		this.observe(
+			context?.alias,
+			(alias) => {
+				this.#managerContext.setPropertyAlias(alias);
+			},
+			'observePropertyAlias',
+		);
+
+		this.observe(
+			observeMultiple([
+				this.#managerContext.layouts,
+				this.#managerContext.contents,
+				this.#managerContext.settings,
+				this.#managerContext.exposes,
+			]).pipe(debounceTime(20)),
+			([layouts, contents, settings, exposes]) => {
+				if (layouts.length === 0) {
+					if (this.value === undefined) {
+						return;
+					}
+					super.value = undefined;
+				} else {
+					const newValue = {
+						...super.value,
+						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+						contentData: contents,
+						settingsData: settings,
+						expose: exposes,
+					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
+				}
+
+				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+				// This is added to prevent the block list from setting an empty value on startup.
+				if (this.#lastValue === undefined && super.value === undefined) {
+					return;
+				}
+
+				context?.setValue(super.value);
+			},
+			'motherObserver',
+		);
 	}
 
 	protected override getFormElement() {
@@ -261,15 +383,18 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	override render() {
+		if (this._notSupportedVariantSetting) return nothing;
 		return html`
+			${this.#renderSortModeToolbar()}
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
-				(layoutEntry, index) => html`
+				(layout, index) => `${index}_${layout.contentKey}`,
+				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
+						index=${index}
+						.contentKey=${layout.contentKey}
+						.layout=${layout}
 						${umbDestroyOnDisconnect()}>
 					</umb-block-list-entry>
 				`,
@@ -279,18 +404,18 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderCreateButtonGroup() {
-		if (this.readonly && this._layouts.length > 0) {
-			return nothing;
-		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
-		}
+		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
+		return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
 	}
 
 	#renderInlineCreateButton(index: number) {
 		if (this.readonly) return nothing;
-		return html`<uui-button-inline-create
-			label=${this._createButtonLabel}
-			href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>`;
+		return html`
+			<uui-button-inline-create
+				label=${this._createButtonLabel}
+				href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}>
+			</uui-button-inline-create>
+		`;
 	}
 
 	#renderCreateButton() {
@@ -318,17 +443,21 @@ export class UmbPropertyEditorUIBlockListElement
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
 				?disabled=${this.readonly}>
-				<uui-icon name="icon-paste-in"></uui-icon>
+				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
 	}
 
-	static override readonly styles = [
-		UmbTextStyles,
+	#renderSortModeToolbar() {
+		if (!this._isSortMode) return nothing;
+		return html`<umb-property-sort-mode-toolbar></umb-property-sort-mode-toolbar>`;
+	}
 
+	static override readonly styles = [
 		css`
 			:host {
 				display: grid;
+				align-content: start;
 				gap: 1px;
 			}
 			> div {

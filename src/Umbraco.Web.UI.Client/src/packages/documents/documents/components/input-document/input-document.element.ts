@@ -1,30 +1,20 @@
+import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
-import {
-	classMap,
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	repeat,
-	state,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
-const elementName = 'umb-input-document';
-
-@customElement(elementName)
-export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+@customElement('umb-input-document')
+export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
 	UmbLitElement,
 ) {
 	#sorter = new UmbSorterController<string>(this, {
@@ -35,7 +25,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputDocument',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -51,10 +41,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
-		this.#pickerContext.min = value;
+		this.#pickerInputContext.min = value;
 	}
 	public get min(): number {
-		return this.#pickerContext.min;
+		return this.#pickerInputContext.min;
 	}
 
 	/**
@@ -64,7 +54,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -74,10 +64,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
-		this.#pickerContext.max = value;
+		this.#pickerInputContext.max = value;
 	}
 	public get max(): number {
-		return this.#pickerContext.max;
+		return this.#pickerInputContext.max;
 	}
 
 	/**
@@ -90,11 +80,11 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+		this.#pickerInputContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
 	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+		return this.#pickerInputContext.getSelection();
 	}
 
 	@property({ type: Object, attribute: false })
@@ -103,12 +93,13 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
+	@property({ type: Boolean, attribute: 'include-trashed' })
+	includeTrashed = false;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
+		super.value = selectionString; // Call the parent setter to ensure the value change is triggered in the FormControlMixin. [NL]
 	}
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
@@ -134,64 +125,98 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		}
 	}
 	#readonly = false;
+	@property({ type: Boolean })
+	required = false;
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
-	@state()
-	private _editDocumentPath = '';
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#pickerInputContext.interactionMemory.getAllMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+	}
+
+	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
 
-	#pickerContext = new UmbDocumentPickerInputContext(this);
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
+	#pickerInputContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('document')
-			.onSetup(() => {
-				return { data: { entityType: 'document', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentPath = routeBuilder({});
-			});
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => !this.readonly && this.required && this.selection.length === 0,
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.selection.length < this.min,
+			() => !this.readonly && !!this.min && this.selection.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.selection.length > this.max,
+			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-	}
+		this.observe(
+			this.#pickerInputContext.selection,
+			(selection) => (this.value = selection.join(',')),
+			'_observeSelection',
+		);
 
-	#isDraft(item: UmbDocumentItemModel) {
-		return item.variants[0]?.state === 'Draft';
-	}
+		this.observe(
+			this.#pickerInputContext.selectedItems,
+			(selectedItems) => (this._items = selectedItems),
+			'_observerItems',
+		);
 
-	#pickableFilter = (item: UmbDocumentItemModel): boolean => {
-		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.documentType.unique);
-		}
-		return true;
-	};
+		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.#interactionMemories = memories;
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+				}
+			},
+			'_observeMemories',
+		);
+	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-			pickableFilter: this.#pickableFilter,
-			startNode: this.startNode,
-		});
+		this.#pickerInputContext.openPicker(
+			{
+				hideTreeRoot: true,
+				startNode: this.startNode,
+			},
+			{
+				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+					unique: id,
+					entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+				})),
+				includeTrashed: this.includeTrashed,
+			},
+		);
 	}
 
-	#onRemove(item: UmbDocumentItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#onRemove(unique: string) {
+		this.#pickerInputContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -199,7 +224,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderAddButton() {
-		if (this.selection.length >= this.max) return nothing;
+		if (this.selection.length > 0 && this.max === 1) return nothing;
 		if (this.readonly && this.selection.length > 0) {
 			return nothing;
 		} else {
@@ -215,66 +240,52 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._statuses) return;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
+						return html`
+							<umb-entity-item-ref
+								id=${unique}
+								.item=${item}
+								?error=${isError}
+								.errorMessage=${status.state.error}
+								.errorDetail=${isError ? unique : undefined}
+								?readonly=${this.readonly}
+								?standalone=${this.max === 1}>
+								${when(
+									!this.readonly,
+									() => html`
+										<uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												@click=${() => this.#onRemove(unique)}></uui-button>
+										</uui-action-bar>
+									`,
+								)}
+							</umb-entity-item-ref>
+						`;
+					},
 				)}
 			</uui-ref-list>
 		`;
 	}
 
-	#renderItem(item: UmbDocumentItemModel) {
-		if (!item.unique) return;
-		const href = !this.readonly && this.showOpenButton ? `${this._editDocumentPath}edit/${item.unique}` : undefined;
-		return html`
-			<uui-ref-node
-				id=${item.unique}
-				class=${classMap({ draft: this.#isDraft(item) })}
-				name=${item.name}
-				href=${ifDefined(href)}
-				?readonly=${this.readonly}
-				?standalone=${this.max === 1}>
-				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
-				${when(
-					!this.readonly,
-					() => html`
-						<uui-action-bar slot="actions">
-							<uui-button
-								label=${this.localize.term('general_remove')}
-								@click=${() => this.#onRemove(item)}></uui-button>
-						</uui-action-bar>
-					`,
-				)}
-			</uui-ref-node>
-		`;
-	}
-
-	#renderIcon(item: UmbDocumentItemModel) {
-		if (!item.documentType.icon) return;
-		return html`<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>`;
-	}
-
-	#renderIsTrashed(item: UmbDocumentItemModel) {
-		if (!item.isTrashed) return;
-		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
-	}
-
 	static override styles = [
 		css`
+			uui-ref-list:not(:has(:nth-child(1))) {
+				margin-top: -20px;
+				padding-top: 20px;
+			}
+
 			#btn-add {
 				display: block;
-			}
-
-			uui-ref-node[drag-placeholder] {
-				opacity: 0.2;
-			}
-
-			.draft {
-				opacity: 0.6;
 			}
 		`,
 	];
@@ -284,6 +295,6 @@ export { UmbInputDocumentElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputDocumentElement;
+		'umb-input-document': UmbInputDocumentElement;
 	}
 }

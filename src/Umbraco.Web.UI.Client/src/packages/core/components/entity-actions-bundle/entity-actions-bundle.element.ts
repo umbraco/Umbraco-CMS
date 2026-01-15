@@ -1,12 +1,10 @@
 import { UmbEntityContext } from '../../entity/entity.context.js';
-import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
-import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -28,17 +26,34 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionApi?: UmbEntityAction<unknown>;
 
-	#sectionSidebarContext?: UmbSectionSidebarContext;
+	@state()
+	private _firstActionHref?: string;
 
-	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
+	// TODO: Ideally this is provided on a higher level, as in the Tree-item, Workspace, Collection-Row, etc [NL]
 	#entityContext = new UmbEntityContext(this);
+	#inViewport = false;
+	#observingEntityActions = false;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (sectionContext) => {
-			this.#sectionSidebarContext = sectionContext;
-		});
+		// Only observe entity actions when the element is in the viewport
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						this.#inViewport = true;
+						this.#observeEntityActions();
+					}
+				});
+			},
+			{
+				root: null, // Use the viewport as the root
+				threshold: 0.1, // Trigger when at least 10% of the element is visible
+			},
+		);
+
+		observer.observe(this);
 	}
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -50,6 +65,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	#observeEntityActions() {
+		if (!this.entityType) return;
+		if (this.unique === undefined) return;
+		if (!this.#inViewport) return; // Only observe if the element is in the viewport
+		if (this.#observingEntityActions) return;
+
 		new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -57,57 +77,75 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			(ext) => ext.forEntityTypes.includes(this.entityType!),
 			async (actions) => {
 				this._numberOfActions = actions.length;
+				const oldFirstManifest = this._firstActionManifest;
 				this._firstActionManifest =
 					this._numberOfActions > 0 ? (actions[0].manifest as ManifestEntityActionDefaultKind) : undefined;
-				this.#createFirstActionApi();
+				await this.#createFirstActionApi();
+				this.requestUpdate('_firstActionManifest', oldFirstManifest);
 			},
 			'umbEntityActionsObserver',
 		);
+
+		this.#observingEntityActions = true;
 	}
 
 	async #createFirstActionApi() {
 		if (!this._firstActionManifest) return;
+		const oldFirstApi = this._firstActionApi;
 		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
 			{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
 		]);
-	}
-
-	#openContextMenu() {
-		if (!this.entityType) throw new Error('Entity type is not defined');
-		if (this.unique === undefined) throw new Error('Unique is not defined');
-		this.#sectionSidebarContext?.toggleContextMenu(this, {
-			entityType: this.entityType,
-			unique: this.unique,
-			headline: this.label,
-		});
+		if (this._firstActionApi) {
+			(this._firstActionApi as any).manifest = this._firstActionManifest;
+			this._firstActionHref = await this._firstActionApi.getHref();
+		}
+		this.requestUpdate('_firstActionApi', oldFirstApi);
 	}
 
 	async #onFirstActionClick(event: PointerEvent) {
+		// skip if href is defined
+		if (this._firstActionHref) {
+			return;
+		}
+
 		event.stopPropagation();
-		this.#sectionSidebarContext?.closeContextMenu();
-		await this._firstActionApi?.execute();
+		await this._firstActionApi?.execute().catch(() => {});
 	}
 
 	override render() {
 		if (this._numberOfActions === 0) return nothing;
-		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
+		return html`<uui-action-bar slot="actions">${this.#renderMore()}${this.#renderFirstAction()}</uui-action-bar>`;
 	}
 
 	#renderMore() {
 		if (this._numberOfActions === 1) return nothing;
-		return html`<uui-button @click=${this.#openContextMenu} label="Open actions menu">
-			<uui-symbol-more></uui-symbol-more>
-		</uui-button>`;
+		return html`
+			<umb-entity-actions-dropdown compact .label=${this.localize.term('actions_viewActionsFor', this.label)}>
+				<uui-symbol-more slot="label"></uui-symbol-more>
+			</umb-entity-actions-dropdown>
+		`;
 	}
 
 	#renderFirstAction() {
-		if (!this._firstActionApi) return nothing;
-		return html`<uui-button
-			label=${ifDefined(this._firstActionManifest?.meta.label)}
-			@click=${this.#onFirstActionClick}>
-			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
-		</uui-button>`;
+		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
+		return html`
+			<uui-button
+				label=${this.localize.string(this._firstActionManifest.meta.label, this.label)}
+				data-mark=${'entity-action:' + this._firstActionManifest.alias}
+				href=${ifDefined(this._firstActionHref)}
+				@click=${this.#onFirstActionClick}>
+				<umb-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></umb-icon>
+			</uui-button>
+		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: 700px;
+			}
+		`,
+	];
 }
 
 declare global {

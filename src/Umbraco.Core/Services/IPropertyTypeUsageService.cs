@@ -2,16 +2,11 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Defines service methods for querying property type usage.
+/// </summary>
 public interface IPropertyTypeUsageService
 {
-    /// <summary>
-    /// Checks if a property type has any saved property values associated with it.
-    /// </summary>
-    /// <param name="propertyTypeAlias">The alias of the property type to check.</param>
-    /// <returns>True if the property type has any property values, otherwise false.</returns>
-    [Obsolete("Please use HasSavedPropertyValuesAsync. Scheduled for removable in Umbraco 15.")]
-    bool HasSavedPropertyValues(string propertyTypeAlias);
-
     /// <summary>
     /// Checks if a property type has any saved property values associated with it.
     /// </summary>

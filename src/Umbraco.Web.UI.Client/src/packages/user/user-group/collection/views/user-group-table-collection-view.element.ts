@@ -1,6 +1,4 @@
-import { UMB_USER_GROUP_COLLECTION_CONTEXT } from '../user-group-collection.context-token.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
-import type { UmbUserGroupCollectionContext } from '../user-group-collection.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -12,10 +10,11 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
-import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 
 import '../components/user-group-table-name-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
@@ -35,6 +34,10 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			elementName: 'umb-user-group-table-name-column-layout',
 		},
 		{
+			name: this.localize.term('general_description'),
+			alias: 'description',
+		},
+		{
 			name: this.localize.term('main_sections'),
 			alias: 'userGroupSections',
 			elementName: 'umb-user-group-table-sections-column-layout',
@@ -50,6 +53,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 
@@ -57,13 +61,13 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	@state()
-	private _selection: Array<string | null> = [];
+	private _selection: Array<string> = [];
 
-	#collectionContext?: UmbUserGroupCollectionContext;
+	#collectionContext?: UmbDefaultCollectionContext;
 
 	// TODO: hardcoded dependencies on document and media modules. We should figure out how these dependencies can be added through extensions.
-	#documentItemRepository = new UmbDocumentItemRepository(this);
-	#mediaItemRepository = new UmbMediaItemRepository(this);
+	#documentItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
+	#mediaItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
 
 	#documentStartNodeMap = new Map<string, string>();
 	#mediaStartNodeMap = new Map<string, string>();
@@ -71,24 +75,47 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_USER_GROUP_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
-				this.#collectionContext.selection.selection,
-				(selection) => (this._selection = selection),
+				this.#collectionContext?.selection.selection,
+				(selection) => (this._selection = selection?.filter((x) => x !== undefined && x !== null) ?? []),
 				'umbCollectionSelectionObserver',
 			);
 			this.observe(
-				this.#collectionContext.items,
-				(items) => {
-					this._createTableItems(items);
+				this.#collectionContext?.items,
+				async (items) => {
+					await this.#initRepositories();
+					this._createTableItems(items ?? []);
 				},
 				'umbCollectionItemsObserver',
 			);
 		});
 	}
 
+	async #initRepositories() {
+		if (this.#documentItemRepository && this.#mediaItemRepository) return;
+
+		// TODO: get back to this when documents have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a document import in the user module.
+		this.#documentItemRepository = await createExtensionApiByAlias<UmbItemRepository<UmbUniqueItemModel>>(
+			this,
+			'Umb.Repository.DocumentItem',
+		);
+
+		// TODO: get back to this when media have been decoupled from users.
+		// The repository alias is hardcoded on purpose to avoid a media import in the user module.
+		this.#mediaItemRepository = await createExtensionApiByAlias<UmbItemRepository<UmbUniqueItemModel>>(
+			this,
+			'Umb.Repository.MediaItem',
+		);
+	}
+
 	private async _createTableItems(userGroups: Array<UmbUserGroupDetailModel>) {
+		if (!this.#documentItemRepository || !this.#mediaItemRepository) {
+			throw new Error('Document and media item repositories are not initialized.');
+		}
+
 		await Promise.all([
 			this.#requestAndCacheStartNodes(
 				userGroups,
@@ -109,6 +136,10 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 						value: {
 							name: userGroup.name,
 						},
+					},
+					{
+						columnAlias: 'description',
+						value: userGroup.description ?? '',
 					},
 					{
 						columnAlias: 'userGroupSections',
@@ -132,6 +163,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 							.value=${{
 								entityType: userGroup.entityType,
 								unique: userGroup.unique,
+								name: userGroup.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
@@ -183,8 +215,8 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this.#onSelected}"
-				@deselected="${this.#onDeselected}"></umb-table>
+				@selected=${this.#onSelected}
+				@deselected=${this.#onDeselected}></umb-table>
 		`;
 	}
 

@@ -3,10 +3,14 @@ import { UmbMediaValidationServerDataSource } from './media-validation.server.da
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbContentValidationRepository } from '@umbraco-cms/backoffice/content';
 
 type DetailModelType = UmbMediaDetailModel;
 
-export class UmbMediaValidationRepository extends UmbRepositoryBase {
+export class UmbMediaValidationRepository
+	extends UmbRepositoryBase
+	implements UmbContentValidationRepository<DetailModelType>
+{
 	#validationDataSource: UmbMediaValidationServerDataSource;
 
 	constructor(host: UmbControllerHost) {

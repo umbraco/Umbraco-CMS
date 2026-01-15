@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,13 +23,24 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="current">An optional current Uri.</param>
         /// <param name="umbracoContext">An Umbraco context.</param>
         /// <param name="siteDomainMapper">The site domain helper.</param>
+        /// <param name="domainCache">The domain cache.</param>
+        /// <param name="navigationQueryService">The navigation query service.</param>
+        /// <param name="publishedStatusFilteringService"></param>
         /// <returns>The culture assigned to the document by domains.</returns>
         /// <remarks>
         /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
         /// one document per culture), and domains, withing the context of a current Uri, assign
         /// a culture to that document.</para>
         /// </remarks>
-        public static string? GetCultureFromDomains(int contentId, string contentPath, Uri? current, IUmbracoContext umbracoContext, ISiteDomainMapper siteDomainMapper)
+        public static string? GetCultureFromDomains(
+            int contentId,
+            string contentPath,
+            Uri? current,
+            IUmbracoContext umbracoContext,
+            ISiteDomainMapper siteDomainMapper,
+            IDomainCache domainCache,
+            INavigationQueryService navigationQueryService,
+            IPublishedStatusFilteringService publishedStatusFilteringService)
         {
             if (umbracoContext == null)
             {
@@ -39,20 +52,11 @@ namespace Umbraco.Cms.Core.Routing
                 current = umbracoContext.CleanedUmbracoUrl;
             }
 
-            // get the published route, else the preview route
-            // if both are null then the content does not exist
-            var route = umbracoContext.Content?.GetRouteById(contentId) ??
-                        umbracoContext.Content?.GetRouteById(true, contentId);
+            var domainNodeId = GetAncestorNodeWithDomainsAssigned(contentId, umbracoContext, domainCache, navigationQueryService, publishedStatusFilteringService);
 
-            if (route == null)
-            {
-                return null;
-            }
-
-            var pos = route.IndexOf('/');
-            DomainAndUri? domain = pos == 0
-                ? null
-                : DomainForNode(umbracoContext.Domains, siteDomainMapper, int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current);
+            DomainAndUri? domain = domainNodeId.HasValue
+                ? DomainForNode(umbracoContext.Domains, siteDomainMapper, domainNodeId.Value, current)
+                : null;
 
             var rootContentId = domain?.ContentId ?? -1;
             Domain? wcDomain = FindWildcardDomainInPath(umbracoContext.Domains?.GetAll(true), contentPath, rootContentId);
@@ -69,6 +73,22 @@ namespace Umbraco.Cms.Core.Routing
 
             return umbracoContext.Domains?.DefaultCulture;
         }
+
+        private static int? GetAncestorNodeWithDomainsAssigned(int contentId, IUmbracoContext umbracoContext, IDomainCache domainCache, INavigationQueryService navigationQueryService, IPublishedStatusFilteringService publishedStatusFilteringService)
+        {
+            IPublishedContent? content = umbracoContext.Content.GetById(contentId);
+            var hasDomains = ContentHasAssignedDomains(content, domainCache);
+            while (content is not null && !hasDomains)
+            {
+                content = content.Parent<IPublishedContent>(navigationQueryService, publishedStatusFilteringService);
+                hasDomains = content is not null && domainCache.HasAssigned(content.Id, true);
+            }
+
+            return content?.Id;
+        }
+
+        private static bool ContentHasAssignedDomains(IPublishedContent? content, IDomainCache domainCache)
+            => content is not null && domainCache.HasAssigned(content.Id, true);
 
         #endregion
 
@@ -197,14 +217,14 @@ namespace Umbraco.Cms.Core.Routing
             // if a culture is specified, then try to get domains for that culture
             // (else cultureDomains will be null)
             // do NOT specify a default culture, else it would pick those domains
-            IReadOnlyCollection<DomainAndUri>? cultureDomains = SelectByCulture(domainsAndUris, culture, defaultCulture: null);
+            IReadOnlyList<DomainAndUri>? cultureDomains = SelectByCulture(domainsAndUris, culture, defaultCulture: null);
             IReadOnlyCollection<DomainAndUri> considerForBaseDomains = domainsAndUris;
             if (cultureDomains != null)
             {
                 if (cultureDomains.Count == 1)
                 {
                     // only 1, return
-                    return cultureDomains.First();
+                    return cultureDomains[0];
                 }
 
                 // else restrict to those domains, for base lookup
@@ -213,11 +233,11 @@ namespace Umbraco.Cms.Core.Routing
 
             // look for domains that would be the base of the uri
             // we need to order so example.com/foo matches before example.com/
-            IReadOnlyCollection<DomainAndUri> baseDomains = SelectByBase(considerForBaseDomains.OrderByDescending(d => d.Uri.ToString()).ToList(), uri, culture);
+            List<DomainAndUri> baseDomains = SelectByBase(considerForBaseDomains.OrderByDescending(d => d.Uri.ToString()).ToArray(), uri, culture);
             if (baseDomains.Count > 0)
             {
                 // found, return
-                return baseDomains.First();
+                return baseDomains[0];
             }
 
             // if nothing works, then try to run the filter to select a domain
@@ -237,7 +257,7 @@ namespace Umbraco.Cms.Core.Routing
         private static bool MatchesCulture(DomainAndUri domain, string? culture)
             => culture == null || domain.Culture.InvariantEquals(culture);
 
-        private static IReadOnlyCollection<DomainAndUri> SelectByBase(IReadOnlyCollection<DomainAndUri> domainsAndUris, Uri uri, string? culture)
+        private static List<DomainAndUri> SelectByBase(DomainAndUri[] domainsAndUris, Uri uri, string? culture)
         {
             // look for domains that would be the base of the uri
             // ie current is www.example.com/foo/bar, look for domain www.example.com
@@ -255,7 +275,7 @@ namespace Umbraco.Cms.Core.Routing
             return baseDomains;
         }
 
-        private static IReadOnlyCollection<DomainAndUri>? SelectByCulture(IReadOnlyCollection<DomainAndUri> domainsAndUris, string? culture, string? defaultCulture)
+        private static List<DomainAndUri>? SelectByCulture(DomainAndUri[] domainsAndUris, string? culture, string? defaultCulture)
         {
             // we try our best to match cultures, but may end with a bogus domain
             if (culture is not null)
@@ -329,7 +349,7 @@ namespace Umbraco.Cms.Core.Routing
         public static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
         {
             // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-            var name = domainName.StartsWith("/") && currentUri != null
+            var name = domainName.StartsWith("/", StringComparison.Ordinal) && currentUri != null
                 ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
                 : domainName;
             var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
@@ -375,13 +395,18 @@ namespace Umbraco.Cms.Core.Routing
 
         private static Domain? FindDomainInPath(IEnumerable<Domain>? domains, string path, int? rootNodeId, bool isWildcard)
         {
+            if (domains is null)
+            {
+                return null;
+            }
+
             var stopNodeId = rootNodeId ?? -1;
 
             return path.Split(Constants.CharArrays.Comma)
                        .Reverse()
                        .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains?.FirstOrDefault(d => d.ContentId == id && d.IsWildcard == isWildcard))
+                       .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard == isWildcard))
                        .FirstOrDefault(domain => domain is not null);
         }
 

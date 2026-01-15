@@ -23,20 +23,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContentServicePerformanceTest : UmbracoIntegrationTest
+internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpData() => CreateTestData();
 
-    protected DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
+    private DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
 
-    protected IFileService FileService => GetRequiredService<IFileService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
-    protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    protected IContentService ContentService => GetRequiredService<IContentService>();
+    private IContentService ContentService => GetRequiredService<IContentService>();
 
-    protected IContentType ContentType { get; set; }
+    private IContentType ContentType { get; set; }
 
     [Test]
     public void Profiler() => Assert.IsInstanceOf<TestProfiler>(GetRequiredService<IProfiler>());

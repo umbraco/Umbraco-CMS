@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -21,28 +22,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class DataValueEditor : IDataValueEditor
 {
+    private const string ContentCacheKeyFormat = nameof(DataValueEditor) + "_Content_{0}";
+    private const string MediaCacheKeyFormat = nameof(DataValueEditor) + "_Media_{0}";
+
     private readonly IJsonSerializer? _jsonSerializer;
     private readonly IShortStringHelper _shortStringHelper;
-
-    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
-    public DataValueEditor(
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer? jsonSerializer) // for tests, and manifest
-        : this(shortStringHelper, jsonSerializer)
-    {
-    }
-
-    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
-    public DataValueEditor(
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        DataEditorAttribute attribute)
-        : this(shortStringHelper, jsonSerializer, ioHelper, attribute)
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataValueEditor" /> class.
@@ -435,5 +419,156 @@ public class DataValueEditor : IDataValueEditor
         }
 
         return value.TryConvertTo(valueType);
+    }
+
+    /// <summary>
+    /// Retrieves a <see cref="IContent"/> instance by its unique identifier, using the provided request cache to avoid redundant
+    /// lookups within the same request.
+    /// </summary>
+    /// <remarks>
+    /// This method caches content lookups for the duration of the current request to improve performance when the same content
+    /// item may be accessed multiple times. This is particularly useful in scenarios involving multiple languages or blocks.
+    /// </remarks>
+    /// <param name="key">The unique identifier of the content item to retrieve.</param>
+    /// <param name="requestCache">The request-scoped cache used to store and retrieve content items for the duration of the current request.</param>
+    /// <param name="contentService">The content service used to fetch the content item if it is not found in the cache.</param>
+    /// <returns>The <see cref="IContent"/> instance corresponding to the specified key, or null if no such content item exists.</returns>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+          "Scheduled for removal in Umbraco 19.")]
+    protected static IContent? GetAndCacheContentById(Guid key, IRequestCache requestCache, IContentService contentService)
+    {
+        if (requestCache.IsAvailable is false)
+        {
+            return contentService.GetById(key);
+        }
+
+        var cacheKey = string.Format(ContentCacheKeyFormat, key);
+        IContent? content = requestCache.GetCacheItem<IContent?>(cacheKey);
+        if (content is null)
+        {
+            content = contentService.GetById(key);
+            if (content is not null)
+            {
+                requestCache.Set(cacheKey, content);
+            }
+        }
+
+        return content;
+    }
+
+    /// <summary>
+    /// Adds the specified <see cref="IContent"/> item to the request cache using its unique key.
+    /// </summary>
+    /// <param name="content">The content item to cache.</param>
+    /// <param name="requestCache">The request cache in which to store the content item.</param>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+          "Scheduled for removal in Umbraco 19.")]
+    protected static void CacheContentById(IContent content, IRequestCache requestCache)
+    {
+        if (requestCache.IsAvailable is false)
+        {
+            return;
+        }
+
+        var cacheKey = string.Format(ContentCacheKeyFormat, content.Key);
+        requestCache.Set(cacheKey, content);
+    }
+
+    /// <summary>
+    /// Retrieves a <see cref="IMedia"/> instance by its unique identifier, using the provided request cache to avoid redundant
+    /// lookups within the same request.
+    /// </summary>
+    /// <remarks>
+    /// This method caches media lookups for the duration of the current request to improve performance when the same media
+    /// item may be accessed multiple times. This is particularly useful in scenarios involving multiple languages or blocks.
+    /// </remarks>
+    /// <param name="key">The unique identifier of the media item to retrieve.</param>
+    /// <param name="requestCache">The request-scoped cache used to store and retrieve media items for the duration of the current request.</param>
+    /// <param name="mediaService">The media service used to fetch the media item if it is not found in the cache.</param>
+    /// <returns>The <see cref="IMedia"/> instance corresponding to the specified key, or null if no such media item exists.</returns>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+          "Scheduled for removal in Umbraco 19.")]
+    protected static IMedia? GetAndCacheMediaById(Guid key, IRequestCache requestCache, IMediaService mediaService)
+    {
+        if (requestCache.IsAvailable is false)
+        {
+            return mediaService.GetById(key);
+        }
+
+        var cacheKey = string.Format(MediaCacheKeyFormat, key);
+        IMedia? media = requestCache.GetCacheItem<IMedia?>(cacheKey);
+
+        if (media is null)
+        {
+            media = mediaService.GetById(key);
+            if (media is not null)
+            {
+                requestCache.Set(cacheKey, media);
+            }
+        }
+
+        return media;
+    }
+
+    /// <summary>
+    /// Adds the specified <see cref="IMedia"/> item to the request cache using its unique key.
+    /// </summary>
+    /// <param name="media">The media item to cache.</param>
+    /// <param name="requestCache">The request cache in which to store the media item.</param>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+          "Scheduled for removal in Umbraco 19.")]
+    protected static void CacheMediaById(IMedia media, IRequestCache requestCache)
+    {
+        if (requestCache.IsAvailable is false)
+        {
+            return;
+        }
+
+        var cacheKey = string.Format(MediaCacheKeyFormat, media.Key);
+        requestCache.Set(cacheKey, media);
+    }
+
+    /// <summary>
+    /// Determines whether the content item identified by the specified key is present in the request cache.
+    /// </summary>
+    /// <param name="key">The unique identifier for the content item to check for in the cache.</param>
+    /// <param name="requestCache">The request cache in which to look for the content item.</param>
+    /// <returns>true if the content item is already cached in the request cache; otherwise, false.</returns>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+          "Scheduled for removal in Umbraco 19.")]
+    protected static bool IsContentAlreadyCached(Guid key, IRequestCache requestCache)
+    {
+        if (requestCache.IsAvailable is false)
+        {
+            return false;
+        }
+
+        var cacheKey = string.Format(ContentCacheKeyFormat, key);
+        return requestCache.GetCacheItem<IContent?>(cacheKey) is not null;
+    }
+
+    /// <summary>
+    /// Determines whether the media item identified by the specified key is present in the request cache.
+    /// </summary>
+    /// <param name="key">The unique identifier for the media item to check for in the cache.</param>
+    /// <param name="requestCache">The request cache in which to look for the media item.</param>
+    /// <returns>true if the media item is already cached in the request cache; otherwise, false.</returns>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+              "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+              "Scheduled for removal in Umbraco 19.")]
+    protected static bool IsMediaAlreadyCached(Guid key, IRequestCache requestCache)
+    {
+        if (requestCache.IsAvailable is false)
+        {
+            return false;
+        }
+
+        var cacheKey = string.Format(MediaCacheKeyFormat, key);
+        return requestCache.GetCacheItem<IMedia?>(cacheKey) is not null;
     }
 }

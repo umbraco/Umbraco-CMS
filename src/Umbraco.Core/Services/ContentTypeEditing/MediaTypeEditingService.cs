@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -13,6 +13,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly IReservedFieldNamesService _reservedFieldNamesService;
 
     public MediaTypeEditingService(
         IContentTypeService contentTypeService,
@@ -20,12 +21,14 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        IImageUrlGenerator imageUrlGenerator)
+        IImageUrlGenerator imageUrlGenerator,
+        IReservedFieldNamesService reservedFieldNamesService)
         : base(contentTypeService, mediaTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _mediaTypeService = mediaTypeService;
         _dataTypeService = dataTypeService;
         _imageUrlGenerator = imageUrlGenerator;
+        _reservedFieldNamesService = reservedFieldNamesService;
     }
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
@@ -145,6 +148,8 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.MediaTypeContainer;
 
+    protected override ISet<string> GetReservedFieldNames() => _reservedFieldNamesService.GetMediaReservedFieldNames();
+
     private async Task<IDictionary<IMediaType, IEnumerable<string>>> FetchAllowedFileExtensionsByMediaTypeAsync(IEnumerable<IMediaType> mediaTypes)
     {
         var allowedFileExtensionsByMediaType = new Dictionary<IMediaType, IEnumerable<string>>();
@@ -170,7 +175,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
                 continue;
             }
 
-            allowedFileExtensionsByMediaType[mediaType] = fileUploadConfiguration.FileExtensions;
+            allowedFileExtensionsByMediaType[mediaType] = fileUploadConfiguration.FileExtensions ?? []; // Although we never expect null here, legacy data type configuration did allow it.
         }
 
         return allowedFileExtensionsByMediaType;

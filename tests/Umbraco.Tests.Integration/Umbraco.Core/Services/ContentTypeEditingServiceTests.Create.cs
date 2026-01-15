@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class ContentTypeEditingServiceTests
+internal sealed partial class ContentTypeEditingServiceTests
 {
     [TestCase(false)]
     [TestCase(true)]
@@ -545,6 +545,35 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Create_Child_To_Content_Type_With_Composition()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Composition"), Constants.Security.SuperUserKey)).Result!;
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Parent",
+                    compositions: [new Composition { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+        var result = await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Child",
+                    compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
+                Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        var childContentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.IsNotNull(childContentType);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child", childContentType.Name);
+            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+        });
+    }
+
+    [Test]
     public async Task Cannot_Be_Both_Parent_And_Composition()
     {
         var compositionBase = ContentTypeCreateModel("CompositionBase");
@@ -692,6 +721,32 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Cannot_Have_Same_Key_For_Inheritance_And_Parent()
+    {
+        var parentModel = ContentTypeCreateModel("Parent");
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(parent);
+
+        Composition[] composition =
+        {
+            new()
+            {
+                CompositionType = CompositionType.Inheritance, Key = parent.Key,
+            }
+        };
+
+        var childModel = ContentTypeCreateModel(
+            "Child",
+            containerKey: parent.Key,
+            compositions: composition);
+
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
+    }
+
+    [Test]
     public async Task Cannot_Use_As_ParentKey()
     {
         var parentModel = ContentTypeCreateModel("Parent");
@@ -708,17 +763,6 @@ public partial class ContentTypeEditingServiceTests
         Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
     }
 
-    // test some properties from IPublishedContent
-    [TestCase(nameof(IPublishedContent.Id))]
-    [TestCase(nameof(IPublishedContent.Name))]
-    [TestCase(nameof(IPublishedContent.SortOrder))]
-    // test some properties from IPublishedElement
-    [TestCase(nameof(IPublishedElement.Properties))]
-    [TestCase(nameof(IPublishedElement.ContentType))]
-    [TestCase(nameof(IPublishedElement.Key))]
-    // test some methods from IPublishedContent
-    [TestCase(nameof(IPublishedContent.IsDraft))]
-    [TestCase(nameof(IPublishedContent.IsPublished))]
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("   ")]
@@ -727,21 +771,12 @@ public partial class ContentTypeEditingServiceTests
     [TestCase("!\"#¤%&/()=)?`")]
     public async Task Cannot_Use_Invalid_PropertyType_Alias(string propertyTypeAlias)
     {
-        // ensure that property casing is ignored when handling reserved property aliases
-        var propertyTypeAliases = new[]
-        {
-            propertyTypeAlias, propertyTypeAlias.ToLowerInvariant(), propertyTypeAlias.ToUpperInvariant()
-        };
+        var propertyType = ContentTypePropertyTypeModel("Test Property", propertyTypeAlias);
+        var createModel = ContentTypeCreateModel("Test", propertyTypes: new[] { propertyType });
 
-        foreach (var alias in propertyTypeAliases)
-        {
-            var propertyType = ContentTypePropertyTypeModel("Test Property", alias);
-            var createModel = ContentTypeCreateModel("Test", propertyTypes: new[] { propertyType });
-
-            var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
-        }
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
     }
 
     [TestCase("testProperty", "testProperty")]
@@ -816,9 +851,7 @@ public partial class ContentTypeEditingServiceTests
     [TestCase(".")]
     [TestCase("-")]
     [TestCase("!\"#¤%&/()=)?`")]
-    [TestCase("system")]
-    [TestCase("System")]
-    [TestCase("SYSTEM")]
+    [TestCaseSource(nameof(DifferentCapitalizedAlias), new object[] { "System" })]
     public async Task Cannot_Use_Invalid_Alias(string contentTypeAlias)
     {
         var createModel = ContentTypeCreateModel("Test", contentTypeAlias);
@@ -828,14 +861,15 @@ public partial class ContentTypeEditingServiceTests
         Assert.AreEqual(ContentTypeOperationStatus.InvalidAlias, result.Status);
     }
 
-    [Test]
-    public async Task Cannot_Use_Existing_Alias()
+    [TestCase("test")] // Matches alias case sensitively.
+    [TestCase("Test")] // Matches alias case insensitively.
+    public async Task Cannot_Use_Existing_Alias(string newAlias)
     {
         var createModel = ContentTypeCreateModel("Test", "test");
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
-        createModel = ContentTypeCreateModel("Test 2", "test");
+        createModel = ContentTypeCreateModel("Test 2", newAlias);
         result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateAlias, result.Status);
@@ -1094,5 +1128,33 @@ public partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+    }
+
+    [TestCase(false, true)]
+    [TestCase(true, false)]
+    public async Task Cannot_Have_Element_Type_Mismatched_Inheritance(bool parentIsElement, bool childIsElement)
+    {
+        var parentModel = ContentTypeCreateModel("Parent1", isElement: parentIsElement);
+
+        var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
+        Assert.IsTrue(parentKey.HasValue);
+
+        Composition[] composition =
+        {
+            new()
+            {
+                CompositionType = CompositionType.Inheritance, Key = parentKey.Value,
+            }
+        };
+
+        var childModel = ContentTypeCreateModel(
+            "Child",
+            compositions: composition,
+            isElement: childIsElement);
+
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagComparedToParent, result.Status);
     }
 }

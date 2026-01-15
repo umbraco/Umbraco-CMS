@@ -1,3 +1,4 @@
+import type { ManifestPropertyEditorUi } from '../extensions/types.js';
 import type {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalValue,
@@ -7,7 +8,6 @@ import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-property-editor-ui-picker-modal')
@@ -116,7 +116,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 						<li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
 							<button type="button" @click=${() => this.#handleClick(propertyEditorUI)}>
 								<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
-								${propertyEditorUI.meta.label || propertyEditorUI.name}
+								${this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name)}
 							</button>
 						</li>
 					`,

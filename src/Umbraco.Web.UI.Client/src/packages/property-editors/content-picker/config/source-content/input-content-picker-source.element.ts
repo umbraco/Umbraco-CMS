@@ -43,7 +43,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 	dynamicRoot?: UmbContentPickerDynamicRoot;
 
 	@state()
-	_options: Array<Option> = [
+	private _options: Array<Option> = [
 		{ value: 'content', name: 'Content' },
 		{ value: 'media', name: 'Media' },
 		{ value: 'member', name: 'Members' },

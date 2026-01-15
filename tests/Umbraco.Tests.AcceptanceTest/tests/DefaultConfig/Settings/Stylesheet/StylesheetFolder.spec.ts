@@ -19,11 +19,9 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-  await umbracoUi.stylesheet.createFolder(stylesheetFolderName);
-  await umbracoUi.waitForTimeout(1000);
+  await umbracoUi.stylesheet.createStylesheetFolderAndWaitForStylesheetToBeCreated(stylesheetFolderName);
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeTruthy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetFolderName);
 });
@@ -36,10 +34,9 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.deleteFolder();
+  await umbracoUi.stylesheet.clickDeleteAndConfirmButtonAndWaitForStylesheetToBeDeleted();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeFalsy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetFolderName, false, false);
 });
@@ -53,14 +50,13 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.createFolder(childFolderName);
+  await umbracoUi.stylesheet.createStylesheetFolderAndWaitForStylesheetToBeCreated(childFolderName);
 
   //Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(childFolderName)).toBeTruthy();
   const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName);
   expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName);
-  await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
+  await umbracoUi.stylesheet.openCaretButtonForName(stylesheetFolderName);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(childFolderName, true, false);
 });
 
@@ -74,16 +70,15 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
 
   // Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
-  await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
+  await umbracoUi.stylesheet.openCaretButtonForName(stylesheetFolderName);
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
-  await umbracoUi.stylesheet.createFolder(childOfChildFolderName);
+  await umbracoUi.stylesheet.createStylesheetFolderAndWaitForStylesheetToBeCreated(childOfChildFolderName);
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
   expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + childOfChildFolderName);
-  await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
+  await umbracoUi.stylesheet.openCaretButtonForName(childFolderName);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(childOfChildFolderName, true, false);
 });
 
@@ -96,20 +91,19 @@ test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
   //Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.clickCreateButton();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
   await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
   await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
-  await umbracoUi.stylesheet.clickSaveButton();
+  await umbracoUi.stylesheet.clickSaveButtonAndWaitForStylesheetToBeCreated();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName);
   expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + stylesheetName);
   const stylesheetData = await umbracoApi.stylesheet.get(stylesheetChildren[0].path);
   expect(stylesheetData.content).toBe(stylesheetContent);
-  await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
+  await umbracoUi.stylesheet.openCaretButtonForName(stylesheetFolderName);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, true, false);
 });
 
@@ -123,26 +117,25 @@ test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbr
 
   //Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
-  await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
+  await umbracoUi.stylesheet.openCaretButtonForName(stylesheetFolderName);
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
-  await umbracoUi.stylesheet.clickCreateButton();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
   await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
   await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
-  await umbracoUi.stylesheet.clickSaveButton();
+  await umbracoUi.stylesheet.clickSaveButtonAndWaitForStylesheetToBeCreated();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
   expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + stylesheetName);
   const stylesheetData = await umbracoApi.stylesheet.get(stylesheetChildren[0].path);
   expect(stylesheetData.content).toBe(stylesheetContent);
-  await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
+  await umbracoUi.stylesheet.openCaretButtonForName(childFolderName);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, true, false);
 });
 
-test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
+test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildFolderName';
   await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
@@ -152,7 +145,7 @@ test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.stylesheet.clickRootFolderCaretButton();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.deleteFolder();
+  await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
 
   //Assert
   await umbracoUi.stylesheet.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);

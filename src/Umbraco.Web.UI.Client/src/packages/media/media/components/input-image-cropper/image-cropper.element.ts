@@ -2,7 +2,7 @@ import type { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './types.js'
 import { UmbImageCropChangeEvent } from './crop-change.event.js';
 import { calculateExtrapolatedValue, clamp, inverseLerp, lerp } from '@umbraco-cms/backoffice/utils';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, query, state, css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, query, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-image-cropper')
@@ -19,15 +19,14 @@ export class UmbImageCropperElement extends UmbLitElement {
 	};
 	@property({ type: Number })
 	get zoom() {
-		return this._zoom;
+		return this.#zoom;
 	}
 	set zoom(value) {
 		// Calculate the delta value - the value the zoom has changed b
-		const delta = value - this._zoom;
+		const delta = value - this.#zoom;
 		this.#updateImageScale(delta);
 	}
-
-	@state() _zoom = 0;
+	#zoom = 0;
 
 	#VIEWPORT_PADDING = 50 as const;
 	#MAX_SCALE_FACTOR = 4 as const;
@@ -41,7 +40,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 	#mouseOffsetY = 0;
 
 	get #getImageScale() {
-		return lerp(this.#minImageScale, this.#maxImageScale, this._zoom);
+		return lerp(this.#minImageScale, this.#maxImageScale, this.#zoom);
 	}
 
 	override connectedCallback() {
@@ -179,12 +178,12 @@ export class UmbImageCropperElement extends UmbLitElement {
 		const currentScale = Math.max(currentScaleX, currentScaleY);
 		// Calculate the zoom level based on the current scale
 		// This finds the alpha value in the range of min and max scale.
-		this._zoom = inverseLerp(this.#minImageScale, this.#maxImageScale, currentScale);
+		this.#zoom = inverseLerp(this.#minImageScale, this.#maxImageScale, currentScale);
 	}
 
 	#updateImageScale(amount: number, mouseX?: number, mouseY?: number) {
 		this.#oldImageScale = this.#getImageScale;
-		this._zoom = clamp(this._zoom + amount, 0, 1);
+		this.#zoom = clamp(this.zoom + amount, 0, 1);
 		const newImageScale = this.#getImageScale;
 
 		const mask = this.maskElement.getBoundingClientRect();
@@ -325,7 +324,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 			</div>
 			<uui-slider
 				@input=${this.#onSliderUpdate}
-				.value=${this._zoom.toString()}
+				.value=${this.zoom.toString()}
 				hide-step-values
 				id="slider"
 				type="range"
@@ -335,7 +334,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 				step="0.001">
 			</uui-slider>
 			<div id="actions">
-				<uui-button @click=${this.#onReset} label="${this.localize.term('general_reset')}"></uui-button>
+				<uui-button @click=${this.#onReset} label="${this.localize.term('imagecropper_reset')}"></uui-button>
 				<uui-button
 					look="secondary"
 					@click=${this.#onCancel}

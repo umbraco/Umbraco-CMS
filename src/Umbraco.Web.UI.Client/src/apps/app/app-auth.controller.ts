@@ -7,24 +7,26 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAppAuthController extends UmbControllerBase {
+	#retrievedModal: Promise<unknown>;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#isFirstCheck = true;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
+		this.#retrievedModal = this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.#authContext = context;
 
 			// Observe the user's authorization state and start the authorization flow if the user is not authorized
 			this.observe(
-				context.timeoutSignal,
+				context?.timeoutSignal,
 				() => {
+					console.log('[UmbAppAuthController] Authorization timed out, starting authorization flow');
 					this.makeAuthorizationRequest('timedOut');
 				},
 				'_authState',
 			);
-		});
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -32,6 +34,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * If not, the authorization flow is started.
 	 */
 	async isAuthorized(): Promise<boolean> {
+		await this.#retrievedModal.catch(() => undefined);
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
@@ -63,6 +66,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * @param userLoginState
 	 */
 	async makeAuthorizationRequest(userLoginState: UmbUserLoginState = 'loggingIn'): Promise<boolean> {
+		await this.#retrievedModal.catch(() => undefined);
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
@@ -111,6 +115,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	}
 
 	async #showLoginModal(userLoginState: UmbUserLoginState): Promise<boolean> {
+		await this.#retrievedModal.catch(() => undefined);
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
@@ -118,6 +123,9 @@ export class UmbAppAuthController extends UmbControllerBase {
 		// Show the provider selection screen
 		const authModalKey = 'umbAuthModal';
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) {
+			throw new Error('[Fatal] Modal manager is not available');
+		}
 
 		const selected = await modalManager
 			.open(this._host, UMB_MODAL_APP_AUTH, {
@@ -126,7 +134,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 				},
 				modal: {
 					key: authModalKey,
-					backdropBackground: 'var(--umb-auth-backdrop, rgb(244, 244, 244))',
+					backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
 				},
 			})
 			.onSubmit()

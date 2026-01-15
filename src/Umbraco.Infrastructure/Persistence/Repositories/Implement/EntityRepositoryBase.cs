@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -25,11 +27,43 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     private IQuery<TEntity>? _hasIdQuery;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
+    /// Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
     /// </summary>
-    protected EntityRepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<EntityRepositoryBase<TId, TEntity>> logger)
-        : base(scopeAccessor, appCaches) =>
+    /// <param name="scopeAccessor">The scope accessor.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
+    protected EntityRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<EntityRepositoryBase<TId, TEntity>> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(scopeAccessor, appCaches)
+    {
+        RepositoryCacheVersionService = repositoryCacheVersionService;
+        CacheSyncService = cacheSyncService;
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    protected EntityRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<EntityRepositoryBase<TId, TEntity>> logger)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+    {
+    }
+
+    protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
+
+    protected readonly ICacheSyncService CacheSyncService;
 
     /// <summary>
     ///     Gets the logger
@@ -194,7 +228,12 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     ///     Create the repository cache policy
     /// </summary>
     protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
-        => new DefaultRepositoryCachePolicy<TEntity, TId>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+        => new DefaultRepositoryCachePolicy<TEntity, TId>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            DefaultOptions,
+            RepositoryCacheVersionService,
+            CacheSyncService);
 
     protected abstract TEntity? PerformGet(TId? id);
 
@@ -215,8 +254,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
 
     protected virtual bool PerformExists(TId id)
     {
-        Sql<ISqlContext> sql = GetBaseQuery(true);
-        sql.Where(GetBaseWhereClause(), new { id });
+        Sql<ISqlContext> sql = GetBaseQuery(true).Where(GetBaseWhereClause(), new { id });
         var count = Database.ExecuteScalar<int>(sql);
         return count == 1;
     }
@@ -243,6 +281,6 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 }

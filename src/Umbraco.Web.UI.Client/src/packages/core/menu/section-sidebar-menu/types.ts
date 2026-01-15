@@ -1,3 +1,4 @@
+import type { UmbMenuItemExpansionEntryModel } from '../components/menu/types.js';
 import type { ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/section';
 
 export interface MetaSectionSidebarAppMenuKind {
@@ -23,4 +24,8 @@ export interface ManifestSectionSidebarAppMenuWithEntityActionsKind extends Mani
 
 export interface MetaSectionSidebarAppMenuWithEntityActionsKind extends MetaSectionSidebarAppMenuKind {
 	entityType: string;
+}
+
+export interface UmbSectionMenuItemExpansionEntryModel extends UmbMenuItemExpansionEntryModel {
+	sectionAlias?: string;
 }

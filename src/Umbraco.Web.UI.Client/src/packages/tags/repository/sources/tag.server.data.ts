@@ -1,6 +1,6 @@
 import { TagService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Tag that fetches data from the server
@@ -43,6 +43,6 @@ export class UmbTagServerDataSource {
 		tagGroup?: string;
 		culture?: string;
 	}) {
-		return tryExecuteAndNotify(this.#host, TagService.getTag({ query, skip, take, tagGroup, culture }));
+		return tryExecute(this.#host, TagService.getTag({ query: { query, skip, take, tagGroup, culture } }));
 	}
 }

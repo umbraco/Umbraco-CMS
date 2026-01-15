@@ -8,7 +8,7 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 	entityId?: string;
 
 	@state()
-	_package?: any;
+	private _package?: any;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -32,7 +32,7 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 		return html`<div class="header" slot="header">
 			<uui-button compact @click="${this._navigateBack}">
 				<uui-icon name="icon-arrow-left"></uui-icon>
-				${this._package.name ?? 'Package name'}
+				<span data-mark="input:workspace-name">${this._package.name ?? 'Package name'}</span>
 			</uui-button>
 		</div>`;
 	}

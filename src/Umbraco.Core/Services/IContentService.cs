@@ -1,4 +1,6 @@
-using Umbraco.Cms.Core.Events;
+using System.Collections.Immutable;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -31,41 +33,85 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Gets a blueprint.
     /// </summary>
+    /// <param name="id">The identifier of the blueprint.</param>
+    /// <returns>The blueprint, or null if not found.</returns>
     IContent? GetBlueprintById(int id);
 
     /// <summary>
     ///     Gets a blueprint.
     /// </summary>
+    /// <param name="id">The unique identifier of the blueprint.</param>
+    /// <returns>The blueprint, or null if not found.</returns>
     IContent? GetBlueprintById(Guid id);
 
     /// <summary>
     ///     Gets blueprints for a content type.
     /// </summary>
+    /// <param name="documentTypeId">The document type identifiers.</param>
+    /// <returns>The blueprints.</returns>
     IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
 
     /// <summary>
     ///     Saves a blueprint.
     /// </summary>
+    /// <param name="content">The blueprint to save.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
     void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a blueprint.
+    /// </summary>
+    /// <param name="content">The blueprint to save.</param>
+    /// <param name="createdFromContent">The content from which the blueprint was created.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SaveBlueprint(content, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Deletes a blueprint.
     /// </summary>
+    /// <param name="content">The blueprint to delete.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Creates a new content item from a blueprint.
+    ///     Creates a blueprint from a content item.
     /// </summary>
+    /// <param name="blueprint">The content item to create a blueprint from.</param>
+    /// <param name="name">The name for the new blueprint.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created blueprint.</returns>
+    // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
+    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     (Deprecated) Creates a new content item from a blueprint.
+    /// </summary>
+    /// <param name="blueprint">The blueprint to create content from.</param>
+    /// <param name="name">The name for the new content.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created content.</returns>
+    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
+    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes blueprints for a content type.
     /// </summary>
+    /// <param name="contentTypeId">The content type identifier.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes blueprints for content types.
     /// </summary>
+    /// <param name="contentTypeIds">The content type identifiers.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
     #endregion
@@ -75,90 +121,111 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Gets a document.
     /// </summary>
+    /// <param name="id">The identifier of the document.</param>
+    /// <returns>The document, or null if not found.</returns>
     IContent? GetById(int id);
-
-    /// <summary>
-    ///     Gets a document.
-    /// </summary>
-    new IContent? GetById(Guid key);
 
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>
-    /// <param name="contentId">Id of the Content to load schedule for</param>
-    /// <returns>
-    ///     <see cref="ContentScheduleCollection" />
-    /// </returns>
+    /// <param name="contentId">The identifier of the content to load schedule for.</param>
+    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
     ContentScheduleCollection GetContentScheduleByContentId(int contentId);
 
     /// <summary>
     ///     Persists publish/unpublish schedule for a content node.
     /// </summary>
-    /// <param name="content"></param>
-    /// <param name="contentSchedule"></param>
+    /// <param name="content">The content to persist the schedule for.</param>
+    /// <param name="contentSchedule">The content schedule collection.</param>
     void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule);
 
     /// <summary>
     ///     Gets documents.
     /// </summary>
+    /// <param name="ids">The identifiers of the documents.</param>
+    /// <returns>The documents.</returns>
     IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
 
     /// <summary>
     ///     Gets documents.
     /// </summary>
+    /// <param name="ids">The unique identifiers of the documents.</param>
+    /// <returns>The documents.</returns>
     IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
     ///     Gets documents at a given level.
     /// </summary>
+    /// <param name="level">The level.</param>
+    /// <returns>The documents at the specified level.</returns>
     IEnumerable<IContent> GetByLevel(int level);
 
     /// <summary>
     ///     Gets the parent of a document.
     /// </summary>
+    /// <param name="id">The identifier of the document.</param>
+    /// <returns>The parent document, or null if not found.</returns>
     IContent? GetParent(int id);
 
     /// <summary>
     ///     Gets the parent of a document.
     /// </summary>
+    /// <param name="content">The document.</param>
+    /// <returns>The parent document, or null if not found.</returns>
     IContent? GetParent(IContent content);
 
     /// <summary>
     ///     Gets ancestor documents of a document.
     /// </summary>
+    /// <param name="id">The identifier of the document.</param>
+    /// <returns>The ancestor documents.</returns>
     IEnumerable<IContent> GetAncestors(int id);
 
     /// <summary>
     ///     Gets ancestor documents of a document.
     /// </summary>
+    /// <param name="content">The document.</param>
+    /// <returns>The ancestor documents.</returns>
     IEnumerable<IContent> GetAncestors(IContent content);
 
     /// <summary>
     ///     Gets all versions of a document.
     /// </summary>
+    /// <param name="id">The identifier of the document.</param>
+    /// <returns>The document versions.</returns>
     /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
     IEnumerable<IContent> GetVersions(int id);
 
     /// <summary>
     ///     Gets all versions of a document.
     /// </summary>
+    /// <param name="id">The identifier of the document.</param>
+    /// <param name="skip">The number of versions to skip.</param>
+    /// <param name="take">The number of versions to take.</param>
+    /// <returns>The document versions.</returns>
     /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
     IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take);
 
     /// <summary>
     ///     Gets top versions of a document.
     /// </summary>
+    /// <param name="id">The identifier of the document.</param>
+    /// <param name="topRows">The number of top versions to get.</param>
+    /// <returns>The version identifiers.</returns>
     /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
     IEnumerable<int> GetVersionIds(int id, int topRows);
 
     /// <summary>
     ///     Gets a version of a document.
     /// </summary>
+    /// <param name="versionId">The version identifier.</param>
+    /// <returns>The document version, or null if not found.</returns>
     IContent? GetVersion(int versionId);
 
     /// <summary>
     ///     Gets root-level documents.
     /// </summary>
+    /// <returns>The root-level documents.</returns>
     IEnumerable<IContent> GetRootContent();
 
     /// <summary>
@@ -209,51 +276,73 @@ public interface IContentService : IContentServiceBase<IContent>
     IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
 
     /// <summary>
-    ///     Gets paged documents of a content
+    ///     Gets paged documents of a content type.
     /// </summary>
-    /// <param name="contentTypeId">The page number.</param>
+    /// <param name="contentTypeId">The content type identifier.</param>
     /// <param name="pageIndex">The page number.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Search text filter.</param>
+    /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
+    /// <returns>The paged documents.</returns>
     IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering? ordering = null);
 
     /// <summary>
-    ///     Gets paged documents for specified content types
+    ///     Gets paged documents for specified content types.
     /// </summary>
-    /// <param name="contentTypeIds">The page number.</param>
+    /// <param name="contentTypeIds">The content type identifiers.</param>
     /// <param name="pageIndex">The page number.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Search text filter.</param>
+    /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
+    /// <returns>The paged documents.</returns>
     IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter, Ordering? ordering = null);
 
     /// <summary>
     ///     Counts documents of a given document type.
     /// </summary>
+    /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
+    /// <returns>The document count.</returns>
     int Count(string? documentTypeAlias = null);
 
     /// <summary>
     ///     Counts published documents of a given document type.
     /// </summary>
+    /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
+    /// <returns>The published document count.</returns>
     int CountPublished(string? documentTypeAlias = null);
 
     /// <summary>
     ///     Counts child documents of a given parent, of a given document type.
     /// </summary>
+    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
+    /// <returns>The child document count.</returns>
     int CountChildren(int parentId, string? documentTypeAlias = null);
 
     /// <summary>
     ///     Counts descendant documents of a given parent, of a given document type.
     /// </summary>
+    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
+    /// <returns>The descendant document count.</returns>
     int CountDescendants(int parentId, string? documentTypeAlias = null);
 
     /// <summary>
     ///     Gets a value indicating whether a document has children.
     /// </summary>
+    /// <param name="id">The document identifier.</param>
+    /// <returns><c>true</c> if the document has children; otherwise, <c>false</c>.</returns>
     bool HasChildren(int id);
+
+    /// <summary>
+    ///     Gets a dictionary of content Ids and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+
 
     #endregion
 
@@ -262,17 +351,27 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Saves a document.
     /// </summary>
+    /// <param name="content">The document to save.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="contentSchedule">The content schedule collection.</param>
+    /// <returns>The operation result.</returns>
     OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
 
     /// <summary>
     ///     Saves documents.
     /// </summary>
+    /// <param name="contents">The documents to save.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
     // TODO: why only 1 result not 1 per content?!
-    OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
+    new OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a document.
     /// </summary>
+    /// <param name="content">The document to delete.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
     /// <remarks>
     ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
     ///     <para>This method entirely clears the content from the database.</para>
@@ -282,6 +381,8 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Deletes all documents of a given document type.
     /// </summary>
+    /// <param name="documentTypeId">The document type identifier.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     /// <remarks>
     ///     <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
     ///     <para>This operation is potentially dangerous and expensive.</para>
@@ -291,6 +392,8 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Deletes all documents of given document types.
     /// </summary>
+    /// <param name="contentTypeIds">The content type identifiers.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     /// <remarks>
     ///     <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
     ///     <para>This operation is potentially dangerous and expensive.</para>
@@ -300,11 +403,18 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Deletes versions of a document prior to a given date.
     /// </summary>
+    /// <param name="id">The document identifier.</param>
+    /// <param name="date">The date before which versions should be deleted.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     void DeleteVersions(int id, DateTime date, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a version of a document.
     /// </summary>
+    /// <param name="id">The document identifier.</param>
+    /// <param name="versionId">The version identifier to delete.</param>
+    /// <param name="deletePriorVersions">Whether to also delete versions prior to the specified version.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId);
 
     #endregion
@@ -314,26 +424,20 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Moves a document under a new parent.
     /// </summary>
+    /// <param name="content">The document to move.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    /// Attempts to move the <see cref="IContent"/> <paramref name="content"/> to under the node with id <paramref name="parentId"/>.
-    /// </summary>
-    /// <param name="content">The <see cref="IContent"/> that shall be moved.</param>
-    /// <param name="parentId">The id of the new parent node.</param>
-    /// <param name="userId">Id of the user attempting to move <paramref name="content"/>.</param>
-    /// <returns>Success if moving succeeded, otherwise Failed.</returns>
-    [Obsolete("Adds return type to Move method. Will be removed in V14, as the original method will be adjusted.")]
-    OperationResult
-        AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
-    {
-        Move(content, parentId, userId);
-        return OperationResult.Succeed(new EventMessages());
-    }
 
     /// <summary>
     ///     Copies a document.
     /// </summary>
+    /// <param name="content">The document to copy.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The copied document, or null if the copy failed.</returns>
     /// <remarks>
     ///     <para>Recursively copies all children.</para>
     /// </remarks>
@@ -342,6 +446,12 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Copies a document.
     /// </summary>
+    /// <param name="content">The document to copy.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
+    /// <param name="recursive">Whether to recursively copy all children.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The copied document, or null if the copy failed.</returns>
     /// <remarks>
     ///     <para>Optionally recursively copies all children.</para>
     /// </remarks>
@@ -350,38 +460,43 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Moves a document to the recycle bin.
     /// </summary>
+    /// <param name="content">The document to move to the recycle bin.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
     OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin
+    ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin.
     /// </summary>
-    /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
+    /// <param name="userId">Optional identifier of the user emptying the Recycle Bin.</param>
+    /// <returns>The operation result.</returns>
     OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Returns true if there is any content in the recycle bin
+    ///     Returns true if there is any content in the recycle bin.
     /// </summary>
+    /// <returns><c>true</c> if there is content in the recycle bin; otherwise, <c>false</c>.</returns>
     bool RecycleBinSmells();
 
     /// <summary>
     ///     Sorts documents.
     /// </summary>
+    /// <param name="items">The documents to sort, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
     OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Sorts documents.
     /// </summary>
+    /// <param name="ids">The document identifiers, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
     OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
 
     #endregion
 
     #region Publish Document
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Publishes a document.
@@ -396,52 +511,19 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
-
     /// <summary>
     ///     Publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
-    /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
+    /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the operation.</param>
     /// <remarks>
     ///     <para>
-    ///         The <paramref name="force" /> parameter determines which documents are published. When <c>false</c>,
-    ///         only those documents that are already published, are republished. When <c>true</c>, all documents are
-    ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
+    ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    ///// <summary>
-    ///// Saves and publishes a document branch.
-    ///// </summary>
-    ///// <param name="content">The root document.</param>
-    ///// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-    ///// <param name="shouldPublish">A function determining cultures to publish.</param>
-    ///// <param name="publishCultures">A function publishing cultures.</param>
-    ///// <param name="userId">The identifier of the user performing the operation.</param>
-    ///// <remarks>
-    ///// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
-    ///// only those documents that are already published, are republished. When <c>true</c>, all documents are
-    ///// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
-    ///// <para>The <paramref name="editing"/> parameter is a function which determines whether a document has
-    ///// changes to publish (else there is no need to publish it). If one wants to publish only a selection of
-    ///// cultures, one may want to check that only properties for these cultures have changed. Otherwise, other
-    ///// cultures may trigger an unwanted republish.</para>
-    ///// <para>The <paramref name="publishCultures"/> parameter is a function to execute to publish cultures, on
-    ///// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
-    ///// whether the cultures could be published.</para>
-    ///// </remarks>
-    // IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
-    //    Func<IContent, HashSet<string>> shouldPublish,
-    //    Func<IContent, HashSet<string>, bool> publishCultures,
-    //    int userId = Constants.Security.SuperUserId);
+    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Unpublishes a document.
@@ -462,23 +544,32 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.
     /// </summary>
+    /// <param name="content">The document.</param>
+    /// <returns><c>true</c> if the document is path-publishable; otherwise, <c>false</c>.</returns>
     /// <remarks>A document is path-publishable when all its ancestors are published.</remarks>
     bool IsPathPublishable(IContent content);
 
     /// <summary>
     ///     Gets a value indicating whether a document is path-published.
     /// </summary>
+    /// <param name="content">The document.</param>
+    /// <returns><c>true</c> if the document is path-published; otherwise, <c>false</c>.</returns>
     /// <remarks>A document is path-published when all its ancestors, and the document itself, are published.</remarks>
     bool IsPathPublished(IContent content);
 
     /// <summary>
     ///     Saves a document and raises the "sent to publication" events.
     /// </summary>
+    /// <param name="content">The document to send to publication.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns><c>true</c> if the document was sent to publication; otherwise, <c>false</c>.</returns>
     bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Publishes and unpublishes scheduled documents.
     /// </summary>
+    /// <param name="date">The date to use for determining scheduled actions.</param>
+    /// <returns>The publish results.</returns>
     IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
 
     #endregion
@@ -488,17 +579,23 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Gets permissions assigned to a document.
     /// </summary>
+    /// <param name="content">The document.</param>
+    /// <returns>The permissions assigned to the document.</returns>
     EntityPermissionCollection GetPermissions(IContent content);
 
     /// <summary>
     ///     Sets the permission of a document.
     /// </summary>
+    /// <param name="permissionSet">The permission set to apply.</param>
     /// <remarks>Replaces all permissions with the new set of permissions.</remarks>
     void SetPermissions(EntityPermissionSet permissionSet);
 
     /// <summary>
     ///     Assigns a permission to a document.
     /// </summary>
+    /// <param name="entity">The document entity.</param>
+    /// <param name="permission">The permission to assign.</param>
+    /// <param name="groupIds">The group identifiers to assign the permission to.</param>
     /// <remarks>Adds the permission to existing permissions.</remarks>
     void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds);
 
@@ -509,34 +606,77 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Creates a document.
     /// </summary>
+    /// <param name="name">The name of the document.</param>
+    /// <param name="parentId">The unique identifier of the parent.</param>
+    /// <param name="documentTypeAlias">The document type alias.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created document.</returns>
     IContent Create(string name, Guid parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates a document.
     /// </summary>
+    /// <param name="name">The name of the document.</param>
+    /// <param name="parentId">The identifier of the parent.</param>
+    /// <param name="documentTypeAlias">The document type alias.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created document.</returns>
     IContent Create(string name, int parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Creates a document
+    ///     Creates a document.
     /// </summary>
+    /// <param name="name">The name of the document.</param>
+    /// <param name="parentId">The identifier of the parent.</param>
+    /// <param name="contentType">The content type.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created document.</returns>
     IContent Create(string name, int parentId, IContentType contentType, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates a document.
     /// </summary>
+    /// <param name="name">The name of the document.</param>
+    /// <param name="parent">The parent document.</param>
+    /// <param name="documentTypeAlias">The document type alias.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created document.</returns>
     IContent Create(string name, IContent? parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates and saves a document.
     /// </summary>
+    /// <param name="name">The name of the document.</param>
+    /// <param name="parentId">The identifier of the parent.</param>
+    /// <param name="contentTypeAlias">The content type alias.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created and saved document.</returns>
     IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates and saves a document.
     /// </summary>
+    /// <param name="name">The name of the document.</param>
+    /// <param name="parent">The parent document.</param>
+    /// <param name="contentTypeAlias">The content type alias.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The created and saved document.</returns>
     IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     #endregion
 
+    /// <summary>
+    ///     Empties the Recycle Bin asynchronously by deleting all <see cref="IContent" /> that resides in the bin.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user emptying the Recycle Bin.</param>
+    /// <returns>A task representing the asynchronous operation with the operation result.</returns>
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
+
+    /// <summary>
+    ///     Gets publish/unpublish schedule for a content node.
+    /// </summary>
+    /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
+    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
+    ContentScheduleCollection GetContentScheduleByContentId(Guid contentId) => StaticServiceProvider.Instance
+        .GetRequiredService<ContentService>().GetContentScheduleByContentId(contentId);
 }

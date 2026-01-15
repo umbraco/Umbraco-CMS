@@ -8,18 +8,16 @@ import {
 	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbStylesheetDetailModel, UmbStylesheetDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbStylesheetDetailModel, UmbStylesheetDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
 
 	constructor(host: UmbControllerHost) {
@@ -64,32 +62,12 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	/**
-	 * @description Set the name of the stylesheet
-	 * @param {string} value The name of the stylesheet
-	 * @memberof UmbStylesheetWorkspaceContext
-	 */
-	public setName(value: string) {
-		this._data.updateCurrent({ name: value });
-	}
-
-	/**
 	 * @description Set the content of the stylesheet
 	 * @param {string} value The content of the stylesheet
 	 * @memberof UmbStylesheetWorkspaceContext
 	 */
 	public setContent(value: string) {
 		this._data.updateCurrent({ content: value });
-	}
-
-	/**
-	 * @description Create a new stylesheet
-	 * @deprecated Use `createScaffold` instead. Will be removed in v17.
-	 * @param { UmbEntityModel } parent The parent entity
-	 * @param { string } parent.entityType The entity type of the parent
-	 * @param { UmbEntityUnique } parent.unique The unique identifier of the parent
-	 */
-	async create(parent: UmbEntityModel) {
-		await this.createScaffold({ parent });
 	}
 }
 

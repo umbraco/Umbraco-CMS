@@ -13,9 +13,3 @@ export interface UmbStylesheetItemModel {
 	name: string;
 	isFolder: boolean;
 }
-
-export interface UmbStylesheetRule {
-	name: string;
-	selector: string;
-	styles: string;
-}

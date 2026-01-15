@@ -44,6 +44,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	@state()
 	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
 
+	@state()
+	private _isFiltering = false;
+
 	pagination = new UmbPaginationManager();
 
 	#collectionRepository;
@@ -122,18 +125,30 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.#createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup(async (params) => {
-				const contentContextConsumer = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, () => {
-					this.removeUmbController(contentContextConsumer);
-				}).passContextAliasMatches();
-				const propContextConsumer = this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, () => {
-					this.removeUmbController(propContextConsumer);
-				}).passContextAliasMatches();
+				// TODO: Make it possible to have no callback, and make it possible to use getContext with a callback.
+				// TODO: Make sure a onSetup rejection ends up closing the modal and firing a good error message in the console. eventually calling onReject.
+				const contentContextConsumer = this.consumeContext(
+					UMB_CONTENT_TYPE_WORKSPACE_CONTEXT,
+					() => {},
+				).passContextAliasMatches();
+				const propContextConsumer = this.consumeContext(
+					UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT,
+					() => {},
+				).passContextAliasMatches();
 				const [contentContext, propContext] = await Promise.all([
 					contentContextConsumer.asPromise(),
 					propContextConsumer.asPromise(),
 					this.#initPromise,
 				]);
-				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
+				if (!contentContext || !propContext) {
+					throw new Error('Could not get content or property context');
+				}
+				this.removeUmbController(contentContextConsumer);
+				this.removeUmbController(propContextConsumer);
+				const propertyEditorUiManifest = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias);
+				const propertyEditorName = this.localize.string(
+					propertyEditorUiManifest?.meta?.label || propertyEditorUiManifest?.name || '#general_notFound',
+				);
 				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getName() ?? ''} - ${propertyEditorName}`;
 
 				return {
@@ -150,20 +165,24 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	async #getDataTypes() {
-		this.pagination.setCurrentPageNumber(this._currentPage);
+		try {
+			this.pagination.setCurrentPageNumber(this._currentPage);
 
-		const { data } = await this.#collectionRepository.requestCollection({
-			skip: this.pagination.getSkip(),
-			take: this.pagination.getPageSize(),
-			name: this.#currentFilterQuery,
-		});
+			const { data } = await this.#collectionRepository.requestCollection({
+				skip: this.pagination.getSkip(),
+				take: this.pagination.getPageSize(),
+				name: this.#currentFilterQuery,
+			});
 
-		this.pagination.setTotalItems(data?.total ?? 0);
+			this.pagination.setTotalItems(data?.total ?? 0);
 
-		if (this.pagination.getCurrentPageNumber() > 1) {
-			this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
-		} else {
-			this.#dataTypes = data?.items ?? [];
+			if (this.pagination.getCurrentPageNumber() > 1) {
+				this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
+			} else {
+				this.#dataTypes = data?.items ?? [];
+			}
+		} finally {
+			this._isFiltering = false;
 		}
 	}
 
@@ -184,6 +203,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#onFilterInput(event: UUIInputEvent) {
+		this._isFiltering = true;
 		this.#currentFilterQuery = (event.target.value as string).toLocaleLowerCase();
 		this.#debouncedFilterInput();
 	}
@@ -259,7 +279,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			placeholder=${this.localize.term('placeholders_filter')}
 			label=${this.localize.term('placeholders_filter')}
 			${umbFocus()}>
-			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
+			<div slot="prepend">
+				${this._isFiltering
+					? html`<uui-loader-circle id="filtering-indicator"></uui-loader-circle>`
+					: html`<uui-icon name="search"></uui-icon>`}
+			</div>
 		</uui-input>`;
 	}
 
@@ -338,30 +362,27 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#renderDataTypeButton(propertyEditorUI: ManifestPropertyEditorUi, createAsNewOnPick?: boolean) {
+		const label = this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name);
 		if (createAsNewOnPick) {
 			return html`
-				<uui-button
-					label=${propertyEditorUI.meta.label || propertyEditorUI.name}
-					@click=${() => this.#createDataType(propertyEditorUI.alias)}>
-					${this.#renderItemContent(propertyEditorUI)}
+				<uui-button label=${label} @click=${() => this.#createDataType(propertyEditorUI.alias)}>
+					${this.#renderItemContent(label, propertyEditorUI)}
 				</uui-button>
 			`;
 		} else {
 			return html`
-				<uui-button
-					label=${propertyEditorUI.meta.label || propertyEditorUI.name}
-					href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
-					${this.#renderItemContent(propertyEditorUI)}
+				<uui-button label=${label} href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+					${this.#renderItemContent(label, propertyEditorUI)}
 				</uui-button>
 			`;
 		}
 	}
 
-	#renderItemContent(propertyEditorUI: ManifestPropertyEditorUi) {
+	#renderItemContent(label: string, propertyEditorUI: ManifestPropertyEditorUi) {
 		return html`
 			<div class="item-content">
 				<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
-				${propertyEditorUI.meta.label || propertyEditorUI.name}
+				${label}
 			</div>
 		`;
 	}
@@ -395,11 +416,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				margin-bottom: var(--uui-size-space-4);
 			}
 
-			#filter-icon {
-				height: 100%;
-				padding-left: var(--uui-size-space-2);
+			uui-input [slot='prepend'] {
 				display: flex;
-				color: var(--uui-color-border);
+				align-items: center;
+			}
+
+			#filtering-indicator {
+				margin-left: 7px;
 			}
 
 			#item-grid {
@@ -462,6 +485,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 			.choice-type-headline {
 				border-bottom: 1px solid var(--uui-color-divider);
+			}
+
+			.loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-space-6);
 			}
 		`,
 	];

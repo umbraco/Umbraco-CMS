@@ -1,4 +1,5 @@
 import type { UmbClassMixinInterface } from './class-mixin.interface.js';
+import type { UmbClassGetContextOptions } from './class.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
@@ -11,6 +12,7 @@ import {
 	type UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
+	type UmbContextMinimal,
 } from '@umbraco-cms/backoffice/context-api';
 import { type ObserverCallback, UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
@@ -32,7 +34,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		}
 
 		getHostElement(): Element {
-			return this._host.getHostElement();
+			return this._host?.getHostElement();
 		}
 
 		get controllerAlias(): UmbControllerAlias {
@@ -53,28 +55,33 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 		>(
 			// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 			source: ObservableType,
-			callback: ObserverCallback<SpecificT>,
+			callback?: ObserverCallback<SpecificT>,
 			controllerAlias?: UmbControllerAlias | null,
 		): SpecificR {
-			// Fallback to use a hash of the provided method, but only if the alias is undefined.
-			controllerAlias ??= controllerAlias === undefined ? simpleHashCode(callback.toString()) : undefined;
+			// Fallback to use a hash of the provided method, but only if the alias is undefined and there is a callback.
+			if (controllerAlias === undefined && callback) {
+				controllerAlias = simpleHashCode(callback.toString());
+			} else if (controllerAlias === null) {
+				// if value is null, then reset it to undefined. Null is used to explicitly tell that we do not want a controller alias. [NL]
+				controllerAlias = undefined;
+			}
 
 			if (source) {
 				return new UmbObserverController<T>(
 					this,
 					source,
-					callback as unknown as ObserverCallback<T>,
+					callback as unknown as ObserverCallback<T> | undefined,
 					controllerAlias,
 				) as unknown as SpecificR;
 			} else {
-				callback(undefined as SpecificT);
+				callback?.(undefined as SpecificT);
 				this.removeUmbControllerByAlias(controllerAlias);
 				return undefined as SpecificR;
 			}
 		}
 
 		provideContext<
-			BaseType = unknown,
+			BaseType extends UmbContextMinimal = UmbContextMinimal,
 			ResultType extends BaseType = BaseType,
 			InstanceType extends ResultType = ResultType,
 		>(
@@ -84,30 +91,37 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
 
-		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		consumeContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 
-		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		async getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		): Promise<ResultType> {
+			options?: UmbClassGetContextOptions,
+		): Promise<ResultType | undefined> {
 			const controller = new UmbContextConsumerController(this, contextAlias);
-			const promise = controller.asPromise().then((result) => {
-				controller.destroy();
-				return result;
-			});
-			return promise;
+			if (options) {
+				if (options.passContextAliasMatches) {
+					controller.passContextAliasMatches();
+				}
+				if (options.skipHost) {
+					controller.skipHost();
+				}
+			}
+			return controller.asPromise(options);
 		}
 
 		public override destroy(): void {
 			if (this._host) {
 				this._host.removeUmbController(this);
-				this._host = undefined as never;
 			}
 			super.destroy();
+			if (this._host) {
+				this._host = undefined as never;
+			}
 		}
 	}
 

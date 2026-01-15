@@ -197,7 +197,7 @@ public class Content : ContentBase, IContent
 
     /// <inheritdoc />
     [IgnoreDataMember]
-    public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
+    public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? [];
 
     /// <inheritdoc />
     public bool IsCulturePublished(string culture)

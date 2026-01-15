@@ -1,10 +1,12 @@
-export type UmbMediaPickerPropertyValue = {
+export type UmbMediaPickerPropertyValueEntry = {
 	key: string;
 	mediaKey: string;
 	mediaTypeAlias: string;
 	focalPoint: UmbFocalPointModel | null;
 	crops: Array<UmbCropModel>;
 };
+
+export type UmbMediaPickerValueModel = Array<UmbMediaPickerPropertyValueEntry>;
 
 export type UmbCropModel = {
 	label?: string;

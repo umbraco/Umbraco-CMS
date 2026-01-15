@@ -31,6 +31,7 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 
@@ -102,6 +103,7 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 							.value=${{
 								entityType: item.entityType,
 								unique: item.unique,
+								name: item.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],

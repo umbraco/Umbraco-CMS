@@ -8,14 +8,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class LogViewerServiceTests : UmbracoIntegrationTest
+internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 {
     private ILogViewerService LogViewerService => GetRequiredService<ILogViewerService>();
 
     private const string LogfileName = "UmbracoTraceLog.INTEGRATIONTEST.20230707.json";
 
-    private readonly string _newLogfilePath;
-    private readonly string _newLogfileDirPath;
+    private string _newLogfilePath;
+
     private readonly DateTime _startDate = new(2023, 7, 7);
     private readonly DateTime _endDate = new(2023, 7, 8);
 
@@ -33,13 +33,13 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
         var exampleLogfilePath = Path.Combine(testRoot, "TestData", "TestLogs", LogfileName);
 
         string newLogfileDirPath = loggingConfiguration.LogDirectory;
-        string newLogfilePath = Path.Combine(newLogfileDirPath, LogfileName);
+        _newLogfilePath = Path.Combine(newLogfileDirPath, LogfileName);
 
         // Create/ensure Directory exists
         ioHelper.EnsurePathExists(newLogfileDirPath);
 
         // Copy the sample files
-        File.Copy(exampleLogfilePath, newLogfilePath, true);
+        File.Copy(exampleLogfilePath, _newLogfilePath, true);
     }
 
     [OneTimeTearDown]

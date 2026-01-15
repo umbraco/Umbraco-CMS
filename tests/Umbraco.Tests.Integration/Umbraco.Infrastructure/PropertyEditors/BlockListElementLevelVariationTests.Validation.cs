@@ -1,12 +1,13 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 
@@ -42,10 +43,10 @@ public partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -142,10 +143,10 @@ public partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -172,7 +173,15 @@ public partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only()
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only_With_AllowEditInvariantFromNonDefault()
+        => await Can_Validate_Invalid_Properties_Specific_Culture_Only();
+
+    [Test]
+    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only_Without_AllowEditInvariantFromNonDefault()
+        => await Can_Validate_Invalid_Properties_Specific_Culture_Only();
+
+    private async Task Can_Validate_Invalid_Properties_Specific_Culture_Only()
     {
         var elementType = CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -203,10 +212,10 @@ public partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -214,6 +223,8 @@ public partial class BlockListElementLevelVariationTests
             contentType,
             new[] { "en-US" });
 
+        // NOTE: since the default culture is being validated, we expect the same result regardless
+        //       of the AllowEditInvariantFromNonDefault configuration
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
@@ -256,10 +267,10 @@ public partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -316,10 +327,10 @@ public partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -338,7 +349,15 @@ public partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only()
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_With_AllowEditInvariantFromNonDefault()
+        => await Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(true);
+
+    [Test]
+    public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_Without_AllowEditInvariantFromNonDefault()
+        => await Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(false);
+
+    private async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(bool expectedInvariantValidationErrors)
     {
         var (rootElementType, nestedElementType) = await CreateElementTypeWithValidationAndNestedBlocksAsync();
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
@@ -436,10 +455,10 @@ public partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -448,19 +467,39 @@ public partial class BlockListElementLevelVariationTests
             new[] { "da-DK" });
 
         var errors = result.ValidationErrors.ToArray();
-        Assert.Multiple(() =>
+
+        // NOTE: since the default culture is not being validated, we expect different results depending
+        //       on the AllowEditInvariantFromNonDefault configuration
+
+        if (expectedInvariantValidationErrors)
         {
-            Assert.AreEqual(6, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(6, errors.Length);
+                Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-        });
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            });
+        }
+        else
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(3, errors.Length);
+                Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+            });
+        }
     }
 
     [Test]
@@ -499,10 +538,10 @@ public partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Properties = [], Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Properties = [], Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
                 ],
-                InvariantProperties =
+                Properties =
                 [
                     new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
                 ]
@@ -511,5 +550,117 @@ public partial class BlockListElementLevelVariationTests
             ["da-DK"]);
 
         Assert.IsEmpty(result.ValidationErrors);
+    }
+
+    [Test]
+    public async Task Can_Validate_Properties_Variant_Blocks()
+    {
+        var elementType = CreateElementTypeWithValidation(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    // blocks property values use null culture for culture variant block editor properties
+                    new() { Alias = "invariantText", Value = "Valid invariantText content value", Culture = null },
+                    new() { Alias = "variantText", Value = "Invalid variantText content value", Culture = null },
+                },
+                new List<BlockPropertyValue>
+                {
+                    // blocks property values use null culture for culture variant block editor properties
+                    new() { Alias = "invariantText", Value = "Invalid invariantText settings value", Culture = null },
+                    new() { Alias = "variantText", Value = "Valid variantText settings value", Culture = null },
+                },
+                "en-US",
+                null));
+
+        // make sure all blocks are exposed as they would be for culture variant properties
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = null }
+        ];
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
+                ],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue), Culture = "en-US" }
+                ]
+            },
+            contentType);
+
+        var errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, errors.Length);
+            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[1].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Validate_Missing_Properties_Variant_Blocks()
+    {
+        var elementType = CreateElementTypeWithValidation(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    // missing the mandatory "invariantText"
+                    new() { Alias = "variantText", Value = "Valid variantText content value", Culture = null },
+                },
+                new List<BlockPropertyValue>
+                {
+                    // missing the mandatory "variantText" (which, to add to the confusion, is invariant at block level in this test case)
+                    new() { Alias = "invariantText", Value = "Valid invariantText settings value", Culture = null },
+                },
+                "en-US",
+                null));
+
+        // make sure all blocks are exposed as they would be for culture variant properties
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = null }
+        ];
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
+                ],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue), Culture = "en-US" }
+                ]
+            },
+            contentType);
+
+        var errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, errors.Length);
+            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == null && @.segment == null)].value"));
+        });
     }
 }

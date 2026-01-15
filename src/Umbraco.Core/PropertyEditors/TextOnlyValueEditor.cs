@@ -1,8 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -12,25 +17,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class TextOnlyValueEditor : DataValueEditor
 {
-    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
     public TextOnlyValueEditor(
         DataEditorAttribute attribute,
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
-        : this(attribute, shortStringHelper, jsonSerializer, ioHelper)
-    {
-    }
-
-    public TextOnlyValueEditor(
-        DataEditorAttribute attribute,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
-        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
-    {
-    }
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+        Validators.Add(new LengthValidator(localizedTextService));
 
     /// <summary>
     ///     A method used to format the database value to a value that can be used by the editor
@@ -63,6 +57,54 @@ public class TextOnlyValueEditor : DataValueEditor
             default:
                 throw new InvalidOperationException("The " + typeof(TextOnlyValueEditor) +
                                                     " can only be used with string based property editors");
+        }
+    }
+
+    /// <summary>
+    /// A common length validator for both textbox and text area.
+    /// </summary>
+    internal sealed class LengthValidator : IValueValidator
+    {
+        private readonly ILocalizedTextService _localizedTextService;
+
+        public LengthValidator(ILocalizedTextService localizedTextService)
+        {
+            _localizedTextService = localizedTextService;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(
+            object? value,
+            string? valueType,
+            object? dataTypeConfiguration,
+            PropertyValidationContext validationContext)
+        {
+            int? maxCharacters = dataTypeConfiguration switch
+            {
+                TextAreaConfiguration areaConfiguration => areaConfiguration.MaxChars,
+                TextboxConfiguration textboxConfiguration => textboxConfiguration.MaxChars,
+                _ => null,
+            };
+
+            if (maxCharacters is null)
+            {
+                return [];
+            }
+
+            if (value is string typedValue && typedValue.Length > maxCharacters)
+            {
+                return
+                [
+                    new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "stringLengthExceeded",
+                            [maxCharacters.ToString(), (typedValue.Length - maxCharacters).ToString() ]),
+                        ["value'"])
+                ];
+            }
+
+            return [];
         }
     }
 }

@@ -4,20 +4,18 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Blocks;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
-using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
@@ -28,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter
+public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -43,25 +41,25 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+
     private DeliveryApiSettings _deliveryApiSettings;
+    private readonly IDisposable? _deliveryApiSettingsChangeSubscription;
 
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V16")]
-    public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
-        IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
-        IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
-        IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
+    public RteBlockRenderingValueConverter(
+        HtmlLocalLinkParser linkParser,
+        HtmlUrlParser urlParser,
+        HtmlImageSourceParser imageSourceParser,
+        IApiRichTextElementParser apiRichTextElementParser,
+        IApiRichTextMarkupParser apiRichTextMarkupParser,
+        IPartialViewBlockEngine partialViewBlockEngine,
+        BlockEditorConverter blockEditorConverter,
+        IJsonSerializer jsonSerializer,
+        IApiElementBuilder apiElementBuilder,
+        RichTextBlockPropertyValueConstructorCache constructorCache,
+        ILogger<RteBlockRenderingValueConverter> logger,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
-        : this(linkParser, urlParser, imageSourceParser, apiRichTextElementParser, apiRichTextMarkupParser, partialViewBlockEngine, blockEditorConverter, jsonSerializer,
-            apiElementBuilder, constructorCache, logger, StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
-            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(), deliveryApiSettingsMonitor)
-    {
-    }
-
-    public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
-        IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
-        IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
-        IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
-        IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _linkParser = linkParser;
         _urlParser = urlParser;
@@ -76,15 +74,29 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _logger = logger;
         _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
+
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
-        deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
+        _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
 
         // because that version of RTE converter parses {locallink} and renders blocks, its value has
-        // to be cached at the published snapshot level, because we have no idea what the block renderings may depend on actually.
-        PropertyCacheLevel.Snapshot;
+        // to be re-rendered at request time, because we have no idea what the block renderings may depend on actually.
+        PropertyCacheLevel.None;
+
+    /// <inheritdoc />
+    public override bool? IsValue(object? value, PropertyValueLevel level)
+        => level switch
+        {
+            // we cannot determine if an RTE has a value at source level, because some RTEs might
+            // be saved with an "empty" representation like {"markup":"","blocks":null}.
+            PropertyValueLevel.Source => null,
+            // we assume the RTE has a value if the intermediate value has markup beyond an empty paragraph tag.
+            PropertyValueLevel.Inter => value is IRichTextEditorIntermediateValue { Markup.Length: > 0 } intermediateValue
+                                        && intermediateValue.Markup != "<p></p>",
+            _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
+        };
 
     // to counterweigh the cache level, we're going to do as much of the heavy lifting as we can while converting source to intermediate
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
@@ -106,8 +118,12 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         };
     }
 
-    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object ConvertIntermediateToObject(
+        IPublishedElement owner,
+        IPublishedPropertyType propertyType,
+        PropertyCacheLevel referenceCacheLevel,
+        object? inter,
+        bool preview)
     {
         var converted = Convert(inter, preview);
 
@@ -116,7 +132,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.None;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson
@@ -149,7 +165,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         var sourceString = intermediateValue.Markup;
 
         // ensures string is parsed for {localLink} and URLs and media are resolved correctly
-        sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);
+        sourceString = _linkParser.EnsureInternalLinks(sourceString);
         sourceString = _urlParser.EnsureUrls(sourceString);
         sourceString = _imageSourceParser.EnsureImageSources(sourceString);
 
@@ -245,10 +261,12 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         };
     }
 
-    private class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
+    private sealed class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
     {
         public required string Markup { get; set; }
 
         public required RichTextBlockModel? RichTextBlockModel { get; set; }
     }
+
+    public void Dispose() => _deliveryApiSettingsChangeSubscription?.Dispose();
 }

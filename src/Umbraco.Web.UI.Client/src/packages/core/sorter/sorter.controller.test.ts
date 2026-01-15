@@ -1,7 +1,7 @@
 import { UmbSorterController } from './sorter.controller.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '../lit-element/lit-element.element.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('test-my-sorter')
 class UmbSorterTestElement extends UmbLitElement {
@@ -46,7 +46,7 @@ describe('UmbSorterController', () => {
 
 	beforeEach(async () => {
 		element = await fixture(html`<test-my-sorter></test-my-sorter>`);
-		await aTimeout(10);
+		//await aTimeout(10);
 	});
 
 	it('is defined with its own instance', () => {
@@ -104,8 +104,8 @@ describe('UmbSorterController', () => {
 				expect(element.sorter).to.have.property('notifyDisallowed').that.is.a('function');
 			});
 
-			it('has a notifyRequestDrop method', () => {
-				expect(element.sorter).to.have.property('notifyRequestDrop').that.is.a('function');
+			it('has a notifyRequestMove method', () => {
+				expect(element.sorter).to.have.property('notifyRequestMove').that.is.a('function');
 			});
 
 			it('has a destroy method', () => {
@@ -120,17 +120,19 @@ describe('UmbSorterController', () => {
 			expect(items.length).to.equal(4);
 		});
 
-		it('sets all allowed draggable items to draggable', () => {
+		it('sets all allowed draggable items to draggable="false"', async () => {
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
+			await aTimeout(100);
 			items.forEach((item) => {
-				expect(item.draggable).to.be.true;
+				expect(item.draggable).to.be.false;
 			});
 		});
 
-		it('sets all disabled items non draggable', () => {
+		it('sets all disabled items non draggable', async () => {
 			const items = element.getDisabledItems();
 			expect(items.length).to.equal(1);
+			await aTimeout(100);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.false;
 			});
@@ -138,9 +140,10 @@ describe('UmbSorterController', () => {
 	});
 
 	describe('disable', () => {
-		it('sets all items to non draggable', () => {
+		it('sets all items to non draggable', async () => {
 			element.sorter.disable();
 			const items = element.getAllItems();
+			await aTimeout(100);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.false;
 			});
@@ -148,7 +151,7 @@ describe('UmbSorterController', () => {
 	});
 
 	describe('enable', () => {
-		it('sets all allowed items to draggable', async () => {
+		it('sets all allowed items to draggable="false"', async () => {
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
 
@@ -157,13 +160,14 @@ describe('UmbSorterController', () => {
 
 			// Expect all items to be draggable
 			items.forEach((item) => {
-				expect(item.draggable).to.be.true;
+				expect(item.draggable).to.be.false;
 			});
 		});
 
-		it('sets all disabled items non draggable', () => {
+		it('sets all disabled items non draggable', async () => {
 			const items = element.getDisabledItems();
 			expect(items.length).to.equal(1);
+			await aTimeout(100);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.false;
 			});

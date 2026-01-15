@@ -1,17 +1,18 @@
 import { css, customElement, html, ifDefined, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement
-	extends UmbFormControlMixin<string>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -23,6 +24,22 @@ export class UmbPropertyEditorUITextareaElement
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
+	/**
+	 * The name of this field.
+	 * @type {string}
+	 */
+	@property({ type: String })
+	name?: string;
+
 	@state()
 	private _maxChars?: number;
 
@@ -30,23 +47,19 @@ export class UmbPropertyEditorUITextareaElement
 	private _rows?: number;
 
 	@state()
-	private _maxHeight?: number;
-
-	@state()
-	private _minHeight?: number;
-
-	@state()
 	private _css: StyleInfo = {};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
-		this._minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
-		this._maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
+		// min/max height where for a short period present in the config, but we do not want this complexity of our configuration.
+		// @deprecated remove config option in v.18, leave good default.
+		const _minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
+		const _maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
 
 		this._css = {
-			'--uui-textarea-min-height': this._minHeight ? `${this._minHeight}px` : 'reset',
-			'--uui-textarea-max-height': this._maxHeight ? `${this._maxHeight}px` : 'reset',
+			'--uui-textarea-min-height': _minHeight ? `${_minHeight}px` : 'reset',
+			'--uui-textarea-max-height': _maxHeight ? `${_maxHeight}px` : '33vh',
 		};
 	}
 
@@ -54,28 +67,38 @@ export class UmbPropertyEditorUITextareaElement
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-textarea')!);
 	}
 
+	override focus() {
+		return this.shadowRoot?.querySelector<UUITextareaElement>('uui-textarea')?.focus();
+	}
+
 	#onInput(event: InputEvent) {
 		const newValue = (event.target as HTMLTextAreaElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
 		return html`
 			<uui-textarea
-				label="Textarea"
+				.label=${this.localize.term('general_fieldFor', [this.name])}
 				style=${styleMap(this._css)}
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}
 				rows=${ifDefined(this._rows)}
 				.value=${this.value ?? ''}
 				@input=${this.#onInput}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
+				.maxlengthMessage=${() => {
+					const exceeded = (this.value?.length ?? 0) - (this._maxChars ?? 0);
+					return this.localize.term('textbox_characters_exceed', this._maxChars, exceeded);
+				}}
 				?readonly=${this.readonly}></uui-textarea>
 		`;
 	}
 
-	static styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-textarea {

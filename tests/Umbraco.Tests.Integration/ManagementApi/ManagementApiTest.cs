@@ -22,74 +22,138 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
 [TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
 public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {
+
+    private static readonly Dictionary<string, TokenModel> _tokenCache = new();
+    private static readonly SHA256 _sha256 = SHA256.Create();
+
+    protected abstract Expression<Func<T, object>> MethodSelector { get; set; }
+
+    protected string Url => GetManagementApiUrl(MethodSelector);
+
     [SetUp]
-    public async Task Setup()
+    public override void Setup()
     {
-        Client.DefaultRequestHeaders
-            .Accept
-            .Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
+        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
+
+        base.Setup();
+        Client.DefaultRequestHeaders.Accept.Clear();
+        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
     }
+
+    [SetUp]
+    public override void SetUp_Logging() =>
+        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.FullName}");
+
+    [OneTimeTearDown]
+    public void ClearCache() => _tokenCache.Clear();
 
     protected override void CustomTestAuthSetup(IServiceCollection services)
     {
         // We do not wanna fake anything, and thereby have protection
     }
 
-    protected abstract Expression<Func<T, object>> MethodSelector { get; }
+    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
+        await AuthenticateClientAsync(client,
+            async userService =>
+            {
+                IUser user;
+                if (isAdmin)
+                {
+                    user = await userService.GetRequiredUserAsync(Constants.Security.SuperUserKey);
+                    user.Username = user.Email = username;
+                    userService.Save(user);
+                }
+                else
+                {
+                    user = (await userService.CreateAsync(
+                        Constants.Security.SuperUserKey,
+                        new UserCreateModel
+                        {
+                            Email = username,
+                            Name = username,
+                            UserName = username,
+                            UserGroupKeys = new HashSet<Guid>(new[] { Constants.Security.EditorGroupKey })
+                        },
+                        true)).Result.CreatedUser;
+                }
 
-    protected virtual string Url => GetManagementApiUrl(MethodSelector);
+                return (user, password);
+            },
+            $"{username}:{isAdmin}");
 
-    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin)
+    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, Guid userGroupKey) =>
+        await AuthenticateClientAsync(
+            client,
+            async userService =>
+            {
+                IUser user;
+                if (userGroupKey == Constants.Security.AdminGroupKey)
+                {
+                    user = await userService.GetRequiredUserAsync(Constants.Security.SuperUserKey);
+                    user.Username = user.Email = username;
+                    userService.Save(user);
+                }
+                else
+                {
+                    user = (await userService.CreateAsync(
+                        Constants.Security.SuperUserKey,
+                        new UserCreateModel
+                        {
+                            Email = username,
+                            Name = username,
+                            UserName = username,
+                            UserGroupKeys = new HashSet<Guid>([userGroupKey]),
+                        },
+                        true)).Result.CreatedUser;
+                }
+
+                return (user, password);
+            },
+            $"{username}:{userGroupKey}");
+
+    protected async Task AuthenticateClientAsync(HttpClient client, Func<IUserService, Task<(IUser User, string Password)>> createUser, string cacheKey = null)
     {
-        Guid userKey = Constants.Security.SuperUserKey;
+        // Check cache first
+        if (!string.IsNullOrEmpty(cacheKey) && _tokenCache.TryGetValue(cacheKey, out var cachedToken))
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", cachedToken.AccessToken);
+            return;
+        }
+
         OpenIddictApplicationDescriptor backofficeOpenIddictApplicationDescriptor;
         var scopeProvider = GetRequiredService<ICoreScopeProvider>();
+
+        string username;
+        string password;
+
         using (var scope = scopeProvider.CreateCoreScope())
         {
             var userService = GetRequiredService<IUserService>();
             using var serviceScope = GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
 
-            IUser user;
-            if (isAdmin)
-            {
-                user = await userService.GetRequiredUserAsync(userKey);
-                user.Username = user.Email = username;
-                userService.Save(user);
-            }
-            else
-            {
-                user = (await userService.CreateAsync(
-                    Constants.Security.SuperUserKey,
-                    new UserCreateModel()
-                    {
-                        Email = username,
-                        Name = username,
-                        UserName = username,
-                        UserGroupKeys = new HashSet<Guid>(new[] { Constants.Security.EditorGroupKey })
-                    },
-                    true)).Result.CreatedUser;
-                userKey = user.Key;
-            }
+            var userCreationResult = await createUser(userService);
+            username = userCreationResult.User.Username;
+            password = userCreationResult.Password;
+            var userKey = userCreationResult.User.Key;
 
-
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-
+            var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.User);
 
             var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
                 new ChangeUserPasswordModel
                 {
-                    NewPassword = password,
-                    ResetPasswordToken = token.Result.ToUrlBase64(),
-                    UserKey = userKey
+                    NewPassword = password, ResetPasswordToken = token.Result.ToUrlBase64(), UserKey = userKey,
                 });
 
             Assert.IsTrue(changePasswordAttempt.Success);
@@ -110,12 +174,11 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
-        var codeVerifier = "12345"; // Just a dummy value we use in tests
-        var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
+        const string codeVerifier = "12345"; // Just a dummy value we use in tests
+        var codeChallenge = Convert.ToBase64String(_sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
             .TrimEnd("=");
 
-        var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) +
-                  $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}";
+        var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) + $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}";
         var authorizeResponse = await client.GetAsync(authorizationUrl);
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
@@ -128,17 +191,23 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 ["client_id"] = backofficeOpenIddictApplicationDescriptor.ClientId,
                 ["code"] = HttpUtility.ParseQueryString(authorizeResponse.Headers.Location.Query).Get("code"),
                 ["redirect_uri"] =
-                    backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault().AbsoluteUri
+                    backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault().AbsoluteUri,
             }));
 
         var tokenModel = await tokenResponse.Content.ReadFromJsonAsync<TokenModel>();
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenModel.AccessToken);
+
+        // Cache the token if cache key provided
+        if (!string.IsNullOrEmpty(cacheKey))
+        {
+            _tokenCache[cacheKey] = tokenModel;
+        }
     }
 
     private class TokenModel
     {
-        [JsonPropertyName("access_token")] public string AccessToken { get; set; }
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; }
     }
-
 }

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +24,9 @@ public class DetailsIndexerController : IndexerControllerBase
     /// <summary>
     ///     Check if the index has been rebuilt
     /// </summary>
-    /// <param name="indexName"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="indexName">The name of the index.</param>
+    /// <returns>The index details.</returns>
     /// <remarks>
     ///     This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
     ///     have a listener for the index op complete so we'll just check if that id is no longer there in the runtime cache
@@ -34,11 +35,11 @@ public class DetailsIndexerController : IndexerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(IndexResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
+    public Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
-            return await Task.FromResult(_indexPresentationFactory.Create(index!));
+            return Task.FromResult<ActionResult<IndexResponseModel?>>(_indexPresentationFactory.Create(index));
         }
 
         var invalidModelProblem = new ProblemDetails
@@ -49,7 +50,6 @@ public class DetailsIndexerController : IndexerControllerBase
             Type = "Error",
         };
 
-        return await Task.FromResult(NotFound(invalidModelProblem));
-
+        return Task.FromResult<ActionResult<IndexResponseModel?>>(NotFound(invalidModelProblem));
     }
 }

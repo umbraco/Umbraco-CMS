@@ -1,5 +1,24 @@
 import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_CREATE,
+	UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
+	UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
+	UMB_USER_PERMISSION_DOCUMENT_DELETE,
+	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
+	UMB_USER_PERMISSION_DOCUMENT_MOVE,
+	UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
+	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
+	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
+	UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_READ,
+	UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
+	UMB_USER_PERMISSION_DOCUMENT_SORT,
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+} from '@umbraco-cms/backoffice/document';
 
 export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
 
@@ -8,30 +27,48 @@ export const data: Array<UmbMockUserGroupModel> = [
 		id: 'user-group-administrators-id',
 		name: 'Administrators',
 		alias: 'admin',
+		description: 'Administrators have full access to all settings and features within the CMS.',
 		icon: 'icon-medal',
-		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [
-			'Umb.Document.Read',
-			'Umb.Document.Create',
-			'Umb.Document.Update',
-			'Umb.Document.Delete',
-			'Umb.Document.CreateBlueprint',
-			'Umb.Document.Notifications',
-			'Umb.Document.Publish',
-			'Umb.Document.Permissions',
-			'Umb.Document.Unpublish',
-			'Umb.Document.Duplicate',
-			'Umb.Document.Move',
-			'Umb.Document.Sort',
-			'Umb.Document.CultureAndHostnames',
-			'Umb.Document.PublicAccess',
-			'Umb.Document.Rollback',
+			UMB_USER_PERMISSION_DOCUMENT_READ,
+			UMB_USER_PERMISSION_DOCUMENT_CREATE,
+			UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+			UMB_USER_PERMISSION_DOCUMENT_DELETE,
+			UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
+			UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
+			UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+			UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
+			UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+			UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
+			UMB_USER_PERMISSION_DOCUMENT_MOVE,
+			UMB_USER_PERMISSION_DOCUMENT_SORT,
+			UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
+			UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS,
+			UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
+			UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
+			UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
 		],
 		permissions: [
 			{
 				$type: 'DocumentPermissionPresentationModel',
-				verbs: ['Umb.Document.Rollback'],
-				document: { id: 'simple-document-id' },
+				document: {
+					id: 'permissions-document-id',
+				},
+				verbs: ['Umb.Document.Read'],
+			},
+			{
+				$type: 'DocumentPermissionPresentationModel',
+				document: {
+					id: 'permissions-2-document-id',
+				},
+				verbs: ['Umb.Document.Create', 'Umb.Document.Read'],
+			},
+			{
+				$type: 'DocumentPermissionPresentationModel',
+				document: {
+					id: 'permissions-2-2-document-id',
+				},
+				verbs: ['Umb.Document.Delete', 'Umb.Document.Read'],
 			},
 		],
 		sections: [
@@ -49,11 +86,14 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,
+		flags: [],
 	},
 	{
 		id: 'user-group-editors-id',
 		name: 'Editors',
 		alias: 'editors',
+		description:
+			'The Editors group is responsible for creating, updating, and managing Content and Media within the platform. While they do not have access to system-level areas such as Settings, Users, or Packages, they play a crucial role in maintaining the website’s daily content operations. Editors start from the Media root node when handling media files, ensuring they can upload, modify, and organize assets relevant to their work.',
 		icon: 'icon-tools',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [
@@ -79,6 +119,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		flags: [],
 	},
 	{
 		id: 'user-group-sensitive-data-id',
@@ -95,6 +136,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,
+		flags: [],
 	},
 	{
 		id: 'user-group-translators-id',
@@ -111,6 +153,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		flags: [],
 	},
 	{
 		id: 'user-group-writers-id',
@@ -132,5 +175,23 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		flags: [],
+	},
+	{
+		id: 'forbidden',
+		name: 'Forbidden',
+		alias: 'forbidden',
+		icon: 'icon-lock',
+		documentStartNode: { id: 'forbidden-document-id' },
+		fallbackPermissions: [],
+		permissions: [],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		aliasCanBeChanged: false,
+		isDeletable: false,
+		flags: [],
 	},
 ];

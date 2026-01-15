@@ -10,9 +10,10 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     private static readonly Dictionary<Guid, Guid> ObjectTypeMap = new()
     {
         { Constants.ObjectTypes.DataType, Constants.ObjectTypes.DataTypeContainer },
+        { Constants.ObjectTypes.DocumentBlueprint, Constants.ObjectTypes.DocumentBlueprintContainer },
         { Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentTypeContainer },
         { Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MediaTypeContainer },
-        { Constants.ObjectTypes.DocumentBlueprint, Constants.ObjectTypes.DocumentBlueprintContainer },
+        { Constants.ObjectTypes.MemberType, Constants.ObjectTypes.MemberTypeContainer },
     };
 
     /// <summary>
@@ -66,12 +67,12 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     /// <returns>The object type of containers containing objects of the contained object type.</returns>
     public static Guid GetContainerObjectType(Guid containedObjectType)
     {
-        if (ObjectTypeMap.ContainsKey(containedObjectType) == false)
+        if (ObjectTypeMap.TryGetValue(containedObjectType, out Guid containerObjectType) == false)
         {
             throw new ArgumentException("Not a contained object type.", nameof(containedObjectType));
         }
 
-        return ObjectTypeMap[containedObjectType];
+        return containerObjectType;
     }
 
     /// <summary>
@@ -82,7 +83,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     public static Guid GetContainedObjectType(Guid containerObjectType)
     {
         Guid contained = ObjectTypeMap.FirstOrDefault(x => x.Value == containerObjectType).Key;
-        if (contained == null)
+        if (contained == default)
         {
             throw new ArgumentException("Not a container object type.", nameof(containerObjectType));
         }

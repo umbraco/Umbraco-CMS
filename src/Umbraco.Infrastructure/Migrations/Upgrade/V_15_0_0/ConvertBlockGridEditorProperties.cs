@@ -23,7 +23,10 @@ public class ConvertBlockGridEditorProperties : ConvertBlockEditorPropertiesBase
         IOptions<ConvertBlockEditorPropertiesOptions> options,
         ICoreScopeProvider coreScopeProvider)
         : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService, coreScopeProvider)
-        => SkipMigration = options.Value.SkipBlockGridEditors;
+    {
+        SkipMigration = options.Value.SkipBlockGridEditors;
+        ParallelizeMigration = options.Value.ParallelizeMigration;
+    }
 
     protected override IEnumerable<string> PropertyEditorAliases
         => new[] { Constants.PropertyEditors.Aliases.BlockGrid };

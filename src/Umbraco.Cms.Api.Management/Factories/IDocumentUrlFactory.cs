@@ -6,5 +6,8 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public interface IDocumentUrlFactory
 {
     Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content);
+
     Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems);
+
+    Task<DocumentUrlInfo?> GetPreviewUrlAsync(IContent content, string providerAlias, string? culture, string? segment);
 }

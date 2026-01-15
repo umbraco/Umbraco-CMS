@@ -21,7 +21,7 @@ public sealed class RoutableDocumentFilter : IRoutableDocumentFilter
     private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ConcurrentDictionary<string, bool> _routeChecks = new(StringComparer.OrdinalIgnoreCase);
-    private readonly object _routeLocker = new();
+    private readonly Lock _routeLocker = new();
     private readonly WebRoutingSettings _routingSettings;
     private object _initLocker = new();
     private bool _isInit;

@@ -7,7 +7,7 @@ const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Dropdown';
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -28,10 +28,9 @@ for (const dropdown of dropdownValues) {
       templateId = await umbracoApi.template.createTemplateWithDisplayingMulitpleStringValue(templateName, AliasHelper.toAlias(propertyName));
     } else {
       templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
-    }  
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, dropdown.value, dataTypeId, templateId, propertyName, documentTypeName);
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const contentURL = contentData.urls[0].url;
+    }
+    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, dropdown.value, dataTypeId, templateId, propertyName, documentTypeName);
+    const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
     // Act
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
@@ -39,6 +38,6 @@ for (const dropdown of dropdownValues) {
     // Assert
     dropdown.value.forEach(async value => {
       await umbracoUi.contentRender.doesContentRenderValueContainText(value);
-    }); 
+    });
   });
 }

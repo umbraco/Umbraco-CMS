@@ -12,10 +12,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
+internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
 {
-    public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RedirectUrlRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public RedirectUrlRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<RedirectUrlRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -28,10 +38,10 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         return dto == null ? null : Map(dto);
     }
 
-    public void DeleteAll() => Database.Execute("DELETE FROM umbracoRedirectUrl");
+    public void DeleteAll() => Database.Execute($"DELETE FROM {QuoteTableName("umbracoRedirectUrl")}");
 
     public void DeleteContentUrls(Guid contentKey) =>
-        Database.Execute("DELETE FROM umbracoRedirectUrl WHERE contentKey=@contentKey", new { contentKey });
+        Database.Execute($"DELETE FROM {QuoteTableName("umbracoRedirectUrl")} WHERE {QuoteColumnName("contentKey")}=@contentKey", new { contentKey });
 
     public void Delete(Guid id) => Database.Delete<RedirectUrlDto>(id);
 
@@ -133,8 +143,11 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
             .Where(
-                string.Format("{0}.{1} LIKE @path", SqlSyntax.GetQuotedTableName("umbracoNode"),
-                    SqlSyntax.GetQuotedColumnName("path")), new { path = "%," + rootContentId + ",%" })
+                string.Format(
+                    "{0}.{1} LIKE @path",
+                    QuoteTableName("umbracoNode"),
+                    QuoteColumnName("path")),
+                new { path = "%," + rootContentId + ",%" })
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
         total = Convert.ToInt32(result.TotalItems);
@@ -147,8 +160,10 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
             .Where(
-                string.Format("{0}.{1} LIKE @url", SqlSyntax.GetQuotedTableName("umbracoRedirectUrl"),
-                    SqlSyntax.GetQuotedColumnName("Url")),
+                string.Format(
+                    "{0}.{1} LIKE @url",
+                    QuoteTableName("umbracoRedirectUrl"),
+                    QuoteColumnName("Url")),
                 new { url = "%" + searchTerm.Trim().ToLowerInvariant() + "%" })
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
@@ -166,7 +181,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
     protected override IRedirectUrl? PerformGet(Guid id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Id == id);
-        RedirectUrlDto? dto = Database.Fetch<RedirectUrlDto>(sql.SelectTop(1)).FirstOrDefault();
+        RedirectUrlDto? dto = Database.FirstOrDefault<RedirectUrlDto>(sql);
         return dto == null ? null : Map(dto);
     }
 
@@ -191,15 +206,17 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         Sql<ISqlContext> sql = Sql();
         if (isCount)
         {
-            sql.Select(@"COUNT(*)
-FROM umbracoRedirectUrl
-JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
+            sql.Select($@"COUNT(*)
+FROM {QuoteTableName("umbracoRedirectUrl")}
+JOIN {QuoteTableName(NodeDto.TableName)}
+ON {QuoteTableName("umbracoRedirectUrl")}.{QuoteColumnName("contentKey")}={QuoteTableName(NodeDto.TableName)}.{QuoteColumnName("uniqueId")}");
         }
         else
         {
-            sql.Select(@"umbracoRedirectUrl.*, umbracoNode.id AS contentId
-FROM umbracoRedirectUrl
-JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
+            sql.Select($@"{QuoteTableName("umbracoRedirectUrl")}.*, {QuoteTableName(NodeDto.TableName)}.id AS contentId
+FROM {QuoteTableName("umbracoRedirectUrl")}
+JOIN {QuoteTableName(NodeDto.TableName)}
+ON {QuoteTableName("umbracoRedirectUrl")}.{QuoteColumnName("contentKey")}={QuoteTableName(NodeDto.TableName)}.{QuoteColumnName("uniqueId")}");
         }
 
         return sql;
@@ -209,7 +226,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { "DELETE FROM umbracoRedirectUrl WHERE id = @id" };
+        var list = new List<string> { $"DELETE FROM {QuoteTableName("umbracoRedirectUrl")} WHERE id = @id" };
         return list;
     }
 

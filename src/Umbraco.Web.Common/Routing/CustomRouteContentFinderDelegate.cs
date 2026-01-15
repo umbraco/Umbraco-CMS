@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Web.Common.Routing;
 
-internal class CustomRouteContentFinderDelegate
+internal sealed class CustomRouteContentFinderDelegate
 {
     private readonly Func<ActionExecutingContext, IPublishedContent> _findContent;
 

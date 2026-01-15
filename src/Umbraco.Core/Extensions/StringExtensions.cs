@@ -51,22 +51,37 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Convert a path to node ids in the order from right to left (deepest to shallowest)
+    ///     Convert a path to node ids in the order from right to left (deepest to shallowest).
     /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
+    /// <param name="path">The path string expected as a comma delimited collection of integers.</param>
+    /// <returns>An array of integers matching the provided path.</returns>
     public static int[] GetIdsFromPathReversed(this string path)
     {
-        var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x =>
-                int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output)
-                    ? Attempt<int>.Succeed(output)
-                    : Attempt<int>.Fail())
-            .Where(x => x.Success)
-            .Select(x => x.Result)
-            .Reverse()
-            .ToArray();
-        return nodeIds;
+        ReadOnlySpan<char> pathSpan = path.AsSpan();
+
+        // Using the explicit enumerator (while/MoveNext) over the SpanSplitEnumerator in a foreach loop to avoid any compiler
+        // boxing of the ref struct enumerator.
+        // This prevents potential InvalidProgramException across compilers/JITs ("Cannot create boxed ByRef-like values.").
+        MemoryExtensions.SpanSplitEnumerator<char> pathSegmentsEnumerator = pathSpan.Split(Constants.CharArrays.Comma);
+
+        List<int> nodeIds = [];
+        while (pathSegmentsEnumerator.MoveNext())
+        {
+            Range rangeOfPathSegment = pathSegmentsEnumerator.Current;
+            if (int.TryParse(pathSpan[rangeOfPathSegment], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pathSegment))
+            {
+                nodeIds.Add(pathSegment);
+            }
+        }
+
+        var result = new int[nodeIds.Count];
+        var resultIndex = 0;
+        for (int i = nodeIds.Count - 1; i >= 0; i--)
+        {
+            result[resultIndex++] = nodeIds[i];
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -79,7 +94,7 @@ public static class StringExtensions
     public static string StripFileExtension(this string fileName)
     {
         // filenames cannot contain line breaks
-        if (fileName.Contains(Environment.NewLine) || fileName.Contains("\r") || fileName.Contains("\n"))
+        if (fileName.Contains('\n') || fileName.Contains('\r'))
         {
             return fileName;
         }
@@ -151,14 +166,16 @@ public static class StringExtensions
 
     public static string ReplaceNonAlphanumericChars(this string input, char replacement)
     {
-        var inputArray = input.ToCharArray();
-        var outputArray = new char[input.Length];
-        for (var i = 0; i < inputArray.Length; i++)
+        var chars = input.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
         {
-            outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
+            if (!char.IsLetterOrDigit(chars[i]))
+            {
+                chars[i] = replacement;
+            }
         }
 
-        return new string(outputArray);
+        return new string(chars);
     }
 
     /// <summary>
@@ -208,7 +225,7 @@ public static class StringExtensions
 
         var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
 
-        if (url.Contains("?"))
+        if (url.Contains('?'))
         {
             return url + string.Join("&", nonEmpty).EnsureStartsWith('&');
         }
@@ -434,8 +451,7 @@ public static class StringExtensions
     {
         var delimiters = new[] { delimiter };
         return !list.IsNullOrWhiteSpace()
-            ? list.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
-                .Select(i => i.Trim())
+            ? list.Split(delimiters, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .ToList()
             : new List<string>();
     }
@@ -499,8 +515,7 @@ public static class StringExtensions
         var convertToHex = input.ConvertToHex();
         var hexLength = convertToHex.Length < 32 ? convertToHex.Length : 32;
         var hex = convertToHex[..hexLength].PadLeft(32, '0');
-        Guid output = Guid.Empty;
-        return Guid.TryParse(hex, out output) ? output : Guid.Empty;
+        return Guid.TryParse(hex, out Guid output) ? output : Guid.Empty;
     }
 
     /// <summary>
@@ -617,7 +632,7 @@ public static class StringExtensions
         compare.EndsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);
 
     public static bool InvariantContains(this string compare, string compareTo) =>
-        compare.IndexOf(compareTo, StringComparison.OrdinalIgnoreCase) >= 0;
+        compare.Contains(compareTo, StringComparison.OrdinalIgnoreCase);
 
     public static bool InvariantContains(this IEnumerable<string> compare, string compareTo) =>
         compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);
@@ -692,7 +707,7 @@ public static class StringExtensions
 
         if (input.Length == 0)
         {
-            return Array.Empty<byte>();
+            return [];
         }
 
         // calc array size - must be groups of 4
@@ -743,13 +758,7 @@ public static class StringExtensions
     /// <returns>The hashed string</returns>
     private static string GenerateHash(this string str, string? hashType)
     {
-        HashAlgorithm? hasher = null;
-
-        // create an instance of the correct hashing provider based on the type passed in
-        if (hashType is not null)
-        {
-            hasher = HashAlgorithm.Create(hashType);
-        }
+        HashAlgorithm? hasher = CreateHashAlgorithm(hashType);
 
         if (hasher == null)
         {
@@ -780,6 +789,33 @@ public static class StringExtensions
     }
 
     /// <summary>
+    ///     Creates a hash algorithm instance by name.
+    /// </summary>
+    /// <param name="algorithmName">The algorithm name (e.g., "SHA1", "SHA256", "MD5").</param>
+    /// <returns>A HashAlgorithm instance, or null if the algorithm is not recognized.</returns>
+    private static HashAlgorithm? CreateHashAlgorithm(string? algorithmName)
+    {
+        if (string.IsNullOrEmpty(algorithmName))
+        {
+            return null;
+        }
+
+        return algorithmName.ToUpperInvariant() switch
+        {
+            "SHA1" or "SHA-1" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA1" => SHA1.Create(),
+            "SHA256" or "SHA-256" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA256" => SHA256.Create(),
+            "SHA384" or "SHA-384" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA384" => SHA384.Create(),
+            "SHA512" or "SHA-512" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA512" => SHA512.Create(),
+            "MD5" or "SYSTEM.SECURITY.CRYPTOGRAPHY.MD5" => MD5.Create(),
+            "HMACSHA1" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA1" => new HMACSHA1(),
+            "HMACSHA256" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA256" => new HMACSHA256(),
+            "HMACSHA384" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA384" => new HMACSHA384(),
+            "HMACSHA512" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA512" => new HMACSHA512(),
+            _ => null
+        };
+    }
+
+    /// <summary>
     ///     Encodes a string so that it is 'safe' for URLs, files, etc..
     /// </summary>
     /// <param name="input"></param>
@@ -807,7 +843,7 @@ public static class StringExtensions
         }
 
         // replace chars that would cause problems in URLs
-        var chArray = new char[pos];
+        Span<char> chArray = pos <= 1024 ? stackalloc char[pos] : new char[pos];
         for (var i = 0; i < pos; i++)
         {
             var ch = str[i];
@@ -902,7 +938,8 @@ public static class StringExtensions
         return text;
     }
 
-    public static string OrIfNullOrWhiteSpace(this string input, string alternative) =>
+    [return: NotNullIfNotNull(nameof(alternative))]
+    public static string? OrIfNullOrWhiteSpace(this string? input, string? alternative) =>
         !string.IsNullOrWhiteSpace(input)
             ? input
             : alternative;
@@ -1293,8 +1330,7 @@ public static class StringExtensions
         }
 
         // most bytes from the hash are copied straight to the bytes of the new GUID (steps 5-7, 9, 11-12)
-        var newGuid = new byte[16];
-        Array.Copy(hash, 0, newGuid, 0, 16);
+        Span<byte> newGuid = hash.AsSpan()[..16];
 
         // set the four most significant bits (bits 12 through 15) of the time_hi_and_version field to the appropriate 4-bit version number from Section 4.1.3 (step 8)
         newGuid[6] = (byte)((newGuid[6] & 0x0F) | (version << 4));
@@ -1308,7 +1344,7 @@ public static class StringExtensions
     }
 
     // Converts a GUID (expressed as a byte array) to/from network order (MSB-first).
-    internal static void SwapByteOrder(byte[] guid)
+    internal static void SwapByteOrder(Span<byte> guid)
     {
         SwapBytes(guid, 0, 3);
         SwapBytes(guid, 1, 2);
@@ -1316,12 +1352,7 @@ public static class StringExtensions
         SwapBytes(guid, 6, 7);
     }
 
-    private static void SwapBytes(byte[] guid, int left, int right)
-    {
-        var temp = guid[left];
-        guid[left] = guid[right];
-        guid[right] = temp;
-    }
+    private static void SwapBytes(Span<byte> guid, int left, int right) => (guid[left], guid[right]) = (guid[right], guid[left]);
 
     /// <summary>
     ///     Checks if a given path is a full path including drive letter
@@ -1571,4 +1602,22 @@ public static class StringExtensions
     // this is by far the fastest way to find string needles in a string haystack
     public static int CountOccurrences(this string haystack, string needle)
         => haystack.Length - haystack.Replace(needle, string.Empty).Length;
+
+    /// <summary>
+    /// Verifies the provided string is a valid culture code and returns it in a consistent casing.
+    /// </summary>
+    /// <param name="culture">Culture code.</param>
+    /// <returns>Culture code in standard casing.</returns>
+    public static string? EnsureCultureCode(this string? culture)
+    {
+        if (string.IsNullOrEmpty(culture) || culture == "*")
+        {
+            return culture;
+        }
+
+        // Create as CultureInfo instance from provided name so we can ensure consistent casing of culture code when persisting.
+        // This will accept mixed case but once created have a `Name` property that is consistently and correctly cased.
+        // Will throw in an invalid culture code is provided.
+        return new CultureInfo(culture).Name;
+    }
 }

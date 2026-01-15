@@ -1,41 +1,42 @@
-import type { MediaValueType } from '../../property-editors/upload-field/types.js';
-import { getMimeTypeFromExtension } from './utils.js';
+import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
-import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
-import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
-import { UmbId } from '@umbraco-cms/backoffice/id';
-import {
-	css,
-	html,
-	nothing,
-	ifDefined,
-	customElement,
-	property,
-	query,
-	state,
-	type PropertyValueMap,
-} from '@umbraco-cms/backoffice/external/lit';
-import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { getMimeTypeFromExtension } from './utils.js';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type {
+	UmbDropzoneChangeEvent,
+	UmbInputDropzoneElement,
+	UmbUploadableFile,
+} from '@umbraco-cms/backoffice/dropzone';
+import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-upload-field')
-export class UmbInputUploadFieldElement extends UmbLitElement {
-	@property({ type: Object })
-	set value(value: MediaValueType) {
+export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValueType, typeof UmbLitElement>(
+	UmbLitElement,
+) {
+	@property({ type: Object, attribute: false })
+	override set value(value: UmbMediaValueType | undefined) {
+		super.value = value;
 		this.#src = value?.src ?? '';
+		this.#setPreviewAlias();
 	}
-	get value(): MediaValueType {
-		return {
-			src: this.#src,
-			temporaryFileId: this.temporaryFile?.temporaryUnique,
-		};
+	override get value(): UmbMediaValueType | undefined {
+		if (this.#src || this.temporaryFile?.temporaryUnique) {
+			return {
+				src: this.#src,
+				temporaryFileId: this.temporaryFile?.temporaryUnique,
+			};
+		}
+		return undefined;
 	}
-
 	#src = '';
 
 	/**
@@ -43,39 +44,31 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	 * @type {Array<string>}
 	 * @default
 	 */
-	@property({ type: Array })
-	set allowedFileExtensions(value: Array<string>) {
-		this.#setExtensions(value);
-	}
-	get allowedFileExtensions(): Array<string> | undefined {
-		return this._extensions;
-	}
+	@property({ type: Array, attribute: 'allowed-file-extensions' })
+	allowedFileExtensions?: Array<string>;
 
 	@state()
 	public temporaryFile?: UmbTemporaryFileModel;
 
 	@state()
-	private _extensions?: string[];
-
-	@state()
 	private _previewAlias?: string;
 
-	@query('#dropzone')
-	private _dropzone?: UUIFileDropzoneElement;
-
-	#manager = new UmbTemporaryFileManager(this);
+	@state()
+	private _serverUrl = '';
 
 	#manifests: Array<ManifestFileUploadPreview> = [];
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this._serverUrl = context?.getServerUrl() ?? '';
+		});
 	}
 
-	override updated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
-		super.updated(changedProperties);
-		if (changedProperties.has('value') && changedProperties.get('value')?.src !== this.value.src) {
-			this.#setPreviewAlias();
-		}
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#clearObjectUrl();
 	}
 
 	async #getManifests() {
@@ -88,33 +81,35 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		return this.#manifests;
 	}
 
-	#setExtensions(extensions: Array<string>) {
-		if (!extensions?.length) {
-			this._extensions = undefined;
-			return;
-		}
-		// TODO: The dropzone uui component does not support file extensions without a dot. Remove this when it does.
-		this._extensions = extensions?.map((extension) => `.${extension}`);
-	}
-
 	async #setPreviewAlias(): Promise<void> {
-		this._previewAlias = await this.#getPreviewElementAlias();
+		// Store current src to detect changes during async operation
+		const currentSrc = this.#src;
+		const alias = await this.#getPreviewElementAlias();
+
+		// Only update if src hasn't changed in the meantime (prevents race conditions)
+		if (this.#src === currentSrc) {
+			this._previewAlias = alias;
+		}
 	}
 
 	async #getPreviewElementAlias() {
-		if (!this.value.src) return;
+		if (!this.value?.src) return;
 		const manifests = await this.#getManifests();
 		const fallbackAlias = manifests.find((manifest) =>
 			stringOrStringArrayContains(manifest.forMimeTypes, '*/*'),
 		)?.alias;
 
-		const mimeType = this.#getMimeTypeFromPath(this.value.src);
+		let mimeType: string | null = null;
+		if (this.temporaryFile?.file) {
+			mimeType = this.temporaryFile.file.type;
+		} else {
+			mimeType = this.#getMimeTypeFromPath(this.value.src);
+		}
+
 		if (!mimeType) return fallbackAlias;
 
 		// Check for an exact match
-		const exactMatch = manifests.find((manifest) => {
-			return stringOrStringArrayContains(manifest.forMimeTypes, mimeType);
-		});
+		const exactMatch = manifests.find((manifest) => stringOrStringArrayContains(manifest.forMimeTypes, mimeType));
 		if (exactMatch) return exactMatch.alias;
 
 		// Check for wildcard match (e.g. image/*)
@@ -146,68 +141,64 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		return getMimeTypeFromExtension('.' + extension);
 	}
 
-	async #onUpload(e: UUIFileDropzoneEvent) {
-		//Property Editor for Upload field will always only have one file.
-		const item: UmbTemporaryFileModel = {
-			temporaryUnique: UmbId.new(),
-			file: e.detail.files[0],
-		};
-
-		const upload = this.#manager.uploadOne(item);
-
-		const reader = new FileReader();
-		reader.onload = () => {
-			this.value = { src: reader.result as string };
-		};
-		reader.readAsDataURL(item.file);
-
-		const uploaded = await upload;
-		if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-			this.temporaryFile = { temporaryUnique: item.temporaryUnique, file: item.file };
-			this.dispatchEvent(new UmbChangeEvent());
-		}
-	}
-
-	#handleBrowse(e: Event) {
-		if (!this._dropzone) return;
+	async #onUpload(e: UmbDropzoneChangeEvent) {
 		e.stopImmediatePropagation();
-		this._dropzone.browse();
+
+		const target = e.target as UmbInputDropzoneElement;
+		const file = target.value?.[0];
+
+		if (file?.status !== UmbFileDropzoneItemStatus.COMPLETE) return;
+
+		this.temporaryFile = (file as UmbUploadableFile).temporaryFile;
+
+		if (!this.temporaryFile?.file) {
+			console.error('No file available for upload');
+			return;
+		}
+
+		this.#clearObjectUrl();
+
+		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
+		this.value = { src: blobUrl };
+
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
-		if (this.value.src && this._previewAlias) {
-			return this.#renderFile(this.value.src, this._previewAlias, this.temporaryFile?.file);
-		} else {
+		if (!this.temporaryFile && !this.value?.src) {
 			return this.#renderDropzone();
 		}
+
+		if (this.value?.src && this._previewAlias) {
+			return this.#renderFile(this.value.src);
+		}
+
+		return nothing;
 	}
 
 	#renderDropzone() {
 		return html`
-			<uui-file-dropzone
-				@click=${this.#handleBrowse}
-				id="dropzone"
-				label="dropzone"
-				@change="${this.#onUpload}"
-				accept="${ifDefined(this._extensions?.join(', '))}">
-				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#handleBrowse}"></uui-button>
-			</uui-file-dropzone>
+			<umb-input-dropzone
+				standalone
+				disable-folder-upload
+				accept=${ifDefined(this.allowedFileExtensions ? this.allowedFileExtensions.join(',') : undefined)}
+				@change=${this.#onUpload}></umb-input-dropzone>
 		`;
 	}
 
-	#renderFile(src: string, previewAlias: string, file?: File) {
-		if (!previewAlias) return 'An error occurred. No previewer found for the file type.';
+	#renderFile(src: string) {
+		if (!src.startsWith('blob:')) {
+			src = this._serverUrl + src;
+		}
+
 		return html`
 			<div id="wrapper">
-				<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
+				<div id="wrapperInner">
 					<umb-extension-slot
 						type="fileUploadPreview"
-						.props=${{ path: src, file: file }}
-						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === previewAlias}>
+						.props=${{ path: src, file: this.temporaryFile?.file }}
+						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
 					</umb-extension-slot>
-					${this.temporaryFile?.status === TemporaryFileStatus.WAITING
-						? html`<umb-temporary-file-badge></umb-temporary-file-badge>`
-						: nothing}
 				</div>
 			</div>
 			${this.#renderButtonRemove()}
@@ -215,18 +206,36 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#renderButtonRemove() {
-		return html`<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-			<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
-		</uui-button>`;
+		return html`
+			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
+				<uui-icon name="icon-trash"></uui-icon>
+				<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
+			</uui-button>
+		`;
 	}
 
 	#handleRemove() {
+		// If the upload promise happens to be in progress, cancel it.
+		this.temporaryFile?.abortController?.abort();
+
+		this.#clearObjectUrl();
+
 		this.value = { src: undefined };
 		this.temporaryFile = undefined;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	/**
+	 * If there is a former File, revoke the object URL.
+	 */
+	#clearObjectUrl(): void {
+		if (this.value?.src?.startsWith('blob:')) {
+			URL.revokeObjectURL(this.value.src);
+		}
+	}
+
 	static override readonly styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				position: relative;
@@ -241,6 +250,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 				gap: var(--uui-size-space-4);
 				box-sizing: border-box;
+				margin-bottom: var(--uui-size-space-3);
 			}
 
 			#wrapper:has(umb-input-upload-field-file) {
@@ -249,17 +259,10 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 			}
 
-			uui-file-dropzone {
+			#wrapperInner {
 				position: relative;
-				display: block;
-				padding: 3px; /** Dropzone background is blurry and covers slightly into other elements. Hack to avoid this */
-			}
-			uui-file-dropzone::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				cursor: pointer;
-				border: 1px dashed var(--uui-color-divider-emphasis);
+				display: flex;
+				width: 100%;
 			}
 		`,
 	];

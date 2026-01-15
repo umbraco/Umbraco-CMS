@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -23,9 +24,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.ImageCropper,
     ValueType = ValueTypes.Json,
     ValueEditorIsReusable = true)]
-public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
-    INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
-    INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
+public class ImageCropperPropertyEditor : DataEditor,
+    IMediaUrlGenerator,
+    INotificationHandler<ContentCopiedNotification>,
+    INotificationHandler<ContentDeletedNotification>,
+    INotificationHandler<MediaDeletedNotification>,
+    INotificationHandler<MediaSavingNotification>,
+    INotificationHandler<MediaMovedToRecycleBinNotification>,
+    INotificationHandler<MediaMovedNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
@@ -33,8 +39,9 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly IIOHelper _ioHelper;
     private readonly ILogger<ImageCropperPropertyEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
-    private ContentSettings _contentSettings;
     private readonly IJsonSerializer _jsonSerializer;
+
+    private ContentSettings _contentSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
@@ -50,16 +57,16 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory)
     {
-        _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-        _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-        _autoFillProperties =
-            uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
+        _mediaFileManager = mediaFileManager;
+        _ioHelper = ioHelper;
+        _autoFillProperties = uploadAutoFillProperties;
         _contentService = contentService;
         _jsonSerializer = jsonSerializer;
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
+        _contentSettings = contentSettings.CurrentValue;
         contentSettings.OnChange(x => _contentSettings = x);
+
         SupportsReadOnly = true;
     }
 
@@ -106,7 +113,10 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
                     ? _jsonSerializer.Deserialize<ImageCropperValue>(stringValue)
                     : null) ?? new ImageCropperValue();
                 newValue.Src = _mediaFileManager.FileSystem.GetUrl(copyPath);
-                notification.Copy.SetValue(property.Alias,  _jsonSerializer.Serialize(newValue), propertyValue.Culture,
+                notification.Copy.SetValue(
+                    property.Alias,
+                    _jsonSerializer.Serialize(newValue),
+                    propertyValue.Culture,
                     propertyValue.Segment);
                 isUpdated = true;
             }
@@ -119,10 +129,25 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
+    /// <inheritdoc/>
     public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
-    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    /// <inheritdoc/>
+    public void Handle(MediaDeletedNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection)
+        {
+            RecycleBinMediaProtectionHelper.DeleteContainedFilesWithProtection(
+                notification.DeletedEntities,
+                ContainedFilePaths,
+                _mediaFileManager);
+            return;
+        }
 
+        DeleteContainedFiles(notification.DeletedEntities);
+    }
+
+    /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
     {
         foreach (IMedia entity in notification.SavedEntities)
@@ -131,6 +156,34 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
+    /// <inheritdoc/>
+    public void Handle(MediaMovedToRecycleBinNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        SuffixContainedFiles(
+            notification.MoveInfoCollection
+                .Select(x => x.Entity));
+    }
+
+    /// <inheritdoc/>
+    public void Handle(MediaMovedNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        RemoveSuffixFromContainedFiles(
+            notification.MoveInfoCollection
+                .Where(x => x.OriginalPath.StartsWith($"{Constants.System.RootString},{Constants.System.RecycleBinMediaString}"))
+                .Select(x => x.Entity));
+    }
+
+    /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <summary>
@@ -233,10 +286,34 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         return relative ? _mediaFileManager.FileSystem.GetRelativePath(source) : source;
     }
 
+    /// <summary>
+    /// Deletes all file upload property files contained within a collection of content entities.
+    /// </summary>
+    /// <param name="deletedEntities">Delete media entities.</param>
     private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
     {
         IEnumerable<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
         _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been moved to the recycle bin.
+    /// </summary>
+    /// <param name="trashedMedia">Media entities that have been moved to the recycle bin.</param>
+    private void SuffixContainedFiles(IEnumerable<IMedia> trashedMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
+        RecycleBinMediaProtectionHelper.SuffixContainedFiles(filePathsToRename, _mediaFileManager);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been restore from the recycle bin.
+    /// </summary>
+    /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
+    private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia);
+        RecycleBinMediaProtectionHelper.RemoveSuffixFromContainedFiles(filePathsToRename, _mediaFileManager);
     }
 
     /// <summary>
@@ -273,7 +350,8 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
                         // are fixing that anomaly here - does not make any sense at all but... bah...
                         property.SetValue(
                             _jsonSerializer.Serialize(new LightWeightImageCropperValue { Src = stringValue }),
-                            pvalue.Culture, pvalue.Segment);
+                            pvalue.Culture,
+                            pvalue.Segment);
                     }
 
                     if (source is null)
@@ -290,7 +368,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     }
 
     // for efficient value deserialization, we don't want to deserialize more than we need to (we don't need crops, focal point etc.)
-    private class LightWeightImageCropperValue
+    private sealed class LightWeightImageCropperValue
     {
         public string? Src { get; set; } = string.Empty;
     }

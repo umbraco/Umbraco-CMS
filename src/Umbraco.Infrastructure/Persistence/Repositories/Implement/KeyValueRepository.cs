@@ -12,10 +12,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
+internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
 {
-    public KeyValueRepository(IScopeAccessor scopeAccessor, ILogger<KeyValueRepository> logger)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    public KeyValueRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<KeyValueRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -56,7 +65,7 @@ internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKe
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => Constants.DatabaseSchema.Tables.KeyValue + ".key = @id";
+    protected override string GetBaseWhereClause() => QuoteTableName(Constants.DatabaseSchema.Tables.KeyValue) + ".key = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 

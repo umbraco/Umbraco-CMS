@@ -16,7 +16,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 {
     private MediaPickerWithCropsValueConverter MediaPickerWithCropsValueConverter()
     {
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiUrlProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(
@@ -40,7 +40,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var publishedPropertyType = SetupMediaPropertyType(false);
         var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800);
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
@@ -84,7 +84,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var mediaKey1 = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800);
         var mediaKey2 = SetupMedia("My other media", ".png", 800, 600, "My other alt text", 200);
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
@@ -166,7 +166,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         };
         var mediaKey = SetupMedia("Some media", ".123", 123, 456, "My alt text", 789, mediaCrops);
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
@@ -226,7 +226,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         };
         var mediaKey = SetupMedia("Some media", ".123", 123, 456, "My alt text", 789, mediaCrops);
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
@@ -298,7 +298,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MediaPicker3Configuration
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MediaPicker3Configuration
         {
             Multiple = multiSelect,
             EnableLocalFocalPoint = true,

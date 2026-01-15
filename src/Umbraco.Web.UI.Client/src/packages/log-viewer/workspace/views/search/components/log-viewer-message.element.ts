@@ -1,9 +1,9 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
-import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, customElement, html, property, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 //TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
@@ -51,53 +51,52 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		}
 	}
 
-	private _searchMenuData: Array<{ label: string; href: () => string; icon: string; title: string }> = [
-		{
-			label: 'Search in Google',
-			title: '@logViewer_searchThisMessageWithGoogle',
-			href: () => `https://www.google.com/search?q=${this.renderedMessage}`,
-			icon: 'https://www.google.com/favicon.ico',
-		},
-		{
-			label: 'Search in Bing',
-			title: 'Search this message with Bing',
-			href: () => `https://www.bing.com/search?q=${this.renderedMessage}`,
-			icon: 'https://www.bing.com/favicon.ico',
-		},
-		{
-			label: 'Search in OurUmbraco',
-			title: 'Search this message on Our Umbraco forums and docs',
-			href: () => `https://our.umbraco.com/search?q=${this.renderedMessage}&content=wiki,forum,documentation`,
-			icon: 'https://our.umbraco.com/assets/images/app-icons/favicon.png',
-		},
-		{
-			label: 'Search in OurUmbraco with Google',
-			title: 'Search Our Umbraco forums using Google',
-			href: () =>
-				`https://www.google.co.uk/?q=site:our.umbraco.com ${this.renderedMessage}&safe=off#q=site:our.umbraco.com ${
-					this.renderedMessage
-				} ${this.properties.find((property) => property.name === 'SourceContext')?.value}&safe=off"`,
-			icon: 'https://www.google.com/favicon.ico',
-		},
-		{
-			label: 'Search Umbraco Source',
-			title: 'Search within Umbraco source code on Github',
-			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/search?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
-			icon: 'https://github.githubassets.com/favicon.ico',
-		},
-		{
-			label: 'Search Umbraco Issues',
-			title: 'Search Umbraco Issues on Github',
-			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/issues?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
-			icon: 'https://github.githubassets.com/favicon.ico',
-		},
-	];
+	private _getSearchMenuData() {
+		return [
+			{
+				label: this.localize.term('logViewer_searchWithGoogle'),
+				title: this.localize.term('logViewer_searchThisMessageWithGoogle'),
+				href: () => `https://www.google.com/search?q=${this.renderedMessage}`,
+				icon: 'icon-google',
+			},
+			{
+				label: this.localize.term('logViewer_searchWithBing'),
+				title: this.localize.term('logViewer_searchThisMessageWithBing'),
+				href: () => `https://www.bing.com/search?q=${this.renderedMessage}`,
+				icon: 'icon-search',
+			},
+			{
+				label: this.localize.term('logViewer_searchOurUmbraco'),
+				title: this.localize.term('logViewer_searchThisMessageOnOurUmbracoForumsAndDocs'),
+				href: () => `https://forum.umbraco.com/search?q=${this.renderedMessage}`,
+				icon: 'icon-umbraco',
+			},
+			{
+				label: this.localize.term('logViewer_searchOurUmbracoWithGoogle'),
+				title: this.localize.term('logViewer_searchOurUmbracoForumsUsingGoogle'),
+				href: () => `https://www.google.com/?q=site:forum.umbraco.com%20${this.renderedMessage}`,
+				icon: 'icon-google',
+			},
+			{
+				label: this.localize.term('logViewer_searchUmbracoSource'),
+				title: this.localize.term('logViewer_searchWithinUmbracoSourceCodeOnGithub'),
+				href: () =>
+					`https://github.com/umbraco/Umbraco-CMS/search?q=${
+						this.properties.find((property) => property.name === 'SourceContext')?.value
+					}`,
+				icon: 'icon-github',
+			},
+			{
+				label: this.localize.term('logViewer_searchUmbracoIssues'),
+				title: this.localize.term('logViewer_searchUmbracoIssuesOnGithub'),
+				href: () =>
+					`https://github.com/umbraco/Umbraco-CMS/issues?q=${
+						this.properties.find((property) => property.name === 'SourceContext')?.value
+					}`,
+				icon: 'icon-github',
+			},
+		];
+	}
 
 	private _propertiesWithSearchMenu: Array<string> = ['HttpRequestNumber', 'SourceContext', 'MachineName'];
 
@@ -113,7 +112,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 		query = {
 			...query,
-			lq: encodeURIComponent(`${name}=${sanitizedValue}`),
+			lq: `${name}=${sanitizedValue}`,
 		};
 
 		const queryString = toQueryString(query);
@@ -139,7 +138,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				${this.exception ? html`<pre id="exception">${this.exception}</pre>` : ''}
 				<ul id="properties-list">
 					<li class="property">
-						<div class="property-name">Timestamp</div>
+						<div class="property-name"><umb-localize key="logViewer_timestamp">Timestamp</umb-localize></div>
 						<div class="property-value">${this.date?.toLocaleString()}</div>
 					</li>
 					<li class="property">
@@ -156,8 +155,8 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 										? html`<uui-button
 												compact
 												look="secondary"
-												label="Find logs with ${property.name}"
-												title="Find logs with ${property.name}"
+												label=${this.localize.term('logViewer_findLogsWith', property.name ?? '')}
+												title=${this.localize.term('logViewer_findLogsWith', property.name ?? '')}
 												href=${`section/settings/workspace/logviewer/view/search/?${this._findLogsWithProperty(
 													property,
 												)}`}>
@@ -168,17 +167,27 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 							</li>`,
 					)}
 				</ul>
-				<umb-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
-					<span slot="label"><uui-icon name="icon-search"></uui-icon> Search</span>
-					${this._searchMenuData.map(
+				<umb-dropdown
+					look="secondary"
+					placement="bottom-start"
+					id="search-button"
+					label=${this.localize.term('general_search')}>
+					<span slot="label"
+						><uui-icon name="icon-search"></uui-icon> <umb-localize key="general_search">Search</umb-localize></span
+					>
+					${this._getSearchMenuData().map(
 						(menuItem) => html`
 							<uui-menu-item
 								class="search-item"
-								href="${menuItem.href()}"
+								href=${menuItem.href()}
 								target="_blank"
-								label="${menuItem.label}"
-								title="${menuItem.title}">
-								<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
+								label=${menuItem.label}
+								title=${menuItem.title}>
+								${when(
+									menuItem.icon,
+									(icon) => html`<uui-icon slot="icon" name=${icon}></uui-icon>`,
+									() => html`<uui-icon slot="icon" name="icon-search"></uui-icon>`,
+								)}
 							</uui-menu-item>
 						`,
 					)}
@@ -187,7 +196,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host > details {
@@ -237,7 +246,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			pre {
 				border-left: 4px solid #d42054;
-				color: #303033;
 				display: block;
 				font-family:
 					Lato,

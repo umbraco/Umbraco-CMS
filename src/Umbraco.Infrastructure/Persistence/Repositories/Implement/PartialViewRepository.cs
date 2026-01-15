@@ -6,14 +6,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
+internal sealed class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
 {
     public PartialViewRepository(FileSystems fileSystems)
         : base(fileSystems.PartialViewsFileSystem)
     {
     }
 
-    protected PartialViewRepository(IFileSystem? fileSystem)
+    private PartialViewRepository(IFileSystem? fileSystem)
         : base(fileSystem)
     {
     }

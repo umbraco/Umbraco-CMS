@@ -25,10 +25,13 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
         IOptions<ConvertBlockEditorPropertiesOptions> options,
         ICoreScopeProvider coreScopeProvider)
         : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService, coreScopeProvider)
-        => SkipMigration = options.Value.SkipRichTextEditors;
+    {
+        SkipMigration = options.Value.SkipRichTextEditors;
+        ParallelizeMigration = options.Value.ParallelizeMigration;
+    }
 
     protected override IEnumerable<string> PropertyEditorAliases
-        => new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.RichText };
+        => new[] { "Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.RichText };
 
     protected override EditorValueHandling DetermineEditorValueHandling(object editorValue)
         => editorValue is RichTextEditorValue richTextEditorValue

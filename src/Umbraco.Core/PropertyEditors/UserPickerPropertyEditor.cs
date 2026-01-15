@@ -21,7 +21,7 @@ public class UserPickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<UserPickerPropertyValueEditor>(Attribute!);
 
-    private class UserPickerPropertyValueEditor : DataValueEditor
+    private sealed class UserPickerPropertyValueEditor : DataValueEditor
     {
         private readonly IUserService _userService;
 

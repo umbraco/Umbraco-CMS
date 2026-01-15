@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -9,7 +9,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 
-internal class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
+internal sealed class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
@@ -24,7 +24,8 @@ internal class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApp
         _globalSettings = globalSettings.Value;
     }
 
-    public async Task HandleAsync(UmbracoApplicationStartedNotification notification,
+    public async Task HandleAsync(
+        UmbracoApplicationStartingNotification notification,
         CancellationToken cancellationToken)
     {
 

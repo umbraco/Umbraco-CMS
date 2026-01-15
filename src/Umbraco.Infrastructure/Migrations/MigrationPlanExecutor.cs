@@ -1,15 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
-using Org.BouncyCastle.Utilities;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
-using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -47,11 +45,41 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly IDatabaseCacheRebuilder _databaseCacheRebuilder;
     private readonly IKeyValueService _keyValueService;
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly AppCaches _appCaches;
     private readonly DistributedCache _distributedCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+
     private bool _rebuildCache;
     private bool _invalidateBackofficeUserAccess;
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public MigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        ILoggerFactory loggerFactory,
+        IMigrationBuilder migrationBuilder,
+        IUmbracoDatabaseFactory databaseFactory,
+        IDatabaseCacheRebuilder databaseCacheRebuilder,
+        DistributedCache distributedCache,
+        IKeyValueService keyValueService,
+        IServiceScopeFactory serviceScopeFactory,
+        AppCaches appCaches)
+        : this(
+            scopeProvider,
+            scopeAccessor,
+            loggerFactory,
+            migrationBuilder,
+            databaseFactory,
+            databaseCacheRebuilder,
+            distributedCache,
+            keyValueService,
+            serviceScopeFactory,
+            appCaches,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeFactory>())
+    {
+    }
 
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
@@ -62,7 +90,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         IDatabaseCacheRebuilder databaseCacheRebuilder,
         DistributedCache distributedCache,
         IKeyValueService keyValueService,
-        IServiceScopeFactory serviceScopeFactory)
+        IServiceScopeFactory serviceScopeFactory,
+        AppCaches appCaches,
+        IPublishedContentTypeFactory publishedContentTypeFactory)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
@@ -72,74 +102,40 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _databaseCacheRebuilder = databaseCacheRebuilder;
         _keyValueService = keyValueService;
         _serviceScopeFactory = serviceScopeFactory;
+        _appCaches = appCaches;
         _distributedCache = distributedCache;
+        _publishedContentTypeFactory = publishedContentTypeFactory;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
 
-    public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
+    /// <inheritdoc/>
+    [Obsolete("Use ExecutePlanAsync instead. Scheduled for removal in Umbraco 18.")]
+    public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState) => ExecutePlanAsync(plan, fromState).GetAwaiter().GetResult();
 
-    /// <summary>
-    ///     Executes the plan.
-    /// </summary>
-    /// <param name="plan">The migration plan to be executes.</param>
-    /// <param name="fromState">The state to start execution at.</param>
-    /// <returns>ExecutedMigrationPlan containing information about the plan execution, such as completion state and the steps that ran.</returns>
-    /// <remarks>
-    /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
-    /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
-    /// </remarks>
-    public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState)
+    /// <inheritdoc/>
+    public async Task<ExecutedMigrationPlan> ExecutePlanAsync(MigrationPlan plan, string fromState)
     {
         plan.Validate();
 
-        ExecutedMigrationPlan result = RunMigrationPlan(plan, fromState);
-
-        HandlePostMigrations(result);
+        ExecutedMigrationPlan result = await RunMigrationPlanAsync(plan, fromState).ConfigureAwait(false);
 
         // If any completed migration requires us to rebuild cache we'll do that.
         if (_rebuildCache)
         {
             _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
-            RebuildCache();
+            await RebuildCache();
         }
 
         // If any completed migration requires us to sign out the user we'll do that.
         if (_invalidateBackofficeUserAccess)
         {
-            RevokeBackofficeTokens().GetAwaiter().GetResult(); // should async all the way up at some point
+            await RevokeBackofficeTokens().ConfigureAwait(false);
         }
 
         return result;
     }
 
-    [Obsolete]
-    private void HandlePostMigrations(ExecutedMigrationPlan result)
-    {
-        // prepare and de-duplicate post-migrations, only keeping the 1st occurence
-        var executedTypes = new HashSet<Type>();
-
-        foreach (IMigrationContext executedMigrationContext in result.ExecutedMigrationContexts)
-        {
-            if (executedMigrationContext is MigrationContext migrationContext)
-            {
-                foreach (Type migrationContextPostMigration in migrationContext.PostMigrations)
-                {
-                    if (executedTypes.Contains(migrationContextPostMigration))
-                    {
-                        continue;
-                    }
-
-                    _logger.LogInformation("PostMigration: {migrationContextFullName}.", migrationContextPostMigration.FullName);
-                    MigrationBase postMigration = _migrationBuilder.Build(migrationContextPostMigration, executedMigrationContext);
-                    postMigration.Run();
-
-                    executedTypes.Add(migrationContextPostMigration);
-                }
-            }
-        }
-    }
-
-    private ExecutedMigrationPlan RunMigrationPlan(MigrationPlan plan, string fromState)
+    private async Task<ExecutedMigrationPlan> RunMigrationPlanAsync(MigrationPlan plan, string fromState)
     {
         _logger.LogInformation("Starting '{MigrationName}'...", plan.Name);
         var nextState = fromState;
@@ -160,13 +156,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
             try
             {
-                if (transition.MigrationType.IsAssignableTo(typeof(UnscopedMigrationBase)))
+                if (transition.MigrationType.IsAssignableTo(typeof(UnscopedAsyncMigrationBase)))
                 {
-                    executedMigrationContexts.Add(RunUnscopedMigration(transition, plan));
+                    executedMigrationContexts.Add(await RunUnscopedMigrationAsync(transition, plan).ConfigureAwait(false));
                 }
                 else
                 {
-                    executedMigrationContexts.Add(RunScopedMigration(transition, plan));
+                    executedMigrationContexts.Add(await RunScopedMigrationAsync(transition, plan).ConfigureAwait(false));
                 }
             }
             catch (Exception exception)
@@ -185,7 +181,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     ExecutedMigrationContexts = executedMigrationContexts
                 };
             }
-
 
             IEnumerable<IMigrationContext> nonCompletedMigrationsContexts = executedMigrationContexts.Where(x => x.IsCompleted is false);
             if (nonCompletedMigrationsContexts.Any())
@@ -242,12 +237,12 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         };
     }
 
-    private MigrationContext RunUnscopedMigration(MigrationPlan.Transition transition, MigrationPlan plan)
+    private async Task<MigrationContext> RunUnscopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
         var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), () => OnComplete(plan, transition.TargetState));
 
-        RunMigration(transition.MigrationType, context);
+        await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
 
         return context;
     }
@@ -257,7 +252,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _keyValueService.SetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, targetState);
     }
 
-    private MigrationContext RunScopedMigration(MigrationPlan.Transition transition, MigrationPlan plan)
+    private async Task<MigrationContext> RunScopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         // We want to suppress scope (service, etc...) notifications during a migration plan
         // execution. This is because if a package that doesn't have their migration plan
@@ -272,7 +267,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                 _loggerFactory.CreateLogger<MigrationContext>(),
                 () => OnComplete(plan, transition.TargetState));
 
-            RunMigration(transition.MigrationType, context);
+            await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
 
             // Ensure we mark the context as complete before the scope completes
             context.Complete();
@@ -283,10 +278,10 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
     }
 
-    private void RunMigration(Type migrationType, MigrationContext context)
+    private async Task RunMigrationAsync(Type migrationType, MigrationContext context)
     {
-        MigrationBase migration = _migrationBuilder.Build(migrationType, context);
-        migration.Run();
+        AsyncMigrationBase migration = _migrationBuilder.Build(migrationType, context);
+        await migration.RunAsync().ConfigureAwait(false);
 
         // If the migration requires clearing the cache set the flag, this will automatically only happen if it succeeds
         // Otherwise it'll error out before and return.
@@ -301,10 +296,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
     }
 
-    private void RebuildCache()
+    private async Task RebuildCache()
     {
-        _databaseCacheRebuilder.Rebuild();
+        _appCaches.RuntimeCache.Clear();
+        _appCaches.IsolatedCaches.ClearAllCaches();
+        await _databaseCacheRebuilder.RebuildAsync(false);
         _distributedCache.RefreshAllPublishedSnapshot();
+        _publishedContentTypeFactory.ClearDataTypeCache();
     }
 
     private async Task RevokeBackofficeTokens()
@@ -322,7 +320,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         var backOfficeClientId = await openIddictApplicationManager.GetIdAsync(backOfficeClient);
         if (backOfficeClientId is null)
         {
-            _logger.LogWarning("Could not extract the clientId from the openIddict backofficelient Application. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            _logger.LogWarning("Could not extract the clientId from the openIddict backoffice client Application for {BackOfficeClientId}. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
             return;
         }
 

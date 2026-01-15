@@ -50,6 +50,16 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 		return uniqueArray;
 	}
 
+	getFallbackPermissions(userGroupIds: Array<{ id: string }>): string[] {
+		const fallbackPermissions = this.data
+			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
+			.map((userGroup) => (userGroup.fallbackPermissions?.length ? userGroup.fallbackPermissions : []))
+			.flat();
+
+		// Remove duplicates
+		return Array.from(new Set(fallbackPermissions));
+	}
+
 	getAllowedSections(userGroupIds: Array<{ id: string }>): string[] {
 		const sections = this.data
 			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
@@ -83,6 +93,7 @@ const itemMapper = (item: UmbMockUserGroupModel): UserGroupItemResponseModel => 
 		id: item.id,
 		name: item.name,
 		icon: item.icon,
+		flags: item.flags,
 	};
 };
 
@@ -103,6 +114,7 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		sections: item.sections,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		flags: [],
 	};
 };
 

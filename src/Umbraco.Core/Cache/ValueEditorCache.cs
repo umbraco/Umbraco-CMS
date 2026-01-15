@@ -5,13 +5,13 @@ namespace Umbraco.Cms.Core.Cache;
 
 public class ValueEditorCache : IValueEditorCache
 {
-    private readonly object _dictionaryLocker;
+    private readonly Lock _dictionaryLocker;
     private readonly Dictionary<string, Dictionary<int, IDataValueEditor>> _valueEditorCache;
 
     public ValueEditorCache()
     {
         _valueEditorCache = new Dictionary<string, Dictionary<int, IDataValueEditor>>();
-        _dictionaryLocker = new object();
+        _dictionaryLocker = new Lock();
     }
 
     public IDataValueEditor GetValueEditor(IDataEditor editor, IDataType dataType)
@@ -51,7 +51,15 @@ public class ValueEditorCache : IValueEditorCache
             {
                 foreach (Dictionary<int, IDataValueEditor> editors in _valueEditorCache.Values)
                 {
-                    editors.Remove(id);
+                    if (editors.TryGetValue(id, out IDataValueEditor? editor))
+                    {
+                        if (editor is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
+
+                        editors.Remove(id);
+                    }
                 }
             }
         }

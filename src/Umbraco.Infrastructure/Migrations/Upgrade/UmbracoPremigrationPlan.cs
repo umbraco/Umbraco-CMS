@@ -67,5 +67,19 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
         To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{EEB1F012-B44D-4AB4-8756-F7FB547345B4}");
         To<V_14_0_0.AddListViewKeysToDocumentTypes>("{0F49E1A4-AFD8-4673-A91B-F64E78C48174}");
+
+        // To 16.2.0
+        // - This needs to be a pre-migration as it adds a lock to the process for rebuilding document URLs, which is
+        //   called by a migration for 15. By using a pre-migration we ensure the lock record is in place when migrating
+        //   through 15 versions to the latest.
+        To<V_16_2_0.AddDocumentUrlLock>("{5ECCE7A7-2EFC-47A5-A081-FFD94D9F79AA}");
+
+        // To 17.0.0
+        To<V_17_0_0.UpdateToOpenIddictV7>("{D54EE168-C19D-48D8-9006-C7E719AD61FE}");
+        // The lock and table are required to access caches.
+        // When logging in, we save the user to the cache so these need to have run.
+        To<V_17_0_0.AddCacheVersionDatabaseLock>("{1DC39DC7-A88A-4912-8E60-4FD36246E8D1}");
+        To<V_17_0_0.AddRepositoryCacheVersionTable>("{A1B3F5D6-4C8B-4E7A-9F8C-1D2B3E4F5A6B}");
+        To<V_17_0_0.AddLastSyncedTable>("{72894BCA-9FAD-4CC3-B0D0-D6CDA2FFA636}");
     }
 }

@@ -34,18 +34,6 @@ public static partial class Constants
 
         public const string AdminGroupAlias = "admin";
 
-        [Obsolete("Use EditorGroupKey instead. Scheduled for removal in V15.")]
-        public const string EditorGroupAlias = "editor";
-
-        [Obsolete("Use SensitiveDataGroupKey instead. Scheduled for removal in V15.")]
-        public const string SensitiveDataGroupAlias = "sensitiveData";
-
-        [Obsolete("Use TranslatorGroupKey instead. Scheduled for removal in V15.")]
-        public const string TranslatorGroupAlias = "translator";
-
-        [Obsolete("Use WriterGroupKey instead. Scheduled for removal in V15.")]
-        public const string WriterGroupAlias = "writer";
-
         /// <summary>
         /// The key of the admin group
         /// </summary>
@@ -85,6 +73,17 @@ public static partial class Constants
         public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
         public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
         public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
+
+        /// <summary>
+        /// Authentication type and scheme used for backoffice users when it is exposed out of the backoffice context via a cookie.
+        /// </summary>
+        public const string BackOfficeExposedAuthenticationType = "UmbracoBackOfficeExposed";
+
+        /// <summary>
+        /// Represents the name of the authentication cookie used to expose the backoffice authentication token outside of the backoffice context.
+        /// </summary>
+        public const string BackOfficeExposedCookieName = "UMB_UCONTEXT_EXPOSED";
+
         public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
 
         public const string DefaultMemberTypeAlias = "Member";

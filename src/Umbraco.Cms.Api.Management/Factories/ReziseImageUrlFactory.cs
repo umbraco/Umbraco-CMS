@@ -46,6 +46,16 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
             var extension = Path.GetExtension(url).Remove(0, 1);
             if (_imageUrlGenerator.SupportedImageFileTypes.InvariantContains(extension) is false)
             {
+                // It's okay to return just the image URL for SVGs, as they are always scalable.
+                if (extension == "svg")
+                {
+                    yield return new MediaUrlInfo
+                    {
+                        Culture = null,
+                        Url = _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString(),
+                    };
+                }
+
                 continue;
             }
 

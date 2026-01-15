@@ -1,4 +1,3 @@
-import { UMB_MEDIA_COLLECTION_CONTEXT } from '../media-collection.context-token.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
@@ -8,15 +7,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-create-media-collection-action')
 export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	@state()
 	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
-
-	@state()
-	private _workspacePathBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _mediaUnique?: UmbEntityUnique;
@@ -36,28 +31,22 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.observe(workspaceContext.unique, (unique) => {
+			this.observe(workspaceContext?.unique, (unique) => {
 				this._mediaUnique = unique;
 			});
 
-			this.observe(workspaceContext.contentTypeUnique, (mediaTypeUnique) => {
+			this.observe(workspaceContext?.contentTypeUnique, (mediaTypeUnique) => {
 				this._mediaTypeUnique = mediaTypeUnique;
-			});
-		});
-
-		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
-			this.observe(collectionContext.workspacePathBuilder, (builder) => {
-				this._workspacePathBuilder = builder;
 			});
 		});
 	}
 
 	override async firstUpdated() {
-		this.#retrieveAllowedMediaTypesOf(this._mediaTypeUnique ?? '');
+		this.#retrieveAllowedMediaTypesOf(this._mediaTypeUnique ?? '', this._mediaUnique || null);
 	}
 
-	async #retrieveAllowedMediaTypesOf(unique: string | null) {
-		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique);
+	async #retrieveAllowedMediaTypesOf(unique: string | null, parentContentUnique: string | null) {
+		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
 		if (data && data.items) {
 			this._allowedMediaTypes = data.items;
 		}
@@ -71,14 +60,14 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	}
 
 	#getCreateUrl(item: UmbAllowedMediaTypeModel) {
-		return item.unique && this._workspacePathBuilder
-			? this._workspacePathBuilder({ entityType: UMB_MEDIA_ENTITY_TYPE }) +
-					UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
-						parentEntityType: this._mediaUnique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
-						parentUnique: this._mediaUnique ?? 'null',
-						mediaTypeUnique: item.unique,
-					})
-			: '';
+		if (!item.unique) {
+			throw new Error('Item does not have a unique identifier');
+		}
+		return UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({
+			parentEntityType: this._mediaUnique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+			parentUnique: this._mediaUnique ?? 'null',
+			mediaTypeUnique: item.unique,
+		});
 	}
 
 	override render() {

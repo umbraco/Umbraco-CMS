@@ -83,7 +83,7 @@ public class JsonBlockValueConverterTests
             ]
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockGridValue);
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
 
@@ -173,7 +173,7 @@ public class JsonBlockValueConverterTests
     public void Can_Serialize_BlockGrid_Without_Blocks()
     {
         var blockGridValue = new BlockGridValue();
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockGridValue);
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
 
@@ -217,7 +217,7 @@ public class JsonBlockValueConverterTests
             ]
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
@@ -265,7 +265,7 @@ public class JsonBlockValueConverterTests
     public void Can_Serialize_BlockList_Without_Blocks()
     {
         var blockListValue = new BlockListValue();
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
@@ -315,7 +315,7 @@ public class JsonBlockValueConverterTests
             Markup = "<p>This is some markup</p>"
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(richTextEditorValue);
         var deserialized = serializer.Deserialize<RichTextEditorValue>(serialized);
 
@@ -371,7 +371,7 @@ public class JsonBlockValueConverterTests
             Markup = "<p>This is some markup</p>"
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(richTextEditorValue);
         var deserialized = serializer.Deserialize<RichTextEditorValue>(serialized);
 
@@ -425,7 +425,7 @@ public class JsonBlockValueConverterTests
             ]
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
@@ -440,5 +440,72 @@ public class JsonBlockValueConverterTests
             Assert.AreEqual(contentElementKey1, layoutItems.First().ContentKey);
             Assert.AreEqual(settingsElementKey1, layoutItems.First().SettingsKey);
         });
+    }
+
+    [Test]
+    public void Try_Deserialize_Unknown_Block_Layout_With_Nested_Array()
+    {
+        var json = """
+        {
+            "layout": {
+                "Umbraco.BlockGrid": [{
+                        "contentUdi": "umb://element/1304E1DDAC87439684FE8A399231CB3D",
+                        "rowSpan": 1,
+                        "areas": [],
+                        "columnSpan": 12
+                    }
+                ],
+                "Umbraco.BlockList": [{
+                        "contentUdi": "umb://element/1304E1DDAC87439684FE8A399231CB3D"
+                    }
+                ],
+                "Some.Custom.BlockEditor": [{
+                        "contentUdi": "umb://element/1304E1DDAC87439684FE8A399231CB3D"
+                    }
+                ]
+            }
+        }
+""";
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        Assert.DoesNotThrow(() => serializer.Deserialize<BlockListValue>(json));
+    }
+
+    /// <summary>
+    /// Test case that verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/20409.
+    /// </summary>
+    [Test]
+    public void Can_Deserialize_BlockGrid_With_Blocks_Using_Values_As_Property_Alias()
+    {
+        // Create a serialized BlockGridValue in Umbraco 13 format that has a block with a property alias "values".
+        var serialized = @"{
+   ""layout"":{
+      ""Umbraco.BlockList"":[
+         {
+            ""contentUdi"":""umb://element/6ad18441631140d48515ea0fc5b00425""
+         }
+      ]
+   },
+   ""contentData"":[
+      {
+         ""contentTypeKey"":""a1d1123c-289b-4a05-b33f-9f06cb723da1"",
+         ""udi"":""umb://element/6ad18441631140d48515ea0fc5b00425"",
+         ""text"":""Text"",
+         ""values"":""Values""
+      }
+   ],
+   ""settingsData"":[
+   ]
+}";
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
+
+        Assert.IsNotNull(deserialized);
+
+        Assert.AreEqual(1, deserialized.ContentData.Count);
+        Assert.AreEqual(2, deserialized.ContentData[0].RawPropertyValues.Count);
+        Assert.AreEqual("Text", deserialized.ContentData[0].RawPropertyValues["text"]);
+        Assert.AreEqual("Values", deserialized.ContentData[0].RawPropertyValues["values"]);
     }
 }

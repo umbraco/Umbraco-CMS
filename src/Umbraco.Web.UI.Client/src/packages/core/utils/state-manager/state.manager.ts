@@ -4,7 +4,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbState {
 	unique: string;
-	message: string;
+	message?: string;
 }
 
 export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbControllerBase {
@@ -64,7 +64,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	removeState(unique: StateType['unique']) {
-		this._states.setValue(this._states.getValue().filter((x) => x.unique !== unique));
+		this._states.removeOne(unique);
 	}
 
 	/**
@@ -73,7 +73,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	removeStates(uniques: StateType['unique'][]) {
-		this._states.setValue(this._states.getValue().filter((x) => !uniques.includes(x.unique)));
+		this._states.remove(uniques);
 	}
 
 	/**
@@ -85,11 +85,24 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 		return this._states.getValue();
 	}
 
+	getIsOn(): boolean {
+		return this._states.getValue().length > 0;
+	}
+
+	getIsOff(): boolean {
+		return this._states.getValue().length === 0;
+	}
+
 	/**
 	 * Clear all states from the state manager
 	 * @memberof UmbStateManager
 	 */
 	clear() {
 		this._states.setValue([]);
+	}
+
+	override destroy() {
+		super.destroy();
+		this._states.destroy();
 	}
 }

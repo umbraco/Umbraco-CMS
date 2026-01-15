@@ -54,12 +54,12 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 	private async _buttonHandler() {
 		this._buttonState = 'waiting';
-		this._api?.checkGroup(this.groupName);
+		await this._api?.checkGroup(this.groupName);
 		this._buttonState = 'success';
 	}
 
 	override render() {
-		return html` <a href="/section/settings/dashboard/health-check"> &larr; Back to overview </a>
+		return html` <a href="section/settings/dashboard/health-check"> &larr; Back to overview </a>
 			${this._group ? this.#renderGroup() : nothing}`;
 	}
 
@@ -102,11 +102,11 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				${checkResults.results?.map((result) => {
 					return html`<div class="check-result">
 						<div class="check-result-description">
-							<span>${this.renderIcon(result.resultType)}</span>
+							<span>${this.#renderIcon(result.resultType)}</span>
 							<p>${unsafeHTML(result.message)}</p>
 						</div>
 
-						${result.actions ? this.renderActions(result.actions) : nothing}
+						${result.actions ? this.#renderActions(result.actions) : nothing}
 						${result.readMoreLink
 							? html`<uui-button
 									label="Read more"
@@ -124,7 +124,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		</uui-icon-registry-essential>`;
 	}
 
-	private renderIcon(type?: StatusResultTypeModel) {
+	#renderIcon(type?: StatusResultTypeModel) {
 		switch (type) {
 			case StatusResultTypeModel.SUCCESS:
 				return html`<uui-icon style="color: var(--uui-color-positive);" name="check"></uui-icon>`;
@@ -139,7 +139,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		}
 	}
 
-	private renderActions(actions: HealthCheckActionRequestModel[]) {
+	#renderActions(actions: HealthCheckActionRequestModel[]) {
 		if (actions.length)
 			return html` <div class="action-wrapper">
 				${actions.map(

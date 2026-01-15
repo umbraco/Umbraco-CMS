@@ -1,12 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -18,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TagRepositoryTest : UmbracoIntegrationTest
+internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 {
     private IFileService FileService => GetRequiredService<IFileService>();
 
@@ -639,6 +640,89 @@ public class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Get_Tags_For_Entity_Type_Excluding_Trashed_Entity()
+    {
+        var provider = ScopeProvider;
+        using (ScopeProvider.CreateScope())
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+            ContentTypeRepository.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+            content1.PublishedState = PublishedState.Publishing;
+            DocumentRepository.Save(content1);
+
+            var content2 = ContentBuilder.CreateSimpleContent(contentType);
+            content2.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+            content2.PublishedState = PublishedState.Publishing;
+            content2.Trashed = true;
+            DocumentRepository.Save(content2);
+
+            var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
+            MediaTypeRepository.Save(mediaType);
+
+            var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+            MediaRepository.Save(media1);
+
+            var media2 = MediaBuilder.CreateMediaImage(mediaType, -1);
+            media2.Trashed = true;
+            MediaRepository.Save(media2);
+
+            var repository = CreateRepository(provider);
+            Tag[] tags =
+            {
+                new Tag {Text = "tag1", Group = "test"},
+                new Tag {Text = "tag2", Group = "test1"},
+                new Tag {Text = "tag3", Group = "test"}
+            };
+
+            Tag[] tags2 =
+{
+                new Tag {Text = "tag4", Group = "test"},
+                new Tag {Text = "tag5", Group = "test1"},
+                new Tag {Text = "tag6", Group = "test"}
+            };
+
+            repository.Assign(
+                content1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags,
+                false);
+
+            repository.Assign(
+                content2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags2,
+                false);
+
+            repository.Assign(
+                media1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags,
+                false);
+
+            repository.Assign(
+                media2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags2,
+                false);
+
+            var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
+            var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
+            var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
+
+            const string ExpectedTags = "tag1,tag2,tag3";
+            Assert.AreEqual(ExpectedTags, string.Join(",", result1.Select(x => x.Text)));
+            Assert.AreEqual(ExpectedTags, string.Join(",", result2.Select(x => x.Text)));
+            Assert.AreEqual(ExpectedTags, string.Join(",", result3.Select(x => x.Text)));
+        }
+    }
+
+    [Test]
     public void Can_Get_Tags_For_Entity_Type()
     {
         var provider = ScopeProvider;
@@ -964,6 +1048,98 @@ public class TagRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Can_Create_Tag_Relations_With_Mixed_Casing_For_Tag()
+    {
+        var provider = ScopeProvider;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            (IContentType contentType, IContent content1, IContent content2) = CreateContentForCreateTagTests();
+
+            var repository = CreateRepository(provider);
+
+            // Note two tags are applied, but they differ only in case for the tag.
+            Tag[] tags1 = { new() { Text = "tag1", Group = "test" }, new() { Text = "Tag1", Group = "test" } };
+            repository.Assign(
+                content1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags1,
+                false);
+
+            // Note the casing is different from the tag in tags1, but both should be considered equivalent.
+            Tag[] tags2 = { new() { Text = "TAG1", Group = "test" } };
+            repository.Assign(
+                content2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags2,
+                false);
+
+            // Only one tag should have been saved.
+            var tagCount = scope.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTags WHERE [group] = 'test'");
+            Assert.AreEqual(1, tagCount);
+
+            // Both content items should be found as tagged by the tag, even though one was assigned with the tag differing in case.
+            Assert.AreEqual(2, repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").Count());
+        }
+    }
+
+    [Test]
+    public void Can_Create_Tag_Relations_With_Mixed_Casing_For_Group()
+    {
+        var provider = ScopeProvider;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            (IContentType contentType, IContent content1, IContent content2) = CreateContentForCreateTagTests();
+
+            var repository = CreateRepository(provider);
+
+            // Note two tags are applied, but they differ only in case for the group.
+            Tag[] tags1 = { new() { Text = "tag1", Group = "group1" }, new() { Text = "tag1", Group = "Group1" } };
+            repository.Assign(
+                content1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags1,
+                false);
+
+            // Note the casing is different from the group in tags1, but both should be considered equivalent.
+            Tag[] tags2 = { new() { Text = "tag1", Group = "GROUP1" } };
+            repository.Assign(
+                content2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags2,
+                false);
+
+            // Only one tag/group should have been saved.
+            var tagCount = scope.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTags WHERE [tag] = 'tag1'");
+            Assert.AreEqual(1, tagCount);
+
+            var groupCount = scope.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTags WHERE [group] = 'group1'");
+            Assert.AreEqual(1, groupCount);
+
+            // Both content items should be found as tagged by the tag, even though one was assigned with the group differing in case.
+            Assert.AreEqual(2, repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "group1").Count());
+        }
+    }
+
+    private (IContentType ContentType, IContent Content1, IContent Content2) CreateContentForCreateTagTests()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+        ContentTypeRepository.Save(contentType);
+
+        var content1 = ContentBuilder.CreateSimpleContent(contentType);
+        var content2 = ContentBuilder.CreateSimpleContent(contentType);
+        DocumentRepository.Save(content1);
+        DocumentRepository.Save(content2);
+
+        return (contentType, content1, content2);
+    }
+
     private TagRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

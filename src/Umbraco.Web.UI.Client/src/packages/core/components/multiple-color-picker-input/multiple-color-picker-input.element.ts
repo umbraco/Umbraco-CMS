@@ -94,7 +94,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			const workspace = instance;
 			this.observe(
-				await workspace.propertyValueByAlias<boolean>('useLabel'),
+				await workspace?.propertyValueByAlias<boolean>('useLabel'),
 				(value) => {
 					this.showLabels = !!value;
 				},

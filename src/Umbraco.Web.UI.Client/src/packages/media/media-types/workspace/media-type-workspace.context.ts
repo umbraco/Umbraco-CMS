@@ -12,6 +12,7 @@ import type { UmbContentTypeSortModel, UmbContentTypeWorkspaceContext } from '@u
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type DetailModelType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
@@ -33,7 +34,8 @@ export class UmbMediaTypeWorkspaceContext
 					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const parent: UmbEntityModel = { entityType: parentEntityType, unique: parentUnique };
-					await this.createScaffold({ parent });
+
+					await this.#onScaffoldSetup(parent);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -77,13 +79,21 @@ export class UmbMediaTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ collection });
 	}
 
-	/**
-	 * @deprecated Use the createScaffold method instead. Will be removed in 17.
-	 * @param {UmbEntityModel} parent
-	 * @memberof UmbMediaTypeWorkspaceContext
-	 */
-	async create(parent: UmbEntityModel) {
-		this.createScaffold({ parent });
+	async #onScaffoldSetup(parent: UmbEntityModel) {
+		let preset: Partial<DetailModelType> | undefined = undefined;
+
+		if (parent.unique && parent.entityType === UMB_MEDIA_TYPE_ENTITY_TYPE) {
+			preset = {
+				compositions: [
+					{
+						contentType: { unique: parent.unique },
+						compositionType: CompositionTypeModel.INHERITANCE,
+					},
+				],
+			};
+		}
+
+		this.createScaffold({ parent, preset });
 	}
 }
 

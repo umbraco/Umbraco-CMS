@@ -46,6 +46,9 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool SupportsIntegratedAuthentication => false;
 
     /// <inheritdoc />
+    public bool SupportsTrustServerCertificate => false;
+
+    /// <inheritdoc />
     public bool RequiresConnectionTest => false;
 
     /// <inheritdoc />

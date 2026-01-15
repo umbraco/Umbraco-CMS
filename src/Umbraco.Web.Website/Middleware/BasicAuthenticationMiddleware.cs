@@ -27,13 +27,11 @@ public class BasicAuthenticationMiddleware : IMiddleware
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
         IBasicAuthService basicAuthService,
-        IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment)
     {
         _runtimeState = runtimeState;
         _basicAuthService = basicAuthService;
-
-        _backOfficePath = globalSettings.CurrentValue.GetBackOfficePath(hostingEnvironment);
+        _backOfficePath = hostingEnvironment.GetBackOfficePath();
     }
 
     /// <inheritdoc />
@@ -108,7 +106,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
         else
         {
             context.Response.StatusCode = 401;
-            context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"Umbraco login\"");
+            context.Response.Headers.Append("WWW-Authenticate", "Basic realm=\"Umbraco login\"");
         }
     }
 }

@@ -34,11 +34,11 @@
         "cases": [
           {
             "condition": "(StarterKit == 'Umbraco.TheStarterKit' && (UmbracoRelease == 'Latest' || UmbracoRelease == 'Custom'))",
-            "value": "14.0.0"
+            "value": "17.0.0-rc"
           },
           {
             "condition": "(StarterKit == 'Umbraco.TheStarterKit' && UmbracoRelease == 'LTS')",
-            "value": "13.0.0"
+            "value": "17.0.0"
           }
         ]
       }

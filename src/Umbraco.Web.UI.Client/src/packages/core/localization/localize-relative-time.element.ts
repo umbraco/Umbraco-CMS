@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -13,7 +13,7 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 	 * @attr
 	 * @example time=10
 	 */
-	@property()
+	@property({ type: Number })
 	time!: number;
 
 	/**
@@ -21,7 +21,7 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 	 * @attr
 	 * @example options={ dateStyle: 'full', timeStyle: 'long', timeZone: 'Australia/Sydney' }
 	 */
-	@property()
+	@property({ type: Object })
 	options?: Intl.RelativeTimeFormatOptions;
 
 	/**
@@ -33,12 +33,16 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 	unit: Intl.RelativeTimeFormatUnit = 'seconds';
 
 	@state()
-	protected get text(): string {
+	protected get text(): string | null {
 		return this.localize.relativeTime(this.time, this.unit, this.options);
 	}
 
 	override render() {
-		return this.time ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
+		return when(
+			this.text,
+			(text) => unsafeHTML(text),
+			() => html`<slot></slot>`,
+		);
 	}
 
 	static override styles = [

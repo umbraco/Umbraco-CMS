@@ -3,7 +3,7 @@ import type { UmbMediaTypeSearchItemModel } from './media-type.search-provider.j
 import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -29,17 +29,17 @@ export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<U
 	 * @memberof UmbMediaTypeSearchServerDataSource
 	 */
 	async search(args: UmbSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getItemMediaTypeSearch({
-				query: args.query,
+				query: { query: args.query },
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbMediaTypeSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/settings/workspace/media-type/edit/' + item.id,
+					href: 'section/settings/workspace/media-type/edit/' + item.id,
 					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,

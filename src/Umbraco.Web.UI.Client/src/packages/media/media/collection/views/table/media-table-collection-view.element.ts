@@ -1,10 +1,10 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
+import type { UmbMediaCollectionItemModel } from '../../types.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -16,15 +16,11 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 
 import './column-layouts/media-table-column-name.element.js';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-table-collection-view')
 export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
-
-	@state()
-	private _workspacePathBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _items?: Array<UmbMediaCollectionItemModel>;
@@ -52,22 +48,14 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbMediaCollectionItemModel, UmbMediaCollectionFilterModel>;
+	#collectionContext?: typeof UMB_MEDIA_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
-			collectionContext.setupView(this);
-			this.observe(
-				collectionContext.workspacePathBuilder,
-				(builder) => {
-					this._workspacePathBuilder = builder;
-					this.#createTableItems();
-				},
-				'observePath',
-			);
+			collectionContext?.setupView(this);
 		});
 	}
 
@@ -108,13 +96,18 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 					name: this.localize.string(item.header),
 					alias: item.alias,
 					elementName: item.elementName,
+					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
 			});
 
-			this._tableColumns = [...this.#systemColumns, ...userColumns, { name: '', alias: 'entityActions' }];
+			this._tableColumns = [
+				...this.#systemColumns,
+				...userColumns,
+				{ name: '', alias: 'entityActions', align: 'right' },
+			];
 		} else {
-			this._tableColumns = [...this.#systemColumns, { name: '', alias: 'entityActions' }];
+			this._tableColumns = [...this.#systemColumns, { name: '', alias: 'entityActions', align: 'right' }];
 		}
 	}
 
@@ -122,7 +115,6 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = [];
 
 		if (this._items === undefined) return;
-		if (this._workspacePathBuilder === undefined) return;
 
 		if (this._tableColumns.length === 0) {
 			this.#createTableHeadings();
@@ -140,17 +132,14 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 								.value=${{
 									entityType: item.entityType,
 									unique: item.unique,
+									name: item.name,
 								}}></umb-entity-actions-table-column-view>`,
 						};
 					}
 
-					const editPath =
-						item.unique && this._workspacePathBuilder
-							? this._workspacePathBuilder({ entityType: item.entityType }) +
-								UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
-									unique: item.unique,
-								})
-							: '';
+					const editPath = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({
+						unique: item.unique,
+					});
 
 					return {
 						columnAlias: column.alias,

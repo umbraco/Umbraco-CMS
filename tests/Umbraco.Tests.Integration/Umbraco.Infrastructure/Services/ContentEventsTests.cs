@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ContentEventsTests : UmbracoIntegrationTestWithContent
+    internal sealed class ContentEventsTests : UmbracoIntegrationTestWithContent
     {
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
@@ -719,7 +719,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // branch is:
             ResetEvents();
-            ContentService.PublishBranch(content1, force: false, cultures: content1.AvailableCultures.ToArray()); // force = false, don't publish unpublished items
+            ContentService.PublishBranch(content1, PublishBranchFilter.Default, cultures: content1.AvailableCultures.ToArray()); // PublishBranchFilter.Default: don't publish unpublished items
 
             foreach (EventInstance e in _events)
             {
@@ -756,7 +756,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content1);
 
             ResetEvents();
-            ContentService.PublishBranch(content1, force: true, cultures: content1.AvailableCultures.ToArray()); // force = true, also publish unpublished items
+            ContentService.PublishBranch(content1, PublishBranchFilter.IncludeUnpublished, cultures: content1.AvailableCultures.ToArray()); // PublishBranchFilter.IncludeUnpublished: also publish unpublished items
 
             foreach (EventInstance e in _events)
             {
@@ -2086,10 +2086,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         // all content type events
         #endregion
 
-        public class LocalServerMessenger : ServerMessengerBase
+        internal sealed class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()
-                : base(false, new SystemTextJsonSerializer())
+                : base(false, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
             {
             }
 

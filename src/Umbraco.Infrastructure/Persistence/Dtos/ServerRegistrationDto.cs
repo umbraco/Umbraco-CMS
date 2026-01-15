@@ -5,11 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Server)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class ServerRegistrationDto
+internal sealed class ServerRegistrationDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.Server;
+
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
@@ -24,7 +26,7 @@ internal class ServerRegistrationDto
     public string? ServerIdentity { get; set; }
 
     [Column("registeredDate")]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime DateRegistered { get; set; }
 
     [Column("lastNotifiedDate")]

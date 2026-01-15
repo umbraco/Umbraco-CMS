@@ -1,21 +1,22 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-
-import './data-type-workspace-view-info-reference.element.js';
 
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_unique: string = '';
+	private _unique: string = '';
 
 	@state()
-	_schemaAlias?: string;
+	private _schemaAlias?: string;
 
 	@state()
-	_uiAlias?: string | null;
+	private _uiAlias?: string | null;
+
+	@state()
+	private _dataSourceAlias?: string | null;
 
 	private _workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
@@ -42,13 +43,16 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 		this.observe(this._workspaceContext.propertyEditorUiAlias, (editorUiAlias) => {
 			this._uiAlias = editorUiAlias;
 		});
+
+		this.observe(this._workspaceContext.propertyEditorDataSourceAlias, (dataSourceAlias) => {
+			this._dataSourceAlias = dataSourceAlias;
+		});
 	}
 
 	override render() {
 		return html`
 			<div class="container">
-				<umb-data-type-workspace-view-info-reference
-					.dataTypeUnique=${this._unique}></umb-data-type-workspace-view-info-reference>
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
 			</div>
 			<div class="container">${this.#renderGeneralInfo()}</div>
 		`;
@@ -69,7 +73,19 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 					<strong>Property Editor UI Alias</strong>
 					<span>${this._uiAlias}</span>
 				</div>
+				${this.#renderDataSourceInfo()}
 			</uui-box>
+		`;
+	}
+
+	#renderDataSourceInfo() {
+		if (!this._dataSourceAlias) return nothing;
+
+		return html`
+			<div class="general-item">
+				<strong>Property Editor Data Source Alias</strong>
+				<span>${this._dataSourceAlias}</span>
+			</div>
 		`;
 	}
 

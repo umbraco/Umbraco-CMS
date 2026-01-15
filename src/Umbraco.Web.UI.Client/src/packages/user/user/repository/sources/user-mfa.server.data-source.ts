@@ -1,6 +1,6 @@
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for User MFA items that fetches data from the server
@@ -26,10 +26,10 @@ export class UmbUserMfaServerDataSource {
 	requestMfaProviders(unique: string) {
 		if (!unique) throw new Error('User id is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.getUserById2Fa({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}
@@ -45,9 +45,9 @@ export class UmbUserMfaServerDataSource {
 		if (!providerName) throw new Error('Provider is missing');
 
 		return tryExecute(
+			this.#host,
 			UserService.deleteUserById2FaByProviderName({
-				id: unique,
-				providerName,
+				path: { id: unique, providerName },
 			}),
 		);
 	}

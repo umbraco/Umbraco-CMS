@@ -17,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install
 {
@@ -104,18 +105,22 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
+                IScope ambientScope = _scopeAccessor.AmbientScope ?? throw new InvalidOperationException("Cannot execute without a valid AmbientScope.");
                 // look for the super user with default password
-                NPoco.Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+                NPoco.Sql<ISqlContext> sql = ambientScope.Database.SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>()
                     .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
-                var result = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>(sql);
+                var result = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(sql);
                 var has = result != 1;
                 if (has == false)
                 {
                     // found only 1 user == the default user with default password
                     // however this always exists on uCloud, also need to check if there are other users too
-                    result = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                        .SelectCount()
+                        .From<UserDto>();
+                    result = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(sql);
                     has = result != 1;
                 }
                 scope.Complete();
@@ -190,7 +195,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                     throw new InstallException("Didn't retrieve updated connection string within 10 seconds, try manual configuration instead.");
                 }
 
-                Configure(_globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
+                Configure(providerMeta.ForceCreateDatabase);
             }
 
             return true;
@@ -353,7 +358,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
+        [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
         public Result? UpgradeSchemaAndData(UmbracoPlan plan) => UpgradeSchemaAndData((MigrationPlan)plan);
+
+        [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
+        public Result? UpgradeSchemaAndData(MigrationPlan plan) => UpgradeSchemaAndDataAsync(plan).GetAwaiter().GetResult();
+
+        public async Task<Result?> UpgradeSchemaAndDataAsync(UmbracoPlan plan) => await UpgradeSchemaAndDataAsync((MigrationPlan)plan).ConfigureAwait(false);
 
         /// <summary>
         /// Upgrades the database schema and data by running migrations.
@@ -363,7 +374,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result? UpgradeSchemaAndData(MigrationPlan plan)
+        public async Task<Result?> UpgradeSchemaAndDataAsync(MigrationPlan plan)
         {
             try
             {
@@ -377,7 +388,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                ExecutedMigrationPlan result = upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                ExecutedMigrationPlan result = await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService).ConfigureAwait(false);
 
                 _aggregator.Publish(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
 

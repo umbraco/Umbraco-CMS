@@ -32,7 +32,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
-        target.Compositions = MapNestedCompositions(
+        target.Compositions = MapCompositions(
             source.ContentTypeComposition,
             source.ParentId,
             (referenceByIdModel, compositionType) => new MemberTypeComposition

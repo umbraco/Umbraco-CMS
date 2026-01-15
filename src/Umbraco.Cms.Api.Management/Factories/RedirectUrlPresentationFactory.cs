@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
@@ -21,6 +21,12 @@ public class RedirectUrlPresentationFactory : IRedirectUrlPresentationFactory
             : "#";
 
         var originalUrl = _publishedUrlProvider.GetUrlFromRoute(source.ContentId, source.Url, source.Culture);
+
+        // Even if the URL could not be extracted from the route, if we have a path as a the route for the original URL, we should display it.
+        if (originalUrl == "#" && source.Url.StartsWith('/'))
+        {
+            originalUrl = source.Url;
+        }
 
         return new RedirectUrlResponseModel
         {

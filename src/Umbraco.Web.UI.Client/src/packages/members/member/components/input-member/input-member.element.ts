@@ -1,19 +1,18 @@
-import type { UmbMemberItemModel } from '../../repository/index.js';
+import type { UmbMemberItemModel } from '../../item/types.js';
 import { UmbMemberPickerInputContext } from './input-member.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/member-type';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
-const elementName = 'umb-input-member';
-
-@customElement(elementName)
-export class UmbInputMemberElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+@customElement('umb-input-member')
+export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
 	UmbLitElement,
+	undefined,
 ) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -23,7 +22,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputMember',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -52,7 +51,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -85,15 +84,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		return this.#pickerContext.getSelection();
 	}
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
-
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
+		super.value = selectionString; // Call the parent setter to ensure the value change is triggered in the FormControlMixin. [NL]
 	}
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
@@ -123,58 +120,65 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	}
 	#readonly = false;
 
-	@state()
-	private _editMemberPath = '';
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+	@property({ type: String })
+	requiredMessage?: string;
 
 	@state()
 	private _items?: Array<UmbMemberItemModel>;
+
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
 	#pickerContext = new UmbMemberPickerInputContext(this);
 
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('member')
-			.onSetup(() => {
-				return { data: { entityType: 'member', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMemberPath = routeBuilder({});
-			});
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.selection.length < this.min,
+			() => !this.readonly && !!this.min && this.selection.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.selection.length > this.max,
+			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observeItems');
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 	}
-
-	#pickableFilter = (item: UmbMemberItemModel): boolean => {
-		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.memberType.unique);
-		}
-		return true;
-	};
 
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			filter: this.filter,
-			pickableFilter: this.#pickableFilter,
-		});
+		this.#pickerContext.openPicker(
+			{
+				filter: this.filter,
+			},
+			{
+				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+					unique: id,
+					entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
+				})),
+			},
+		);
 	}
 
-	#onRemove(item: UmbMemberItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#onRemove(unique: string) {
+		this.#pickerContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -182,13 +186,38 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	}
 
 	#renderItems() {
-		if (!this._items) return nothing;
+		if (!this._statuses) return nothing;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
+						return html`
+							<umb-entity-item-ref
+								id=${unique}
+								.item=${item}
+								?error=${isError}
+								.errorMessage=${status.state.error}
+								.errorDetail=${isError ? unique : undefined}
+								?readonly=${this.readonly}
+								?standalone=${this.max === 1}>
+								${when(
+									!this.readonly,
+									() => html`
+										<uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												@click=${() => this.#onRemove(unique)}></uui-button>
+										</uui-action-bar>
+									`,
+								)}
+							</umb-entity-item-ref>
+						`;
+					},
 				)}
 			</uui-ref-list>
 		`;
@@ -210,42 +239,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		}
 	}
 
-	#renderItem(item: UmbMemberItemModel) {
-		if (!item.unique) return nothing;
-		return html`
-			<uui-ref-node-member name=${item.name} id=${item.unique} ?readonly=${this.readonly}>
-				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
-				</uui-action-bar>
-			</uui-ref-node-member>
-		`;
-	}
-
-	#renderOpenButton(item: UmbMemberItemModel) {
-		if (!this.showOpenButton) return nothing;
-		return html`
-			<uui-button
-				href="${this._editMemberPath}edit/${item.unique}"
-				label="${this.localize.term('general_open')} ${item.name}">
-				${this.localize.term('general_open')}
-			</uui-button>
-		`;
-	}
-
-	#renderRemoveButton(item: UmbMemberItemModel) {
-		if (this.readonly) return nothing;
-		return html`
-			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
-		`;
-	}
-
 	static override styles = [
 		css`
 			#btn-add {
 				display: block;
 			}
 
-			uui-ref-node[drag-placeholder] {
+			umb-entity-item-ref[drag-placeholder] {
 				opacity: 0.2;
 			}
 		`,
@@ -256,6 +256,6 @@ export { UmbInputMemberElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputMemberElement;
+		'umb-input-member': UmbInputMemberElement;
 	}
 }

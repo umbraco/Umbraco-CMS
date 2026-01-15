@@ -1,15 +1,13 @@
-import type { ManifestMenu } from '../../menu.extension.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_MENU_CONTEXT } from './menu.context.token.js';
+import type { UmbMenuItemExpansionEntryModel } from './types.js';
+import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbMenuContext {
-	#manifest = new UmbDeepState<ManifestMenu | undefined>(undefined);
-	public readonly manifest = this.#manifest.asObservable();
-	public readonly alias = this.#manifest.asObservablePart((x) => x?.alias);
+export class UmbDefaultMenuContext extends UmbContextBase {
+	public readonly expansion = new UmbEntityExpansionManager<UmbMenuItemExpansionEntryModel>(this);
 
-	public setManifest(manifest: ManifestMenu | undefined) {
-		this.#manifest.setValue(manifest);
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_MENU_CONTEXT);
 	}
 }
-
-export const UMB_MENU_CONTEXT = new UmbContextToken<UmbMenuContext>('UMB_MENU_CONTEXT');

@@ -13,29 +13,6 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     ///     Gets a list of paged <see cref="IMember" /> objects
     /// </summary>
     /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
-    /// <param name="pageIndex">Current page index</param>
-    /// <param name="pageSize">Size of the page</param>
-    /// <param name="totalRecords">Total number of records found (out)</param>
-    /// <param name="orderBy">Field to order by</param>
-    /// <param name="orderDirection">Direction to order by</param>
-    /// <param name="memberTypeAlias"></param>
-    /// <param name="filter">Search text filter</param>
-    /// <returns>
-    ///     <see cref="IEnumerable{T}" />
-    /// </returns>
-    IEnumerable<IMember> GetAll(
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        string orderBy,
-        Direction orderDirection,
-        string? memberTypeAlias = null,
-        string filter = "");
-
-    /// <summary>
-    ///     Gets a list of paged <see cref="IMember" /> objects
-    /// </summary>
-    /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <param name="totalRecords">Total number of records found (out)</param>
@@ -53,19 +30,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         string orderBy,
         Direction orderDirection,
         string? memberTypeAlias = null,
-        string filter = "")
-    {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-        return GetAll(
-            pageNumber,
-            pageSize,
-            out totalRecords,
-            orderBy,
-            orderDirection,
-            memberTypeAlias,
-            filter);
-    }
+        string filter = "");
 
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects
@@ -217,18 +182,20 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
 
     /// <summary>
+    ///     Saves an <see cref="IMembershipUser" />
+    /// </summary>
+    /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
+    /// <param name="member"><see cref="IMember" /> or <see cref="IUser" /> to Save</param>
+    /// <param name="publishNotificationSaveOptions"> Enum for deciding which notifications to publish.</param>
+    /// <param name="userId">Id of the User saving the Member</param>
+    Attempt<OperationResult?> Save(IMember member, PublishNotificationSaveOptions publishNotificationSaveOptions, int userId = Constants.Security.SuperUserId) => Save(member, userId);
+
+    /// <summary>
     ///     Saves a single <see cref="IMember" /> object
     /// </summary>
     /// <param name="media">The <see cref="IMember" /> to save</param>
     /// <param name="userId">Id of the User saving the Member</param>
     Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a list of <see cref="IMember" /> objects
-    /// </summary>
-    /// <param name="members">Collection of <see cref="IMember" /> to save</param>
-    /// <param name="userId">Id of the User saving the Members</param>
-    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
@@ -256,7 +223,8 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember? GetByKey(Guid id);
+    [Obsolete($"Use {nameof(GetById)}. Scheduled for removal in Umbraco 18.")]
+    IMember? GetByKey(Guid id) => GetById(id);
 
     /// <summary>
     ///     Gets a Member by its integer id
@@ -266,6 +234,21 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     ///     <see cref="IMember" />
     /// </returns>
     IMember? GetById(int id);
+
+    /// <summary>
+    ///     Get an list of <see cref="IMember"/> for all members with the specified email.
+    /// </summary>
+    /// <param name="email">Email to use for retrieval</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{IMember}" />
+    /// </returns>
+    IEnumerable<IMember> GetMembersByEmail(string email)
+        =>
+        // TODO (V16): Remove this default implementation.
+        // The following is very inefficient, but will return the correct data, so probably better than throwing a NotImplementedException
+        // in the default implentation here, for, presumably rare, cases where a custom IMemberService implementation has been registered and
+        // does not override this method.
+        GetAllMembers().Where(x => x.Email.Equals(email));
 
     /// <summary>
     ///     Gets all Members for the specified MemberType alias
@@ -359,7 +342,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(
         string propertyTypeAlias,
         string value,
         StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
@@ -376,7 +365,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -386,7 +381,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value);
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -400,5 +401,18 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+
+    /// <summary>
+    /// Saves only the properties related to login for the member, using an optimized, non-locking update.
+    /// </summary>
+    /// <param name="member">The member to update.</param>
+    /// <returns>Used to avoid the full save of the member object after a login operation.</returns>
+    Task UpdateLoginPropertiesAsync(IMember member) => Task.CompletedTask;
 }

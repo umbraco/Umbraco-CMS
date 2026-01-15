@@ -1,13 +1,13 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { ManifestCollectionView } from '../extensions/index.js';
+import type { ManifestCollectionView } from '../view/types.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
-import { UMB_ROUTE_CONTEXT } from '../../router/route.context.js';
 import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 
 interface UmbCollectionViewLayout {
 	alias: string;
@@ -19,10 +19,10 @@ interface UmbCollectionViewLayout {
 @customElement('umb-collection-view-bundle')
 export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
-	_views: Array<UmbCollectionViewLayout> = [];
+	private _views: Array<UmbCollectionViewLayout> = [];
 
 	@state()
-	_currentView?: UmbCollectionViewLayout;
+	private _currentView?: UmbCollectionViewLayout;
 
 	@state()
 	private _collectionRootPathName?: string;
@@ -36,7 +36,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_ROUTE_CONTEXT, (context) => {
-			this.observe(context.activePath, (activePath) => {
+			this.observe(context?.activePath, (activePath) => {
 				this._collectionRootPathName = activePath;
 			});
 		});
@@ -47,7 +47,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
-			this._entityUnique = context.getUnique() ?? '';
+			this._entityUnique = context?.getUnique() ?? '';
 		});
 	}
 

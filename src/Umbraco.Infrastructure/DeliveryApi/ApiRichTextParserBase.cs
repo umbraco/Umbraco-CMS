@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Templates;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
@@ -21,7 +21,7 @@ internal abstract partial class ApiRichTextParserBase
         _apiMediaUrlProvider = apiMediaUrlProvider;
     }
 
-    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl, Action handleInvalidLink)
+    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl, Action handleInvalidLink)
     {
         ReplaceStatus replaceAttempt = ReplaceLocalLink(contentCache, mediaCache, href, type, handleContentRoute, handleMediaUrl);
         if (replaceAttempt == ReplaceStatus.Success)
@@ -35,7 +35,7 @@ internal abstract partial class ApiRichTextParserBase
         }
     }
 
-    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl)
     {
         Match match = LocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -59,7 +59,8 @@ internal abstract partial class ApiRichTextParserBase
                     : null;
                 if (route != null)
                 {
-                    handleContentRoute(route);
+                    route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
+                    handleContentRoute(route, content!);
                     return ReplaceStatus.Success;
                 }
 
@@ -68,7 +69,7 @@ internal abstract partial class ApiRichTextParserBase
                 IPublishedContent? media = mediaCache.GetById(guid);
                 if (media != null)
                 {
-                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
+                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media), media);
                     return ReplaceStatus.Success;
                 }
 
@@ -78,7 +79,7 @@ internal abstract partial class ApiRichTextParserBase
         return ReplaceStatus.InvalidEntityType;
     }
 
-    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl)
     {
         Match match = LegacyLocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -106,7 +107,8 @@ internal abstract partial class ApiRichTextParserBase
                     : null;
                 if (route != null)
                 {
-                    handleContentRoute(route);
+                    route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
+                    handleContentRoute(route, content!);
                     return ReplaceStatus.Success;
                 }
 
@@ -115,7 +117,7 @@ internal abstract partial class ApiRichTextParserBase
                 IPublishedContent? media = mediaCache.GetById(guidUdi.Guid);
                 if (media != null)
                 {
-                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
+                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media), media);
                     return ReplaceStatus.Success;
                 }
 
@@ -141,10 +143,10 @@ internal abstract partial class ApiRichTextParserBase
         handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
     }
 
-    [GeneratedRegex("{localLink:(?<udi>umb:.+)}")]
+    [GeneratedRegex("{localLink:(?<udi>umb:.+)}(?<query>[^\"]*)")]
     private static partial Regex LegacyLocalLinkRegex();
 
-    [GeneratedRegex("{localLink:(?<guid>.+)}")]
+    [GeneratedRegex("{localLink:(?<guid>.+)}(?<query>[^\"]*)")]
     private static partial Regex LocalLinkRegex();
 
     private enum ReplaceStatus

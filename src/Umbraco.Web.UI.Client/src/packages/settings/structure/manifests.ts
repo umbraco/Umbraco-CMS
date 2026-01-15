@@ -1,5 +1,6 @@
 import { UMB_SETTINGS_SECTION_ALIAS } from '../constants.js';
 import { UMB_STRUCTURE_SETTINGS_MENU_ALIAS } from './constants.js';
+import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -20,7 +21,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionAlias',
+				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 				match: UMB_SETTINGS_SECTION_ALIAS,
 			},
 		],

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,7 @@ public class StatusModelsBuilderController : ModelsBuilderControllerBase
     [HttpGet("status")]
     [ProducesResponseType(typeof(OutOfDateStatusResponseModel), StatusCodes.Status200OK)]
     [MapToApiVersion("1.0")]
-    public async Task<ActionResult<OutOfDateStatusResponseModel>> GetModelsOutOfDateStatus(CancellationToken cancellationToken)
+    public Task<ActionResult<OutOfDateStatusResponseModel>> GetModelsOutOfDateStatus(CancellationToken cancellationToken)
     {
         OutOfDateStatusResponseModel status = _outOfDateModelsStatus.IsEnabled
             ? _outOfDateModelsStatus.IsOutOfDate
@@ -26,6 +26,6 @@ public class StatusModelsBuilderController : ModelsBuilderControllerBase
                 : new OutOfDateStatusResponseModel { Status = OutOfDateType.Current }
             : new OutOfDateStatusResponseModel { Status = OutOfDateType.Unknown };
 
-        return await Task.FromResult(Ok(status));
+        return Task.FromResult<ActionResult<OutOfDateStatusResponseModel>>(Ok(status));
     }
 }

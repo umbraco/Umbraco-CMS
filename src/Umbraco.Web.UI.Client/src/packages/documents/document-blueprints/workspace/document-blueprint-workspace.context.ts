@@ -44,9 +44,19 @@ export class UmbDocumentBlueprintWorkspaceContext
 			detailRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'documentType',
+			ignoreValidationResultOnSubmit: true,
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
 
 		this.routes.setRoutes([
 			{

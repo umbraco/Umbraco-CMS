@@ -1,5 +1,6 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Examine;
+using Examine.Lucene.Search;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +23,7 @@ public class QuerySearcherController : SearcherControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearchResultResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PagedViewModel<SearchResultResponseModel>>> Query(
+    public Task<ActionResult<PagedViewModel<SearchResultResponseModel>>> Query(
         CancellationToken cancellationToken,
         string searcherName,
         string? term,
@@ -33,7 +34,7 @@ public class QuerySearcherController : SearcherControllerBase
 
         if (term.IsNullOrWhiteSpace())
         {
-            return new PagedViewModel<SearchResultResponseModel>();
+            return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(new PagedViewModel<SearchResultResponseModel>());
         }
 
         if (!_examineManagerService.TryFindSearcher(searcherName, out ISearcher searcher))
@@ -46,18 +47,19 @@ public class QuerySearcherController : SearcherControllerBase
                 Type = "Error",
             };
 
-            return NotFound(invalidModelProblem);
+            return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(NotFound(invalidModelProblem));
         }
 
         ISearchResults results;
 
         // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
+        // Due to examine changes we need to supply the skipTakeMaxResults, see https://github.com/umbraco/Umbraco-CMS/issues/17920 for more info
         try
         {
             results = searcher
                 .CreateQuery()
                 .NativeQuery(term)
-                .Execute(QueryOptions.SkipTake(skip, take));
+                .Execute(new LuceneQueryOptions(skip, take, skipTakeMaxResults: skip + take));
         }
         catch (ParseException)
         {
@@ -69,10 +71,10 @@ public class QuerySearcherController : SearcherControllerBase
                 Type = "Error",
             };
 
-            return BadRequest(invalidModelProblem);
+            return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(BadRequest(invalidModelProblem));
         }
 
-        return await Task.FromResult(new PagedViewModel<SearchResultResponseModel>
+        return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(new PagedViewModel<SearchResultResponseModel>
         {
             Total = results.TotalItemCount,
             Items = results.Select(x => new SearchResultResponseModel

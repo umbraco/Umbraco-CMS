@@ -2,9 +2,9 @@ import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import type { ModelsBuilderResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { ModelsBuilderService, ModelsModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { ModelsBuilderService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-models-builder-dashboard')
@@ -24,7 +24,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 	}
 
 	private async _getDashboardData() {
-		const { data } = await tryExecuteAndNotify(this, ModelsBuilderService.getModelsBuilderDashboard());
+		const { data } = await tryExecute(this, ModelsBuilderService.getModelsBuilderDashboard());
 		if (data) {
 			this._modelsBuilder = data;
 			return true;
@@ -39,7 +39,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 	}
 
 	private async _postGenerateModels() {
-		const { error } = await tryExecuteAndNotify(this, ModelsBuilderService.postModelsBuilderBuild());
+		const { error } = await tryExecute(this, ModelsBuilderService.postModelsBuilderBuild());
 		if (error) {
 			return false;
 		}
@@ -56,17 +56,15 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box class="uui-text">
-				<div class="headline">
-					<h1 class="uui-h2">Models Builder</h1>
-					<uui-button
-						.state="${this._buttonStateReload}"
-						look="secondary"
-						label="Reload"
-						@click="${this._onDashboardReload}">
-						Reload
-					</uui-button>
-				</div>
+			<uui-box headline="Models Builder" class="overview">
+				<uui-button
+					slot="header-actions"
+					.state="${this._buttonStateReload}"
+					look="secondary"
+					label="Reload"
+					@click="${this._onDashboardReload}">
+					Reload
+				</uui-button>
 				<p>Version: ${this._modelsBuilder?.version}</p>
 				<div class="models-description">
 					<p>ModelsBuilder is enabled with the following configuration:</p>
@@ -76,7 +74,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 									The <strong>ModelsMode</strong> is '${this._modelsBuilder.mode}'. ${this.renderModelsMode()}
 								</li> `
 							: nothing}
-						${this.renderList()}
+						${this._renderList()}
 					</ul>
 				</div>
 				<p class="models-actions">
@@ -95,14 +93,14 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 				</p>
 				${this._modelsBuilder?.lastError
 					? html`<p class="error">Last generation failed with the following error:</p>
-							<umb-code-block>${this._modelsBuilder.lastError}</umb-code-block>`
+							<umb-code-block style="max-height:500px;">${this._modelsBuilder.lastError}</umb-code-block>`
 					: nothing}
 			</uui-box>
 		`;
 	}
 
-	private renderList() {
-		if (this._modelsBuilder?.mode !== ModelsModeModel.NOTHING) {
+	private _renderList() {
+		if (this._modelsBuilder?.mode !== 'Nothing') {
 			return html`${this._modelsBuilder?.modelsNamespace
 				? html`<li>The <strong>models namespace</strong> is ${this._modelsBuilder.modelsNamespace}.</li>`
 				: nothing}
@@ -117,13 +115,13 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 
 	renderModelsMode() {
 		switch (this._modelsBuilder?.mode) {
-			case ModelsModeModel.IN_MEMORY_AUTO:
+			case 'InMemoryAuto':
 				return 'Strongly typed models are re-generated on startup and anytime schema changes (i.e. Content Type) are made. No recompilation necessary but the generated models are not available to code outside of Razor.';
-			case ModelsModeModel.SOURCE_CODE_MANUAL:
+			case 'SourceCodeManual':
 				return 'Strongly typed models are generated on demand. Recompilation is necessary and models are available to all CSharp code.';
-			case ModelsModeModel.SOURCE_CODE_AUTO:
+			case 'SourceCodeAuto':
 				return 'Strong typed models are generated on demand and anytime schema changes (i.e. Content Type) are made. Recompilation is necessary and models are available to all CSharp code.';
-			case ModelsModeModel.NOTHING:
+			case 'Nothing':
 				return 'Strongly typed models are not generated. All content and cache will operate from instance of IPublishedContent only.';
 			default:
 				return;
@@ -136,12 +134,6 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 			:host {
 				display: block;
 				padding: var(--uui-size-layout-1);
-			}
-
-			.headline {
-				display: flex;
-				justify-content: space-between;
-				align-items: flex-start;
 			}
 
 			.models-description ul {

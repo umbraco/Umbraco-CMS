@@ -1,9 +1,6 @@
 import type { UmbRelationEntityType } from './entity.js';
-import type {
-	DefaultReferenceResponseModel,
-	DocumentReferenceResponseModel,
-	MediaReferenceResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+export type * from './global-components/types.js';
+export type * from './reference/types.js';
 
 export interface UmbRelationDetailModel {
 	unique: string;
@@ -22,8 +19,3 @@ export interface UmbRelationDetailModel {
 	createDate: string;
 	comment: string | null;
 }
-
-export type UmbReferenceModel =
-	| DefaultReferenceResponseModel
-	| DocumentReferenceResponseModel
-	| MediaReferenceResponseModel;

@@ -90,6 +90,10 @@ public class DatabaseSchemaCreator
         typeof(WebhookLogDto),
         typeof(WebhookRequestDto),
         typeof(UserDataDto),
+        typeof(LongRunningOperationDto),
+        typeof(DistributedJobDto),
+        typeof(LastSyncedDto),
+        typeof(RepositoryCacheVersionDto),
     };
 
     private readonly IUmbracoDatabase _database;
@@ -170,7 +174,8 @@ public class DatabaseSchemaCreator
         if (creatingNotification.Cancel == false)
         {
             var dataCreation = new DatabaseDataCreator(
-                _database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
+                _database,
+                _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
                 _installDefaultDataSettings);
             foreach (Type table in _orderedTables)

@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 
@@ -54,7 +52,7 @@ public static class ContentRepositoryExtensions
             return;
         }
 
-        content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.Now);
+        content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.UtcNow);
     }
 
     /// <summary>
@@ -237,7 +235,7 @@ public static class ContentRepositoryExtensions
         {
             foreach (ContentCultureInfos cultureInfo in other.CultureInfos)
             {
-                if (culture == "*" || culture == cultureInfo.Culture)
+                if (culture == "*" || culture.InvariantEquals(cultureInfo.Culture))
                 {
                     content.SetCultureName(cultureInfo.Name, cultureInfo.Culture);
                 }
@@ -289,10 +287,6 @@ public static class ContentRepositoryExtensions
             content.EditedCultures = editedCultures.Count > 0 ? editedCultures : null;
         }
     }
-
-    [Obsolete("Please use the overload that accepts all parameters. Will be removed in V16.")]
-    public static bool PublishCulture(this IContent content, CultureImpact? impact)
-        => PublishCulture(content, impact, DateTime.Now, StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>());
 
     /// <summary>
     ///     Sets the publishing values for names and properties.

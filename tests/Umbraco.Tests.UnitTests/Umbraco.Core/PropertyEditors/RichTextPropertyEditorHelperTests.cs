@@ -30,7 +30,7 @@ public class RichTextPropertyEditorHelperTests
                                    "markup": "<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>",
                                    "blocks": {
                                        "layout": {
-                                           "Umbraco.TinyMCE": [{
+                                           "Umbraco.RichText": [{
                                                    "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02",
                                                    "settingsKey": "d2eeef66-4111-42f4-a164-7a523eaffbc2"
                                                }
@@ -95,14 +95,31 @@ public class RichTextPropertyEditorHelperTests
     }
 
     [Test]
-    public void Can_Parse_Blocks_With_Both_Content_And_Settings()
+    public void Can_Parse_JObject_With_Missing_Blocks()
     {
-        const string input = """
+        var input = JsonNode.Parse(""""
+                                   {
+                                    "markup": "<h2>Vælg et af vores mest populære produkter</h2>"
+                                   }
+                                   """");
+
+        var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
+        Assert.IsTrue(result);
+        Assert.IsNotNull(value);
+        Assert.AreEqual("<h2>Vælg et af vores mest populære produkter</h2>", value.Markup);
+        Assert.IsNull(value.Blocks);
+    }
+
+    [TestCase(Constants.PropertyEditors.Aliases.RichText)]
+    [TestCase("Umbraco.TinyMCE")]
+    public void Can_Parse_Blocks_With_Both_Content_And_Settings(string propertyEditorAlias)
+    {
+        string input = """
                              {
                               "markup": "<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>",
                               "blocks": {
                                   "layout": {
-                                      "Umbraco.TinyMCE": [{
+                                      "[PropertyEditorAlias]": [{
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02",
                                               "settingsKey": "d2eeef66-4111-42f4-a164-7a523eaffbc2"
                                           }
@@ -127,6 +144,7 @@ public class RichTextPropertyEditorHelperTests
                                 }
                              }
                              """;
+        input = input.Replace("[PropertyEditorAlias]", propertyEditorAlias);
 
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
         Assert.IsTrue(result);
@@ -164,6 +182,12 @@ public class RichTextPropertyEditorHelperTests
             Assert.AreEqual("settingsPropertyAlias", settingsProperties.First().Alias);
             Assert.AreEqual("A settings property value", settingsProperties.First().Value);
         });
+
+        Assert.IsTrue(value.Blocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.RichText));
+        var layout = value.Blocks.Layout[Constants.PropertyEditors.Aliases.RichText];
+        Assert.AreEqual(1, layout.Count());
+        Assert.AreEqual(Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02"), layout.First().ContentKey);
+        Assert.AreEqual(Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2"), layout.First().SettingsKey);
     }
 
     [Test]
@@ -174,7 +198,7 @@ public class RichTextPropertyEditorHelperTests
                               "markup": "<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>",
                               "blocks": {
                                   "layout": {
-                                      "Umbraco.TinyMCE": [{
+                                      "Umbraco.RichText": [{
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02"
                                           }
                                       ]
@@ -225,7 +249,7 @@ public class RichTextPropertyEditorHelperTests
                               "markup": "<p>this is <umb-rte-block-inline data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>",
                               "blocks": {
                                   "layout": {
-                                      "Umbraco.TinyMCE": [{
+                                      "Umbraco.RichText": [{
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02"
                                           }, {
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf03"
@@ -268,7 +292,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(0, value.Blocks.SettingsData.Count);
     }
 
-    private IJsonSerializer JsonSerializer() => new SystemTextJsonSerializer();
+    private IJsonSerializer JsonSerializer() => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
     private ILogger Logger() => Mock.Of<ILogger>();
 }

@@ -1,0 +1,11 @@
+{
+	"name": "@umbraco-backoffice/marked",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"marked": "^17.0.1"
+	}
+}

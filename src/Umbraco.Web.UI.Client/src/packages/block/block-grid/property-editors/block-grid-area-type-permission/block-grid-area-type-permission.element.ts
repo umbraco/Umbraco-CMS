@@ -3,7 +3,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, css, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 import type { UUIComboboxElement, UUIComboboxEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -12,6 +11,7 @@ import {
 	UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 	type UmbDocumentTypeItemModel,
 } from '@umbraco-cms/backoffice/document-type';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-block-grid-area-type-permission')
 export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
@@ -29,10 +29,15 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	@state()
 	private _value: Array<UmbBlockGridTypeAreaTypePermission> = [];
 
-	_blockTypes: Array<UmbBlockTypeWithGroupKey> = [];
+	@state()
+	private _blockTypes?: Array<UmbBlockTypeWithGroupKey>;
 
 	@state()
-	private _blockTypesWithElementName: Array<{ type: UmbBlockTypeWithGroupKey; name: string }> = [];
+	private _blockTypesWithElementName: Array<{
+		type: UmbBlockTypeWithGroupKey;
+		name: string;
+		icon: string | null | undefined;
+	}> = [];
 
 	@state()
 	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
@@ -40,7 +45,6 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	#itemsManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
 	);
 
 	constructor() {
@@ -49,26 +53,30 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		this.observe(this.#itemsManager.items, (items) => {
 			this._blockTypesWithElementName = items
 				.map((item) => {
-					const blockType = this._blockTypes.find((block) => block.contentElementTypeKey === item.unique);
+					const blockType = this._blockTypes?.find((block) => block.contentElementTypeKey === item.unique);
 					if (blockType) {
-						return { type: blockType, name: item.name };
+						return { type: blockType, name: item.name, icon: item.icon };
 					}
 					return undefined;
 				})
-				.filter((x) => x !== undefined) as Array<{ type: UmbBlockTypeWithGroupKey; name: string }>;
+				.filter((x) => x !== undefined) as Array<{
+				type: UmbBlockTypeWithGroupKey;
+				name: string;
+				icon: string | null | undefined;
+			}>;
 		});
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
 			this.observe(
-				await context.propertyValueByAlias<Array<UmbBlockTypeWithGroupKey>>('blocks'),
+				await context?.propertyValueByAlias<Array<UmbBlockTypeWithGroupKey>>('blocks'),
 				(blockTypes) => {
 					this._blockTypes = blockTypes ?? [];
-					this.#itemsManager.setUniques(blockTypes.map((block) => block.contentElementTypeKey));
+					this.#itemsManager.setUniques(this._blockTypes.map((block) => block.contentElementTypeKey));
 				},
 				'observeBlockType',
 			);
 			this.observe(
-				await context.propertyValueByAlias<Array<UmbBlockGridTypeGroupType>>('blockGroups'),
+				await context?.propertyValueByAlias<Array<UmbBlockGridTypeGroupType>>('blockGroups'),
 				(blockGroups) => {
 					this._blockGroups = blockGroups ?? [];
 				},
@@ -79,7 +87,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 
 	#addNewPermission() {
 		this.value = [...this.value, { minAllowed: 0, maxAllowed: undefined }];
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#setPermissionKey(e: UUIComboboxEvent, index: number) {
@@ -96,7 +104,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			: { elementTypeKey: undefined, groupKey: undefined };
 
 		this.value = value.map((permission, i) => (i === index ? { ...permission, ...setting } : permission));
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#setPermissionMinimumRange(e: UUIInputEvent, index: number) {
@@ -106,7 +114,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		this.value = value.map((permission, i) =>
 			i === index ? { ...permission, minAllowed: parseInt(input) ?? 0 } : permission,
 		);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 	#setPermissionMaximumRange(e: UUIInputEvent, index: number) {
 		const value = [...this.value];
@@ -115,15 +123,21 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		this.value = value.map((permission, i) =>
 			i === index ? { ...permission, maxAllowed: parseInt(input) ?? undefined } : permission,
 		);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#remove(index: number) {
 		this.value = [...this.value].filter((_, i) => i !== index);
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
+		if (this._blockTypes === undefined) {
+			return nothing;
+		}
+		if (this._blockTypesWithElementName.length === 0) {
+			return 'There must be one Block Type created before permissions can be configured.';
+		}
 		return html`<div id="permissions">
 				${repeat(
 					this._value,
@@ -188,7 +202,8 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			(group) => group.key,
 			(group) =>
 				html`<uui-combobox-list-option .value=${group.key} ?selected=${area.groupKey === group.key}>
-					${group.name}
+					<umb-icon name="icon-folder"></umb-icon>
+					${this.localize.string(group.name)}
 				</uui-combobox-list-option>`,
 		);
 	}
@@ -201,7 +216,8 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 				html`<uui-combobox-list-option
 					.value=${block.type.contentElementTypeKey}
 					?selected=${area.elementTypeKey === block.type.contentElementTypeKey}>
-					${block.name}
+					<umb-icon name=${block.icon}></umb-icon>
+					${this.localize.string(block.name)}
 				</uui-combobox-list-option>`,
 		);
 	}
@@ -237,7 +253,14 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			}
 
 			uui-combobox strong {
-				padding: 0 var(--uui-size-space-1);
+				padding: var(--uui-size-space-2);
+			}
+
+			uui-combobox-list-option {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+				padding: var(--uui-size-2);
 			}
 		`,
 	];

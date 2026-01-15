@@ -15,13 +15,12 @@ namespace Umbraco.Cms.Core.Services;
 
 public class RelationService : RepositoryService, IRelationService
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
-    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in V15")]
     public RelationService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -29,19 +28,18 @@ public class RelationService : RepositoryService, IRelationService
         IEntityService entityService,
         IRelationRepository relationRepository,
         IRelationTypeRepository relationTypeRepository,
-        IAuditRepository auditRepository)
-        : this(
-            uowProvider,
-            loggerFactory,
-            eventMessagesFactory,
-            entityService,
-            relationRepository,
-            relationTypeRepository,
-            auditRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+        IAuditService auditService,
+        IUserIdKeyResolver userIdKeyResolver)
+        : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
+        _relationRepository = relationRepository;
+        _relationTypeRepository = relationTypeRepository;
+        _auditService = auditService;
+        _userIdKeyResolver = userIdKeyResolver;
+        _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
     }
 
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public RelationService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -51,40 +49,60 @@ public class RelationService : RepositoryService, IRelationService
         IRelationTypeRepository relationTypeRepository,
         IAuditRepository auditRepository,
         IUserIdKeyResolver userIdKeyResolver)
-        : base(uowProvider, loggerFactory, eventMessagesFactory)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            userIdKeyResolver)
     {
-        _relationRepository = relationRepository;
-        _relationTypeRepository = relationTypeRepository;
-        _auditRepository = auditRepository;
-        _userIdKeyResolver = userIdKeyResolver;
-        _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            auditService,
+            userIdKeyResolver)
+    {
     }
 
     /// <inheritdoc />
     public IRelation? GetById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _relationRepository.Get(id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _relationRepository.Get(id);
     }
 
     /// <inheritdoc />
     public IRelationType? GetRelationTypeById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _relationTypeRepository.Get(id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _relationTypeRepository.Get(id);
     }
 
     /// <inheritdoc />
     public IRelationType? GetRelationTypeById(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _relationTypeRepository.Get(id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _relationTypeRepository.Get(id);
     }
 
     /// <inheritdoc />
@@ -93,10 +111,8 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetAllRelations(params int[] ids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _relationRepository.GetMany(ids);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _relationRepository.GetMany(ids);
     }
 
     /// <inheritdoc />
@@ -106,48 +122,42 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
-            return _relationRepository.Get(query);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
+        return _relationRepository.Get(query);
     }
 
     /// <inheritdoc />
     public IEnumerable<IRelationType> GetAllRelationTypes(params int[] ids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _relationTypeRepository.GetMany(ids);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _relationTypeRepository.GetMany(ids);
     }
 
     /// <summary>
     /// Gets the Relation types in a paged manner.
     /// Currently implements the paging in memory on the name property because the underlying repository does not support paging yet
     /// </summary>
-    public async Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
+    public Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         if (take == 0)
         {
-            return new PagedModel<IRelationType>(CountRelationTypes(), Enumerable.Empty<IRelationType>());
+            return Task.FromResult(new PagedModel<IRelationType>(CountRelationTypes(), Enumerable.Empty<IRelationType>()));
         }
 
-        IRelationType[] items = await Task.FromResult(_relationTypeRepository.GetMany(ids).ToArray());
+        IRelationType[] items = _relationTypeRepository.GetMany(ids).ToArray();
 
-        return new PagedModel<IRelationType>(
+        return Task.FromResult(new PagedModel<IRelationType>(
             items.Length,
             items.OrderBy(relationType => relationType.Name)
                 .Skip(skip)
-                .Take(take));
+                .Take(take)));
     }
 
-    public int CountRelationTypes()
-    {
-        return _relationTypeRepository.Count(null);
-    }
+    /// <inheritdoc />
+    public int CountRelationTypes() => _relationTypeRepository.Count(null);
 
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByParentId(int id) => GetByParentId(id, null);
@@ -155,24 +165,22 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByParentId(int id, string? relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        if (relationTypeAlias.IsNullOrWhiteSpace())
         {
-            if (relationTypeAlias.IsNullOrWhiteSpace())
-            {
-                IQuery<IRelation> qry1 = Query<IRelation>().Where(x => x.ParentId == id);
-                return _relationRepository.Get(qry1);
-            }
-
-            IRelationType? relationType = GetRelationType(relationTypeAlias!);
-            if (relationType == null)
-            {
-                return Enumerable.Empty<IRelation>();
-            }
-
-            IQuery<IRelation> qry2 =
-                Query<IRelation>().Where(x => x.ParentId == id && x.RelationTypeId == relationType.Id);
-            return _relationRepository.Get(qry2);
+            IQuery<IRelation> qry1 = Query<IRelation>().Where(x => x.ParentId == id);
+            return _relationRepository.Get(qry1);
         }
+
+        IRelationType? relationType = GetRelationType(relationTypeAlias!);
+        if (relationType == null)
+        {
+            return Enumerable.Empty<IRelation>();
+        }
+
+        IQuery<IRelation> qry2 =
+            Query<IRelation>().Where(x => x.ParentId == id && x.RelationTypeId == relationType.Id);
+        return _relationRepository.Get(qry2);
     }
 
     /// <inheritdoc />
@@ -188,24 +196,22 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByChildId(int id, string? relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        if (relationTypeAlias.IsNullOrWhiteSpace())
         {
-            if (relationTypeAlias.IsNullOrWhiteSpace())
-            {
-                IQuery<IRelation> qry1 = Query<IRelation>().Where(x => x.ChildId == id);
-                return _relationRepository.Get(qry1);
-            }
-
-            IRelationType? relationType = GetRelationType(relationTypeAlias!);
-            if (relationType == null)
-            {
-                return Enumerable.Empty<IRelation>();
-            }
-
-            IQuery<IRelation> qry2 =
-                Query<IRelation>().Where(x => x.ChildId == id && x.RelationTypeId == relationType.Id);
-            return _relationRepository.Get(qry2);
+            IQuery<IRelation> qry1 = Query<IRelation>().Where(x => x.ChildId == id);
+            return _relationRepository.Get(qry1);
         }
+
+        IRelationType? relationType = GetRelationType(relationTypeAlias!);
+        if (relationType == null)
+        {
+            return Enumerable.Empty<IRelation>();
+        }
+
+        IQuery<IRelation> qry2 =
+            Query<IRelation>().Where(x => x.ChildId == id && x.RelationTypeId == relationType.Id);
+        return _relationRepository.Get(qry2);
     }
 
     /// <inheritdoc />
@@ -218,39 +224,34 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByParentOrChildId(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.ChildId == id || x.ParentId == id);
-            return _relationRepository.Get(query);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.ChildId == id || x.ParentId == id);
+        return _relationRepository.Get(query);
     }
 
+    /// <inheritdoc />
     public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IRelationType? relationType = GetRelationType(relationTypeAlias);
+        if (relationType == null)
         {
-            IRelationType? relationType = GetRelationType(relationTypeAlias);
-            if (relationType == null)
-            {
-                return Enumerable.Empty<IRelation>();
-            }
-
-            IQuery<IRelation> query = Query<IRelation>().Where(x =>
-                (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
-            return _relationRepository.Get(query);
+            return Enumerable.Empty<IRelation>();
         }
+
+        IQuery<IRelation> query = Query<IRelation>().Where(x =>
+            (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
+        return _relationRepository.Get(query);
     }
 
     /// <inheritdoc />
     public IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == parentId &&
-                                                                    x.ChildId == childId &&
-                                                                    x.RelationTypeId == relationType.Id);
-            return _relationRepository.Get(query).FirstOrDefault();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == parentId &&
+                                                                x.ChildId == childId &&
+                                                                x.RelationTypeId == relationType.Id);
+        return _relationRepository.Get(query).FirstOrDefault();
     }
 
     /// <inheritdoc />
@@ -266,7 +267,7 @@ public class RelationService : RepositoryService, IRelationService
         }
 
         return relationTypeIds.Count == 0
-            ? Enumerable.Empty<IRelation>()
+            ? []
             : GetRelationsByListOfTypeIds(relationTypeIds);
     }
 
@@ -276,54 +277,48 @@ public class RelationService : RepositoryService, IRelationService
         IRelationType? relationType = GetRelationType(relationTypeAlias);
 
         return relationType == null
-            ? Enumerable.Empty<IRelation>()
-            : GetRelationsByListOfTypeIds(new[] { relationType.Id });
+            ? []
+            : GetRelationsByListOfTypeIds([relationType.Id]);
     }
 
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
-            return _relationRepository.Get(query);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
+        return _relationRepository.Get(query);
     }
 
     /// <inheritdoc />
     public IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation>? query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
-            return _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out totalRecords, ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation>? query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
+        return _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out totalRecords, ordering);
     }
 
+    /// <inheritdoc />
     public async Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return await _relationRepository.GetPagedByChildKeyAsync(childKey, skip, take, relationTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return await _relationRepository.GetPagedByChildKeyAsync(childKey, skip, take, relationTypeAlias);
     }
 
-    public async Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null)
+    /// <inheritdoc />
+    public Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IRelationType? relationType = _relationTypeRepository.Get(key);
+        if (relationType is null)
         {
-            IRelationType? relationType = _relationTypeRepository.Get(key);
-            if (relationType is null)
-            {
-                return await Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
-            }
-
-            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-            IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageNumber, pageSize, out var totalRecords, ordering);
-            return await Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
         }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+        IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageNumber, pageSize, out var totalRecords, ordering);
+        return Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
     }
 
     /// <inheritdoc />
@@ -394,19 +389,15 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
     }
 
     /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
     }
 
     /// <inheritdoc />
@@ -440,22 +431,20 @@ public class RelationService : RepositoryService, IRelationService
         // TODO: We don't check if this exists first, it will throw some sort of data integrity exception if it already exists, is that ok?
         var relation = new Relation(parentId, childId, relationType);
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new RelationSavingNotification(relation, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingNotification))
         {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new RelationSavingNotification(relation, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return relation; // TODO: returning sth that does not exist here?!
-            }
-
-            _relationRepository.Save(relation);
-            scope.Notifications.Publish(
-                new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
             scope.Complete();
-            return relation;
+            return relation; // TODO: returning sth that does not exist here?!
         }
+
+        _relationRepository.Save(relation);
+        scope.Notifications.Publish(
+            new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
+        scope.Complete();
+        return relation;
     }
 
     /// <inheritdoc />
@@ -491,31 +480,50 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public bool HasRelations(IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-            return _relationRepository.Get(query).Any();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+        return _relationRepository.Get(query).Any();
     }
 
+    [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
+
+    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
+
     /// <inheritdoc />
-    public bool IsRelated(int id)
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>();
+
+        query = directionFilter switch
         {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
-            return _relationRepository.Get(query).Any();
+            RelationDirectionFilter.Parent => query.Where(x => x.ParentId == id),
+            RelationDirectionFilter.Child => query.Where(x => x.ChildId == id),
+            RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
+            _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
+        };
+
+        if (includeRelationTypeIds is not null && includeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereIn(x => x.RelationTypeId, includeRelationTypeIds);
         }
+
+        if (excludeRelationTypeIds is not null && excludeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereNotIn(x => x.RelationTypeId, excludeRelationTypeIds);
+        }
+
+        return _relationRepository.Get(query).Any();
     }
 
     /// <inheritdoc />
     public bool AreRelated(int parentId, int childId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
-            return _relationRepository.Get(query).Any();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
+        return _relationRepository.Get(query).Any();
     }
 
     /// <inheritdoc />
@@ -540,65 +548,61 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public void Save(IRelation relation)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new RelationSavingNotification(relation, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingNotification))
         {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new RelationSavingNotification(relation, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _relationRepository.Save(relation);
             scope.Complete();
-            scope.Notifications.Publish(
-                new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
+            return;
         }
+
+        _relationRepository.Save(relation);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
     }
 
+    /// <inheritdoc />
     public void Save(IEnumerable<IRelation> relations)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IRelation[] relationsA = relations.ToArray();
+
+        EventMessages messages = EventMessagesFactory.Get();
+        var savingNotification = new RelationSavingNotification(relationsA, messages);
+        if (scope.Notifications.PublishCancelable(savingNotification))
         {
-            IRelation[] relationsA = relations.ToArray();
-
-            EventMessages messages = EventMessagesFactory.Get();
-            var savingNotification = new RelationSavingNotification(relationsA, messages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _relationRepository.Save(relationsA);
             scope.Complete();
-            scope.Notifications.Publish(
-                new RelationSavedNotification(relationsA, messages).WithStateFrom(savingNotification));
+            return;
         }
+
+        _relationRepository.Save(relationsA);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationSavedNotification(relationsA, messages).WithStateFrom(savingNotification));
     }
 
     /// <inheritdoc />
     public void Save(IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingNotification))
         {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _relationTypeRepository.Save(relationType);
-            Audit(AuditType.Save, Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
             scope.Complete();
-            scope.Notifications.Publish(
-                new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
+            return;
         }
+
+        _relationTypeRepository.Save(relationType);
+        Audit(AuditType.Save, Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey)
     {
         if (relationType.Id != 0)
@@ -614,6 +618,7 @@ public class RelationService : RepositoryService, IRelationService
             userKey);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey) =>
         await SaveAsync(
             relationType,
@@ -649,125 +654,115 @@ public class RelationService : RepositoryService, IRelationService
 
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(RelationTypeOperationStatus.CancelledByNotification, relationType);
             }
 
             _relationTypeRepository.Save(relationType);
-            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, currentUser, relationType.Id, auditMessage);
+            await AuditAsync(auditType, userKey, relationType.Id, auditMessage);
             scope.Complete();
             scope.Notifications.Publish(
                 new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
         }
 
-        return await Task.FromResult(Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType));
+        return Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType);
     }
 
     /// <inheritdoc />
     public void Delete(IRelation relation)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new RelationDeletingNotification(relation, eventMessages);
+        if (scope.Notifications.PublishCancelable(deletingNotification))
         {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new RelationDeletingNotification(relation, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _relationRepository.Delete(relation);
             scope.Complete();
-            scope.Notifications.Publish(
-                new RelationDeletedNotification(relation, eventMessages).WithStateFrom(deletingNotification));
+            return;
         }
+
+        _relationRepository.Delete(relation);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationDeletedNotification(relation, eventMessages).WithStateFrom(deletingNotification));
     }
 
     /// <inheritdoc />
     public void Delete(IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+        if (scope.Notifications.PublishCancelable(deletingNotification))
         {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _relationTypeRepository.Delete(relationType);
             scope.Complete();
-            scope.Notifications.Publish(
-                new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
+            return;
         }
+
+        _relationTypeRepository.Delete(relationType);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IRelationType? relationType = _relationTypeRepository.Get(key);
+        if (relationType is null)
         {
-            IRelationType? relationType = _relationTypeRepository.Get(key);
-            if (relationType is null)
-            {
-                return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.NotFound, null);
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
-            }
-
-            _relationTypeRepository.Delete(relationType);
-            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
-            scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
-            scope.Complete();
-            return await Task.FromResult(Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType));
+            return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.NotFound, null);
         }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
+        }
+
+        _relationTypeRepository.Delete(relationType);
+        await AuditAsync(AuditType.Delete, userKey, relationType.Id, "Deleted relation type");
+        scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType);
     }
 
     /// <inheritdoc />
     public void DeleteRelationsOfType(IRelationType relationType)
     {
         var relations = new List<IRelation>();
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+        var allRelations = _relationRepository.Get(query).ToList();
+        relations.AddRange(allRelations);
+
+        // TODO: N+1, we should be able to do this in a single call
+        foreach (IRelation relation in relations)
         {
-            IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-            var allRelations = _relationRepository.Get(query).ToList();
-            relations.AddRange(allRelations);
-
-            // TODO: N+1, we should be able to do this in a single call
-            foreach (IRelation relation in relations)
-            {
-                _relationRepository.Delete(relation);
-            }
-
-            scope.Complete();
-
-            scope.Notifications.Publish(new RelationDeletedNotification(relations, EventMessagesFactory.Get()));
+            _relationRepository.Delete(relation);
         }
+
+        scope.Complete();
+
+        scope.Notifications.Publish(new RelationDeletedNotification(relations, EventMessagesFactory.Get()));
     }
 
+    /// <inheritdoc />
     public bool AreRelated(int parentId, int childId, IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelation> query = Query<IRelation>().Where(x =>
-                x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
-            return _relationRepository.Get(query).Any();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelation> query = Query<IRelation>().Where(x =>
+            x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
+        return _relationRepository.Get(query).Any();
     }
 
+    /// <inheritdoc />
     public IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes() =>
-        new[]
-        {
+        [
             UmbracoObjectTypes.Document,
             UmbracoObjectTypes.Media,
             UmbracoObjectTypes.Member,
@@ -778,20 +773,18 @@ public class RelationService : RepositoryService, IRelationService
             UmbracoObjectTypes.MemberGroup,
             UmbracoObjectTypes.ROOT,
             UmbracoObjectTypes.RecycleBin,
-        };
+        ];
 
     #region Private Methods
 
     private IRelationType? GetRelationType(string relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IRelationType> query = Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
-            return _relationTypeRepository.Get(query).FirstOrDefault();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IRelationType> query = Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
+        return _relationTypeRepository.Get(query).FirstOrDefault();
     }
 
-    private IEnumerable<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
+    private List<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
     {
         var relations = new List<IRelation>();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -809,7 +802,23 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.RelationType.GetName(), message));
+        AuditAsync(type, userId, objectId, message).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+    {
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await AuditAsync(type, userKey, objectId, message, parameters);
+    }
+
+    private async Task AuditAsync(AuditType type, Guid userKey, int objectId, string? message = null, string? parameters = null) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            UmbracoObjectTypes.RelationType.GetName(),
+            message,
+            parameters);
 
     #endregion
 }

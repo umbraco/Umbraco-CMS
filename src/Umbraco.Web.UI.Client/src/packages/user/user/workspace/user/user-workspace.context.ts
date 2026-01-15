@@ -1,27 +1,26 @@
 import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } from '../../types.js';
-import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserDetailRepository } from '../../repository/index.js';
 import { UMB_USER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserAvatarRepository } from '../../repository/avatar/index.js';
 import { UmbUserConfigRepository } from '../../repository/config/index.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
-import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
+import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 type EntityType = UmbUserDetailModel;
 
 export class UmbUserWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbUserDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<EntityType, UmbUserDetailRepository>
 	implements UmbSubmittableWorkspaceContext
 {
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
 	public readonly configRepository = new UmbUserConfigRepository(this);
 
-	readonly name = this._data.createObservablePartOfCurrent((x) => x?.name);
 	readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
 	readonly kind = this._data.createObservablePartOfCurrent((x) => x?.kind);
 	readonly userGroupUniques = this._data.createObservablePartOfCurrent((x) => x?.userGroupUniques || []);
@@ -46,8 +45,6 @@ export class UmbUserWorkspaceContext
 			detailRepositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
 		});
 
-		this.addValidationContext(new UmbValidationContext(this));
-
 		this.routes.setRoutes([
 			{
 				path: 'edit/:id',
@@ -63,7 +60,17 @@ export class UmbUserWorkspaceContext
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
-		this.observe(response.asObservable?.(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
+		if (!response.data) {
+			// Return early if there is no user	data
+			this.removeUmbControllerByAlias('umbUserStoreObserver');
+			return response;
+		}
+
+		this.observe(
+			(response as UmbRepositoryResponseWithAsObservable<EntityType>).asObservable?.(),
+			(user) => this.onUserStoreChanges(user),
+			'umbUserStoreObserver',
+		);
 
 		if (!this._detailRepository) {
 			throw new Error('Detail repository is missing');
@@ -102,18 +109,10 @@ export class UmbUserWorkspaceContext
 		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
-	deleteAvatar() {
+	async deleteAvatar() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
-		return this.avatarRepository.deleteAvatar(unique);
-	}
-
-	getName(): string {
-		return this._data.getCurrent()?.name || '';
-	}
-
-	setName(name: string) {
-		this._data.updateCurrent({ name });
+		await this.avatarRepository.deleteAvatar(unique);
 	}
 
 	override destroy(): void {

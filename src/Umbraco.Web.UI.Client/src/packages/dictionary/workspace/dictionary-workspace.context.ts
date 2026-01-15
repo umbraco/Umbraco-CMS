@@ -7,15 +7,14 @@ import {
 	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbDictionaryDetailModel, UmbDictionaryDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbDictionaryDetailModel, UmbDictionaryDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	readonly dictionary = this._data.createObservablePartOfCurrent((data) => data);
 
 	constructor(host: UmbControllerHost) {
@@ -50,14 +49,6 @@ export class UmbDictionaryWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	setName(name: string) {
-		this._data.updateCurrent({ name });
-	}
-
-	getName() {
-		return this._data.getCurrent()?.name;
 	}
 
 	setPropertyValue(isoCode: string, translation: string) {

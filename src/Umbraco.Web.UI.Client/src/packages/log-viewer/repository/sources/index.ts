@@ -1,6 +1,6 @@
+import type { UmbLogLevelCounts } from '../../types.js';
 import type {
 	DirectionModel,
-	LogLevelCountsReponseModel,
 	LogLevelModel,
 	PagedLoggerResponseModel,
 	PagedLogMessageResponseModel,
@@ -10,7 +10,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export interface LogSearchDataSource {
+export interface UmbLogSearchDataSource {
 	getAllSavedSearches({
 		skip,
 		take,
@@ -23,7 +23,7 @@ export interface LogSearchDataSource {
 	postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel): Promise<UmbDataSourceResponse<unknown>>;
 }
 
-export interface LogMessagesDataSource {
+export interface UmbLogMessagesDataSource {
 	getLogViewerLevel({
 		skip,
 		take,
@@ -37,7 +37,7 @@ export interface LogMessagesDataSource {
 	}: {
 		startDate?: string;
 		endDate?: string;
-	}): Promise<UmbDataSourceResponse<LogLevelCountsReponseModel>>;
+	}): Promise<UmbDataSourceResponse<UmbLogLevelCounts>>;
 	getLogViewerLogs({
 		skip,
 		take,

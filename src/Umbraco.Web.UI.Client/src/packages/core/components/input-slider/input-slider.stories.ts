@@ -1,16 +1,25 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
-import './input-slider.element.js';
 import type { UmbInputSliderElement } from './input-slider.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import './input-slider.element.js';
 
 const meta: Meta<UmbInputSliderElement> = {
-	title: 'Components/Inputs/Slider',
+	title: 'Generic Components/Inputs/Slider',
 	component: 'umb-input-slider',
+	render: (args) =>
+		html`<umb-input-slider
+			.min="${args.min}"
+			.max="${args.max}"
+			.step="${args.step}"
+			.valueLow="${args.valueLow}"
+			.valueHigh="${args.valueHigh}"
+			?enableRange="${args.enableRange}"></umb-input-slider>`,
 };
 
 export default meta;
 type Story = StoryObj<UmbInputSliderElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		min: 0,
 		max: 100,

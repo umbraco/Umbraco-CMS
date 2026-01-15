@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -16,6 +15,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 {
     private readonly ITemplateService _templateService;
     private readonly IElementSwitchValidator _elementSwitchValidator;
+    private readonly IReservedFieldNamesService _reservedFieldNamesService;
     private readonly IContentTypeService _contentTypeService;
 
     public ContentTypeEditingService(
@@ -24,26 +24,14 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        IElementSwitchValidator elementSwitchValidator)
+        IElementSwitchValidator elementSwitchValidator,
+        IReservedFieldNamesService reservedFieldNamesService)
         : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
         _elementSwitchValidator = elementSwitchValidator;
-    }
-
-    [Obsolete("Use the constructor that is not marked obsolete, will be removed in v16")]
-    public ContentTypeEditingService(
-        IContentTypeService contentTypeService,
-        ITemplateService templateService,
-        IDataTypeService dataTypeService,
-        IEntityService entityService,
-        IShortStringHelper shortStringHelper)
-        : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
-    {
-        _contentTypeService = contentTypeService;
-        _templateService = templateService;
-        _elementSwitchValidator = StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidator>();
+        _reservedFieldNamesService = reservedFieldNamesService;
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
@@ -184,4 +172,6 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
     protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.DocumentType;
 
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DocumentTypeContainer;
+
+    protected override ISet<string> GetReservedFieldNames() => _reservedFieldNamesService.GetDocumentReservedFieldNames();
 }

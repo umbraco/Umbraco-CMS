@@ -1,16 +1,17 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-test.beforeEach(async ({umbracoUi}) => {
+test('can update value of activate the profiler by default', async ({umbracoUi}) => {
+  // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.profiling.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.profiling.clickProfilingTab();
-});
 
-test('can update value of activate the profiler by default', async ({umbracoUi}) => {
   // Act
-  await umbracoUi.profiling.clickActivateProfilerByDefaultSlider();
-  await umbracoUi.reloadPage();
+  await umbracoUi.profiling.isActivateProfilerByDefaultToggleChecked(false);
+  await umbracoUi.profiling.clickActivateProfilerByDefaultToggle();
 
   // Assert
-  await umbracoUi.profiling.isActivateProfilerByDefaultSliderChecked(true);
+  await umbracoUi.profiling.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.profiling.clickProfilingTab();
+  await umbracoUi.profiling.isActivateProfilerByDefaultToggleChecked(true);
 });

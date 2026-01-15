@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -42,6 +43,8 @@ internal class PublishedContent : PublishedContentBase
         _urlSegment = contentData.UrlSegment;
         _published = contentData.Published;
 
+        IsPreviewing = preview;
+
         var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
         var i = 0;
         foreach (IPublishedPropertyType propertyType in _contentNode.ContentType.PropertyTypes)
@@ -57,11 +60,11 @@ internal class PublishedContent : PublishedContentBase
         Id = contentNode.Id;
         Key = contentNode.Key;
         CreatorId = contentNode.CreatorId;
-        CreateDate = contentNode.CreateDate;
+        CreateDate = contentNode.CreateDate.EnsureUtc();
         SortOrder = contentNode.SortOrder;
         WriterId = contentData.WriterId;
         TemplateId = contentData.TemplateId;
-        UpdateDate = contentData.VersionDate;
+        UpdateDate = contentData.VersionDate.EnsureUtc();
     }
 
     public override IPublishedContentType ContentType => _contentNode.ContentType;
@@ -127,7 +130,7 @@ internal class PublishedContent : PublishedContentBase
 
     public override DateTime UpdateDate { get; }
 
-    public bool IsPreviewing { get; } = false;
+    public bool IsPreviewing { get; }
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
@@ -268,22 +271,22 @@ internal class PublishedContent : PublishedContentBase
     private IPublishedContent? GetParent()
     {
         INavigationQueryService? navigationQueryService;
-        IPublishedCache? publishedCache;
+        IPublishedStatusFilteringService? publishedStatusFilteringService;
 
         switch (ContentType.ItemType)
         {
             case PublishedItemType.Content:
-                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
                 navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>();
                 break;
             case PublishedItemType.Media:
-                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
                 navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaStatusFilteringService>();
                 break;
             default:
                 throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
         }
 
-        return this.Parent<IPublishedContent>(publishedCache, navigationQueryService);
+        return this.Parent<IPublishedContent>(navigationQueryService, publishedStatusFilteringService);
     }
 }

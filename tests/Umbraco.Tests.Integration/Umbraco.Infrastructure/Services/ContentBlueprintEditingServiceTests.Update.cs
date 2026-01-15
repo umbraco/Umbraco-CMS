@@ -15,12 +15,12 @@ public partial class ContentBlueprintEditingServiceTests
 
         var updateModel = new ContentBlueprintUpdateModel
         {
-            InvariantName = "Updated Blueprint Name",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "Updated Blueprint Name" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The updated title" },
-                new PropertyValueModel { Alias = "text", Value = "The updated text" },
-            },
+                new PropertyValueModel { Alias = "text", Value = "The updated text" }
+            ],
         };
 
         var result = await ContentBlueprintEditingService.UpdateAsync(blueprint.Key, updateModel, Constants.Security.SuperUserKey);
@@ -54,30 +54,16 @@ public partial class ContentBlueprintEditingServiceTests
 
         var updateModel = new ContentBlueprintUpdateModel
         {
-            InvariantProperties = new[]
+            Properties = new[]
             {
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The updated blueprint invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title", Culture = "da-DK" },
             },
             Variants = new[]
             {
-                new VariantModel
-                {
-                    Culture = "en-US",
-                    Name = "Updated Blueprint English Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title" },
-                    },
-                },
-                new VariantModel
-                {
-                    Culture = "da-DK",
-                    Name = "Updated Blueprint Danish Name",
-                    Properties = new[]
-                    {
-                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title" },
-                    },
-                },
+                new VariantModel { Culture = "en-US", Name = "Updated Blueprint English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Blueprint Danish Name" },
             },
         };
 
@@ -117,11 +103,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = blueprintToUpdate.ContentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Blueprint",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Blueprint" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         var createResult = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -136,7 +122,7 @@ public partial class ContentBlueprintEditingServiceTests
         // update a blueprint with the same name
         var updateModel = new ContentBlueprintUpdateModel
         {
-            InvariantName = "Test Blueprint",
+            Variants = [new VariantModel { Name = "Test Blueprint" }]
         };
 
         var updateResult = await ContentBlueprintEditingService.UpdateAsync(blueprintToUpdate.Key, updateModel, Constants.Security.SuperUserKey);

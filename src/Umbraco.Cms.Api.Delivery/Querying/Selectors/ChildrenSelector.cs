@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -9,8 +12,12 @@ public sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
 {
     private const string ChildrenSpecifier = "children:";
 
-    public ChildrenSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
-        : base(publishedContentCache, requestRoutingService)
+    public ChildrenSelector(
+        IRequestRoutingService requestRoutingService,
+        IRequestPreviewService requestPreviewService,
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
+        : base(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
     {
     }
 

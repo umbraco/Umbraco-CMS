@@ -3,6 +3,7 @@
 
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -26,7 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaRepositoryTest : UmbracoIntegrationTest
+internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpTestData() => CreateTestData();
@@ -50,21 +51,20 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
     {
         appCaches ??= AppCaches.NoCache;
         var scopeAccessor = (IScopeAccessor)provider;
-        var globalSettings = new GlobalSettings();
         var commonRepository =
             new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
         var languageRepository =
-            new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>());
-        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
-        var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>());
-        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
+            new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
+        var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
+        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var propertyEditors =
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var mediaUrlGenerators = new MediaUrlGeneratorCollection(() => Enumerable.Empty<IMediaUrlGenerator>());
         var dataValueReferences =
-            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
         var repository = new MediaRepository(
             scopeAccessor,
             appCaches,
@@ -80,12 +80,14 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
             dataValueReferences,
             DataTypeService,
             JsonSerializer,
-            Mock.Of<IEventAggregator>());
+            Mock.Of<IEventAggregator>(),
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
         return repository;
     }
 
     [Test]
-    public void CacheActiveForIntsAndGuids()
+    public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -93,43 +95,123 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
             new IsolatedCaches(t => new ObjectCacheAppCache()));
 
         var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+        var scopeAccessor = ScopeAccessor;
 
-            var udb = ScopeAccessor.AmbientScope.Database;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
 
-            udb.EnableSqlCount = false;
+        var database = scopeAccessor.AmbientScope.Database;
 
-            var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");
-            mediaTypeRepository.Save(mediaType);
+        database.EnableSqlCount = false;
 
-            var media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
-            repository.Save(media);
+        var media = CreateMedia(repository, mediaTypeRepository);
 
-            udb.EnableSqlCount = true;
+        database.EnableSqlCount = true;
 
-            // go get it, this should already be cached since the default repository key is the INT
-            var found = repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // retrieve again, this should use cache
-            found = repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // reset counter
-            udb.EnableSqlCount = false;
-            udb.EnableSqlCount = true;
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // now get by GUID, this won't be cached yet because the default repo key is not a GUID
-            found = repository.Get(media.Key);
-            var sqlCount = udb.SqlCount;
-            Assert.Greater(sqlCount, 0);
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
 
-            // retrieve again, this should use cache now
-            found = repository.Get(media.Key);
-            Assert.AreEqual(sqlCount, udb.SqlCount);
-        }
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var media = CreateMedia(repository, mediaTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IMedia so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IMedia>();
+
+        // Initial request by ID should hit the database.
+        repository.Get(media.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var media = CreateMedia(repository, mediaTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IMedia so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IMedia>();
+
+        // Initial request by key should hit the database.
+        repository.Get(media.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
+    {
+        var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");
+        mediaTypeRepository.Save(mediaType);
+
+        var media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
+        repository.Save(media);
+        return media;
     }
 
     [Test]
@@ -249,6 +331,37 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void DeleteVersions()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider, out var mediaTypeRepository);
+
+            // Act
+            var media = repository.Get(_testFile.Id);
+
+            int initialCount = repository.GetAllVersions(media.Id).Count();
+            repository.DeleteVersions(media.Id, DateTime.Now);
+            int initialDeleteCount = repository.GetAllVersions(media.Id).Count();
+
+            media.Name = $"Test File Updated";
+            repository.Save(media);
+
+            int updatedCount = repository.GetAllVersions(media.Id).Count();
+            repository.DeleteVersions(media.Id, DateTime.Now);
+            int updatedDeleteCount = repository.GetAllVersions(media.Id).Count();
+
+            // Assert
+            Assert.That(initialCount == 1);
+            Assert.That(initialDeleteCount == initialCount);
+            Assert.That(updatedCount == 1); // media has no unpublished state and therefore only one Version
+            Assert.That(updatedDeleteCount == initialCount);
+        }
+    }
+
+    [Test]
     public void GetMedia()
     {
         // Arrange
@@ -309,7 +422,7 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
                 repository.Save(folder);
             }
 
-            int[] types = { 1031 };
+            var types = new List<int> { 1031 };
             var query = provider.CreateQuery<IMedia>().Where(x => types.Contains(x.ContentTypeId));
             var result = repository.Get(query);
 

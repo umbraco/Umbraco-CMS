@@ -19,13 +19,12 @@ public class GlobalSettings
     internal const string StaticTimeOut = "00:20:00";
     internal const string StaticDefaultUILanguage = "en-US";
     internal const bool StaticHideTopLevelNodeFromPath = true;
-    internal const bool StaticUseHttps = false;
+    internal const bool StaticUseHttps = true;
     internal const int StaticVersionCheckPeriod = 7;
     internal const string StaticIconsPath = "umbraco/assets/icons";
     internal const string StaticUmbracoCssPath = "~/css";
     internal const string StaticUmbracoScriptsPath = "~/scripts";
     internal const string StaticUmbracoMediaPath = "~/media";
-    internal const bool StaticInstallMissingDatabase = false;
     internal const bool StaticDisableElectionForSingleServer = false;
     internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
     internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
@@ -115,13 +114,6 @@ public class GlobalSettings
     public string UmbracoMediaPhysicalRootPath { get; set; } = null!;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether to install the database when it is missing.
-    /// </summary>
-    [Obsolete("This option will be removed in V16.")]
-    [DefaultValue(StaticInstallMissingDatabase)]
-    public bool InstallMissingDatabase { get; set; } = StaticInstallMissingDatabase;
-
-    /// <summary>
     ///     Gets or sets a value indicating whether to disable the election for a single server.
     /// </summary>
     [DefaultValue(StaticDisableElectionForSingleServer)]
@@ -188,6 +180,11 @@ public class GlobalSettings
     ///     Gets a value indicating whether SMTP is configured.
     /// </summary>
     public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
+
+    /// <summary>
+    ///     Gets a value indicating whether SMTP expiry is configured.
+    /// </summary>
+    public bool IsSmtpExpiryConfigured => Smtp?.EmailExpiration != null && Smtp?.EmailExpiration.HasValue == true;
 
     /// <summary>
     ///     Gets a value indicating whether there is a physical pickup directory configured.

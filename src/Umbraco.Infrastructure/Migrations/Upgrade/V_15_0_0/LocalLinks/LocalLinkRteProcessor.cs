@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 
@@ -10,7 +11,7 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
 
     public IEnumerable<string> PropertyEditorAliases =>
     [
-        Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.RichText
+        "Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.RichText
     ];
 
     public Func<object?, Func<object?, bool>, Func<string, string>, bool> Process => ProcessRichText;
@@ -28,6 +29,16 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
         bool hasChanged = false;
 
         var newMarkup = processStringValue.Invoke(richTextValue.Markup);
+
+        // fix recursive hickup in ConvertRichTextEditorProperties
+        newMarkup = RteBlockHelper.BlockRegex().Replace(
+            newMarkup,
+            match => UdiParser.TryParse(match.Groups["udi"].Value, out GuidUdi? guidUdi)
+                ? match.Value
+                    .Replace(match.Groups["attribute"].Value, "data-content-key")
+                    .Replace(match.Groups["udi"].Value, guidUdi.Guid.ToString("D"))
+                : string.Empty);
+
         if (newMarkup.Equals(richTextValue.Markup) == false)
         {
             hasChanged = true;
@@ -52,4 +63,11 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
 
         return hasChanged;
     }
+}
+
+[Obsolete("Will be removed in V18")]
+public static partial class RteBlockHelper
+{
+    [GeneratedRegex("<umb-rte-block.*(?<attribute>data-content-udi)=\"(?<udi>.[^\"]*)\".*<\\/umb-rte-block")]
+    public static partial Regex BlockRegex();
 }

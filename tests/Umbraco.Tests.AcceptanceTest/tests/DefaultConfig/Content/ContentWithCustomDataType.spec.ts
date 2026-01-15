@@ -11,7 +11,7 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
@@ -26,13 +26,12 @@ test('can create content with the custom data type with email address property e
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -51,10 +50,9 @@ test('can add text to the email address in the content section', async ({umbraco
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(emailAddress);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -71,16 +69,16 @@ test('can create content with the custom data type with decimal property editor'
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
+  expect(contentData.values[0].value).toEqual(0);
 });
 
 test('can add decimal number to the decimal in the content section', async ({umbracoApi, umbracoUi}) => {
@@ -96,18 +94,16 @@ test('can add decimal number to the decimal in the content section', async ({umb
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterNumeric(decimal);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual(decimal);
 });
 
-// Skip this test as currently there is no code editor property editor available.
-test.skip('can create content with the custom data type with code editor property editor', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the custom data type with code editor property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Code Editor';
   const customDataTypeId = await umbracoApi.dataType.createCodeEditorDataType(customDataTypeName);
@@ -117,13 +113,12 @@ test.skip('can create content with the custom data type with code editor propert
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -142,10 +137,9 @@ test('can add javascript code to the code editor in the content section', async 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterCodeEditorValue(javascriptCode);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -162,13 +156,12 @@ test('can create content with the custom data type with markdown editor property
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -187,10 +180,9 @@ test('can add code to the markdown editor in the content section', async ({umbra
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterMarkdownEditorValue(inputText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -207,13 +199,12 @@ test('can create content with the custom data type with multiple text string pro
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -232,10 +223,9 @@ test('can add string to the multiple text string in the content section', async 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addMultipleTextStringItem(multipleTextStringValue);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -244,8 +234,8 @@ test('can add string to the multiple text string in the content section', async 
 
 test('can create content with the custom data type with slider property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  customDataTypeName = 'Slider';
-  const customDataTypeId = await umbracoApi.dataType.createSliderDataTyper(customDataTypeName);
+  customDataTypeName = 'Custom Slider';
+  const customDataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -253,19 +243,18 @@ test('can create content with the custom data type with slider property editor',
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });
 
-test('can change slider value in the content section', async ({umbracoApi, umbracoUi}) => {
+test('can change slider value in the content section', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Slider';
   const sliderValue = 10;
@@ -273,7 +262,7 @@ test('can change slider value in the content section', async ({umbracoApi, umbra
     "from": sliderValue,
     "to": sliderValue
   }
-  const customDataTypeId = await umbracoApi.dataType.createSliderDataTyper(customDataTypeName);
+  const customDataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -282,10 +271,9 @@ test('can change slider value in the content section', async ({umbracoApi, umbra
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.changeSliderValue(sliderValue.toString());
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -310,8 +298,9 @@ test('can save content after changing the property editor of the custom data typ
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addMultipleTextStringItem(inputText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value).toContain(inputText);
 });

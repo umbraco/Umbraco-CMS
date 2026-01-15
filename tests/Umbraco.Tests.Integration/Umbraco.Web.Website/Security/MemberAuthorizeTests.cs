@@ -21,7 +21,7 @@ using Umbraco.Cms.Web.Website.Controllers;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
 {
-    public class MemberAuthorizeTests : UmbracoTestServerTestBase
+    internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
     {
         private Mock<IMemberManager> _memberManagerMock = new();
 

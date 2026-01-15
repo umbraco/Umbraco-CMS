@@ -38,7 +38,7 @@ public class WebProfiler : IProfiler
 
     public IDisposable? Step(string name) =>
         MiniProfiler.Current?.Step(name);
-    bool IsEnabled => true;
+    private bool IsEnabled => true;
 
     public void Start()
     {
@@ -109,7 +109,7 @@ public class WebProfiler : IProfiler
                     && !location.Contains("://"))
                 {
                     MiniProfilerContext.Value.Root.Name = "Before Redirect";
-                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson(), false);
+                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson(), false, false, "Unspecified");
                 }
             }
         }

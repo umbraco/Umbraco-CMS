@@ -8,8 +8,10 @@ import {
 	UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 } from './constants.js';
+import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -22,7 +24,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_DOCUMENT_TYPE_TREE_STORE_ALIAS,
 		name: 'Document Type Tree Store',
-		api: () => import('./document-type.tree.store.js'),
+		api: UmbDocumentTypeTreeStore,
 	},
 	{
 		type: 'tree',
@@ -57,7 +59,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				oneOf: [UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS, UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS],
 			},
 		],

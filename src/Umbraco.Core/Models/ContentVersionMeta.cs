@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Extensions;
+
 namespace Umbraco.Cms.Core.Models;
 
 public class ContentVersionMeta
@@ -37,7 +39,7 @@ public class ContentVersionMeta
 
     public int UserId { get; }
 
-    public DateTime VersionDate { get; }
+    public DateTime VersionDate { get; private set; }
 
     public bool CurrentPublishedVersion { get; }
 
@@ -48,4 +50,6 @@ public class ContentVersionMeta
     public string? Username { get; }
 
     public override string ToString() => $"ContentVersionMeta(versionId: {VersionId}, versionDate: {VersionDate:s}";
+
+    public void EnsureUtc() => VersionDate = VersionDate.EnsureUtc();
 }

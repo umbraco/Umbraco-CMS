@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Validation;
@@ -27,6 +27,7 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
         if (validationContextCulture is null)
         {
+            // make sure we extend validation to variant block value (element level variation)
             IEnumerable<string> validationContextCulturesBeingValidated = isWildcardCulture
                 ? blockEditorData.BlockValue.Expose.Select(e => e.Culture).WhereNotNull().Distinct()
                 : validationContext.CulturesBeingValidated;
@@ -38,9 +39,23 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
                 }
             }
         }
+        else
+        {
+            // make sure we extend validation to invariant block values (no element level variation)
+            foreach (var segment in validationContext.SegmentsBeingValidated.DefaultIfEmpty(null))
+            {
+                elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, null, segment));
+            }
+        }
 
         return elementTypeValidation;
     }
+
+    protected virtual string ContentDataGroupJsonPath =>
+        nameof(BlockValue<TLayout>.ContentData).ToFirstLowerInvariant();
+
+    protected virtual string SettingsDataGroupJsonPath =>
+        nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant();
 
     private IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData<TValue, TLayout> blockEditorData, string? culture, string? segment)
     {
@@ -65,15 +80,21 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
         var itemDataGroups = new[]
         {
-            new { Path = nameof(BlockValue<TLayout>.ContentData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.ContentData.Where(cd => exposedContentKeys.Contains(cd.Key)).ToArray() },
-            new { Path = nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.SettingsData.Where(sd => exposedSettingsKeys.Contains(sd.Key)).ToArray() }
+            new { Path = ContentDataGroupJsonPath, Items = blockEditorData.BlockValue.ContentData.Where(cd => exposedContentKeys.Contains(cd.Key)).ToArray() },
+            new { Path = SettingsDataGroupJsonPath, Items = blockEditorData.BlockValue.SettingsData.Where(sd => exposedSettingsKeys.Contains(sd.Key)).ToArray() }
         };
 
         var valuesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
 
         foreach (var group in itemDataGroups)
         {
-            var allElementTypes = _elementTypeCache.GetMany(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
+            Guid[] elementTypeKeys = group.Items.Select(x => x.ContentTypeKey).ToArray();
+            if (elementTypeKeys.Length == 0)
+            {
+                continue;
+            }
+
+            var allElementTypes = _elementTypeCache.GetMany(elementTypeKeys).ToDictionary(x => x.Key);
 
             for (var i = 0; i < group.Items.Length; i++)
             {

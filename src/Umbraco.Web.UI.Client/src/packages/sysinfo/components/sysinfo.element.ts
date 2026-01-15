@@ -5,10 +5,11 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCurrentUserRepository } from '@umbraco-cms/backoffice/current-user';
+import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 
 type ServerKeyValue = {
-	name: string;
-	data: string;
+	name?: string;
+	data?: string;
 };
 
 @customElement('umb-sysinfo')
@@ -25,6 +26,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 	readonly #serverKeyValues: Array<ServerKeyValue> = [];
 	readonly #sysinfoRepository = new UmbSysinfoRepository(this);
 	readonly #currentUserRepository = new UmbCurrentUserRepository(this);
+	readonly #temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -35,28 +37,38 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		this._loading = true;
 		this.#serverKeyValues.length = 0;
 
-		const [serverTroubleshooting, serverInformation] = await Promise.all([
-			this.#sysinfoRepository.requestTroubleShooting(),
-			this.#sysinfoRepository.requestServerInformation(),
-		]);
+		const [serverTroubleshooting, serverInformation, clientInformation, { data: currentUser }, temporaryFileConfig] =
+			await Promise.all([
+				this.#sysinfoRepository.requestTroubleShooting(),
+				this.#sysinfoRepository.requestServerInformation(),
+				this.#sysinfoRepository.requestClientInformation(),
+				this.#currentUserRepository.requestCurrentUser(),
+				this.#temporaryFileConfigRepository.requestTemporaryFileConfiguration(),
+			]);
 
+		this.#serverKeyValues.push({ name: 'Server Troubleshooting' });
 		if (serverTroubleshooting) {
 			this.#serverKeyValues.push(...serverTroubleshooting.items);
 		}
 
+		this.#serverKeyValues.push({});
+		this.#serverKeyValues.push({ name: 'Server Information' });
 		if (serverInformation) {
 			this.#serverKeyValues.push({ name: 'Umbraco build version', data: serverInformation.version });
+			this.#serverKeyValues.push({ name: 'Umbraco assembly version', data: serverInformation.assemblyVersion });
 			this.#serverKeyValues.push({ name: 'Server time offset', data: serverInformation.baseUtcOffset });
 			this.#serverKeyValues.push({ name: 'Runtime mode', data: serverInformation.runtimeMode });
 		}
 
-		// Browser information
-		this.#serverKeyValues.push({ name: 'Browser (user agent)', data: navigator.userAgent });
-		this.#serverKeyValues.push({ name: 'Browser language', data: navigator.language });
-		this.#serverKeyValues.push({ name: 'Browser location', data: location.href });
+		this.#serverKeyValues.push({});
+		this.#serverKeyValues.push({ name: 'Client Information' });
+		if (clientInformation) {
+			this.#serverKeyValues.push({ name: 'Umbraco client version', data: clientInformation.version });
+		}
 
 		// User information
-		const { data: currentUser } = await this.#currentUserRepository.requestCurrentUser();
+		this.#serverKeyValues.push({});
+		this.#serverKeyValues.push({ name: 'Current user' });
 		if (currentUser) {
 			this.#serverKeyValues.push({ name: 'User is admin', data: currentUser.isAdmin ? 'Yes' : 'No' });
 			this.#serverKeyValues.push({ name: 'User sections', data: currentUser.allowedSections.join(', ') });
@@ -67,9 +79,38 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 			});
 			this.#serverKeyValues.push({
 				name: 'User document start nodes',
-				data: currentUser.documentStartNodeUniques.length ? currentUser.documentStartNodeUniques.join(', ') : 'None',
+				data: currentUser.documentStartNodeUniques.join(', '),
 			});
 		}
+
+		this.#serverKeyValues.push({});
+		this.#serverKeyValues.push({ name: 'Temporary file configuration' });
+		// Temporary file configuration
+		if (temporaryFileConfig) {
+			this.#serverKeyValues.push({
+				name: 'Max allowed file size',
+				data: temporaryFileConfig.maxFileSize?.toString() ?? 'Not set (unlimited)',
+			});
+			this.#serverKeyValues.push({
+				name: 'Allowed file types',
+				data: temporaryFileConfig.allowedUploadedFileExtensions.join(', '),
+			});
+			this.#serverKeyValues.push({
+				name: 'Disallowed file types',
+				data: temporaryFileConfig.disallowedUploadedFilesExtensions?.join(', '),
+			});
+			this.#serverKeyValues.push({
+				name: 'Image file types',
+				data: temporaryFileConfig.imageFileTypes?.join(', '),
+			});
+		}
+
+		// Browser information
+		this.#serverKeyValues.push({});
+		this.#serverKeyValues.push({ name: 'Browser Troubleshooting' });
+		this.#serverKeyValues.push({ name: 'Browser (user agent)', data: navigator.userAgent });
+		this.#serverKeyValues.push({ name: 'Browser language', data: navigator.language });
+		this.#serverKeyValues.push({ name: 'Browser location', data: location.href });
 
 		this._systemInformation = this.#renderServerKeyValues();
 		this._loading = false;
@@ -78,7 +119,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 	#renderServerKeyValues() {
 		return this.#serverKeyValues
 			.map((serverKeyValue) => {
-				return `${serverKeyValue.name}: ${serverKeyValue.data}`;
+				return serverKeyValue.name ? `${serverKeyValue.name}: ${serverKeyValue.data ?? ''}` : '';
 			})
 			.join('\n');
 	}
@@ -145,8 +186,9 @@ ${this._systemInformation}`;
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
-			#code-block {
+			#codeblock {
 				max-height: 300px;
+				overflow: auto;
 			}
 		`,
 	];

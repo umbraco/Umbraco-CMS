@@ -1,16 +1,17 @@
+import type { UmbApiConstructorArgumentsMethodType } from '../functions/index.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import type { ManifestApi, ManifestBase } from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
+	type UmbBaseExtensionsInitializerArgs,
 } from './base-extensions-initializer.controller.js';
 import { UmbExtensionApiInitializer } from './extension-api-initializer.controller.js';
-import type {
-	ManifestApi,
-	ManifestBase,
-	UmbApiConstructorArgumentsMethodType,
-	UmbExtensionRegistry,
-} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbExtensionsApiInitializerArgs extends UmbBaseExtensionsInitializerArgs {}
 
 /**
  * This Controller manages a set of Extensions and their Manifest.
@@ -63,8 +64,9 @@ export class UmbExtensionsApiInitializer<
 		filter?: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
+		args?: UmbExtensionsApiInitializerArgs,
 	) {
-		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias, args);
 		this.#extensionRegistry = extensionRegistry;
 		this.#constructorArgs = constructorArguments;
 		this._init();

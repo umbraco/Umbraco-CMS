@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -20,6 +23,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IContentValidationServiceBase<TContentType> _validationService;
+    private readonly IRelationService _relationService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     protected ContentEditingServiceBase(
         TContentService contentService,
@@ -29,16 +34,27 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        IContentValidationServiceBase<TContentType> validationService)
+        IContentValidationServiceBase<TContentType> validationService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _validationService = validationService;
+        ContentSettings = optionsMonitor.CurrentValue;
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            ContentSettings = contentSettings;
+        });
+
+        _relationService = relationService;
         CoreScopeProvider = scopeProvider;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
+        _contentTypeFilters = contentTypeFilters;
     }
 
     protected abstract TContent New(string? name, int parentId, TContentType contentType);
@@ -51,11 +67,18 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected abstract OperationResult? Delete(TContent content, int userId);
 
+    protected ContentSettings ContentSettings { get; private set; }
+
     protected ICoreScopeProvider CoreScopeProvider { get; }
 
     protected TContentService ContentService { get; }
 
     protected TContentTypeService ContentTypeService { get; }
+
+    /// <summary>
+    /// Gets the alias used to relate the parent entity when handling content (document or media) delete operations.
+    /// </summary>
+    protected virtual string? RelateParentOnDeleteAlias => null;
 
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
@@ -137,23 +160,43 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustNotBeTrashed, MoveToRecycleBin);
+        => await HandleDeletionAsync(
+                key,
+                userKey,
+                ContentTrashStatusRequirement.MustNotBeTrashed,
+                MoveToRecycleBin,
+                ContentSettings.DisableUnpublishWhenReferenced,
+                ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
-        => await HandleDeletionAsync(key, userKey, mustBeTrashed ? ContentTrashStatusRequirement.MustBeTrashed : ContentTrashStatusRequirement.Irrelevant, Delete);
+        => await HandleDeletionAsync(
+                key,
+                userKey,
+                mustBeTrashed
+                    ? ContentTrashStatusRequirement.MustBeTrashed
+                    : ContentTrashStatusRequirement.Irrelevant,
+                Delete,
+                ContentSettings.DisableDeleteWhenReferenced,
+                ContentEditingOperationStatus.CannotDeleteWhenReferenced);
 
     // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
     // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
     // DeleteAsync (irrelevant, Delete)
     // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBin)
     // DeleteFromRecycleBinAsync (MustBeTrashed, Delete)
-    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, ContentTrashStatusRequirement trashStatusRequirement, Func<TContent, int, OperationResult?> performDelete)
+    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(
+        Guid key,
+        Guid userKey,
+        ContentTrashStatusRequirement trashStatusRequirement,
+        Func<TContent, int, OperationResult?> performDelete,
+        bool disabledWhenReferenced,
+        ContentEditingOperationStatus referenceFailStatus)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content == null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         // checking the trash status is not done when it is irrelevant
@@ -163,7 +206,30 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
                 ? ContentEditingOperationStatus.NotInTrash
                 : ContentEditingOperationStatus.InTrash;
-            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content));
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content);
+        }
+
+        if (disabledWhenReferenced)
+        {
+            // When checking if an item is related, we may need to exclude the "relate parent on delete" relation type, as this prevents
+            // deleting from the recycle bin.
+            int[]? excludeRelationTypeIds = null;
+            if (string.IsNullOrWhiteSpace(RelateParentOnDeleteAlias) is false)
+            {
+                IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(RelateParentOnDeleteAlias);
+                if (relateParentOnDeleteRelationType is not null)
+                {
+                    excludeRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                }
+            }
+
+            if (_relationService.IsRelated(
+                content.Id,
+                RelationDirectionFilter.Child,
+                excludeRelationTypeIds: excludeRelationTypeIds))
+            {
+                return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
+            }
         }
 
         var userId = await GetUserIdAsync(userKey);
@@ -180,12 +246,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         if (mustBeInRecycleBin && content.Trashed is false)
         {
-            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content));
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content);
         }
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
@@ -228,7 +294,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
@@ -264,6 +330,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             // these are the only result states currently expected from the invoked IContentService operations
             OperationResultType.Success => ContentEditingOperationStatus.Success,
             OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+            OperationResultType.FailedCannot => ContentEditingOperationStatus.CannotDeleteWhenReferenced,
 
             // for any other state we'll return "unknown" so we know that we need to amend this switch statement
             _ => ContentEditingOperationStatus.Unknown
@@ -280,34 +347,36 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByCulture() == false)
+        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null && v.Segment is null) is false)
         {
-            if (contentEditingModelBase.InvariantName.IsNullOrWhiteSpace() || contentEditingModelBase.Variants.Any())
-            {
-                operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
-                return null;
-            }
+            // does not vary by anything and is missing the invariant name = invalid
+            operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
+            return null;
+        }
+
+        if (contentType.VariesByCulture() && contentEditingModelBase.Variants.Any(v => v.Culture is null))
+        {
+            // varies by culture with one or more variants not bound to a culture = invalid
+            operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
+            return null;
+        }
+
+        if (contentType.VariesBySegment() && contentEditingModelBase.Variants.Any(v => v.Segment is null) is false)
+        {
+            // varies by segment with no default segment variants = invalid
+            operationStatus = ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch;
+            return null;
         }
 
         var propertyTypesByAlias = contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
         var propertyValuesAndVariance = contentEditingModelBase
-            .InvariantProperties
+            .Properties
             .Select(pv => new
             {
-                VariesByCulture = false,
-                VariesBySegment = false,
+                VariesByCulture = pv.Culture is not null,
+                VariesBySegment = pv.Segment is not null,
                 PropertyValue = pv
             })
-            .Union(contentEditingModelBase
-                .Variants
-                .SelectMany(v => v
-                    .Properties
-                    .Select(vpv => new
-                    {
-                        VariesByCulture = true,
-                        VariesBySegment = v.Segment.IsNullOrWhiteSpace() == false,
-                        PropertyValue = vpv
-                    })))
             .ToArray();
 
         // verify that all property values are defined as property types
@@ -321,7 +390,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         if (propertyValuesAndVariance.Any(pv =>
             {
                 IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
-                return propertyType.VariesByCulture() != pv.VariesByCulture || propertyType.VariesBySegment() != pv.VariesBySegment;
+                return (propertyType.VariesByCulture() != pv.VariesByCulture)
+                       || (propertyType.VariesBySegment() is false && pv.VariesBySegment);
             }))
         {
             operationStatus = ContentEditingOperationStatus.PropertyTypeNotFound;
@@ -340,10 +410,15 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         if (parentKey.HasValue && parent == null)
         {
-            return await Task.FromResult<(int? ParentId, ContentEditingOperationStatus OperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
+            return (null, ContentEditingOperationStatus.ParentNotFound);
         }
 
-        if (parent == null && contentType.AllowedAsRoot == false)
+        if (parent == null &&
+            (contentType.AllowedAsRoot == false ||
+
+            // We could have a content type filter registered that prevents the content from being created at the root level,
+            // even if it's allowed in the content type definition.
+            await IsAllowedAtRootByContentTypeFilters(contentType) == false))
         {
             return (null, ContentEditingOperationStatus.NotAllowed);
         }
@@ -359,13 +434,39 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             Guid[] allowedContentTypeKeys = parentContentType?.AllowedContentTypes?.Select(c => c.Key).ToArray()
                                             ?? Array.Empty<Guid>();
 
-            if (allowedContentTypeKeys.Contains(contentType.Key) == false)
+            if (allowedContentTypeKeys.Contains(contentType.Key) == false ||
+
+                // We could have a content type filter registered that prevents the content from being created as a child,
+                // even if it's allowed in the content type definition.
+                await IsAllowedAsChildByContentTypeFilters(contentType, parentContentType!.Key, parent.Key) == false)
             {
                 return (null, ContentEditingOperationStatus.NotAllowed);
             }
         }
 
         return (parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success);
+    }
+
+    private async Task<bool> IsAllowedAtRootByContentTypeFilters(TContentType contentType)
+    {
+        IEnumerable<TContentType> filteredContentTypes = [contentType];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedAtRootAsync(filteredContentTypes);
+        }
+
+        return filteredContentTypes.Any();
+    }
+
+    private async Task<bool> IsAllowedAsChildByContentTypeFilters(TContentType contentType, Guid parentContentTypeKey, Guid parentKey)
+    {
+        IEnumerable<ContentTypeSort> filteredContentTypes = [new ContentTypeSort(contentType.Key, contentType.SortOrder, contentType.Alias)];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedChildrenAsync(filteredContentTypes, parentContentTypeKey, parentKey);
+        }
+
+        return filteredContentTypes.Any();
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
@@ -386,10 +487,16 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 content.SetCultureName(name, culture);
             }
         }
+        else if (contentType.VariesBySegment())
+        {
+            // this should be validated already so it's OK to throw an exception here
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Segment is null)?.Name
+                           ?? throw new ArgumentException("Could not find the default segment variant", nameof(contentEditingModelBase));
+        }
         else
         {
             // this should be validated already so it's OK to throw an exception here
-            content.Name = contentEditingModelBase.InvariantName
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
                            ?? throw new ArgumentException("Could not find a culture invariant variant", nameof(contentEditingModelBase));
         }
     }
@@ -399,26 +506,19 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // create a mapping dictionary for all content type property types by their property aliases
         Dictionary<string, IPropertyType> propertyTypesByAlias = GetPropertyTypesByAlias(contentType);
 
-        // flatten the invariant and variant property values from the model into one array, and remove any properties
-        // that do not exist on the content type
-        var propertyValues = contentEditingModelBase
-            .InvariantProperties
-            .Select(pv => new { Culture = (string?)null, Segment = (string?)null, Alias = pv.Alias, Value = pv.Value })
-            .Union(contentEditingModelBase
-                .Variants
-                .SelectMany(v => v
-                    .Properties
-                    .Select(vpv => new { Culture = v.Culture, Segment = v.Segment, Alias = vpv.Alias, Value = vpv.Value })))
+        // remove any properties that do not exist on the content type
+        PropertyValueModel[] propertyValues = contentEditingModelBase
+            .Properties
             .Where(propertyValue => propertyTypesByAlias.ContainsKey(propertyValue.Alias))
             .ToArray();
 
         // update all properties on the content item
-        foreach (var propertyValue in propertyValues)
+        foreach (PropertyValueModel propertyValue in propertyValues)
         {
             // the following checks should already have been validated by now, so it's OK to throw exceptions here
             if(propertyTypesByAlias.TryGetValue(propertyValue.Alias, out IPropertyType? propertyType) == false
                || (propertyType.VariesByCulture() && propertyValue.Culture.IsNullOrWhiteSpace())
-               || (propertyType.VariesBySegment() && propertyValue.Segment.IsNullOrWhiteSpace()))
+               || (propertyType.VariesBySegment() is false && propertyValue.Segment.IsNullOrWhiteSpace() is false))
             {
                 throw new ArgumentException($"Culture or segment variance mismatch for property: {propertyValue.Alias}", nameof(contentEditingModelBase));
             }
@@ -434,8 +534,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // create a mapping dictionary for all content type property types by their property aliases
         Dictionary<string, IPropertyType> propertyTypesByAlias = GetPropertyTypesByAlias(contentType);
         var knownPropertyAliases = contentEditingModelBase
-            .InvariantProperties.Select(pv => pv.Alias)
-            .Union(contentEditingModelBase.Variants.SelectMany(v => v.Properties.Select(vpv => vpv.Alias)))
+            .Properties
+            .Select(pv => pv.Alias)
             .Distinct()
             .ToArray();
 
@@ -451,14 +551,19 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // this should already have been validated by now, so it's OK to throw exceptions here
         if (_propertyEditorCollection.TryGet(propertyType.PropertyEditorAlias, out IDataEditor? dataEditor) == false)
         {
-            _logger.LogWarning("Unable to retrieve property value - no data editor found for property editor: {PropertyEditorAlias}", propertyType.PropertyEditorAlias);
-            return null;
+            _logger.LogWarning(
+                "Unable to find property editor {PropertyEditorAlias}, for property {PropertyAlias}. Leaving property value unchanged.",
+                propertyType.PropertyEditorAlias,
+                propertyType.Alias);
+
+            return content.GetValue(propertyType.Alias, culture, segment);
         }
 
         IDataValueEditor dataValueEditor = dataEditor.GetValueEditor();
         if (dataValueEditor.IsReadOnly)
         {
-            return null;
+            // read-only property editor - get and return the current value
+            return content.GetValue(propertyType.Alias, culture, segment);
         }
 
         IDataType? dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey);
@@ -478,7 +583,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <summary>
     /// Should never be made public, serves the purpose of a nullable bool but more readable.
     /// </summary>
-    private enum ContentTrashStatusRequirement
+    protected internal enum ContentTrashStatusRequirement
     {
         Irrelevant,
         MustBeTrashed,

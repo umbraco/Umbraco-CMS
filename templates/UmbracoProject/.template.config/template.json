@@ -32,7 +32,8 @@
           "condition": "(!Docker)",
           "exclude": [
             "Dockerfile",
-            ".dockerignore"
+            ".dockerignore",
+            "entrypoint.sh"
           ]
         }
       ]
@@ -82,7 +83,7 @@
       "replaces": "CUSTOM_VERSION",
       "isRequired": false
     },
-    "FinalVersion" : {
+    "FinalVersion": {
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
@@ -98,13 +99,12 @@
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "13.5.0"
+            "value": "17.0.0"
           }
         ]
       }
     },
-    "DotnetVersion":
-    {
+    "DotnetVersion": {
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
@@ -116,11 +116,11 @@
         "cases": [
           {
             "condition": "(UmbracoRelease == 'Latest')",
-            "value": "net9.0"
+            "value": "net10.0"
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "net8.0"
+            "value": "net10.0"
           }
         ]
       }
@@ -299,6 +299,33 @@
         ]
       },
       "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
+    },
+    "UnattendedTelemetryLevel": {
+      "displayName": "Unattended telemetry level",
+      "description": "Specifies the level of telemetry information the installation will report.",
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Detailed",
+      "choices": [
+        {
+          "choice": "Minimal",
+          "description": "Minimal information"
+        },
+        {
+          "choice": "Basic",
+          "description": "Basic information"
+        },
+        {
+          "choice": "Detailed",
+          "description": "Detailed information"
+        }
+      ],
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_TELEMETRY_LEVEL_FROM_TEMPLATE"
     },
     "UsingUnattenedInstall": {
       "type": "computed",

@@ -5,9 +5,13 @@ import {
 } from '../entity.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
+import { UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
 
 export const UMB_STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
 export const UMB_STYLESHEET_TREE_REPOSITORY_ALIAS = 'Umb.Repository.StylesheetTree';
+/**
+ * @deprecated Use {@link UMB_STYLESHEET_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
+ */
 export const UMB_STYLESHEET_TREE_STORE_ALIAS = 'Umb.Store.StylesheetTree';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -21,7 +25,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_STYLESHEET_TREE_STORE_ALIAS,
 		name: 'Stylesheet Tree Store',
-		api: () => import('./stylesheet-tree.store.js'),
+		api: UmbStylesheetTreeStore,
 	},
 	{
 		type: 'tree',

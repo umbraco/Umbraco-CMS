@@ -18,7 +18,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	UmbDuplicateDocumentModalValue
 > {
 	@state()
-	_destinationUnique?: string | null;
+	private _destinationUnique?: string | null;
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
@@ -46,7 +46,13 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="Duplicate">
 				<uui-box id="tree-box" headline="Duplicate to">
-					<umb-tree alias=${UMB_DOCUMENT_TREE_ALIAS} @selection-change=${this.#onTreeSelectionChange}></umb-tree>
+					<umb-tree
+						alias=${UMB_DOCUMENT_TREE_ALIAS}
+						.props=${{
+							expandTreeRoot: true,
+							hideTreeItemActions: true,
+						}}
+						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
 				<uui-box headline="Options">
 					<umb-property-layout label="Relate to original" orientation="vertical"

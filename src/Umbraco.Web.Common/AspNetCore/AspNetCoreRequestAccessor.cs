@@ -34,7 +34,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, IDisposable
     public string? GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
 
     /// <inheritdoc />
-    public string? GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
+    public string? GetQueryStringValue(string name) => _httpContextAccessor.HttpContext?.Request.Query[name];
 
     /// <inheritdoc />
     public Uri? GetRequestUrl() => _httpContextAccessor.HttpContext != null
@@ -86,8 +86,8 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, IDisposable
 
     private string? GetFormValue(string name)
     {
-        HttpRequest request = _httpContextAccessor.GetRequiredHttpContext().Request;
-        if (!request.HasFormContentType)
+        HttpRequest? request = _httpContextAccessor.HttpContext?.Request;
+        if (request?.HasFormContentType is not true)
         {
             return null;
         }

@@ -1,25 +1,21 @@
-using System;
-using System.Threading.Tasks;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
 [ApiVersion("1.0")]
 public class BuildModelsBuilderController : ModelsBuilderControllerBase
 {
-    private ModelsBuilderSettings _modelsBuilderSettings;
+    private readonly ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly IModelsGenerator _modelGenerator;
 
-    [ActivatorUtilitiesConstructor]
     public BuildModelsBuilderController(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
@@ -28,39 +24,18 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
         _mbErrors = mbErrors;
         _modelGenerator = modelGenerator;
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
-
-        modelsBuilderSettings.OnChange(x => _modelsBuilderSettings = x);
-    }
-
-    [Obsolete("Please use the constructor that accepts IModelsGenerator only. Will be removed in V16.")]
-    public BuildModelsBuilderController(
-        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
-        ModelsGenerationError mbErrors,
-        ModelsGenerator modelGenerator)
-        : this(modelsBuilderSettings, mbErrors, (IModelsGenerator)modelGenerator)
-    {
-    }
-
-    // this constructor is required for the DI, otherwise it'll throw an "Ambiguous Constructor" errors at boot time.
-    [Obsolete("Please use the constructor that accepts IModelsGenerator only. Will be removed in V16.")]
-    public BuildModelsBuilderController(
-        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
-        ModelsGenerationError mbErrors,
-        IModelsGenerator modelGenerator,
-        ModelsGenerator notUsed)
-        : this(modelsBuilderSettings, mbErrors, modelGenerator)
-    {
     }
 
     [HttpPost("build")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> BuildModels(CancellationToken cancellationToken)
+    public Task<IActionResult> BuildModels(CancellationToken cancellationToken)
     {
         try
         {
-            if (!_modelsBuilderSettings.ModelsMode.SupportsExplicitGeneration())
+            if (_modelsBuilderSettings.ModelsMode != Constants.ModelsBuilder.ModelsModes.SourceCodeManual
+                && _modelsBuilderSettings.ModelsMode != Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)
             {
                 var problemDetailsModel = new ProblemDetails
                 {
@@ -70,7 +45,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
                     Type = "Error",
                 };
 
-                return new ObjectResult(problemDetailsModel) { StatusCode = StatusCodes.Status428PreconditionRequired };
+                return Task.FromResult<IActionResult>(new ObjectResult(problemDetailsModel) { StatusCode = StatusCodes.Status428PreconditionRequired });
             }
 
             _modelGenerator.GenerateModels();
@@ -81,6 +56,6 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
             _mbErrors.Report("Failed to build models.", e);
         }
 
-        return Ok();
+        return Task.FromResult<IActionResult>(Ok());
     }
 }

@@ -1,19 +1,17 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type {
-	InstallSettingsResponseModel,
-	ProblemDetails,
-	InstallRequestModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { InstallSettingsResponseModel, InstallRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { InstallService, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError, type UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * Context API for the installer
  * @class UmbInstallerContext
  */
-export class UmbInstallerContext {
+export class UmbInstallerContext extends UmbContextBase {
 	private _data = new UmbObjectState<InstallRequestModel>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '', useIntegratedAuthentication: false, trustServerCertificate: false },
@@ -27,10 +25,11 @@ export class UmbInstallerContext {
 	private _settings = new UmbObjectState<InstallSettingsResponseModel | undefined>(undefined);
 	public readonly settings = this._settings.asObservable();
 
-	private _installStatus = new UmbObjectState<ProblemDetails | null>(null);
+	private _installStatus = new UmbObjectState<UmbProblemDetails | null>(null);
 	public readonly installStatus = this._installStatus.asObservable();
 
-	constructor() {
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_INSTALLER_CONTEXT);
 		this._loadInstallerSettings();
 	}
 
@@ -47,10 +46,10 @@ export class UmbInstallerContext {
 	/**
 	 * Observable method to get the install status in the installation process
 	 * @public
-	 * @returns {*}  {(Observable<ProblemDetails | null>)}
+	 * @returns {*}  {(Observable<UmbProblemDetails | null>)}
 	 * @memberof UmbInstallerContext
 	 */
-	public installStatusChanges(): Observable<ProblemDetails | null> {
+	public installStatusChanges(): Observable<UmbProblemDetails | null> {
 		return this.installStatus;
 	}
 
@@ -85,7 +84,7 @@ export class UmbInstallerContext {
 	/**
 	 * Set the data for the installation process
 	 * @public
-	 * @param {Partial<PostInstallRequest>} data
+	 * @param {Partial<InstallRequestModel>} data The data to set
 	 * @memberof UmbInstallerContext
 	 */
 	public appendData(data: Partial<InstallRequestModel>): void {
@@ -102,13 +101,29 @@ export class UmbInstallerContext {
 		return this._data.getValue();
 	}
 
+	public async postInstallSetup(): Promise<boolean> {
+		const { error } = await tryExecute(this, InstallService.postInstallSetup({ body: this.getData() }), {
+			disableNotifications: true,
+		});
+		if (error) {
+			if (UmbApiError.isUmbApiError(error)) this.setInstallStatus(error.problemDetails);
+			else this.setInstallStatus({ title: 'Unknown error', detail: error.message, status: 500, type: 'error' });
+			return false;
+		}
+
+		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
+		history.replaceState(null, '', 'section/content');
+
+		return true;
+	}
+
 	/**
 	 * Set the install status
 	 * @public
-	 * @param {(ProblemDetails | null)} status
+	 * @param {(UmbProblemDetails | null)} status The status to set
 	 * @memberof UmbInstallerContext
 	 */
-	public setInstallStatus(status: ProblemDetails | null): void {
+	public setInstallStatus(status: UmbProblemDetails | null): void {
 		this._installStatus.setValue(status);
 	}
 
@@ -118,12 +133,13 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	private async _loadInstallerSettings() {
-		const { data, error: _error } = await tryExecute(InstallService.getInstallSettings());
-		const error: any = _error;
+		const { data, error } = await tryExecute(this, InstallService.getInstallSettings(), {
+			disableNotifications: true,
+		});
 		if (data) {
 			this._settings.setValue(data);
-		} else if (error) {
-			this._installStatus.setValue(error);
+		} else if (UmbApiError.isUmbApiError(error)) {
+			this._installStatus.setValue(error.problemDetails);
 		}
 	}
 }

@@ -4,8 +4,8 @@ import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token
 import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { umbOpenModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
@@ -13,7 +13,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 	#userDetailRepository = new UmbUserDetailRepository(this);
 
 	@query('#CreateUserForm')
-	_form?: HTMLFormElement;
+	private _form?: HTMLFormElement;
 
 	async #onSubmit(e: SubmitEvent) {
 		e.preventDefault();
@@ -56,21 +56,17 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 	}
 
 	async #openSuccessModal(userUnique: string) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_CREATE_USER_SUCCESS_MODAL, {
+		await umbOpenModal(this, UMB_CREATE_USER_SUCCESS_MODAL, {
 			data: {
 				user: {
 					unique: userUnique,
 				},
 			},
-		});
-
-		modalContext
-			?.onSubmit()
+		})
 			.then(() => {
 				this._submitModal();
 			})
-			.catch((reason) => {
+			.catch((reason: any) => {
 				if (reason?.type === 'createAnotherUser') {
 					this._form?.reset();
 				} else {

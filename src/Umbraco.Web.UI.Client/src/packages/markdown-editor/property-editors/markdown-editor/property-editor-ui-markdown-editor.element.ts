@@ -1,7 +1,6 @@
 import type { UmbInputMarkdownElement } from '../../components/input-markdown-editor/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -9,16 +8,17 @@ import type {
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../../components/input-markdown-editor/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-const elementName = 'umb-property-editor-ui-markdown-editor';
 /**
  * @element umb-property-editor-ui-markdown-editor
  */
-@customElement(elementName)
-export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
-
+@customElement('umb-property-editor-ui-markdown-editor')
+export class UmbPropertyEditorUIMarkdownEditorElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -27,6 +27,14 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _preview?: boolean;
@@ -43,17 +51,23 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 
 	#onChange(event: Event & { target: UmbInputMarkdownElement }) {
 		this.value = event.target.value as string;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-markdown')!);
 	}
 
 	override render() {
 		return html`
 			<umb-input-markdown
-				value=${this.value}
+				.value=${this.value}
 				.overlaySize=${this._overlaySize}
 				?preview=${this._preview}
 				@change=${this.#onChange}
-				?readonly=${this.readonly}></umb-input-markdown>
+				?readonly=${this.readonly}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}></umb-input-markdown>
 		`;
 	}
 }
@@ -62,6 +76,6 @@ export { UmbPropertyEditorUIMarkdownEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUIMarkdownEditorElement;
+		'umb-property-editor-ui-markdown-editor': UmbPropertyEditorUIMarkdownEditorElement;
 	}
 }

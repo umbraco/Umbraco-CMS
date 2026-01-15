@@ -25,7 +25,7 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .Build()),
             UserOperationStatus.NoUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("No User Group Specified")
-                .WithDetail("A user group must be specified to create a user")
+                .WithDetail("A user must be assigned to at least one group")
                 .Build()),
             UserOperationStatus.UserNameIsNotEmail => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid Username")
@@ -34,6 +34,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.EmailCannotBeChanged => BadRequest(problemDetailsBuilder
                 .WithTitle("Email Cannot be changed")
                 .WithDetail("Local login is disabled, so the email cannot be changed.")
+                .Build()),
+            UserOperationStatus.InvalidUserName => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid username")
+                .WithDetail("The username contains one or more invalid characters.")
                 .Build()),
             UserOperationStatus.DuplicateUserName => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate Username")

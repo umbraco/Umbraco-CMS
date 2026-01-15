@@ -46,6 +46,6 @@ public class CreateMediaController : CreateMediaControllerBase
 
             return result.Success
                 ? CreatedAtId<ByKeyMediaController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
-                : ContentEditingOperationStatusResult(result.Status);
+                : MediaEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationResult);
         });
 }

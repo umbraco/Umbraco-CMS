@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Diagnostics;
 // which itself got it from http://blog.kalmbach-software.de/2008/12/13/writing-minidumps-in-c/
 public static class MiniDump
 {
-    private static readonly object LockO = new();
+    private static readonly Lock LockO = new();
 
     [Flags]
     public enum Option : uint

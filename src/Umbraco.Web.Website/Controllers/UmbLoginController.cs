@@ -23,10 +23,9 @@ public class UmbLoginController : SurfaceController
     private readonly IMemberManager _memberManager;
     private readonly IMemberSignInManager _signInManager;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
-    private readonly IPublishedContentCache _contentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
-    [ActivatorUtilitiesConstructor]
     public UmbLoginController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -37,41 +36,15 @@ public class UmbLoginController : SurfaceController
         IMemberSignInManager signInManager,
         IMemberManager memberManager,
         ITwoFactorLoginService twoFactorLoginService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
         : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
     {
         _signInManager = signInManager;
         _memberManager = memberManager;
         _twoFactorLoginService = twoFactorLoginService;
-        _contentCache = contentCache;
         _navigationQueryService = navigationQueryService;
-    }
-
-    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
-    public UmbLoginController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services,
-        AppCaches appCaches,
-        IProfilingLogger profilingLogger,
-        IPublishedUrlProvider publishedUrlProvider,
-        IMemberSignInManager signInManager,
-        IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService)
-        : this(
-            umbracoContextAccessor,
-            databaseFactory,
-            services,
-            appCaches,
-            profilingLogger,
-            publishedUrlProvider,
-            signInManager,
-            memberManager,
-            twoFactorLoginService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
-    {
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
     }
 
     [HttpPost]
@@ -102,7 +75,7 @@ public class UmbLoginController : SurfaceController
                 // If it's not a local URL we'll redirect to the root of the current site.
                 return Redirect(Url.IsLocalUrl(model.RedirectUrl)
                     ? model.RedirectUrl
-                    : CurrentPage!.AncestorOrSelf(_contentCache, _navigationQueryService, 1)!.Url(PublishedUrlProvider));
+                    : CurrentPage!.AncestorOrSelf(_navigationQueryService, _publishedContentStatusFilteringService, 1)!.Url(PublishedUrlProvider));
             }
 
             // Redirect to current URL by default.

@@ -1,6 +1,6 @@
 import { UmbSectionSidebarContext } from './section-sidebar.context.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import { css, html, customElement, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-sidebar')
@@ -10,18 +10,20 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 		new UmbSectionSidebarContext(this);
 	}
 
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'section-sidebar');
+	}
+
 	override render() {
 		return html`
-			<umb-section-sidebar-context-menu>
-				<uui-scroll-container id="scroll-container">
-					<slot></slot>
-				</uui-scroll-container>
-			</umb-section-sidebar-context-menu>
+			<uui-scroll-container id="scroll-container">
+				<slot></slot>
+			</uui-scroll-container>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				flex: 0 0 var(--umb-section-sidebar-width);
@@ -33,7 +35,6 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				flex-direction: column;
 				z-index: 10;
 				position: relative;
-				padding-bottom: var(--uui-size-4);
 				box-sizing: border-box;
 			}
 

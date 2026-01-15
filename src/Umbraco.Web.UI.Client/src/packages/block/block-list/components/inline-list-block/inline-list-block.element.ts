@@ -1,21 +1,15 @@
 import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/index.js';
-import {
-	UMB_BLOCK_WORKSPACE_ALIAS,
-	type UmbBlockDataType,
-	type UMB_BLOCK_WORKSPACE_CONTEXT,
-} from '@umbraco-cms/backoffice/block';
-import {
-	UmbExtensionApiInitializer,
-	UmbExtensionsApiInitializer,
-	type UmbApiConstructorArgumentsMethodType,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
-import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -36,17 +30,23 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
 	@state()
 	private _exposed?: boolean;
 
 	@state()
-	_isOpen = false;
+	private _isOpen = false;
 
 	@state()
 	private _ownerContentTypeName?: string;
@@ -60,7 +60,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_LIST_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
-				this.#blockContext.unique,
+				this.#blockContext?.unique,
 				(contentKey) => {
 					this.#contentKey = contentKey;
 					this.#load();
@@ -115,10 +115,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 						'observeVariant',
 					);
 
-					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
-						this,
-						this.#workspaceContext,
-					]);
+					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this.#workspaceContext]);
 				}
 			},
 		);
@@ -153,34 +150,43 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					<slot></slot>
 					<slot name="tag"></slot>
 				</button>
-				${this._isOpen === true ? this.#renderInside() : ''}
+				${this._isOpen === true ? this.#renderInside() : nothing}
 			</div>
 		`;
 	}
 
 	#renderBlockInfo() {
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				</div>
 			</span>
+			${when(
+				this.unpublished,
+				() =>
+					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
+					></uui-tag>`,
+			)}
 		`;
 	}
 
 	#renderInside() {
 		if (this._exposed === false) {
-			return html`<uui-button style="position:absolute; inset:0;" @click=${this.#expose}
+			return html`<uui-button id="exposeButton" draggable="false" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>
 				<umb-localize
 					key="blockEditor_createThisFor"
 					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
 			></uui-button>`;
 		} else {
-			return html`<umb-block-workspace-view-edit-content-no-router></umb-block-workspace-view-edit-content-no-router>`;
+			return html`<umb-block-workspace-view-edit-content-no-router
+				draggable="false"></umb-block-workspace-view-edit-content-no-router>`;
 		}
 	}
 
@@ -201,6 +207,12 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 				min-width: 250px;
 			}
+
+			#exposeButton {
+				width: 100%;
+				min-height: var(--uui-size-16);
+			}
+
 			#open-part + * {
 				border-top: 1px solid var(--uui-color-border);
 			}
@@ -218,7 +230,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				border-color: var(--uui-color-disabled-standalone);
 			}
 
-			:host([unpublished]) #open-part {
+			:host([unpublished]) #open-part #content {
 				opacity: 0.6;
 			}
 
@@ -280,8 +292,11 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				padding-left: var(--uui-size-2, 6px);
 			}
 
-			#name {
-				font-weight: 700;
+			uui-tag {
+				margin-left: 0.5em;
+				margin-bottom: -0.3em;
+				margin-top: -0.3em;
+				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

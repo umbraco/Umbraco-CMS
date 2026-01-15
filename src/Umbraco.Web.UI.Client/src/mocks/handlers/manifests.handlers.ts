@@ -1,9 +1,9 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 
-import type { PackageManifestResponse } from '../../packages/packages/types.js';
+import type { UmbPackageManifestResponse } from '../../packages/packages/types.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const privateManifests: PackageManifestResponse = [
+const privateManifests: UmbPackageManifestResponse = [
 	{
 		name: 'My Package Name',
 		version: '1.0.0',
@@ -43,18 +43,6 @@ const privateManifests: PackageManifestResponse = [
 					icon: 'document',
 					group: 'Common',
 					propertyEditorSchema: 'Umbraco.TextBox',
-				},
-			},
-			{
-				type: 'tinyMcePlugin',
-				alias: 'My.TinyMcePlugin.Custom',
-				name: 'My Custom TinyMce Plugin',
-				js: '/App_Plugins/tinyMcePlugin.js',
-				meta: {
-					config: {
-						plugins: ['wordcount'],
-						statusbar: true,
-					},
 				},
 			},
 		],
@@ -115,7 +103,7 @@ const privateManifests: PackageManifestResponse = [
 	},
 ];
 
-const publicManifests: PackageManifestResponse = [
+const publicManifests: UmbPackageManifestResponse = [
 	{
 		name: 'My Auth Package',
 		extensions: [
@@ -156,29 +144,25 @@ const publicManifests: PackageManifestResponse = [
 ];
 
 export const manifestDevelopmentHandlers = [
-	rest.get(umbracoPath('/manifest/manifest/private'), (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<PackageManifestResponse>(privateManifests),
-		);
+	http.get(umbracoPath('/manifest/manifest/private'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>(privateManifests);
 	}),
-	rest.get(umbracoPath('/manifest/manifest/public'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PackageManifestResponse>(publicManifests));
+	http.get(umbracoPath('/manifest/manifest/public'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>(publicManifests);
 	}),
-	rest.get(umbracoPath('/manifest/manifest'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PackageManifestResponse>([...privateManifests, ...publicManifests]));
+	http.get(umbracoPath('/manifest/manifest'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([...privateManifests, ...publicManifests]);
 	}),
 ];
 
 export const manifestEmptyHandlers = [
-	rest.get(umbracoPath('/manifest/manifest/private'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PackageManifestResponse>([]));
+	http.get(umbracoPath('/manifest/manifest/private'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([]);
 	}),
-	rest.get(umbracoPath('/manifest/manifest/public'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PackageManifestResponse>([]));
+	http.get(umbracoPath('/manifest/manifest/public'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([]);
 	}),
-	rest.get(umbracoPath('/manifest/manifest'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PackageManifestResponse>([]));
+	http.get(umbracoPath('/manifest/manifest'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([]);
 	}),
 ];

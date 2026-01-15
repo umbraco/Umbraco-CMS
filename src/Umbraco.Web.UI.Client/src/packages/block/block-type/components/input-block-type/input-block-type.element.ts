@@ -1,4 +1,4 @@
-import type { UmbBlockTypeWithGroupKey } from '../../types.js';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
 import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -6,13 +6,14 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
 	UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT,
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	type UmbDocumentTypePickerModalData,
+	type UmbDocumentTypePickerModalValue,
 } from '@umbraco-cms/backoffice/document-type';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 
 import '../block-type-card/index.js';
 
@@ -27,27 +28,35 @@ export class UmbInputBlockTypeElement<
 		itemSelector: 'umb-block-type-card',
 		identifier: 'umb-block-type-sorter',
 		containerSelector: '#blocks',
+		resolvePlacement: UmbSorterResolvePlacementAsGrid,
+		onContainerChange: ({ item, model }) => {
+			this.dispatchEvent(new CustomEvent('container-change', { detail: { item, model } }));
+		},
 		onChange: ({ model }) => {
-			this._items = model;
+			this._value = model;
+			this.dispatchEvent(new UmbChangeEvent());
 		},
-		onContainerChange: ({ model, item }) => {
-			this._items = model;
-			this.dispatchEvent(new CustomEvent('change', { detail: { item } }));
-		},
-		onEnd: () => {
+		/*onEnd: () => {
 			// TODO: Investigate if onEnd is called when a container move has been performed, if not then I would say it should be. [NL]
-			this.dispatchEvent(new CustomEvent('change', { detail: { moveComplete: true } }));
-		},
+			this.dispatchEvent(new UmbChangeEvent());
+		},*/
 	});
-	#elementPickerModal;
+	#elementPickerModal: UmbModalRouteRegistrationController<
+		UmbDocumentTypePickerModalData,
+		UmbDocumentTypePickerModalValue
+	>;
 
 	@property({ type: Array, attribute: false })
 	public set value(items) {
-		this._items = items ?? [];
-		this.#sorter.setModel(this._items);
+		this._value = items ?? [];
+		// Make sure the block types are unique on contentTypeElementKey:
+		this._value = this._value.filter(
+			(value, index, self) => self.findIndex((x) => x.contentElementTypeKey === value.contentElementTypeKey) === index,
+		);
+		this.#sorter.setModel(this._value);
 	}
 	public get value() {
-		return this._items;
+		return this._value;
 	}
 
 	@property({ type: String })
@@ -65,7 +74,7 @@ export class UmbInputBlockTypeElement<
 	private _pickerPath?: string;
 
 	@state()
-	private _items: Array<BlockType> = [];
+	private _value: Array<BlockType> = [];
 
 	// TODO: Seems no need to have these initially, then can be retrieved inside the `create` method. [NL]
 	#datasetContext?: UmbPropertyDatasetContext;
@@ -75,9 +84,13 @@ export class UmbInputBlockTypeElement<
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			this.#datasetContext = instance;
-			this.observe(await this.#datasetContext?.propertyValueByAlias('blocks'), (value) => {
-				this.#filter = value as Array<UmbBlockTypeBaseModel>;
-			});
+			this.observe(
+				await this.#datasetContext?.propertyValueByAlias('blocks'),
+				(value) => {
+					this.#filter = value as Array<UmbBlockTypeBaseModel>;
+				},
+				'observeBlocks',
+			);
 		});
 
 		this.#elementPickerModal = new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
@@ -93,12 +106,17 @@ export class UmbInputBlockTypeElement<
 								presetAlias: 'element',
 							},
 						},
+						// TODO: hide the queryParams and filter config under a "elementTypesOnly" field. [MR]
+						search: {
+							queryParams: {
+								isElementType: true,
+							},
+						},
 						pickableFilter: (docType) =>
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this.#filter &&
-							this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
+							this.#filter?.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
 					},
 					value: {
 						selection: [],
@@ -120,19 +138,21 @@ export class UmbInputBlockTypeElement<
 	}
 
 	deleteItem(contentElementTypeKey: string) {
-		this.value = this.value.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
-		this.dispatchEvent(new UmbDeleteEvent());
+		this._value = this.value.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	async #onRequestDelete(item: BlockType) {
 		const store = await this.getContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT);
+		if (!store) {
+			return;
+		}
 		const contentType = store.getItems([item.contentElementTypeKey]);
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${contentType[0]?.name}?`,
-			// TODO: Translations: [NL]
-			content: 'Are you sure you want to remove this Block Type Configuration?',
-			confirmLabel: 'Remove',
+			headline: '#blockEditor_confirmDeleteBlockTypeTitle',
+			content: this.localize.term('blockEditor_confirmDeleteBlockTypeMessage', [contentType[0]?.name]),
+			confirmLabel: '#general_remove',
 		});
 		this.deleteItem(item.contentElementTypeKey);
 	}
@@ -176,35 +196,23 @@ export class UmbInputBlockTypeElement<
 			div {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-template-rows: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 			}
 
 			[drag-placeholder] {
 				opacity: 0.5;
 			}
 
+			uui-action-bar {
+				--uui-button-background-color: var(--uui-color-surface);
+				--uui-button-background-color-hover: var(--uui-color-surface);
+			}
+
 			#add-button {
 				text-align: center;
 				min-height: 150px;
 				height: 100%;
-			}
-
-			uui-icon {
-				display: block;
-				margin: 0 auto;
-			}
-
-			uui-input {
-				border: none;
-				margin: var(--uui-size-space-6) 0 var(--uui-size-space-4);
-			}
-
-			uui-input:hover uui-button {
-				opacity: 1;
-			}
-			uui-input uui-button {
-				opacity: 0;
 			}
 		`,
 	];

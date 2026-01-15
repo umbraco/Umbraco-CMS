@@ -1,5 +1,5 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
-import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockLayoutBaseModel, UmbBlockValueType } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -15,18 +15,10 @@ export abstract class UmbBlockEntriesContext<
 	BlockType extends UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData,
-> extends UmbContextBase<
-	UmbBlockEntriesContext<
-		BlockManagerContextTokenType,
-		BlockManagerContextType,
-		BlockType,
-		BlockLayoutType,
-		BlockOriginData
-	>
-> {
+> extends UmbContextBase {
 	//
-	_manager?: BlockManagerContextType;
-	_retrieveManager;
+	protected _manager?: BlockManagerContextType;
+	protected _retrieveManager;
 
 	protected _catalogueRouteBuilderState = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
 	readonly catalogueRouteBuilder = this._catalogueRouteBuilderState.asObservable();
@@ -53,7 +45,7 @@ export abstract class UmbBlockEntriesContext<
 		this._retrieveManager = this.consumeContext(blockManagerContextToken, (blockGridManager) => {
 			this._manager = blockGridManager;
 			this._gotBlockManager();
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	async getManager() {
@@ -97,24 +89,47 @@ export abstract class UmbBlockEntriesContext<
 		settings: UmbBlockDataModel | undefined,
 		originData: BlockOriginData,
 	): Promise<boolean>;
-	//edit?
-	//editSettings
 
-	// Idea: should we return true if it was successful?
 	public async delete(contentKey: string) {
 		await this._retrieveManager;
 		const layout = this._layoutEntries.value.find((x) => x.contentKey === contentKey);
 		if (!layout) {
 			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
 		}
+		this._layoutEntries.removeOne(contentKey);
 
+		this._manager!.removeOneContent(contentKey);
 		if (layout.settingsKey) {
 			this._manager!.removeOneSettings(layout.settingsKey);
 		}
-		this._manager!.removeOneContent(contentKey);
 		this._manager!.removeExposesOf(contentKey);
-
-		this._layoutEntries.removeOne(contentKey);
 	}
-	//copy
+
+	// insert/paste from property value methods:
+
+	protected async _insertFromPropertyValues(values: Array<UmbBlockValueType>, originData: BlockOriginData) {
+		await Promise.all(
+			values.map(async (value) => {
+				originData = await this._insertFromPropertyValue(value, originData);
+			}),
+		);
+	}
+
+	protected abstract _insertFromPropertyValue(
+		values: UmbBlockValueType,
+		originData: BlockOriginData,
+	): Promise<BlockOriginData>;
+
+	protected async _insertBlockFromPropertyValue(
+		layoutEntry: BlockLayoutType,
+		value: UmbBlockValueType,
+		originData: BlockOriginData,
+	) {
+		const content = value.contentData.find((x) => x.key === layoutEntry.contentKey);
+		if (!content) {
+			throw new Error('No content found for layout entry');
+		}
+		const settings = value.settingsData.find((x) => x.key === layoutEntry.settingsKey);
+		await this.insert(layoutEntry, content, settings, originData);
+	}
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
@@ -18,6 +19,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 public class BackOfficeGraphicsController : Controller
 {
     public const string LogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Logo);
+    public const string LogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LogoAlternative);
     public const string LoginBackGroundRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginBackground);
     public const string LoginLogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogo);
     public const string LoginLogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogoAlternative);
@@ -43,6 +45,11 @@ public class BackOfficeGraphicsController : Controller
     [MapToApiVersion("1.0")]
     public IActionResult Logo() => HandleFileRequest(_contentSettings.Value.BackOfficeLogo);
 
+    [HttpGet("logo-alternative", Name = LogoAlternativeRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    public IActionResult LogoAlternative() => HandleFileRequest(_contentSettings.Value.BackOfficeLogoAlternative);
+
     [HttpGet("login-logo", Name = LoginLogoRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
@@ -55,8 +62,8 @@ public class BackOfficeGraphicsController : Controller
 
     private IActionResult HandleFileRequest(string virtualPath)
     {
-        var filePath = Path.Combine(Constants.SystemDirectories.Umbraco, virtualPath).TrimStart(Constants.CharArrays.Tilde);
-        var fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
+        var filePath = $"{Constants.SystemDirectories.Umbraco}/{virtualPath}".TrimStart(Constants.CharArrays.Tilde);
+        IFileInfo fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
 
         if (fileInfo.PhysicalPath is null)
         {

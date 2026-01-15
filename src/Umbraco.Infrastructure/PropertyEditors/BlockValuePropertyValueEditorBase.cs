@@ -1,7 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -10,6 +7,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -24,31 +22,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
     private readonly ILanguageService _languageService;
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    protected BlockValuePropertyValueEditorBase(
-        DataEditorAttribute attribute,
-        PropertyEditorCollection propertyEditors,
-        IDataTypeConfigurationCache dataTypeConfigurationCache,
-        ILocalizedTextService textService,
-        ILogger logger,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
-        : this(
-            propertyEditors,
-            dataTypeConfigurationCache,
-            shortStringHelper,
-            jsonSerializer,
-            dataValueReferenceFactoryCollection,
-            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            ioHelper,
-            attribute
-            )
-    {
-    }
 
     protected BlockValuePropertyValueEditorBase(
         PropertyEditorCollection propertyEditors,
@@ -69,6 +42,45 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _languageService = languageService;
     }
+
+    /// <summary>
+    /// Caches referenced entities for all property values with supporting property editors within the specified block editor data
+    /// optimising subsequent retrieval of entities when parsing and converting property values.
+    /// </summary>
+    /// <remarks>
+    /// This method iterates through all property values associated with data editors in the provided
+    /// block editor data and invokes caching for referenced entities where supported by the property editor.
+    /// </remarks>
+    /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+              "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+              "Scheduled for removal in Umbraco 19.")]
+    protected void CacheReferencedEntities(BlockEditorData<TValue, TLayout>? blockEditorData)
+    {
+        // Group property values by their associated data editor alias.
+        IEnumerable<IGrouping<string, BlockPropertyValue>> valuesByDataEditors = (blockEditorData?.BlockValue.ContentData ?? []).Union(blockEditorData?.BlockValue.SettingsData ?? [])
+            .SelectMany(x => x.Values)
+            .Where(x => x.EditorAlias is not null && x.Value is not null)
+            .GroupBy(x => x.EditorAlias!);
+
+        // Iterate through each group and cache referenced entities if supported by the data editor.
+        foreach (IGrouping<string, BlockPropertyValue> valueByDataEditor in valuesByDataEditors)
+        {
+            IDataEditor? dataEditor = _propertyEditors[valueByDataEditor.Key];
+            if (dataEditor is null)
+            {
+                continue;
+            }
+
+            IDataValueEditor valueEditor = dataEditor.GetValueEditor();
+
+            if (valueEditor is ICacheReferencedEntities valueEditorWithPrecaching)
+            {
+                valueEditorWithPrecaching.CacheReferencedEntities(valueByDataEditor.Select(x => x.Value!));
+            }
+        }
+    }
+
 
     /// <inheritdoc />
     public abstract IEnumerable<UmbracoEntityReference> GetReferences(object? value);
@@ -98,17 +110,17 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 continue;
             }
 
-            var districtValues = valuesByPropertyEditorAlias.Distinct().ToArray();
+            var distinctValues = valuesByPropertyEditorAlias.Distinct().ToArray();
 
             if (dataEditor.GetValueEditor() is IDataValueReference reference)
             {
-                foreach (UmbracoEntityReference value in districtValues.SelectMany(reference.GetReferences))
+                foreach (UmbracoEntityReference value in distinctValues.SelectMany(reference.GetReferences))
                 {
                     result.Add(value);
                 }
             }
 
-            IEnumerable<UmbracoEntityReference> references = _dataValueReferenceFactoryCollection.GetReferences(dataEditor, districtValues);
+            IEnumerable<UmbracoEntityReference> references = _dataValueReferenceFactoryCollection.GetReferences(dataEditor, distinctValues);
 
             foreach (UmbracoEntityReference value in references)
             {
@@ -156,10 +168,112 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         return result;
     }
 
-    protected void MapBlockValueFromEditor(TValue blockValue)
+    protected void MapBlockValueFromEditor(TValue? editedBlockValue, TValue? currentBlockValue, Guid contentKey)
     {
-        MapBlockItemDataFromEditor(blockValue.ContentData);
-        MapBlockItemDataFromEditor(blockValue.SettingsData);
+        MapBlockItemDataFromEditor(
+            editedBlockValue?.ContentData ?? [],
+            currentBlockValue?.ContentData ?? [],
+            contentKey);
+
+        MapBlockItemDataFromEditor(
+            editedBlockValue?.SettingsData ?? [],
+            currentBlockValue?.SettingsData ?? [],
+            contentKey);
+    }
+
+    private void MapBlockItemDataFromEditor(List<BlockItemData> editedItems, List<BlockItemData> currentItems, Guid contentKey)
+    {
+        // Create mapping between edited and current block items.
+        IEnumerable<BlockStateMapping<BlockItemData>> itemsMapping = GetBlockStatesMapping(editedItems, currentItems, (mapping, current) => mapping.Edited?.Key == current.Key);
+
+        foreach (BlockStateMapping<BlockItemData> itemMapping in itemsMapping)
+        {
+            // Create mapping between edited and current block item values.
+            IEnumerable<BlockStateMapping<BlockPropertyValue>> valuesMapping = GetBlockStatesMapping(itemMapping.Edited?.Values, itemMapping.Current?.Values, (mapping, current) => mapping.Edited?.Alias == current.Alias);
+
+            foreach (BlockStateMapping<BlockPropertyValue> valueMapping in valuesMapping)
+            {
+                BlockPropertyValue? editedValue = valueMapping.Edited;
+                BlockPropertyValue? currentValue = valueMapping.Current;
+
+                IPropertyType propertyType = editedValue?.PropertyType
+                    ?? currentValue?.PropertyType
+                    ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
+
+                // Lookup the property editor.
+                IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
+                if (propertyEditor is null)
+                {
+                    continue;
+                }
+
+                // Fetch the property types prevalue.
+                var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
+
+                // Create a real content property data object.
+                var propertyData = new ContentPropertyData(editedValue?.Value, configuration)
+                {
+                    ContentKey = contentKey,
+                    PropertyTypeKey = propertyType.Key,
+                };
+
+                // Get the property editor to do it's conversion.
+                IDataValueEditor valueEditor = propertyEditor.GetValueEditor();
+                var newValue = valueEditor.FromEditor(propertyData, currentValue?.Value);
+
+                // Update the raw value since this is what will get serialized out.
+                if (editedValue != null)
+                {
+                    editedValue.Value = newValue;
+                }
+            }
+        }
+    }
+
+    private sealed class BlockStateMapping<T>
+    {
+        public T? Edited { get; set; }
+
+        public T? Current { get; set; }
+    }
+
+    private static IEnumerable<BlockStateMapping<T>> GetBlockStatesMapping<T>(IList<T>? editedItems, IList<T>? currentItems, Func<BlockStateMapping<T>, T, bool> condition)
+    {
+        // filling with edited items first
+        List<BlockStateMapping<T>> mapping = editedItems?
+            .Select(editedItem => new BlockStateMapping<T>
+            {
+                Current = default,
+                Edited = editedItem,
+            })
+            .ToList()
+            ?? [];
+
+        if (currentItems is null)
+        {
+            return mapping;
+        }
+
+        // then adding current items
+        foreach (T currentItem in currentItems)
+        {
+            BlockStateMapping<T>? mappingItem = mapping.FirstOrDefault(x => condition(x, currentItem));
+
+            if (mappingItem == null) // if there is no edited item, then adding just current
+            {
+                mapping.Add(new BlockStateMapping<T>
+                {
+                    Current = currentItem,
+                    Edited = default,
+                });
+            }
+            else
+            {
+                mappingItem.Current = currentItem;
+            }
+        }
+
+        return mapping;
     }
 
     protected void MapBlockValueToEditor(IProperty property, TValue blockValue, string? culture, string? segment)
@@ -184,6 +298,12 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         foreach (BlockItemData item in items)
         {
+            // if changes were made to the element type variations, we need those changes reflected in the block property values.
+            // for regular content this happens when a content type is saved (copies of property values are created in the DB),
+            // but for local block level properties we don't have that kind of handling, so we to do it manually.
+            // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
+            // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
+            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType;
@@ -198,13 +318,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     // leave the current block property value as-is - will be used to render a fallback output in the client
                     continue;
                 }
-
-                // if changes were made to the element type variation, we need those changes reflected in the block property values.
-                // for regular content this happens when a content type is saved (copies of property values are created in the DB),
-                // but for local block level properties we don't have that kind of handling, so we to do it manually.
-                // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
-                // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
-                _blockEditorVarianceHandler.AlignPropertyVarianceAsync(blockPropertyValue, propertyType, culture).GetAwaiter().GetResult();
 
                 if (!valueEditorsByKey.TryGetValue(propertyType.DataTypeKey, out IDataValueEditor? valueEditor))
                 {
@@ -225,38 +338,259 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         }
     }
 
-    private void MapBlockItemDataFromEditor(List<BlockItemData> items)
+    /// <summary>
+    /// Updates the invariant data in the source with the invariant data in the value if allowed
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="target"></param>
+    /// <param name="canUpdateInvariantData"></param>
+    /// <returns></returns>
+    internal virtual BlockEditorData<TValue, TLayout>? UpdateSourceInvariantData(BlockEditorData<TValue, TLayout>? source, BlockEditorData<TValue, TLayout>? target, bool canUpdateInvariantData)
     {
-        foreach (BlockItemData item in items)
+        if (source is null && target is null)
         {
-            foreach (BlockPropertyValue blockPropertyValue in item.Values)
+            return null;
+        }
+
+        if (source is null)
+        {
+            return MergeNewInvariant(target!, canUpdateInvariantData);
+        }
+
+        if (target is null)
+        {
+            return MergeRemovalInvariant(source, canUpdateInvariantData);
+        }
+
+        return MergeInvariant(source, target, canUpdateInvariantData);
+    }
+
+    internal virtual object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        if (canUpdateInvariantData is false && targetValue is null)
+        {
+            return sourceValue;
+        }
+
+        BlockEditorData<TValue, TLayout>? source = BlockEditorValues.DeserializeAndClean(sourceValue);
+        BlockEditorData<TValue, TLayout>? target = BlockEditorValues.DeserializeAndClean(targetValue);
+
+        TValue? mergedBlockValue =
+            MergeVariantInvariantPropertyValueTyped(source, target, canUpdateInvariantData, allowedCultures);
+        if (mergedBlockValue is null)
+        {
+            return null;
+        }
+
+        return _jsonSerializer.Serialize(mergedBlockValue);
+    }
+
+    internal virtual TValue? MergeVariantInvariantPropertyValueTyped(
+        BlockEditorData<TValue, TLayout>? source,
+        BlockEditorData<TValue, TLayout>? target,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        var mergedInvariant = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
+
+        // if the structure (invariant) is not defined after merger, the target content does not matter
+        if (mergedInvariant?.Layout is null)
+        {
+            return null;
+        }
+
+        // since we merged the invariant data (layout) before we get to this point
+        // we just need an empty valid object to run comparisons at this point
+        if (source is null)
+        {
+            source = new BlockEditorData<TValue, TLayout>([], new TValue());
+        }
+
+        // update the target with the merged invariant
+        target!.BlockValue.Layout = mergedInvariant.BlockValue.Layout;
+
+        // remove all the blocks that are no longer part of the layout
+        target.BlockValue.ContentData.RemoveAll(contentBlock =>
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesContent(contentBlock.Key)) is false);
+        // remove any exposes that no longer have content assigned to them
+        target.BlockValue.Expose.RemoveAll(expose => target.BlockValue.ContentData.Any(data => data.Key == expose.ContentKey) is false);
+
+        target.BlockValue.SettingsData.RemoveAll(settingsBlock =>
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesSetting(settingsBlock.Key)) is false);
+
+        CleanupVariantValues(source.BlockValue.ContentData, target.BlockValue.ContentData, canUpdateInvariantData, allowedCultures);
+        CleanupVariantValues(source.BlockValue.SettingsData, target.BlockValue.SettingsData, canUpdateInvariantData, allowedCultures);
+
+        // every source block value for a culture that is not allowed to be edited should be present on the target
+        RestoreMissingValues(
+            source.BlockValue.ContentData,
+            target.BlockValue.ContentData,
+            mergedInvariant.Layout,
+            (layoutItem, itemData) => layoutItem.ContentKey == itemData.Key,
+            canUpdateInvariantData,
+            allowedCultures);
+        RestoreMissingValues(
+            source.BlockValue.SettingsData,
+            target.BlockValue.SettingsData,
+            mergedInvariant.Layout,
+            (layoutItem, itemData) => layoutItem.SettingsKey == itemData.Key,
+            canUpdateInvariantData,
+            allowedCultures);
+
+        // update the expose list from source for any blocks that were restored
+        var missingSourceExposes =
+            source.BlockValue.Expose.Where(sourceExpose =>
+                target.BlockValue.Expose.Any(targetExpose => targetExpose.ContentKey == sourceExpose.ContentKey) is false
+                && target.BlockValue.ContentData.Any(data => data.Key == sourceExpose.ContentKey)).ToList();
+        foreach (BlockItemVariation missingSourceExpose in missingSourceExposes)
+        {
+            target.BlockValue.Expose.Add(missingSourceExpose);
+        }
+
+        return target.BlockValue;
+    }
+
+    private void RestoreMissingValues(
+        List<BlockItemData> sourceBlockItemData,
+        List<BlockItemData> targetBlockItemData,
+        IEnumerable<TLayout> mergedLayout,
+        Func<TLayout, BlockItemData, bool> relevantBlockItemMatcher,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        IEnumerable<BlockItemData> blockItemsToCheck = sourceBlockItemData.Where(itemData =>
+            mergedLayout.Any(layoutItem => relevantBlockItemMatcher(layoutItem, itemData)));
+        foreach (BlockItemData blockItemData in blockItemsToCheck)
+        {
+            var relevantValues = blockItemData.Values.Where(value =>
+                (value.Culture is null && canUpdateInvariantData is false)
+                || (value.Culture is not null && allowedCultures.Contains(value.Culture) is false)).ToList();
+            if (relevantValues.Count < 1)
             {
-                IPropertyType? propertyType = blockPropertyValue.PropertyType;
-                if (propertyType is null)
+                continue;
+            }
+
+            BlockItemData targetBlockData =
+                targetBlockItemData.FirstOrDefault(itemData => itemData.Key == blockItemData.Key)
+                ?? new BlockItemData(blockItemData.Key, blockItemData.ContentTypeKey, blockItemData.ContentTypeAlias);
+            foreach (BlockPropertyValue missingValue in relevantValues.Where(value => targetBlockData.Values.Any(targetValue =>
+                         targetValue.Alias == value.Alias
+                         && targetValue.Culture == value.Culture
+                         && targetValue.Segment == value.Segment) is false))
+            {
+                targetBlockData.Values.Add(missingValue);
+            }
+
+            if (targetBlockItemData.Any(existingBlockItemData => existingBlockItemData.Key == targetBlockData.Key) is false)
+            {
+                targetBlockItemData.Add(blockItemData);
+            }
+        }
+    }
+
+    private void CleanupVariantValues(
+        List<BlockItemData> sourceBlockItems,
+        List<BlockItemData> targetBlockItems,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        // merge the source values into the target values per culture
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
+        {
+            BlockItemData? sourceBlockItem = sourceBlockItems.FirstOrDefault(i => i.Key == targetBlockItem.Key);
+
+            var valuesToRemove = new List<BlockPropertyValue>();
+
+            foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
+            {
+                BlockPropertyValue? sourceBlockPropertyValue = sourceBlockItem?.Values.FirstOrDefault(v
+                    => v.Alias == targetBlockPropertyValue.Alias && v.Culture == targetBlockPropertyValue.Culture);
+
+                // todo double check if this path can have an invariant value, but it shouldn't right???
+                // => it can be a null culture, but we shouldn't do anything? as the invariant section should have done it already
+                if ((targetBlockPropertyValue.Culture is null && canUpdateInvariantData == false)
+                    || (targetBlockPropertyValue.Culture is not null && allowedCultures.Contains(targetBlockPropertyValue.Culture) is false))
                 {
-                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(items));
+                    // not allowed to update this culture, set the value back to the source
+                    if (sourceBlockPropertyValue is null)
+                    {
+                        valuesToRemove.Add(targetBlockPropertyValue);
+                    }
+                    else
+                    {
+                        targetBlockPropertyValue.Value = sourceBlockPropertyValue.Value;
+                    }
+
+                    continue;
                 }
 
-                // Lookup the property editor
-                IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
-                if (propertyEditor is null)
+                // is this another editor that supports partial merging? i.e. blocks within blocks.
+                IDataEditor? mergingDataEditor = null;
+                var shouldPerformPartialMerge = targetBlockPropertyValue.PropertyType is not null
+                                  && _propertyEditors.TryGet(targetBlockPropertyValue.PropertyType.PropertyEditorAlias, out mergingDataEditor)
+                                  && mergingDataEditor.CanMergePartialPropertyValues(targetBlockPropertyValue.PropertyType);
+
+                if (shouldPerformPartialMerge is false)
                 {
                     continue;
                 }
 
-                // Fetch the property types prevalue
-                var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
+                // marge subdata
+                targetBlockPropertyValue.Value = mergingDataEditor!.MergeVariantInvariantPropertyValue(
+                    sourceBlockPropertyValue?.Value,
+                    targetBlockPropertyValue.Value,
+                    canUpdateInvariantData,
+                    allowedCultures);
+            }
 
-                // Create a fake content property data object
-                var propertyData = new ContentPropertyData(blockPropertyValue.Value, configuration);
-
-                // Get the property editor to do it's conversion
-                var newValue = propertyEditor.GetValueEditor().FromEditor(propertyData, blockPropertyValue.Value);
-
-                // update the raw value since this is what will get serialized out
-                blockPropertyValue.Value = newValue;
+            foreach (BlockPropertyValue value in valuesToRemove)
+            {
+                targetBlockItem.Values.Remove(value);
             }
         }
+    }
+
+    private BlockEditorData<TValue, TLayout>? MergeNewInvariant(BlockEditorData<TValue, TLayout> target, bool canUpdateInvariantData)
+    {
+        if (canUpdateInvariantData is false)
+        {
+            // source value was null and not allowed to update the structure which is invariant => nothing remains
+            return null;
+        }
+
+        // create a new source object based on the target value that only has the invariant data (structure)
+        return target.Layout is not null
+            ? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(target.Layout))
+            : null;
+    }
+
+    private BlockEditorData<TValue, TLayout>? MergeRemovalInvariant(BlockEditorData<TValue, TLayout> source, bool canUpdateInvariantData)
+    {
+        if (canUpdateInvariantData)
+        {
+            // if the structure is removed, everything is gone anyway
+            return null;
+        }
+
+        // create a new target object based on the source value that only has the invariant data (structure)
+        return source.Layout is not null
+            ? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(source.Layout))
+            : null;
+    }
+
+    private BlockEditorData<TValue, TLayout> MergeInvariant(BlockEditorData<TValue, TLayout> source, BlockEditorData<TValue, TLayout> target, bool canUpdateInvariantData)
+    {
+        if (canUpdateInvariantData)
+        {
+            source.BlockValue.Layout = target.BlockValue.Layout;
+            source.BlockValue.Expose = target.BlockValue.Expose;
+        }
+
+        return source;
     }
 
     internal virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
@@ -341,7 +675,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     {
                         Alias = sourceBlockPropertyValue.Alias,
                         Culture = sourceBlockPropertyValue.Culture,
-                        Segment = sourceBlockPropertyValue.Segment
+                        Segment = sourceBlockPropertyValue.Segment,
+                        PropertyType = sourceBlockPropertyValue.PropertyType
                     };
                     targetBlockItem.Values.Add(targetBlockPropertyValue);
                 }
@@ -351,6 +686,21 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ? sourceBlockPropertyValue.Value
                     : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
+        }
+
+        // After merging, remove stale values when property variation changed.
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
+        {
+            targetBlockItem.Values.RemoveAll(value =>
+            {
+                if (value.PropertyType is null)
+                {
+                    throw new ArgumentException("One or more block item values did not have a resolved property type. Block item value property types must be resolved before attempting perform partial value merging.", nameof(targetBlockItem));
+                }
+
+                var propertyValueIsCultureVariant = value.Culture is not null;
+                return propertyValueIsCultureVariant != value.PropertyType.VariesByCulture();
+            });
         }
     }
 }

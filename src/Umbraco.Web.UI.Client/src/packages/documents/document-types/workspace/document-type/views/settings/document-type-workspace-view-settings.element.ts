@@ -1,5 +1,14 @@
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
-import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentTypeConfigurationRepository } from '../../../../configuration/configuration.repository.js';
+import {
+	css,
+	html,
+	customElement,
+	state,
+	when,
+	nothing,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -27,14 +36,28 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	@state()
 	private _preventCleanup?: boolean;
 
+	@state()
+	private _useSegments?: boolean;
+
+	#configurationRepository = new UmbDocumentTypeConfigurationRepository(this);
+
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext;
 			this.#observeDocumentType();
 		});
+	}
+
+	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
+		super.firstUpdated(_changedProperties);
+		// TODO: cache this request
+		const { data } = await this.#configurationRepository.requestConfiguration();
+
+		if (data) {
+			this._useSegments = data.useSegments;
+		}
 	}
 
 	#observeDocumentType() {
@@ -100,26 +123,12 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setVariesByCulture((e.target as UUIToggleElement).checked);
 							}}
-							label="Vary by culture"></uui-toggle>
+							label=${this.localize.term('contentTypeEditor_cultureVariantLabel')}></uui-toggle>
 					</div>
 				</umb-property-layout>
-				<umb-property-layout
-					alias="VaryBySegments"
-					label=${this.localize.term('contentTypeEditor_segmentVariantHeading')}>
-					<div slot="description">
-						<umb-localize key="contentTypeEditor_segmentVariantDescription"
-							>Allow editors to segment their content.</umb-localize
-						>
-					</div>
-					<div slot="editor">
-						<uui-toggle
-							?checked=${this._variesBySegment}
-							@change=${(e: CustomEvent) => {
-								this.#workspaceContext?.setVariesBySegment((e.target as UUIToggleElement).checked);
-							}}
-							label="Vary by segments"></uui-toggle>
-					</div>
-				</umb-property-layout>
+
+				${this.#renderVaryBySegmentProperty()}
+
 				<umb-property-layout alias="ElementType" label=${this.localize.term('contentTypeEditor_elementHeading')}>
 					<div slot="description">
 						<umb-localize key="contentTypeEditor_elementDescription"
@@ -136,7 +145,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</div>
 				</umb-property-layout>
 			</uui-box>
-			<uui-box headline="History cleanup">
+			<uui-box headline=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
 				<umb-property-layout
 					alias="HistoryCleanup"
 					label=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
@@ -169,7 +178,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 										id="versions-newer-than-days"
 										min="0"
 										placeholder="7"
-										.value=${this._keepAllVersionsNewerThanDays}
+										.value=${this._keepAllVersionsNewerThanDays?.toString() ?? ''}
 										@change=${this.#onChangeKeepAllVersionsNewerThanDays}></uui-input>
 								</uui-form-layout-item>
 
@@ -184,7 +193,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 										id="latest-version-per-day-days"
 										min="0"
 										placeholder="90"
-										.value=${this._keepLatestVersionPerDayForDays}
+										.value=${this._keepLatestVersionPerDayForDays?.toString() ?? ''}
 										@change=${this.#onChangeKeepLatestVersionPerDayForDays}></uui-input>
 								</uui-form-layout-item>
 							`,
@@ -192,6 +201,31 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</div>
 				</umb-property-layout>
 			</uui-box>
+		`;
+	}
+
+	#renderVaryBySegmentProperty() {
+		if (!this._useSegments) return nothing;
+		if (this._isElement) return nothing;
+
+		return html`
+			<umb-property-layout
+				alias="VaryBySegments"
+				label=${this.localize.term('contentTypeEditor_segmentVariantHeading')}>
+				<div slot="description">
+					<umb-localize key="contentTypeEditor_segmentVariantDescription"
+						>Allow editors to segment their content.</umb-localize
+					>
+				</div>
+				<div slot="editor">
+					<uui-toggle
+						?checked=${this._variesBySegment}
+						@change=${(e: CustomEvent) => {
+							this.#workspaceContext?.setVariesBySegment((e.target as UUIToggleElement).checked);
+						}}
+						label=${this.localize.term('contentTypeEditor_segmentVariantLabel')}></uui-toggle>
+				</div>
+			</umb-property-layout>
 		`;
 	}
 

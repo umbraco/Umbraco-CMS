@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 /// <summary>
 ///     Deals with custom headers for the umbraco request
 /// </summary>
-internal class PublishedRequestFilterAttribute : ResultFilterAttribute
+internal sealed class PublishedRequestFilterAttribute : ResultFilterAttribute
 {
     /// <summary>
     ///     Deals with custom headers for the umbraco request
@@ -48,7 +48,7 @@ internal class PublishedRequestFilterAttribute : ResultFilterAttribute
     /// <summary>
     ///     Gets the <see cref="UmbracoRouteValues" />
     /// </summary>
-    protected UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
+    private static UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
     {
         UmbracoRouteValues? routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
         if (routeVals == null)
@@ -60,7 +60,7 @@ internal class PublishedRequestFilterAttribute : ResultFilterAttribute
         return routeVals;
     }
 
-    private void AddCacheControlHeaders(ResultExecutingContext context, IPublishedRequest pcr)
+    private static void AddCacheControlHeaders(ResultExecutingContext context, IPublishedRequest pcr)
     {
         var cacheControlHeaders = new List<string>();
 

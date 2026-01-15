@@ -1,11 +1,60 @@
+import { UmbFormControlMixin } from '../../validation/mixins/index.js';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
+
+/**
+ *
+ * @param value
+ */
+function splitString(value: string | undefined): Partial<[number | undefined, number | undefined]> {
+	const [from, to] = (value ?? ',').split(',');
+	const fromNumber = makeNumberOrUndefined(from);
+	return [fromNumber, makeNumberOrUndefined(to, fromNumber)];
+}
+
+/**
+ *
+ * @param value
+ * @param fallback
+ */
+function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
+	if (value === undefined) {
+		return fallback;
+	}
+	const n = Number(value);
+	if (isNaN(n)) {
+		return fallback;
+	}
+	return n;
+}
+
+/**
+ *
+ * @param value
+ * @param fallback
+ */
+function undefinedFallbackToString(value: number | undefined, fallback: number): string {
+	return (value === undefined ? fallback : value).toString();
+}
 
 @customElement('umb-input-slider')
-export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof UmbLitElement, ''>(UmbLitElement, '') {
+	override set value(value: string) {
+		const [from, to] = splitString(value);
+		this.#valueLow = from;
+		this.#valueHigh = to;
+		super.value = value;
+	}
+	override get value() {
+		return super.value;
+	}
+
+	@property()
+	label: string = '';
+
 	@property({ type: Number })
 	min = 0;
 
@@ -14,12 +63,43 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	@property({ type: Number })
 	step = 1;
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
 
 	@property({ type: Number })
-	valueLow = 0;
+	public get valueLow(): number | undefined {
+		return this.#valueLow;
+	}
+	public set valueLow(value: number | undefined) {
+		this.#valueLow = value;
+		this.#setValueFromLowHigh();
+	}
+	#valueLow?: number | undefined;
 
 	@property({ type: Number })
-	valueHigh = 0;
+	public get valueHigh(): number | undefined {
+		return this.#valueHigh;
+	}
+	public set valueHigh(value: number | undefined) {
+		this.#valueHigh = value;
+		this.#setValueFromLowHigh();
+	}
+	#valueHigh?: number | undefined;
+
+	#setValueFromLowHigh() {
+		if (this.enableRange) {
+			super.value = `${undefinedFallbackToString(this.valueLow, this.min)},${undefinedFallbackToString(this.valueHigh, this.max)}`;
+		} else {
+			super.value = `${undefinedFallbackToString(this.valueLow, this.min)}`;
+		}
+	}
 
 	@property({ type: Boolean, attribute: 'enable-range' })
 	enableRange = false;
@@ -32,6 +112,68 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
+
+		this.addValidator(
+			'rangeUnderflow',
+			() => {
+				return this.localize.term('validation_numberMinimum', [this.min?.toString()]);
+			},
+			() => {
+				if (this.min !== undefined) {
+					const [from, to] = splitString(this.value);
+					if (to !== undefined && to < this.min) {
+						return true;
+					}
+					if (from !== undefined && from < this.min) {
+						return true;
+					}
+				}
+				return false;
+			},
+		);
+
+		this.addValidator(
+			'rangeOverflow',
+			() => {
+				return this.localize.term('validation_numberMaximum', [this.max?.toString()]);
+			},
+			() => {
+				if (this.max !== undefined) {
+					const [from, to] = splitString(this.value);
+					if (to !== undefined && to > this.max) {
+						return true;
+					}
+					if (from !== undefined && from > this.max) {
+						return true;
+					}
+				}
+				return false;
+			},
+		);
+
+		this.addValidator(
+			'patternMismatch',
+			() => {
+				return this.localize.term('validation_rangeExceeds');
+			},
+			() => {
+				const [from, to] = splitString(this.value);
+				if (to !== undefined && from !== undefined) {
+					return from > to;
+				}
+				return false;
+			},
+		);
+	}
 
 	protected override getFormElement() {
 		return undefined;
@@ -50,10 +192,11 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	#renderSlider() {
 		return html`
 			<uui-slider
+				.label=${this.label}
 				.min=${this.min}
 				.max=${this.max}
 				.step=${this.step}
-				.value=${this.valueLow.toString()}
+				.value=${undefinedFallbackToString(this.valueLow, this.min).toString()}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-slider>
@@ -63,10 +206,14 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	#renderRangeSlider() {
 		return html`
 			<uui-range-slider
+				.label=${this.label}
 				.min=${this.min}
 				.max=${this.max}
 				.step=${this.step}
-				.value="${this.valueLow},${this.valueHigh}"
+				.value="${undefinedFallbackToString(this.valueLow, this.min).toString()},${undefinedFallbackToString(
+					this.valueHigh,
+					this.max,
+				).toString()}"
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-range-slider>

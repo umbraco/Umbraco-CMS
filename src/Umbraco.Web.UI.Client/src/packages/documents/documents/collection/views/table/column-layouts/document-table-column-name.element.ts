@@ -1,32 +1,42 @@
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-table-column-name')
 export class UmbDocumentTableColumnNameElement extends UmbLitElement implements UmbTableColumnLayoutElement {
+	#resolver = new UmbDocumentItemDataResolver(this);
+
+	@state()
+	private _name = '';
+
 	column!: UmbTableColumn;
 	item!: UmbTableItem;
 
 	@property({ attribute: false })
-	value!: UmbEditableDocumentCollectionItemModel;
+	public set value(value: UmbEditableDocumentCollectionItemModel) {
+		this.#value = value;
 
-	#onClick(event: Event & { target: UUIButtonElement }) {
-		event.preventDefault();
-		event.stopPropagation();
-		window.history.pushState(null, '', event.target.href);
+		if (value.item) {
+			this.#resolver.setData(value.item);
+		}
+	}
+	public get value(): UmbEditableDocumentCollectionItemModel {
+		return this.#value;
+	}
+	#value!: UmbEditableDocumentCollectionItemModel;
+
+	constructor() {
+		super();
+		this.#resolver.observe(this.#resolver.name, (name) => (this._name = name || ''));
 	}
 
 	override render() {
 		if (!this.value) return nothing;
-		return html`
-			<uui-button
-				compact
-				href=${this.value.editPath}
-				label=${this.value.item.name}
-				@click=${this.#onClick}></uui-button>
-		`;
+		if (!this.value.editPath) return nothing;
+		if (!this._name) return nothing;
+		return html`<uui-button compact href=${this.value.editPath} label=${this._name}></uui-button>`;
 	}
 
 	static override styles = [

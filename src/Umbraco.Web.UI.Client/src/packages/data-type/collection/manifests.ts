@@ -1,4 +1,5 @@
-import { UMB_DATA_TYPE_COLLECTION_ALIAS, UMB_DATA_TYPE_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
+import { UMB_DATA_TYPE_COLLECTION_REPOSITORY_ALIAS } from './repository/constants.js';
+import { UMB_DATA_TYPE_COLLECTION_ALIAS } from './constants.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [

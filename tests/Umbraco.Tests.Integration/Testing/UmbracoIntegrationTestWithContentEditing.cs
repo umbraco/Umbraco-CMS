@@ -20,7 +20,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
     protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
-    private IContentEditingService ContentEditingService => (IContentEditingService)GetRequiredService<IContentEditingService>();
+    protected IContentEditingService ContentEditingService => (IContentEditingService)GetRequiredService<IContentEditingService>();
 
     private IContentPublishingService ContentPublishingService => (IContentPublishingService)GetRequiredService<IContentPublishingService>();
 
@@ -34,9 +34,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
     protected ContentCreateModel Textpage { get; private set; }
 
-    protected ContentScheduleCollection ContentSchedule { get; private set; }
-
-    protected CultureAndScheduleModel CultureAndSchedule { get; private set; }
+    protected ICollection<CulturePublishScheduleModel> CultureAndSchedule { get; private set; }
 
     protected int TextpageId { get; private set; }
 
@@ -91,11 +89,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         }
 
         // Sets the culture and schedule for the content, in this case, we are publishing immediately for all cultures
-        ContentSchedule = new ContentScheduleCollection();
-        CultureAndSchedule = new CultureAndScheduleModel
-        {
-            CulturesToPublishImmediately = new HashSet<string> { "*" }, Schedules = ContentSchedule,
-        };
+        CultureAndSchedule = [new CulturePublishScheduleModel { Culture = "*", Schedule = null }];
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         PublishedTextPage = ContentEditingBuilder.CreateSimpleContent(ContentType.Key, "Published Page");
@@ -112,7 +106,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
             PublishedTextPageId = createContentResultPublishPage.Result.Content.Id;
         }
 
-        var publishResult = await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+        var publishResult = await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055

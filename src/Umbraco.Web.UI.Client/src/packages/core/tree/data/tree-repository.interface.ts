@@ -4,10 +4,13 @@ import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type {
+	UmbRepositoryResponse,
+	UmbRepositoryResponseWithAsObservable,
+	UmbTargetPagedModel,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * Interface for a tree repository.
@@ -27,52 +30,45 @@ export interface UmbTreeRepository<
 	 * Requests the root of the tree.
 	 * @memberof UmbTreeRepository
 	 */
-	requestTreeRoot: () => Promise<{
-		data?: TreeRootType;
-		error?: ProblemDetails;
-	}>;
+	requestTreeRoot: () => Promise<UmbRepositoryResponse<TreeRootType>>;
 
 	/**
 	 * Requests the root items of the tree.
 	 * @param {UmbTreeRootItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestTreeRootItems: (args: TreeRootItemsRequestArgsType) => Promise<{
-		data?: UmbPagedModel<TreeItemType>;
-		error?: ProblemDetails;
-		asObservable?: () => Observable<TreeItemType[]>;
-	}>;
+	requestTreeRootItems: (
+		args: TreeRootItemsRequestArgsType,
+	) => Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, TreeItemType[]>>;
 
 	/**
 	 * Requests the children of the given parent item.
 	 * @param {UmbTreeChildrenOfRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestTreeItemsOf: (args: TreeChildrenOfRequestArgsType) => Promise<{
-		data?: UmbPagedModel<TreeItemType>;
-		error?: ProblemDetails;
-		asObservable?: () => Observable<TreeItemType[]>;
-	}>;
+	requestTreeItemsOf: (
+		args: TreeChildrenOfRequestArgsType,
+	) => Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, TreeItemType[]>>;
 
 	/**
 	 * Requests the ancestors of the given item.
 	 * @param {UmbTreeAncestorsOfRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestTreeItemAncestors: (
-		args: TreeAncestorsOfRequestArgsType,
-	) => Promise<{ data?: TreeItemType[]; error?: ProblemDetails; asObservable?: () => Observable<TreeItemType[]> }>;
+	requestTreeItemAncestors: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
 
 	/**
 	 * Returns an observable of the root items of the tree.
 	 * @memberof UmbTreeRepository
+	 * @deprecated Use `requestTreeRootItems` instead. It will be removed in Umbraco 18.
 	 */
-	rootTreeItems: () => Promise<Observable<TreeItemType[]>>;
+	rootTreeItems?: () => Promise<Observable<TreeItemType[]>>;
 
 	/**
 	 * Returns an observable of the children of the given parent item.
 	 * @param {(string | null)} parentUnique
 	 * @memberof UmbTreeRepository
+	 * @deprecated Use `requestTreeItemsOf` instead. It will be removed in Umbraco 18.
 	 */
-	treeItemsOf: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
+	treeItemsOf?: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
 }

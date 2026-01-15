@@ -1,6 +1,7 @@
 import type { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 export type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type ObserverCallback<T> = (value: T) => void;
 
 export class UmbObserver<T> {
@@ -32,6 +33,9 @@ export class UmbObserver<T> {
 						wantedToClose = true;
 					} else {
 						subscription.unsubscribe();
+						if (!this.#callback) {
+							this.destroy();
+						}
 					}
 					resolve(value as Exclude<T, undefined>);
 				}
@@ -39,6 +43,9 @@ export class UmbObserver<T> {
 			initialCallback = false;
 			if (wantedToClose) {
 				subscription.unsubscribe();
+				if (!this.#callback) {
+					this.destroy();
+				}
 			}
 		});
 	}

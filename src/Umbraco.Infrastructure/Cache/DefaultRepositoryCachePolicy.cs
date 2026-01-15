@@ -1,7 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -24,11 +27,30 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
-    public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
-        : base(cache, scopeAccessor) =>
+    public DefaultRepositoryCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
-    protected string EntityTypeCacheKey { get; } = $"uRepo_{typeof(TEntity).Name}_";
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    public DefaultRepositoryCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options)
+        : this(
+            cache,
+            scopeAccessor,
+            options,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+    {
+    }
+
+    protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />
     public override void Create(TEntity entity, Action<TEntity> persistNew)
@@ -98,6 +120,10 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
             throw;
         }
+
+        // We've changed the entity, register cache change for other servers.
+        // We assume that if something goes wrong, we'll roll back, so don't need to register the change.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
@@ -116,30 +142,50 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         {
             // whatever happens, clear the cache
             var cacheKey = GetEntityCacheKey(entity.Id);
+
             Cache.Clear(cacheKey);
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
             Cache.Clear(EntityTypeCacheKey);
         }
+
+        // We've removed an entity, register cache change for other servers.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
     public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
+
         var cacheKey = GetEntityCacheKey(id);
+
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
 
-        // if found in cache then return else fetch and cache
-        if (fromCache != null)
+        // If found in cache then return immediately.
+        if (fromCache is not null)
         {
             return fromCache;
         }
 
+        // If we've cached a "null" value, return null.
+        if (_options.CacheNullValues && Cache.GetCacheItem<string>(cacheKey) == Constants.Cache.NullRepresentationInCache)
+        {
+            return null;
+        }
+
+        // Otherwise go to the database to retrieve.
         TEntity? entity = performGet(id);
 
         if (entity != null && entity.HasIdentity)
         {
+            // If we've found an identified entity, cache it for subsequent retrieval.
             InsertEntity(cacheKey, entity);
+        }
+        else if (entity is null && _options.CacheNullValues)
+        {
+            // If we've not found an entity, and we're caching null values, cache a "null" value.
+            InsertNull(cacheKey);
         }
 
         return entity;
@@ -148,6 +194,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override TEntity? GetCached(TId id)
     {
+        EnsureCacheIsSynced();
         var cacheKey = GetEntityCacheKey(id);
         return Cache.GetCacheItem<TEntity>(cacheKey);
     }
@@ -155,6 +202,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
         // if found in cache the return else check
         var cacheKey = GetEntityCacheKey(id);
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -164,6 +212,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
         if (ids?.Length > 0)
         {
             // try to get each entity from the cache
@@ -247,6 +296,15 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
     protected virtual void InsertEntity(string cacheKey, TEntity entity)
         => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+
+    protected virtual void InsertNull(string cacheKey)
+    {
+        // We can't actually cache a null value, as in doing so wouldn't be able to distinguish between
+        // a value that does exist but isn't yet cached, or a value that has been explicitly cached with a null value.
+        // Both would return null when we retrieve from the cache and we couldn't distinguish between the two.
+        // So we cache a special value that represents null, and then we can check for that value when we retrieve from the cache.
+        Cache.Insert(cacheKey, () => Constants.Cache.NullRepresentationInCache, TimeSpan.FromMinutes(5), true);
+    }
 
     protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
     {

@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
@@ -13,7 +14,7 @@ public class ContentScheduleTests
     [Test]
     public void Release_Date_Less_Than_Expire_Date()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
         Assert.IsFalse(schedule.Add(now, now));
     }
@@ -21,7 +22,7 @@ public class ContentScheduleTests
     [Test]
     public void Cannot_Add_Duplicate_Dates_Invariant()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, null);
         Assert.Throws<ArgumentException>(() => schedule.Add(null, now));
@@ -30,7 +31,7 @@ public class ContentScheduleTests
     [Test]
     public void Cannot_Add_Duplicate_Dates_Variant()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, null);
         schedule.Add("en-US", now, null);
@@ -41,10 +42,10 @@ public class ContentScheduleTests
     [Test]
     public void Can_Remove_Invariant()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, null);
-        var invariantSched = schedule.GetSchedule(string.Empty);
+        var invariantSched = schedule.GetSchedule(Constants.System.InvariantCulture);
         schedule.Remove(invariantSched.First());
         Assert.AreEqual(0, schedule.FullSchedule.Count());
     }
@@ -52,11 +53,11 @@ public class ContentScheduleTests
     [Test]
     public void Can_Remove_Variant()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, null);
         schedule.Add("en-US", now, null);
-        var invariantSched = schedule.GetSchedule(string.Empty);
+        var invariantSched = schedule.GetSchedule(Constants.System.InvariantCulture);
         schedule.Remove(invariantSched.First());
         Assert.AreEqual(0, schedule.GetSchedule(string.Empty).Count());
         Assert.AreEqual(1, schedule.FullSchedule.Count());
@@ -69,7 +70,7 @@ public class ContentScheduleTests
     [Test]
     public void Can_Clear_Start_Invariant()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, now.AddDays(1));
 
@@ -83,7 +84,7 @@ public class ContentScheduleTests
     [Test]
     public void Can_Clear_End_Variant()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, now.AddDays(1));
         schedule.Add("en-US", now, now.AddDays(1));

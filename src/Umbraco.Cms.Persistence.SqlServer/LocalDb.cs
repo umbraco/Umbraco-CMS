@@ -821,7 +821,7 @@ public class LocalDb
         /// <param name="ldfName">The LDF logical name.</param>
         /// <param name="mdfFilename">The MDF filename.</param>
         /// <param name="ldfFilename">The LDF filename.</param>
-        private void GetFilenames(
+        private static void GetFilenames(
             SqlCommand cmd,
             string databaseName,
             out string? mdfName,

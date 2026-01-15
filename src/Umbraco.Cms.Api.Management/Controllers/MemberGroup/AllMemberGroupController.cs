@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -36,6 +36,6 @@ public class AllMemberGroupController : MemberGroupControllerBase
             Items = _mapper.MapEnumerable<IMemberGroup, MemberGroupResponseModel>(memberGroups.Skip(skip).Take(take)),
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }

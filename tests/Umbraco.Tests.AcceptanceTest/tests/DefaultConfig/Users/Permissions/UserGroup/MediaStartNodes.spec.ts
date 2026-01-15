@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -33,7 +33,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(childFolderTwoName);
 });
 
-test('can see root media start node and children', async ({umbracoApi, umbracoUi}) => {
+test('can see root media start node and children', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, rootFolderId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -45,12 +45,13 @@ test('can see root media start node and children', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
+  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
 
-test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, childFolderOneId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -62,10 +63,10 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.media.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
-  await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for workspace to load
+  await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
+  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
 });

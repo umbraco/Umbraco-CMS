@@ -43,11 +43,11 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_ExpandsNothingByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false);
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, CacheManager);
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, CacheManager);
+        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, VariationContext, CacheManager);
+        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, VariationContext, CacheManager);
 
         var contentPickerContent = CreateSimplePickedContent(123, 456);
         var contentPickerProperty = CreateContentPickerProperty(content.Object, contentPickerContent.Key, "contentPicker", apiContentBuilder);
@@ -69,7 +69,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_CanExpandSpecificContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "contentPickerTwo" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 
@@ -142,7 +142,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_CanExpandAllContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(true);
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 
@@ -177,7 +177,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_DoesNotExpandNestedContentPicker(string rootPropertyTypeAlias, string nestedPropertyTypeAlias)
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { rootPropertyTypeAlias, nestedPropertyTypeAlias });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 
@@ -207,7 +207,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_DoesNotExpandElementsByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false);
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
@@ -283,7 +283,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     public void OutputExpansionStrategy_ForwardsExpansionStateToPropertyValueConverter(bool expanding)
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { expanding ? "theAlias" : "noSuchAlias" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
         var content = new Mock<IPublishedContent>();
 
@@ -303,7 +303,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
             .Returns(expanding ? "Expanding" : "Not expanding");
 
         var propertyType = SetupPublishedPropertyType(valueConverterMock.Object, "theAlias", Constants.PropertyEditors.Aliases.Label);
-        var property = new PublishedElementPropertyBase(propertyType, content.Object, false, PropertyCacheLevel.None, CacheManager, "The Value");
+        var property = new PublishedElementPropertyBase(propertyType, content.Object, false, PropertyCacheLevel.None, VariationContext, CacheManager, "The Value");
 
         SetupContentMock(content, property);
 
@@ -327,7 +327,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var urlSegment = "url-segment";
         ConfigurePublishedContentMock(content, key, name, urlSegment, _contentType, properties);
 
-        RegisterContentWithProviders(content.Object);
+        RegisterContentWithProviders(content.Object, false);
     }
 
     protected void SetupMediaMock(Mock<IPublishedContent> media, params IPublishedProperty[] properties)
@@ -378,7 +378,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         ContentPickerValueConverter contentPickerValueConverter = new ContentPickerValueConverter(PublishedContentCacheMock.Object, contentBuilder);
         var contentPickerPropertyType = SetupPublishedPropertyType(contentPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.ContentPicker);
 
-        return new PublishedElementPropertyBase(contentPickerPropertyType, parent, false, PropertyCacheLevel.None, CacheManager, new GuidUdi(Constants.UdiEntityType.Document, pickedContentKey).ToString());
+        return new PublishedElementPropertyBase(contentPickerPropertyType, parent, false, PropertyCacheLevel.None, VariationContext, CacheManager, new GuidUdi(Constants.UdiEntityType.Document, pickedContentKey).ToString());
     }
 
     internal PublishedElementPropertyBase CreateMediaPickerProperty(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
@@ -386,15 +386,15 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
 
-        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(), apiMediaWithCropsBuilder);
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), apiMediaWithCropsBuilder);
         var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
-        return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, CacheManager, new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString());
+        return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, VariationContext, CacheManager, new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString());
     }
 
     internal PublishedElementPropertyBase CreateMediaPicker3Property(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
     {
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var value = serializer.Serialize(new[]
         {
             new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
@@ -406,16 +406,16 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
 
-        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(), apiMediaWithCropsBuilder);
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), apiMediaWithCropsBuilder);
         var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
-        return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, CacheManager, value);
+        return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, VariationContext, CacheManager, value);
     }
 
     internal PublishedElementPropertyBase CreateNumberProperty(IPublishedElement parent, int propertyValue, string propertyTypeAlias)
     {
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), propertyTypeAlias, Constants.PropertyEditors.Aliases.Label);
-        return new PublishedElementPropertyBase(numberPropertyType, parent, false, PropertyCacheLevel.None, CacheManager, propertyValue);
+        return new PublishedElementPropertyBase(numberPropertyType, parent, false, PropertyCacheLevel.None, VariationContext, CacheManager, propertyValue);
     }
 
     internal PublishedElementPropertyBase CreateElementProperty(
@@ -452,7 +452,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         elementValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevelForExpansion(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
         var elementPropertyType = SetupPublishedPropertyType(elementValueConverter.Object, elementPropertyAlias, "My.Element.Property");
-        return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None, CacheManager);
+        return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None, VariationContext, CacheManager);
     }
 
     protected IApiContentRouteBuilder ApiContentRouteBuilder() => CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());

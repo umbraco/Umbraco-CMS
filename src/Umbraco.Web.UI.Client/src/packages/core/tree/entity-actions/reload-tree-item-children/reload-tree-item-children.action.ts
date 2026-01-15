@@ -11,7 +11,7 @@ export class UmbReloadTreeItemChildrenEntityAction extends UmbEntityActionBase<M
 
 	override async execute() {
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-
+		if (!eventContext) throw new Error('Event context is not available');
 		eventContext.dispatchEvent(
 			new UmbRequestReloadChildrenOfEntityEvent({
 				unique: this.args.unique,

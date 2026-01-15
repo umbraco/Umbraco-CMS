@@ -1,29 +1,28 @@
-import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
+import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '../../types.js';
+import { UmbBlockGridManagerContext } from '../../block-grid-manager/index.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, customElement, html, nothing, property, ref, state } from '@umbraco-cms/backoffice/external/lit';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import {
-	html,
-	customElement,
-	property,
-	state,
-	css,
-	type PropertyValueMap,
-	ref,
-} from '@umbraco-cms/backoffice/external/lit';
+	UmbFormControlMixin,
+	UmbValidationContext,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+} from '@umbraco-cms/backoffice/validation';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
-import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
-import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
-import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
-import '../../components/block-grid-entries/index.js';
+// TODO: consider moving the components to the property editor folder as they are only used here
+import '../../local-components.js';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -33,17 +32,18 @@ export class UmbPropertyEditorUIBlockGridElement
 	extends UmbFormControlMixin<UmbBlockGridValueModel, typeof UmbLitElement>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
-	#validationContext = new UmbValidationContext(this);
-	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
+	#lastValue: UmbBlockGridValueModel | undefined = undefined;
 	#managerContext = new UmbBlockGridManagerContext(this);
-	//
-	private _value: UmbBlockGridValueModel = {
-		layout: {},
-		contentData: [],
-		settingsData: [],
-		expose: [],
-	};
+	#validationContext = new UmbValidationContext(this);
+
+	@state()
+	private _layoutColumns?: number;
+
+	@state()
+	private _notSupportedVariantSetting?: boolean;
+
+	@state()
+	private _isSortMode = false;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -63,43 +63,121 @@ export class UmbPropertyEditorUIBlockGridElement
 		this.#managerContext.setEditorConfiguration(config);
 	}
 
-	@state()
-	private _layoutColumns?: number;
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @default
+	 */
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#managerContext.readOnlyState.fallbackToPermitted();
+		} else {
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
+		}
+	}
+	public get readonly() {
+		return this.#readonly;
+	}
+	#readonly = false;
+
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@property({ attribute: false })
 	public override set value(value: UmbBlockGridValueModel | undefined) {
+		this.#lastValue = value;
+
+		if (!value) {
+			super.value = undefined;
+			return;
+		}
+
 		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
 		buildUpValue.expose ??= [];
-		this._value = buildUpValue as UmbBlockGridValueModel;
+		super.value = buildUpValue as UmbBlockGridValueModel;
 
-		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
-		this.#managerContext.setContents(this._value.contentData);
-		this.#managerContext.setSettings(this._value.settingsData);
-		this.#managerContext.setExposes(this._value.expose);
+		this.#managerContext.setLayouts(super.value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
+		this.#managerContext.setContents(super.value.contentData);
+		this.#managerContext.setSettings(super.value.settingsData);
+		this.#managerContext.setExposes(super.value.expose);
 	}
-	public override get value(): UmbBlockGridValueModel {
-		return this._value;
+	public override get value(): UmbBlockGridValueModel | undefined {
+		return super.value;
 	}
 
 	constructor() {
 		super();
 
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage,
+			() => {
+				if (!this.mandatory || this.readonly) return false;
+				const count = this.value?.layout?.[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.length ?? 0;
+				return count === 0;
+			},
+		);
+
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
+			if (context) {
+				this.observe(
+					observeMultiple([
+						this.#managerContext.blockTypes,
+						context.structure.variesByCulture,
+						context.structure.variesBySegment,
+					]),
+					async ([blockTypes, variesByCulture, variesBySegment]) => {
+						if (blockTypes.length > 0 && (variesByCulture === false || variesBySegment === false)) {
+							// check if any of the Blocks varyByCulture or Segment and then display a warning.
+							const promises = await Promise.all(
+								blockTypes.map(async (blockType) => {
+									const elementType = blockType.contentElementTypeKey;
+									await this.#managerContext.contentTypesLoaded;
+									const structure = await this.#managerContext.getStructure(elementType);
+									if (variesByCulture === false && structure?.getVariesByCulture() === true) {
+										// If block varies by culture but document does not.
+										return true;
+									} else if (variesBySegment === false && structure?.getVariesBySegment() === true) {
+										// If block varies by segment but document does not.
+										return true;
+									}
+									return false;
+								}),
+							);
+							this._notSupportedVariantSetting = promises.filter((x) => x === true).length > 0;
+
+							if (this._notSupportedVariantSetting) {
+								this.#validationContext.messages.addMessage(
+									'config',
+									'$',
+									'#blockEditor_blockVariantConfigurationNotSupported',
+								);
+							}
+						}
+					},
+					'observeBlockTypes',
+				);
+			} else {
+				this.removeUmbControllerByAlias('observeBlockTypes');
+			}
+		}).passContextAliasMatches();
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(
-				context.dataPath,
+				context?.dataPath,
 				(dataPath) => {
-					// Translate paths for content/settings:
-					this.#contentDataPathTranslator?.destroy();
-					this.#settingsDataPathTranslator?.destroy();
 					if (dataPath) {
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
-
-						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+						this.#validationContext.autoReport();
 					}
 				},
 				'observeDataPath',
@@ -116,14 +194,32 @@ export class UmbPropertyEditorUIBlockGridElement
 					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
-					this._value = {
-						...this._value,
-						layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-						contentData: contents,
-						settingsData: settings,
-						expose: exposes,
-					};
-					propertyContext.setValue(this._value);
+					if (layouts.length === 0) {
+						if (this.value === undefined) {
+							return;
+						}
+						super.value = undefined;
+					} else {
+						const newValue = {
+							...super.value,
+							layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+							contentData: contents,
+							settingsData: settings,
+							expose: exposes,
+						};
+						if (jsonStringComparison(this.value, newValue)) {
+							return;
+						}
+						super.value = newValue;
+					}
+
+					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+					// This is added to prevent the block grid from setting an empty value on startup.
+					if (this.#lastValue === undefined && super.value === undefined) {
+						return;
+					}
+
+					propertyContext?.setValue(super.value);
 				},
 				'motherObserver',
 			);
@@ -135,33 +231,19 @@ export class UmbPropertyEditorUIBlockGridElement
 				},
 				'observePropertyAlias',
 			);
+		});
 
-			// If the current property is readonly all inner block content should also be readonly.
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 			this.observe(
-				observeMultiple([propertyContext.isReadOnly, propertyContext.variantId]),
-				([isReadOnly, variantId]) => {
-					const unique = 'UMB_PROPERTY_EDITOR_UI';
-					if (variantId === undefined) return;
-
-					if (isReadOnly) {
-						const state = {
-							unique,
-							variantId,
-							message: '',
-						};
-
-						this.#managerContext.readOnlyState.addState(state);
-					} else {
-						this.#managerContext.readOnlyState.removeState(unique);
-					}
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
 				},
-				'observeIsReadOnly',
+				'observeContextualVariantId',
 			);
 		});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context.getVariantId());
-		});
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -188,29 +270,29 @@ export class UmbPropertyEditorUIBlockGridElement
 	}
 
 	override render() {
-		return html` <umb-block-grid-entries
-			${ref(this.#gotRootEntriesElement)}
-			.areaKey=${null}
-			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
+		if (this._notSupportedVariantSetting) return nothing;
+		return html`
+			${this.#renderSortModeToolbar()}
+			<umb-block-grid-entries
+				${ref(this.#gotRootEntriesElement)}
+				.areaKey=${null}
+				.layoutColumns=${this._layoutColumns}>
+			</umb-block-grid-entries>
+		`;
+	}
+
+	#renderSortModeToolbar() {
+		if (!this._isSortMode) return nothing;
+		return html`<umb-property-sort-mode-toolbar></umb-property-sort-mode-toolbar>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
-				display: grid;
-				gap: 1px;
-			}
-			> div {
 				display: flex;
 				flex-direction: column;
-				align-items: stretch;
-			}
-
-			uui-button-group {
-				padding-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				gap: var(--uui-size-1);
 			}
 		`,
 	];

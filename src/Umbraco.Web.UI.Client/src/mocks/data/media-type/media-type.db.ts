@@ -3,6 +3,7 @@ import { UmbMockEntityFolderManager } from '../utils/entity/entity-folder.manage
 import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
+import { umbDataTypeMockDb } from '../data-type/data-type.db.js';
 import type { UmbMockMediaTypeModel } from './media-type.data.js';
 import { data } from './media-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -10,6 +11,7 @@ import type {
 	AllowedMediaTypeModel,
 	CreateFolderRequestModel,
 	CreateMediaTypeRequestModel,
+	GetItemMediaTypeAllowedResponse,
 	MediaTypeItemResponseModel,
 	MediaTypeResponseModel,
 	MediaTypeSortModel,
@@ -45,6 +47,26 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 		const mappedItems = mockItems.map((item) => allowedMediaTypeMapper(item));
 		return { items: mappedItems, total: mappedItems.length };
 	}
+
+	getAllowedByFileExtension(fileExtension: string): GetItemMediaTypeAllowedResponse {
+		const allowedTypes = this.data.filter((field) => {
+			const allProperties = field.properties.flat();
+
+			const fileUploadType = allProperties.find((prop) => prop.alias === 'umbracoFile' || prop.alias === 'mediaPicker');
+			if (!fileUploadType) return false;
+
+			const dataType = umbDataTypeMockDb.read(fileUploadType.dataType.id);
+			if (dataType?.editorAlias !== 'Umbraco.UploadField') return false;
+
+			const allowedFileExtensions = dataType.values.find((value) => value.alias === 'fileExtensions')?.value;
+			if (!allowedFileExtensions || !Array.isArray(allowedFileExtensions)) return false;
+
+			return allowedFileExtensions.includes(fileExtension);
+		});
+
+		const mappedTypes = allowedTypes.map(mediaTypeItemMapper);
+		return allowedExtensionMediaTypeMapper(mappedTypes, mappedTypes.length);
+	}
 }
 
 const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): UmbMockMediaTypeModel => {
@@ -68,6 +90,7 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		collection: null,
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		flags: [],
 	};
 };
 
@@ -92,6 +115,7 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		collection: null,
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		flags: [],
 	};
 };
 
@@ -125,6 +149,7 @@ const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeTreeItem
 		isFolder: item.isFolder,
 		icon: item.icon,
 		isDeletable: item.isDeletable,
+		flags: item.flags,
 	};
 };
 
@@ -133,6 +158,7 @@ const mediaTypeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeItemResponse
 		id: item.id,
 		name: item.name,
 		icon: item.icon,
+		flags: item.flags,
 	};
 };
 
@@ -142,6 +168,16 @@ const allowedMediaTypeMapper = (item: UmbMockMediaTypeModel): AllowedMediaTypeMo
 		name: item.name,
 		description: item.description,
 		icon: item.icon,
+	};
+};
+
+const allowedExtensionMediaTypeMapper = (
+	items: Array<MediaTypeItemResponseModel>,
+	total: number,
+): GetItemMediaTypeAllowedResponse => {
+	return {
+		items,
+		total,
 	};
 };
 

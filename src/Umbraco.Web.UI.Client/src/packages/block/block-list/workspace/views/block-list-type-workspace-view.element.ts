@@ -18,7 +18,6 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
 			</uui-box>
 			<uui-box headline=${this.localize.term('blockEditor_headlineDataModels')}>
-				<!-- TODO: implement readonly mode for umb-property -->
 				<umb-property
 					label=${this.localize.term('blockEditor_labelContentElementType')}
 					alias="contentElementTypeKey"
@@ -75,6 +74,7 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 				<umb-property
 					label=${this.localize.term('blockEditor_forceHideContentEditor')}
 					alias="forceHideContentEditorInOverlay"
+					description=${this.localize.term('blockEditor_forceHideContentEditorHelp')}
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 			</uui-box>
 		`;

@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     [TestCase("en-US", "The culture variant content value in English", "The culture variant settings value in English")]
     [TestCase("da-DK", "The culture variant content value in Danish", "The culture variant settings value in Danish")]
@@ -267,13 +267,6 @@ public partial class BlockListElementLevelVariationTests
         ContentTypeService.Save(contentType);
 
         RefreshContentTypeCache(elementType, contentType);
-
-        // to re-publish the content in both cultures we need to set the culture names
-        content = ContentService.GetById(content.Key)!;
-        content.SetCultureName("Home (en)", "en-US");
-        content.SetCultureName("Home (da)", "da-DK");
-        ContentService.Save(content);
-        PublishContent(content, contentType);
 
         var publishedContent = GetPublishedContent(content.Key);
 

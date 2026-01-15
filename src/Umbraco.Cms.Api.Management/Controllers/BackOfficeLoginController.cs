@@ -7,24 +7,7 @@ using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Api.Management;
 
-[BindProperties]
-public class BackOfficeLoginModel
-{
-    /// <summary>
-    /// Gets or sets the value of the "ReturnUrl" query parameter or defaults to the configured Umbraco directory.
-    /// </summary>
-    [FromQuery(Name = "ReturnUrl")]
-    public string? ReturnUrl { get; set; }
-
-    /// <summary>
-    /// The configured Umbraco directory.
-    /// </summary>
-    public string? UmbracoUrl { get; set; }
-
-    public bool UserIsAlreadyLoggedIn { get; set; }
-}
-
-[ApiExplorerSettings(IgnoreApi=true)]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route(LoginPath)]
 public class BackOfficeLoginController : Controller
 {
@@ -51,7 +34,7 @@ public class BackOfficeLoginController : Controller
 
         if (string.IsNullOrEmpty(model.UmbracoUrl))
         {
-            model.UmbracoUrl = _hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+            model.UmbracoUrl = _hostingEnvironment.GetBackOfficePath();
         }
 
         if (string.IsNullOrEmpty(model.ReturnUrl))

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 
-internal class JsonPathValidationError
+internal sealed class JsonPathValidationError
 {
     public required string JsonPath { get; init; }
 

@@ -68,7 +68,7 @@ public class RegisterModelBuilder : MemberModelBuilderBase
             UsernameIsEmail = _usernameIsEmail,
             MemberProperties = _lookupProperties
                 ? GetMemberPropertiesViewModel(memberType)
-                : Enumerable.Empty<MemberPropertyModel>().ToList(),
+                : [],
             AutomaticLogIn = _automaticLogIn
         };
         return model;

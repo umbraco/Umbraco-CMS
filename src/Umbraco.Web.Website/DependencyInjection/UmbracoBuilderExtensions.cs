@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Cms.Web.Website.Models;
 using Umbraco.Cms.Web.Website.Routing;
@@ -57,7 +59,8 @@ public static partial class UmbracoBuilderExtensions
             x.GetRequiredService<IControllerActionSearcher>(),
             x.GetRequiredService<IPublicAccessRequestHandler>(),
             x.GetRequiredService<IUmbracoVirtualPageRoute>(),
-            x.GetRequiredService<IOptionsMonitor<GlobalSettings>>()));
+            x.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
+            x.GetRequiredService<IDocumentUrlService>()));
         builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
         builder.Services.TryAddEnumerable(Singleton<MatcherPolicy, NotFoundSelectorPolicy>());
         builder.Services.AddSingleton<IUmbracoVirtualPageRoute, UmbracoVirtualPageRoute>();
@@ -72,6 +75,9 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IPublicAccessRequestHandler, PublicAccessRequestHandler>();
         builder.Services.AddSingleton<BasicAuthenticationMiddleware>();
+
+        // Partial view cache invalidators
+        builder.Services.AddUnique<IMemberPartialViewCacheInvalidator, MemberPartialViewCacheInvalidator>();
 
         builder
             .AddDistributedCache()

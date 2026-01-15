@@ -17,7 +17,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 	#init?: Promise<unknown>;
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	override connectedCallback(): void {
 		super.connectedCallback();

@@ -2,54 +2,85 @@ import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../contexts/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbClassState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
-export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSplitViewContext> {
+export class UmbWorkspaceSplitViewContext extends UmbContextBase {
+	//
+	#variantVariantValidationContext?: UmbValidationController;
 	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	public getWorkspaceContext() {
 		return this.#workspaceContext;
 	}
 
-	#variantContext?: UmbPropertyDatasetContext;
+	#datasetContext?: UmbPropertyDatasetContext;
 
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
 
-	//#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	//variantId = this.#variantId.asObservable();
+	#isNew = new UmbBooleanState(undefined);
+	isNew = this.#isNew.asObservable();
+
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	variantId = this.#variantId.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_SPLIT_VIEW_CONTEXT);
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._observeVariant();
+			this.#observeVariant();
+			this.#observeIsNew();
 		});
 
-		this.observe(this.index, () => {
-			this._observeVariant();
-		});
+		this.observe(
+			this.index,
+			() => {
+				this.#observeVariant();
+			},
+			null,
+		);
 	}
 
-	private _observeVariant() {
+	#observeIsNew() {
+		this.observe(
+			this.#workspaceContext?.isNew,
+			(isNew) => {
+				this.#isNew.setValue(isNew ?? false);
+			},
+			'umbObserveIsNew',
+		);
+	}
+
+	#observeVariant() {
 		if (!this.#workspaceContext) return;
 
 		const index = this.#index.getValue();
 		if (index === undefined) return;
 
-		// TODO: Should splitView be put into its own context?... a split view manager context?   one which might have a reference to the workspace context, so we still can ask that about how to create the variant context.
 		this.observe(
 			this.#workspaceContext.splitView.activeVariantByIndex(index),
 			async (activeVariantInfo) => {
+				if (this.#variantVariantValidationContext) {
+					this.#variantVariantValidationContext.unprovide();
+				}
 				if (!activeVariantInfo) return;
 
-				// TODO: Ask workspace context to create the specific variant context.
-
-				this.#variantContext?.destroy();
+				this.#datasetContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
-				this.#variantContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
+				this.#variantId.setValue(variantId);
+
+				const validationContext = this.#workspaceContext?.getVariantValidationContext(variantId);
+				if (validationContext) {
+					validationContext.provideAt(this);
+					this.#variantVariantValidationContext = validationContext;
+				}
+
+				this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
+				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
 			},
 			'_observeActiveVariant',
 		);
@@ -83,11 +114,17 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 	 * concept this class could have methods to set and get the culture and segment of the active variant? just by using the index.
 	 */
 
-	/*
-	public destroy(): void {
-
+	public override destroy(): void {
+		this.#isNew.destroy();
+		this.#variantId.destroy();
+		this.#index.destroy();
+		this.#variantVariantValidationContext?.unprovide();
+		this.#datasetContext?.destroy();
+		this.#workspaceContext = undefined;
+		this.#variantVariantValidationContext = undefined;
+		this.#datasetContext = undefined;
+		super.destroy();
 	}
-	*/
 }
 
 export const UMB_WORKSPACE_SPLIT_VIEW_CONTEXT = new UmbContextToken<UmbWorkspaceSplitViewContext>(

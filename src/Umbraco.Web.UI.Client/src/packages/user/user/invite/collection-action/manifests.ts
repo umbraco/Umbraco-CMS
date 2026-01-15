@@ -10,6 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 100,
 		meta: {
 			label: '#user_invite',
+			additionalOptions: true,
 		},
 		conditions: [
 			{

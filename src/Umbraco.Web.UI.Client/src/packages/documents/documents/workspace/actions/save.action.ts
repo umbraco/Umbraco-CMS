@@ -1,37 +1,72 @@
-import {
-	UMB_USER_PERMISSION_DOCUMENT_CREATE,
-	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-} from '../../user-permissions/constants.js';
-import { UmbDocumentUserPermissionCondition } from '../../user-permissions/conditions/document-user-permission.condition.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
+import type UmbDocumentWorkspaceContext from '../document-workspace.context.js';
+import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
+	UmbSaveWorkspaceAction,
+	type MetaWorkspaceAction,
+	type UmbSaveWorkspaceActionArgs,
+	type UmbWorkspaceActionDefaultKind,
+} from '@umbraco-cms/backoffice/workspace';
 
-export class UmbDocumentSaveWorkspaceAction extends UmbSubmitWorkspaceAction {
-	constructor(host: UmbControllerHost, args: any) {
-		super(host, args);
+export class UmbDocumentSaveWorkspaceAction
+	extends UmbSaveWorkspaceAction<MetaWorkspaceAction, UmbDocumentWorkspaceContext>
+	implements UmbWorkspaceActionDefaultKind<MetaWorkspaceAction>
+{
+	#variants: Array<UmbDocumentVariantModel> | undefined;
 
-		/* The action is disabled by default because the onChange callback
-		 will first be triggered when the condition is changed to permitted */
-		this.disable();
+	constructor(
+		host: UmbControllerHost,
+		args: UmbSaveWorkspaceActionArgs<MetaWorkspaceAction, UmbDocumentWorkspaceContext>,
+	) {
+		super(host, { workspaceContextToken: UMB_DOCUMENT_WORKSPACE_CONTEXT, ...args });
+	}
 
-		// TODO: this check is not sufficient. It will show the save button if a use
-		// has only create options. The best solution would be to split the two buttons into two separate actions
-		// with a condition on isNew to show/hide them
-		// The server will throw a permission error if this scenario happens
-		const condition = new UmbDocumentUserPermissionCondition(host, {
-			host,
-			config: {
-				alias: 'Umb.Condition.UserPermission.Document',
-				oneOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE],
+	async hasAdditionalOptions() {
+		await this._retrieveWorkspaceContext;
+		const variantOptions = await this.observe(this._workspaceContext!.variantOptions)
+			.asPromise()
+			.catch(() => undefined);
+		const cultureVariantOptions = variantOptions?.filter((option) => option.culture);
+		return cultureVariantOptions ? cultureVariantOptions?.length > 1 : false;
+	}
+
+	protected override _gotWorkspaceContext() {
+		super._gotWorkspaceContext();
+		this.#observeVariants();
+		this.#observeReadOnlyGuardRules();
+	}
+
+	#observeVariants() {
+		this.observe(
+			this._workspaceContext?.variants,
+			(variants) => {
+				this.#variants = variants;
+				this.#checkReadOnlyGuardRules();
 			},
-			onChange: () => {
-				if (condition.permitted) {
-					this.enable();
-				} else {
-					this.disable();
-				}
-			},
-		});
+			'saveWorkspaceActionVariantsObserver',
+		);
+	}
+
+	#observeReadOnlyGuardRules() {
+		this.observe(
+			this._workspaceContext?.readOnlyGuard.rules,
+			() => this.#checkReadOnlyGuardRules(),
+			'umbObserveReadOnlyGuardRules',
+		);
+	}
+
+	#checkReadOnlyGuardRules() {
+		const allVariantsAreReadOnly =
+			this.#variants?.filter((variant) =>
+				this._workspaceContext!.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)),
+			).length === this.#variants?.length;
+		if (allVariantsAreReadOnly) {
+			this.disable();
+		} else {
+			this.enable();
+		}
 	}
 }
 

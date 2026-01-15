@@ -13,7 +13,7 @@ export class UmbBlockEntryIsExposedCondition
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.exposed,
+				context?.exposed,
 				(exposed) => {
 					if (exposed !== undefined) {
 						// Check if equal to match, if match not set it defaults to true.

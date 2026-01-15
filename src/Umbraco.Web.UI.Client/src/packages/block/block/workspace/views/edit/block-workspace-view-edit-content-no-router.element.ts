@@ -4,7 +4,7 @@ import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/b
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 /**
@@ -14,19 +14,16 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
  */
 @customElement('umb-block-workspace-view-edit-content-no-router')
 export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	//private _hasRootProperties = false;
+	// private _hasRootProperties = false;
 
 	@state()
 	private _hasRootGroups = false;
 
 	@state()
-	_tabs?: Array<UmbPropertyTypeContainerModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
 
 	@state()
-	private _activeTabId?: string | null | undefined;
-
-	//@state()
-	//private _activeTabName?: string | null | undefined;
+	private _activeTabKey?: string | null | undefined;
 
 	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
@@ -36,7 +33,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this.#tabsStructureHelper.mergedContainers, (tabs) => {
+		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
 			this._tabs = tabs;
 			this.#checkDefaultTabName();
 		});
@@ -45,7 +42,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.#blockWorkspace = context;
-			this.#tabsStructureHelper.setStructureManager(context.content.structure);
+			this.#tabsStructureHelper.setStructureManager(context?.content.structure);
 
 			this.#observeRootGroups();
 		});
@@ -67,57 +64,56 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	#checkDefaultTabName() {
 		if (!this._tabs || !this.#blockWorkspace) return;
 
-		// Find the default tab to grab:
-		if (this._activeTabId === undefined) {
+		// Find the default tab to grab
+		if (this._activeTabKey === undefined) {
 			if (this._hasRootGroups) {
-				//this._activeTabName = null;
-				this._activeTabId = null;
+				this._activeTabKey = null;
 			} else if (this._tabs.length > 0) {
-				//this._activeTabName = this._tabs[0].name;
-				this._activeTabId = this._tabs[0].id;
+				const tab = this._tabs[0];
+				this._activeTabKey = tab.ownerId ?? tab.ids[0];
 			}
 		}
 	}
 
-	#setTabName(tabName: string | undefined | null, tabId: string | null | undefined) {
-		//this._activeTabName = tabName;
-		this._activeTabId = tabId;
+	#setTabKey(tabKey: string | null | undefined) {
+		this._activeTabKey = tabKey;
 	}
 
 	override render() {
 		if (!this._tabs) return;
+
 		return html`
 			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
-				? html` <uui-tab-group slot="header">
+				? html`<uui-tab-group slot="header">
 						${this._hasRootGroups && this._tabs.length > 0
-							? html`
-									<uui-tab
-										label="Content"
-										.active=${null === this._activeTabId}
-										@click=${() => this.#setTabName(null, null)}
-										>Content</uui-tab
-									>
-								`
+							? html`<uui-tab
+									label=${this.localize.term('general_generic')}
+									.active=${this._activeTabKey === null}
+									@click=${() => this.#setTabKey(null)}
+									>Content</uui-tab
+								>`
 							: nothing}
 						${repeat(
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
+								const tabKey = tab.ownerId ?? tab.ids[0];
+
 								return html`<uui-tab
-									label=${tab.name ?? 'Unnamed'}
-									.active=${tab.id === this._activeTabId}
-									@click=${() => this.#setTabName(tab.name, tab.id)}
+									label=${this.localize.string(tab.name ?? '#general_unnamed')}
+									.active=${this._activeTabKey === tabKey}
+									@click=${() => this.#setTabKey(tabKey)}
 									>${tab.name}</uui-tab
 								>`;
 							},
 						)}
 					</uui-tab-group>`
 				: nothing}
-			${this._activeTabId !== undefined
+			${this._activeTabKey !== undefined
 				? html`<umb-block-workspace-view-edit-tab
 						.managerName=${'content'}
 						.hideSingleGroup=${true}
-						.containerId=${this._activeTabId}>
+						.containerId=${this._activeTabKey}>
 					</umb-block-workspace-view-edit-tab>`
 				: nothing}
 		`;

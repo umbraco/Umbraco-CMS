@@ -1,179 +1,110 @@
-import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { css, html, nothing, customElement, state, classMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbDocumentTreeItemModel } from '../types.js';
+import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
+import { css, html, customElement, state, property, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
-export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocumentTreeItemModel> {
-	#appLanguageContext?: UmbAppLanguageContext;
+export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeItemContext
+> {
+	#api: UmbDocumentTreeItemContext | undefined;
+
+	@property({ type: Object, attribute: false })
+	public override get api(): UmbDocumentTreeItemContext | undefined {
+		return this.#api;
+	}
+	public override set api(value: UmbDocumentTreeItemContext | undefined) {
+		this.#api = value;
+
+		if (this.#api) {
+			this.observe(this.#api.name, (name) => (this._name = name || ''));
+			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
+			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess || false));
+			this.observe(this.#api.hasCollection, (has) => {
+				const oldValue = this._forceShowExpand;
+				this._forceShowExpand = has;
+				this.requestUpdate('_forceShowExpand', oldValue);
+			});
+			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
+			this.observe(this.#api.flags, (flags) => (this._flags = flags || ''));
+		}
+
+		super.api = value;
+	}
 
 	@state()
-	_currentCulture?: string;
+	private _name = '';
 
-	@state()
-	_defaultCulture?: string;
+	/**
+	 * @internal
+	 * Indicates whether the document is a draft, this is controlled internally but present as an attribute as it affects styling.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'draft' })
+	protected _isDraft = false;
 
-	@state()
-	_variant?: UmbDocumentTreeItemVariantModel;
+	/**
+	 * @internal
+	 * Indicates whether the user has no access to this document, this is controlled internally but present as an attribute as it affects styling.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
+	protected _noAccess = false;
+
+	#icon: string | null | undefined;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.#appLanguageContext = instance;
-			this.#observeAppCulture();
-			this.#observeDefaultCulture();
-		});
+		this.addEventListener('click', this.#handleClick);
 	}
 
-	#observeAppCulture() {
-		this.observe(this.#appLanguageContext!.appLanguageCulture, (value) => {
-			this._currentCulture = value;
-			this._variant = this.#findVariant(value);
-		});
-	}
-
-	#observeDefaultCulture() {
-		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
-			this._defaultCulture = value?.unique;
-		});
-	}
-
-	#findVariant(culture: string | undefined) {
-		return this.item?.variants.find((x) => x.culture === culture);
-	}
-
-	#isInvariant() {
-		const firstVariant = this.item?.variants[0];
-		return firstVariant?.culture === null && firstVariant?.segment === null;
-	}
-
-	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
-	#getLabel() {
-		if (this.#isInvariant()) {
-			return this._item?.variants[0].name;
+	#handleClick = (event: MouseEvent) => {
+		if (this._noAccess) {
+			event.preventDefault();
+			event.stopPropagation();
 		}
+	};
 
-		// ensure we always have the correct variant data
-		this._variant = this.#findVariant(this._currentCulture);
-
-		const fallbackName = this.#findVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
-		return this._variant?.name ?? `(${fallbackName})`;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected override _extractFlags(item: UmbDocumentTreeItemModel | undefined) {
+		// Empty on purpose and NOT calling super to prevent doing what the base does. [NL]
 	}
 
-	#isDraft() {
-		if (this.#isInvariant()) {
-			return this._item?.variants[0].state === DocumentVariantStateModel.DRAFT;
+	protected override _getIconName(): string | null | undefined {
+		return this.#icon;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	override _renderExpandSymbol = () => {
+		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
+		// `this._forceShowExpand` is equivalent to hasCollection for this element.
+		if (this._isMenu && this._forceShowExpand) {
+			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
+		} else {
+			return undefined;
 		}
-
-		// ensure we always have the correct variant data
-		this._variant = this.#findVariant(this._currentCulture);
-
-		return this._variant?.state === DocumentVariantStateModel.DRAFT;
-	}
-
-	override renderIconContainer() {
-		const icon = this.item?.documentType.icon;
-		const iconWithoutColor = icon?.split(' ')[0];
-
-		return html`
-			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
-				${icon && iconWithoutColor
-					? html`
-							<umb-icon id="icon" slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>
-							${this.#renderStateIcon()}
-						`
-					: nothing}
-			</span>
-		`;
-	}
+	};
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
-			>${this.#getLabel()}</span
-		> `;
-	}
-
-	#renderStateIcon() {
-		if (this.item?.isProtected) {
-			return this.#renderIsProtectedIcon();
-		}
-
-		if (this.item?.documentType.collection) {
-			return this.#renderIsCollectionIcon();
-		}
-
-		return nothing;
-	}
-
-	#renderIsCollectionIcon() {
-		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
-	}
-
-	#renderIsProtectedIcon() {
-		return html`<umb-icon id="state-icon" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
 	}
 
 	static override styles = [
-		UmbTextStyles,
+		...UmbTreeItemElementBase.styles,
 		css`
-			#icon-container {
-				position: relative;
+			:host([draft]) #label {
+				opacity: 0.6;
 			}
-
-			#icon {
-				vertical-align: middle;
+			:host([draft]) umb-icon {
+				opacity: 0.6;
 			}
-
-			#label {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
+			:host([no-access]) {
+				cursor: not-allowed;
 			}
-
-			#state-icon {
-				position: absolute;
-				bottom: -5px;
-				right: -5px;
-				font-size: 10px;
-				background: var(--uui-color-surface);
-				width: 14px;
-				height: 14px;
-				border-radius: 100%;
-				line-height: 14px;
+			:host([no-access]) #label {
+				opacity: 0.6;
+				font-style: italic;
 			}
-
-			:hover #state-icon {
-				background: var(--uui-color-surface-emphasis);
-			}
-
-			/** Active */
-			[active] #state-icon {
-				background: var(--uui-color-current);
-			}
-
-			[active]:hover #state-icon {
-				background: var(--uui-color-current-emphasis);
-			}
-
-			/** Selected */
-			[selected] #state-icon {
-				background-color: var(--uui-color-selected);
-			}
-
-			[selected]:hover #state-icon {
-				background-color: var(--uui-color-selected-emphasis);
-			}
-
-			/** Disabled */
-			[disabled] #state-icon {
-				background-color: var(--uui-color-disabled);
-			}
-
-			.draft {
+			:host([no-access]) umb-icon {
 				opacity: 0.6;
 			}
 		`,

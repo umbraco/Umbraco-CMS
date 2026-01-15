@@ -2,8 +2,10 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -17,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class AuditRepositoryTest : UmbracoIntegrationTest
+internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void Prepare() => _logger = LoggerFactory.CreateLogger<AuditRepository>();
@@ -34,7 +36,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = ScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"));
 
             var dtos = ScopeAccessor.AmbientScope.Database.Fetch<LogDto>("WHERE id > -1");
@@ -82,7 +84,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -95,7 +97,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var page = repo.GetPagedResultsByQuery(sp.CreateQuery<IAuditItem>(), 0, 10, out var total, Direction.Descending, null, null);
 
@@ -110,7 +112,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -123,7 +125,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var query = sp.CreateQuery<IAuditItem>().Where(x => x.UserId == -1);
 
@@ -159,7 +161,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -172,7 +174,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var page = repo.GetPagedResultsByQuery(
                     sp.CreateQuery<IAuditItem>(),
@@ -196,7 +198,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -209,7 +211,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger);
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var page = repo.GetPagedResultsByQuery(
                     sp.CreateQuery<IAuditItem>(),

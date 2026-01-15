@@ -18,8 +18,8 @@ export class UmbDocumentCreateBlueprintRepository extends UmbControllerBase impl
 		});
 	}
 
-	async create(requestBody: CreateDocumentBlueprintFromDocumentRequestModel) {
-		const { data, error } = await this.#dataSource.create(requestBody);
+	async create(body: CreateDocumentBlueprintFromDocumentRequestModel) {
+		const { data, error } = await this.#dataSource.create(body);
 		if (!error) {
 			const notification = { data: { message: `Document Blueprint created` } };
 			this.#notificationContext!.peek('positive', notification);

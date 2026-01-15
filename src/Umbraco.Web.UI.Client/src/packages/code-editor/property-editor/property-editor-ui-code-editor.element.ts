@@ -1,20 +1,23 @@
 import type { CodeEditorLanguage } from '../models/index.js';
 import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
 import { css, customElement, html, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import { UmbInputEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 
 import '../components/code-editor.element.js';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-property-editor-ui-code-editor';
 
 @customElement(elementName)
-export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUICodeEditorElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	#defaultLanguage: CodeEditorLanguage = 'javascript';
 
 	@state()
@@ -32,14 +35,17 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	@state()
 	private _wordWrap = false;
 
-	@property()
-	value = '';
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._language = config?.getValueByAlias<CodeEditorLanguage>('language') ?? this.#defaultLanguage;
+		const language = config?.getValueByAlias<Array<CodeEditorLanguage> | CodeEditorLanguage | undefined>('language');
+		this._language = Array.isArray(language) ? language[0] : language;
+
 		this._height = Number(config?.getValueByAlias('height')) || 400;
 		this._lineNumbers = config?.getValueByAlias('lineNumbers') ?? false;
 		this._minimap = config?.getValueByAlias('minimap') ?? false;
@@ -49,7 +55,17 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	#onChange(event: UmbInputEvent & { target: UmbCodeEditorElement }) {
 		if (!(event instanceof UmbInputEvent)) return;
 		this.value = event.target.code;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage,
+			() => !!this.mandatory && (!this.value || this.value.length === 0),
+		);
 	}
 
 	override render() {

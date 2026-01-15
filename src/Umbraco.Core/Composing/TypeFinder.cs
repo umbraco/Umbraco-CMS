@@ -29,18 +29,18 @@ public class TypeFinder : ITypeFinder
         "DataAnnotationsExtensions,", "DataAnnotationsExtensions.", "Dynamic,", "Examine,", "Examine.",
         "HtmlAgilityPack,", "HtmlAgilityPack.", "HtmlDiff,", "ICSharpCode.", "Iesi.Collections,", // used by NHibernate
         "JetBrains.Annotations,", "LightInject.", // DI
-        "LightInject,", "Lucene.", "Markdown,", "Microsoft.", "MiniProfiler,", "Moq,", "MySql.", "NHibernate,",
+        "LightInject,", "Lucene.", "Markdig,", "Markdown,", "Microsoft.", "MiniProfiler,", "Moq,", "MySql.", "NHibernate,",
         "NHibernate.", "Newtonsoft.", "NPoco,", "NuGet.", "RouteDebugger,", "Semver.", "Serilog.", "Serilog,",
         "ServiceStack.", "SqlCE4Umbraco,", "Superpower,", // used by Serilog
         "System.", "TidyNet,", "TidyNet.", "WebDriver,", "itextsharp,", "mscorlib,", "NUnit,", "NUnit.", "NUnit3.",
         "Selenium.", "ImageProcessor", "MiniProfiler.", "Owin,", "SQLite",
-        "ReSharperTestRunner", "ReSharperTestRunner32", "ReSharperTestRunner64", // These are used by the Jetbrains Rider IDE and Visual Studio ReSharper Extension
+        "ReSharperTestRunner", "ReSharperTestRunner32", "ReSharperTestRunner64", "ReSharperTestRunnerArm32", "ReSharperTestRunnerArm64", // These are used by the Jetbrains Rider IDE and Visual Studio ReSharper Extension
     };
 
     private static readonly ConcurrentDictionary<string, Type?> TypeNamesCache = new();
 
     private readonly IAssemblyProvider _assemblyProvider;
-    private readonly object _localFilteredAssemblyCacheLocker = new();
+    private readonly Lock _localFilteredAssemblyCacheLocker = new();
     private readonly ILogger<TypeFinder> _logger;
     private readonly List<string> _notifiedLoadExceptionAssemblies = new();
 
@@ -115,7 +115,10 @@ public class TypeFinder : ITypeFinder
     {
         IEnumerable<Assembly> assemblyList = assemblies ?? AssembliesToScan;
 
-        return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses,
+        return GetClassesWithBaseType(
+            assignTypeFrom,
+            assemblyList,
+            onlyConcreteClasses,
 
             // the additional filter will ensure that any found types also have the attribute applied.
             t => t.GetCustomAttributes(attributeType, false).Any());
@@ -233,10 +236,7 @@ public class TypeFinder : ITypeFinder
             excludeFromResults = new HashSet<Assembly>();
         }
 
-        if (exclusionFilter == null)
-        {
-            exclusionFilter = new string[] { };
-        }
+        exclusionFilter ??= [];
 
         return GetAllAssemblies()
             .Where(x => excludeFromResults.Contains(x) == false

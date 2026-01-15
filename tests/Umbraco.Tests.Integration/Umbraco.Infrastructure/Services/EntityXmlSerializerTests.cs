@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -30,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class EntityXmlSerializerTests : UmbracoIntegrationTest
+internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
 {
     private IEntityXmlSerializer Serializer => GetRequiredService<IEntityXmlSerializer>();
     private IContentService ContentService => GetRequiredService<IContentService>();
@@ -162,10 +164,6 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
 
         var ignored = new FileUploadPropertyEditor(
             DataValueEditorFactory,
-            mediaFileManager,
-            Mock.Of<IOptionsMonitor<ContentSettings>>(x => x.CurrentValue == contentSettings),
-            Services.GetRequiredService<UploadAutoFillProperties>(),
-            ContentService,
             IOHelper);
 
         var media = MediaBuilder.CreateMediaImage(mediaType, -1);

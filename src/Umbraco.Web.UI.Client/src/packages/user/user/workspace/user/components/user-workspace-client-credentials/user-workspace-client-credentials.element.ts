@@ -33,10 +33,10 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
 
-			this.observe(this.#userWorkspaceContext.kind, (kind) => (this._userKind = kind), 'umbUserKindObserver');
+			this.observe(this.#userWorkspaceContext?.kind, (kind) => (this._userKind = kind), 'umbUserKindObserver');
 
 			this.observe(
-				this.#userWorkspaceContext.unique,
+				this.#userWorkspaceContext?.unique,
 				async (unique) => {
 					if (unique) {
 						this.#onUserUniqueChange(unique);

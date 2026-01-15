@@ -11,10 +11,10 @@ import type {
 	UmbSubmittableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
@@ -25,14 +25,13 @@ export interface UmbPartialViewWorkspaceContextCreateArgs
 }
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<
+	extends UmbEntityNamedDetailWorkspaceContextBase<
 		UmbPartialViewDetailModel,
 		UmbPartialViewDetailRepository,
 		UmbPartialViewWorkspaceContextCreateArgs
 	>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
 
 	constructor(host: UmbControllerHost) {
@@ -95,10 +94,6 @@ export class UmbPartialViewWorkspaceContext
 		);
 	};
 
-	setName(value: string) {
-		this._data.updateCurrent({ name: value });
-	}
-
 	setContent(value: string) {
 		this._data.updateCurrent({ content: value });
 	}
@@ -117,10 +112,10 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	#getSnippet(unique: string) {
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this,
 			PartialViewService.getPartialViewSnippetById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

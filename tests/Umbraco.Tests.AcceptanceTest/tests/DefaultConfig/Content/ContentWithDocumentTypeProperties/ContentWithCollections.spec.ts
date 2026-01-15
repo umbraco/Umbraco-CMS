@@ -28,14 +28,13 @@ test('can create content configured as a collection', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isTabNameVisible('Collection');
+  await umbracoUi.content.isTabNameVisible('Child items');
   await umbracoUi.content.doesContentListHaveNoItemsInList();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
@@ -51,23 +50,19 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
-  // This wait is needed
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(firstChildContentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   // verify that the child content displays in collection list after reloading tree
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadButton();
+  await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean
@@ -87,12 +82,10 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
-  // This wait is needed
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(secondChildContentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
   const childData = await umbracoApi.document.getChildren(contentId);
@@ -100,11 +93,9 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   expect(childData[1].variants[0].name).toBe(secondChildContentName);
   // verify that the child content displays in collection list after reloading tree
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadButton();
+  await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean

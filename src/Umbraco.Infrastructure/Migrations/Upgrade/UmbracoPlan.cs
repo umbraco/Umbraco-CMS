@@ -104,6 +104,54 @@ public class UmbracoPlan : MigrationPlan
         To<V_15_0_0.ConvertBlockGridEditorProperties>("{9D3CE7D4-4884-41D4-98E8-302EB6CB0CF6}");
         To<V_15_0_0.ConvertRichTextEditorProperties>("{37875E80-5CDD-42FF-A21A-7D4E3E23E0ED}");
         To<V_15_0_0.ConvertLocalLinks>("{42E44F9E-7262-4269-922D-7310CB48E724}");
+
+        // To 15.1.0
         To<V_15_1_0.RebuildCacheMigration>("{7B51B4DE-5574-4484-993E-05D12D9ED703}");
+        To<V_15_1_0.FixConvertLocalLinks>("{F3D3EF46-1B1F-47DB-B437-7D573EEDEB98}");
+
+        // To 15.3.0
+        To<V_15_3_0.AddNameAndDescriptionToWebhooks>("{7B11F01E-EE33-4B0B-81A1-F78F834CA45B}");
+
+        // To 15.4.0
+        To<V_15_4_0.UpdateDocumentUrlToPersistMultipleSegmentsPerDocument>("{A9E72794-4036-4563-B543-1717C73B8879}");
+        To<V_15_4_0.AddRelationTypeForMembers>("{33D62294-D0DE-4A86-A830-991EB36B96DA}");
+
+        // To 16.0.0
+        To<V_16_0_0.MigrateTinyMceToTiptap>("{C6681435-584F-4BC8-BB8D-BC853966AF0B}");
+        To<V_16_0_0.AddDocumentPropertyPermissions>("{D1568C33-A697-455F-8D16-48060CB954A1}");
+
+        // To 16.2.0
+        To<V_16_2_0.AddLongRunningOperations>("{741C22CF-5FB8-4343-BF79-B97A58C2CCBA}");
+        To<NoopMigration>("{BE11D4D3-3A1F-4598-90D4-B548BD188C48}"); // Originally was V_16_2_0.AddDocumentUrlLock, now moved to a pre-migration.
+
+        // To 16.3.0
+        To<V_16_3_0.AddRichTextEditorCapabilities>("{A917FCBC-C378-4A08-A36C-220C581A6581}");
+        To<V_16_3_0.MigrateMediaTypeLabelProperties>("{FB7073AF-DFAF-4AC1-800D-91F9BD5B5238}");
+
+        // To 16.4.0
+        To<V_16_4_0.CreateMissingTabs>("{6A7D3B80-8B64-4E41-A7C0-02EC39336E97}");
+
+        // To 17.0.0
+        To<V_17_0_0.AddGuidsToAuditEntries>("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
+        To<V_17_0_0.MigrateCheckboxListDataTypesAndPropertyData>("{EB1E50B7-CD5E-4B6B-B307-36237DD2C506}");
+        To<V_17_0_0.SetDateDefaultsToUtcNow>("{1847C7FF-B021-44EB-BEB0-A77A4376A6F2}");
+        To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
+        To<V_17_0_0.AddDistributedJobLock>("{263075BF-F18A-480D-92B4-4947D2EAB772}");
+        To<V_17_0_0.AddLastSyncedTable>("26179D88-58CE-4C92-B4A4-3CBA6E7188AC");
+        To<V_17_0_0.EnsureDefaultMediaFolderHasDefaultCollection>("{8B2C830A-4FFB-4433-8337-8649B0BF52C8}");
+        To<V_17_0_0.InvalidateBackofficeUserAccess>("{1C38D589-26BB-4A46-9ABE-E4A0DF548A87}");
+
+        // To 17.0.1
+        To<V_17_0_1.EnsureUmbracoPropertyDataColumnCasing>("{BE5CA411-E12D-4455-A59E-F12A669E5363}");
+
+        // To 17.1.0
+        To<V_17_1_0.ChangeValidationRegExpToNvarcharMax>("{1CE2E78B-E736-45D8-97A2-CE3EF2F31BCD}");
+
+        // To 17.2.0
+        To<V_17_2_0.AddDescriptionToUserGroup>("{F1A2B3C4-D5E6-4789-ABCD-1234567890AB}");
+
+        // To 18.0.0
+        // TODO (V18): Enable on 18 branch
+        //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
     }
 }

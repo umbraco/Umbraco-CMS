@@ -46,12 +46,22 @@ public abstract class HealthCheck : IDiscoverable
     ///     If there are possible actions to take to rectify this check, this method must be overridden by a sub class
     ///     in order to explicitly provide those actions.
     /// </remarks>
-    public abstract Task<IEnumerable<HealthCheckStatus>> GetStatus();
+    public virtual Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
+        Task.FromResult(Enumerable.Empty<HealthCheckStatus>());
 
     /// <summary>
     ///     Executes the action and returns it's status
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    public abstract HealthCheckStatus ExecuteAction(HealthCheckAction action);
+    public virtual HealthCheckStatus ExecuteAction(HealthCheckAction action) =>
+        new HealthCheckStatus("Not implemented");
+
+    /// <summary>
+    ///     Executes the action and returns it's status
+    /// </summary>
+    /// <param name="action"></param>
+    /// <returns></returns>
+    public virtual Task<HealthCheckStatus> ExecuteActionAsync(HealthCheckAction action) =>
+        Task.FromResult(ExecuteAction(action));
 }

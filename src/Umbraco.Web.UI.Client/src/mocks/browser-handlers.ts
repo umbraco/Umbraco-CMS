@@ -23,6 +23,8 @@ import { handlers as partialViewHandlers } from './handlers/partial-view/index.j
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as publishedStatusHandlers } from './handlers/published-status.handlers.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
+import { handlers as relationTypeHandlers } from './handlers/relation-type/index.js';
+import { handlers as relationHandlers } from './handlers/relation/index.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
 import { handlers as scriptHandlers } from './handlers/script/index.js';
 import { handlers as staticFileHandlers } from './handlers/static-file/index.js';
@@ -30,6 +32,7 @@ import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js';
 import { handlers as templateHandlers } from './handlers/template/index.js';
+import { handlers as umbracoNewsHandlers } from './handlers/umbraco-news.handlers.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
@@ -37,6 +40,7 @@ import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 import { handlers as temporaryFileHandlers } from './handlers/temporary-file/index.js';
+import { handlers as segmentHandlers } from './handlers/segment.handlers.js';
 
 const handlers = [
 	...backofficeHandlers,
@@ -64,6 +68,8 @@ const handlers = [
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
+	...relationTypeHandlers,
+	...relationHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
 	...staticFileHandlers,
@@ -71,11 +77,13 @@ const handlers = [
 	...tagHandlers,
 	...telemetryHandlers,
 	...templateHandlers,
+	...umbracoNewsHandlers,
 	...upgradeHandlers,
 	...userGroupsHandlers,
 	...userHandlers,
 	...documentBlueprintHandlers,
 	...temporaryFileHandlers,
+	...segmentHandlers,
 	...serverHandlers.serverInformationHandlers,
 	serverHandlers.serverRunningHandler,
 	...manifestsHandlers.manifestEmptyHandlers,

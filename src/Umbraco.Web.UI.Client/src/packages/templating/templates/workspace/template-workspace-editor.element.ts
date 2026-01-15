@@ -2,14 +2,15 @@ import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.js';
 import { UMB_TEMPLATING_SECTION_PICKER_MODAL } from '../../modals/templating-section-picker/templating-section-picker-modal.token.js';
 import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/insert-menu.element.js';
+import { UMB_TEMPLATE_PICKER_MODAL } from '../modals/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context-token.js';
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
@@ -47,24 +48,24 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#templateWorkspaceContext = workspaceContext;
-			this.observe(this.#templateWorkspaceContext.name, (name) => {
+			this.observe(this.#templateWorkspaceContext?.name, (name) => {
 				this._name = name;
 			});
 
-			this.observe(this.#templateWorkspaceContext.alias, (alias) => {
+			this.observe(this.#templateWorkspaceContext?.alias, (alias) => {
 				this._alias = alias;
 			});
 
-			this.observe(this.#templateWorkspaceContext.content, (content) => {
+			this.observe(this.#templateWorkspaceContext?.content, (content) => {
 				this._content = content;
 			});
 
-			this.observe(this.#templateWorkspaceContext.masterTemplate, (masterTemplate) => {
+			this.observe(this.#templateWorkspaceContext?.masterTemplate, (masterTemplate) => {
 				this.#masterTemplateUnique = masterTemplate?.unique ?? null;
 				this._masterTemplateName = masterTemplate?.name ?? null;
 			});
 
-			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
+			this.observe(this.#templateWorkspaceContext?.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
 		});
@@ -101,7 +102,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#resetMasterTemplate() {
-		this.#templateWorkspaceContext?.setMasterTemplate(null);
+		this.#templateWorkspaceContext?.setMasterTemplate(null, true);
 	}
 
 	#openMasterTemplatePicker() {
@@ -120,7 +121,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			?.onSubmit()
 			.then((value) => {
 				if (!value?.selection) return;
-				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
+				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null, true);
 			})
 			.catch(() => undefined);
 	}
@@ -170,6 +171,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					.alias=${this._alias}
 					?auto-generate-alias=${this.#isNew}
 					@change=${this.#onNameAndAliasChange}
+					required
+					${umbBindToValidation(this)}
 					${umbFocus()}>
 				</umb-input-with-alias>
 

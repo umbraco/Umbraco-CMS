@@ -1,15 +1,19 @@
+// This file has been automatically migrated to valid ESM format by Storybook.
+import { createRequire } from "node:module";
 import { dirname, join } from 'path';
 import { StorybookConfig } from '@storybook/web-components-vite';
 import remarkGfm from 'remark-gfm';
 
+const require = createRequire(import.meta.url);
+
 const config: StorybookConfig = {
 	stories: ['../@(src|libs|apps|storybook)/**/*.mdx', '../@(src|libs|apps|storybook)/**/*.stories.@(js|jsx|ts|tsx)'],
+
 	addons: [
 		getAbsolutePath('@storybook/addon-links'),
-		getAbsolutePath('@storybook/addon-essentials'),
 		getAbsolutePath('@storybook/addon-a11y'),
 		{
-			name: '@storybook/addon-docs',
+			name: getAbsolutePath('@storybook/addon-docs'),
 			options: {
 				mdxPluginOptions: {
 					mdxCompileOptions: {
@@ -19,10 +23,12 @@ const config: StorybookConfig = {
 			},
 		},
 	],
+
 	framework: {
 		name: getAbsolutePath('@storybook/web-components-vite'),
 		options: {},
 	},
+
 	staticDirs: [
 		'../public-assets',
 		'../public',
@@ -32,10 +38,11 @@ const config: StorybookConfig = {
 			to: 'assets/icons',
 		},
 	],
+
 	typescript: {
 		check: true,
 	},
-	docs: {},
+
 	managerHead(head, { configType }) {
 		const base = process.env.VITE_BASE_PATH || '/';
 		const injections = [
@@ -43,10 +50,12 @@ const config: StorybookConfig = {
 		];
 		return configType === 'PRODUCTION' ? `${injections.join('')}${head}` : head;
 	},
+
 	refs: {
 		uui: {
 			title: 'Umbraco UI Library',
-			url: 'https://62189360eeb21b003ab2f4ad-vfnpsanjps.chromatic.com/',
+			url: 'https://uui.umbraco.com/',
+			expanded: false,
 		},
 	},
 };

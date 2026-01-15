@@ -1,20 +1,55 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
-import { css, html, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
+import { css, html, customElement, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-media-tree-item';
 @customElement(elementName)
-export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel> {
+export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
+	#api: UmbMediaTreeItemContext | undefined;
+
+	@property({ type: Object, attribute: false })
+	public override get api(): UmbMediaTreeItemContext | undefined {
+		return this.#api;
+	}
+	public override set api(value: UmbMediaTreeItemContext | undefined) {
+		this.#api = value;
+
+		if (this.#api) {
+			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess || false));
+		}
+
+		super.api = value;
+	}
+
+	/**
+	 * @internal
+	 * Indicates whether the user has no access to this media item, this is controlled internally but present as an attribute as it affects styling.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
+	protected _noAccess = false;
+
+	constructor() {
+		super();
+		this.addEventListener('click', this.#handleClick);
+	}
+
+	#handleClick = (event: MouseEvent) => {
+		if (this._noAccess) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	};
+
 	override renderIconContainer() {
 		const icon = this.item?.mediaType.icon;
-		const iconWithoutColor = icon?.split(' ')[0];
 
 		return html`
 			<span id="icon-container" slot="icon">
-				${icon && iconWithoutColor
+				${icon
 					? html`
-							<umb-icon id="icon" slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>
+							<umb-icon id="icon" slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>
 							${this.#renderStateIcon()}
 						`
 					: nothing}
@@ -92,6 +127,18 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 			/** Disabled */
 			[disabled] #state-icon {
 				background-color: var(--uui-color-disabled);
+			}
+
+			/** No Access */
+			:host([no-access]) {
+				cursor: not-allowed;
+			}
+			:host([no-access]) #label {
+				opacity: 0.6;
+				font-style: italic;
+			}
+			:host([no-access]) umb-icon {
+				opacity: 0.6;
 			}
 		`,
 	];

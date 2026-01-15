@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Logging.Enrichers;
 
-internal class ApplicationIdEnricher : ILogEventEnricher
+internal sealed class ApplicationIdEnricher : ILogEventEnricher
 {
     public const string ApplicationIdProperty = "ApplicationId";
     private readonly IApplicationDiscriminator _applicationDiscriminator;

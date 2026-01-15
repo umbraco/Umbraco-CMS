@@ -5,9 +5,10 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends { hasChildren: boolean },
@@ -16,9 +17,13 @@ export interface UmbTreeServerDataSourceBaseArgs<
 	TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
 	TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
 > {
-	getRootItems: (args: TreeRootItemsRequestArgsType) => Promise<UmbPagedModel<ServerTreeItemType>>;
-	getChildrenOf: (args: TreeChildrenOfRequestArgsType) => Promise<UmbPagedModel<ServerTreeItemType>>;
-	getAncestorsOf: (args: TreeAncestorsOfRequestArgsType) => Promise<Array<ServerTreeItemType>>;
+	getRootItems: (
+		args: TreeRootItemsRequestArgsType,
+	) => Promise<UmbDataSourceResponse<UmbTargetPagedModel<ServerTreeItemType>>>;
+	getChildrenOf: (
+		args: TreeChildrenOfRequestArgsType,
+	) => Promise<UmbDataSourceResponse<UmbTargetPagedModel<ServerTreeItemType>>>;
+	getAncestorsOf: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbDataSourceResponse<Array<ServerTreeItemType>>>;
 	mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 }
 
@@ -28,12 +33,14 @@ export interface UmbTreeServerDataSourceBaseArgs<
  * @implements {UmbTreeDataSource}
  */
 export abstract class UmbTreeServerDataSourceBase<
-	ServerTreeItemType extends { hasChildren: boolean },
-	ClientTreeItemType extends UmbTreeItemModel,
-	TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
-	TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
-	TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
-> implements
+		ServerTreeItemType extends { hasChildren: boolean },
+		ClientTreeItemType extends UmbTreeItemModel,
+		TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+		TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
+		TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
+	>
+	extends UmbControllerBase
+	implements
 		UmbTreeDataSource<
 			ClientTreeItemType,
 			TreeRootItemsRequestArgsType,
@@ -41,7 +48,6 @@ export abstract class UmbTreeServerDataSourceBase<
 			TreeAncestorsOfRequestArgsType
 		>
 {
-	#host;
 	#getRootItems;
 	#getChildrenOf;
 	#getAncestorsOf;
@@ -63,7 +69,7 @@ export abstract class UmbTreeServerDataSourceBase<
 			TreeAncestorsOfRequestArgsType
 		>,
 	) {
-		this.#host = host;
+		super(host);
 		this.#getRootItems = args.getRootItems;
 		this.#getChildrenOf = args.getChildrenOf;
 		this.#getAncestorsOf = args.getAncestorsOf;
@@ -77,11 +83,18 @@ export abstract class UmbTreeServerDataSourceBase<
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getRootItems(args: TreeRootItemsRequestArgsType) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getRootItems(args));
+		const { data, error } = await tryExecute(this, this.#getRootItems(args));
 
 		if (data) {
 			const items = data?.items.map((item) => this.#mapper(item));
-			return { data: { total: data.total, items } };
+			return {
+				data: {
+					total: data.total,
+					totalBefore: data.totalBefore,
+					totalAfter: data.totalAfter,
+					items,
+				},
+			};
 		}
 
 		return { error };
@@ -96,11 +109,18 @@ export abstract class UmbTreeServerDataSourceBase<
 	async getChildrenOf(args: TreeChildrenOfRequestArgsType) {
 		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getChildrenOf(args));
+		const { data, error } = await tryExecute(this, this.#getChildrenOf(args));
 
 		if (data) {
 			const items = data?.items.map((item: ServerTreeItemType) => this.#mapper(item));
-			return { data: { total: data.total, items } };
+			return {
+				data: {
+					total: data.total,
+					totalBefore: data.totalBefore,
+					totalAfter: data.totalAfter,
+					items,
+				},
+			};
 		}
 
 		return { error };
@@ -115,7 +135,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	async getAncestorsOf(args: TreeAncestorsOfRequestArgsType) {
 		if (!args.treeItem.entityType) throw new Error('Parent unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAncestorsOf(args));
+		const { data, error } = await tryExecute(this, this.#getAncestorsOf(args));
 
 		if (data) {
 			const items = data?.map((item: ServerTreeItemType) => this.#mapper(item));

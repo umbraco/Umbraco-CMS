@@ -1,4 +1,3 @@
-
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -8,51 +7,26 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
+/// <inheritdoc/>
+internal sealed class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
 {
-    private static readonly Guid?[] NodeObjectTypes = new Guid?[]
-    {
+    private static readonly List<Guid> _nodeObjectTypes =
+    [
         Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MemberType,
-    };
+    ];
 
     private readonly IScopeAccessor _scopeAccessor;
 
-    public PropertyTypeUsageRepository(IScopeAccessor scopeAccessor)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyTypeUsageRepository"/> class.
+    /// </summary>
+    public PropertyTypeUsageRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
+
+    /// <inheritdoc/>
+    public Task<bool> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
     {
-        _scopeAccessor = scopeAccessor;
-    }
-
-    [Obsolete("Please use HasSavedPropertyValuesAsync. Scheduled for removable in Umbraco 15.")]
-    public bool HasSavedPropertyValues(string propertyTypeAlias)
-    {
-        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
-
-        if (database is null)
-        {
-            throw new InvalidOperationException("A scope is required to query the database");
-        }
-
-        Sql<ISqlContext> selectQuery = database.SqlContext.Sql()
-            .SelectAll()
-            .From<PropertyTypeDto>("m")
-            .InnerJoin<PropertyDataDto>("p")
-            .On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "p", "m")
-            .Where<PropertyTypeDto>(m => m.Alias == propertyTypeAlias, "m");
-
-        Sql<ISqlContext> hasValuesQuery = database.SqlContext.Sql()
-            .SelectAnyIfExists(selectQuery);
-
-        return database.ExecuteScalar<bool>(hasValuesQuery);
-    }
-
-    public async Task<bool> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
-    {
-        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
-
-        if (database is null)
-        {
-            throw new InvalidOperationException("A scope is required to query the database");
-        }
+        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database
+            ?? throw new InvalidOperationException("A scope is required to query the database");
 
         Sql<ISqlContext> selectQuery = database.SqlContext.Sql()
             .SelectAll()
@@ -67,29 +41,24 @@ internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
         Sql<ISqlContext> hasValuesQuery = database.SqlContext.Sql()
             .SelectAnyIfExists(selectQuery);
 
-        return database.ExecuteScalar<bool>(hasValuesQuery);
+        return Task.FromResult(database.ExecuteScalar<bool>(hasValuesQuery));
     }
 
-    public async Task<bool> ContentTypeExistAsync(Guid contentTypeKey)
+    /// <inheritdoc/>
+    public Task<bool> ContentTypeExistAsync(Guid contentTypeKey)
     {
-        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
-
-        if (database is null)
-        {
-            throw new InvalidOperationException("A scope is required to query the database");
-        }
+        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database
+            ?? throw new InvalidOperationException("A scope is required to query the database");
 
         Sql<ISqlContext> selectQuery = database.SqlContext.Sql()
             .SelectAll()
             .From<NodeDto>("n")
             .Where<NodeDto>(n => n.UniqueId == contentTypeKey, "n")
-            .Where<NodeDto>(n => NodeObjectTypes.Contains(n.NodeObjectType), "n");
+            .WhereIn<NodeDto>(n => n.NodeObjectType, _nodeObjectTypes, "n");
 
         Sql<ISqlContext> hasValuesQuery = database.SqlContext.Sql()
             .SelectAnyIfExists(selectQuery);
 
-        return database.ExecuteScalar<bool>(hasValuesQuery);
+        return Task.FromResult(database.ExecuteScalar<bool>(hasValuesQuery));
     }
-
-
 }

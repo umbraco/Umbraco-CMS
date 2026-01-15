@@ -1,7 +1,7 @@
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
 
-export interface UmbPropertyEditorUiValueType {
+export interface UmbPropertyEditorRteValueType {
 	markup: string;
-	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
+	blocks?: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }

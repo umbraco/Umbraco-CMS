@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.Locking;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -18,6 +19,67 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
 {
+    private readonly ITemplateService _templateService;
+
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditService auditService,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters,
+        ITemplateService templateService)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
+        _templateService = templateService;
+        ContentService = contentService;
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditService auditService,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            contentService,
+            repository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters,
+            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -28,20 +90,25 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IDocumentTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
+            contentService,
             repository,
-            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
             entityContainerRepository,
             entityRepository,
             eventAggregator,
-            userIdKeyResolver) =>
-        ContentService = contentService;
+            userIdKeyResolver,
+            contentTypeFilters,
+            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
+    {
+    }
 
-    [Obsolete("Use the ctor specifying all dependencies instead")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -49,21 +116,58 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IContentService contentService,
         IContentTypeRepository repository,
         IAuditRepository auditRepository,
+        IAuditService auditService,
         IDocumentTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             contentService,
             repository,
-            auditRepository,
+            auditService,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    { }
+            userIdKeyResolver,
+            contentTypeFilters,
+            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditRepository auditRepository,
+        IAuditService auditService,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters,
+        ITemplateService templateService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            contentService,
+            repository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters,
+            templateService)
+    {
+    }
 
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 
@@ -118,6 +222,58 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
             return Repository.GetAllContentTypeIds(aliases);
         }
+    }
+
+    public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes);
+        IEnumerable<IContentType> contentTypes = Repository.Get(query);
+        scope.Complete();
+        return contentTypes;
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<Guid?, ContentTypeOperationStatus>> CreateTemplateAsync(
+        Guid contentTypeKey,
+        string templateName,
+        string templateAlias,
+        bool isDefaultTemplate,
+        Guid userKey)
+    {
+        IContentType? contentType = await GetAsync(contentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt<Guid?, ContentTypeOperationStatus>.Fail(ContentTypeOperationStatus.NotFound);
+        }
+
+        Attempt<ITemplate?, TemplateOperationStatus> templateResult =
+            await _templateService.CreateForContentTypeAsync(templateName, templateAlias, contentType.Alias, userKey);
+        if (templateResult.Success is false)
+        {
+            return Attempt<Guid?, ContentTypeOperationStatus>.Fail(
+                templateResult.Status switch
+                {
+                    TemplateOperationStatus.CancelledByNotification => ContentTypeOperationStatus
+                        .CancelledByNotification,
+                    TemplateOperationStatus.InvalidAlias => ContentTypeOperationStatus.InvalidTemplateAlias,
+                    _ => ContentTypeOperationStatus.Unknown,
+                });
+        }
+
+        ITemplate template = templateResult.Result!;
+        contentType.AllowedTemplates = [..contentType.AllowedTemplates ?? [], template];
+        if (isDefaultTemplate)
+        {
+            contentType.DefaultTemplateId = template.Id;
+        }
+
+        Attempt<ContentTypeOperationStatus> updateContentTypeResult = await UpdateAsync(contentType, userKey);
+
+        return updateContentTypeResult.Success
+            ? Attempt<Guid?, ContentTypeOperationStatus>.Succeed(ContentTypeOperationStatus.Success, template.Key)
+            : Attempt<Guid?, ContentTypeOperationStatus>.Fail(updateContentTypeResult.Result);
     }
 
     protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)

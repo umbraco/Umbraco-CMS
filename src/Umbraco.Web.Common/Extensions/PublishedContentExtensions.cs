@@ -3,9 +3,12 @@ using Examine;
 using Examine.Search;
 using Microsoft.AspNetCore.Html;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Examine;
 
@@ -20,7 +23,10 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <param name="content">The document.</param>
     /// <param name="umbracoContextAccessor"></param>
-    /// <param name="siteDomainHelper"></param>
+    /// <param name="siteDomainHelper">The site domain helper.</param>
+    /// <param name="domainCache">The domain cache.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service. </param>
     /// <param name="current">An optional current Uri.</param>
     /// <returns>The culture assigned to the document by domains.</returns>
     /// <remarks>
@@ -34,10 +40,13 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IUmbracoContextAccessor umbracoContextAccessor,
         ISiteDomainMapper siteDomainHelper,
+        IDomainCache domainCache,
+        INavigationQueryService navigationQueryService,
+        IPublishedStatusFilteringService publishedStatusFilteringService,
         Uri? current = null)
     {
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
+        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper, domainCache, navigationQueryService, publishedStatusFilteringService);
     }
 
     #endregion

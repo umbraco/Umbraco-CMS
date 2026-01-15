@@ -1,8 +1,8 @@
 import type { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -18,24 +18,28 @@ export class UmbPropertyEditorUINumberRangeElement
 	implements UmbPropertyEditorUiElement
 {
 	@state()
-	_minValue?: number;
+	private _minValue?: number;
 
 	@state()
-	_maxValue?: number;
+	private _maxValue?: number;
 
 	@state()
-	_validationRange?: UmbNumberRangeValueType;
+	private _validationRange?: UmbNumberRangeValueType;
+
+	@property({ type: Boolean })
+	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@property({ type: Object })
 	public override set value(value: UmbNumberRangeValueType | undefined) {
-		this.#value = value || { min: undefined, max: undefined };
+		super.value = value;
 		this._minValue = value?.min;
 		this._maxValue = value?.max;
 	}
 	public override get value() {
-		return this.#value;
+		return super.value;
 	}
-	#value: UmbNumberRangeValueType = { min: undefined, max: undefined };
 
 	public set config(config: UmbPropertyEditorConfigCollection) {
 		if (!config) return;
@@ -43,8 +47,10 @@ export class UmbPropertyEditorUINumberRangeElement
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputNumberRangeElement }) {
-		this.value = { min: event.target.minValue, max: event.target.maxValue };
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		const min = event.target.minValue;
+		const max = event.target.maxValue;
+		this.value = min == null && max == null ? undefined : { min, max };
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override firstUpdated() {
@@ -60,6 +66,8 @@ export class UmbPropertyEditorUINumberRangeElement
 			<umb-input-number-range
 				.minValue=${this._minValue}
 				.maxValue=${this._maxValue}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				.validationRange=${this._validationRange}
 				@change=${this.#onChange}>
 			</umb-input-number-range>

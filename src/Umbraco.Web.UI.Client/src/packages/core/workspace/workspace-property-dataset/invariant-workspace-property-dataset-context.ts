@@ -1,3 +1,4 @@
+import type { UmbInvariantDatasetWorkspaceContext } from '../contexts/index.js';
 import type {
 	UmbPropertyDatasetContext,
 	UmbNameablePropertyDatasetContext,
@@ -6,8 +7,7 @@ import type {
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbInvariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -16,13 +16,14 @@ import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observ
 export class UmbInvariantWorkspacePropertyDatasetContext<
 		WorkspaceType extends UmbInvariantDatasetWorkspaceContext = UmbInvariantDatasetWorkspaceContext,
 	>
-	extends UmbContextBase<UmbPropertyDatasetContext>
+	extends UmbContextBase
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
 	#readOnly = new UmbBooleanState(false);
 	public readOnly = this.#readOnly.asObservable();
 
 	#workspace: WorkspaceType;
+	#variantContext = new UmbVariantContext(this).inherit();
 
 	name;
 
@@ -49,6 +50,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 		this.#workspace = workspace;
 
 		this.name = this.#workspace.name;
+		this.#variantContext.setVariantId(this.getVariantId());
 	}
 
 	get properties(): Observable<Array<UmbPropertyValueData> | undefined> {

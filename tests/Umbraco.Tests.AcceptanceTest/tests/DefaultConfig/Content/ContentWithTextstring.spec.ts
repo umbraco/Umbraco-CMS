@@ -14,7 +14,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -27,13 +27,12 @@ test('can create content with the textstring data type', async ({umbracoApi, umb
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -50,10 +49,9 @@ test('can publish content with the textstring data type', async ({umbracoApi, um
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -70,21 +68,21 @@ test('can input text into the textstring', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(text);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(text);
 });
 
-test('cannot input the text that exceeds the allowed amount of characters', async ({umbracoApi, umbracoUi}) => {
+test('cannot input the text that exceeds the allowed amount of characters', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxChars = 20;
   const textExceedMaxChars = 'Lorem ipsum dolor sit';
-  const warningMessage = 'This field exceeds the allowed amount of characters';
+  const exceedNumberOfChars = textExceedMaxChars.length - maxChars;
+  const warningMessage = 'The string length exceeds the maximum length of ' + maxChars + ' characters, ' + exceedNumberOfChars + ' too many.';
   const dataTypeId = await umbracoApi.dataType.createTextstringDataType(customDataTypeName, maxChars);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -93,11 +91,12 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(textExceedMaxChars);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isFailedStateButtonVisible();
+  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.isTextWithMessageVisible(warningMessage);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);

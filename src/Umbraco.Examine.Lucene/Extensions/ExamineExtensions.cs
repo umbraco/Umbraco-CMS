@@ -20,7 +20,7 @@ public static class ExamineExtensions
     {
         // TODO: I'd assume there would be a more strict way to parse the query but not that i can find yet, for now we'll
         // also do this rudimentary check
-        if (!query.Contains(":"))
+        if (!query.Contains(':'))
         {
             return false;
         }

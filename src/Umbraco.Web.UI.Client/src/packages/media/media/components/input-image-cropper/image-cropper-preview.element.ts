@@ -18,12 +18,12 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 	label?: string;
 
 	@property({ attribute: false })
-	get focalPoint() {
-		return this.#focalPoint;
-	}
 	set focalPoint(value) {
 		this.#focalPoint = value;
 		this.#onFocalPointUpdated();
+	}
+	get focalPoint() {
+		return this.#focalPoint;
 	}
 
 	#focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };

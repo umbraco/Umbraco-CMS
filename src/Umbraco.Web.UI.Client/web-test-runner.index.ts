@@ -1,10 +1,9 @@
 import { handlers } from './src/mocks/browser-handlers.js';
-import { onUnhandledRequest } from './src/mocks/index.js';
-
-const { setupWorker } = window.MockServiceWorker;
+import { onUnhandledRequest, setupWorker } from './src/mocks/index.js';
 
 const worker = setupWorker(...handlers);
 
-worker.start({
+await worker.start({
 	onUnhandledRequest,
+	quiet: true,
 });

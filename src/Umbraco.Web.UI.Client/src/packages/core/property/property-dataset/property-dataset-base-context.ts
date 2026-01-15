@@ -5,7 +5,7 @@ import type { UmbNameablePropertyDatasetContext } from './nameable-property-data
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A base property dataset context implementation.
@@ -13,7 +13,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
  * @augments {UmbContextBase}
  */
 export class UmbPropertyDatasetContextBase
-	extends UmbContextBase<typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE>
+	extends UmbContextBase
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
 	#name = new UmbStringState(undefined);
@@ -32,26 +32,34 @@ export class UmbPropertyDatasetContextBase
 	#readOnly = new UmbBooleanState(false);
 	public readOnly = this.#readOnly.asObservable();
 
+	#variantId: UmbVariantId = UmbVariantId.CreateInvariant();
+	#variantContext = new UmbVariantContext(this).inherit();
+
 	getEntityType() {
 		return this._entityType;
 	}
+
 	getUnique() {
 		return this._unique;
 	}
+
 	getName() {
 		return this.#name.getValue();
 	}
+
 	setName(name: string | undefined) {
 		this.#name.setValue(name);
 	}
+
 	getVariantId() {
-		return UmbVariantId.CreateInvariant();
+		return this.#variantId;
 	}
 	// variant id for a specific property?
 
 	constructor(host: UmbControllerHost) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, UMB_PROPERTY_DATASET_CONTEXT);
+		this.#variantContext.setVariantId(this.getVariantId());
 	}
 
 	/**

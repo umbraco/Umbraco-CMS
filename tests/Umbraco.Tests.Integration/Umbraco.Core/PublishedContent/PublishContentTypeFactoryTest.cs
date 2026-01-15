@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.PublishedContent;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class PublishContentTypeFactoryTest : UmbracoIntegrationTest
+internal sealed class PublishContentTypeFactoryTest : UmbracoIntegrationTest
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -81,6 +81,9 @@ public class PublishContentTypeFactoryTest : UmbracoIntegrationTest
     {
         var dataType = new DataTypeBuilder()
             .WithId(0)
+            .AddEditor()
+            .WithAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .Done()
             .Build();
         dataType.EditorUiAlias = "NotUpdated";
         var dataTypeCreateResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);

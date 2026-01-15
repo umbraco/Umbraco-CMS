@@ -35,25 +35,23 @@ test.afterEach(async ({umbracoApi}) => {
 test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCultureAndHostnamesButton();
+  await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.selectCultureLanguageOption(languageName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
-  await umbracoUi.waitForTimeout(2000);
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.defaultIsoCode).toEqual(isoCode);
 });
 
-test('can add a domain', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can add a domain', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCultureAndHostnamesButton();
-  await umbracoUi.waitForTimeout(1000);
-  await umbracoUi.content.clickAddNewDomainButton();
-  await umbracoUi.content.enterDomain(domainName);
-  await umbracoUi.content.selectDomainLanguageOption(languageName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
+  await umbracoUi.content.clickAddNewHostnameButton();
+  await umbracoUi.content.enterDomain(domainName, 0);
+  await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
   const domainsData = await umbracoApi.document.getDomains(contentId);
@@ -71,9 +69,9 @@ test('can update culture and hostname', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCultureAndHostnamesButton();
+  await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.enterDomain(updatedDomainName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
   domainsData = await umbracoApi.document.getDomains(contentId);
@@ -89,16 +87,16 @@ test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCultureAndHostnamesButton();
-  await umbracoUi.content.clickDeleteDomainButton();
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
+  await umbracoUi.content.clickDeleteHostnameButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
   domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(0);
 });
 
-test('can add culture and hostname for multiple languages', async ({umbracoApi, umbracoUi}) => {
+test('can add culture and hostname for multiple languages', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondDomainName = 'testdomain2';
   const secondLanguageName = 'Vietnamese';
@@ -108,16 +106,14 @@ test('can add culture and hostname for multiple languages', async ({umbracoApi, 
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCultureAndHostnamesButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName, 0);
-  await umbracoUi.content.selectDomainLanguageOption(languageName, 0);
-  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(secondDomainName, 1);
-  await umbracoUi.content.selectDomainLanguageOption(secondLanguageName, 1);
-  await umbracoUi.content.clickSaveModalButton();
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.content.selectHostnameLanguageOption(secondLanguageName, 1);
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
   const domainsData = await umbracoApi.document.getDomains(contentId);
@@ -126,4 +122,7 @@ test('can add culture and hostname for multiple languages', async ({umbracoApi, 
   expect(domainsData.domains[0].isoCode).toEqual(isoCode);
   expect(domainsData.domains[1].domainName).toEqual(secondDomainName);
   expect(domainsData.domains[1].isoCode).toEqual(secondIsoCode);
+
+  // Clean
+  await umbracoApi.language.ensureNameNotExists(secondLanguageName);
 });

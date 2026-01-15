@@ -1,16 +1,18 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
-import type { UmbMemberSearchItemModel } from './member.search-provider.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbMemberSearchItemModel, UmbMemberSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbMemberSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMemberSearchServerDataSource implements UmbSearchDataSource<UmbMemberSearchItemModel> {
+export class UmbMemberSearchServerDataSource
+	implements UmbSearchDataSource<UmbMemberSearchItemModel, UmbMemberSearchRequestArgs>
+{
 	#host: UmbControllerHost;
 
 	/**
@@ -28,18 +30,21 @@ export class UmbMemberSearchServerDataSource implements UmbSearchDataSource<UmbM
 	 * @returns {*}
 	 * @memberof UmbMemberSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+	async search(args: UmbMemberSearchRequestArgs) {
+		const { data, error } = await tryExecute(
 			this.#host,
 			MemberService.getItemMemberSearch({
-				query: args.query,
+				query: {
+					query: args.query,
+					allowedMemberTypes: args.allowedContentTypes?.map((memberReference) => memberReference.unique),
+				},
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbMemberSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/member-management/workspace/member/edit/' + item.id,
+					href: 'section/member-management/workspace/member/edit/' + item.id,
 					entityType: UMB_MEMBER_ENTITY_TYPE,
 					unique: item.id,
 					name: item.variants[0].name || '',

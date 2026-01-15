@@ -13,15 +13,25 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
+internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
 {
-    public PublicAccessRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PublicAccessRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public PublicAccessRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<PublicAccessRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
     protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected override PublicAccessEntry? PerformGet(Guid id) =>
 
@@ -60,13 +70,15 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
             .LeftJoin<AccessRuleDto>()
             .On<AccessDto, AccessRuleDto>(left => left.Id, right => right.AccessId);
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Access}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Access)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string>
         {
-            "DELETE FROM umbracoAccessRule WHERE accessId = @id", "DELETE FROM umbracoAccess WHERE id = @id",
+            $@"DELETE FROM {QuoteTableName("umbracoAccessRule")}
+                WHERE {QuoteColumnName("accessId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoAccess")} WHERE id = @id",
         };
         return list;
     }

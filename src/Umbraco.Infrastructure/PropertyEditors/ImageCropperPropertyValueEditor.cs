@@ -22,22 +22,28 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the image cropper property editor.
 /// </summary>
-internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
+/// <remarks>
+///     As this class is loaded into <see cref="ValueEditorCache"/> which can be cleared, it needs
+///     to be disposable in order to properly clean up resources such as
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
+internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IJsonSerializer _jsonSerializer;
-    private ContentSettings _contentSettings;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
+
+    private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     public ImageCropperPropertyValueEditor(
         DataEditorAttribute attribute,
         ILogger<ImageCropperPropertyValueEditor> logger,
         MediaFileManager mediaFileSystem,
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
@@ -46,17 +52,18 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IScopeProvider scopeProvider,
         IFileStreamSecurityValidator fileStreamSecurityValidator,
         IDataTypeConfigurationCache dataTypeConfigurationCache)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _jsonSerializer = jsonSerializer;
-        _contentSettings = contentSettings.CurrentValue;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
-        contentSettings.OnChange(x => _contentSettings = x);
+
+        _contentSettings = contentSettings.CurrentValue;
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
 
         Validators.Add(new TemporaryFileUploadValidator(() => _contentSettings, TryParseTemporaryFileKey, TryGetTemporaryFile));
     }
@@ -102,7 +109,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
     ///     <para>The <paramref name="currentValue" /> is used to re-use the folder, if possible.</para>
     ///     <para>
     ///         editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file.
-    ///         If editorValue.Value deserializes as <see cref="ImageCropperValue"/> and the <see cref="ImageCropperValue.Src"/>
+    ///         If editorValue.Value deserializes as <see cref="ImageCropperValue"/> and the <see cref="TemporaryFileUploadValueBase.Src"/>
     ///         value is a GUID, it is assumed to contain a temporary file key, and we will attempt to replace the currently
     ///         selected file with the corresponding temporary file.
     ///     </para>
@@ -268,4 +275,6 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         return filepath;
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

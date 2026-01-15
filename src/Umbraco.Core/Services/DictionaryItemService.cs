@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class DictionaryItemService : RepositoryService, IDictionaryItemService
 {
     private readonly IDictionaryRepository _dictionaryRepository;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly ILanguageService _languageService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
@@ -21,54 +21,54 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDictionaryRepository dictionaryRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         ILanguageService languageService,
         IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dictionaryRepository = dictionaryRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _languageService = languageService;
         _userIdKeyResolver = userIdKeyResolver;
     }
 
     /// <inheritdoc />
-    public async Task<IDictionaryItem?> GetAsync(Guid id)
+    public Task<IDictionaryItem?> GetAsync(Guid id)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(id);
-            return await Task.FromResult(item);
+            return Task.FromResult(item);
         }
     }
 
     /// <inheritdoc />
-    public async Task<IDictionaryItem?> GetAsync(string key)
+    public Task<IDictionaryItem?> GetAsync(string key)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(key);
-            return await Task.FromResult(item);
+            return Task.FromResult(item);
         }
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDictionaryItem>> GetManyAsync(params Guid[] ids)
+    public Task<IEnumerable<IDictionaryItem>> GetManyAsync(params Guid[] ids)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetMany(ids).ToArray();
-            return await Task.FromResult(items);
+            return Task.FromResult(items);
         }
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDictionaryItem>> GetManyAsync(params string[] keys)
+    public Task<IEnumerable<IDictionaryItem>> GetManyAsync(params string[] keys)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetManyByKeys(keys).ToArray();
-            return await Task.FromResult(items);
+            return Task.FromResult(items);
         }
     }
 
@@ -106,12 +106,12 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId, string? filter = null)
+    public Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId, string? filter = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId, filter).ToArray();
-            return await Task.FromResult(items);
+            return Task.FromResult<IEnumerable<IDictionaryItem>>(items);
         }
     }
 
@@ -123,12 +123,12 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
 
     /// <inheritdoc/>
-    public async Task<bool> ExistsAsync(string key)
+    public Task<bool> ExistsAsync(string key)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(key);
-            return await Task.FromResult(item != null);
+            return Task.FromResult(item != null);
         }
     }
 
@@ -159,7 +159,27 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> UpdateAsync(
         IDictionaryItem dictionaryItem, Guid userKey)
-        => await SaveAsync(
+    {
+        // Create and update dates aren't tracked for dictionary items. They exist on IDictionaryItem due to the
+        // inheritance from IEntity, but we don't store them.
+        // However we have logic in ServerEventSender that will provide SignalR events for created and update operations,
+        // where these dates are used to distinguish between the two (whether or not the entity has an identity cannot
+        // be used here, as these events fire after persistence when the identity is known for both creates and updates).
+        // So ensure we set something that can be distinguished here.
+        if (dictionaryItem.CreateDate == default)
+        {
+            // Set such that it's prior to the update date, but not the default date which will be considered
+            // uninitialized and get reset to the current date at the repository.
+            dictionaryItem.CreateDate = DateTime.MinValue.AddHours(1);
+        }
+
+        if (dictionaryItem.UpdateDate == default)
+        {
+            // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
+            dictionaryItem.UpdateDate = DateTime.UtcNow;
+        }
+
+        return await SaveAsync(
             dictionaryItem,
             () =>
             {
@@ -174,6 +194,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             AuditType.Save,
             "Update DictionaryItem",
             userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, Guid userKey)
@@ -199,11 +220,10 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, "Delete DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(AuditType.Delete, "Delete DictionaryItem", userKey, dictionaryItem.Id, nameof(DictionaryItem));
 
             scope.Complete();
-            return await Task.FromResult(Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem));
+            return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem);
         }
     }
 
@@ -261,20 +281,19 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Move, "Move DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(AuditType.Move, "Move DictionaryItem", userKey, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
-            return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
+            return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
         }
     }
 
-    private async Task<int> CountByQueryAsync(IQuery<IDictionaryItem> query)
+    private Task<int> CountByQueryAsync(IQuery<IDictionaryItem> query)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             var items = _dictionaryRepository.Count(query);
-            return await Task.FromResult(items);
+            return Task.FromResult(items);
         }
     }
 
@@ -322,25 +341,29 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, auditMessage, currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(auditType, auditMessage, userKey, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
-            return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
+            return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
         }
     }
 
-    private async Task<IEnumerable<IDictionaryItem>> GetByQueryAsync(IQuery<IDictionaryItem> query)
+    private Task<IEnumerable<IDictionaryItem>> GetByQueryAsync(IQuery<IDictionaryItem> query)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem[] items = _dictionaryRepository.Get(query).ToArray();
-            return await Task.FromResult(items);
+            return Task.FromResult<IEnumerable<IDictionaryItem>>(items);
         }
     }
 
-    private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
+    private async Task AuditAsync(AuditType type, string message, Guid userKey, int objectId, string? entityType) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            entityType,
+            message);
 
     private bool HasValidParent(IDictionaryItem dictionaryItem)
         => dictionaryItem.ParentId.HasValue == false || _dictionaryRepository.Get(dictionaryItem.ParentId.Value) != null;

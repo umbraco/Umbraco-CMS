@@ -64,10 +64,10 @@ public class ProfileModelBuilder : MemberModelBuilderBase
             Comments = member.Comments,
             IsApproved = member.IsApproved,
             IsLockedOut = member.IsLockedOut,
-            LastLockoutDate = member.LastLockoutDateUtc?.ToLocalTime(),
-            CreatedDate = member.CreatedDateUtc.ToLocalTime(),
-            LastLoginDate = member.LastLoginDateUtc?.ToLocalTime(),
-            LastPasswordChangedDate = member.LastPasswordChangeDateUtc?.ToLocalTime(),
+            LastLockoutDate = member.LastLockoutDate,
+            CreatedDate = member.CreatedDate,
+            LastLoginDate = member.LastLoginDate,
+            LastPasswordChangedDate = member.LastPasswordChangeDate,
             RedirectUrl = _redirectUrl,
             Key = member.Key,
         };
@@ -79,7 +79,7 @@ public class ProfileModelBuilder : MemberModelBuilderBase
         }
 
         // TODO: This wouldn't be required if we support exposing custom member properties on the MemberIdentityUser at the ASP.NET Identity level.
-        IMember? persistedMember = _memberService.GetByKey(member.Key);
+        IMember? persistedMember = _memberService.GetById(member.Key);
         if (persistedMember == null)
         {
             // should never happen

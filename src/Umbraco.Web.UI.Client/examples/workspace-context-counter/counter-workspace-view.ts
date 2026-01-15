@@ -1,10 +1,10 @@
+import { EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context';
 
 @customElement('example-counter-workspace-view')
-export class ExampleCounterWorkspaceView extends UmbElementMixin(LitElement) {
+export class ExampleCounterWorkspaceViewElement extends UmbElementMixin(LitElement) {
 	#counterContext?: typeof EXAMPLE_COUNTER_CONTEXT.TYPE;
 
 	@state()
@@ -46,10 +46,10 @@ export class ExampleCounterWorkspaceView extends UmbElementMixin(LitElement) {
 	];
 }
 
-export default ExampleCounterWorkspaceView;
+export default ExampleCounterWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-counter-workspace-view': ExampleCounterWorkspaceView;
+		'example-counter-workspace-view': ExampleCounterWorkspaceViewElement;
 	}
 }

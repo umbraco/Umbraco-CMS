@@ -1,10 +1,12 @@
+import type { Editor, Extension, Mark, Node } from '../externals.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
-import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export type * from './tiptap.extension.js';
+export type * from './tiptap-statusbar.extension.js';
 export type * from './tiptap-toolbar.extension.js';
 
 export interface UmbTiptapExtensionApi extends UmbApi {
@@ -17,6 +19,11 @@ export interface UmbTiptapExtensionApi extends UmbApi {
 	 * Sets the editor instance to the extension.
 	 */
 	setEditor(editor: Editor): void;
+
+	/**
+	 * Gets the styles for the extension
+	 */
+	getStyles(): CSSResultGroup | null | undefined;
 
 	/**
 	 * Gets the Tiptap extensions for the editor.
@@ -42,12 +49,12 @@ export interface UmbTiptapToolbarElementApi extends UmbApi, UmbTiptapExtensionAr
 	/**
 	 * Executes the toolbar element action.
 	 */
-	execute(editor?: Editor): void;
+	execute(editor?: Editor, ...args: Array<unknown>): void;
 
 	/**
 	 * Checks if the toolbar element is active.
 	 */
-	isActive(editor?: Editor): boolean;
+	isActive(editor?: Editor, ...args: Array<unknown>): boolean;
 
 	/**
 	 * Checks if the toolbar element is disabled.

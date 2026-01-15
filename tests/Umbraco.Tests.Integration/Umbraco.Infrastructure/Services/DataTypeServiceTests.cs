@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -20,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DataTypeServiceTests : UmbracoIntegrationTest
+internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
 {
     private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
 
@@ -29,6 +28,8 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     private IFileService FileService => GetRequiredService<IFileService>();
 
@@ -445,5 +446,76 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         var result = await DataTypeService.DeleteAsync(dataType.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.NonDeletable, result.Status);
+    }
+
+    [Test]
+    public async Task DataTypeService_Can_Get_References()
+    {
+        IEnumerable<IDataType> dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText);
+
+        IContentType documentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Text Page");
+        ContentTypeService.Save(documentType);
+
+        IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbMediaItem", "Media Item");
+        MediaTypeService.Save(mediaType);
+
+        documentType = ContentTypeService.Get(documentType.Id);
+        Assert.IsNotNull(documentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
+
+        mediaType = MediaTypeService.Get(mediaType.Id);
+        Assert.IsNotNull(mediaType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
+
+        var definition = dataTypeDefinitions.First();
+        var definitionKey = definition.Key;
+        PagedModel<RelationItemModel> result = await DataTypeService.GetPagedRelationsAsync(definitionKey, 0, 10);
+        Assert.AreEqual(2, result.Total);
+
+        RelationItemModel firstResult = result.Items.First();
+        Assert.AreEqual("umbTextpage", firstResult.ContentTypeAlias);
+        Assert.AreEqual("Text Page", firstResult.ContentTypeName);
+        Assert.AreEqual("icon-document", firstResult.ContentTypeIcon);
+        Assert.AreEqual(documentType.Key, firstResult.ContentTypeKey);
+        Assert.AreEqual("bodyText", firstResult.NodeAlias);
+        Assert.AreEqual("Body text", firstResult.NodeName);
+
+        RelationItemModel secondResult = result.Items.Skip(1).First();
+        Assert.AreEqual("umbMediaItem", secondResult.ContentTypeAlias);
+        Assert.AreEqual("Media Item", secondResult.ContentTypeName);
+        Assert.AreEqual("icon-picture", secondResult.ContentTypeIcon);
+        Assert.AreEqual(mediaType.Key, secondResult.ContentTypeKey);
+        Assert.AreEqual("bodyText", secondResult.NodeAlias);
+        Assert.AreEqual("Body text", secondResult.NodeName);
+    }
+
+    [Test]
+    public async Task Gets_MissingPropertyEditor_When_Editor_NotFound()
+    {
+        // Arrange
+        IDataType? dataType = (await DataTypeService.CreateAsync(
+            new DataType(new TestEditor(DataValueEditorFactory), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Test Missing Editor",
+                DatabaseType = ValueStorageType.Ntext,
+            },
+            Constants.Security.SuperUserKey)).Result;
+
+        Assert.IsNotNull(dataType);
+
+        // Act
+        IDataType? actual = await DataTypeService.GetAsync(dataType.Key);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.AreEqual(dataType.Key, actual.Key);
+        Assert.IsAssignableFrom(typeof(MissingPropertyEditor), actual.Editor);
+        Assert.AreEqual("Test Editor", actual.EditorAlias, "The alias should be the same as the original editor");
+        Assert.AreEqual("Umb.PropertyEditorUi.Missing", actual.EditorUiAlias, "The editor UI alias should be the Missing Editor UI");
+    }
+
+    private class TestEditor : DataEditor
+    {
+        public TestEditor(IDataValueEditorFactory dataValueEditorFactory)
+            : base(dataValueEditorFactory) =>
+            Alias = "Test Editor";
     }
 }

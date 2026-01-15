@@ -25,13 +25,14 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <summary>
     ///     Gets a paginated grouped list of all names the health checks are grouped by.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of health checks group names.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(
+    public Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
@@ -46,6 +47,6 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
             Items = _umbracoMapper.MapEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupResponseModel>(groups.Skip(skip).Take(take))
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Task.FromResult<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>>(Ok(viewModel));
     }
 }

@@ -24,8 +24,10 @@ public class RichTextBlockValue : BlockValue<RichTextBlockLayoutItem>
     [JsonIgnore]
     public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.RichText;
 
-    // RTE block layouts uses "Umbraco.TinyMCE" in V14 and below, but should use "Umbraco.RichText" for V15+
-    [Obsolete("Will be removed in V18.")]
-    public override bool SupportsBlockLayoutAlias(string alias)
-        => base.SupportsBlockLayoutAlias(alias) || alias.Equals(Constants.PropertyEditors.Aliases.TinyMce);
+    /// <inheritdoc />
+#pragma warning disable CS0672 // Member overrides obsolete member
+#pragma warning disable CS0618 // Type or member is obsolete
+    public override bool SupportsBlockLayoutAlias(string alias) => base.SupportsBlockLayoutAlias(alias) || alias.Equals("Umbraco.TinyMCE");
+#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0672 // Member overrides obsolete member
 }

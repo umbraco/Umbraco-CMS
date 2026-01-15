@@ -49,7 +49,7 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
         }
 
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> accessAttempt =
-            await _publicAccessService.GetEntryByContentKeyAsync(id);
+            await _publicAccessService.GetEntryByContentKeyWithoutAncestorsAsync(id);
 
         if (accessAttempt.Success is false || accessAttempt.Result is null)
         {

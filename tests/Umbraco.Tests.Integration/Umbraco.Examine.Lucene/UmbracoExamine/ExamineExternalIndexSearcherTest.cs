@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -9,19 +9,18 @@ using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
-public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTest
+internal sealed class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTest
 {
     private readonly AppCaches _appCaches;
     private readonly ILanguageService _languageService;
@@ -160,7 +159,7 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
         // then nodeName will be matched normally with wildcards
         // the rest will be normal without wildcards
 
-        var allLanguages = (await _languageService.GetAllAsync()).Select(x => x.IsoCode.ToLowerInvariant()).ToList();
+        var allLanguages = (await _languageService.GetAllIsoCodesAsync()).Select(x => x.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
         // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.

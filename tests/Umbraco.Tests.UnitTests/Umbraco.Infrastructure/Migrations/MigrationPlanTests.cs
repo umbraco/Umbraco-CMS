@@ -12,6 +12,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
 public class MigrationPlanTests
 {
     [Test]
-    public void CanExecute()
+    public async Task CanExecute()
     {
         var loggerFactory = NullLoggerFactory.Instance;
 
@@ -71,13 +72,22 @@ public class MigrationPlanTests
             Mock.Of<IServerMessenger>(),
             new CacheRefresherCollection(() => Enumerable.Empty<ICacheRefresher>()));
 
+        var isolatedCaches = new IsolatedCaches(type => NoAppCache.Instance);
+
+        var appCaches = new AppCaches(Mock.Of<IAppPolicyCache>(), Mock.Of<IRequestCache>(), isolatedCaches);
+
         var executor = new MigrationPlanExecutor(
             scopeProvider,
             scopeProvider,
             loggerFactory,
             migrationBuilder,
             databaseFactory,
-            Mock.Of<IDatabaseCacheRebuilder>(), distributedCache, Mock.Of<IKeyValueService>(), Mock.Of<IServiceScopeFactory>());
+            Mock.Of<IDatabaseCacheRebuilder>(),
+            distributedCache,
+            Mock.Of<IKeyValueService>(),
+            Mock.Of<IServiceScopeFactory>(),
+            appCaches,
+            Mock.Of<IPublishedContentTypeFactory>());
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)
@@ -95,7 +105,7 @@ public class MigrationPlanTests
             var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
             // execute plan
-            var result = executor.ExecutePlan(plan, sourceState);
+            var result = await executor.ExecutePlanAsync(plan, sourceState).ConfigureAwait(false);
             state = result.FinalState;
 
             // save new state

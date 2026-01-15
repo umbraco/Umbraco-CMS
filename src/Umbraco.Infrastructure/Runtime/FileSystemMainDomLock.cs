@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Runtime;
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
-internal class FileSystemMainDomLock : IMainDomLock
+internal sealed class FileSystemMainDomLock : IMainDomLock
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -15,6 +15,7 @@ internal class FileSystemMainDomLock : IMainDomLock
     private readonly string _lockFilePath;
     private readonly ILogger<FileSystemMainDomLock> _logger;
     private readonly string _releaseSignalFilePath;
+    private bool _disposed;
     private Task? _listenForReleaseSignalFileTask;
 
     private FileStream? _lockFileStream;
@@ -89,26 +90,47 @@ internal class FileSystemMainDomLock : IMainDomLock
             ListeningLoop,
             _cancellationTokenSource.Token,
             TaskCreationOptions.LongRunning,
-            TaskScheduler.Default);
+            TaskScheduler.Default)
+            .Unwrap(); // Because ListeningLoop is an async method, we need to use Unwrap to return the inner task.
 
         return _listenForReleaseSignalFileTask;
     }
 
-    public void Dispose()
-    {
-        _lockFileStream?.Close();
-        _lockFileStream = null;
-    }
+    /// <summary>Releases the resources used by this <see cref="FileSystemMainDomLock" />.</summary>
+    public void Dispose() => Dispose(true);
 
     public void CreateLockReleaseSignalFile() =>
-        File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+        File.Open(
+                _releaseSignalFilePath,
+                FileMode.OpenOrCreate,
+                FileAccess.ReadWrite,
                 FileShare.ReadWrite | FileShare.Delete)
             .Close();
 
     public void DeleteLockReleaseSignalFile() =>
         File.Delete(_releaseSignalFilePath);
 
-    private void ListeningLoop()
+    /// <summary>Releases the resources used by this <see cref="FileSystemMainDomLock" />.</summary>
+    /// <param name="disposing">true to release both managed resources.</param>
+    private void Dispose(bool disposing)
+    {
+        if (disposing && !_disposed)
+        {
+            _logger.LogDebug($"{nameof(FileSystemMainDomLock)} Disposing...");
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            ReleaseLock();
+            _disposed = true;
+        }
+    }
+
+    private void ReleaseLock()
+    {
+        _lockFileStream?.Close();
+        _lockFileStream = null;
+    }
+
+    private async Task ListeningLoop()
     {
         while (true)
         {
@@ -118,6 +140,7 @@ internal class FileSystemMainDomLock : IMainDomLock
                 {
                     _logger.LogDebug("ListenAsync Task canceled, exiting loop");
                 }
+
                 return;
             }
 
@@ -127,12 +150,12 @@ internal class FileSystemMainDomLock : IMainDomLock
                 {
                     _logger.LogDebug("Found lock release signal file, releasing lock on {lockFilePath}", _lockFilePath);
                 }
-                _lockFileStream?.Close();
-                _lockFileStream = null;
+
+                ReleaseLock();
                 break;
             }
 
-            Thread.Sleep(_globalSettings.CurrentValue.MainDomReleaseSignalPollingInterval);
+            await Task.Delay(_globalSettings.CurrentValue.MainDomReleaseSignalPollingInterval, _cancellationTokenSource.Token);
         }
     }
 }

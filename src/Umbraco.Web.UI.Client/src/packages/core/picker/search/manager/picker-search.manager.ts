@@ -1,10 +1,9 @@
 import type { UmbPickerSearchManagerConfig } from './types.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 /**
  * A manager for searching items in a picker.
@@ -12,16 +11,16 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
  * @class UmbPickerSearchManager
  * @augments {UmbControllerBase}
  * @template ResultItemType
- * @template QueryType
+ * @template SearchRequestArgsType
  */
 export class UmbPickerSearchManager<
 	ResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel,
-	QueryType extends UmbSearchRequestArgs = UmbSearchRequestArgs,
+	SearchRequestArgsType extends UmbSearchRequestArgs = UmbSearchRequestArgs,
 > extends UmbControllerBase {
 	#searchable = new UmbBooleanState(false);
 	public readonly searchable = this.#searchable.asObservable();
 
-	#query = new UmbObjectState<QueryType | undefined>(undefined);
+	#query = new UmbObjectState<SearchRequestArgsType | undefined>(undefined);
 	public readonly query = this.#query.asObservable();
 
 	#searching = new UmbBooleanState(false);
@@ -34,16 +33,7 @@ export class UmbPickerSearchManager<
 	public readonly resultTotalItems = this.#resultTotalItems.asObservable();
 
 	#config?: UmbPickerSearchManagerConfig;
-	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, QueryType>;
-
-	/**
-	 * Creates an instance of UmbPickerSearchManager.
-	 * @param {UmbControllerHost} host The controller host for the search manager.
-	 * @memberof UmbPickerSearchManager
-	 */
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
+	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
 
 	/**
 	 * Set the configuration for the search manager.
@@ -122,11 +112,10 @@ export class UmbPickerSearchManager<
 
 	/**
 	 * Set the search query.
-	 * @param {QueryType} query The search query.
+	 * @param {SearchRequestArgsType} query The search query.
 	 * @memberof UmbPickerSearchManager
 	 */
-	public setQuery(query: QueryType) {
-		if (this.getSearchable() === false) throw new Error('Search is not enabled');
+	public setQuery(query: SearchRequestArgsType) {
 		if (!this.query) {
 			this.clear();
 			return;
@@ -138,19 +127,19 @@ export class UmbPickerSearchManager<
 	/**
 	 * Get the current search query.
 	 * @memberof UmbPickerSearchManager
-	 * @returns {QueryType | undefined} The current search query.
+	 * @returns {SearchRequestArgsType | undefined} The current search query.
 	 */
-	public getQuery(): QueryType | undefined {
+	public getQuery(): SearchRequestArgsType | undefined {
 		return this.#query.getValue();
 	}
 
 	/**
 	 * Update the current search query.
-	 * @param {Partial<QueryType>} query
+	 * @param {Partial<SearchRequestArgsType>} query
 	 * @memberof UmbPickerSearchManager
 	 */
-	public updateQuery(query: Partial<QueryType>) {
-		const mergedQuery = { ...this.getQuery(), ...query } as QueryType;
+	public updateQuery(query: Partial<SearchRequestArgsType>) {
+		const mergedQuery = { ...this.getQuery(), ...query } as SearchRequestArgsType;
 		this.#query.setValue(mergedQuery);
 	}
 
@@ -176,17 +165,20 @@ export class UmbPickerSearchManager<
 	async #search() {
 		if (this.getSearchable() === false) throw new Error('Search is not enabled');
 		if (!this.#searchProvider) throw new Error('Search provider is not available');
-		const query = this.#query.getValue();
-		if (!query) throw new Error('No query provided');
 
-		if (!query.query) {
+		const query = this.#query.getValue();
+		if (!query?.query) {
 			this.clear();
 			return;
 		}
 
 		const args = {
-			searchFrom: this.#config?.searchFrom,
 			...query,
+			// ensure that config params are always included
+			...this.#config?.queryParams,
+			searchFrom: this.#config?.searchFrom,
+			// TODO: Move this implementation to another place. The generic picker search manager shouldn't be aware of data types.
+			dataTypeUnique: this.#config?.dataTypeUnique,
 		};
 
 		const { data } = await this.#searchProvider.search(args);

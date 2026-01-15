@@ -1,17 +1,16 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
-import { TimeOptions } from './utils.js';
-import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { TimeOptions } from '../../../audit-log/info-app/utils.js';
+import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE, UmbMediaTypeItemRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-// import of local components
-import './media-workspace-view-info-history.element.js';
-import './media-workspace-view-info-reference.element.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
@@ -35,13 +34,16 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	#mediaTypeItemRepository = new UmbMediaTypeItemRepository(this);
 
 	@state()
-	private _urls?: Array<MediaUrlInfoModel>;
-
-	@state()
 	private _createDate?: string | null = null;
 
 	@state()
 	private _updateDate?: string | null = null;
+
+	@state()
+	private _hasSettingsAccess: boolean = false;
+
+	@state()
+	private _isTrashed: boolean = false;
 
 	constructor() {
 		super();
@@ -55,15 +57,37 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				this._editMediaTypePath = routeBuilder({});
 			});
 
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
+
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._mediaTypeUnique = this.#workspaceContext.getContentTypeId()!;
+			this._mediaTypeUnique = context?.getContentTypeId();
 			this.#getData();
 			this.#observeContent();
+		});
+
+		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
+			this.observe(
+				context?.isTrashed,
+				(isTrashed) => {
+					this._isTrashed = isTrashed ?? false;
+				},
+				'_isTrashed',
+			);
 		});
 	}
 
 	async #getData() {
+		if (!this.#workspaceContext) return;
 		if (!this._mediaTypeUnique) throw new Error('Media type unique is not set');
 		const { data } = await this.#mediaTypeItemRepository.requestItems([this._mediaTypeUnique]);
 		this._mediaTypeName = data?.[0].name;
@@ -71,18 +95,8 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#observeContent() {
-		if (!this.#workspaceContext) return;
-
 		this.observe(
-			this.#workspaceContext.urls,
-			(urls) => {
-				this._urls = urls;
-			},
-			'__urls',
-		);
-
-		this.observe(
-			this.#workspaceContext.unique,
+			this.#workspaceContext?.unique,
 			(unique) => {
 				this._mediaUnique = unique!;
 			},
@@ -90,38 +104,20 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		);
 
 		/** TODO: Doubt this is the right way to get the create date... */
-		this.observe(this.#workspaceContext.variants, (variants) => {
-			this._createDate = variants?.[0]?.createDate;
-			this._updateDate = variants?.[0]?.updateDate;
-		});
-	}
-	#openSvg(imagePath: string) {
-		const popup = window.open('', '_blank');
-		if (!popup) return;
-
-		const html = `<!doctype html>
-<body style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(135deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(135deg, transparent 75%, #ccc 75%); background-size:30px 30px; background-position:0 0, 15px 0, 15px -15px, 0px 15px;">
-	<img src="${imagePath}"/>
-	<script>history.pushState(null, null, "${window.location.href}");</script>
-</body>`;
-
-		popup.document.open();
-		popup.document.write(html);
-		popup.document.close();
+		this.observe(
+			this.#workspaceContext?.variants,
+			(variants) => {
+				this._createDate = variants?.[0]?.createDate;
+				this._updateDate = variants?.[0]?.updateDate;
+			},
+			'observeVariants',
+		);
 	}
 
 	override render() {
 		return html`
 			<div class="container">
-				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
-					<div id="link-section">${this.#renderLinksSection()}</div>
-				</uui-box>
-
-				<umb-media-workspace-view-info-reference
-					.mediaUnique=${this._mediaUnique}></umb-media-workspace-view-info-reference>
-
-				<umb-media-workspace-view-info-history
-					.mediaUnique=${this._mediaUnique}></umb-media-workspace-view-info-history>
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
 			</div>
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_general')} id="general-section"
@@ -131,51 +127,17 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		`;
 	}
 
-	#renderLinksSection() {
-		if (this._urls && this._urls.length) {
-			return html`
-				${repeat(
-					this._urls,
-					(item) => item.url,
-					(item) => this.#renderLinkItem(item),
-				)}
-			`;
-		} else {
-			return html`
-				<div class="link-item">
-					<span class="link-content italic"><umb-localize key="content_noMediaLink"></umb-localize></span>
-				</div>
-			`;
-		}
-	}
-
-	#renderLinkItem(item: MediaUrlInfoModel) {
-		const ext = item.url.split(/[#?]/)[0].split('.').pop()?.trim();
-		if (ext === 'svg') {
-			return html`
-				<a href="#" target="_blank" class="link-item with-href" @click=${() => this.#openSvg(item.url)}>
-					<span class="link-content">${item.url}</span>
-					<uui-icon name="icon-out"></uui-icon>
-				</a>
-			`;
-		} else {
-			return html`
-				<a href=${item.url} target="_blank" class="link-item with-href">
-					<span class="link-content">${item.url}</span>
-					<uui-icon name="icon-out"></uui-icon>
-				</a>
-			`;
-		}
-	}
-
 	#renderGeneralSection() {
 		return html`
-			${this.#renderCreateDate()} ${this.#renderUpdateDate()}
+			${this.#renderTrashState()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 			<div class="general-item">
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
-					href=${this._editMediaTypePath + 'edit/' + this._mediaTypeUnique}
+					href=${ifDefined(
+						this._hasSettingsAccess ? this._editMediaTypePath + 'edit/' + this._mediaTypeUnique : undefined,
+					)}
+					?readonly=${!this._hasSettingsAccess || this._isTrashed}
 					name=${ifDefined(this._mediaTypeName)}>
 					${this._mediaTypeIcon ? html`<umb-icon slot="icon" name=${this._mediaTypeIcon}></umb-icon>` : nothing}
 				</uui-ref-node-document-type>
@@ -183,6 +145,20 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
 				<span>${this._mediaUnique}</span>
+			</div>
+		`;
+	}
+
+	#renderTrashState() {
+		if (!this._isTrashed) return nothing;
+
+		return html`
+			<div class="general-item">
+				<span>
+					<uui-tag color="danger" look="primary" label=${this.localize.term('content_trashed')}>
+						${this.localize.term('content_trashed')}
+					</uui-tag>
+				</span>
 			</div>
 		`;
 	}
@@ -244,42 +220,9 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				margin-bottom: var(--uui-size-space-6);
 			}
 
-			// Link section
-
-			#link-section {
-				display: flex;
-				flex-direction: column;
-				text-align: left;
-			}
-
-			.link-item {
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
-				display: grid;
-				grid-template-columns: 1fr auto;
-				gap: var(--uui-size-6);
-				color: inherit;
-				text-decoration: none;
-			}
-
-			.link-language {
-				color: var(--uui-color-divider-emphasis);
-			}
-
-			.link-content.italic {
-				font-style: italic;
-			}
-
-			.link-item uui-icon {
-				margin-right: var(--uui-size-space-2);
-				vertical-align: middle;
-			}
-
-			.link-item.with-href {
-				cursor: pointer;
-			}
-
-			.link-item.with-href:hover {
-				background: var(--uui-color-divider);
+			uui-ref-node-document-type[readonly] {
+				padding-top: 7px;
+				padding-bottom: 7px;
 			}
 		`,
 	];

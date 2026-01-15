@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ElementSwitchValidatorTests : UmbracoIntegrationTest
+internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
 {
     private IElementSwitchValidator ElementSwitchValidator => GetRequiredService<IElementSwitchValidator>();
 
@@ -286,104 +286,12 @@ public class ElementSwitchValidatorTests : UmbracoIntegrationTest
         Guid elementKey,
         Guid? elementSettingKey)
     {
-        Dictionary<string, object> configuration;
-        switch (editorAlias)
-        {
-            case Constants.PropertyEditors.Aliases.BlockGrid:
-                configuration = GetBlockGridBaseConfiguration();
-                break;
-            case Constants.PropertyEditors.Aliases.RichText:
-                configuration = GetRteBaseConfiguration();
-                break;
-            default:
-                configuration = new Dictionary<string, object>();
-                break;
-        }
-
-        SetBlockConfiguration(
-            configuration,
+        var dataType = DataTypeBuilder.CreateSimpleElementDataType(
+            IOHelper,
+            editorAlias,
             elementKey,
-            elementSettingKey,
-            editorAlias == Constants.PropertyEditors.Aliases.BlockGrid ? true : null);
-
-
-        var dataTypeBuilder = new DataTypeBuilder()
-            .WithId(0)
-            .WithDatabaseType(ValueStorageType.Nvarchar)
-            .AddEditor()
-            .WithAlias(editorAlias);
-
-        switch (editorAlias)
-        {
-            case Constants.PropertyEditors.Aliases.BlockGrid:
-                dataTypeBuilder.WithConfigurationEditor(
-                    new BlockGridConfigurationEditor(IOHelper) { DefaultConfiguration = configuration });
-                break;
-            case Constants.PropertyEditors.Aliases.BlockList:
-                dataTypeBuilder.WithConfigurationEditor(
-                    new BlockListConfigurationEditor(IOHelper) { DefaultConfiguration = configuration });
-                break;
-            case Constants.PropertyEditors.Aliases.RichText:
-                dataTypeBuilder.WithConfigurationEditor(
-                    new RichTextConfigurationEditor(IOHelper) { DefaultConfiguration = configuration });
-                break;
-        }
-
-         var dataType = dataTypeBuilder.Done()
-            .Build();
+            elementSettingKey);
 
         await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-    }
-
-    private void SetBlockConfiguration(
-        Dictionary<string, object> dictionary,
-        Guid? elementKey,
-        Guid? elementSettingKey,
-        bool? allowAtRoot)
-    {
-        if (elementKey is null)
-        {
-            return;
-        }
-
-        dictionary["blocks"] = new[] { BuildBlockConfiguration(elementKey.Value, elementSettingKey, allowAtRoot) };
-    }
-
-    private Dictionary<string, object> GetBlockGridBaseConfiguration()
-        => new Dictionary<string, object> { ["gridColumns"] = 12 };
-
-    private Dictionary<string, object> GetRteBaseConfiguration()
-    {
-        var dictionary = new Dictionary<string, object>
-        {
-            ["maxImageSize"] = 500,
-            ["mode"] = "Classic",
-            ["toolbar"] = new[]
-            {
-                "styles", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist",
-                "outdent", "indent", "sourcecode", "link", "umbmediapicker", "umbembeddialog"
-            },
-        };
-        return dictionary;
-    }
-
-    private Dictionary<string, object> BuildBlockConfiguration(
-        Guid? elementKey,
-        Guid? elementSettingKey,
-        bool? allowAtRoot)
-    {
-        var dictionary = new Dictionary<string, object>();
-        if (allowAtRoot is not null)
-        {
-            dictionary.Add("allowAtRoot", allowAtRoot.Value);
-        }
-
-        dictionary.Add("contentElementTypeKey", elementKey.ToString());
-        if (elementSettingKey is not null)
-        {
-            dictionary.Add("settingsElementTypeKey", elementSettingKey.ToString());
-        }
-
-        return dictionary;
     }
 }

@@ -46,6 +46,9 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool SupportsIntegratedAuthentication => false;
 
     /// <inheritdoc />
+    public bool SupportsTrustServerCertificate => false;
+
+    /// <inheritdoc />
     public bool RequiresConnectionTest => true;
 
     /// <inheritdoc />
@@ -83,20 +86,20 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
         var user = databaseModel.Login;
         var password = databaseModel.Password;
 
-        if (server.Contains(".") && ServerStartsWithTcp(server) == false)
+        if (server.Contains('.') && ServerStartsWithTcp(server) == false)
         {
             server = $"tcp:{server}";
         }
 
-        if (server.Contains(".") == false && ServerStartsWithTcp(server))
+        if (server.Contains('.') == false && ServerStartsWithTcp(server))
         {
-            var serverName = server.Contains(",")
+            var serverName = server.Contains(',')
                 ? server.Substring(0, server.IndexOf(",", StringComparison.Ordinal))
                 : server;
 
             var portAddition = string.Empty;
 
-            if (server.Contains(","))
+            if (server.Contains(','))
             {
                 portAddition = server.Substring(server.IndexOf(",", StringComparison.Ordinal));
             }
@@ -109,12 +112,12 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
             server = $"tcp:{server}.database.windows.net";
         }
 
-        if (server.Contains(",") == false)
+        if (server.Contains(',') == false)
         {
             server = $"{server},1433";
         }
 
-        if (user?.Contains("@") == false)
+        if (user?.Contains('@') == false)
         {
             var userDomain = server;
 
@@ -123,7 +126,7 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
                 userDomain = userDomain.Substring(userDomain.IndexOf(":", StringComparison.Ordinal) + 1);
             }
 
-            if (userDomain.Contains("."))
+            if (userDomain.Contains('.'))
             {
                 userDomain = userDomain.Substring(0, userDomain.IndexOf(".", StringComparison.Ordinal));
             }

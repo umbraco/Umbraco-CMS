@@ -1,6 +1,5 @@
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 
@@ -11,12 +10,20 @@ public interface IPackageDataInstallation
     InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId);
 
     /// <summary>
-    /// Imports and saves package xml as <see cref="IContentType"/>
+    /// Imports and saves package xml as <see cref="IMediaType"/>.
     /// </summary>
     /// <param name="docTypeElements">Xml to import</param>
     /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-    /// <returns>An enumerable list of generated ContentTypes</returns>
+    /// <returns>An enumerable list of generated <see cref="IMediaType"/>s.</returns>
     IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId);
+
+    /// <summary>
+    /// Imports and saves package xml as <see cref="IMemberType"/>.
+    /// </summary>
+    /// <param name="docTypeElements">Xml to import</param>
+    /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+    /// <returns>An enumerable list of generated <see cref="IMemberType"/>s.</returns>
+    IReadOnlyList<IMemberType> ImportMemberTypes(IEnumerable<XElement> docTypeElements, int userId) => throw new NotImplementedException();
 
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
         IEnumerable<CompiledPackageContentBase> docs,
@@ -65,10 +72,7 @@ public interface IPackageDataInstallation
     /// <returns>An enumerable list of generated languages</returns>
     IReadOnlyList<ILanguage> ImportLanguages(IEnumerable<XElement> languageElements, int userId);
 
-    [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
-    IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId);
-
-    Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId) => Task.FromResult(ImportTemplate(templateElement, userId));
+    Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId);
 
     /// <summary>
     /// Imports and saves package xml as <see cref="ITemplate"/>
@@ -76,16 +80,7 @@ public interface IPackageDataInstallation
     /// <param name="templateElements">Xml to import</param>
     /// <param name="userId">Optional user id</param>
     /// <returns>An enumerable list of generated Templates</returns>
-    [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
-    IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId);
-
-    /// <summary>
-    /// Imports and saves package xml as <see cref="ITemplate"/>
-    /// </summary>
-    /// <param name="templateElements">Xml to import</param>
-    /// <param name="userId">Optional user id</param>
-    /// <returns>An enumerable list of generated Templates</returns>
-    Task<IReadOnlyList<ITemplate>> ImportTemplatesAsync(IReadOnlyCollection<XElement> templateElements, int userId) => Task.FromResult(ImportTemplates(templateElements, userId));
+    Task<IReadOnlyList<ITemplate>> ImportTemplatesAsync(IReadOnlyCollection<XElement> templateElements, int userId);
 
     Guid GetContentTypeKey(XElement contentType);
 

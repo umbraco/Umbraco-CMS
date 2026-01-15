@@ -9,7 +9,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export const isCurrentUser = async (host: UmbControllerHost, userUnique: string) => {
 	const ctrl = new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT);
-	const currentUserContext = await ctrl.asPromise();
+	const currentUserContext = await ctrl.asPromise().catch(() => undefined);
 	ctrl.destroy();
 
 	return await currentUserContext!.isUserCurrentUser(userUnique);

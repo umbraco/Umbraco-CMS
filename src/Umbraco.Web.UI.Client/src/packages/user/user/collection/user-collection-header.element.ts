@@ -27,7 +27,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	private _orderByOptions: Array<UmbUserOrderByOption> = [];
 
 	@state()
-	_activeOrderByOption?: UmbUserOrderByOption;
+	private _activeOrderByOption?: UmbUserOrderByOption;
 
 	#collectionContext?: typeof UMB_USER_COLLECTION_CONTEXT.TYPE;
 

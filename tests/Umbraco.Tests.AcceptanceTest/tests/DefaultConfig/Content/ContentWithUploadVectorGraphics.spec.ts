@@ -26,13 +26,12 @@ test('can create content with the upload vector graphics data type', async ({umb
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -50,17 +49,16 @@ test('can publish content with the upload vector graphics data type', async ({um
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values).toEqual([]);
 });
 
-test(`can upload a file with the svg extension in the content`, async ({umbracoApi, umbracoUi}) => {
+test(`can upload a file with the svg extension in the content`, {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const vectorGraphicsName = 'VectorGraphics.svg';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -72,18 +70,20 @@ test(`can upload a file with the svg extension in the content`, async ({umbracoA
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(uploadVectorGraphicsPath + vectorGraphicsName);
-  await umbracoUi.content.clickSaveButton();
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isInputUploadFieldVisible();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(vectorGraphicsName));
+  await umbracoUi.content.doesUploadedSvgThumbnailHaveSrc(umbracoApi.baseUrl + contentData.values[0].value.src);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded vector graphics file still displays after removing.
-test.skip('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadVectorGraphicsName = 'VectorGraphics.svg';
   const mineType = 'image/svg+xml';
@@ -96,10 +96,9 @@ test.skip('can remove an svg file in the content', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickRemoveFilesButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -18,7 +19,7 @@ namespace Umbraco.Cms.Web.Common.Filters;
 ///     In which case it returns a redirect to the same page after 1 sec if not in debug mode.
 /// </summary>
 /// <remarks>
-///     This is only enabled when using <see cref="ModelsMode.InMemoryAuto" /> mode
+///     This is only enabled when using InMemoryAuto mode.
 /// </remarks>
 public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
 {
@@ -30,7 +31,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
     {
     }
 
-    private class ModelBindingExceptionFilter : IExceptionFilter
+    private sealed class ModelBindingExceptionFilter : IExceptionFilter
     {
         private static readonly Regex GetPublishedModelsTypesRegex =
             new("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
@@ -56,7 +57,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
                 && (filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)
                 && IsMessageAboutTheSameModelType(filterContext.Exception.Message))
             {
-                filterContext.HttpContext.Response.Headers.Add(HttpResponseHeader.RetryAfter.ToString(), "1");
+                filterContext.HttpContext.Response.Headers.Append(HttpResponseHeader.RetryAfter.ToString(), "1");
                 filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.GetEncodedUrl(), false);
 
                 filterContext.ExceptionHandled = true;
@@ -85,7 +86,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
         ///         The application is in an unstable state and is going to be restarted. The application is restarting now.
         ///     </para>
         /// </remarks>
-        private bool IsMessageAboutTheSameModelType(string exceptionMessage)
+        private static bool IsMessageAboutTheSameModelType(string exceptionMessage)
         {
             MatchCollection matches = GetPublishedModelsTypesRegex.Matches(exceptionMessage);
 

@@ -8,7 +8,7 @@ import {
 	type MetaEntityCreateOptionAction,
 	type UmbEntityCreateOptionActionArgs,
 } from '@umbraco-cms/backoffice/entity-create-option-action';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbUserEntityCreateOptionActionBaseArgs
 	extends UmbEntityCreateOptionActionArgs<MetaEntityCreateOptionAction> {
@@ -24,18 +24,13 @@ export abstract class UmbUserEntityCreateOptionActionBase extends UmbEntityCreat
 	}
 
 	override async execute() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
-		const modalContext = modalManager.open(this, UMB_CREATE_USER_MODAL, {
+		await umbOpenModal(this, UMB_CREATE_USER_MODAL, {
 			data: {
 				user: {
 					kind: this.#kind,
 				},
 			},
-		});
-
-		await modalContext
-			?.onSubmit()
+		})
 			.then(() => {
 				this.#requestReloadChildrenOfEntity();
 			})
@@ -48,6 +43,7 @@ export abstract class UmbUserEntityCreateOptionActionBase extends UmbEntityCreat
 
 	async #requestReloadChildrenOfEntity() {
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context not found');
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: this.args.entityType,
 			unique: this.args.unique,

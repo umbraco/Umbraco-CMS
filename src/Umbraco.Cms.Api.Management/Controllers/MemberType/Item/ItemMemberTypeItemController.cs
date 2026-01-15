@@ -23,17 +23,17 @@ public class ItemMemberTypeItemController : MemberTypeItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item(
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<MemberTypeItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<MemberTypeItemResponseModel>()));
         }
 
         IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(ids);
         List<MemberTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(memberTypes);
-        return Ok(responseModels);
+        return Task.FromResult<IActionResult>(Ok(responseModels));
     }
 }

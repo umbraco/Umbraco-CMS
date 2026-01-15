@@ -1,18 +1,18 @@
 import type { UmbRefDataTypeElement } from './ref-data-type.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 import './ref-data-type.element.js';
 
 const meta: Meta<UmbRefDataTypeElement> = {
-	title: 'Components/Ref Data Type',
+	title: 'Entity/Data Type/Components/Ref Data Type',
 	component: 'umb-ref-property-editor-ui',
 };
 
 export default meta;
 type Story = StoryObj<UmbRefDataTypeElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		name: 'Custom Data Type',
 		propertyEditorUiAlias: 'Umb.DataTypeInput.CustomUI',

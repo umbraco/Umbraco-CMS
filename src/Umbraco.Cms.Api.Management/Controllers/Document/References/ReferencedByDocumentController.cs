@@ -1,11 +1,13 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
 
@@ -15,10 +17,31 @@ public class ReferencedByDocumentController : DocumentControllerBase
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
 
-    public ReferencedByDocumentController(ITrackedReferencesService trackedReferencesService, IRelationTypePresentationFactory relationTypePresentationFactory)
+    public ReferencedByDocumentController(
+        ITrackedReferencesService trackedReferencesService,
+        IRelationTypePresentationFactory relationTypePresentationFactory)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
+    }
+
+    [Obsolete("Use the ReferencedBy2 action method instead. Scheduled for removal in Umbraco 19, when ReferencedBy2 will be renamed back to ReferencedBy.")]
+    [NonAction]
+    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
+        CancellationToken cancellationToken,
+        Guid id,
+        int skip = 0,
+        int take = 20)
+    {
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
+
+        var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
+        {
+            Total = relationItems.Total,
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
+        };
+
+        return pagedViewModel;
     }
 
     /// <summary>
@@ -31,20 +54,26 @@ public class ReferencedByDocumentController : DocumentControllerBase
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReferencedBy2(
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,
         int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, false);
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, UmbracoObjectTypes.Document, skip, take, true);
+
+        if (relationItemsAttempt.Success is false)
+        {
+            return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
+        }
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
-            Total = relationItems.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
+            Total = relationItemsAttempt.Result.Total,
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItemsAttempt.Result.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return Ok(pagedViewModel);
     }
 }

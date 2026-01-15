@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -38,7 +38,7 @@ internal sealed class ApiMediaWithCropsResponseBuilder : ApiMediaWithCropsBuilde
         while (current != null)
         {
             yield return current.Name.ToLowerInvariant();
-            current = GetParent(media);
+            current = GetParent(current);
         }
     }
 

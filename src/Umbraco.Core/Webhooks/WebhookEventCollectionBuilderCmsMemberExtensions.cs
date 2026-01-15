@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Core.Webhooks.Events;
 using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderCmsExtensions;
 
@@ -12,15 +13,28 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// Adds the member webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsMember AddDefault(this WebhookEventCollectionBuilderCmsMember builder)
+    public static WebhookEventCollectionBuilderCmsMember AddDefault(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
-        builder.Builder
-            .Add<ExportedMemberWebhookEvent>()
-            .Add<MemberDeletedWebhookEvent>()
-            .Add<MemberSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<ExportedMemberWebhookEvent>()
+                    .Add<MemberDeletedWebhookEvent>()
+                    .Add<MemberSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyExportedMemberWebhookEvent>()
+                    .Add<LegacyMemberDeletedWebhookEvent>()
+                    .Add<LegacyMemberSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -29,14 +43,26 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// Adds the member role webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsMember AddRoles(this WebhookEventCollectionBuilderCmsMember builder)
+    public static WebhookEventCollectionBuilderCmsMember AddRoles(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
-        builder.Builder
-            .Add<AssignedMemberRolesWebhookEvent>()
-            .Add<RemovedMemberRolesWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<AssignedMemberRolesWebhookEvent>()
+                    .Add<RemovedMemberRolesWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyAssignedMemberRolesWebhookEvent>()
+                    .Add<LegacyRemovedMemberRolesWebhookEvent>();
+                break;
+        }
 
         return builder;
     }
@@ -45,14 +71,26 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// Adds the member group webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsMember AddGroup(this WebhookEventCollectionBuilderCmsMember builder)
+    public static WebhookEventCollectionBuilderCmsMember AddGroup(this WebhookEventCollectionBuilderCmsMember builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
     {
-        builder.Builder
-            .Add<MemberGroupDeletedWebhookEvent>()
-            .Add<MemberGroupSavedWebhookEvent>();
+        switch (payloadType)
+        {
+            case WebhookPayloadType.Extended:
+            case WebhookPayloadType.Minimal:
+                builder.Builder
+                    .Add<MemberGroupDeletedWebhookEvent>()
+                    .Add<MemberGroupSavedWebhookEvent>();
+                break;
+            case WebhookPayloadType.Legacy:
+                builder.Builder
+                    .Add<LegacyMemberGroupDeletedWebhookEvent>()
+                    .Add<LegacyMemberGroupSavedWebhookEvent>();
+                break;
+        }
 
         return builder;
     }

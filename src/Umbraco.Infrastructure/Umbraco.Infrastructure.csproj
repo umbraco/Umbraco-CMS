@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Umbraco.Cms.Infrastructure</PackageId>
     <Title>Umbraco CMS - Infrastructure</Title>
@@ -39,8 +39,8 @@
     <PackageReference Include="Examine.Core" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="MailKit" />
+    <PackageReference Include="Markdig" />
     <PackageReference Include="Markdown" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
@@ -61,11 +61,9 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Take top-level depedendency on System.Text.RegularExpressions, because Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depends on a vulnerable version -->
-    <PackageReference Include="System.Text.RegularExpressions" />
+    <PackageReference Include="System.Linq.Async">
+      <ExcludeAssets>compile</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

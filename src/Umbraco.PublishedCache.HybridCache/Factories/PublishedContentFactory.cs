@@ -1,16 +1,22 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
-internal class PublishedContentFactory : IPublishedContentFactory
+/// <summary>
+/// Defines a factory to create <see cref="IPublishedContent"/> and <see cref="IPublishedMember"/> from a <see cref="ContentCacheNode"/> or <see cref="IMember"/>.
+/// </summary>
+internal sealed class PublishedContentFactory : IPublishedContentFactory
 {
     private readonly IElementsCache _elementsCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedContentFactory"/> class.
+    /// </summary>
     public PublishedContentFactory(
         IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor,
@@ -21,37 +27,41 @@ internal class PublishedContentFactory : IPublishedContentFactory
         _publishedContentTypeCache = publishedContentTypeCache;
     }
 
+    /// <inheritdoc/>
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
+        IPublishedContentType contentType =
+            _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
         var contentNode = new ContentNode(
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
+            contentCacheNode.CreateDate.EnsureUtc(),
             contentCacheNode.CreatorId,
             contentType,
             preview ? contentCacheNode.Data : null,
             preview ? null : contentCacheNode.Data);
 
-        IPublishedContent? model = GetModel(contentNode, preview);
+        IPublishedContent? publishedContent = GetModel(contentNode, preview);
 
         if (preview)
         {
-            return model ?? GetPublishedContentAsDraft(model);
+            publishedContent ??= GetPublishedContentAsDraft(publishedContent);
         }
 
-        return model;
+        return publishedContent;
     }
 
+    /// <inheritdoc/>
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
-        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
+        IPublishedContentType contentType =
+            _publishedContentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
         var contentNode = new ContentNode(
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
+            contentCacheNode.CreateDate.EnsureUtc(),
             contentCacheNode.CreatorId,
             contentType,
             null,
@@ -60,16 +70,18 @@ internal class PublishedContentFactory : IPublishedContentFactory
         return GetModel(contentNode, false);
     }
 
+    /// <inheritdoc/>
     public IPublishedMember ToPublishedMember(IMember member)
     {
-        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
+        IPublishedContentType contentType =
+            _publishedContentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
 
-        // Members are only "mapped" never cached, so these default values are a bit wierd, but they are not used.
+        // Members are only "mapped" never cached, so these default values are a bit weird, but they are not used.
         var contentData = new ContentData(
             member.Name,
             null,
             0,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             null,
             true,
@@ -80,7 +92,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             member.Id,
             member.Key,
             member.SortOrder,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             contentType,
             null,
@@ -88,7 +100,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
         return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
     }
 
-    private Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
+    private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
     {
         var properties = member
             .Properties
@@ -111,7 +123,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
         return properties;
     }
 
-    private void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
+    private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
     {
         IPublishedPropertyType? propertyType = contentType.GetPropertyType(alias);
         if (propertyType == null || propertyType.IsUserProperty)
@@ -134,22 +146,21 @@ internal class PublishedContentFactory : IPublishedContentFactory
                 _variationContextAccessor);
     }
 
-
-    private IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>
+    private static IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>
         content == null ? null :
             // an object in the cache is either an IPublishedContentOrMedia,
             // or a model inheriting from PublishedContentExtended - in which
             // case we need to unwrap to get to the original IPublishedContentOrMedia.
             UnwrapIPublishedContent(content);
 
-    private PublishedContent UnwrapIPublishedContent(IPublishedContent content)
+    private static PublishedContent UnwrapIPublishedContent(IPublishedContent content)
     {
         while (content is PublishedContentWrapped wrapped)
         {
             content = wrapped.Unwrap();
         }
 
-        if (!(content is PublishedContent inner))
+        if (content is not PublishedContent inner)
         {
             throw new InvalidOperationException("Innermost content is not PublishedContent.");
         }

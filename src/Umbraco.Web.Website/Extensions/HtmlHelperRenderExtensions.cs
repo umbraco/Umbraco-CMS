@@ -86,7 +86,7 @@ public static class HtmlHelperRenderExtensions
             var htmlBadge =
                 string.Format(
                     contentSettings.PreviewBadge,
-                    hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath),
+                    hostingEnvironment.GetBackOfficePath(),
                     WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                     umbracoContext.PublishedRequest?.PublishedContent?.Key);
             return new HtmlString(htmlBadge);
@@ -105,42 +105,18 @@ public static class HtmlHelperRenderExtensions
         ViewDataDictionary? viewData = null,
         Func<object, ViewDataDictionary?, string>? contextualKeyBuilder = null)
     {
-        var cacheKey = new StringBuilder(partialViewName);
-
-        // let's always cache by the current culture to allow variants to have different cache results
-        var cultureName = Thread.CurrentThread.CurrentUICulture.Name;
-        if (!string.IsNullOrEmpty(cultureName))
-        {
-            cacheKey.AppendFormat("{0}-", cultureName);
-        }
-
         IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
         umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext);
 
-        if (cacheByPage)
-        {
-            if (umbracoContext == null)
-            {
-                throw new InvalidOperationException(
-                    "Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
-            }
-
-            cacheKey.AppendFormat("{0}-", umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
-        }
-
-        if (cacheByMember)
-        {
-            IMemberManager memberManager =
-                htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
-            MemberIdentityUser? currentMember = await memberManager.GetCurrentMemberAsync();
-            cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? "0");
-        }
-
-        if (contextualKeyBuilder != null)
-        {
-            var contextualKey = contextualKeyBuilder(model, viewData);
-            cacheKey.AppendFormat("c{0}-", contextualKey);
-        }
+        string cacheKey = await GenerateCacheKeyForCachedPartialViewAsync(
+            partialViewName,
+            cacheByPage,
+            umbracoContext,
+            cacheByMember,
+            cacheByMember ? GetRequiredService<IMemberManager>(htmlHelper) : null,
+            model,
+            viewData,
+            contextualKeyBuilder);
 
         AppCaches appCaches = GetRequiredService<AppCaches>(htmlHelper);
         IHostingEnvironment hostingEnvironment = GetRequiredService<IHostingEnvironment>(htmlHelper);
@@ -154,6 +130,58 @@ public static class HtmlHelperRenderExtensions
             cacheTimeout,
             cacheKey.ToString(),
             viewData);
+    }
+
+    // Internal for tests.
+    internal static async Task<string> GenerateCacheKeyForCachedPartialViewAsync(
+        string partialViewName,
+        bool cacheByPage,
+        IUmbracoContext? umbracoContext,
+        bool cacheByMember,
+        IMemberManager? memberManager,
+        object model,
+        ViewDataDictionary? viewData,
+        Func<object, ViewDataDictionary?, string>? contextualKeyBuilder)
+    {
+        var cacheKey = new StringBuilder(partialViewName + "-");
+
+        // let's always cache by the current culture to allow variants to have different cache results
+        var cultureName = Thread.CurrentThread.CurrentUICulture.Name;
+        if (!string.IsNullOrEmpty(cultureName))
+        {
+            cacheKey.AppendFormat("{0}-", cultureName);
+        }
+
+        if (cacheByPage)
+        {
+            if (umbracoContext == null)
+            {
+                throw new InvalidOperationException(
+                    "Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request.");
+            }
+
+            cacheKey.AppendFormat("{0}-", umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
+        }
+
+        if (cacheByMember)
+        {
+            if (memberManager == null)
+            {
+                throw new InvalidOperationException(
+                    "Cannot cache by member if the MemberManager is not available.");
+            }
+
+            MemberIdentityUser? currentMember = await memberManager.GetCurrentMemberAsync();
+            cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? "0");
+        }
+
+        if (contextualKeyBuilder != null)
+        {
+            var contextualKey = contextualKeyBuilder(model, viewData);
+            cacheKey.AppendFormat("c{0}-", contextualKey);
+        }
+
+        return cacheKey.ToString();
     }
 
     // public static IHtmlContent EditorFor<T>(this IHtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
@@ -254,14 +282,7 @@ public static class HtmlHelperRenderExtensions
         if (!metaData.AreaName.IsNullOrWhiteSpace())
         {
             // set the area to the plugin area
-            if (routeVals.ContainsKey("area"))
-            {
-                routeVals["area"] = metaData.AreaName;
-            }
-            else
-            {
-                routeVals.Add("area", metaData.AreaName);
-            }
+            routeVals["area"] = metaData.AreaName;
         }
 
         return htmlHelper.ActionLink(actionName, metaData.ControllerName, routeVals);
@@ -816,10 +837,7 @@ public static class HtmlHelperRenderExtensions
         object? additionalRouteVals = null)
     {
         // ensure that the multipart/form-data is added to the HTML attributes
-        if (htmlAttributes.ContainsKey("enctype") == false)
-        {
-            htmlAttributes.Add("enctype", "multipart/form-data");
-        }
+        htmlAttributes.TryAdd("enctype", "multipart/form-data");
 
         var tagBuilder = new TagBuilder("form");
         tagBuilder.MergeAttributes(htmlAttributes);
@@ -854,7 +872,7 @@ public static class HtmlHelperRenderExtensions
     /// <summary>
     ///     Used for rendering out the Form for BeginUmbracoForm
     /// </summary>
-    internal class UmbracoForm : MvcForm
+    internal sealed class UmbracoForm : MvcForm
     {
         private readonly string _surfaceControllerInput;
         private readonly ViewContext _viewContext;

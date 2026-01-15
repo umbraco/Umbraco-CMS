@@ -2,10 +2,10 @@ using System.Globalization;
 using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
 
@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Indexing handler for Examine indexes
 /// </summary>
-internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
+internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IContentValueSetBuilder _contentValueSetBuilder;
@@ -163,7 +163,10 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
 
                     foreach (ISearchResult item in results)
                     {
-                        if (int.TryParse(item.Id, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                        if (int.TryParse(
+                                item.Id,
+                                NumberStyles.Integer,
+                                CultureInfo.InvariantCulture,
                                 out var contentId))
                         {
                             DeleteIndexForEntity(contentId, false);
@@ -208,7 +211,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <summary>
     ///     Re-indexes an <see cref="IContent" /> item on a background thread
     /// </summary>
-    private class DeferredReIndexForContent : IDeferredAction
+    private sealed class DeferredReIndexForContent : IDeferredAction
     {
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly IContent _content;
@@ -271,7 +274,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <summary>
     ///     Re-indexes an <see cref="IMedia" /> item on a background thread
     /// </summary>
-    private class DeferredReIndexForMedia : IDeferredAction
+    private sealed class DeferredReIndexForMedia : IDeferredAction
     {
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
@@ -323,7 +326,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <summary>
     ///     Re-indexes an <see cref="IMember" /> item on a background thread
     /// </summary>
-    private class DeferredReIndexForMember : IDeferredAction
+    private sealed class DeferredReIndexForMember : IDeferredAction
     {
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
@@ -366,7 +369,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             });
     }
 
-    private class DeferredDeleteIndex : IDeferredAction
+    private sealed class DeferredDeleteIndex : IDeferredAction
     {
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly int _id;
@@ -405,7 +408,9 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             }
         }
 
-        public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id,
+        public static void Execute(
+            ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            int id,
             bool keepIfUnpublished)
         {
             foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
@@ -435,7 +440,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <summary>
     ///     Removes all protected content from applicable indexes on a background thread
     /// </summary>
-    private class DeferredRemoveProtectedContent : IDeferredAction
+    private sealed class DeferredRemoveProtectedContent : IDeferredAction
     {
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public abstract class MediaNavigationServiceTestsBase : UmbracoIntegrationTest
+internal abstract class MediaNavigationServiceTestsBase : UmbracoIntegrationTest
 {
     protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
@@ -49,7 +49,7 @@ public abstract class MediaNavigationServiceTestsBase : UmbracoIntegrationTest
         {
             ContentTypeKey = mediaTypeKey,
             ParentKey = parentKey ?? Constants.System.RootKey,
-            InvariantName = name,
+            Variants = [new () { Name = name }],
             Key = key,
         };
 

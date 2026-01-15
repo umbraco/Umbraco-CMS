@@ -202,4 +202,10 @@ public class DataEditor : IDataEditor
 
     /// <inheritdoc />
     public virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
+
+    public virtual object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures) => sourceValue;
 }

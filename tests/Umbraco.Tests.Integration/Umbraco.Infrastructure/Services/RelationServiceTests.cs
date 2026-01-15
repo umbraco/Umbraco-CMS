@@ -1,22 +1,21 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RelationServiceTests : UmbracoIntegrationTest
+internal sealed class RelationServiceTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -26,7 +25,18 @@ public class RelationServiceTests : UmbracoIntegrationTest
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
+    private IMemberService MemberService => GetRequiredService<IMemberService>();
+
     private IRelationService RelationService => GetRequiredService<IRelationService>();
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>();
+    }
 
     [Test]
     public void Get_Paged_Relations_By_Relation_Type()
@@ -116,11 +126,49 @@ public class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Return_List_Of_Content_Items_Where_Member_Item_Referenced()
+    {
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType("testMemberType", "Test Member Type");
+        MemberTypeService.Save(memberType);
+        var member = MemberBuilder.CreateSimpleMember(memberType, "Test Member", "test@test.com", "xxxxxxxx", "testMember");
+        MemberService.Save(member);
+
+        var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
+        ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+        ContentTypeService.Save(ct);
+
+        void CreateContentWithMemberRefs()
+        {
+            var content = ContentBuilder.CreateTextpageContent(ct, "my content 2", -1);
+
+            // 'bodyText' is a property with a RTE property editor which we knows automatically tracks relations
+            content.Properties["bodyText"].SetValue(@"<div data-udi='umb://member/" + member.Key.ToString("N") + @"'></div>");
+            ContentService.Save(content);
+        }
+
+        for (var i = 0; i < 6; i++)
+        {
+            CreateContentWithMemberRefs(); // create 6 content items referencing the same member
+        }
+
+        var relations = RelationService.GetByChildId(member.Id, Constants.Conventions.RelationTypes.RelatedMemberAlias).ToList();
+        Assert.AreEqual(6, relations.Count);
+
+        var entities = RelationService.GetParentEntitiesFromRelations(relations).ToList();
+        Assert.AreEqual(6, entities.Count);
+    }
+
+    [Test]
     public void Can_Create_RelationType_Without_Name()
     {
         var rs = RelationService;
-        IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Media, false);
+        IRelationType rt = new RelationType(
+            "Test",
+            "repeatedEventOccurence",
+            false,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Media,
+            false);
 
         Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -189,7 +237,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
     {
         var rs = RelationService;
 
-        var date = DateTime.Now.AddDays(-10);
+        var date = DateTime.UtcNow.AddDays(-10);
         var newRelations = CreateRelations(10);
         foreach (var r in newRelations)
         {
@@ -201,7 +249,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
         RelationService.Save(newRelations);
         Assert.IsTrue(newRelations.All(x => x.UpdateDate == date));
 
-        var newDate = DateTime.Now.AddDays(-5);
+        var newDate = DateTime.UtcNow.AddDays(-5);
         foreach (var r in newRelations)
         {
             r.UpdateDate = newDate;

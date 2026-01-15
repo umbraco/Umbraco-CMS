@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -45,6 +47,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     private readonly IRuntimeState _runtime;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IUmbracoVirtualPageRoute _umbracoVirtualPageRoute;
+    private readonly IDocumentUrlService _urlService;
     private GlobalSettings _globalSettings;
 
     /// <summary>
@@ -61,7 +64,8 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         IControllerActionSearcher controllerActionSearcher,
         IPublicAccessRequestHandler publicAccessRequestHandler,
         IUmbracoVirtualPageRoute umbracoVirtualPageRoute,
-        IOptionsMonitor<GlobalSettings> globalSettings)
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IDocumentUrlService urlService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _umbracoContextAccessor =
@@ -77,6 +81,39 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         _umbracoVirtualPageRoute = umbracoVirtualPageRoute;
         _globalSettings = globalSettings.CurrentValue;
         globalSettings.OnChange(x => _globalSettings = x);
+        _urlService = urlService;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
+    /// </summary>
+    [Obsolete("Scheduled for removal in Umbraco 18")]
+    public UmbracoRouteValueTransformer(
+        ILogger<UmbracoRouteValueTransformer> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedRouter publishedRouter,
+        IRuntimeState runtime,
+        IUmbracoRouteValuesFactory routeValuesFactory,
+        IRoutableDocumentFilter routableDocumentFilter,
+        IDataProtectionProvider dataProtectionProvider,
+        IControllerActionSearcher controllerActionSearcher,
+        IPublicAccessRequestHandler publicAccessRequestHandler,
+        IUmbracoVirtualPageRoute umbracoVirtualPageRoute,
+        IOptionsMonitor<GlobalSettings> globalSettings)
+    : this(
+        logger,
+        umbracoContextAccessor,
+        publishedRouter,
+        runtime,
+        routeValuesFactory,
+        routableDocumentFilter,
+        dataProtectionProvider,
+        controllerActionSearcher,
+        publicAccessRequestHandler,
+        umbracoVirtualPageRoute,
+        globalSettings,
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
     }
 
     /// <inheritdoc />
@@ -100,8 +137,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         }
 
         // Check if there is no existing content and return the no content controller
-        // FIXME: This should be changed to route cache, so instead, if there are any routes, we know there is content.
-        if (!umbracoContext.Content?.HasContent() ?? false)
+        if (!_urlService?.HasAny() ?? false)
         {
             return new RouteValueDictionary
             {
@@ -272,7 +308,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         return values;
     }
 
-    private class PostedDataProxyInfo
+    private sealed class PostedDataProxyInfo
     {
         public string? ControllerName { get; set; }
 

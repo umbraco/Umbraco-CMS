@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
@@ -102,7 +103,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             sb.AppendLine($", {primaryKey}");
         }
 
-        foreach (var foreignKey in foreignKeys)
+        foreach (var foreignKey in CollectionsMarshal.AsSpan(foreignKeys))
         {
             sb.AppendLine($", {foreignKey}");
         }
@@ -161,6 +162,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override string ConvertDateToOrderableString => "{0}";
 
+    public override string ConvertUniqueIdentifierToString => "{0}";
+
     public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
     /// <inheritdoc />
@@ -202,13 +205,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     protected override string? FormatSystemMethods(SystemMethods systemMethod)
     {
-        // TODO: SQLite
         switch (systemMethod)
         {
             case SystemMethods.NewGuid:
-                return "NEWID()"; // No NEWID() in SQLite perhaps try RANDOM()
+                return null; // Not available in SQLite.
             case SystemMethods.CurrentDateTime:
-                return "DATE()"; // No GETDATE() trying DATE()
+                return null; // Not available in SQLite.
+            case SystemMethods.CurrentUTCDateTime:
+                return "CURRENT_TIMESTAMP";
         }
 
         return null;
@@ -303,7 +307,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
         if (!skipKeysAndIndexes)
         {
-            foreach (var foreignKey in foreignKeys)
+            foreach (var foreignKey in CollectionsMarshal.AsSpan(foreignKeys))
             {
                 sb.AppendLine($", {foreignKey}");
             }
@@ -434,7 +438,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override IDictionary<Type, IScalarMapper> ScalarMappers => _scalarMappers;
 
-    private class Constraint
+    private sealed class Constraint
     {
         public string TableName { get; }
 
@@ -452,7 +456,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         public override string ToString() => ConstraintName;
     }
 
-    private class SqliteMaster
+    private sealed class SqliteMaster
     {
         public string Type { get; set; } = null!;
 
@@ -461,7 +465,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         public string Sql { get; set; } = null!;
     }
 
-    private class IndexMeta
+    private sealed class IndexMeta
     {
         public string TableName { get; set; } = null!;
 

@@ -1,14 +1,12 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Querying;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
@@ -18,17 +16,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 public class ByKeyDocumentController : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
-    private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IContentQueryService _contentQueryService;
 
     public ByKeyDocumentController(
         IAuthorizationService authorizationService,
-        IContentEditingService contentEditingService,
-        IDocumentPresentationFactory documentPresentationFactory)
+        IDocumentPresentationFactory documentPresentationFactory,
+        IContentQueryService contentQueryService)
     {
         _authorizationService = authorizationService;
-        _contentEditingService = contentEditingService;
         _documentPresentationFactory = documentPresentationFactory;
+        _contentQueryService = contentQueryService;
     }
 
     [HttpGet("{id:guid}")]
@@ -47,13 +45,16 @@ public class ByKeyDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        IContent? content = await _contentEditingService.GetAsync(id);
-        if (content == null)
+        var contentWithScheduleAttempt = await _contentQueryService.GetWithSchedulesAsync(id);
+
+        if (contentWithScheduleAttempt.Success == false)
         {
-            return DocumentNotFound();
+            return ContentQueryOperationStatusResult(contentWithScheduleAttempt.Status);
         }
 
-        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(content);
+        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(
+            contentWithScheduleAttempt.Result!.Content,
+            contentWithScheduleAttempt.Result.Schedules);
         return Ok(model);
     }
 }

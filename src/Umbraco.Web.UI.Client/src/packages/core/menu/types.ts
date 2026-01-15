@@ -1,5 +1,10 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+export type * from './components/types.js';
 export type * from './conditions/types.js';
+export type * from './menu-structure/types.js';
+export type * from './menu.extension.js';
+export type * from './section-sidebar-menu/types.js';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbStructureItemModelBase extends UmbEntityModel {}

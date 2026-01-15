@@ -4,12 +4,12 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
 
 public abstract class BreadthFirstKeyProvider
 {
-    private readonly INavigationQueryService _navigationQueryService;
+    protected readonly INavigationQueryService NavigationQueryService;
     private readonly int _seedCount;
 
     public BreadthFirstKeyProvider(INavigationQueryService navigationQueryService, int seedCount)
     {
-        _navigationQueryService = navigationQueryService;
+        NavigationQueryService = navigationQueryService;
         _seedCount = seedCount;
     }
 
@@ -24,7 +24,7 @@ public abstract class BreadthFirstKeyProvider
         HashSet<Guid> keys = [];
         int keyCount = 0;
 
-        if (_navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+        if (NavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
         {
             return new HashSet<Guid>();
         }
@@ -44,7 +44,7 @@ public abstract class BreadthFirstKeyProvider
         {
             Guid key = keyQueue.Dequeue();
 
-            if (_navigationQueryService.TryGetChildrenKeys(key, out IEnumerable<Guid> childKeys) is false)
+            if (NavigationQueryService.TryGetChildrenKeys(key, out IEnumerable<Guid> childKeys) is false)
             {
                 continue;
             }

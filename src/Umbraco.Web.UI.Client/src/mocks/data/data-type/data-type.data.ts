@@ -18,6 +18,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [],
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 	},
 	{
 		name: 'Folder 2',
@@ -30,6 +31,20 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [],
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
+	},
+	{
+		id: 'forbidden',
+		parent: null,
+		name: 'Forbidden Data Type',
+		editorAlias: 'Umbraco.TextBox',
+		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+		values: [],
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
 	},
 	{
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
@@ -42,6 +57,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 	},
 	{
 		name: 'Text',
@@ -53,6 +69,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'maxChars',
@@ -71,6 +88,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [],
+		flags: [],
 	},
 	{
 		name: 'My JS Property Editor',
@@ -83,6 +101,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [],
+		flags: [],
 	},
 	{
 		name: 'Color Picker',
@@ -94,6 +113,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'useLabel',
@@ -152,6 +172,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'validationLimit',
@@ -169,6 +190,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				//showPalette
@@ -208,6 +230,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'overlaySize',
@@ -241,6 +264,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'startNode',
@@ -271,10 +295,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: false,
 			},
 			{
-				alias: 'showOpenButton',
-				value: true,
-			},
-			{
 				alias: 'filter',
 				value: '',
 			},
@@ -290,6 +310,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'format',
@@ -315,6 +336,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'format',
@@ -336,6 +358,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'format',
@@ -357,6 +380,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'inputMode',
@@ -374,6 +398,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'minNumber',
@@ -395,10 +420,33 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'multiple',
 				value: false,
+			},
+			{
+				alias: 'items',
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
+			},
+		],
+	},
+	{
+		name: 'Dropdown (Multiple)',
+		id: 'dt-dropdown-multiple',
+		parent: null,
+		editorAlias: 'Umbraco.DropDown.Flexible',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'multiple',
+				value: true,
 			},
 			{
 				alias: 'items',
@@ -416,6 +464,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'multiple',
@@ -437,6 +486,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'enableRange',
@@ -474,6 +524,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'default',
@@ -503,6 +554,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'group',
@@ -524,6 +576,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		canIgnoreStartNodes: false,
 		isDeletable: true,
+		flags: [],
 		values: [
 			{
 				alias: 'language',
@@ -541,6 +594,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -553,6 +607,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'items',
@@ -570,6 +625,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'items',
@@ -587,6 +643,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'blocks',
@@ -595,7 +652,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 						label: 'Mocked Block Type for Block List',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 						settingsElementTypeKey: 'all-property-editors-document-type-id',
-						icon: 'icon-server-alt',
+						iconColor: '#F5C1BC',
+						backgroundColor: '#1B264F',
 					},
 					{
 						label: 'Mocked Coffee Block',
@@ -603,7 +661,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 						iconColor: '#FFFDD0',
 						backgroundColor: '#633f32',
 						editorSize: 'medium',
-						icon: 'icon-coffee',
 					},
 					{
 						label: 'Headline',
@@ -611,25 +668,21 @@ export const data: Array<UmbMockDataTypeModel> = [
 						settingsElementTypeKey: 'headline-settings-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
-						icon: 'icon-edit',
 					},
 					{
 						label: 'Image',
 						contentElementTypeKey: 'image-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-picture',
 					},
 					{
 						label: 'Rich Text',
 						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-diploma',
 					},
 					{
 						label: 'Two Column Layout',
 						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-book-alt',
 					},
 				],
 			},
@@ -653,6 +706,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -665,6 +719,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'crops',
@@ -698,10 +753,77 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'fileExtensions',
-				value: ['jpg', 'jpeg', 'png', 'pdf'],
+				value: ['jpg', 'jpeg', 'png', 'svg'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Files)',
+		id: 'dt-uploadFieldFiles',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['pdf', 'iso'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Movies)',
+		id: 'dt-uploadFieldMovies',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['mp4', 'mov'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Vector)',
+		id: 'dt-uploadFieldVector',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['svg'],
 			},
 			{
 				alias: 'multiple',
@@ -719,6 +841,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'blockGroups',
@@ -842,6 +965,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: false,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{ alias: 'pageSize', value: 25 },
 			{ alias: 'orderDirection', value: 'desc' },
@@ -857,8 +981,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Document Grid Collection View',
+						collectionView: 'Umb.CollectionView.Document.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Document Table Collection View',
+						collectionView: 'Umb.CollectionView.Document.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },
@@ -876,6 +1008,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: false,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{ alias: 'pageSize', value: 2 },
 			{ alias: 'orderDirection', value: 'desc' },
@@ -891,8 +1024,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Media Grid Collection View',
+						collectionView: 'Umb.CollectionView.Media.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Media Table Collection View',
+						collectionView: 'Umb.CollectionView.Media.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },
@@ -910,6 +1051,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -922,90 +1064,93 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
-		values: [
-			{ alias: 'dimensions', value: { height: 500 } },
-			{ alias: 'maxImageSize', value: 500 },
-			{ alias: 'ignoreUserStartNodes', value: false },
-		],
-	},
-	{
-		name: 'Rich Text Editor (TinyMCE)',
-		id: 'dt-richTextEditorTinyMce',
-		parent: null,
-		editorAlias: 'Umbraco.RichText',
-		editorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
-		hasChildren: false,
-		isFolder: false,
-		isDeletable: true,
-		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
-				alias: 'hideLabel',
-				value: true,
+				alias: 'extensions',
+				value: [
+					'Umb.Tiptap.RichTextEssentials',
+					'Umb.Tiptap.Anchor',
+					'Umb.Tiptap.Block',
+					'Umb.Tiptap.Blockquote',
+					'Umb.Tiptap.Bold',
+					'Umb.Tiptap.BulletList',
+					'Umb.Tiptap.CodeBlock',
+					'Umb.Tiptap.Embed',
+					'Umb.Tiptap.Figure',
+					'Umb.Tiptap.Heading',
+					'Umb.Tiptap.HorizontalRule',
+					'Umb.Tiptap.HtmlAttributeClass',
+					'Umb.Tiptap.HtmlAttributeDataset',
+					'Umb.Tiptap.HtmlAttributeId',
+					'Umb.Tiptap.HtmlAttributeStyle',
+					'Umb.Tiptap.HtmlTagDiv',
+					'Umb.Tiptap.HtmlTagSpan',
+					'Umb.Tiptap.Image',
+					'Umb.Tiptap.Italic',
+					'Umb.Tiptap.Link',
+					'Umb.Tiptap.MediaUpload',
+					'Umb.Tiptap.OrderedList',
+					'Umb.Tiptap.Strike',
+					'Umb.Tiptap.Subscript',
+					'Umb.Tiptap.Superscript',
+					'Umb.Tiptap.Table',
+					'Umb.Tiptap.TextAlign',
+					'Umb.Tiptap.TextDirection',
+					'Umb.Tiptap.TextIndent',
+					'Umb.Tiptap.TrailingNode',
+					'Umb.Tiptap.Underline',
+					'Umb.Tiptap.WordCount',
+				],
 			},
-			{ alias: 'dimensions', value: { height: 500 } },
-			{ alias: 'maxImageSize', value: 500 },
-			{ alias: 'ignoreUserStartNodes', value: false },
-			{
-				alias: 'validElements',
-				value:
-					'+a[id|style|rel|data-id|data-udi|rev|charset|hreflang|dir|lang|tabindex|accesskey|type|name|href|target|title|class|onfocus|onblur|onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup],-strong/-b[class|style],-em/-i[class|style],-strike[class|style],-s[class|style],-u[class|style],#p[id|style|dir|class|align],-ol[class|reversed|start|style|type],-ul[class|style],-li[class|style],br[class],img[id|dir|lang|longdesc|usemap|style|class|src|onmouseover|onmouseout|border|alt=|title|hspace|vspace|width|height|align|umbracoorgwidth|umbracoorgheight|onresize|onresizestart|onresizeend|rel|data-id],-sub[style|class],-sup[style|class],-blockquote[dir|style|class],-table[border=0|cellspacing|cellpadding|width|height|class|align|summary|style|dir|id|lang|bgcolor|background|bordercolor],-tr[id|lang|dir|class|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor],tbody[id|class],thead[id|class],tfoot[id|class],#td[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor|scope],-th[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|scope],caption[id|lang|dir|class|style],-div[id|dir|class|align|style],-span[class|align|style],-pre[class|align|style],address[class|align|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align|style],hr[class|style],small[class|style],dd[id|class|title|style|dir|lang],dl[id|class|title|style|dir|lang],dt[id|class|title|style|dir|lang],object[class|id|width|height|codebase|*],param[name|value|_value|class],embed[type|width|height|src|class|*],map[name|class],area[shape|coords|href|alt|target|class],bdo[class],button[class],iframe[*],figure,figcaption,video[*],audio[*],picture[*],source[*],canvas[*]',
-			},
-			{ alias: 'invalidElements', value: 'font' },
-			{ alias: 'stylesheets', value: [] },
 			{
 				alias: 'toolbar',
 				value: [
-					'sourcecode',
-					'undo',
-					'redo',
-					'styles',
-					'bold',
-					'italic',
-					'alignleft',
-					'aligncenter',
-					'alignright',
-					'bullist',
-					'numlist',
-					'outdent',
-					'indent',
-					'link',
-					'unlink',
-					'anchor',
-					'table',
-					'umbmediapicker',
-					'umbembeddialog',
+					[
+						[
+							'Umb.Tiptap.Toolbar.SourceEditor',
+							'Umb.Tiptap.Toolbar.Undo',
+							'Umb.Tiptap.Toolbar.Redo',
+							'Umb.Tiptap.Toolbar.ClearFormatting',
+						],
+						['Umb.Tiptap.Toolbar.StyleSelect', 'Umb.Tiptap.Toolbar.FontFamily', 'Umb.Tiptap.Toolbar.FontSize'],
+						[
+							'Umb.Tiptap.Toolbar.Bold',
+							'Umb.Tiptap.Toolbar.Italic',
+							'Umb.Tiptap.Toolbar.Underline',
+							'Umb.Tiptap.Toolbar.Strike',
+						],
+						['Umb.Tiptap.Toolbar.TextColorForeground', 'Umb.Tiptap.Toolbar.TextColorBackground'],
+						[
+							'Umb.Tiptap.Toolbar.TextAlignLeft',
+							'Umb.Tiptap.Toolbar.TextAlignCenter',
+							'Umb.Tiptap.Toolbar.TextAlignRight',
+						],
+						['Umb.Tiptap.Toolbar.Subscript', 'Umb.Tiptap.Toolbar.Superscript'],
+						['Umb.Tiptap.Toolbar.CodeBlock'],
+						[
+							'Umb.Tiptap.Toolbar.CharacterMap',
+							'Umb.Tiptap.Toolbar.TextDirectionRtl',
+							'Umb.Tiptap.Toolbar.TextDirectionLtr',
+						],
+						['Umb.Tiptap.Toolbar.TextIndent', 'Umb.Tiptap.Toolbar.TextOutdent'],
+						[
+							'Umb.Tiptap.Toolbar.BulletList',
+							'Umb.Tiptap.Toolbar.OrderedList',
+							'Umb.Tiptap.Toolbar.Blockquote',
+							'Umb.Tiptap.Toolbar.HorizontalRule',
+						],
+						['Umb.Tiptap.Toolbar.Anchor', 'Umb.Tiptap.Toolbar.Link', 'Umb.Tiptap.Toolbar.Unlink'],
+						['Umb.Tiptap.Toolbar.Table', 'Umb.Tiptap.Toolbar.MediaPicker', 'Umb.Tiptap.Toolbar.EmbeddedMedia'],
+					],
 				],
 			},
-			{
-				alias: 'plugins',
-				value: [
-					{
-						name: 'anchor',
-					},
-					{
-						name: 'charmap',
-					},
-					{
-						name: 'table',
-					},
-					{
-						name: 'lists',
-					},
-					{
-						name: 'advlist',
-					},
-					{
-						name: 'autolink',
-					},
-					{
-						name: 'directionality',
-					},
-					{
-						name: 'searchreplace',
-					},
-				],
-			},
+			{ alias: 'statusbar', value: [['Umb.Tiptap.Statusbar.ElementPath'], ['Umb.Tiptap.Statusbar.WordCount']] },
+			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
+			{ alias: 'dimensions', value: { height: 500 } },
+			{ alias: 'maxImageSize', value: 500 },
+			{ alias: 'ignoreUserStartNodes', value: false },
+			{ alias: 'overlaySize', value: 'medium' },
 		],
 	},
 	{
@@ -1018,6 +1163,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -1030,6 +1176,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -1042,6 +1189,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [
 			{
 				alias: 'step',
@@ -1059,6 +1207,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -1071,6 +1220,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -1083,6 +1233,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -1095,6 +1246,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
 	},
 	{
@@ -1107,6 +1259,67 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		flags: [],
 		values: [],
+	},
+	{
+		name: 'Date Only',
+		id: 'dt-dateOnly',
+		parent: null,
+		editorAlias: 'Umbraco.DateOnly',
+		editorUiAlias: 'Umb.PropertyEditorUi.DateOnlyPicker',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [],
+	},
+	{
+		name: 'Time Only',
+		id: 'dt-timeOnly',
+		parent: null,
+		editorAlias: 'Umbraco.TimeOnly',
+		editorUiAlias: 'Umb.PropertyEditorUi.TimeOnlyPicker',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [],
+	},
+	{
+		name: 'Date Time (Unspecified)',
+		id: 'dt-dateTimeUnspecified',
+		parent: null,
+		editorAlias: 'Umbraco.DateTimeUnspecified',
+		editorUiAlias: 'Umb.PropertyEditorUi.DateTimePicker',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [],
+	},
+	{
+		name: 'Date Time (with time zone)',
+		id: 'dt-dateTimeWithTimeZone',
+		parent: null,
+		editorAlias: 'Umbraco.DateTimeWithTimeZone',
+		editorUiAlias: 'Umb.PropertyEditorUi.DateTimeWithTimeZonePicker',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'timeZones',
+				value: {
+					mode: 'all',
+					timeZones: [],
+				},
+			},
+		],
 	},
 ];

@@ -1,4 +1,3 @@
-﻿
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -16,17 +15,20 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+    private readonly TimeProvider _timeProvider;
 
     public DataTypePresentationFactory(
         IDataTypeContainerService dataTypeContainerService,
         PropertyEditorCollection propertyEditorCollection,
         IDataValueEditorFactory dataValueEditorFactory,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        TimeProvider timeProvider)
     {
         _dataTypeContainerService = dataTypeContainerService;
         _propertyEditorCollection = propertyEditorCollection;
         _dataValueEditorFactory = dataValueEditorFactory;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc />
@@ -44,6 +46,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             return Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(parentAttempt.Status, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer));
         }
 
+        DateTime createDate = _timeProvider.GetLocalNow().DateTime;
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
         {
             Name = requestModel.Name,
@@ -51,7 +54,8 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             DatabaseType = GetEditorValueStorageType(editor),
             ConfigurationData = MapConfigurationData(requestModel, editor),
             ParentId = parentAttempt.Result,
-            CreateDate = DateTime.Now,
+            CreateDate = createDate,
+            UpdateDate = createDate,
         };
 
         if (requestModel.Id.HasValue)

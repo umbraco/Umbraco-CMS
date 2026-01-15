@@ -1,5 +1,7 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
@@ -288,6 +290,8 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         // set on variant content type
         if (ContentType.VariesByCulture())
         {
+            culture = culture.EnsureCultureCode();
+
             // invariant is ok
             if (culture.IsNullOrWhiteSpace())
             {
@@ -297,13 +301,13 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             // clear
             else if (name.IsNullOrWhiteSpace())
             {
-                ClearCultureInfo(culture!);
+                ClearCultureInfo(culture);
             }
 
             // set
-            else
+            else if (GetCultureName(culture) != name)
             {
-                this.SetCultureInfo(culture!, name, DateTime.Now);
+                this.SetCultureInfo(culture!, name, DateTime.UtcNow);
             }
         }
 
@@ -322,11 +326,6 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
     private void ClearCultureInfo(string culture)
     {
-        if (culture == null)
-        {
-            throw new ArgumentNullException(nameof(culture));
-        }
-
         if (string.IsNullOrWhiteSpace(culture))
         {
             throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
@@ -455,10 +454,13 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
                 $"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
         }
 
-        property?.SetValue(value, culture, segment);
-
-        // bump the culture to be flagged for updating
-        this.TouchCulture(culture);
+        culture = culture.EnsureCultureCode();
+        var updated = property.SetValue(value, culture, segment);
+        if (updated)
+        {
+            // bump the culture to be flagged for updating
+            this.TouchCulture(culture);
+        }
     }
 
     /// <inheritdoc />

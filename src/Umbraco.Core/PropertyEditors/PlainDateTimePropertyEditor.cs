@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class PlainDateTimePropertyEditor : DataEditor
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PlainIntegerPropertyEditor" /> class.
+    ///     Initializes a new instance of the <see cref="PlainDateTimePropertyEditor" /> class.
     /// </summary>
     public PlainDateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)

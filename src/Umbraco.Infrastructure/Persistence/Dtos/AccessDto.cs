@@ -5,11 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Access)]
+[TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class AccessDto
+internal sealed class AccessDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.Access;
+
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoAccess", AutoIncrement = false)]
     public Guid Id { get; set; }
@@ -28,11 +30,11 @@ internal class AccessDto
     public int NoAccessNodeId { get; set; }
 
     [Column("createDate")]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
     [Column("updateDate")]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 
     [ResultColumn]

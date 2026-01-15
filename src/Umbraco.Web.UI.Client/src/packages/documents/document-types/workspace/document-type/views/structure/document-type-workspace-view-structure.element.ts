@@ -1,17 +1,18 @@
-import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbInputDocumentTypeElement } from '../../../../components/input-document-type/input-document-type.element.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
+import type {
+	UmbContentTypeSortModel,
+	UmbInputContentTypeCollectionConfigurationElement,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-type-workspace-view-structure')
 export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
+	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _allowedAtRoot?: boolean;
@@ -25,9 +26,8 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
-			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
+			this.#workspaceContext = documentTypeContext;
 			this._observeDocumentType();
 		});
 	}
@@ -95,17 +95,17 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				</umb-property-layout>
 			</uui-box>
 			<uui-box headline=${this.localize.term('contentTypeEditor_presentation')}>
-				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collections')}">
-					<div slot="description">${this.localize.term('contentTypeEditor_collectionsDescription')}</div>
+				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collection')}">
+					<div slot="description">${this.localize.term('contentTypeEditor_collectionDescription')}</div>
 					<div slot="editor">
-						<umb-input-collection-configuration
+						<umb-input-content-type-collection-configuration
 							default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
 							.value=${this._collection ?? undefined}
 							@change=${(e: CustomEvent) => {
-								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
+								const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });
 							}}>
-						</umb-input-collection-configuration>
+						</umb-input-content-type-collection-configuration>
 					</div>
 				</umb-property-layout>
 			</uui-box>

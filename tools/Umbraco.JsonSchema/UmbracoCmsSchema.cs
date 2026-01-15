@@ -1,8 +1,7 @@
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 
-internal class UmbracoCmsSchema
+internal sealed class UmbracoCmsSchema
 {
     public required UmbracoDefinition Umbraco { get; set; }
 
@@ -59,27 +58,35 @@ internal class UmbracoCmsSchema
 
         public required UnattendedSettings Unattended { get; set; }
 
-        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
-        public required RuntimeMinificationSettings RuntimeMinification { get; set; }
-
         public required BasicAuthSettings BasicAuth { get; set; }
 
         public required PackageMigrationSettings PackageMigration { get; set; }
 
         public required LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
 
-        [Obsolete("Scheduled for removal in v16, dashboard manipulation is now done trough frontend extensions.")]
-        public required ContentDashboardSettings ContentDashboard { get; set; }
-
         public required HelpPageSettings HelpPage { get; set; }
 
-        public required InstallDefaultDataSettings DefaultDataCreation { get; set; }
+        public required InstallDefaultDataNamedOptions InstallDefaultData { get; set; }
 
         public required DataTypesSettings DataTypes { get; set; }
 
         public required MarketplaceSettings Marketplace { get; set; }
 
         public required WebhookSettings Webhook { get; set; }
+
         public required CacheSettings Cache { get; set; }
+
+        public required DistributedJobSettings DistributedJobSettings { get; set; }
+    }
+
+    public class InstallDefaultDataNamedOptions
+    {
+        public required InstallDefaultDataSettings Languages { get; set; }
+
+        public required InstallDefaultDataSettings DataTypes { get; set; }
+
+        public required InstallDefaultDataSettings MediaTypes { get; set; }
+
+        public required InstallDefaultDataSettings MemberTypes { get; set; }
     }
 }

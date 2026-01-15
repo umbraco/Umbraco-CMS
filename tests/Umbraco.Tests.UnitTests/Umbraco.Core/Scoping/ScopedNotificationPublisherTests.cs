@@ -85,13 +85,14 @@ public class ScopedNotificationPublisherTests
             loggerFactory.CreateLogger<MediaFileManager>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IServiceProvider>(),
-            Options.Create(new ContentSettings()));
+            Mock.Of<Lazy<ICoreScopeProvider>>());
 
         eventAggregatorMock = new Mock<IEventAggregator>();
 
         return new ScopeProvider(
             new AmbientScopeStack(),
-                new AmbientScopeContextStack(),Mock.Of<IDistributedLockingMechanismFactory>(),
+            new AmbientScopeContextStack(),
+            Mock.Of<IDistributedLockingMechanismFactory>(),
             Mock.Of<IUmbracoDatabaseFactory>(),
             fileSystems,
             new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),

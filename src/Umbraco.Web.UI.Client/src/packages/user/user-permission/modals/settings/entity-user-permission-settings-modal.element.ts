@@ -16,13 +16,25 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 		super.data = data;
 		this._entityType = data?.entityType;
 		this._headline = data?.headline ?? this._headline;
+		this._preset = data?.preset;
 	}
 
 	@state()
-	_headline: string = 'Set permissions';
+	private _headline: string = 'Set permissions';
 
 	@state()
-	_entityType?: string;
+	private _entityType?: string;
+
+	@state()
+	private _preset?: UmbEntityUserPermissionSettingsModalValue;
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+
+		if (this._preset?.allowedVerbs && !this.value?.allowedVerbs) {
+			this.updateValue({ allowedVerbs: this._preset.allowedVerbs });
+		}
+	}
 
 	#onPermissionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
