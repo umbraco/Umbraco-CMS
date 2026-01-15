@@ -1,9 +1,9 @@
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbElementItemModel } from './types.js';
 import { UmbManagementApiElementItemDataRequestManager } from './element-item.server.request-manager.js';
+import type { UmbElementItemModel } from './types.js';
+import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { ElementItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Element items that fetches data from the server
@@ -39,13 +39,12 @@ export class UmbElementItemServerDataSource extends UmbItemServerDataSourceBase<
 const mapper = (item: ElementItemResponseModel): UmbElementItemModel => {
 	return {
 		documentType: {
-			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
-			icon: item.documentType.icon,
 			unique: item.documentType.id,
+			icon: item.documentType.icon,
+			collection: null,
 		},
 		entityType: UMB_ELEMENT_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
-		isProtected: false, //item.isProtected,
 		isTrashed: false, //item.isTrashed,
 		parent: item.parent ? { unique: item.parent.id } : null,
 		unique: item.id,

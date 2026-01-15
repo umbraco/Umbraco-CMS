@@ -1,31 +1,24 @@
-import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
-import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import type { UmbElementItemModel } from './types.js';
+import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UmbElementItemDataResolver } from '../data-resolver/element-item-data-resolver.js';
+import type { UmbElementItemModel } from '../types.js';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-element-item-ref')
 export class UmbElementItemRefElement extends UmbLitElement {
-	#item?: UmbElementItemModel;
+	#item = new UmbElementItemDataResolver<UmbElementItemModel>(this);
 
 	@property({ type: Object })
 	public set item(value: UmbElementItemModel | undefined) {
-		this.#item = value;
-
-		if (!value) return;
-
-		this._unique = value.unique;
-		this._name = value.variants[0].name; // TODO: Implement name when available in the API. [LK:2026-01-06]
-		this._icon = value.documentType.icon;
-		this._isTrashed = value.isTrashed ?? false;
-		this._isDraft = false;
+		this.#item.setData(value);
 	}
 	public get item(): UmbElementItemModel | undefined {
-		return this.#item;
+		return this.#item.getData();
 	}
 
 	@property({ type: Boolean, reflect: true })
@@ -75,6 +68,12 @@ export class UmbElementItemRefElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE });
 			});
+
+		this.#item.observe(this.#item.unique, (unique) => (this._unique = unique ?? ''));
+		this.#item.observe(this.#item.name, (name) => (this._name = name ?? ''));
+		this.#item.observe(this.#item.icon, (icon) => (this._icon = icon ?? ''));
+		this.#item.observe(this.#item.isTrashed, (isTrashed) => (this._isTrashed = isTrashed ?? false));
+		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
 	#getHref() {

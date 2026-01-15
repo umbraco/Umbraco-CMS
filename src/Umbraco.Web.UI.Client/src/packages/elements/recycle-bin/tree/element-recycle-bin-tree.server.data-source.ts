@@ -76,7 +76,7 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 		//isProtected: false,
 		documentType: {
 			unique: item.documentType?.id ?? '',
-			icon: item.documentType?.icon ?? '',
+			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 			collection: null,
 		},
 		variants: item.variants.map((variant): UmbElementTreeItemVariantModel => {
