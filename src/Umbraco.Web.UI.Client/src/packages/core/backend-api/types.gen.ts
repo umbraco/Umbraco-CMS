@@ -83,6 +83,8 @@ export type CalculatedUserStartNodesResponseModel = {
     hasDocumentRootAccess: boolean;
     mediaStartNodeIds: Array<ReferenceByIdModel>;
     hasMediaRootAccess: boolean;
+    elementStartNodeIds: Array<ReferenceByIdModel>;
+    hasElementRootAccess: boolean;
 };
 
 export type ChangePasswordCurrentUserRequestModel = {
@@ -426,6 +428,7 @@ export type CreateUserDataRequestModel = {
 export type CreateUserGroupRequestModel = {
     name: string;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -434,10 +437,11 @@ export type CreateUserGroupRequestModel = {
     documentRootAccess: boolean;
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
+    elementStartNode?: ReferenceByIdModel | null;
+    elementRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
-    description?: string | null;
 };
 
 export type CreateUserRequestModel = {
@@ -490,6 +494,8 @@ export type CurrentUserResponseModel = {
     hasDocumentRootAccess: boolean;
     mediaStartNodeIds: Array<ReferenceByIdModel>;
     hasMediaRootAccess: boolean;
+    elementStartNodeIds: Array<ReferenceByIdModel>;
+    hasElementRootAccess: boolean;
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
@@ -537,6 +543,7 @@ export type DataTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    noAccess: boolean;
     editorUiAlias?: string | null;
     isDeletable: boolean;
 };
@@ -645,6 +652,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    noAccess: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
 };
 
@@ -865,6 +873,7 @@ export type DocumentTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    noAccess: boolean;
     isElement: boolean;
     icon: string;
 };
@@ -1039,6 +1048,7 @@ export type ElementTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    noAccess: boolean;
     createDate: string;
     documentType?: DocumentTypeReferenceResponseModel | null;
     variants: Array<ElementVariantItemResponseModel>;
@@ -1081,6 +1091,26 @@ export type ElementVariantResponseModel = {
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
+};
+
+export type ElementVersionItemResponseModel = {
+    id: string;
+    element: ReferenceByIdModel;
+    documentType: ReferenceByIdModel;
+    user: ReferenceByIdModel;
+    versionDate: string;
+    isCurrentPublishedVersion: boolean;
+    isCurrentDraftVersion: boolean;
+    preventCleanup: boolean;
+};
+
+export type ElementVersionResponseModel = {
+    values: Array<ElementValueResponseModel>;
+    variants: Array<ElementVariantResponseModel>;
+    id: string;
+    flags: Array<FlagModel>;
+    documentType: DocumentTypeReferenceResponseModel;
+    element?: ReferenceByIdModel | null;
 };
 
 export type EnableTwoFactorRequestModel = {
@@ -1488,6 +1518,7 @@ export type MediaTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    noAccess: boolean;
     icon: string;
     isDeletable: boolean;
 };
@@ -1679,6 +1710,7 @@ export type MemberTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    noAccess: boolean;
     icon: string;
 };
 
@@ -1929,6 +1961,11 @@ export type PagedElementRecycleBinItemResponseModel = {
 export type PagedElementTreeItemResponseModel = {
     total: number;
     items: Array<ElementTreeItemResponseModel>;
+};
+
+export type PagedElementVersionItemResponseModel = {
+    total: number;
+    items: Array<ElementVersionItemResponseModel>;
 };
 
 export type PagedFileSystemTreeItemPresentationModel = {
@@ -2963,8 +3000,8 @@ export type UpdateUserDataRequestModel = {
 
 export type UpdateUserGroupRequestModel = {
     name: string;
-    description?: string | null;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -2973,6 +3010,8 @@ export type UpdateUserGroupRequestModel = {
     documentRootAccess: boolean;
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
+    elementStartNode?: ReferenceByIdModel | null;
+    elementRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
@@ -2992,6 +3031,8 @@ export type UpdateUserRequestModel = {
     hasDocumentRootAccess: boolean;
     mediaStartNodeIds: Array<ReferenceByIdModel>;
     hasMediaRootAccess: boolean;
+    elementStartNodeIds: Array<ReferenceByIdModel>;
+    hasElementRootAccess: boolean;
 };
 
 export type UpdateWebhookRequestModel = {
@@ -3066,6 +3107,7 @@ export type UserGroupItemResponseModel = {
 export type UserGroupResponseModel = {
     name: string;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -3074,12 +3116,13 @@ export type UserGroupResponseModel = {
     documentRootAccess: boolean;
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
+    elementStartNode?: ReferenceByIdModel | null;
+    elementRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
-    description?: string | null;
 };
 
 export type UserInstallRequestModel = {
@@ -3135,6 +3178,8 @@ export type UserResponseModel = {
     hasDocumentRootAccess: boolean;
     mediaStartNodeIds: Array<ReferenceByIdModel>;
     hasMediaRootAccess: boolean;
+    elementStartNodeIds: Array<ReferenceByIdModel>;
+    hasElementRootAccess: boolean;
     avatarUrls: Array<string>;
     state: UserStateModel;
     failedLoginAttempts: number;
@@ -7630,6 +7675,149 @@ export type GetDynamicRootStepsResponses = {
 
 export type GetDynamicRootStepsResponse = GetDynamicRootStepsResponses[keyof GetDynamicRootStepsResponses];
 
+export type GetElementVersionData = {
+    body?: never;
+    path?: never;
+    query: {
+        elementId: string;
+        culture?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/element-version';
+};
+
+export type GetElementVersionErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetElementVersionError = GetElementVersionErrors[keyof GetElementVersionErrors];
+
+export type GetElementVersionResponses = {
+    /**
+     * OK
+     */
+    200: PagedElementVersionItemResponseModel;
+};
+
+export type GetElementVersionResponse = GetElementVersionResponses[keyof GetElementVersionResponses];
+
+export type GetElementVersionByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/element-version/{id}';
+};
+
+export type GetElementVersionByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetElementVersionByIdError = GetElementVersionByIdErrors[keyof GetElementVersionByIdErrors];
+
+export type GetElementVersionByIdResponses = {
+    /**
+     * OK
+     */
+    200: ElementVersionResponseModel;
+};
+
+export type GetElementVersionByIdResponse = GetElementVersionByIdResponses[keyof GetElementVersionByIdResponses];
+
+export type PutElementVersionByIdPreventCleanupData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        preventCleanup?: boolean;
+    };
+    url: '/umbraco/management/api/v1/element-version/{id}/prevent-cleanup';
+};
+
+export type PutElementVersionByIdPreventCleanupErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutElementVersionByIdPreventCleanupError = PutElementVersionByIdPreventCleanupErrors[keyof PutElementVersionByIdPreventCleanupErrors];
+
+export type PutElementVersionByIdPreventCleanupResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostElementVersionByIdRollbackData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        culture?: string;
+    };
+    url: '/umbraco/management/api/v1/element-version/{id}/rollback';
+};
+
+export type PostElementVersionByIdRollbackErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostElementVersionByIdRollbackError = PostElementVersionByIdRollbackErrors[keyof PostElementVersionByIdRollbackErrors];
+
+export type PostElementVersionByIdRollbackResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostElementData = {
     body?: CreateElementRequestModel;
     path?: never;
@@ -8032,6 +8220,10 @@ export type PostElementFolderErrors = {
      */
     401: unknown;
     /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
      * Not Found
      */
     404: ProblemDetails;
@@ -8065,6 +8257,10 @@ export type DeleteElementFolderByIdErrors = {
      */
     401: unknown;
     /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
      * Not Found
      */
     404: ProblemDetails;
@@ -8093,6 +8289,10 @@ export type GetElementFolderByIdErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -8129,6 +8329,10 @@ export type PutElementFolderByIdErrors = {
      */
     401: unknown;
     /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
      * Not Found
      */
     404: ProblemDetails;
@@ -8162,6 +8366,10 @@ export type PutElementFolderByIdMoveErrors = {
      */
     401: unknown;
     /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
      * Not Found
      */
     404: ProblemDetails;
@@ -8194,6 +8402,10 @@ export type PutElementFolderByIdMoveToRecycleBinErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -8481,6 +8693,10 @@ export type GetTreeElementAncestorsErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetTreeElementAncestorsResponses = {
@@ -8509,6 +8725,10 @@ export type GetTreeElementChildrenErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetTreeElementChildrenResponses = {
@@ -8536,6 +8756,10 @@ export type GetTreeElementRootErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetTreeElementRootResponses = {
@@ -8564,6 +8788,10 @@ export type GetTreeElementSiblingsErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetTreeElementSiblingsResponses = {
