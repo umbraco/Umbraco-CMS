@@ -146,7 +146,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	#createTreeItemPickerModalToken(api: UmbPickerTreeDataSource) {
 		const supportsSearch = isPickerSearchableDataSource(api);
 
-		return new UmbModalToken<UmbTreePickerModalData<UmbTreeItemModel>, UmbTreePickerModalValue>(
+		return new UmbModalToken<UmbTreePickerModalData<UmbItemModel | UmbTreeItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
 			{
 				modal: {
@@ -157,7 +157,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 					treeAlias: UMB_ENTITY_DATA_PICKER_TREE_ALIAS,
 					hideTreeRoot: true,
 					// TODO: make specific pickable filter for tree to avoid type issues
-					pickableFilter: api.treePickableFilter,
+					pickableFilter: api.treePickableFilter as ((item: UmbItemModel | UmbTreeItemModel) => boolean) | undefined,
 					search: supportsSearch
 						? {
 								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
