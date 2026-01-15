@@ -3421,6 +3421,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
+              "default": "Ascending",
               "$ref": "#/components/schemas/DirectionModel"
             }
           },
@@ -4050,6 +4051,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
+              "default": "Descending",
               "$ref": "#/components/schemas/DirectionModel"
             }
           },
@@ -14944,6 +14946,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
+              "default": "Descending",
               "$ref": "#/components/schemas/DirectionModel"
             }
           },
@@ -15694,6 +15697,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
+              "default": "Ascending",
               "$ref": "#/components/schemas/DirectionModel"
             }
           },
@@ -16489,6 +16493,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
+              "default": "Descending",
               "$ref": "#/components/schemas/DirectionModel"
             }
           },
@@ -21234,6 +21239,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
+              "default": "Ascending",
               "$ref": "#/components/schemas/DirectionModel"
             }
           },
@@ -34717,6 +34723,7 @@
             "name": "orderBy",
             "in": "query",
             "schema": {
+              "default": "UserName",
               "$ref": "#/components/schemas/UserOrderModel"
             }
           },
@@ -34724,6 +34731,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
+              "default": "Ascending",
               "$ref": "#/components/schemas/DirectionModel"
             }
           },
@@ -43474,8 +43482,7 @@
         "enum": [
           "Ascending",
           "Descending"
-        ],
-        "default": "Ascending"
+        ]
       },
       "DisableUserRequestModel": {
         "required": [
@@ -52693,8 +52700,7 @@
           "IsApproved",
           "IsLockedOut",
           "LastLoginDate"
-        ],
-        "default": "UserName"
+        ]
       },
       "UserPermissionModel": {
         "required": [
