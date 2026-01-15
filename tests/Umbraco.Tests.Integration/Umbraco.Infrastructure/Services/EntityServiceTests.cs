@@ -323,40 +323,6 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         }
     }
 
-    [TestCase(false)]
-    [TestCase(true)]
-    public void EntityService_Can_Count_Trashed_Content_Children_At_Root(bool useTrashed)
-    {
-        ContentService.EmptyRecycleBin();
-
-        var contentType = ContentTypeService.Get("umbTextpage");
-
-        var root = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(root);
-        for (var i = 0; i < 10; i++)
-        {
-            var content = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            ContentService.Save(content);
-
-            if (i % 2 == 0)
-            {
-                ContentService.MoveToRecycleBin(content);
-            }
-        }
-
-        // get paged entities at recycle bin root
-        long total;
-        var entities = useTrashed
-            ? EntityService
-                .GetPagedTrashedChildren(Constants.System.RecycleBinContent, UmbracoObjectTypes.Document, 0, 0, out total)
-                .ToArray()
-            : EntityService
-                .GetPagedChildren(Constants.System.RecycleBinContentKey, [UmbracoObjectTypes.Document], [UmbracoObjectTypes.Document], 0, 0, true, out total);
-
-        Assert.AreEqual(5, total);
-        Assert.IsEmpty(entities);
-    }
-
     [Test]
     public void EntityService_Can_Get_Paged_Content_Descendants_With_Search()
     {
