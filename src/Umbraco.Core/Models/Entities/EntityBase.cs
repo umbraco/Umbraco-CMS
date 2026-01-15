@@ -18,7 +18,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     private bool _hasIdentity;
     private int _id;
     private Guid _key;
-    private bool _keyIsAssigned;
+    private bool _isKeyAssigned;
     private DateTime _createDate;
     private DateTime _updateDate;
 
@@ -38,7 +38,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     ///     Gets a value indicating whether the Key can be changed after the entity has identity.
     ///     Override this to return <c>true</c> for entities where Key is derived from other properties (e.g., file path).
     /// </summary>
-    protected virtual bool SupportsKeyChange => false;
+    protected virtual bool CanChangeKey => false;
 
     /// <inheritdoc />
     [DataMember]
@@ -63,7 +63,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
             //   - _keyIsAssigned: Key was previously set while entity had identity (i.e., loaded from DB or set after save)
             //   - value != Guid.Empty: not resetting the Key (allowed for cloning/identity reset)
             //   - value != _key: actually trying to change to a different value
-            if (!SupportsKeyChange && HasIdentity && _keyIsAssigned && value != Guid.Empty && value != _key)
+            if (!CanChangeKey && HasIdentity && _isKeyAssigned && value != Guid.Empty && value != _key)
             {
                 throw new InvalidOperationException($"Cannot change the Key of an existing {GetType().Name}.");
             }
@@ -78,7 +78,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
             // This prevents bypassing the immutability check by setting Key = Guid.Empty then Key = newValue.
             if (HasIdentity && value != Guid.Empty)
             {
-                _keyIsAssigned = true;
+                _isKeyAssigned = true;
             }
         }
     }
@@ -117,7 +117,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     {
         _id = default;
         _key = Guid.Empty;
-        _keyIsAssigned = false;
+        _isKeyAssigned = false;
         _hasIdentity = false;
     }
 
@@ -127,7 +127,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     /// </summary>
     [OnDeserialized]
     private void OnDeserialized(StreamingContext context) =>
-        _keyIsAssigned = HasIdentity && _key != Guid.Empty;
+        _isKeyAssigned = HasIdentity && _key != Guid.Empty;
 
     public virtual bool Equals(EntityBase? other) =>
         other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));

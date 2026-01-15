@@ -23,7 +23,7 @@ public abstract class File : EntityBase, IFile
     /// <summary>
     ///     File-based entities derive their Key from the file path, so Key must be allowed to change when the path changes.
     /// </summary>
-    protected override bool SupportsKeyChange => true;
+    protected override bool CanChangeKey => true;
 
     protected File(string path, Func<File, string?>? getFileContent = null)
     {
