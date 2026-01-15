@@ -196,7 +196,7 @@ internal sealed class ReferenceResolver
             }
         }
 
-        Debug.Assert(classification != Classification.Unknown);
+        Debug.Assert(classification != Classification.Unknown, "Assembly classification should not be unknown at this point.");
         _classifications[assembly] = classification;
         return classification;
     }

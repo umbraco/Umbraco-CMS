@@ -18,8 +18,6 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     public override async Task As_Admin_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.AdminGroupKey, "Admin");
-        UserEmail += "Admin";
-
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
@@ -28,8 +26,6 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     public override async Task As_Editor_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.EditorGroupKey, "Editor");
-        UserEmail += "Editor";
-
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
@@ -38,8 +34,6 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     public override async Task As_Sensitive_Data_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey, "SensitiveData");
-        UserEmail += "SensitiveData";
-
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
@@ -48,8 +42,6 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     public override async Task As_Translator_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey, "Translator");
-        UserEmail += "Translator";
-
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
@@ -58,8 +50,6 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     public override async Task As_Writer_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.WriterGroupKey, "Writer");
-        UserEmail += "Writer";
-
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
@@ -68,7 +58,6 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     public override async Task As_Unauthorized_I_Have_Specified_Access()
     {
         var response = await ClientRequest();
-
         Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
