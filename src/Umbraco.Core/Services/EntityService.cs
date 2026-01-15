@@ -873,7 +873,7 @@ public class EntityService : RepositoryService, IEntityService
 
             if (take == 0)
             {
-                totalRecords = CountChildren(parentId, childObjectTypes, filter: filter);
+                totalRecords = CountChildren(parentId, childObjectTypes, trashed, filter);
                 return Array.Empty<IEntitySlim>();
             }
 
