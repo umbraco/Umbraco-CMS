@@ -12,23 +12,24 @@ internal sealed class ContentVersionCultureVariationDto
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    private const string LanguageIdName = "languageId";
-    private const string VersionIdName = "versionId";
-    private const string UpdateUserIdName = "availableUserId";
-    private const string UpdateDateName = "date";
-    private const string NameName = "name";
+    private const string LanguageIdColumnName = "languageId";
+    private const string VersionIdColumnName = "versionId";
+    private const string UpdateUserIdColumnName = "availableUserId";
+    private const string UpdateDateColumnName = "date";
+    private const string NameColumnName = "name";
+
     private int? _updateUserId;
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column(VersionIdName)]
+    [Column(VersionIdColumnName)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = $"{VersionIdName},{LanguageIdName}", IncludeColumns = $"{PrimaryKeyColumnName},{NameName},{UpdateDateName},{UpdateUserIdName}")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = $"{VersionIdColumnName},{LanguageIdColumnName}", IncludeColumns = $"{PrimaryKeyColumnName},{NameColumnName},{UpdateDateColumnName},{UpdateUserIdColumnName}")]
     public int VersionId { get; set; }
 
-    [Column(LanguageIdName)]
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }
@@ -37,13 +38,13 @@ internal sealed class ContentVersionCultureVariationDto
     [Ignore]
     public string? Culture { get; set; }
 
-    [Column(NameName)]
+    [Column(NameColumnName)]
     public string? Name { get; set; }
 
-    [Column(UpdateDateName)] // TODO: db rename to 'updateDate'
+    [Column(UpdateDateColumnName)] // TODO: db rename to 'updateDate'
     public DateTime UpdateDate { get; set; }
 
-    [Column(UpdateUserIdName)] // TODO: db rename to 'updateDate'
+    [Column(UpdateUserIdColumnName)] // TODO: db rename to 'updateDate'
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? UpdateUserId

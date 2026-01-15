@@ -13,23 +13,24 @@ internal sealed class AccessRuleDto
     public const string TableName = Constants.DatabaseSchema.Tables.AccessRule;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    private const string RuleValueName = "ruleValue";
-    private const string RuleTypeName = "ruleType";
-    private const string AssessIdName = "accessId";
+    internal const string AccessIdColumnName = "accessId";
+
+    private const string RuleValueColumnName = "ruleValue";
+    private const string RuleTypeColumnName = "ruleType";
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]
     public Guid Id { get; set; }
 
-    [Column(AssessIdName)]
+    [Column(AccessIdColumnName)]
     [ForeignKey(typeof(AccessDto), Name = "FK_umbracoAccessRule_umbracoAccess_id")]
     public Guid AccessId { get; set; }
 
-    [Column(RuleValueName)]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{RuleValueName},{RuleTypeName},{AssessIdName}", Name = "IX_umbracoAccessRule")]
+    [Column(RuleValueColumnName)]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{RuleValueColumnName},{RuleTypeColumnName},{AccessIdColumnName}", Name = "IX_umbracoAccessRule")]
     public string? RuleValue { get; set; }
 
-    [Column(RuleTypeName)]
+    [Column(RuleTypeColumnName)]
     public string? RuleType { get; set; }
 
     [Column("createDate")]

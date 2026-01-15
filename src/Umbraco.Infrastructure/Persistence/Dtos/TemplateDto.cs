@@ -13,6 +13,8 @@ internal sealed class TemplateDto
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
+    internal const string ReferenceColumnName = "NodeId"; // should be NodeIdColumnName, but for database compatibility we keep it like this
+
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
@@ -28,6 +30,6 @@ internal sealed class TemplateDto
     public string? Alias { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.NodeId))]
+    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
     public NodeDto NodeDto { get; set; } = null!;
 }

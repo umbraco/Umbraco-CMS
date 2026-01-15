@@ -12,19 +12,21 @@ public class LanguageTextDto
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryValue;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
 
-    private const string LanguageIdName = "languageId";
-    private const string UniqueIdName = "UniqueId";
+    internal const string ReferenceMemberName = "UniqueId"; // for clarity in DictionaryDto reference
+
+    private const string LanguageIdColumnName = "languageId";
+    private const string UniqueIdColumnName = "UniqueId";
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
 
-    [Column(LanguageIdName)]
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto), Column = LanguageDto.PrimaryKeyColumnName)]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_languageId", ForColumns = $"{LanguageIdName},{UniqueIdName}")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_languageId", ForColumns = $"{LanguageIdColumnName},{UniqueIdColumnName}")]
     public int LanguageId { get; set; }
 
-    [Column(UniqueIdName)]
+    [Column(UniqueIdColumnName)]
     [ForeignKey(typeof(DictionaryDto), Column = DictionaryDto.UniqueIdColumnName)]
     public Guid UniqueId { get; set; }
 
