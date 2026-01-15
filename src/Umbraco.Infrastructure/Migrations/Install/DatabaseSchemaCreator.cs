@@ -109,16 +109,16 @@ public class DatabaseSchemaCreator
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IEventAggregator eventAggregator,
-            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+            IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
             _eventAggregator = eventAggregator;
-            _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V13): Rename this parameter to installDefaultDataSettings.
+        _installDefaultDataSettings = installDefaultDataSettings;
 
-        if (_database?.SqlContext?.SqlSyntax == null)
+        if (_database.SqlContext?.SqlSyntax == null)
         {
             throw new InvalidOperationException("No SqlContext has been assigned to the database");
         }
@@ -223,8 +223,13 @@ public class DatabaseSchemaCreator
     /// </remarks>
     private void ValidateDbConstraints(DatabaseSchemaResult result)
     {
-        //Check constraints in configured database against constraints in schema
+        // Check constraints in configured database against constraints in schema
         var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
+        if (constraintsInDatabase.Count == 0)
+        {
+            return;
+        }
+
         var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_"))
             .Select(x => x.Item3).ToList();
         var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_"))
@@ -234,9 +239,9 @@ public class DatabaseSchemaCreator
             x => x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
                  x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
 
-        var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name))
+        var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(y.Name)))
             .Where(x => x is not null).ToList();
-        var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
+        var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => SqlSyntax.TruncateConstraintName<ColumnDefinition>(y.PrimaryKeyName)))
             .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
         // Add valid and invalid foreign key differences to the result object
@@ -516,9 +521,16 @@ public class DatabaseSchemaCreator
 
         dataCreation.InitializeBaseData(tableName);
 
-        if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+        if (tableDefinition.Columns.Any(x => x.IsIdentity))
         {
-            _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
+            if (SqlSyntax.SupportsIdentityInsert())
+            {
+                _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
+            }
+            else if (SqlSyntax.SupportsSequences())
+            {
+                SqlSyntax.AlterSequences(_database, tableName);
+            }
         }
 
         if (overwrite)

@@ -310,22 +310,38 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
+    [Obsolete("Use the typed version OnRepositoryRefreshedTyped instead")]
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
-        ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
+        await OnRepositoryRefreshedTyped(serializer, content, preview);
+    }
 
-        string c(string s) => SqlSyntax.GetQuotedColumnName(s);
+    private async Task OnRepositoryRefreshedTyped(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
+        ContentNuDto newOrCachedEntity = GetDtoFromCacheNode(content, !preview, serializer);
 
-        await Database.InsertOrUpdateAsync(
-            dto,
-            $"SET data = @data, {c("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {c("nodeId")} = @id AND published = @published",
-            new
-            {
-                dataRaw = dto.RawData ?? Array.Empty<byte>(),
-                data = dto.Data,
-                id = dto.NodeId,
-                published = dto.Published,
-            });
+        newOrCachedEntity.RawData ??= [];
+        newOrCachedEntity.Rv++;
+        Sql<ISqlContext> existingSql = Sql()
+            .SelectAll()
+            .From<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == newOrCachedEntity.NodeId && x.Published == newOrCachedEntity.Published);
+        ContentNuDto? existingEntity = await Database.FirstOrDefaultAsync<ContentNuDto>(existingSql);
+
+        if (existingEntity is null)
+        {
+            await Database.InsertAsync(newOrCachedEntity);
+        }
+        else
+        {
+            Sql<ISqlContext> updateSql = Sql()
+                .Update<ContentNuDto>(u => u
+                    .Set(d => d.Data, newOrCachedEntity.Data)
+                    .Set(rd => rd.RawData, newOrCachedEntity.RawData)
+                    .Set(v => v.Rv, newOrCachedEntity.Rv))
+                .Where<ContentNuDto>(x => x.NodeId == newOrCachedEntity.NodeId && x.Published == newOrCachedEntity.Published);
+            await Database.ExecuteAsync(updateSql);
+        }
     }
 
     /// <summary>
