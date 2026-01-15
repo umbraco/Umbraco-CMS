@@ -147,7 +147,7 @@ public static class ContentRepositoryExtensions
     /// <summary>
     ///     Copies values from another document.
     /// </summary>
-    public static void CopyFrom(this IContent content, IPublishableContentBase other, string? culture = "*")
+    public static void CopyFrom(this IPublishableContentBase content, IPublishableContentBase other, string? culture = "*")
     {
         if (other.ContentTypeId != content.ContentTypeId)
         {

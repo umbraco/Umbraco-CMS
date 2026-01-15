@@ -22,6 +22,7 @@ public static class UserGroupExtensions
             group.Icon,
             group.StartContentId,
             group.StartMediaId,
+            group.StartElementId,
             group.Alias,
             group.AllowedLanguages,
             group.AllowedSections,

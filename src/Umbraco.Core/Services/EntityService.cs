@@ -193,6 +193,17 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
+    public virtual IEnumerable<IEntitySlim> GetAll(IEnumerable<UmbracoObjectTypes> objectTypes, params int[] ids)
+    {
+        IEnumerable<Guid> objectTypeGuids = objectTypes.Select(x => x.GetGuid());
+
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _entityRepository.GetAll(objectTypeGuids, ids);
+        }
+    }
+
+    /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType)
         => GetAll(objectType, Array.Empty<int>());
 
@@ -753,9 +764,6 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[]? ids)
     {
-        Type? entityType = objectType.GetClrType();
-        GetObjectType(entityType);
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAllPaths(objectType.GetGuid(), ids);
@@ -765,9 +773,6 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys)
     {
-        Type? entityType = objectType.GetClrType();
-        GetObjectType(entityType);
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAllPaths(objectType.GetGuid(), keys);
@@ -784,7 +789,7 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     private int CountChildren(int id, UmbracoObjectTypes objectType, bool trashed = false, IQuery<IUmbracoEntity>? filter = null) =>
-        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, trashed, filter);
+        CountChildren(id, new HashSet<UmbracoObjectTypes> { objectType }, trashed, filter);
 
     private int CountChildren(
         int id,

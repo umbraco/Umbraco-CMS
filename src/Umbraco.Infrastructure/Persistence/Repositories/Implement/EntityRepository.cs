@@ -407,6 +407,14 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
             : PerformGetAll(objectType);
 
+    public IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params int[] ids)
+    {
+        Guid[] objectTypeArray = objectTypes.ToArray();
+        return ids.Length > 0
+            ? PerformGetAll(objectTypeArray, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
+            : PerformGetAll(objectTypeArray);
+    }
+
     public IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys) =>
         keys.Length > 0
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
@@ -451,6 +459,18 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         var isElement = objectType == Constants.ObjectTypes.Element;
 
         Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, isElement, objectType, filter);
+        return GetEntities(sql, isContent, isMedia, isMember, isElement);
+    }
+
+    private IEnumerable<IEntitySlim> PerformGetAll(Guid[] objectTypes, Action<Sql<ISqlContext>>? filter = null)
+    {
+        var isContent = objectTypes.Contains(Constants.ObjectTypes.Document) ||
+                        objectTypes.Contains(Constants.ObjectTypes.DocumentBlueprint);
+        var isMedia = objectTypes.Contains(Constants.ObjectTypes.Media);
+        var isMember = objectTypes.Contains(Constants.ObjectTypes.Member);
+        var isElement = objectTypes.Contains(Constants.ObjectTypes.Element);
+
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, isElement, objectTypes, filter);
         return GetEntities(sql, isContent, isMedia, isMember, isElement);
     }
 
@@ -760,7 +780,20 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, filter, new[] { objectType });
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, filter, [objectType]);
+        return AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
+    }
+
+    // gets the full sql for multiple object types, with a given filter
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isElement,
+        Guid[] objectTypes,
+        Action<Sql<ISqlContext>>? filter)
+    {
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, filter, objectTypes);
         return AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
     }
 

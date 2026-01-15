@@ -300,6 +300,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
             Services.AddUnique<IElementService, ElementService>();
+            Services.AddUnique<IElementVersionService, ElementVersionService>();
             Services.AddUnique<IElementContainerService, ElementContainerService>();
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();

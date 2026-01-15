@@ -12,9 +12,11 @@ internal static class ElementBuilderExtensions
     {
         builder.Services.AddTransient<IElementPresentationFactory, ElementPresentationFactory>();
         builder.Services.AddTransient<IElementEditingPresentationFactory, ElementEditingPresentationFactory>();
+        builder.Services.AddTransient<IElementVersionPresentationFactory, ElementVersionPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<ElementMapDefinition>();
+            .Add<ElementMapDefinition>()
+            .Add<ElementVersionMapDefinition>();
 
         return builder;
     }

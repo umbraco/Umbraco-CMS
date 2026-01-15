@@ -16,6 +16,10 @@ public class UserResponseModel : UserPresentationBase
 
     public bool HasMediaRootAccess { get; set; }
 
+    public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
+
+    public bool HasElementRootAccess { get; set; }
+
     public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();
 
     public UserState State { get; set; }

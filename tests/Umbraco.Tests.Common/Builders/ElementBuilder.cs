@@ -256,16 +256,20 @@ public class ElementBuilder
             .WithName("Element")
             .Build();
 
-    public static Element CreateSimpleElement(IContentType contentType, string name = "Element", string? culture = null, string? segment = null)
+    public static Element CreateSimpleElement(IContentType contentType, string name = "Element", string? culture = null,
+        string? segment = null)
         => new ElementBuilder()
             .WithContentType(contentType)
             .WithName(name)
-            .WithPropertyValues(new
-            {
-                title = "This is the element title",
-                bodyText = "This is the element body text",
-                author = "Some One"
-            })
+            .WithPropertyValues(
+                new
+                {
+                    title = "This is the element title",
+                    bodyText = "This is the element body text",
+                    author = "Some One"
+                },
+                culture,
+                segment)
             .Build();
 
 }

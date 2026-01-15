@@ -9,8 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Element)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Element))]
-// TODO ELEMENTS: backoffice authorization policies
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessElements)]
 public class ElementControllerBase : ContentControllerBase
 {
 }
