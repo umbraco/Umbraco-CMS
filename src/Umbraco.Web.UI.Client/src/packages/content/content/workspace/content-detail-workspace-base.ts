@@ -431,14 +431,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this._segments.setValue([]);
 		}
 
-		// Set culture and segment for all values:
-		const cultures = this.#languages.getValue().map((x) => x.unique);
-
-		let segments: Array<string> | undefined;
-		if (this.#variesBySegment) {
-			segments = this._segments.getValue().map((s) => s.alias);
-		}
-
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
