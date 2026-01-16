@@ -24,9 +24,18 @@ public interface IEntityRepository : IRepository
     /// <param name="ids">The identifiers of the entities.</param>
     /// <remarks>If <paramref name="ids" /> is empty, returns all entities of the specified types.</remarks>
     IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params int[] ids)
-        => throw new NotImplementedException();
+        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
+
+    /// <summary>
+    ///     Gets entities of multiple object types.
+    /// </summary>
+    /// <param name="objectTypes">The object types of the entities.</param>
+    /// <param name="keys">The unique identifiers of the entities.</param>
+    /// <remarks>If <paramref name="keys" /> is empty, returns all entities of the specified types.</remarks>
+    IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params Guid[] keys)
+        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>
     /// Gets sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.

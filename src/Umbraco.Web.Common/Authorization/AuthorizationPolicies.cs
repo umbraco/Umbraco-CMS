@@ -18,6 +18,8 @@ public static class AuthorizationPolicies
 
     public const string MediaPermissionByResource = nameof(MediaPermissionByResource);
 
+    public const string ElementPermissionByResource = nameof(ElementPermissionByResource);
+
     // Single section access
     public const string SectionAccessContent = nameof(SectionAccessContent);
     public const string SectionAccessPackages = nameof(SectionAccessPackages);

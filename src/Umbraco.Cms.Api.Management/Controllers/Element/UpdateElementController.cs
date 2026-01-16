@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -12,16 +13,18 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
 [ApiVersion("1.0")]
-public class UpdateElementController : ElementControllerBase
+public class UpdateElementController : UpdateElementControllerBase
 {
     private readonly IElementEditingPresentationFactory _elementEditingPresentationFactory;
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateElementController(
+        IAuthorizationService authorizationService,
         IElementEditingPresentationFactory elementEditingPresentationFactory,
         IElementEditingService elementEditingService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : base(authorizationService)
     {
         _elementEditingPresentationFactory = elementEditingPresentationFactory;
         _elementEditingService = elementEditingService;
@@ -34,13 +37,14 @@ public class UpdateElementController : ElementControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, UpdateElementRequestModel requestModel)
-    {
-        ElementUpdateModel model = _elementEditingPresentationFactory.MapUpdateModel(requestModel);
-        Attempt<ElementUpdateResult, ContentEditingOperationStatus> result =
-            await _elementEditingService.UpdateAsync(id, model, CurrentUserKey(_backOfficeSecurityAccessor));
+        => await HandleRequest(id, requestModel, async () =>
+        {
+            ElementUpdateModel model = _elementEditingPresentationFactory.MapUpdateModel(requestModel);
+            Attempt<ElementUpdateResult, ContentEditingOperationStatus> result =
+                await _elementEditingService.UpdateAsync(id, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
-        return result.Success
-            ? Ok()
-            : ContentEditingOperationStatusResult(result.Status);
-    }
+            return result.Success
+                ? Ok()
+                : ContentEditingOperationStatusResult(result.Status);
+        });
 }
