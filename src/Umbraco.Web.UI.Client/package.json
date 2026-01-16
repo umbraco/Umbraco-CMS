@@ -145,6 +145,9 @@
 	"files": [
 		"dist-cms",
 		"examples",
+		"umbraco-package-schema.json",
+		"custom-elements.json",
+		"vscode-html-custom-data.json",
 		"README.md"
 	],
 	"repository": {
@@ -168,7 +171,7 @@
 		"backoffice:test:e2e": "npx playwright test",
 		"build-storybook": "npm run wc-analyze && storybook build",
 		"build:for:cms": "npm run build && npm run build:workspaces && npm run generate:manifest && npm run package:validate && node ./devops/build/copy-to-cms.js",
-		"build:for:npm": "npm run build -- --declaration && npm run generate:manifest && npm run package:validate",
+		"build:for:npm": "npm run build -- --declaration && npm run package:validate",
 		"build:for:static": "cross-env VITE_UMBRACO_USE_MSW=on vite build",
 		"build:vite": "tsc && vite build --mode staging",
 		"build:workspaces": "npm run build -ws --if-present",
@@ -189,7 +192,7 @@
 		"generate:icons": "node ./devops/icons/index.js",
 		"generate:overrides": "node ./devops/tsc/index.js",
 		"generate:jsonschema:imports": "node ./devops/json-schema-generator/index.js",
-		"generate:jsonschema:dist": "npm run generate:jsonschema -- --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
+		"generate:jsonschema:dist": "npm run generate:jsonschema -- --out ./umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"generate:jsonschema": "typescript-json-schema --skipLibCheck --ignoreErrors --excludePrivate --required --include \"./src/json-schema/umbraco-package-schema.ts\"",
 		"generate:check-const-test": "node ./devops/generate-check-const-test/index.js",
 		"lint:errors": "npm run lint -- --quiet",
@@ -209,8 +212,8 @@
 		"test:examples:dev": "npm run generate:check-const-test && web-test-runner --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\"",
 		"test:examples:watch": "npm run generate:check-const-test && web-test-runner --watch --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\"",
 		"test:examples:browser": "npm run generate:check-const-test && web-test-runner --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\" --manual",
-		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
-		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
+		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile ./vscode-html-custom-data.json",
+		"wc-analyze": "wca **/*.element.ts --outFile ./custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
 		"package:validate": "node ./devops/package/validate-exports.js",
