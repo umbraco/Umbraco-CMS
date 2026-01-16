@@ -45,7 +45,7 @@ export class UmbCardCollectionViewElement extends UmbCollectionViewElementBase {
 
 			#card-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				gap: var(--uui-size-space-4);
 			}
 		`,

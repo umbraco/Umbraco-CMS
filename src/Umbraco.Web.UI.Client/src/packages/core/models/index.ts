@@ -33,3 +33,16 @@ export interface UmbUniqueItemModel {
 	name: string;
 	icon?: string;
 }
+
+export interface UmbThumbnailModel {
+	src: string;
+	alt?: string;
+}
+
+export interface UmbWithThumbnailModel {
+	thumbnail: UmbThumbnailModel | null;
+}
+
+export interface UmbWithOptionalThumbnailModel {
+	thumbnail?: UmbThumbnailModel | null;
+}
