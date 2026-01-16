@@ -1,6 +1,15 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
 import { UmbUserPickerInputContext } from './user-input.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -171,7 +180,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				href=${this._modalRoute}
+				href=${ifDefined(this._modalRoute)}
 				label=${this.localize.term('general_choose')}
 				?disabled=${this.readonly}></uui-button>
 		`;
