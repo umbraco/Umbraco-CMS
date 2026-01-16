@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npx web-test-runner:*)",
-      "Bash(npm test:*)",
-      "Bash(npm run lint:*)"
-    ]
-  }
-}
