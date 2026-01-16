@@ -719,7 +719,8 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF",
+    [TestCase(
+        "E48DD82A-7059-418E-9B82-CDD5205796CF",
         8)] // Root - Child 1, Grandchild 1, Grandchild 2, Child 2, Grandchild 3, Great-grandchild 1, Child 3, Grandchild 4
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Grandchild 1, Grandchild 2
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 0)] // Grandchild 1
