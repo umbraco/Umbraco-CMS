@@ -93,7 +93,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			(query) => {
 				this._searchQuery = query?.query;
 			},
-			'umbPickerSearchQueryObserver',
+			null,
 		);
 	}
 

@@ -153,13 +153,17 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), null);
 
-		this.observe(this.#pickerContext.modalRoute, (modalRoute) => {
-			this._modalRoute = modalRoute;
-		});
+		this.observe(
+			this.#pickerContext.modalRoute,
+			(modalRoute) => {
+				this._modalRoute = modalRoute;
+			},
+			null,
+		);
 	}
 
 	protected override getFormElement() {
