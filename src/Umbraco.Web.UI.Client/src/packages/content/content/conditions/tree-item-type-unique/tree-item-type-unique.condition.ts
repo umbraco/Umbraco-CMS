@@ -15,7 +15,7 @@ export class UmbContentTreeItemTypeUniqueCondition
 		super(host, args);
 
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (context) => {
-			this.observe(context?.typeUnique, this.#check, '_UmbContentTreeItemTypeUniqueCondition');
+			this.observe((context as any)?.typeUnique, this.#check, '_UmbContentTreeItemTypeUniqueCondition');
 		});
 	}
 
