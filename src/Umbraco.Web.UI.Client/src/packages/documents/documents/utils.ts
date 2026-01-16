@@ -34,8 +34,18 @@ export const sortVariants = (a: VariantType, b: VariantType) => {
 	const compareState = (a: VariantType, b: VariantType) =>
 		getVariantStateOrderValue(a.variant) - getVariantStateOrderValue(b.variant);
 
-	const compareName = (a: VariantType, b: VariantType) => a.language?.name.localeCompare(b.language?.name || '') || 999;
+	const compareName = (a: VariantType, b: VariantType) => {
+		const nameA = a.language?.name;
+		const nameB = b.language?.name;
 
+		// If both names are missing, consider them equal.
+		if (!nameA && !nameB) return 0;
+		// If only one name is missing, sort the defined name first.
+		if (!nameA) return 1;
+		if (!nameB) return -1;
+
+		return nameA.localeCompare(nameB);
+	};
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
 };
 
