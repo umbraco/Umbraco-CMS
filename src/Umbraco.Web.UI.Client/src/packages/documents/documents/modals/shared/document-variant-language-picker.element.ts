@@ -24,7 +24,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		return this.#variantLanguageOptions;
 	}
 	public set variantLanguageOptions(value: Array<UmbDocumentVariantOptionModel>) {
-		this.#variantLanguageOptions = value.sort(sortVariants);
+		this.#variantLanguageOptions = [...value].sort(sortVariants);
 	}
 	#variantLanguageOptions: Array<UmbDocumentVariantOptionModel> = [];
 
