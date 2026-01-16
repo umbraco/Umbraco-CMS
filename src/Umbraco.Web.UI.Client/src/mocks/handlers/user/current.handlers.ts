@@ -1,82 +1,77 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
 import type { GetUserCurrentLoginProvidersResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.get(umbracoPath(`${UMB_SLUG}/current`), (_req, res, ctx) => {
+	http.get(umbracoPath(`${UMB_SLUG}/current`), () => {
 		const loggedInUser = umbUserMockDb.getCurrentUser();
-		return res(ctx.status(200), ctx.json(loggedInUser));
+		return HttpResponse.json(loggedInUser);
 	}),
-	rest.get<GetUserCurrentLoginProvidersResponse>(
-		umbracoPath(`${UMB_SLUG}/current/login-providers`),
-		(_req, res, ctx) => {
-			return res(
-				ctx.status(200),
-				ctx.json<GetUserCurrentLoginProvidersResponse>([
-					{
-						hasManualLinkingEnabled: true,
-						isLinkedOnUser: true,
-						providerKey: 'google',
-						providerSchemeName: 'Umbraco.Google',
-					},
-				]),
-			);
-		},
-	),
-	rest.get(umbracoPath(`${UMB_SLUG}/current/2fa`), (_req, res, ctx) => {
+	http.get(umbracoPath(`${UMB_SLUG}/current/login-providers`), () => {
+		return HttpResponse.json<GetUserCurrentLoginProvidersResponse>([
+			{
+				hasManualLinkingEnabled: true,
+				isLinkedOnUser: true,
+				providerKey: 'google',
+				providerSchemeName: 'Umbraco.Google',
+			},
+		]);
+	}),
+	http.get(umbracoPath(`${UMB_SLUG}/current/2fa`), () => {
 		const mfaLoginProviders = umbUserMockDb.getMfaLoginProviders();
-		return res(ctx.status(200), ctx.json(mfaLoginProviders));
+		return HttpResponse.json(mfaLoginProviders);
 	}),
-	rest.get(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), (req, res, ctx) => {
-		if (!req.params.providerName) {
-			return res(ctx.status(400));
+	http.get(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), ({ params }) => {
+		const providerName = params.providerName as string | undefined;
+		if (!providerName) {
+			return new HttpResponse(null, { status: 400 });
 		}
 
 		const mfaProviders = umbUserMockDb.getMfaLoginProviders();
-		const mfaProvider = mfaProviders.find((p) => p.providerName === req.params.providerName.toString());
+		const mfaProvider = mfaProviders.find((p) => p.providerName === providerName);
 
 		if (!mfaProvider) {
-			return res(ctx.status(404));
+			return new HttpResponse(null, { status: 404 });
 		}
 
-		return res(
-			ctx.status(200),
-			ctx.json({
-				$type: 'TwoFactorAuthInfo',
-				qrCodeSetupImageUrl: 'https://placehold.co/200x200?text=QR+Code+here',
-				secret: '8b713fc7-8f17-4f5d-b2ac-b53879c75953',
-			}),
-		);
+		return HttpResponse.json({
+			$type: 'TwoFactorAuthInfo',
+			qrCodeSetupImageUrl: 'https://placehold.co/200x200?text=QR+Code+here',
+			secret: '8b713fc7-8f17-4f5d-b2ac-b53879c75953',
+		});
 	}),
-	rest.post<{ code: string; secret: string }>(
+	http.post<{ providerName: string }, { code: string; secret: string }>(
 		umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`),
-		async (req, res, ctx) => {
-			const body = await req.json();
-			if (!req.params.providerName || !body.code || !body.secret) {
-				return res(ctx.status(400));
+		async ({ request, params }) => {
+			const providerName = params.providerName;
+			const body = await request.json();
+			if (!providerName || !body?.code || !body?.secret) {
+				return new HttpResponse(null, { status: 400 });
 			}
 
 			if (body.code === 'fail') {
-				return res(ctx.delay(), ctx.status(400));
+				return new HttpResponse(null, { status: 400 });
 			}
 
-			const result = umbUserMockDb.enableMfaProvider(req.params.providerName.toString());
-			return res(ctx.delay(), ctx.status(result ? 200 : 404));
+			const result = umbUserMockDb.enableMfaProvider(providerName);
+			return new HttpResponse(null, { status: result ? 200 : 404 });
 		},
 	),
-	rest.delete<{ code: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), (req, res, ctx) => {
-		const code = req.url.searchParams.get('code');
-		if (!req.params.providerName || !code) {
-			return res(ctx.status(400));
+	http.delete(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), ({ request, params }) => {
+		const providerName = params.providerName as string | undefined;
+		const url = new URL(request.url);
+		const code = url.searchParams.get('code');
+		if (!providerName || !code) {
+			return new HttpResponse(null, { status: 400 });
 		}
 
 		if (code === 'fail') {
-			return res(ctx.delay(), ctx.status(400));
+			return new HttpResponse(null, { status: 400 });
 		}
 
-		const result = umbUserMockDb.disableMfaProvider(req.params.providerName.toString());
-		return res(ctx.delay(), ctx.status(result ? 200 : 404));
+		const result = umbUserMockDb.disableMfaProvider(providerName);
+		return new HttpResponse(null, { status: result ? 200 : 404 });
 	}),
 ];

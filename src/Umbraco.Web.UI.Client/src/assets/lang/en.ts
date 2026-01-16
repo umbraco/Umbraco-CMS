@@ -238,6 +238,7 @@ export default {
 	},
 	content: {
 		isPublished: 'Is Published',
+		unpublishedChanges: 'Unpublished changes',
 		about: 'About this page',
 		alias: 'Alias',
 		alternativeTextHelp: '(how would you describe the picture over the phone)',
@@ -275,6 +276,7 @@ export default {
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
 		routeErrorCannotRoute: 'This document is published but its URL cannot be routed',
+		protected: 'Protected',
 		publish: 'Publish',
 		published: 'Published',
 		publishedPendingChanges: 'Published (pending changes)',
@@ -287,6 +289,7 @@ export default {
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
+		scheduledPublishing: 'Scheduled publishing',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
@@ -2870,6 +2873,7 @@ export default {
 		modalManual: 'Manual',
 		modalAnchorValidationMessage:
 			'Please enter an anchor or querystring, select a document or media item, or manually configure the URL.',
+		modalUrlOrAnchorValidationMessage: 'Please enter an URL or Anchor.',
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',

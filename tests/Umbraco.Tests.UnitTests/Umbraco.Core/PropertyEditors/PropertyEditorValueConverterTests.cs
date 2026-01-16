@@ -95,8 +95,14 @@ public class PropertyEditorValueConverterTests
             .Returns(new PublishedDataType(123, "test", "test", new Lazy<object>(() => new DropDownFlexibleConfiguration { Multiple = true })));
 
         var publishedPropType = new PublishedPropertyType(
-            new PublishedContentType(Guid.NewGuid(), 1234, "test", PublishedItemType.Content,
-                Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
+            new PublishedContentType(
+                Guid.NewGuid(),
+                1234,
+                "test",
+                PublishedItemType.Content,
+                Enumerable.Empty<string>(),
+                Enumerable.Empty<PublishedPropertyType>(),
+                ContentVariation.Nothing),
             new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
             new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()),
             Mock.Of<IPublishedModelFactory>(),

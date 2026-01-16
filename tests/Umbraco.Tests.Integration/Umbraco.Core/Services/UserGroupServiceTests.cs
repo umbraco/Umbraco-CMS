@@ -11,14 +11,93 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
+internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
     private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
 
     [Test]
-    public async Task Cannot_create_user_group_with_name_equals_null()
+    public async Task Can_Create_User_Group()
+    {
+        var allowedSections = new[] { "content", "media", "settings" };
+        var userGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "Some Name",
+            Alias = "someAlias",
+            Description = "This is a test user group description",
+            Icon = "icon-users",
+            HasAccessToAllLanguages = true,
+            Permissions = new HashSet<string> { "A", "B", "C" }
+        };
+
+        foreach (var allowedSection in allowedSections)
+        {
+            userGroup.AddAllowedSection(allowedSection);
+        }
+
+        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        var createdUserGroup = await UserGroupService.GetAsync(result.Result.Key);
+
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(createdUserGroup);
+        Assert.AreEqual(userGroup.Name, createdUserGroup.Name);
+        Assert.AreEqual(userGroup.Alias, createdUserGroup.Alias);
+        Assert.AreEqual(userGroup.Description, createdUserGroup.Description);
+        Assert.AreEqual(userGroup.Icon, createdUserGroup.Icon);
+        Assert.AreEqual(userGroup.HasAccessToAllLanguages, createdUserGroup.HasAccessToAllLanguages);
+        CollectionAssert.AreEquivalent(userGroup.Permissions, createdUserGroup.Permissions);
+        CollectionAssert.AreEquivalent(userGroup.AllowedSections, createdUserGroup.AllowedSections);
+    }
+
+    [Test]
+    public async Task Can_Update_User_Group()
+    {
+        var allowedSections = new[] { "content", "media", "settings" };
+        var userGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "Some Name",
+            Alias = "someAlias",
+            Description = "This is a test user group description",
+            Icon = "icon-users",
+            HasAccessToAllLanguages = true,
+            Permissions = new HashSet<string> { "A", "B", "C" }
+        };
+
+        foreach (var allowedSection in allowedSections)
+        {
+            userGroup.AddAllowedSection(allowedSection);
+        }
+
+        var createResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        var createdUserGroup = await UserGroupService.GetAsync(createResult.Result.Key);
+
+        Assert.IsTrue(createResult.Success);
+        createdUserGroup.Name = "Updated Name";
+        createdUserGroup.Alias = "updatedAlias";
+        createdUserGroup.Description = "Updated description";
+        createdUserGroup.Icon = "icon-user";
+        createdUserGroup.HasAccessToAllLanguages = false;
+        createdUserGroup.Permissions = new HashSet<string> { "X", "Y", "Z" };
+        createdUserGroup.ClearAllowedSections();
+        createdUserGroup.AddAllowedSection("users");
+
+        var updateResult = await UserGroupService.UpdateAsync(createdUserGroup, Constants.Security.SuperUserKey);
+        var updatedUserGroup = await UserGroupService.GetAsync(updateResult.Result.Key);
+
+        Assert.IsTrue(updateResult.Success);
+        Assert.IsNotNull(updatedUserGroup);
+        Assert.AreEqual(createdUserGroup.Name, updatedUserGroup.Name);
+        Assert.AreEqual(createdUserGroup.Alias, updatedUserGroup.Alias);
+        Assert.AreEqual(createdUserGroup.Description, updatedUserGroup.Description);
+        Assert.AreEqual(createdUserGroup.Icon, updatedUserGroup.Icon);
+        Assert.AreEqual(createdUserGroup.HasAccessToAllLanguages, updatedUserGroup.HasAccessToAllLanguages);
+        CollectionAssert.AreEquivalent(createdUserGroup.Permissions, updatedUserGroup.Permissions);
+        CollectionAssert.AreEquivalent(createdUserGroup.AllowedSections, updatedUserGroup.AllowedSections);
+    }
+
+    [Test]
+    public async Task Cannot_Create_User_Group_With_Name_Equals_Null()
     {
         var userGroup = new UserGroup(ShortStringHelper)
         {
@@ -32,7 +111,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_create_user_group_with_name_longer_than_max_length()
+    public async Task Cannot_Create_User_Group_With_Name_Longer_Than_Max_Length()
     {
         var userGroup = new UserGroup(ShortStringHelper)
         {
@@ -46,7 +125,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_create_user_group_with_alias_longer_than_max_length()
+    public async Task Cannot_Create_User_Group_With_Alias_Longer_Than_Max_Length()
     {
         var userGroup = new UserGroup(ShortStringHelper)
         {
@@ -61,7 +140,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_update_non_existing_user_group()
+    public async Task Cannot_Update_Non_Existing_User_Group()
     {
         var userGroup = new UserGroup(ShortStringHelper)
         {
@@ -76,7 +155,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_create_existing_user_group()
+    public async Task Cannot_Create_Existing_User_Group()
     {
         var userGroup = new UserGroup(ShortStringHelper)
         {
@@ -95,7 +174,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_create_user_group_with_duplicate_alias()
+    public async Task Cannot_Create_User_Group_With_Duplicate_Alias()
     {
         var alias = "duplicateAlias";
 
@@ -119,7 +198,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_update_user_group_with_duplicate_alias()
+    public async Task Cannot_Update_User_Group_With_Duplicate_Alias()
     {
         var alias = "duplicateAlias";
 
@@ -150,7 +229,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Update_UserGroup_To_New_Name()
+    public async Task Can_Update_User_Group_To_New_Name()
     {
         var userGroup = new UserGroup(ShortStringHelper)
         {
@@ -172,7 +251,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
     [TestCase(Constants.Security.AdminGroupKeyString, "admin")]
     [TestCase(Constants.Security.SensitiveDataGroupKeyString, "sensitiveData")]
     [TestCase(Constants.Security.TranslatorGroupString, "translator")]
-    public async Task Cannot_Delete_System_UserGroups(string userGroupKeyAsString, string expectedGroupAlias)
+    public async Task Cannot_Delete_System_User_Group(string userGroupKeyAsString, string expectedGroupAlias)
     {
         // since we can't use the constants as input, let's make sure we don't get false positives by double checking the group alias
         var key = Guid.Parse(userGroupKeyAsString);
@@ -188,7 +267,7 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
 
     [TestCase( Constants.Security.EditorGroupKeyString, "editor")]
     [TestCase(Constants.Security.WriterGroupKeyString, "writer")]
-    public async Task Can_Delete_Non_System_UserGroups(string userGroupKeyAsString, string expectedGroupAlias)
+    public async Task Can_Delete_Non_System_User_Group(string userGroupKeyAsString, string expectedGroupAlias)
     {
         // since we can't use the constants as input, let's make sure we don't get false positives by double checking the group alias
         var key = Guid.Parse(userGroupKeyAsString);

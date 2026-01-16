@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbDocumentBlueprintMockDb } from '../../data/document-blueprint/document-blueprint.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
@@ -8,53 +8,53 @@ import type {
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [
-	rest.post(umbracoPath(`${UMB_SLUG}`), async (req, res, ctx) => {
-		const requestBody = (await req.json()) as CreateDocumentRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
+	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {
+		const requestBody = (await request.json()) as CreateDocumentRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
 
 		const id = umbDocumentBlueprintMockDb.detail.create(requestBody);
 
-		return res(
-			ctx.status(201),
-			ctx.set({
-				Location: req.url.href + '/' + id,
+		return new HttpResponse(null, {
+			status: 201,
+			headers: {
+				Location: request.url + '/' + id,
 				'Umb-Generated-Resource': id,
-			}),
-		);
+			},
+		});
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 		const response = umbDocumentBlueprintMockDb.detail.read(id);
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
-		const requestBody = (await req.json()) as UpdateDocumentRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		const requestBody = (await request.json()) as UpdateDocumentRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
 		umbDocumentBlueprintMockDb.detail.update(id, requestBody);
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 
-	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.delete(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 		umbDocumentBlueprintMockDb.detail.delete(id);
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 ];

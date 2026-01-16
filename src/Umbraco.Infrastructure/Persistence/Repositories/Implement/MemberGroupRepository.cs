@@ -34,7 +34,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
             cacheSyncService) =>
         _eventMessagesFactory = eventMessagesFactory;
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
+    private Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
 
     public IMemberGroup? Get(Guid uniqueId)
     {
