@@ -7,6 +7,8 @@ import type {
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
 } from './types.js';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -14,12 +16,15 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {
+	#imagingRepository = new UmbImagingRepository(this);
+
 	@property({ attribute: false })
 	set value(value) {
 		if (!value) {
 			this.crops = [];
 			this.focalPoint = { left: 0.5, top: 0.5 };
 			this.src = '';
+			this._resizedSrc = '';
 			this.#value = undefined;
 		} else {
 			this.crops = [...value.crops];
@@ -27,6 +32,8 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			this.focalPoint = value.focalPoint || { left: 0.5, top: 0.5 };
 			this.src = value.src;
 			this.#value = value;
+			// Load resized image for better performance
+			this.#getResizedImageUrl();
 		}
 
 		this.requestUpdate();
@@ -70,9 +77,16 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	src = '';
 
 	@state()
+	_resizedSrc = '';
+
+	@state()
 	private _serverUrl = '';
 
 	get source(): string {
+		if (this._resizedSrc) {
+			return this._resizedSrc;
+		}
+		
 		if (this.src) {
 			// Test that URL is relative:
 			if (this.src.startsWith('/')) {
@@ -97,6 +111,41 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		super.disconnectedCallback();
 		if (this.fileDataUrl) {
 			URL.revokeObjectURL(this.fileDataUrl);
+		}
+	}
+
+	// Get resized image URL for better performance
+	async #getResizedImageUrl(): Promise<void> {
+		if (!this.src || this.fileDataUrl) {
+			this._resizedSrc = '';
+			return;
+		}
+
+		try {
+			// Extract unique from src if it's a media URL
+			const uniqueMatch = this.src.match(/\/media\/([^\/]+)/);
+			if (!uniqueMatch) {
+				this._resizedSrc = '';
+				return;
+			}
+
+			const unique = uniqueMatch[1];
+			
+			// Request resized image (max 2000x2000 for good performance)
+			const { data } = await this.#imagingRepository.requestResizedItems([unique], {
+				width: 2000,
+				height: 2000,
+				mode: ImageCropModeModel.MAX,
+			});
+
+			if (data?.[0]?.url) {
+				this._resizedSrc = data[0].url;
+			} else {
+				this._resizedSrc = '';
+			}
+		} catch (error) {
+			console.warn('Failed to get resized image URL, falling back to original:', error);
+			this._resizedSrc = '';
 		}
 	}
 

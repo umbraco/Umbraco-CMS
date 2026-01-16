@@ -38,6 +38,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 	#isDragging = false;
 	#mouseOffsetX = 0;
 	#mouseOffsetY = 0;
+	#isLoading = false;
 
 	get #getImageScale() {
 		return lerp(this.#minImageScale, this.#maxImageScale, this.#zoom);
@@ -78,9 +79,14 @@ export class UmbImageCropperElement extends UmbLitElement {
 
 		await this.updateComplete; // Wait for the @query to be resolved
 
+		// Show loading state if image is not complete
 		if (!this.imageElement.complete) {
+			this.#isLoading = true;
 			// Wait for the image to load
-			await new Promise((resolve) => (this.imageElement.onload = () => resolve(this.imageElement)));
+			await new Promise((resolve) => (this.imageElement.onload = () => {
+				this.#isLoading = false;
+				resolve(this.imageElement);
+			}));
 		}
 
 		const viewportWidth = this.viewportElement.clientWidth;
@@ -319,7 +325,12 @@ export class UmbImageCropperElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="viewport">
-				<img id="image" src=${this.src} alt="" />
+				${this.#isLoading ? 
+					html`<div id="loading-overlay">
+						<uui-loader></uui-loader>
+					</div>` : 
+					html`<img id="image" src=${this.src} alt="" />`
+				}
 				<div id="mask"></div>
 			</div>
 			<uui-slider
@@ -387,6 +398,18 @@ export class UmbImageCropperElement extends UmbLitElement {
 			display: block;
 			position: absolute;
 			user-select: none;
+		}
+
+		#loading-overlay {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: rgba(255, 255, 255, 0.8);
 		}
 
 		#viewport #image {
