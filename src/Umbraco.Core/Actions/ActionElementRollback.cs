@@ -12,7 +12,7 @@ public class ActionElementRollback : IAction
     public const string ActionLetter = "Umb.Element.Rollback";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
-    public const string ActionAlias = "elementRollback";
+    public const string ActionAlias = "elementrollback";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

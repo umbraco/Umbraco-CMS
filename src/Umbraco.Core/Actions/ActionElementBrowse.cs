@@ -17,7 +17,7 @@ public class ActionElementBrowse : IAction
     public const string ActionLetter = "Umb.Element.Read";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementBrowse";
+    public const string ActionAlias = "elementbrowse";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

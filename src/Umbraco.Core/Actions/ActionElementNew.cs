@@ -12,7 +12,7 @@ public class ActionElementNew : IAction
     public const string ActionLetter = "Umb.Element.Create";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementNew";
+    public const string ActionAlias = "elementcreate";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

@@ -12,7 +12,7 @@ public class ActionElementMove : IAction
     public const string ActionLetter = "Umb.Element.Move";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementMove";
+    public const string ActionAlias = "elementmove";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

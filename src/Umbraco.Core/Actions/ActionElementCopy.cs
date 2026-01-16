@@ -12,7 +12,7 @@ public class ActionElementCopy : IAction
     public const string ActionLetter = "Umb.Element.Duplicate";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementCopy";
+    public const string ActionAlias = "elementcopy";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

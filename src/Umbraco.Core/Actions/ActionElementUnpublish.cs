@@ -12,7 +12,7 @@ public class ActionElementUnpublish : IAction
     public const string ActionLetter = "Umb.Element.Unpublish";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementUnpublish";
+    public const string ActionAlias = "elementunpublish";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

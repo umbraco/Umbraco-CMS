@@ -12,7 +12,7 @@ public class ActionElementDelete : IAction
     public const string ActionLetter = "Umb.Element.Delete";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementDelete";
+    public const string ActionAlias = "elementdelete";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;
