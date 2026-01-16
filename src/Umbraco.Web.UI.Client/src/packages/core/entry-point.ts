@@ -11,7 +11,7 @@ import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
-// Ensure the load of some package for their global components(Which are exported as part of the import-map, those where its not have deep imports here):
+// Ensure the load of some package for their global components(Which are exported as part of the import-map, those where it's not have deep imports here):
 import '@umbraco-cms/backoffice/collection';
 import '@umbraco-cms/backoffice/entity-sign';
 import '@umbraco-cms/backoffice/extension-registry';
