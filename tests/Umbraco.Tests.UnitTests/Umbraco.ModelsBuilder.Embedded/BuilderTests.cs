@@ -789,11 +789,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [TestCase("global::System.Collections.Generic.IEnumerable<int>", typeof(IEnumerable<int>))]
     [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1", typeof(BuilderTestsClass1))]
     [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTests.Class1", typeof(Class1))]
-    public void WriteClrType(string expected, Type input)
+    public void WriteClrType_Type(string expected, Type input)
     {
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+#pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
 #pragma warning disable CS0618 // Type or member is obsolete
         builder.WriteClrType(sb, input);
@@ -805,11 +807,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [TestCase("global::System.Collections.Generic.IEnumerable<int>", typeof(IEnumerable<int>))]
     [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1", typeof(BuilderTestsClass1))]
     [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTests.Class1", typeof(Class1))]
-    public void WriteClrTypeUsing(string expected, Type input)
+    public void WriteClrType_Type_WithUsing(string expected, Type input)
     {
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder");
         builder.ModelsNamespaceForTests = "ModelsNamespace";
         var sb = new StringBuilder();
@@ -820,9 +824,11 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     }
 
     [Test]
-    public void WriteClrType_WithUsing()
+    public void WriteClrType_Type_StringBuilder_WithUsing()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.Using.Add("System.Text");
         builder.ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
         var sb = new StringBuilder();
@@ -836,12 +842,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     }
 
     [Test]
-    public void WriteClrTypeAnother_WithoutUsing()
+    public void WriteClrType_Type_StringBuilder_WithoutUsing()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder
         {
             ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models",
         };
+#pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
 #pragma warning disable CS0618 // Type or member is obsolete
         builder.WriteClrType(sb, typeof(StringBuilder));
@@ -850,9 +858,11 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     }
 
     [Test]
-    public void WriteClrType_Ambiguous1()
+    public void WriteClrType_Type_Ambiguous1()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeRandomNamespace";
@@ -867,9 +877,11 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     }
 
     [Test]
-    public void WriteClrType_Ambiguous()
+    public void WriteClrType_Type_Ambiguous()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeBorkedNamespace";
@@ -884,9 +896,11 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     }
 
     [Test]
-    public void WriteClrType_Ambiguous2()
+    public void WriteClrType_Type_Ambiguous2()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeRandomNamespace";
@@ -901,9 +915,11 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     }
 
     [Test]
-    public void WriteClrType_AmbiguousNot()
+    public void WriteClrType_Type_AmbiguousNot()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
@@ -918,9 +934,11 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     }
 
     [Test]
-    public void WriteClrType_AmbiguousWithNested()
+    public void WriteClrType_Type_AmbiguousWithNested()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeRandomNamespace";
@@ -937,7 +955,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_String_SimpleType()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+#pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Int32");
         Assert.AreEqual("int", sb.ToString());
@@ -946,7 +966,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_String_SingleLevelGeneric()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+#pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Collections.Generic.IEnumerable<System.Int32>");
         Assert.AreEqual("global::System.Collections.Generic.IEnumerable<int>", sb.ToString());
@@ -955,7 +977,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_String_MultipleTypeParams()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+#pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Collections.Generic.Dictionary<System.String, System.Int32>");
         Assert.AreEqual("global::System.Collections.Generic.Dictionary<string, int>", sb.ToString());
@@ -964,7 +988,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_String_NestedGeneric_TupleInList()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+#pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
 
         // This is the format produced by ModelType.MapToName() - tests the string-based WriteClrType overload
@@ -976,10 +1002,23 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_String_DeeplyNestedGeneric()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+#pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Collections.Generic.Dictionary<System.String, System.Collections.Generic.List<System.Tuple<System.Int32, System.String>>>");
         Assert.AreEqual("global::System.Collections.Generic.Dictionary<string, global::System.Collections.Generic.List<global::System.Tuple<int, string>>>", sb.ToString());
+    }
+
+    [Test]
+    public void WriteClrType_String_MultipleNestedGenericsAtSameLevel()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+#pragma warning restore CS0618 // Type or member is obsolete
+        var sb = new StringBuilder();
+        builder.WriteClrType(sb, "System.Collections.Generic.Dictionary<System.Tuple<System.Int32, System.Int32>, System.Tuple<System.String, System.String>>");
+        Assert.AreEqual("global::System.Collections.Generic.Dictionary<global::System.Tuple<int, int>, global::System.Tuple<string, string>>", sb.ToString());
     }
 
     public class Class1

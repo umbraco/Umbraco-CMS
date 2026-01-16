@@ -42,7 +42,14 @@ public class TextBuilder : Builder
     {
     }
 
-    // internal for unit tests only
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TextBuilder"/> class.
+    /// </summary>
+    /// <remarks>
+    /// Internal for unit tests only.
+    /// </remarks>
+    // TODO (V19): Remove obsoletion and make internal (so still available for unit tests). Also remove pragma warning disable CS0618 in BuilderTests.
+    [Obsolete("This constructor is not expected to be called from external libraries. Scheduled to be made internal in Umbraco 19.")]
     public TextBuilder()
     {
     }
@@ -112,6 +119,12 @@ public class TextBuilder : Builder
         sb.Append("}\n");
     }
 
+    /// <summary>
+    /// Appends a string representation of the specified CLR type to the provided <see cref="StringBuilder"/>, including
+    /// generic type arguments if present.
+    /// </summary>
+    /// <param name="sb">The <see cref="StringBuilder"/> instance to which the type representation will be appended.</param>
+    /// <param name="type">The <see cref="Type"/> to represent as a string, including its generic arguments if applicable.</param>
     // TODO (V19): Remove obsoletion and make internal (so still available for unit tests). Also remove pragma warning disable CS0618 in BuilderTests.
     [Obsolete("This method is not expected to be called from external libraries. Scheduled to be made internal in Umbraco 19.")]
     public void WriteClrType(StringBuilder sb, Type type)
@@ -121,7 +134,7 @@ public class TextBuilder : Builder
         if (type.IsGenericType)
         {
             var p = s.IndexOf('`');
-            WriteNonGenericClrType(sb, s.Substring(0, p));
+            WriteNonGenericClrType(sb, s[..p]);
             sb.Append("<");
             Type[] args = type.GetGenericArguments();
             for (var i = 0; i < args.Length; i++)
@@ -181,7 +194,7 @@ public class TextBuilder : Builder
                 break;
             }
 
-            yield return error.Substring(p, n - p);
+            yield return error[p..n];
             p = n + 1;
         }
 
@@ -330,7 +343,7 @@ public class TextBuilder : Builder
         // write the properties
         foreach (PropertyModel prop in type.Properties.OrderBy(x => x.ClrName))
         {
-            WriteProperty(sb, type, prop, staticMixinGetters && type.IsMixin ? type.ClrName : null);
+            WriteProperty(sb, prop, staticMixinGetters && type.IsMixin ? type.ClrName : null);
         }
 
         // no need to write the parent properties since we inherit from the parent
@@ -348,7 +361,7 @@ public class TextBuilder : Builder
                 }
                 else
                 {
-                    WriteProperty(sb, mixinType, prop);
+                    WriteProperty(sb, prop);
                 }
             }
         }
@@ -404,7 +417,7 @@ public class TextBuilder : Builder
             MixinStaticGetterName(property.ClrName));
     }
 
-    private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string? mixinClrName = null)
+    private void WriteProperty(StringBuilder sb, PropertyModel property, string? mixinClrName = null)
     {
         var mixinStatic = mixinClrName != null;
 
@@ -606,6 +619,12 @@ public class TextBuilder : Builder
         }
     }
 
+    /// <summary>
+    /// Appends a formatted representation of a CLR type name, including generic type arguments, to the specified
+    /// StringBuilder.
+    /// </summary>
+    /// <param name="sb">The <see cref="StringBuilder"/> instance to which the type representation will be appended.</param>
+    /// <param name="type">The <see cref="string"/> representing the full name of the type, including its generic arguments if applicable.</param>
     internal void WriteClrType(StringBuilder sb, string type)
     {
         var p = type.IndexOf('<');
@@ -615,7 +634,7 @@ public class TextBuilder : Builder
             sb.Append("<");
 
             var argsString = type[(p + 1)..].TrimEnd(Constants.CharArrays.GreaterThan);
-            var args = SplitGenericArguments(argsString);
+            IReadOnlyList<string> args = SplitGenericArguments(argsString);
 
             for (var i = 0; i < args.Count; i++)
             {
@@ -707,15 +726,15 @@ public class TextBuilder : Builder
         var p = typeName.LastIndexOf('.');
         if (p > 0)
         {
-            var x = typeName.Substring(0, p);
+            var x = typeName[..p];
             if (Using.Contains(x))
             {
-                typeName = typeName.Substring(p + 1);
+                typeName = typeName[(p + 1)..];
                 typeUsing = x;
             }
             else if (x == ModelsNamespace) // that one is used by default
             {
-                typeName = typeName.Substring(p + 1);
+                typeName = typeName[(p + 1)..];
                 typeUsing = ModelsNamespace;
             }
         }
@@ -726,7 +745,7 @@ public class TextBuilder : Builder
         // symbol to test is the first part of the name
         // so if type name is Foo.Bar.Nil we want to ensure that Foo is not ambiguous
         p = typeName.IndexOf('.');
-        var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
+        var symbol = p > 0 ? typeName[..p] : typeName;
 
         // what we should find - WITHOUT any generic <T> thing - just the type
         // no 'using' = the exact symbol
@@ -753,7 +772,7 @@ public class TextBuilder : Builder
         // note: all-or-nothing, not trying to segment the using clause
         typeName = s.Replace("+", ".");
         p = typeName.IndexOf('.');
-        symbol = typeName.Substring(0, p);
+        symbol = typeName[..p];
         match = symbol;
 
         // still ambiguous, must prepend global::
