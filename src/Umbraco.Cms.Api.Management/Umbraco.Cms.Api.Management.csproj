@@ -19,7 +19,7 @@
       [CS1573] param tag for all parameters
       [CS1574] unresolveable cref
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,CS0108,CS0618,CS9042,CS1998,CS8524,IDE0060,SA1649,CS0419,CS1573,CS1574</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,CS0108,CS0618,CS9042,CS1998,CS8524,IDE0060,CS0419,CS1573,CS1574</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
