@@ -97,7 +97,7 @@ describe('UmbIsRoutableContextCondition', () => {
 		});
 	});
 
-	describe('without route context', () => {
+	describe('without route context directly available', () => {
 		let hostElement: UmbTestControllerHostElement;
 		let condition: UmbIsRoutableContextCondition;
 
