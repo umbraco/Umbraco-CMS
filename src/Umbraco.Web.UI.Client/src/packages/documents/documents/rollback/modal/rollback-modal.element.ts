@@ -383,9 +383,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				<uui-checkbox
 					label=${this.localize.term('rollback_showDiff')}
 					@change=${this.#onToggleDiff}
-					.checked=${this._showDiff}>
-					${this.localize.term('rollback_showDiff')}
-				</uui-checkbox>
+					.checked=${this._showDiff}></uui-checkbox>
 				${this._showDiff ? html`<p>${unsafeHTML(this.localize.term('rollback_diffHelp'))}</p>` : nothing}
 				<uui-table>
 					<uui-table-column style="width: 0"></uui-table-column>
