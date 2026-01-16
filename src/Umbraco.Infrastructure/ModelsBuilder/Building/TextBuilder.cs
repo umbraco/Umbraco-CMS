@@ -658,6 +658,7 @@ public class TextBuilder : Builder
     /// Splits generic type arguments while respecting nested generic brackets.
     /// For example, "Tuple&lt;string, string&gt;, int" splits into ["Tuple&lt;string, string&gt;", "int"].
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the input has mismatched generic type brackets.</exception>
     private static IReadOnlyList<string> SplitGenericArguments(string argsString)
     {
         var result = new List<string>();
@@ -674,6 +675,11 @@ public class TextBuilder : Builder
                     break;
                 case '>':
                     depth--;
+                    if (depth < 0)
+                    {
+                        throw new ArgumentException("Mismatched generic type brackets: too many closing brackets.", nameof(argsString));
+                    }
+
                     currentArg.Append(c);
                     break;
                 case ',':
@@ -692,6 +698,11 @@ public class TextBuilder : Builder
                     currentArg.Append(c);
                     break;
             }
+        }
+
+        if (depth != 0)
+        {
+            throw new ArgumentException("Mismatched generic type brackets: unclosed brackets.", nameof(argsString));
         }
 
         var lastArg = currentArg.ToString().Trim();
