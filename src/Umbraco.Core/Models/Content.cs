@@ -120,9 +120,8 @@ public class Content : PublishableContentBase, IContent
     public IContent DeepCloneWithResetIdentities()
     {
         var clone = (Content)DeepClone();
-        clone.Key = Guid.Empty;
-        clone.VersionId = clone.PublishedVersionId = 0;
         clone.ResetIdentity();
+        clone.VersionId = clone.PublishedVersionId = 0;
 
         foreach (IProperty property in clone.Properties)
         {

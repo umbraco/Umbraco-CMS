@@ -4,6 +4,7 @@ public static partial class Constants
 {
     public static class Telemetry
     {
+        // TODO (V18): Convert these static fields to const to comply with SA1401 (fields should be private)
         public static string RootCount = "RootCount";
         public static string DomainCount = "DomainCount";
         public static string ExamineIndexCount = "ExamineIndexCount";

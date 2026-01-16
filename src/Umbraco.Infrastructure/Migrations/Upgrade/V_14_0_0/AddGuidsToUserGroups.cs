@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -47,15 +47,15 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         ScopeDatabase(scope);
 
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-        AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);
+        AddColumnIfNotExists<TargetUserGroupDto>(columns, NewColumnName);
 
         var nodeDtoTrashedIndex = $"IX_umbracoUserGroup_userGroupKey";
-        CreateIndex<UserGroupDto>(nodeDtoTrashedIndex);
+        CreateIndex<TargetUserGroupDto>(nodeDtoTrashedIndex);
 
         // We want specific keys for the default user groups, so we need to fetch the user groups again to set their keys.
-        List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>();
+        List<TargetUserGroupDto>? userGroups = Database.Fetch<TargetUserGroupDto>();
 
-        foreach (UserGroupDto userGroup in userGroups)
+        foreach (TargetUserGroupDto userGroup in userGroups)
         {
             userGroup.Key = ResolveAliasToGuid(userGroup.Alias);
             Database.Update(userGroup);
@@ -94,7 +94,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
     private void MigrateColumnSqlite()
     {
-        IEnumerable<UserGroupDto> groups = Database.Fetch<OldUserGroupDto>().Select(x => new UserGroupDto
+        IEnumerable<TargetUserGroupDto> groups = Database.Fetch<SourceUserGroupDto>().Select(x => new TargetUserGroupDto
         {
             Id = x.Id,
             Key = ResolveAliasToGuid(x.Alias),
@@ -116,10 +116,10 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         // So instead of going through the trouble of creating a new table, copying over data, and then deleting
         // We can just drop the table directly and re-create it to add the new column.
         Delete.Table(Constants.DatabaseSchema.Tables.UserGroup).Do();
-        Create.Table<UserGroupDto>().Do();
+        Create.Table<TargetUserGroupDto>().Do();
 
         // We have to insert one at a time to be able to not auto increment the id.
-        foreach (UserGroupDto group in groups)
+        foreach (TargetUserGroupDto group in groups)
         {
             Database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, group);
         }
@@ -136,15 +136,18 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             _ => Guid.NewGuid(),
         };
 
+    /// <summary>
+    /// Represents the UserGroupDto before the migration to 14.0.0.
+    /// </summary>
     [TableName(Constants.DatabaseSchema.Tables.UserGroup)]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    private class OldUserGroupDto
+    private class SourceUserGroupDto
     {
-        public OldUserGroupDto()
+        public SourceUserGroupDto()
         {
-            UserGroup2AppDtos = new List<UserGroup2AppDto>();
-            UserGroup2LanguageDtos = new List<UserGroup2LanguageDto>();
+            UserGroup2AppDtos = [];
+            UserGroup2LanguageDtos = [];
         }
 
         [Column("id")]
@@ -204,6 +207,104 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
         /// <summary>
         ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts).
+        /// </summary>
+        [ResultColumn]
+        public int UserCount { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the UserGroupDto after the migration to 14.0.0.
+    /// </summary>
+    /// <remarks>
+    /// Note that this isn't the same as <see cref="UserGroupDto"/> defined in Persistence/Dtos, as this has had further
+    /// changes since this migration was designed (e.g. the addition of Description). If we use that directly we'll
+    /// get exceptions in this migration step on updates.
+    /// </remarks>
+    [TableName(Constants.DatabaseSchema.Tables.UserGroup)]
+    [PrimaryKey("id")]
+    [ExplicitColumns]
+    private class TargetUserGroupDto
+    {
+        public TargetUserGroupDto()
+        {
+            UserGroup2AppDtos = [];
+            UserGroup2LanguageDtos = [];
+            UserGroup2PermissionDtos = [];
+            UserGroup2GranularPermissionDtos = [];
+        }
+
+        [Column("id")]
+        [PrimaryKeyColumn(IdentitySeed = 6)]
+        public int Id { get; set; }
+
+        [Column("key")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.NewGuid)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupKey")]
+        public Guid Key { get; set; }
+
+        [Column("userGroupAlias")]
+        [Length(200)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupAlias")]
+        public string? Alias { get; set; }
+
+        [Column("userGroupName")]
+        [Length(200)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupName")]
+        public string? Name { get; set; }
+
+        [Column("userGroupDefaultPermissions")]
+        [Length(50)]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Obsolete("Is not used anymore Use UserGroup2PermissionDtos instead. This will be removed in Umbraco 18.")]
+        public string? DefaultPermissions { get; set; }
+
+        [Column("createDate")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+        public DateTime CreateDate { get; set; }
+
+        [Column("updateDate")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+        public DateTime UpdateDate { get; set; }
+
+        [Column("icon")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string? Icon { get; set; }
+
+        [Column("hasAccessToAllLanguages")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        public bool HasAccessToAllLanguages { get; set; }
+
+        [Column("startContentId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(NodeDto), Name = "FK_startContentId_umbracoNode_id")]
+        public int? StartContentId { get; set; }
+
+        [Column("startMediaId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(NodeDto), Name = "FK_startMediaId_umbracoNode_id")]
+        public int? StartMediaId { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+        public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+        public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+        public List<UserGroup2PermissionDto> UserGroup2PermissionDtos { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+        public List<UserGroup2GranularPermissionDto> UserGroup2GranularPermissionDtos { get; set; }
+
+        /// <summary>
+        ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)
         /// </summary>
         [ResultColumn]
         public int UserCount { get; set; }

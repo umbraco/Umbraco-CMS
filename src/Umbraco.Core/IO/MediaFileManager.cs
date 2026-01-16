@@ -25,7 +25,8 @@ public sealed class MediaFileManager
         ILogger<MediaFileManager> logger,
         IShortStringHelper shortStringHelper,
         IServiceProvider serviceProvider)
-        : this(fileSystem,
+        : this(
+            fileSystem,
             mediaPathScheme,
             logger,
             shortStringHelper,
