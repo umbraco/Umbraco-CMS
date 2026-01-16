@@ -66,7 +66,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	 * Should be overwritten by actual implementation.
 	 * @param {VariantOptionModelType} a - First variant option to compare
 	 * @param {VariantOptionModelType} b - Second variant option to compare
-	 * @returns	{number} - Sorting value
+	 * @returns {number} - Sorting value
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantSorter = (a: VariantOptionModelType, b: VariantOptionModelType) => {
