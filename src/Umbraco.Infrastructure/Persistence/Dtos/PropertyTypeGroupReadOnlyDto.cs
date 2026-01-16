@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[Obsolete("This class is obsolete and should be removed in future versions.")]
+[Obsolete("This class is unused in Umbraco. Scheduled for removal in Umbraco 19.")]
 [TableName(TableName)]
 [PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
