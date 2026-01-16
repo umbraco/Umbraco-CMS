@@ -104,6 +104,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		collection: { id: 'dt-collectionView' },
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		noAccess: false,
 	},
 	{
 		name: 'Audio',
@@ -155,6 +156,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		collection: { id: 'dt-collectionView' },
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		noAccess: false,
 	},
 	{
 		name: 'Vector Graphics',
@@ -206,6 +208,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		collection: { id: 'dt-collectionView' },
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		noAccess: false,
 	},
 	{
 		name: 'Movie',
@@ -257,6 +260,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		collection: { id: 'dt-collectionView' },
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		noAccess: false,
 	},
 	{
 		name: 'Media Type 5',
@@ -308,6 +312,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		collection: { id: 'dt-collectionView' },
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		noAccess: false,
 	},
 	{
 		name: 'A Forbidden Media Type',
@@ -359,5 +364,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		collection: { id: 'dt-collectionView' },
 		isDeletable: true,
 		aliasCanBeChanged: false,
+		noAccess: false,
 	},
 ];

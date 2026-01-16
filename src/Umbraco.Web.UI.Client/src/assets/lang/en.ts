@@ -469,6 +469,8 @@ export default {
 		documentType: 'Document Type',
 		documentTypeDescription:
 			'The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.',
+		element: 'Element',
+		elementDescription: 'Select the Element Type you want to make an element for',
 		elementType: 'Element Type',
 		elementTypeDescription:
 			"Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Block Grid' property editor.",
@@ -1434,6 +1436,7 @@ export default {
 	},
 	sections: {
 		content: 'Content',
+		library: 'Library',
 		media: 'Media',
 		member: 'Members',
 		packages: 'Packages',
@@ -1499,9 +1502,11 @@ export default {
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
+		editElementPublishedHeader: 'Element published',
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
+		editElementUnpublishedHeader: 'Element unpublished',
 		editVariantPublishedText: '%0% published and is visible on the website',
 		editVariantSavedText: '%0% saved',
 		editBlueprintSavedHeader: 'Document Blueprint saved',
@@ -2121,6 +2126,7 @@ export default {
 		languagesHelp: 'Limit the languages users have access to edit',
 		allowAccessToAllLanguages: 'Allow access to all languages',
 		allowAccessToAllDocuments: 'Allow access to all documents',
+		allowAccessToAllElements: 'Allow access to all elements',
 		allowAccessToAllMedia: 'Allow access to all media',
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
@@ -2199,6 +2205,8 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		selectElementStartNode: 'Select element start node',
+		selectElementStartNodeDescription: 'Limit the element library to a specific start node',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2366,6 +2374,7 @@ export default {
 	dashboardTabs: {
 		contentIntro: 'Welcome to Umbraco',
 		contentRedirectManager: 'Redirect URL Management',
+		libraryWelcome: 'Welcome',
 		mediaFolderBrowser: 'Content',
 		settingsWelcome: 'Welcome',
 		settingsExamine: 'Examine Management',
@@ -2566,6 +2575,9 @@ export default {
 		errorDisablingProfilerTitle: 'Error disabling profiler',
 		errorDisablingProfilerDescription:
 			'It was not possible to disable the profiler. Try again, and if the problem persists, please check the log for more details.',
+	},
+	libraryDashboard: {
+		welcomeHeader: 'Welcome to the library',
 	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',

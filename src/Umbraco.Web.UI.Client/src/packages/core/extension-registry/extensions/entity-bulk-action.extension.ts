@@ -32,7 +32,7 @@ export interface MetaEntityBulkActionDefaultKind extends MetaEntityBulkAction {
 	 *   "icon-grid"
 	 * ]
 	 */
-	icon: string;
+	icon?: string;
 
 	/**
 	 * The friendly name of the action to perform
