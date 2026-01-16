@@ -34,15 +34,33 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		// Check if all selected documents are invariant
 		const allInvariant = documentItems.every((item) => item.variants.length === 1 && item.variants[0].culture === null);
 
-		// Count documents per culture (variant cultures only, invariant documents excluded)
+		// Count documents per culture and count invariant documents separately
 		const cultureCounts = new Map<string, number>();
+		let invariantCount = 0;
+
 		documentItems.forEach((item) => {
-			item.variants.forEach((variant) => {
-				if (variant.culture) {
-					cultureCounts.set(variant.culture, (cultureCounts.get(variant.culture) ?? 0) + 1);
-				}
-			});
+			// Check if this document has any culture variants
+			const hasVariants = item.variants.some((variant) => variant.culture !== null);
+
+			if (!hasVariants) {
+				// This is an invariant document - it will be published under the default language
+				invariantCount++;
+			} else {
+				// This document has culture variants - count each culture
+				item.variants.forEach((variant) => {
+					if (variant.culture) {
+						cultureCounts.set(variant.culture, (cultureCounts.get(variant.culture) ?? 0) + 1);
+					}
+				});
+			}
 		});
+
+		// Find the default language and add invariant documents to its count
+		const defaultLanguage = languages.find((lang) => lang.isDefault);
+		if (invariantCount > 0 && defaultLanguage) {
+			const currentCount = cultureCounts.get(defaultLanguage.unique) ?? 0;
+			cultureCounts.set(defaultLanguage.unique, currentCount + invariantCount);
+		}
 
 		// Filter options to only include languages that exist in the selected documents
 		const options: Array<UmbDocumentVariantOptionModel> = languages
