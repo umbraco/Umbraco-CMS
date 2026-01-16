@@ -1,11 +1,16 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
@@ -14,13 +19,16 @@ public class RollbackElementVersionController : ElementVersionControllerBase
 {
     private readonly IElementVersionService _elementVersionService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IAuthorizationService _authorizationService;
 
     public RollbackElementVersionController(
         IElementVersionService elementVersionService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IAuthorizationService authorizationService)
     {
         _elementVersionService = elementVersionService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _authorizationService = authorizationService;
     }
 
     [MapToApiVersion("1.0")]
@@ -36,18 +44,16 @@ public class RollbackElementVersionController : ElementVersionControllerBase
             return MapFailure(getContentAttempt.Status);
         }
 
+        IElement element = getContentAttempt.Result;
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.WithKeys(ActionElementRollback.ActionLetter, element.Key),
+            AuthorizationPolicies.ElementPermissionByResource);
 
-        // TODO ELEMENTS: handle auth
-        // IElement element = getContentAttempt.Result;
-        // AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
-        //     User,
-        //     ContentPermissionResource.WithKeys(ActionRollback.ActionLetter, element.Key),
-        //     AuthorizationPolicies.ContentPermissionByResource);
-        //
-        // if (!authorizationResult.Succeeded)
-        // {
-        //     return Forbidden();
-        // }
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
 
         Attempt<ContentVersionOperationStatus> rollBackAttempt =
             await _elementVersionService.RollBackAsync(id, culture, CurrentUserKey(_backOfficeSecurityAccessor));

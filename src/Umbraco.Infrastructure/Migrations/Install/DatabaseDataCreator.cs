@@ -247,6 +247,7 @@ internal sealed class DatabaseDataCreator
                 ActionElementPublish.ActionLetter,
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
             ],
             [Constants.Security.EditorGroupKey] =
             [
@@ -276,6 +277,7 @@ internal sealed class DatabaseDataCreator
                 ActionElementPublish.ActionLetter,
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
             ],
             [Constants.Security.WriterGroupKey] =
             [
