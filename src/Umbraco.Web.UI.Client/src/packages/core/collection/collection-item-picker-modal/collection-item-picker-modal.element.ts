@@ -113,14 +113,14 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	#searchSelectableFilter = () => true;
 
 	override render() {
-		const renderFullCollection = !!this.data?.collection.alias;
+		const renderCollection = !!this.data?.collection.alias;
 
 		return html`
 			<umb-body-layout
 				headline="${this.localize.term('general_choose')}"
-				?main-no-padding=${renderFullCollection}
+				?main-no-padding=${renderCollection}
 				class=${classMap({ 'has-search': this._isSearchable, 'is-searching': !!this._searchQuery })}>
-				${this.#renderSearch()} ${this.#renderMain(renderFullCollection)} ${this.#renderActions()}
+				${this.#renderSearch()} ${this.#renderMain(renderCollection)} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
