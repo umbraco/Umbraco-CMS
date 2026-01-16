@@ -1,5 +1,5 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
@@ -25,7 +25,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	 * Builds variant options for bulk publish/unpublish actions based on selected documents.
 	 * @param documentItems - The document items to process
 	 * @param languages - Available languages in the system
-	 * @returns Object containing whether all documents are invariant and the filtered variant options with document counts
+	 * @returns Object containing whether all documents are invariant and the filtered variant options with document counts and states
 	 */
 	static buildVariantOptions(
 		documentItems: Array<UmbDocumentItemModel>,
@@ -34,9 +34,11 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		// Check if all selected documents are invariant
 		const allInvariant = documentItems.every((item) => item.variants.length === 1 && item.variants[0].culture === null);
 
-		// Count documents per culture and count invariant documents separately
+		// Count documents per culture, track states, and count invariant documents separately
 		const cultureCounts = new Map<string, number>();
+		const cultureStates = new Map<string, Array<UmbDocumentVariantState | null>>();
 		let invariantCount = 0;
+		const invariantStates: Array<UmbDocumentVariantState | null> = [];
 
 		documentItems.forEach((item) => {
 			// Check if this document has any culture variants
@@ -45,11 +47,20 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			if (!hasVariants) {
 				// This is an invariant document - it will be published under the default language
 				invariantCount++;
+				// Get the state from the invariant variant
+				const invariantVariant = item.variants.find((v) => v.culture === null);
+				if (invariantVariant) {
+					invariantStates.push(invariantVariant.state);
+				}
 			} else {
 				// This document has culture variants - count each culture
 				item.variants.forEach((variant) => {
 					if (variant.culture) {
 						cultureCounts.set(variant.culture, (cultureCounts.get(variant.culture) ?? 0) + 1);
+						// Track the state for this culture
+						const states = cultureStates.get(variant.culture) ?? [];
+						states.push(variant.state);
+						cultureStates.set(variant.culture, states);
 					}
 				});
 			}
@@ -60,6 +71,9 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		if (invariantCount > 0 && defaultLanguage) {
 			const currentCount = cultureCounts.get(defaultLanguage.unique) ?? 0;
 			cultureCounts.set(defaultLanguage.unique, currentCount + invariantCount);
+			// Add invariant states to the default language's states
+			const existingStates = cultureStates.get(defaultLanguage.unique) ?? [];
+			cultureStates.set(defaultLanguage.unique, [...existingStates, ...invariantStates]);
 		}
 
 		// Filter options to only include languages that exist in the selected documents
@@ -67,12 +81,16 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			.filter((language) => cultureCounts.has(language.unique))
 			.map((language) => {
 				const count = cultureCounts.get(language.unique) ?? 0;
+				const states = cultureStates.get(language.unique) ?? [];
+				// Determine representative state: if all same, show that; otherwise hide it (null)
+				const representativeState = UmbDocumentPublishEntityBulkAction.#determineRepresentativeState(states);
+
 				return {
 					language,
 					variant: {
 						name: language.name,
 						culture: language.unique,
-						state: null,
+						state: representativeState,
 						createDate: null,
 						publishDate: null,
 						updateDate: null,
@@ -89,6 +107,19 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			});
 
 		return { allInvariant, options };
+	}
+
+	/**
+	 * Determines a representative state from an array of variant states.
+	 * If all states are the same, returns that state.
+	 * If states differ, returns null to hide the state indicator (since we can't meaningfully represent mixed states).
+	 */
+	static #determineRepresentativeState(states: Array<UmbDocumentVariantState | null>): UmbDocumentVariantState | null {
+		if (states.length === 0) return null;
+
+		// If all states are the same, return that state; otherwise return null to hide the indicator
+		const uniqueStates = new Set(states);
+		return uniqueStates.size === 1 ? states[0] : null;
 	}
 
 	async execute() {
