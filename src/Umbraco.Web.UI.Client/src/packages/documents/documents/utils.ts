@@ -34,7 +34,7 @@ export const sortVariants = (a: VariantType, b: VariantType) => {
 	const compareState = (a: VariantType, b: VariantType) =>
 		getVariantStateOrderValue(a.variant) - getVariantStateOrderValue(b.variant);
 
-	const compareName = (a: VariantType, b: VariantType) => a.variant?.name.localeCompare(b.variant?.name || '') || 99;
+	const compareName = (a: VariantType, b: VariantType) => a.language?.name.localeCompare(b.language?.name || '') || 999;
 
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
 };
