@@ -52,9 +52,15 @@ function compareName(a: VariantType, b: VariantType) {
 
 	return nameA.localeCompare(nameB);
 }
-export const sortVariants = (a: VariantType, b: VariantType) => {
+/**
+ * Sorts document variants based on multiple criteria:
+ * @param {VariantType} a - First variant to compare
+ * @param {VariantType} b - Second variant to compare
+ * @returns {number} - Sorting value
+ */
+export function sortVariants(a: VariantType, b: VariantType) {
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
-};
+}
 
 export const TimeOptions: Intl.DateTimeFormatOptions = {
 	year: 'numeric',

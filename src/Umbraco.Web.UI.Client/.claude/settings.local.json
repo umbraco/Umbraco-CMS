@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm test:*)"
+    ]
+  }
+}
