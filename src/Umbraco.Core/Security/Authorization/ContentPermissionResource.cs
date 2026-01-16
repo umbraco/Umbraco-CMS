@@ -3,7 +3,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
-///     A resource used for the <see cref="ContentPermissionHandler" />.
+///     A resource used for the ContentPermissionHandler authorization handler.
 /// </summary>
 public class ContentPermissionResource : IPermissionResource
 {

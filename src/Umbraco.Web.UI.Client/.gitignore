@@ -45,10 +45,10 @@ storybook-static/
 # API Docs
 ui-api/
 
-custom-elements.json
 
 # JSON for HTML Custom Data
 # https://github.com/runem/web-component-analyzer#vscode
+custom-elements.json
 # https://github.com/microsoft/vscode-custom-data
 vscode-html-custom-data.json
 

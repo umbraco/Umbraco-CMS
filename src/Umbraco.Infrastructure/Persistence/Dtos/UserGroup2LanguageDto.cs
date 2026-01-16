@@ -10,12 +10,17 @@ public class UserGroup2LanguageDto
 {
     public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Language;
 
-    [Column("userGroupId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_userGroup2language", OnColumns = "userGroupId, languageId")]
+    internal const string ReferenceMemberName = "UserGroupId"; // should be UserGroupIdColumnName, but for database compatibility we keep it like this
+
+    private const string UserGroupIdColumnName = "userGroupId";
+    private const string LanguageIdColumnName = "languageId";
+
+    [Column(UserGroupIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_userGroup2language", OnColumns = $"{UserGroupIdColumnName}, {LanguageIdColumnName}")]
     [ForeignKey(typeof(UserGroupDto), OnDelete = Rule.Cascade)]
     public int UserGroupId { get; set; }
 
-    [Column("languageId")]
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto), OnDelete = Rule.Cascade)]
     public int LanguageId { get; set; }
 }
