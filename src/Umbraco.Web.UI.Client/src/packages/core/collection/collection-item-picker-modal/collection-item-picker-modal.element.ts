@@ -86,6 +86,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		this.observe(
 			this.#pickerContext?.search.searchable,
 			(isSearchable) => (this._isSearchable = isSearchable ?? false),
+			null,
 		);
 
 		this.observe(
