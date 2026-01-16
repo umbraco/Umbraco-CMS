@@ -863,6 +863,7 @@ export default {
 		dividerPosition: (value: string | number) => `Divider at ${value}%`,
 		discard: 'Discard',
 		document: 'Document',
+		documentCount: (count: number) => (count === 1 ? '1 document' : `${count} documents`),
 		down: 'Down',
 		download: 'Download',
 		edit: 'Edit',
