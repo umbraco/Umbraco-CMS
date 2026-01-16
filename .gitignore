@@ -107,6 +107,7 @@ trace.zip
 /src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.*.json
 /src/Umbraco.Web.UI/umbraco-package-schema.json
+/src/Umbraco.Web.UI.Client/umbraco-package-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /tests/Umbraco.Tests.Integration/umbraco-package-schema.json

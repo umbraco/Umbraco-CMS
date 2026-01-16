@@ -5,10 +5,11 @@ const blockGridEditorName = 'TestBlockGridEditor';
 const elementTypeName = 'BlockGridElement';
 const dataTypeName = 'Textstring';
 const groupName = 'testGroup';
+let contentElementTypeId = '';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
-  await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
-  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
 });
@@ -20,9 +21,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can update grid columns for areas for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const gridColumns = 6;
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
 
   // Act
@@ -39,8 +38,6 @@ test('can update grid columns for areas for a block', async ({umbracoApi, umbrac
 
 test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
 
   // Act
@@ -59,9 +56,7 @@ test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbraco
 // TODO: There are currently issues when trying to select the locator.
 test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
   // Act
@@ -73,10 +68,8 @@ test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
 
 test('can update alias an area for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const newAlias = 'NewAlias';
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
   // Act
@@ -96,9 +89,7 @@ test('can update alias an area for a block', async ({umbracoApi, umbracoUi}) => 
 
 test('can remove an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, areaAlias)).toBeTruthy();
 
@@ -117,9 +108,7 @@ test('can remove an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbr
 
 test('can add multiple areas for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 1)).toBeTruthy();
 
@@ -140,10 +129,8 @@ test('can add multiple areas for a block', async ({umbracoApi, umbracoUi}) => {
 
 test('can add create button label for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const createButtonLabel = 'CreateButtonLabel';
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
   // Act
@@ -162,10 +149,8 @@ test('can add create button label for an area in a block', async ({umbracoApi, u
 
 test('can remove create button label for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const createButtonLabel = 'CreateButtonLabel';
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, createButtonLabel);
 
   // Act
@@ -184,10 +169,8 @@ test('can remove create button label for an area in a block', async ({umbracoApi
 
 test('can add min allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const minAllowed = 3;
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
   // Act
@@ -206,11 +189,9 @@ test('can add min allowed for an area in a block', async ({umbracoApi, umbracoUi
 
 test('can remove min allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const minAllowed = 6;
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, null, undefined, undefined, minAllowed);
+  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, undefined, undefined, undefined, minAllowed);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMinAllowed(blockGridEditorName, contentElementTypeId, areaAlias, minAllowed)).toBeTruthy();
 
   // Act
@@ -229,10 +210,8 @@ test('can remove min allowed for an area in a block', async ({umbracoApi, umbrac
 
 test('can add add max allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const maxAllowed = 7;
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
   // Act
@@ -251,11 +230,9 @@ test('can add add max allowed for an area in a block', async ({umbracoApi, umbra
 
 test('can remove max allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const maxAllowed = 7;
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, null, undefined, undefined, undefined, maxAllowed);
+  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, undefined, undefined, undefined, undefined, maxAllowed);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeTruthy();
 
   // Act
@@ -279,9 +256,7 @@ test.skip('min can not be more than max an area in a block', async ({umbracoApi,
   const minAllowed = 6;
   const maxAllowed = 7;
   const newMinAllowed = 8;
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, null, undefined, undefined, minAllowed, maxAllowed);
+  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, undefined, undefined, undefined, minAllowed, maxAllowed);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -300,8 +275,6 @@ test.skip('min can not be more than max an area in a block', async ({umbracoApi,
 test('can add specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
   // Act
