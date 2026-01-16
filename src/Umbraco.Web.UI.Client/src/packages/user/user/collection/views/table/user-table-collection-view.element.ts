@@ -95,6 +95,7 @@ export class UmbUserTableCollectionViewElement extends UmbCollectionViewElementB
 			return {
 				id: user.unique,
 				icon: user.kind === UmbUserKind.API ? 'icon-unplug' : 'icon-user',
+				selectable: this._isSelectableItem(user),
 				data: [
 					{
 						columnAlias: 'userName',
