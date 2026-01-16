@@ -1,9 +1,9 @@
 import type { UmbFocalPointModel } from '../../types.js';
 import type { UmbImageCropperFocalPoint } from './types.js';
 import { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
+import { isCentered } from './utils.js';
 import { drag } from '@umbraco-cms/backoffice/external/uui';
 import { clamp } from '@umbraco-cms/backoffice/utils';
-import { isCentered } from './utils.js';
 import {
 	css,
 	customElement,
