@@ -61,7 +61,7 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
             [new Uri("https://server2.local/")]);
 
         // Assert: BOTH server1 and server2 URIs should exist
-        // This tests the bug: currently server1 URI gets overwritten
+        // This tests the bug: faulty behavior overwrote server1 URI
         application = await openIddictAppManager.FindByClientIdAsync(
             Constants.OAuthClientIds.BackOffice);
         redirectUris = await openIddictAppManager.GetRedirectUrisAsync(application);
@@ -102,6 +102,7 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
 
     /// <summary>
     /// Tests that re-initializing with the same server URL does not create duplicate redirect URIs.
+    /// This simulates a server restarting
     /// </summary>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_DuplicateServerUrl_DoesNotCreateDuplicateUris()
@@ -130,7 +131,7 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
 
     /// <summary>
     /// Tests that PostLogoutRedirectUris are also preserved across multiple server initializations.
-    /// Note: Current implementation adds both oauth_complete and logout paths to PostLogoutRedirectUris.
+    /// Note: The current implementation adds both oauth_complete and logout paths to PostLogoutRedirectUris.
     /// </summary>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_MultipleServerUrls_PreservesAllPostLogoutRedirectUris()
@@ -140,7 +141,7 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         var backOfficeAppManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
         var openIddictAppManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
-        // Act: Initialize with first server
+        // Act: Initialize with the first server
         await backOfficeAppManager.EnsureBackOfficeApplicationAsync(
             [new Uri("https://server1.local/")]);
 
@@ -158,7 +159,7 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
             Does.Contain(new Uri("https://server1.local/umbraco/logout")),
             "Server1 logout post-logout URI should exist");
 
-        // Act: Initialize with second server
+        // Act: Initialize with the second server
         await backOfficeAppManager.EnsureBackOfficeApplicationAsync(
             [new Uri("https://server2.local/")]);
 
@@ -213,7 +214,7 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         // Assert: All URIs should be registered
         var application = await openIddictAppManager.FindByClientIdAsync(
             Constants.OAuthClientIds.BackOffice);
-        var redirectUris = await openIddictAppManager.GetRedirectUrisAsync(application);
+        var redirectUris = await openIddictAppManager.GetRedirectUrisAsync(application!);
         var redirectUriList = redirectUris.ToList();
 
         Assert.That(redirectUriList, Has.Count.EqualTo(3), "Should register all three URIs");
