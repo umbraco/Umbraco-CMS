@@ -37,6 +37,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             Constants.ObjectTypes.MediaTypeContainer,
             Constants.ObjectTypes.MemberTypeContainer,
             Constants.ObjectTypes.DocumentBlueprintContainer,
+            Constants.ObjectTypes.ElementContainer,
         };
         NodeObjectTypeId = containerObjectType;
         if (allowedContainers.Contains(NodeObjectTypeId) == false)
@@ -138,6 +139,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             containedObjectType,
             nodeDto.Text,
             nodeDto.UserId ?? Constants.Security.UnknownUserId);
+        entity.Trashed = nodeDto.Trashed;
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);
@@ -324,11 +326,21 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
         // update
         nodeDto.Text = entity.Name;
+        nodeDto.Path = entity.Path;
+        nodeDto.Level = Convert.ToInt16(entity.Level);
+        nodeDto.Trashed = entity.Trashed;
         if (nodeDto.ParentId != entity.ParentId)
         {
-            nodeDto.Level = 0;
-            nodeDto.Path = "-1";
-            if (entity.ParentId > -1)
+            nodeDto.Level = 1;
+            if (entity.ParentId == Constants.System.Root)
+            {
+                nodeDto.Path = $"{Constants.System.Root},{nodeDto.NodeId}";
+            }
+            else if (entity.ParentId == Constants.System.RecycleBinElement)
+            {
+                nodeDto.Path = $"{Constants.System.RecycleBinElementPathPrefix}{nodeDto.NodeId}";
+            }
+            else
             {
                 NodeDto parent = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                     .From<NodeDto>()

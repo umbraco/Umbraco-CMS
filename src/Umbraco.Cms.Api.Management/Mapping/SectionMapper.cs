@@ -17,6 +17,7 @@ public static class SectionMapper
         new SectionMapping { Alias = "translation", Name = "Umb.Section.Translation" },
         new SectionMapping { Alias = "users", Name = "Umb.Section.Users" },
         new SectionMapping { Alias = "forms", Name = "Umb.Section.Forms" },
+        new SectionMapping { Alias = "library", Name = "Umb.Section.Library" },
     };
 
     public static string GetName(string alias)

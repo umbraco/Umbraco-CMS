@@ -30,6 +30,7 @@ public abstract class DocumentControllerBase : ContentControllerBase
         where TContentModelBase : ContentModelBase<DocumentValueModel, DocumentVariantRequestModel>
         => ContentEditingOperationStatusResult<TContentModelBase, DocumentValueModel, DocumentVariantRequestModel>(status, requestModel, validationResult);
 
+    // TODO ELEMENTS: move this to ContentControllerBase
     protected IActionResult DocumentPublishingOperationStatusResult(
         ContentPublishingOperationStatus status,
         IEnumerable<string>? invalidPropertyAliases = null,

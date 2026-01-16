@@ -211,6 +211,7 @@ public sealed class UdiParser
             { Constants.UdiEntityType.DocumentType, UdiType.GuidUdi },
             { Constants.UdiEntityType.DocumentTypeContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.Element, UdiType.GuidUdi },
+            { Constants.UdiEntityType.ElementContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.Media, UdiType.GuidUdi },
             { Constants.UdiEntityType.MediaType, UdiType.GuidUdi },
             { Constants.UdiEntityType.MediaTypeContainer, UdiType.GuidUdi },

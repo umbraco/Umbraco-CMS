@@ -5,9 +5,12 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.Controllers;
@@ -32,9 +35,19 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {
-
     private static readonly Dictionary<string, TokenModel> _tokenCache = new();
     private static readonly SHA256 _sha256 = SHA256.Create();
+
+    protected JsonSerializerOptions JsonSerializerOptions
+    {
+        get
+        {
+            var options = GetRequiredService<IOptionsMonitor<JsonOptions>>();
+            return options
+                .Get(Constants.JsonOptionsNames.BackOffice)
+                .JsonSerializerOptions;
+        }
+    }
 
     protected abstract Expression<Func<T, object>> MethodSelector { get; set; }
 

@@ -3,6 +3,7 @@
 /// <summary>
 ///     The saved state of a content item
 /// </summary>
+// TODO ELEMENTS: move this to ViewModels.Content and rename it to VariantState or ContentVariantState (shared between document and element variants)
 public enum DocumentVariantState
 {
     /// <summary>

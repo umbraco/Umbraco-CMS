@@ -10,7 +10,7 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class ContentTypeBuilder
-    : ContentTypeBaseBuilder<ContentBuilder, IContentType>,
+    : ContentTypeBaseBuilder<IBuildContentTypes, IContentType>,
         IWithPropertyTypeIdsIncrementingFrom,
         IBuildPropertyTypes
 {
@@ -30,7 +30,7 @@ public class ContentTypeBuilder
     {
     }
 
-    public ContentTypeBuilder(ContentBuilder parentBuilder)
+    public ContentTypeBuilder(IBuildContentTypes parentBuilder)
         : base(parentBuilder)
     {
     }
@@ -169,6 +169,16 @@ public class ContentTypeBuilder
             .Build();
     }
 
+    public static ContentType CreateBasicElementType(string alias = "elementType", string name = "Element Type")
+    {
+        var builder = new ContentTypeBuilder();
+        return (ContentType)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithIsElement(true)
+            .Build();
+    }
+
     public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content")
     {
         var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupAlias: propertyGroupAlias, propertyGroupName: propertyGroupName);
@@ -197,6 +207,9 @@ public class ContentTypeBuilder
         bool mandatoryProperties = false,
         int defaultTemplateId = 0) =>
         (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupAlias, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
+
+    public static IContentType CreateSimpleElementType(string alias = "elementType", string name = "Element Type")
+        => CreateSimpleContentTypeHelper(alias, name).WithIsElement(true).Build();
 
     public static ContentTypeBuilder CreateSimpleContentTypeHelper(
         string alias = null,
@@ -254,13 +267,16 @@ public class ContentTypeBuilder
                 .Done();
         }
 
-        builder = builder
-            .AddAllowedTemplate()
-            .WithId(defaultTemplateId)
-            .WithAlias("textPage")
-            .WithName("Textpage")
-            .Done()
-            .WithDefaultTemplateId(defaultTemplateId);
+        if (defaultTemplateId > 0)
+        {
+            builder = builder
+                .AddAllowedTemplate()
+                .WithId(defaultTemplateId)
+                .WithAlias("textPage")
+                .WithName("Textpage")
+                .Done()
+                .WithDefaultTemplateId(defaultTemplateId);
+        }
 
         return builder;
     }
