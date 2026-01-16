@@ -107,10 +107,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 					mandatory
 					label=${this.localize.term('webhooks_url')}
 					description=${this.localize.term('webhooks_urlDescription')}>
-					<uui-input
-						@input=${this.#onUrlChange}
-						.value=${this._webhook.url}
-						slot="editor" required="true"></uui-input>
+					<uui-input @input=${this.#onUrlChange} .value=${this._webhook.url} slot="editor" required="true"></uui-input>
 				</umb-property-layout>
 				<umb-property-layout
 					mandatory

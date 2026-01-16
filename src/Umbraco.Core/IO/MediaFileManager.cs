@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -12,20 +14,40 @@ public sealed class MediaFileManager
     private readonly ILogger<MediaFileManager> _logger;
     private readonly IMediaPathScheme _mediaPathScheme;
     private readonly IServiceProvider _serviceProvider;
+    private readonly Lazy<ICoreScopeProvider> _coreScopeProvider;
     private readonly IShortStringHelper _shortStringHelper;
     private MediaUrlGeneratorCollection? _mediaUrlGenerators;
 
+    [Obsolete("Please use the constructor taking all arguments, scheduled for removal in Umbraco 19")]
     public MediaFileManager(
         IFileSystem fileSystem,
         IMediaPathScheme mediaPathScheme,
         ILogger<MediaFileManager> logger,
         IShortStringHelper shortStringHelper,
         IServiceProvider serviceProvider)
+        : this(
+            fileSystem,
+            mediaPathScheme,
+            logger,
+            shortStringHelper,
+            serviceProvider,
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<ICoreScopeProvider>>())
+    {
+    }
+
+    public MediaFileManager(
+        IFileSystem fileSystem,
+        IMediaPathScheme mediaPathScheme,
+        ILogger<MediaFileManager> logger,
+        IShortStringHelper shortStringHelper,
+        IServiceProvider serviceProvider,
+        Lazy<ICoreScopeProvider> coreScopeProvider)
     {
         _mediaPathScheme = mediaPathScheme;
         _logger = logger;
         _shortStringHelper = shortStringHelper;
         _serviceProvider = serviceProvider;
+        _coreScopeProvider = coreScopeProvider;
         FileSystem = fileSystem;
     }
 
@@ -91,6 +113,9 @@ public sealed class MediaFileManager
 
     private void PerformMediaFileOperation(IEnumerable<string> files, Action<string> fileOperation, string errorMessage)
     {
+        using ICoreScope scope = _coreScopeProvider.Value.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.MediaTree);
+
         files = files.Distinct();
 
         // kinda try to keep things under control
@@ -117,6 +142,8 @@ public sealed class MediaFileManager
                 _logger.LogError(e, errorMessage, file);
             }
         });
+
+        scope.Complete();
     }
 
     #region Media Path

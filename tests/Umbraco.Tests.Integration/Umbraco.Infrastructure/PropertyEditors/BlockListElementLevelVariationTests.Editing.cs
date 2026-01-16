@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -43,44 +43,43 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                ),
+                        null)),
                 (
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -203,44 +202,43 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The second invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The second content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The second content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The second content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The second invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The second settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The second settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The second settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                ),
+                        null)),
                 (
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The second invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The second content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The second content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The second content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The second invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The second settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The second settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The second settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         var updateModel = new ContentUpdateModel
         {
@@ -335,44 +333,43 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                ),
+                        null)),
                 (
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -497,44 +494,43 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The second invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The second content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The second content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The second content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The second invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The second settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The second settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The second settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                ),
+                        null)),
                 (
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The second invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The second content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The second content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The second content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The second invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The second settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The second settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The second settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         var updateModel = new ContentUpdateModel
         {
@@ -627,13 +623,15 @@ internal partial class BlockListElementLevelVariationTests
                     firstContentElementKey,
                     firstSettingsElementKey,
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" },
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
@@ -645,13 +643,15 @@ internal partial class BlockListElementLevelVariationTests
                     secondContentElementKey,
                     secondSettingsElementKey,
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" },
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },
@@ -673,7 +673,8 @@ internal partial class BlockListElementLevelVariationTests
                 Key = newContentElementKey,
                 ContentTypeAlias = elementType.Alias,
                 ContentTypeKey = elementType.Key,
-                Values = new List<BlockPropertyValue> {
+                Values = new List<BlockPropertyValue>
+                        {
                     new() { Alias = "invariantText", Value = "#new: The new invariant settings value" },
                     new() { Alias = "variantText", Value = "#new: The new settings value in English", Culture = "en-US" },
                     new() { Alias = "variantText", Value = "#new: The new settings value in Danish", Culture = "da-DK" },
@@ -784,13 +785,15 @@ internal partial class BlockListElementLevelVariationTests
                     firstContentElementKey,
                     firstSettingsElementKey,
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" },
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
@@ -802,13 +805,15 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" },
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },
@@ -830,7 +835,8 @@ internal partial class BlockListElementLevelVariationTests
                 Key = newContentElementKey,
                 ContentTypeAlias = elementType.Alias,
                 ContentTypeKey = elementType.Key,
-                Values = new List<BlockPropertyValue> {
+                Values = new List<BlockPropertyValue>
+                        {
                     new() { Alias = "invariantText", Value = "#new: The new invariant settings value" },
                     new() { Alias = "variantText", Value = "#new: The new settings value in English", Culture = "en-US" },
                     new() { Alias = "variantText", Value = "#new: The new settings value in Danish", Culture = "da-DK" },
@@ -901,44 +907,43 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                ),
+                        null)),
                 (
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" }
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in German", Culture = "de-DE" }
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         var serializedBlockListValue = JsonSerializer.Serialize(blockListValue);
         content.Properties["blocks"]!.SetValue(serializedBlockListValue);
@@ -1011,13 +1016,15 @@ internal partial class BlockListElementLevelVariationTests
                     firstContentElementKey,
                     firstSettingsElementKey,
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#1: The first content value in German", Culture = "de-DE" },
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The first settings value in Danish", Culture = "da-DK" },
@@ -1029,13 +1036,15 @@ internal partial class BlockListElementLevelVariationTests
                     secondContentElementKey,
                     secondSettingsElementKey,
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The first content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first content value in Danish", Culture = "da-DK" },
                             new() { Alias = "variantText", Value = "#2: The first content value in German", Culture = "de-DE" },
                         },
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The first invariant settings value" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The first settings value in Danish", Culture = "da-DK" },

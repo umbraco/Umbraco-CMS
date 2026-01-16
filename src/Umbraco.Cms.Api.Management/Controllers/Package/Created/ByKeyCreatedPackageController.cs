@@ -23,6 +23,7 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Gets a package by id.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <returns>The package or not found result.</returns>
     [HttpGet("{id:guid}")]

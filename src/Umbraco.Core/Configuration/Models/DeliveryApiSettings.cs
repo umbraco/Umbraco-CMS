@@ -42,7 +42,24 @@ public class DeliveryApiSettings
     /// <value>
     /// The content type aliases that are not to be exposed.
     /// </value>
+    /// <remarks>
+    ///     If <see cref="AllowedContentTypeAliases"/> is configured (non-empty), this setting is ignored.
+    /// </remarks>
     public ISet<string> DisallowedContentTypeAliases { get; set; } = new HashSet<string>();
+
+    /// <summary>
+    ///     Gets or sets the aliases of the content types that are exclusively allowed to be exposed through the Delivery API.
+    ///     When configured, only content of these types will be returned from Delivery API endpoints and added to the query index.
+    /// </summary>
+    /// <value>
+    /// The content type aliases that are allowed to be exposed.
+    /// </value>
+    /// <remarks>
+    ///     When this setting is configured (non-empty), it takes precedence over <see cref="DisallowedContentTypeAliases"/>.
+    ///     If a content type alias appears in both lists, the allow list wins and the content type will be exposed.
+    ///     If this setting is empty, all content types are allowed except those in <see cref="DisallowedContentTypeAliases"/>.
+    /// </remarks>
+    public ISet<string> AllowedContentTypeAliases { get; set; } = new HashSet<string>();
 
     /// <summary>
     ///     Gets or sets a value indicating whether the Delivery API should output rich text values as JSON instead of HTML.

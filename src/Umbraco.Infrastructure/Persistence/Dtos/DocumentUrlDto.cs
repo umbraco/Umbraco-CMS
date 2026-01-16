@@ -6,33 +6,39 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
 public class DocumentUrlDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentUrl;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string UniqueIdColumnName = "uniqueId";
+    public const string IsDraftColumnName = "isDraft";
+    public const string LanguageIdColumnName = "languageId";
+    public const string UrlSegmentColumnName = "urlSegment";
+    public const string IsPrimaryColumnName = "isPrimary";
 
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]
     public int NodeId { get; set; }
 
-    [Index(IndexTypes.UniqueClustered, ForColumns = "uniqueId, languageId, isDraft, urlSegment", Name = "IX_" + TableName)]
-    [Column("uniqueId")]
-    [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
+    [Index(IndexTypes.UniqueClustered, ForColumns = $"{UniqueIdColumnName}, {LanguageIdColumnName}, {IsDraftColumnName}, {UrlSegmentColumnName}", Name = "IX_" + TableName)]
+    [Column(UniqueIdColumnName)]
+    [ForeignKey(typeof(NodeDto), Column = NodeDto.KeyColumnName)]
     public Guid UniqueId { get; set; }
 
-    [Column("isDraft")]
+    [Column(IsDraftColumnName)]
     public bool IsDraft { get; set; }
 
-    [Column("languageId")]
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     public int LanguageId { get; set; }
 
-    [Column("urlSegment")]
+    [Column(UrlSegmentColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string UrlSegment { get; set; } = string.Empty;
 
-    [Column("isPrimary")]
+    [Column(IsPrimaryColumnName)]
     [Constraint(Default = 1)]
     public bool IsPrimary { get; set; }
 }
