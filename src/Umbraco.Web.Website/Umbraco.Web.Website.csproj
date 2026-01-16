@@ -13,8 +13,6 @@
       [SA1401] make fields private
       [IDE1006] fix naming rule violation
     -->
-    <!-- SA1649: File name should match first type name - suppressed because extension files use feature-based naming (e.g., UmbracoApplicationBuilder.Website.cs) -->
-    <NoWarn>$(NoWarn);SA1649</NoWarn>
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618,SA1401,SA1649,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
 
