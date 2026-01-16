@@ -82,7 +82,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			.map((language) => {
 				const count = cultureCounts.get(language.unique) ?? 0;
 				const states = cultureStates.get(language.unique) ?? [];
-				// Determine representative state: if all same, show that; otherwise hide it (null)
+				// Determine representative state: if all same, show that; otherwise show DRAFT (Unpublished)
 				const representativeState = UmbDocumentPublishEntityBulkAction.#determineRepresentativeState(states);
 
 				return {
@@ -112,14 +112,15 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	/**
 	 * Determines a representative state from an array of variant states.
 	 * If all states are the same, returns that state.
-	 * If states differ, returns null to hide the state indicator (since we can't meaningfully represent mixed states).
+	 * If states differ, returns DRAFT (displays as "Unpublished") since mixed states can't be meaningfully represented
+	 * and DRAFT is more accurate than showing "Not created" (which shouldn't appear since those variants are filtered out).
 	 */
 	static #determineRepresentativeState(states: Array<UmbDocumentVariantState | null>): UmbDocumentVariantState | null {
 		if (states.length === 0) return null;
 
-		// If all states are the same, return that state; otherwise return null to hide the indicator
+		// If all states are the same, return that state; otherwise return DRAFT (shown as "Unpublished")
 		const uniqueStates = new Set(states);
-		return uniqueStates.size === 1 ? states[0] : null;
+		return uniqueStates.size === 1 ? states[0] : UmbDocumentVariantState.DRAFT;
 	}
 
 	async execute() {
