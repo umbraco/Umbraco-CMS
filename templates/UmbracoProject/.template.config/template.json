@@ -59,15 +59,6 @@
       ],
       "isRequired": false
     },
-    "UmbracoVersion": {
-      "displayName": "Custom Version",
-      "description": "The selected custom version of Umbraco, this is obsoleted, and will be removed in a future version of the template.",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "null",
-      "replaces": "CUSTOM_VERSION",
-      "isRequired": false
-    },
     "FinalVersion": {
       "type": "generated",
       "generator": "switch",
