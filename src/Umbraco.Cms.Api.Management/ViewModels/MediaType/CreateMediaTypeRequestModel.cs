@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.ContentType;
+using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
@@ -17,4 +17,9 @@ public class CreateMediaTypeRequestModel
     ///     Gets or sets the compositions for this media type.
     /// </summary>
     public IEnumerable<MediaTypeComposition> Compositions { get; set; } = Enumerable.Empty<MediaTypeComposition>();
+
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+    public ReferenceByIdModel? Collection { get; set; }
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 }
