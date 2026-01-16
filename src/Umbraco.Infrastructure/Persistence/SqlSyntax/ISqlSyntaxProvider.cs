@@ -115,6 +115,17 @@ public interface ISqlSyntaxProvider
 
     string GetQuotedName(string? name);
 
+    /// <summary>
+    /// Gets the file extension associated with a null value for the specified type parameter.
+    /// </summary>
+    /// <remarks>This method is useful when generating SQL queries that require explicit type casting of NULL
+    /// values, such as in PostgreSQL. The returned string can be used directly in SQL statements for type-safe
+    /// comparisons or assignments.</remarks>
+    /// <typeparam name="T">The type for which to retrieve the null value file extension.</typeparam>
+    /// <returns>A string containing the file extension that represents a null value for type T, or an empty string if no
+    /// extension is defined.</returns>
+    string GetNullExtension<T>();
+
     bool DoesTableExist(IDatabase db, string tableName);
 
     string GetIndexType(IndexTypes indexTypes);
