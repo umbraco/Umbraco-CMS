@@ -257,6 +257,15 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual bool SupportsIdentityInsert() => true;
 
+    /// <inheritdoc />
+    public virtual bool SupportsSequences() => false;
+
+    /// <inheritdoc />
+    public virtual void AlterSequences(IUmbracoDatabase database) { }
+
+    /// <inheritdoc />
+    public virtual void AlterSequences(IUmbracoDatabase database, string tableName) { }
+
     /// <summary>
     ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
     /// </summary>

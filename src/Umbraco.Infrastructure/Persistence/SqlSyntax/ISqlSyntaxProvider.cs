@@ -157,6 +157,28 @@ public interface ISqlSyntaxProvider
 
     bool SupportsIdentityInsert();
 
+    /// <summary>
+    /// Determines whether the current database provider supports sequence objects for generating numeric values like PostgreSQL.
+    /// </summary>
+    /// <returns>true if the provider supports sequences; otherwise, false.</returns>
+    bool SupportsSequences();
+
+    /// <summary>
+    /// Alters the database sequences to match the current schema requirements.
+    /// </summary>
+    /// <remarks>This method should be called when schema changes require updates to database sequences, such
+    /// as after a migration. The specific changes applied depend on the current state of the database and the expected
+    /// schema.</remarks>
+    /// <param name="database">The database connection to use for altering sequences. Must not be null.</param>
+    void AlterSequences(IUmbracoDatabase database);
+
+    /// <summary>
+    /// Alters the database sequences associated with the specified table.
+    /// </summary>
+    /// <param name="database">The database connection to use for altering the sequences. Cannot be null.</param>
+    /// <param name="tableName">The name of the table whose sequences will be altered. Cannot be null or empty.</param>
+    void AlterSequences(IUmbracoDatabase database, string tableName);
+
     IEnumerable<string> GetTablesInSchema(IDatabase db);
 
     IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
