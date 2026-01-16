@@ -1,8 +1,6 @@
 // Don't remove the unused System using, for some reason this breaks docfx, and I have no clue why.
 using System;
-using System.Collections.Concurrent;
 using System.Data;
-using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;

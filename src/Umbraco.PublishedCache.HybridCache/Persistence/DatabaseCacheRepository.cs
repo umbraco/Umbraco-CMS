@@ -310,13 +310,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
-    [Obsolete("Use the typed version OnRepositoryRefreshedTyped instead")]
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
-    {
-        await OnRepositoryRefreshedTyped(serializer, content, preview);
-    }
-
-    private async Task OnRepositoryRefreshedTyped(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
         ContentNuDto newOrCachedEntity = GetDtoFromCacheNode(content, !preview, serializer);
 
