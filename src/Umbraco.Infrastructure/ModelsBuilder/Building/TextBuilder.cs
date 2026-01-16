@@ -112,7 +112,8 @@ public class TextBuilder : Builder
         sb.Append("}\n");
     }
 
-    // internal for unit tests
+    // TODO (V19): Remove obsoletion and make internal (so still available for unit tests). Also remove pragma warning disable CS0618 in BuilderTests.
+    [Obsolete("This method is not expected to be called from external libraries. Scheduled to be made internal in Umbraco 19.")]
     public void WriteClrType(StringBuilder sb, Type type)
     {
         var s = type.ToString();
@@ -608,13 +609,15 @@ public class TextBuilder : Builder
     internal void WriteClrType(StringBuilder sb, string type)
     {
         var p = type.IndexOf('<');
-        if (type.Contains('<'))
+        if (p >= 0)
         {
             WriteNonGenericClrType(sb, type[..p]);
             sb.Append("<");
-            var args = type[(p + 1)..].TrimEnd(Constants.CharArrays.GreaterThan)
-                .Split(Constants.CharArrays.Comma); // TODO: will NOT work with nested generic types
-            for (var i = 0; i < args.Length; i++)
+
+            var argsString = type[(p + 1)..].TrimEnd(Constants.CharArrays.GreaterThan);
+            var args = SplitGenericArguments(argsString);
+
+            for (var i = 0; i < args.Count; i++)
             {
                 if (i > 0)
                 {
@@ -630,6 +633,55 @@ public class TextBuilder : Builder
         {
             WriteNonGenericClrType(sb, type);
         }
+    }
+
+    /// <summary>
+    /// Splits generic type arguments while respecting nested generic brackets.
+    /// For example, "Tuple&lt;string, string&gt;, int" splits into ["Tuple&lt;string, string&gt;", "int"].
+    /// </summary>
+    private static IReadOnlyList<string> SplitGenericArguments(string argsString)
+    {
+        var result = new List<string>();
+        var currentArg = new StringBuilder();
+        var depth = 0;
+
+        foreach (var c in argsString)
+        {
+            switch (c)
+            {
+                case '<':
+                    depth++;
+                    currentArg.Append(c);
+                    break;
+                case '>':
+                    depth--;
+                    currentArg.Append(c);
+                    break;
+                case ',':
+                    if (depth == 0)
+                    {
+                        result.Add(currentArg.ToString().Trim());
+                        currentArg.Clear();
+                    }
+                    else
+                    {
+                        currentArg.Append(c);
+                    }
+
+                    break;
+                default:
+                    currentArg.Append(c);
+                    break;
+            }
+        }
+
+        var lastArg = currentArg.ToString().Trim();
+        if (!string.IsNullOrEmpty(lastArg))
+        {
+            result.Add(lastArg);
+        }
+
+        return result;
     }
 
     private static string XmlCommentString(string s) =>
