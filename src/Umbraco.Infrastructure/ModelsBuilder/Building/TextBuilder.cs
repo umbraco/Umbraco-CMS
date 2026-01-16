@@ -633,7 +633,7 @@ public class TextBuilder : Builder
             WriteNonGenericClrType(sb, type[..p]);
             sb.Append("<");
 
-            var argsString = type[(p + 1)..].TrimEnd(Constants.CharArrays.GreaterThan);
+            var argsString = type[(p + 1)..^1]; // Extract content between '<' and the final '>'
             IReadOnlyList<string> args = SplitGenericArguments(argsString);
 
             for (var i = 0; i < args.Count; i++)
