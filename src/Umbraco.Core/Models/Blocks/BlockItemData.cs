@@ -40,6 +40,7 @@ public class BlockItemData
     public string ContentTypeAlias { get; set; } = string.Empty;
 
     [Obsolete("Use Key instead. Will be removed in V18.")]
+    [JsonIgnore]
     public Udi? Udi { get; set; }
 
     public Guid Key { get; set; }

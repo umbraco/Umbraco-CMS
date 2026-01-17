@@ -2,6 +2,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -2448,5 +2450,77 @@ internal partial class BlockListElementLevelVariationTests
                 Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
             });
         }
+    }
+
+    /// <summary>
+    /// Regression test for GitHub issue #21223.
+    /// When a document with a culture-variant content type has an invariant BlockList property
+    /// containing culture-variant blocks, and you publish all languages for the first time,
+    /// the content should NOT show as having pending changes in either the default or other language.
+    /// </summary>
+    [Test]
+    public async Task Publishing_All_Cultures_Should_Not_Mark_Content_As_Edited()
+    {
+        // Arrange: Create culture-variant content type with INVARIANT BlockList property
+        // containing culture-variant element type.
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        // Create content without publishing first.
+        var content = CreateContent(
+            contentType,
+            elementType,
+            [
+                new() { Alias = "invariantText", Value = "Invariant content value" },
+                new() { Alias = "variantText", Value = "English content value", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "Danish content value", Culture = "da-DK" },
+            ],
+            [
+                new() { Alias = "invariantText", Value = "Invariant settings value" },
+                new() { Alias = "variantText", Value = "English settings value", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "Danish settings value", Culture = "da-DK" },
+            ],
+            publishContent: false);
+
+        // Get the current block list value as JSON.
+        var currentBlocksJson = (string)content.Properties["blocks"]!.GetValue()!;
+
+        // Simulate backoffice edit workflow by going through ContentEditingService.UpdateAsync,
+        // which processes values through FromEditor (where sorting happens).
+        var updateModel = new ContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "blocks", Value = currentBlocksJson },
+            ],
+            Variants =
+            [
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+            ],
+        };
+
+        var updateResult = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success, "Content update should succeed");
+
+        // Reload content to get fresh state.
+        content = ContentService.GetById(content.Key)!;
+
+        // Publish ALL cultures.
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        // Reload content from database to get fresh state with Edited flags set correctly.
+        content = ContentService.GetById(content.Key)!;
+
+        // Assert: Content should NOT show as edited for any culture after initial publish.
+        // Bug #21223: Without the fix, the default language variant incorrectly shows as having
+        // pending changes due to JSON serialization order differences between EditedValue and PublishedValue.
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.Edited, "Content should not be marked as edited after publishing all cultures");
+            Assert.IsFalse(content.IsCultureEdited("en-US"), "en-US culture should not be marked as edited");
+            Assert.IsFalse(content.IsCultureEdited("da-DK"), "da-DK culture should not be marked as edited");
+        });
     }
 }
