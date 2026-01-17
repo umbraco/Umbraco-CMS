@@ -23,8 +23,8 @@ export class UmbCardCollectionViewElement extends UmbCollectionViewElementBase {
 		return html` <umb-entity-collection-item-card
 			.item=${item}
 			href=${href ?? nothing}
-			?selectable=${this._selectable}
-			?select-only=${this._selection.length > 0}
+			?selectable=${this._isSelectableItem(item)}
+			?select-only=${this._selectOnly}
 			?selected=${this._isSelectedItem(item.unique)}
 			@selected=${() => this._selectItem(item.unique)}
 			@deselected=${() => this._deselectItem(item.unique)}>

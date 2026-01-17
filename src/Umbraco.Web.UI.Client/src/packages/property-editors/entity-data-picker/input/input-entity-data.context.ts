@@ -1,4 +1,7 @@
-import { UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS } from '../picker-collection/constants.js';
+import {
+	UMB_ENTITY_DATA_PICKER_COLLECTION_ALIAS,
+	UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+} from '../picker-collection/constants.js';
 import { UMB_ENTITY_DATA_PICKER_TREE_ALIAS } from '../picker-tree/constants.js';
 import { UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS } from '../picker-search/constants.js';
 import { UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS } from '../constants.js';
@@ -31,7 +34,10 @@ import {
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
-export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbItemModel> {
+export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
+	UmbItemModel,
+	UmbItemModel | UmbTreeItemModel
+> {
 	#dataSourceAlias?: string;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerDataSource;
@@ -88,7 +94,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 		// TODO: investigate type issues
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this.modalAlias = this.#getModalToken();
+		this.modalAlias = this.getModalAlias();
 		await super.openPicker(pickerData);
 	}
 
@@ -113,10 +119,11 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 			this.#dataSourceApi.setConfig?.(this.#dataSourceConfig);
 
 			this.#dataSourceApiContext.setDataSourceApi(this.#dataSourceApi);
+			this.#setModalToken();
 		});
 	}
 
-	#getModalToken() {
+	#setModalToken() {
 		if (!this.#dataSourceApi) return;
 
 		const dataSourceApi = this.#dataSourceApi;
@@ -126,9 +133,11 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 
 		// Choose the picker type based on what the data source supports
 		if (isTreeDataSource) {
-			return this.#createTreeItemPickerModalToken(dataSourceApi);
+			const token = this.#createTreeItemPickerModalToken(dataSourceApi);
+			this.setModalAlias(token);
 		} else if (isCollectionDataSource) {
-			return this.#createCollectionItemPickerModalToken(dataSourceApi);
+			const token = this.#createCollectionItemPickerModalToken(dataSourceApi);
+			this.setModalAlias(token);
 		} else {
 			throw new Error('The data source API is not a supported type of picker data source.');
 		}
@@ -137,7 +146,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 	#createTreeItemPickerModalToken(api: UmbPickerTreeDataSource) {
 		const supportsSearch = isPickerSearchableDataSource(api);
 
-		return new UmbModalToken<UmbTreePickerModalData<UmbTreeItemModel>, UmbTreePickerModalValue>(
+		return new UmbModalToken<UmbTreePickerModalData<UmbItemModel | UmbTreeItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
 			{
 				modal: {
@@ -148,7 +157,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 					treeAlias: UMB_ENTITY_DATA_PICKER_TREE_ALIAS,
 					hideTreeRoot: true,
 					// TODO: make specific pickable filter for tree to avoid type issues
-					pickableFilter: api.treePickableFilter,
+					pickableFilter: api.treePickableFilter as ((item: UmbItemModel | UmbTreeItemModel) => boolean) | undefined,
 					search: supportsSearch
 						? {
 								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
@@ -168,10 +177,11 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 			{
 				modal: {
 					type: 'sidebar',
-					size: 'small',
+					size: 'medium',
 				},
 				data: {
 					collection: {
+						alias: UMB_ENTITY_DATA_PICKER_COLLECTION_ALIAS,
 						menuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
 					},
 					// TODO: make specific pickable filter for collection to avoid type issues

@@ -11,6 +11,9 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 	@property({ type: Boolean })
 	standalone = false;
 
+	@property({ type: Boolean })
+	selectable = false;
+
 	override render() {
 		if (!this.item) return nothing;
 
@@ -18,6 +21,7 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 			<uui-ref-node
 				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
 				?standalone=${this.standalone}
+				?selectable=${this.selectable}
 				readonly>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
