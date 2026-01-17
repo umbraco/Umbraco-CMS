@@ -115,6 +115,21 @@ public interface ISqlSyntaxProvider
 
     string GetQuotedName(string? name);
 
+    /// <summary>
+    /// Gets the SQL type cast extension (null type annotation) associated with a null value for the specified type parameter.
+    /// </summary>
+    /// <remarks>
+    /// This method is useful when generating SQL queries that require explicit type casting of NULL values,
+    /// such as in PostgreSQL. The returned string can be used directly in SQL statements for type-safe
+    /// comparisons or assignments (for example, <c>::integer</c> or <c>::text</c>).
+    /// </remarks>
+    /// <typeparam name="T">The type for which to retrieve the SQL null type annotation.</typeparam>
+    /// <returns>
+    /// A string containing the SQL type cast extension (null type annotation) that represents a null value for type
+    /// <typeparamref name="T"/>, or an empty string if no extension is defined.
+    /// </returns>
+    string GetNullExtension<T>() => throw new NotImplementedException();
+
     bool DoesTableExist(IDatabase db, string tableName);
 
     string GetIndexType(IndexTypes indexTypes);
@@ -156,6 +171,28 @@ public interface ISqlSyntaxProvider
     bool SupportsClustered();
 
     bool SupportsIdentityInsert();
+
+    /// <summary>
+    /// Determines whether the current database provider supports sequence objects for generating numeric values like PostgreSQL.
+    /// </summary>
+    /// <returns>true if the provider supports sequences; otherwise, false.</returns>
+    bool SupportsSequences() => false;
+
+    /// <summary>
+    /// Alters the database sequences to match the current schema requirements.
+    /// </summary>
+    /// <remarks>This method should be called when schema changes require updates to database sequences, such
+    /// as after a migration. The specific changes applied depend on the current state of the database and the expected
+    /// schema.</remarks>
+    /// <param name="database">The database connection to use for altering sequences. Must not be null.</param>
+    void AlterSequences(IUmbracoDatabase database) => throw new NotImplementedException();
+
+    /// <summary>
+    /// Alters the database sequences associated with the specified table.
+    /// </summary>
+    /// <param name="database">The database connection to use for altering the sequences. Cannot be null.</param>
+    /// <param name="tableName">The name of the table whose sequences will be altered. Cannot be null or empty.</param>
+    void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotImplementedException();
 
     IEnumerable<string> GetTablesInSchema(IDatabase db);
 
@@ -228,4 +265,12 @@ public interface ISqlSyntaxProvider
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
         string? alias = null);
+
+    /// <summary>
+    /// Some databases have a maximum length for constraint names, this method truncates the name if necessary.
+    /// </summary>
+    /// <typeparam name="T">type of the entity.</typeparam>
+    /// <param name="constraintName">unlimited name.</param>
+    /// <returns>truncated name.</returns>
+    string? TruncateConstraintName<T>(string? constraintName) => throw new NotImplementedException();
 }
