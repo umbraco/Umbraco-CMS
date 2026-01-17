@@ -215,6 +215,28 @@ public interface IMediaService : IContentServiceBase<IMedia>
     Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Saves a collection of <see cref="IMedia" /> objects
+    /// </summary>
+    /// <param name="medias">Collection of <see cref="IMedia" /> to save</param>
+    /// <param name="userId">Id of the User saving the Media</param>
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+    Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+
+    /// <summary>
+    ///     Gets an <see cref="IMedia" /> object by its 'UniqueId'
+    /// </summary>
+    /// <param name="key">Guid key of the Media to retrieve</param>
+    /// <returns>
+    ///     <see cref="IMedia" />
+    /// </returns>
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+    IMedia? GetById(Guid key);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+
+    /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Level
     /// </summary>
     /// <param name="level">The level to retrieve Media from</param>

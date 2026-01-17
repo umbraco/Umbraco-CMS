@@ -1,11 +1,18 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
-import { css, html, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
+import { css, html, customElement, nothing, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-media-tree-item';
 @customElement(elementName)
-export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel> {
+export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
+	public override set api(value: UmbMediaTreeItemContext | undefined) {
+		// Observe noAccess from context and update base class property (_noAccess).
+		// This enables access restriction behavior (click prevention) and styling from the base class.
+		this.observe(value?.noAccess, (noAccess) => (this._noAccess = noAccess ?? false));
+		super.api = value;
+	}
+
 	override renderIconContainer() {
 		const icon = this.item?.mediaType.icon;
 
@@ -22,7 +29,9 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label">${this._item?.variants[0].name}</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ noAccess: this._noAccess })}>
+			${this._item?.variants[0].name}
+		</span> `;
 	}
 
 	#renderStateIcon() {
@@ -38,7 +47,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	static override styles = [
-		UmbTextStyles,
+		...UmbTreeItemElementBase.styles,
 		css`
 			#icon-container {
 				position: relative;

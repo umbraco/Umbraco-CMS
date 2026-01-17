@@ -11,9 +11,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	#api: UmbDocumentTreeItemContext | undefined;
 
 	@property({ type: Object, attribute: false })
-	public override get api(): UmbDocumentTreeItemContext | undefined {
-		return this.#api;
-	}
 	public override set api(value: UmbDocumentTreeItemContext | undefined) {
 		this.#api = value;
 
@@ -27,9 +24,15 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			});
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
 			this.observe(this.#api.flags, (flags) => (this._flags = flags || ''));
+			// Observe noAccess from context and update base class property (_noAccess).
+			// This enables access restriction behavior (click prevention) and styling from the base class.
+			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
 		}
 
 		super.api = value;
+	}
+	public override get api(): UmbDocumentTreeItemContext | undefined {
+		return this.#api;
 	}
 
 	@state()
@@ -65,7 +68,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	};
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}>
+			${this._name}
+		</span> `;
 	}
 
 	static override styles = [
