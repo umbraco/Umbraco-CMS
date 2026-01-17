@@ -78,6 +78,7 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
         contentRebuilder = IndexInitializer.GetContentIndexRebuilder(contentService, publishedValuesOnly, dbFactory);
 
         var luceneDir = new RandomIdRAMDirectory();
+        var luceneTaxonomyDir = new RandomIdRAMDirectory();
 
         ContentValueSetValidator validator;
 
@@ -127,11 +128,12 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
             HostingEnvironment,
             RunningRuntimeState,
             luceneDir,
+            luceneTaxonomyDir,
             validator: validator);
 
         var syncMode = index.WithThreadingMode(IndexThreadingMode.Synchronous);
 
-        return new DisposableWrapper(syncMode, index, luceneDir);
+        return new DisposableWrapper(syncMode, index, luceneDir, luceneTaxonomyDir);
     }
 
     private AutoResetEvent indexingHandle = new(false);

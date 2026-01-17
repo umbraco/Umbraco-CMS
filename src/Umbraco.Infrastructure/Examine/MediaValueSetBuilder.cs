@@ -46,11 +46,12 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
         {
             var urlValue = m.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
 
-            IEnumerable<string?> mediaFiles = m.GetUrls(_contentSettings, _mediaUrlGenerators)
+            IEnumerable<string> mediaFiles = m.GetUrls(_contentSettings, _mediaUrlGenerators)
                 .Select(x => Path.GetFileName(x))
+                .WhereNotNull()
                 .Distinct();
 
-            var values = new Dictionary<string, IEnumerable<object?>>
+            var values = new Dictionary<string, IEnumerable<object>>
             {
                 { "icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 { "id", new object[] { m.Id } },
