@@ -2,7 +2,9 @@ using System.Collections;
 using System.Linq.Expressions;
 using System.Text;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
 
@@ -45,8 +47,22 @@ public class Query<T> : IQuery<T>
 
         var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
         var whereExpression = expressionHelper.Visit(fieldSelector);
+
+        FixCompareCasing(ref values, ref whereExpression);
+
         _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { values } }));
         return this;
+    }
+
+    private static void FixCompareCasing(ref IEnumerable? values, ref string whereExpression)
+    {
+        Attempt<string[]> attempt = values.TryConvertTo<string[]>();
+        if (attempt.Success)
+        {
+            // fix for case insensitive comparison in databases like PostgreSQL
+            whereExpression = $"LOWER({whereExpression})";
+            values = attempt.Result?.Select(v => v.ToLower());
+        }
     }
 
     /// <summary>
@@ -61,6 +77,9 @@ public class Query<T> : IQuery<T>
 
         var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
         var whereExpression = expressionHelper.Visit(fieldSelector);
+
+        FixCompareCasing(ref values, ref whereExpression);
+
         _wheres.Add(new Tuple<string, object[]>(whereExpression + " NOT IN (@values)", new object[] { new { values } }));
         return this;
     }
@@ -88,7 +107,7 @@ public class Query<T> : IQuery<T>
             {
                 sb = new StringBuilder("(");
                 parameters = new List<object>();
-                sql = Sql.BuilderFor(_sqlContext);
+                sql = NPoco.Sql.BuilderFor(_sqlContext);
             }
             else
             {

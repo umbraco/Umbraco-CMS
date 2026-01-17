@@ -545,10 +545,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             // sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
             // from 'current' content version for the given order by field
-            var sortedInt = string.Format(SqlContext.SqlSyntax.ConvertIntegerToOrderableString, "intValue");
-            var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, "decimalValue");
-            var sortedDate = string.Format(SqlContext.SqlSyntax.ConvertDateToOrderableString, "dateValue");
-            var sortedString = "COALESCE(varcharValue,'')"; // assuming COALESCE is ok for all syntaxes
+            var sortedInt = string.Format(SqlContext.SqlSyntax.ConvertIntegerToOrderableString, QuoteColumnName("intValue"));
+            var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, QuoteColumnName("decimalValue"));
+            var sortedDate = string.Format(SqlContext.SqlSyntax.ConvertDateToOrderableString, QuoteColumnName("dateValue"));
+            var sortedString = $"COALESCE({QuoteColumnName("varcharValue")},'')"; // assuming COALESCE is ok for all syntaxes
 
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
             Sql<ISqlContext> innerSql = Sql().Select($@"CASE

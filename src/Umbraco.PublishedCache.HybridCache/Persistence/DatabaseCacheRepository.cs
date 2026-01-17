@@ -314,18 +314,18 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
-        string c(string s) => SqlSyntax.GetQuotedColumnName(s);
+        string C(string s) => SqlSyntax.GetQuotedColumnName(s);
 
         await Database.InsertOrUpdateAsync(
-            dto,
-            $"SET data = @data, {c("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {c("nodeId")} = @id AND published = @published",
-            new
-            {
-                dataRaw = dto.RawData ?? Array.Empty<byte>(),
-                data = dto.Data,
-                id = dto.NodeId,
-                published = dto.Published,
-            });
+           dto,
+           $"SET data = @data, {C("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {C("nodeId")} = @id AND published = @published",
+           new
+           {
+               dataRaw = dto.RawData ?? Array.Empty<byte>(),
+               data = dto.Data,
+               id = dto.NodeId,
+               published = dto.Published,
+           });
     }
 
     /// <summary>

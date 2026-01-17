@@ -158,6 +158,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string GetQuotedValue(string value) => $"'{value}'";
 
+    /// <inheritdoc />
+    public virtual string GetNullExtension<T>() => string.Empty;
+
     public virtual string GetIndexType(IndexTypes indexTypes)
     {
         var indexType = string.Empty;
@@ -256,6 +259,15 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual bool SupportsClustered() => true;
 
     public virtual bool SupportsIdentityInsert() => true;
+
+    /// <inheritdoc />
+    public virtual bool SupportsSequences() => false;
+
+    /// <inheritdoc />
+    public virtual void AlterSequences(IUmbracoDatabase database) { }
+
+    /// <inheritdoc />
+    public virtual void AlterSequences(IUmbracoDatabase database, string tableName) { }
 
     /// <summary>
     ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
@@ -684,4 +696,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     protected abstract string? FormatSystemMethods(SystemMethods systemMethod);
 
     protected abstract string FormatIdentity(ColumnDefinition column);
+
+    public virtual string? TruncateConstraintName<T>(string? constraintName) => constraintName;
 }
