@@ -104,6 +104,20 @@ npm run compile
 npm run check
 ```
 
+### Quick Verification (During Development)
+
+For fast feedback during development, use these commands instead of full builds:
+
+```bash
+# Quick TypeScript check (faster than full build)
+npx tsc
+
+# Quick lint check (errors only, no warnings)
+npm run lint:errors
+```
+
+Reserve `npm run build:for:cms` for final verification before committing.
+
 ### Code Generation Commands
 
 ```bash
