@@ -16,9 +16,8 @@
       [IDE0040]/[SA1400] access modifiers
       [SA1405] Debug assert message text
       [CS0419]/[CS1574] cref ambiguities
-      [SA1649] file name match type
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,CS0618,SYSLIB0051,IDE0040,SA1400,SA1405,CS0419,CS1574,SA1649</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,CS0618,SYSLIB0051,IDE0040,SA1400,SA1405,CS0419,CS1574</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
