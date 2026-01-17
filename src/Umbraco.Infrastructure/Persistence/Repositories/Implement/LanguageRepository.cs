@@ -267,6 +267,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("tagId")} IN (SELECT id FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
         };
         return list;

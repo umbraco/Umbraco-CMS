@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -28,6 +30,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IDomainService _domainService;
     private readonly IDomainCacheService _domainCacheService;
     private readonly IDocumentUrlService _documentUrlService;
+    private readonly IDocumentUrlAliasService _documentUrlAliasService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IContentService _contentService;
@@ -39,6 +42,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -54,12 +58,51 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IPublishStatusManagementService publishStatusManagementService,
         IDocumentCacheService documentCacheService,
         ICacheManager cacheManager)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            domainService,
+            eventAggregator,
+            factory,
+            documentUrlService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlAliasService>(),
+            domainCacheService,
+            documentNavigationQueryService,
+            documentNavigationManagementService,
+            contentService,
+            publishStatusManagementService,
+            documentCacheService,
+            cacheManager)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
+    /// </summary>
+    public ContentCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IDomainService domainService,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IDocumentUrlService documentUrlService,
+        IDocumentUrlAliasService documentUrlAliasService,
+        IDomainCacheService domainCacheService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IContentService contentService,
+        IPublishStatusManagementService publishStatusManagementService,
+        IDocumentCacheService documentCacheService,
+        ICacheManager cacheManager)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _domainService = domainService;
         _domainCacheService = domainCacheService;
         _documentUrlService = documentUrlService;
+        _documentUrlAliasService = documentUrlAliasService;
         _documentNavigationQueryService = documentNavigationQueryService;
         _documentNavigationManagementService = documentNavigationManagementService;
         _contentService = contentService;
@@ -270,28 +313,33 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out IEnumerable<Guid>? descendantsOrSelfKeys))
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
+                _documentUrlAliasService.DeleteAliasesFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
             }
             else if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out IEnumerable<Guid>? descendantsOrSelfKeysInBin))
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
+                _documentUrlAliasService.DeleteAliasesFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
             }
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
             _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult(); // TODO: make async
+            _documentUrlAliasService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
+            _documentUrlAliasService.CreateOrUpdateAliasesAsync(key).GetAwaiter().GetResult();
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
+            _documentUrlAliasService.CreateOrUpdateAliasesWithDescendantsAsync(key).GetAwaiter().GetResult();
         }
     }
 
