@@ -30,17 +30,17 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate alias")
                 .WithDetail("A template with that alias already exists.")
                 .Build()),
-            TemplateOperationStatus.CircularMasterTemplateReference => BadRequest(problemDetailsBuilder
-                .WithTitle("Invalid master template")
-                .WithDetail("The master template referenced in the template leads to a circular reference.")
+            TemplateOperationStatus.CircularLayoutReference => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid layout")
+                .WithDetail("The layout referenced in the template leads to a circular reference.")
                 .Build()),
-            TemplateOperationStatus.MasterTemplateNotFound => BadRequest(problemDetailsBuilder
-                .WithTitle("Master template not found")
-                .WithDetail("The master template referenced in the template was not found.")
+            TemplateOperationStatus.LayoutNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Layout not found")
+                .WithDetail("The layout referenced in the template was not found.")
                 .Build()),
-            TemplateOperationStatus.MasterTemplateCannotBeDeleted => BadRequest(problemDetailsBuilder
-                .WithTitle("Master template cannot be deleted")
-                .WithDetail("The master templates cannot be deleted. Please ensure the template is not a master template before you delete.")
+            TemplateOperationStatus.LayoutCannotBeDeleted => BadRequest(problemDetailsBuilder
+                .WithTitle("Layout cannot be deleted")
+                .WithDetail("The layout cannot be deleted. Please ensure the template is not used as a layout before you delete.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")

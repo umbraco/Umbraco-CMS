@@ -107,7 +107,7 @@ public class ViewHelper : IViewHelper
 
         if (string.IsNullOrEmpty(design))
         {
-            design = _defaultViewContentProvider.GetDefaultFileContent(template.MasterTemplateAlias);
+            design = _defaultViewContentProvider.GetDefaultFileContent(template.LayoutAlias);
         }
 
         return design;

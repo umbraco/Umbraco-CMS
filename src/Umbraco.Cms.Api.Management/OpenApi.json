@@ -47824,7 +47824,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "masterTemplate": {
+          "layout": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"

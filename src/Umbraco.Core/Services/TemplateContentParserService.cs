@@ -1,11 +1,13 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
 public partial class TemplateContentParserService : ITemplateContentParserService
 {
-    public string? MasterTemplateAlias(string? viewContent)
+    /// <inheritdoc />
+    public string? LayoutAlias(string? viewContent)
     {
         if (viewContent.IsNullOrWhiteSpace())
         {

@@ -21,13 +21,13 @@ export class UmbTemplateWorkspaceContext
 {
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
-	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
-	masterTemplate = this.#masterTemplate.asObservable();
+	#layout = new UmbObjectState<UmbTemplateItemModel | null>(null);
+	layout = this.#layout.asObservable();
 
 	public readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias);
 	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
-	public readonly masterTemplateUnique = this._data.createObservablePartOfCurrent(
-		(data) => data?.masterTemplate?.unique,
+	public readonly layoutUnique = this._data.createObservablePartOfCurrent(
+		(data) => data?.layout?.unique,
 	);
 
 	constructor(host: UmbControllerHost) {
@@ -68,13 +68,13 @@ export class UmbTemplateWorkspaceContext
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
-		// On load we want to set the master template details but not update the layout block in the Razor file.
+		// On load we want to set the layout template details but not update the layout block in the Razor file.
 		// This is because you can still set a layout in code by setting `Layout = "_Layout.cshtml";` in the template file.
 		// This gets set automatically if you create a template under a parent, but you don't have to do that, you can
-		// just set  the `Layout` property in the Razor template file itself.
-		// So even if there's no master template set by there being a parent, there may still be one set in the Razor
+		// just set the `Layout` property in the Razor template file itself.
+		// So even if there's no layout set by there being a parent, there may still be one set in the Razor
 		// code, and we shouldn't overwrite it.
-		await this.setMasterTemplate(response.data?.masterTemplate?.unique ?? null, false);
+		await this.setLayout(response.data?.layout?.unique ?? null, false);
 
 		return response;
 	}
@@ -83,13 +83,13 @@ export class UmbTemplateWorkspaceContext
 		const data = await this.createScaffold({
 			parent,
 			preset: {
-				masterTemplate: parent.unique ? { unique: parent.unique } : null,
+				layout: parent.unique ? { unique: parent.unique } : null,
 			},
 		});
 
-		// On create set or reset the master template depending on whether the template is being created under a parent.
+		// On create set or reset the layout depending on whether the template is being created under a parent.
 		// This is important to reset when a new template is created so the UI reflects the correct state.
-		await this.setMasterTemplate(parent.unique, true);
+		await this.setLayout(parent.unique, true);
 
 		return data;
 	}
@@ -110,31 +110,31 @@ export class UmbTemplateWorkspaceContext
 		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
 	}
 
-	async setMasterTemplate(unique: string | null, updateLayoutBlock: boolean) {
+	async setLayout(unique: string | null, updateLayoutBlock: boolean) {
 		if (unique === null) {
-			this.#masterTemplate.setValue(null);
+			this.#layout.setValue(null);
 		} else {
 			// We need the whole template model if the unique id is provided
 			const { data } = await this.itemRepository.requestItems([unique]);
 			if (data) {
-				this.#masterTemplate.setValue(data[0]);
+				this.#layout.setValue(data[0]);
 			}
 		}
 
 		if (updateLayoutBlock) {
-			this.#updateMasterTemplateLayoutBlock();
-			this._data.updateCurrent({ masterTemplate: unique ? { unique } : null });
+			this.#updateLayoutBlock();
+			this._data.updateCurrent({ layout: unique ? { unique } : null });
 		}
 
 		return unique;
 	}
 
-	#updateMasterTemplateLayoutBlock = () => {
+	#updateLayoutBlock = () => {
 		const currentContent = this._data.getCurrent()?.content;
-		const newMasterTemplateAlias = this.#masterTemplate?.getValue()?.alias;
+		const newLayoutAlias = this.#layout?.getValue()?.alias;
 		const hasLayoutBlock = this.getHasLayoutBlock();
 
-		if (this.#masterTemplate.getValue() === null && hasLayoutBlock && currentContent) {
+		if (this.#layout.getValue() === null && hasLayoutBlock && currentContent) {
 			const newString = currentContent.replace(this.getLayoutBlockRegexPattern(), `$1null$3`);
 			this.setContent(newString);
 			return;
@@ -144,7 +144,7 @@ export class UmbTemplateWorkspaceContext
 		if (hasLayoutBlock && currentContent) {
 			const string = currentContent.replace(
 				this.getLayoutBlockRegexPattern(),
-				`$1"${newMasterTemplateAlias}.cshtml"$3`,
+				`$1"${newLayoutAlias}.cshtml"$3`,
 			);
 			this.setContent(string);
 			return;
@@ -152,7 +152,7 @@ export class UmbTemplateWorkspaceContext
 
 		//if no layout block in the content insert it at the beginning
 		const string = `@{
-	Layout = "${newMasterTemplateAlias}.cshtml";
+	Layout = "${newLayoutAlias}.cshtml";
 }
 ${currentContent}`;
 		this.setContent(string);

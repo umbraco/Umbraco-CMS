@@ -17,7 +17,7 @@ internal static class TemplateFactory
             NodeId = entity.Id,
             Level = 1,
             NodeObjectType = nodeObjectTypeId,
-            ParentId = entity.MasterTemplateId?.Value ?? 0,
+            ParentId = entity.LayoutId?.Value ?? 0,
             Path = entity.Path,
             Text = entity.Name,
             Trashed = false,
@@ -46,11 +46,11 @@ internal static class TemplateFactory
             template.Key = dto.NodeDto.UniqueId;
             template.Path = dto.NodeDto.Path;
 
-            template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
+            template.IsLayout = childDefinitions.Any(x => x.ParentId == dto.NodeId);
 
             if (dto.NodeDto.ParentId > 0)
             {
-                template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
+                template.LayoutId = new Lazy<int>(() => dto.NodeDto.ParentId);
             }
 
             // reset dirty initial properties (U4-1946)
@@ -67,9 +67,9 @@ internal static class TemplateFactory
     {
         var dto = new TemplateDto {Alias = entity.Alias, NodeDto = BuildNodeDto(entity, nodeObjectTypeId)};
 
-        if (entity.MasterTemplateId != null && entity.MasterTemplateId.Value > 0)
+        if (entity.LayoutId != null && entity.LayoutId.Value > 0)
         {
-            dto.NodeDto.ParentId = entity.MasterTemplateId.Value;
+            dto.NodeDto.ParentId = entity.LayoutId.Value;
         }
 
         if (entity.HasIdentity)

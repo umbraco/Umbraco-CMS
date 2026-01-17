@@ -142,11 +142,11 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         if (dto.NodeDto.ParentId > 0)
         {
-            IUmbracoEntity? masterTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
-            if (masterTemplate != null)
+            IUmbracoEntity? layout = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
+            if (layout != null)
             {
-                template.MasterTemplateAlias = masterTemplate.Name;
-                template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
+                template.LayoutAlias = layout.Name;
+                template.LayoutId = new Lazy<int>(() => dto.NodeDto.ParentId);
             }
         }
 
@@ -422,7 +422,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
         //Update with new correct path
-        ITemplate? parent = Get(template.MasterTemplateId!.Value);
+        ITemplate? parent = Get(template.LayoutId!.Value);
         if (parent != null)
         {
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -473,16 +473,16 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         var template = (Template)entity;
 
-        if (entity.IsPropertyDirty("MasterTemplateId"))
+        if (entity.IsPropertyDirty("LayoutId"))
         {
-            ITemplate? parent = Get(template.MasterTemplateId!.Value);
+            ITemplate? parent = Get(template.LayoutId!.Value);
             if (parent != null)
             {
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
             }
             else
             {
-                //this means that the master template has been removed, so we need to reset the template's
+                //this means that the layout has been removed, so we need to reset the template's
                 //path to be at the root
                 entity.Path = string.Concat("-1,", entity.Id);
             }
@@ -497,9 +497,9 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         Database.Update(dto.NodeDto);
         Database.Update(dto);
 
-        //re-update if this is a master template, since it could have changed!
+        //re-update if this is a layout template, since it could have changed!
         IEnumerable<IUmbracoEntity> axisDefs = GetAxisDefinitions(dto);
-        template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
+        template.IsLayout = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
         // Only save file when not in production runtime mode
         if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
@@ -589,34 +589,34 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return GetMany().Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
     }
 
-    public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
+    public IEnumerable<ITemplate> GetChildren(int layoutId)
     {
         //return from base.GetAll, this is all cached
         ITemplate[] all = GetMany().ToArray();
 
-        if (masterTemplateId <= 0)
+        if (layoutId <= 0)
         {
-            return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
+            return all.Where(x => x.LayoutAlias.IsNullOrWhiteSpace());
         }
 
-        ITemplate? parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+        ITemplate? parent = all.FirstOrDefault(x => x.Id == layoutId);
         if (parent == null)
         {
             return Enumerable.Empty<ITemplate>();
         }
 
-        IEnumerable<ITemplate> children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
+        IEnumerable<ITemplate> children = all.Where(x => x.LayoutAlias.InvariantEquals(parent.Alias));
         return children;
     }
 
-    public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
+    public IEnumerable<ITemplate> GetDescendants(int layoutId)
     {
         //return from base.GetAll, this is all cached
         ITemplate[] all = GetMany().ToArray();
         var descendants = new List<ITemplate>();
-        if (masterTemplateId > 0)
+        if (layoutId > 0)
         {
-            ITemplate? parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+            ITemplate? parent = all.FirstOrDefault(x => x.Id == layoutId);
             if (parent == null)
             {
                 return Enumerable.Empty<ITemplate>();
@@ -627,7 +627,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
         else
         {
-            descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
+            descendants.AddRange(all.Where(x => x.LayoutAlias.IsNullOrWhiteSpace()));
             foreach (ITemplate parent in descendants)
             {
                 //recursively add all children with a level
@@ -639,9 +639,9 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return descendants;
     }
 
-    private static void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string masterAlias)
+    private static void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string layoutAlias)
     {
-        ITemplate[]? c = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
+        ITemplate[]? c = all?.Where(x => x.LayoutAlias.InvariantEquals(layoutAlias)).ToArray();
         if (c is null || c.Any() == false)
         {
             return;

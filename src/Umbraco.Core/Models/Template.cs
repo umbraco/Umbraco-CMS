@@ -13,8 +13,8 @@ public class Template : File, ITemplate
 {
     private readonly IShortStringHelper _shortStringHelper;
     private string _alias;
-    private string? _masterTemplateAlias;
-    private Lazy<int>? _masterTemplateId;
+    private string? _layoutAlias;
+    private Lazy<int>? _layoutId;
     private string? _name;
 
     public Template(IShortStringHelper shortStringHelper, string? name, string? alias)
@@ -28,20 +28,20 @@ public class Template : File, ITemplate
         _shortStringHelper = shortStringHelper;
         _name = name;
         _alias = alias?.ToCleanString(shortStringHelper, CleanStringType.UnderscoreAlias) ?? string.Empty;
-        _masterTemplateId = new Lazy<int>(() => -1);
+        _layoutId = new Lazy<int>(() => -1);
     }
 
     [DataMember]
-    public Lazy<int>? MasterTemplateId
+    public Lazy<int>? LayoutId
     {
-        get => _masterTemplateId;
-        set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateId, nameof(MasterTemplateId));
+        get => _layoutId;
+        set => SetPropertyValueAndDetectChanges(value, ref _layoutId, nameof(LayoutId));
     }
 
-    public string? MasterTemplateAlias
+    public string? LayoutAlias
     {
-        get => _masterTemplateAlias;
-        set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateAlias, nameof(MasterTemplateAlias));
+        get => _layoutAlias;
+        set => SetPropertyValueAndDetectChanges(value, ref _layoutAlias, nameof(LayoutAlias));
     }
 
     [DataMember]
@@ -62,21 +62,33 @@ public class Template : File, ITemplate
     /// <summary>
     ///     Returns true if the template is used as a layout for other templates (i.e. it has 'children')
     /// </summary>
-    public bool IsMasterTemplate { get; set; }
+    public bool IsLayout { get; set; }
 
-    // FIXME: moving forward the master template is calculated from the actual template content; figure out how to get rid of this method, or at least *only* use it from TemplateService
-    [Obsolete("MasterTemplate is now calculated from the content. This will be removed in Umbraco 15.")]
-    public void SetMasterTemplate(ITemplate? masterTemplate)
+    /// <summary>
+    ///     Returns the master template alias (the parent template this template inherits from)
+    /// </summary>
+    [Obsolete("Use LayoutAlias instead. This will be removed in Umbraco 19.")]
+    public string? MasterTemplateAlias { get => LayoutAlias; set => LayoutAlias = value; }
+
+    /// <summary>
+    ///     Returns the Id of the master template
+    /// </summary>
+    [Obsolete("Use LayoutId instead. This will be removed in Umbraco 19.")]
+    public Lazy<int>? MasterTemplateId { get => LayoutId; set => LayoutId = value; }
+
+    // FIXME: moving forward the layout is calculated from the actual template content; figure out how to get rid of this method, or at least *only* use it from TemplateService
+    [Obsolete("Layout is now calculated from the content. This will be removed in Umbraco 19.")]
+    public void SetLayout(ITemplate? layout)
     {
-        if (masterTemplate == null)
+        if (layout == null)
         {
-            MasterTemplateId = new Lazy<int>(() => -1);
-            MasterTemplateAlias = null;
+            LayoutId = new Lazy<int>(() => -1);
+            LayoutAlias = null;
         }
         else
         {
-            MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
-            MasterTemplateAlias = masterTemplate.Alias;
+            LayoutId = new Lazy<int>(() => layout.Id);
+            LayoutAlias = layout.Alias;
         }
     }
 

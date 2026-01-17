@@ -44,7 +44,7 @@ export const data: Array<UmbMockTemplateModel> = [
 	{
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
-		masterTemplate: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
+		layout: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		name: 'Child',
 		hasChildren: false,
 		alias: 'Test',
@@ -55,10 +55,10 @@ export const data: Array<UmbMockTemplateModel> = [
 	{
 		id: '9a84c0b3-03b4-4dd4-84ac-706740acwerer0f72',
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
-		name: 'Has Master Template',
-		masterTemplate: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
+		name: 'Has Layout',
+		layout: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		hasChildren: false,
-		alias: 'hasMasterTemplate',
+		alias: 'hasLayout',
 		flags: [],
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = "Test.cshtml";\r\n}',
@@ -74,11 +74,11 @@ export const data: Array<UmbMockTemplateModel> = [
 	},
 ];
 
-export const createTemplateScaffold = (masterTemplateAlias: string) => {
+export const createTemplateScaffold = (layoutAlias: string) => {
 	return `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
-	Layout = ${masterTemplateAlias};
+	Layout = ${layoutAlias};
 }`;
 };
 
