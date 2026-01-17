@@ -128,7 +128,7 @@ public interface ISqlSyntaxProvider
     /// A string containing the SQL type cast extension (null type annotation) that represents a null value for type
     /// <typeparamref name="T"/>, or an empty string if no extension is defined.
     /// </returns>
-    string GetNullExtension<T>() => string.Empty;
+    string GetNullExtension<T>() => throw new NotImplementedException();
 
     bool DoesTableExist(IDatabase db, string tableName);
 
@@ -272,5 +272,5 @@ public interface ISqlSyntaxProvider
     /// <typeparam name="T">type of the entity.</typeparam>
     /// <param name="constraintName">unlimited name.</param>
     /// <returns>truncated name.</returns>
-    string? TruncateConstraintName<T>(string? constraintName) => constraintName;
+    string? TruncateConstraintName<T>(string? constraintName) => throw new NotImplementedException();
 }
