@@ -65,10 +65,46 @@ internal sealed class ContentPublishingService : IContentPublishingService
         ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,
         Guid userKey)
     {
-        var culturesToPublishImmediately =
-            culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? Constants.System.InvariantCulture).ToHashSet();
+        CultureAndScheduleModel cultureAndSchedule = BuildCultureAndScheduleModel(key, culturesToPublishOrSchedule);
 
-        ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        IContent? content = _contentService.GetById(key);
+        if (content is null)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
+        }
+
+        return await PublishAsync(scope, content, cultureAndSchedule, userKey);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+        IContent content,
+        ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,
+        Guid userKey,
+        bool skipValidation = false)
+    {
+        CultureAndScheduleModel cultureAndSchedule = BuildCultureAndScheduleModel(content.Key, culturesToPublishOrSchedule);
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        return await PublishAsync(scope, content, cultureAndSchedule, userKey, skipValidation);
+    }
+
+    private CultureAndScheduleModel BuildCultureAndScheduleModel(
+        Guid contentKey,
+        ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule)
+    {
+        var culturesToPublishImmediately = culturesToPublishOrSchedule
+            .Where(culture => culture.Schedule is null)
+            .Select(c => c.Culture ?? Constants.System.InvariantCulture)
+            .ToHashSet();
+
+        ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(contentKey);
 
         foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
         {
@@ -93,31 +129,20 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
         }
 
-        var cultureAndSchedule = new CultureAndScheduleModel
+        return new CultureAndScheduleModel
         {
             CulturesToPublishImmediately = culturesToPublishImmediately,
             Schedules = schedules,
         };
-
-        return await PublishAsync(key, cultureAndSchedule, userKey);
     }
 
-    /// <inheritdoc />
-    // TODO - Integrate this implementation into the one above.
     private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
-        Guid key,
+        ICoreScope scope,
+        IContent content,
         CultureAndScheduleModel cultureAndSchedule,
-        Guid userKey)
+        Guid userKey,
+        bool skipValidation = false)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ContentTree);
-        IContent? content = _contentService.GetById(key);
-        if (content is null)
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
-        }
-
         // If nothing is requested for publish or scheduling, clear all schedules and publish nothing.
         if (cultureAndSchedule.CulturesToPublishImmediately.Count == 0 &&
             cultureAndSchedule.Schedules.FullSchedule.Count == 0)
@@ -187,17 +212,19 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
         }
 
-        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
-        if (validationResult.ValidationErrors.Any())
+        if (skipValidation == false)
         {
-            scope.Complete();
-            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult
+            ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
+            if (validationResult.ValidationErrors.Any())
             {
-                Content = content,
-                InvalidPropertyAliases = validationResult.ValidationErrors.Select(property => property.Alias).ToArray()
-            });
+                scope.Complete();
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult
+                {
+                    Content = content,
+                    InvalidPropertyAliases = validationResult.ValidationErrors.Select(property => property.Alias).ToArray()
+                });
+            }
         }
-
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
 
@@ -232,7 +259,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             {
                 Content = content,
                 InvalidPropertyAliases = result.InvalidProperties?.Select(property => property.Alias).ToArray()
-                                         ?? Enumerable.Empty<string>()
+                                         ?? Enumerable.Empty<string>(),
             });
     }
 

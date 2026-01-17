@@ -190,4 +190,9 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithTitle("Unknown content query status.")
                 .Build()),
         });
+
+    protected static IList<CulturePublishScheduleModel> GetImmediateCulturePublishSchedule(IEnumerable<string?> cultures) =>
+        cultures
+            .Select(culture => new CulturePublishScheduleModel { Culture = culture })
+            .ToList();
 }
