@@ -392,7 +392,7 @@ public class TextBuilder : Builder
         {
             sb.Append("virtual ");
         }
-        WriteClrType(sb, property.ClrTypeName);
+        WriteClrType(sb, property.ModelClrType);
 
         sb.AppendFormat(
             " {0} => ",
@@ -474,7 +474,7 @@ public class TextBuilder : Builder
             {
                 sb.Append("virtual ");
             }
-            WriteClrType(sb, property.ClrTypeName);
+            WriteClrType(sb, property.ModelClrType);
             sb.AppendFormat(
                 " {0} => {1}(this, _publishedValueFallback);\n",
                 property.ClrName,
@@ -487,14 +487,14 @@ public class TextBuilder : Builder
             {
                 sb.Append("virtual ");
             }
-            WriteClrType(sb, property.ClrTypeName);
+            WriteClrType(sb, property.ModelClrType);
             sb.AppendFormat(
                 " {0} => this.Value",
                 property.ClrName);
             if (property.ModelClrType != typeof(object))
             {
                 sb.Append("<");
-                WriteClrType(sb, property.ClrTypeName);
+                WriteClrType(sb, property.ModelClrType);
                 sb.Append(">");
             }
 
@@ -532,7 +532,7 @@ public class TextBuilder : Builder
         }
 
         sb.Append("\t\tpublic static ");
-        WriteClrType(sb, property.ClrTypeName);
+        WriteClrType(sb, property.ModelClrType);
         sb.AppendFormat(
             " {0}(I{1} that, IPublishedValueFallback publishedValueFallback) => that.Value",
             mixinStaticGetterName,
@@ -540,7 +540,7 @@ public class TextBuilder : Builder
         if (property.ModelClrType != typeof(object))
         {
             sb.Append("<");
-            WriteClrType(sb, property.ClrTypeName);
+            WriteClrType(sb, property.ModelClrType);
             sb.Append(">");
         }
 
@@ -592,7 +592,7 @@ public class TextBuilder : Builder
         }
 
         sb.Append("\t\t");
-        WriteClrType(sb, property.ClrTypeName);
+        WriteClrType(sb, property.ModelClrType);
         sb.AppendFormat(
             " {0} {{ get; }}\n",
             property.ClrName);
@@ -602,33 +602,6 @@ public class TextBuilder : Builder
             sb.Append("\n");
             sb.Append("\t\t *\n");
             sb.Append("\t\t */\n");
-        }
-    }
-
-    internal void WriteClrType(StringBuilder sb, string type)
-    {
-        var p = type.IndexOf('<');
-        if (type.Contains('<'))
-        {
-            WriteNonGenericClrType(sb, type[..p]);
-            sb.Append("<");
-            var args = type[(p + 1)..].TrimEnd(Constants.CharArrays.GreaterThan)
-                .Split(Constants.CharArrays.Comma); // TODO: will NOT work with nested generic types
-            for (var i = 0; i < args.Length; i++)
-            {
-                if (i > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                WriteClrType(sb, args[i]);
-            }
-
-            sb.Append(">");
-        }
-        else
-        {
-            WriteNonGenericClrType(sb, type);
         }
     }
 
