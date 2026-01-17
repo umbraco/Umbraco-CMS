@@ -250,23 +250,23 @@ public class DatabaseSchemaCreator
                 && x.InvariantStartsWith("IX_") == false).ToList();
 
         var foreignKeysInSchema = result.TableDefinitions
-            .SelectMany(x =>
-                x.ForeignKeys
-                .Where(x => x is not null)
-                .Select(y => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(y.Name)))
+            .SelectMany(def =>
+                def.ForeignKeys
+                .Where(fk => fk is not null)
+                .Select(fk => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(fk.Name)))
             .ToList();
 
         var primaryKeysInSchema = result.TableDefinitions
-            .SelectMany(x =>
-                x.Columns
-                .Where(x => x.PrimaryKeyName.IsNullOrWhiteSpace() == false)
-                .Select(y => SqlSyntax.TruncateConstraintName<ColumnDefinition>(y.PrimaryKeyName)))
+            .SelectMany(def =>
+                def.Columns
+                .Where(col => col.PrimaryKeyName.IsNullOrWhiteSpace() == false)
+                .Select(col => SqlSyntax.TruncateConstraintName<ColumnDefinition>(col.PrimaryKeyName)))
             .ToList();
 
         // Add valid and invalid foreign key differences to the result object
         // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
         // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
-        HandleUnknowConstraints(result, unknownConstraintsInDatabase, foreignKeysInSchema, primaryKeysInSchema);
+        HandleUnknownConstraints(result, unknownConstraintsInDatabase, foreignKeysInSchema, primaryKeysInSchema);
 
         // Foreign keys:
         AddValidForeignKeys(result, foreignKeysInDatabase, foreignKeysInSchema);
@@ -280,7 +280,7 @@ public class DatabaseSchemaCreator
         AddErrorsForInvalidPrimaryKeys(result, primaryKeysInDatabase, primaryKeysInSchema);
     }
 
-    private static void HandleUnknowConstraints(DatabaseSchemaResult result, List<string> unknownConstraintsInDatabase, List<string?> foreignKeysInSchema, List<string?> primaryKeysInSchema)
+    private static void HandleUnknownConstraints(DatabaseSchemaResult result, List<string> unknownConstraintsInDatabase, List<string?> foreignKeysInSchema, List<string?> primaryKeysInSchema)
     {
         foreach (var unknown in unknownConstraintsInDatabase)
         {
@@ -324,8 +324,9 @@ public class DatabaseSchemaCreator
 
     private static void AddValidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string?> primaryKeysInSchema)
     {
-        IEnumerable<string> validPrimaryKeyDifferences = primaryKeysInDatabase!
-            .Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!;
+        IEnumerable<string> validPrimaryKeyDifferences = primaryKeysInDatabase
+            .Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+            .Where(k => k is not null).Select(k => k!);
 
         foreach (var primaryKey in validPrimaryKeyDifferences)
         {
@@ -335,9 +336,10 @@ public class DatabaseSchemaCreator
 
     private static void AddErrorsForInvalidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string?> primaryKeysInSchema)
     {
-        IEnumerable<string> invalidPrimaryKeyDifferences = primaryKeysInDatabase!
-            .Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!
-            .Union(primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase))!;
+        IEnumerable<string?> onlyInSchema = primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase);
+        IEnumerable<string?> onlyInDatabase = primaryKeysInDatabase.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+        IEnumerable<string> invalidPrimaryKeyDifferences = onlyInDatabase.Union(onlyInSchema)
+            .Where(x => x is not null).Select(x => x!);
 
         foreach (var primaryKey in invalidPrimaryKeyDifferences)
         {
