@@ -876,8 +876,8 @@ export default {
 		reset: 'Reiniciar',
 	},
 	rollback: {
-		diffHelp:
-			'Esto muestra las diferencias entre la versión actual y la versión seleccionada<br /><del>Red</del> el texto de la versión seleccionada no se mostrará. , <ins>el verde significa añadido</ins>',
+		diffHelp: 'El texto en <del>rojo</del> se eliminará en la versión seleccionada, el texto en <ins>verde</ins> se añadirá.',
+		showDiff: 'Mostrar diferencias entre la versión actual (borrador) y la versión seleccionada.',
 		documentRolledBack: 'Se ha recuperado la última versión del documento.',
 		htmlHelp:
 			'Esto muestra la versión seleccionada como html, si deseas ver la diferencia entre 2 versiones al mismo tiempo, por favor usa la vista diff',
