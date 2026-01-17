@@ -312,30 +312,20 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
-        ContentNuDto newOrCachedEntity = GetDtoFromCacheNode(content, !preview, serializer);
+        ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
-        newOrCachedEntity.RawData ??= [];
-        newOrCachedEntity.Rv++;
-        Sql<ISqlContext> existingSql = Sql()
-            .SelectAll()
-            .From<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == newOrCachedEntity.NodeId && x.Published == newOrCachedEntity.Published);
-        ContentNuDto? existingEntity = await Database.FirstOrDefaultAsync<ContentNuDto>(existingSql);
+        string C(string s) => SqlSyntax.GetQuotedColumnName(s);
 
-        if (existingEntity is null)
-        {
-            await Database.InsertAsync(newOrCachedEntity);
-        }
-        else
-        {
-            Sql<ISqlContext> updateSql = Sql()
-                .Update<ContentNuDto>(u => u
-                    .Set(d => d.Data, newOrCachedEntity.Data)
-                    .Set(rd => rd.RawData, newOrCachedEntity.RawData)
-                    .Set(v => v.Rv, newOrCachedEntity.Rv))
-                .Where<ContentNuDto>(x => x.NodeId == newOrCachedEntity.NodeId && x.Published == newOrCachedEntity.Published);
-            await Database.ExecuteAsync(updateSql);
-        }
+        await Database.InsertOrUpdateAsync(
+           dto,
+           $"SET data = @data, {C("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {C("nodeId")} = @id AND published = @published",
+           new
+           {
+               dataRaw = dto.RawData ?? Array.Empty<byte>(),
+               data = dto.Data,
+               id = dto.NodeId,
+               published = dto.Published,
+           });
     }
 
     /// <summary>
