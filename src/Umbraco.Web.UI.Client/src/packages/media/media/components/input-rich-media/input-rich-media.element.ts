@@ -372,6 +372,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return html`<umb-dropzone-media
 			id="dropzone"
 			?multiple=${this.multiple}
+			.parentUnique=${this.startNode?.unique ?? null}
 			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 

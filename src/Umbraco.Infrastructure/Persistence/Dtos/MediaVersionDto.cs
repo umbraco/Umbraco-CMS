@@ -5,19 +5,22 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class MediaVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.MediaVersion;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    [Column("id")]
+    private const string PathColumnName = "path";
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName, ForColumns = "id, path")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName, ForColumns = $"{PrimaryKeyColumnName}, {PathColumnName}")]
     public int Id { get; set; }
 
-    [Column("path")]
+    [Column(PathColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Path { get; set; }
 
