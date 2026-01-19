@@ -17,7 +17,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [Category("Slow")]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
+[UmbracoTest(
+    Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+    PublishedRepositoryEvents = true,
     WithApplication = true)]
 internal sealed class MemberServiceTests : UmbracoIntegrationTest
 {
@@ -464,7 +466,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     [TestCase("MyTestRole1", "test", StringPropertyMatchType.Exact, 0)]
     [TestCase("MyTestRole1", "st2", StringPropertyMatchType.EndsWith, 1)]
     [TestCase("MyTestRole1", "test%", StringPropertyMatchType.Wildcard, 3)]
-    public void Find_Members_In_Role(string roleName1, string usernameToMatch, StringPropertyMatchType matchType,
+    public void Find_Members_In_Role(
+        string roleName1,
+        string usernameToMatch,
+        StringPropertyMatchType matchType,
         int resultCount)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
@@ -749,7 +754,14 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
-        var found = MemberService.GetAll(0, 2, out var totalRecs, "username", Direction.Ascending, true, null,
+        var found = MemberService.GetAll(
+            0,
+            2,
+            out var totalRecs,
+            "username",
+            Direction.Ascending,
+            true,
+            null,
             "Member No-");
 
         Assert.AreEqual(2, found.Count());
@@ -843,7 +855,11 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
-        var found = MemberService.FindByEmail("hello@test.com", 0, 100, out var totalRecs,
+        var found = MemberService.FindByEmail(
+            "hello@test.com",
+            0,
+            100,
+            out var totalRecs,
             StringPropertyMatchType.Exact);
 
         Assert.AreEqual(1, found.Count());
@@ -997,7 +1013,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -1027,7 +1045,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -1057,7 +1077,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -1087,7 +1109,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -1117,7 +1141,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -1147,9 +1173,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1177,9 +1207,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1207,9 +1241,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1237,9 +1275,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1267,9 +1309,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
+            },
+            "content",
+            "Content");
         MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1377,13 +1423,37 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var username = Path.GetRandomFileName();
 
         // Act
-        var member = MemberService.CreateMemberWithIdentity(username, $"{username}@domain.email",
-            Path.GetFileNameWithoutExtension(username), memberType);
+        var member = MemberService.CreateMemberWithIdentity(
+            username,
+            $"{username}@domain.email",
+            Path.GetFileNameWithoutExtension(username),
+            memberType);
         var found = MemberService.GetById(member.Id);
 
         // Assert
         Assert.IsNotNull(member, "Verifying a member instance has been created");
         Assert.IsNotNull(found, "Verifying the created member instance has been retrieved");
         Assert.IsTrue(found?.Name == member?.Name, "Verifying the retrieved member instance has the expected name");
+    }
+
+    [Test]
+    public async Task Can_Get_Multiple_By_Key()
+    {
+        var memberType = MemberTypeService.Get("member");
+        IMember memberA = new Member("aname", "a@email", "ausername", "arawpassword", memberType, true);
+        MemberService.Save(memberA);
+
+        IMember memberB = new Member("bname", "b@email", "busername", "brawpassword", memberType, true);
+        MemberService.Save(memberB);
+
+        IMember memberC = new Member("cname", "c@email", "cusername", "crawpassword", memberType, true);
+        MemberService.Save(memberC);
+
+        var members = (await MemberService.GetByKeysAsync(memberA.Key, memberB.Key, memberC.Key)).ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, members.Length);
+            CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
+        });
     }
 }

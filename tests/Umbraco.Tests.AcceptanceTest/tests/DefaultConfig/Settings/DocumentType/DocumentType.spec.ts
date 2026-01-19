@@ -21,11 +21,11 @@ test('can create a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  await umbracoUi.documentType.clickSaveButton();
+  const documentTypeId = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
-  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
-  expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
+  const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
+  expect(documentTypeData.name).toBe(documentTypeName);
   await umbracoUi.documentType.reloadTree('Document Types');
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
 });
@@ -40,15 +40,14 @@ test('can create a document type with a template', {tag: '@smoke'}, async ({umbr
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentTypeWithTemplateButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  await umbracoUi.documentType.clickSaveButton();
+  const {documentTypeId, templateId} = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeAndTemplateToBeCreated();
 
   // Assert
-  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   // Checks if the documentType contains the template
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
+  expect(documentTypeData.allowedTemplates[0].id).toEqual(templateId);
   const templateData = await umbracoApi.template.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates[0].id).toEqual(templateData.id);
-  expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
@@ -63,13 +62,11 @@ test('can create a element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateElementTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  await umbracoUi.documentType.clickSaveButton();
+  const documentTypeId = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
-  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
-  expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
   expect(documentTypeData.isElement).toBeTruthy();
 });
 
@@ -83,10 +80,9 @@ test('can rename a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.documentType.goToDocumentType(wrongName);
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   await umbracoUi.documentType.isDocumentTreeItemVisible(wrongName, false);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
@@ -104,10 +100,9 @@ test('can update the alias for a document type', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.enterAliasName(newAlias);
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName, true);
   const documentTypeDataNew = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeDataNew.alias).toBe(newAlias);
@@ -121,12 +116,11 @@ test('can add an icon for a document type', {tag: '@smoke'}, async ({umbracoApi,
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.documentType.updateIcon(bugIcon);
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.icon).toBe(bugIcon);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName, true);
@@ -141,9 +135,8 @@ test('can delete a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForDocumentType(documentTypeName);
-  await umbracoUi.documentType.clickDeleteAndConfirmButton();
+  await umbracoUi.documentType.clickDeleteAndConfirmButtonAndWaitForDocumentTypeToBeDeleted();
 
   // Assert
-  await umbracoUi.documentType.waitForDocumentTypeToBeDeleted();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeFalsy();
 });

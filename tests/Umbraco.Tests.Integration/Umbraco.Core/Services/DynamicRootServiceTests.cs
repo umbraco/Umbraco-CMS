@@ -38,11 +38,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         FurthestDescendantOrSelf,
     }
 
-    protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    protected IFileService FileService => GetRequiredService<IFileService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
-    protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
+    private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
     private DynamicRootService DynamicRootService => (GetRequiredService<IDynamicRootService>() as DynamicRootService)!;
 

@@ -24,6 +24,7 @@ public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerB
     /// <summary>
     ///     Gets a paginated list of all saved log searches.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the saved log searches.</returns>

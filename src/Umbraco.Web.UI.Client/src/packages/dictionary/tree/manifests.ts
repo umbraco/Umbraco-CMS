@@ -4,6 +4,7 @@ import {
 	UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
 	UMB_DICTIONARY_TREE_STORE_ALIAS,
 } from './constants.js';
+import { UmbDictionaryTreeStore } from './dictionary-tree.store.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -17,7 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_DICTIONARY_TREE_STORE_ALIAS,
 		name: 'Dictionary Tree Store',
-		api: () => import('./dictionary-tree.store.js'),
+		api: UmbDictionaryTreeStore,
 	},
 	{
 		type: 'tree',

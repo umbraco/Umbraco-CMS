@@ -23,6 +23,7 @@ using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.Strings;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Extensions;
@@ -86,6 +87,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
         builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
         builder.Services.AddUnique<IDistributedJobService, DistributedJobService>();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        // TODO (V18): Replace this with MarkdigMarkdownToHtmlConverter as the default implementation.
+        builder.Services.AddUnique<IMarkdownToHtmlConverter, HeyRedMarkdownToHtmlConverter>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return builder;
     }

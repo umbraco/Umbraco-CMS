@@ -24,10 +24,9 @@ test('can create an entity picker data type with tree data source', async ({umbr
   await umbracoUi.dataType.clickChooseDataSourceButton();
   await umbracoUi.dataType.clickButtonWithName('My Picker Tree Data Source');
   await umbracoUi.dataType.clickChooseModalButton();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });

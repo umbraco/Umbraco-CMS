@@ -55,7 +55,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
     }
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
+    private Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
     public IDataType? Get(Guid key) => GetMany().FirstOrDefault(x => x.Key == key);
 

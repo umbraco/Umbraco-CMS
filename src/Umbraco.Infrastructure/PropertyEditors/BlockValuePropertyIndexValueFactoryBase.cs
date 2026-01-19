@@ -219,10 +219,19 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
                     continue;
                 }
 
+                var propertyCulture = rawPropertyData.Culture ?? culture;
+
+                if (propertyType.VariesByCulture() is false && propertyCulture is not null)
+                {
+                    // culture variance mismatch - the stored property value varies by culture, but the element property
+                    // does not. this is likely due to element (or element property) variation changes since last edit.
+                    // we'll ignore this to avoid polluting the indexes with cross-variant values, as the same property
+                    // might have a value in multiple languages.
+                    continue;
+                }
+
                 IProperty subProperty = new Property(propertyType);
                 IEnumerable<IndexValue> indexValues = null!;
-
-                var propertyCulture = rawPropertyData.Culture ?? culture;
 
                 if (propertyType.VariesByCulture() && propertyCulture is null)
                 {

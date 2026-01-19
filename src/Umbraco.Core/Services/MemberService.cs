@@ -548,7 +548,8 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query = Query<IMember>().Where(x => ids.Contains(x.Key));
+            List<Guid> idsAsList = [.. ids];
+            IQuery<IMember> query = Query<IMember>().Where(x => idsAsList.Contains(x.Key));
             return Task.FromResult(_memberRepository.Get(query));
         }
 

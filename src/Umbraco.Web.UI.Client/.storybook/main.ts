@@ -1,6 +1,10 @@
+// This file has been automatically migrated to valid ESM format by Storybook.
+import { createRequire } from "node:module";
 import { dirname, join } from 'path';
 import { StorybookConfig } from '@storybook/web-components-vite';
 import remarkGfm from 'remark-gfm';
+
+const require = createRequire(import.meta.url);
 
 const config: StorybookConfig = {
 	stories: ['../@(src|libs|apps|storybook)/**/*.mdx', '../@(src|libs|apps|storybook)/**/*.stories.@(js|jsx|ts|tsx)'],

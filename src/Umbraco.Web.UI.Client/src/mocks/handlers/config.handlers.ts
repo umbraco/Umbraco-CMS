@@ -1,13 +1,9 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbServertimeOffset } from '@umbraco-cms/backoffice/models';
 
 export const handlers = [
-	rest.get(umbracoPath('/config/servertimeoffset'), (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<UmbServertimeOffset>({ offset: -120 }),
-		);
+	http.get(umbracoPath('/config/servertimeoffset'), () => {
+		return HttpResponse.json<UmbServertimeOffset>({ offset: -120 });
 	}),
 ];

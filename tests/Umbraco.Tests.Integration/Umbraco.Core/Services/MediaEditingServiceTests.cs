@@ -14,13 +14,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
 {
-    protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    protected IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
+    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
-    protected IMediaType ImageMediaType { get; set; }
+    private IMediaType ImageMediaType { get; set; }
 
-    protected IMediaType ArticleMediaType { get; set; }
+    private IMediaType ArticleMediaType { get; set; }
 
     [SetUp]
     public async Task Setup()

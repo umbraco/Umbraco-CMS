@@ -98,7 +98,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : this(scopeAccessor,
+        : this(
+            scopeAccessor,
             cache,
             logger,
             loggerFactory,
@@ -114,8 +115,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             serializer,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
@@ -141,7 +141,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             }
         }
 
-        return GetPage<ContentDto>(query, pageIndex, pageSize, out totalRecords,
+        return GetPage<ContentDto>(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
             x => MapDtosToContent(x),
             filterSql,
             ordering);

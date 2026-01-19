@@ -504,7 +504,13 @@ public class DocumentUrlService : IDocumentUrlService
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
     {
         var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
-        IContent item = _contentService.GetById(id)!;
+        IContent? item = _contentService.GetById(id);
+        if (item is null)
+        {
+            _logger.LogDebug("Skipping URL segment rebuild for document with key {DocumentKey} was not found.", key);
+            return;
+        }
+
         IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
 
         await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)

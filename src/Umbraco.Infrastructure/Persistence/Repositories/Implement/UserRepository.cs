@@ -53,9 +53,9 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
-    /// <param name="globalCache">The app policy cache.</param>
-    /// <param name="repositoryCacheVersionService"></param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -725,14 +725,20 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
         if (entity.IsPropertyDirty("StartContentIds"))
         {
-            AddingOrUpdateStartNodes(entity, Enumerable.Empty<UserStartNodeDto>(),
-                UserStartNodeDto.StartNodeTypeValue.Content, entity.StartContentIds);
+            AddingOrUpdateStartNodes(
+                entity,
+                Enumerable.Empty<UserStartNodeDto>(),
+                UserStartNodeDto.StartNodeTypeValue.Content,
+                entity.StartContentIds);
         }
 
         if (entity.IsPropertyDirty("StartMediaIds"))
         {
-            AddingOrUpdateStartNodes(entity, Enumerable.Empty<UserStartNodeDto>(),
-                UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
+            AddingOrUpdateStartNodes(
+                entity,
+                Enumerable.Empty<UserStartNodeDto>(),
+                UserStartNodeDto.StartNodeTypeValue.Media,
+                entity.StartMediaIds);
         }
 
         if (entity.IsPropertyDirty("Groups"))
@@ -937,8 +943,11 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         userGroupCache.Clear(cacheKey);
     }
 
-    private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current,
-        UserStartNodeDto.StartNodeTypeValue startNodeType, int[]? entityStartIds)
+    private void AddingOrUpdateStartNodes(
+        IEntity entity,
+        IEnumerable<UserStartNodeDto> current,
+        UserStartNodeDto.StartNodeTypeValue startNodeType,
+        int[]? entityStartIds)
     {
         if (entityStartIds is null)
         {
@@ -1112,10 +1121,16 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     ///     The query supplied will ONLY work with data specifically on the umbracoUser table because we are using NPoco paging
     ///     (SQL paging)
     /// </remarks>
-    public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser>? query, long pageIndex, int pageSize,
+    public IEnumerable<IUser> GetPagedResultsByQuery(
+        IQuery<IUser>? query,
+        long pageIndex,
+        int pageSize,
         out long totalRecords,
-        Expression<Func<IUser, object?>> orderBy, Direction orderDirection = Direction.Ascending,
-        string[]? includeUserGroups = null, string[]? excludeUserGroups = null, UserState[]? userState = null,
+        Expression<Func<IUser, object?>> orderBy,
+        Direction orderDirection = Direction.Ascending,
+        string[]? includeUserGroups = null,
+        string[]? excludeUserGroups = null,
+        UserState[]? userState = null,
         IQuery<IUser>? filter = null)
     {
         if (orderBy == null)
@@ -1306,7 +1321,9 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return sql;
     }
 
-    private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IUser, object?>>? orderBy,
+    private Sql<ISqlContext> ApplySort(
+        Sql<ISqlContext> sql,
+        Expression<Func<IUser, object?>>? orderBy,
         Direction orderDirection)
     {
         if (orderBy == null)
