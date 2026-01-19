@@ -1,3 +1,7 @@
+import blueFlowersImgUrl from './images/blue-flowers-small.jpg';
+import redflowersImgUrl from './images/red-flowers-small.jpg';
+import branchImgUrl from './images/branch-small.jpg';
+import grassImgUrl from './images/grass-small.jpg';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
 import type { UmbWithThumbnailModel } from '@umbraco-cms/backoffice/models';
@@ -35,7 +39,7 @@ const customItems: Array<ExampleThumbnailCollectionItemModel> = [
 		name: 'Example 1',
 		icon: 'icon-shape-triangle',
 		thumbnail: {
-			src: 'https://placehold.co/600x400',
+			src: blueFlowersImgUrl,
 			alt: 'Example 1 thumbnail',
 		},
 	},
@@ -45,7 +49,7 @@ const customItems: Array<ExampleThumbnailCollectionItemModel> = [
 		name: 'Example 2',
 		icon: 'icon-shape-triangle',
 		thumbnail: {
-			src: 'https://placehold.co/600x400',
+			src: redflowersImgUrl,
 			alt: 'Example 2 thumbnail',
 		},
 	},
@@ -62,7 +66,7 @@ const customItems: Array<ExampleThumbnailCollectionItemModel> = [
 		name: 'Example 4',
 		icon: 'icon-shape-triangle',
 		thumbnail: {
-			src: 'https://placehold.co/600x400',
+			src: branchImgUrl,
 			alt: 'Example 4 thumbnail',
 		},
 	},
@@ -72,7 +76,7 @@ const customItems: Array<ExampleThumbnailCollectionItemModel> = [
 		name: 'Example 5',
 		icon: 'icon-shape-triangle',
 		thumbnail: {
-			src: 'https://placehold.co/600x400',
+			src: grassImgUrl,
 			alt: 'Example 5 thumbnail',
 		},
 	},
