@@ -122,7 +122,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const noGroupBlocks = blocks.filter((block) => !blockGroups.find((group) => group.key === block.groupKey));
 
 		const grouped = blockGroups.map((group) => ({
-			name: group.name,
+			name: this.localize.string(group.name),
 			blocks: blocks.filter((block) => block.groupKey === group.key),
 		}));
 

@@ -165,8 +165,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		} else {
 			return html`
 				<div id="header">
-					<p><b>${this.property.name}</b></p>
-					<p><i>${this.property.alias}</i></p>
+					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
 					<p>${this.property.description}</p>
 				</div>
 				<div id="editor">
@@ -429,6 +428,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#header i {
 				opacity: 0.55;
+				float: right;
 			}
 
 			#header umb-input-with-alias {
@@ -459,7 +459,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			}
 			#editor-name {
 				position: absolute;
-				top: var(--uui-size-space-4);
+				top: var(--uui-size-space-3);
 				left: var(--uui-size-space-4);
 				font-size: var(--uui-type-small-size);
 				font-weight: 400;

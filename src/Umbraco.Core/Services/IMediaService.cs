@@ -219,7 +219,10 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// </summary>
     /// <param name="medias">Collection of <see cref="IMedia" /> to save</param>
     /// <param name="userId">Id of the User saving the Media</param>
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
     Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets an <see cref="IMedia" /> object by its 'UniqueId'
@@ -228,7 +231,10 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
     IMedia? GetById(Guid key);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Level

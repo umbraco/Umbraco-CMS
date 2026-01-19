@@ -123,8 +123,12 @@ public class UserGroupServiceTests
             {
                 persistedUserGroup
             });
-        var updatingUserGroup = new UserGroup(Mock.Of<IShortStringHelper>(), 0, persistedUserGroup.Alias + "updated",
-            persistedUserGroup.Name + "updated", null)
+        var updatingUserGroup = new UserGroup(
+            Mock.Of<IShortStringHelper>(),
+            0,
+            persistedUserGroup.Alias + "updated",
+            persistedUserGroup.Name + "updated",
+            null)
         {
             Key = persistedUserGroup.Key,
             Id = persistedUserGroup.Id

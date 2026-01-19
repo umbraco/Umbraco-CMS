@@ -48,8 +48,9 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 	}
 
 	#onDropdownOpened() {
-		if (this.#scrollContainerElement) {
-			return; // Already created
+		if (this.#entityActionListElement) {
+			this.#entityActionListElement.focus();
+			return;
 		}
 
 		// First create dropdown content when the dropdown is opened.
@@ -69,6 +70,13 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 			id="action-modal"
 			@click=${this.#onDropdownClick}
 			@opened=${this.#onDropdownOpened}
+			@focusout=${(e: FocusEvent) => {
+				const relatedTarget = e.relatedTarget as HTMLElement | null;
+				if (!relatedTarget) return;
+				const allowedTags = ['umb-entity-action-list', 'uui-scroll-container', 'uui-menu-item', 'umb-entity-action'];
+				if (allowedTags.includes(relatedTarget.tagName.toLowerCase())) return;
+				this.#onActionExecuted();
+			}}
 			.label=${this.label}
 			?compact=${this.compact}
 			hide-expand>

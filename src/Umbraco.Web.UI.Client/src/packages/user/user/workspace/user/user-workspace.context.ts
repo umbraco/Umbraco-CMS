@@ -109,10 +109,10 @@ export class UmbUserWorkspaceContext
 		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
-	deleteAvatar() {
+	async deleteAvatar() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
-		return this.avatarRepository.deleteAvatar(unique);
+		await this.avatarRepository.deleteAvatar(unique);
 	}
 
 	override destroy(): void {

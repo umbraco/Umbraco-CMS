@@ -27,7 +27,8 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
     ///     Initializes a new instance of the <see cref="AuditEntryRepository" /> class.
     /// </summary>
     public AuditEntryRepository(
-        IRuntimeState runtimeState,IScopeAccessor scopeAccessor,
+        IRuntimeState runtimeState,
+        IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<AuditEntryRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,

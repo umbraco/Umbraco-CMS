@@ -198,8 +198,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		const completedUniques = completedItems.map((item) => item.unique);
 
 		if (this.data?.multiple) {
-			// Multiple selection: add all uploaded items to selection
-			const newSelection = [...(this.value?.selection ?? []), ...completedUniques];
+			// Multiple selection: add all uploaded items to selection, avoiding duplicates
+			const existingSelection = this.value?.selection ?? [];
+			const newSelection = [...new Set([...existingSelection, ...completedUniques])];
 			this._isSelectionMode = newSelection.length > 0;
 			this.modalContext?.setValue({ selection: newSelection });
 		} else {
@@ -551,7 +552,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 			#searching-indicator {
 				margin-left: 7px;
-				margin-top: 4px;
 			}
 
 			#media-grid {

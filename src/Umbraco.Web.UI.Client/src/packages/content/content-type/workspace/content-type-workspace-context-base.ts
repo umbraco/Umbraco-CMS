@@ -153,6 +153,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		const data = await this.structure.reload();
 		if (data) {
 			this._data.setPersisted(data);
+			this._data.setCurrent(data);
 		}
 	}
 
@@ -172,7 +173,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		try {
 			await this.structure.create(parent?.unique);
 
-			this._data.setPersisted(this.structure.getOwnerContentType());
+			const savedData = this.structure.getOwnerContentType();
+			this._data.setPersisted(savedData);
+			this._data.setCurrent(savedData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!eventContext) {
@@ -198,7 +201,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		try {
 			await this.structure.save();
 
-			this._data.setPersisted(this.structure.getOwnerContentType());
+			const savedData = this.structure.getOwnerContentType();
+			this._data.setPersisted(savedData);
+			this._data.setCurrent(savedData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!eventContext) {
