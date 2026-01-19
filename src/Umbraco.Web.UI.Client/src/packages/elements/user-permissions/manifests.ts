@@ -11,7 +11,10 @@ import {
 	UMB_USER_PERMISSION_ELEMENT_UPDATE,
 } from './constants.js';
 import { manifests as conditions } from './conditions/manifests.js';
-import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
+import type {
+	ManifestEntityUserPermission,
+	ManifestGranularUserPermission,
+} from '@umbraco-cms/backoffice/user-permission';
 
 const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 	{
@@ -121,4 +124,20 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 	},
 ];
 
-export const manifests: Array<UmbExtensionManifest> = [...conditions, ...entityUserPermissions];
+const granularPermissions: Array<ManifestGranularUserPermission> = [
+	{
+		type: 'userGranularPermission',
+		alias: 'Umb.UserGranularPermission.Element',
+		name: 'Element Granular User Permission',
+		weight: 1000,
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
+		element: () => import('./input-element-granular-user-permission.element.js'),
+		meta: {
+			schemaType: 'ElementPermissionPresentationModel',
+			label: '#user_permissionsGranular',
+			description: '{#userPermissions_granular_element}',
+		},
+	},
+];
+
+export const manifests: Array<UmbExtensionManifest> = [...conditions, ...entityUserPermissions, ...granularPermissions];

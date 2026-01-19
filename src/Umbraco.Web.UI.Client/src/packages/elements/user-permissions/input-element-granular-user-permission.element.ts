@@ -1,41 +1,40 @@
-import type { UmbDocumentUserPermissionModel } from '../types.js';
-import { UmbDocumentItemRepository } from '../../../item/index.js';
-import type { UmbDocumentItemModel } from '../../../item/types.js';
-import { UMB_DOCUMENT_PICKER_MODAL } from '../../../constants.js';
+import { UmbElementItemRepository } from '../item/repository/element-item.repository.js';
+import { UMB_ELEMENT_PICKER_MODAL } from '../modals/element-picker-modal.token.js';
+import type { UmbElementItemModel } from '../item/repository/types.js';
+import type { UmbElementTreeItemModel } from '../tree/types.js';
+import type { UmbElementUserPermissionModel } from './types.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
-import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_ENTITY_USER_PERMISSION_MODAL } from '@umbraco-cms/backoffice/user-permission';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_ENTITY_USER_PERMISSION_MODAL,
-	type ManifestEntityUserPermission,
-} from '@umbraco-cms/backoffice/user-permission';
+import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
+import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-input-document-granular-user-permission')
-export class UmbInputDocumentGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
-	#permissions: Array<UmbDocumentUserPermissionModel> = [];
-	public get permissions(): Array<UmbDocumentUserPermissionModel> {
+@customElement('umb-input-element-granular-user-permission')
+export class UmbInputElementGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+	#permissions: Array<UmbElementUserPermissionModel> = [];
+	public get permissions(): Array<UmbElementUserPermissionModel> {
 		return this.#permissions;
 	}
-	public set permissions(value: Array<UmbDocumentUserPermissionModel>) {
+	public set permissions(value: Array<UmbElementUserPermissionModel>) {
 		this.#permissions = value;
-		const uniques = value.map((item) => item.document.id);
-		this.#observePickedDocuments(uniques);
+		const uniques = value.map((item) => item.element.id);
+		this.#observePickedElements(uniques);
 	}
 
 	@property({ type: Array, attribute: false })
 	public fallbackPermissions: Array<string> = [];
 
 	@state()
-	private _items?: Array<UmbDocumentItemModel>;
+	private _items?: Array<UmbElementItemModel>;
 
-	#documentItemRepository = new UmbDocumentItemRepository(this);
+	#elementItemRepository = new UmbElementItemRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
-	#documentPickerModalContext?: any;
+	#elementPickerModalContext?: any;
 	#entityUserPermissionModalContext?: any;
 
 	constructor() {
@@ -48,8 +47,8 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		return undefined;
 	}
 
-	async #observePickedDocuments(uniques: Array<string>) {
-		const { asObservable } = await this.#documentItemRepository.requestItems(uniques);
+	async #observePickedElements(uniques: Array<string>) {
+		const { asObservable } = await this.#elementItemRepository.requestItems(uniques);
 		this.observe(
 			asObservable?.(),
 			(items) => {
@@ -59,15 +58,15 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		);
 	}
 
-	async #editGranularPermission(item: UmbDocumentItemModel) {
-		const currentPermissionVerbs = this.#getPermissionForDocument(item.unique)?.verbs ?? [];
-		const result = await this.#selectEntityUserPermissionsForDocument(item, currentPermissionVerbs);
+	async #editGranularPermission(item: UmbElementItemModel) {
+		const currentPermissionVerbs = this.#getPermissionForElement(item.unique)?.verbs ?? [];
+		const result = await this.#selectEntityUserPermissionsForElement(item, currentPermissionVerbs);
 		// don't do anything if the verbs have not been updated
 		if (JSON.stringify(result) === JSON.stringify(currentPermissionVerbs)) return;
 
 		// update permission with new verbs
 		this.permissions = this.#permissions.map((permission) => {
-			if (permission.document.id === item.unique) {
+			if (permission.element.id === item.unique) {
 				return {
 					...permission,
 					verbs: result,
@@ -80,30 +79,29 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 	}
 
 	async #addGranularPermission() {
-		this.#documentPickerModalContext = this.#modalManagerContext?.open(this, UMB_DOCUMENT_PICKER_MODAL, {
+		this.#elementPickerModalContext = this.#modalManagerContext?.open(this, UMB_ELEMENT_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				// prevent already selected items to be picked again
-				// TODO: this type is wrong. It should be the tree item type
-				pickableFilter: (treeItem: UmbDocumentItemModel) =>
-					!this._items?.map((i) => i.unique).includes(treeItem.unique),
+				pickableFilter: (treeItem: UmbElementTreeItemModel) =>
+					!treeItem.isFolder && !this._items?.map((i) => i.unique).includes(treeItem.unique),
 			},
 		});
 
-		this.#documentPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbDeselectedEvent) => {
+		this.#elementPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbDeselectedEvent) => {
 			const selectedEvent = event as UmbSelectedEvent;
 			const unique = selectedEvent.unique;
 			if (!unique) return;
 
-			const documentItem = await this.#requestDocumentItem(unique);
+			const elementItem = await this.#requestElementItem(unique);
 
-			this.#selectEntityUserPermissionsForDocument(documentItem).then(
+			this.#selectEntityUserPermissionsForElement(elementItem).then(
 				(result) => {
-					this.#documentPickerModalContext?.reject();
+					this.#elementPickerModalContext?.reject();
 
-					const permissionItem: UmbDocumentUserPermissionModel = {
-						$type: 'DocumentPermissionPresentationModel',
-						document: { id: unique },
+					const permissionItem: UmbElementUserPermissionModel = {
+						$type: 'ElementPermissionPresentationModel',
+						element: { id: unique },
 						verbs: result,
 					};
 
@@ -111,23 +109,23 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 					this.dispatchEvent(new UmbChangeEvent());
 				},
 				() => {
-					this.#documentPickerModalContext?.reject();
+					this.#elementPickerModalContext?.reject();
 				},
 			);
 		});
 	}
 
-	async #requestDocumentItem(unique: string) {
+	async #requestElementItem(unique: string) {
 		if (!unique) throw new Error('Could not open permissions modal, no unique was provided');
 
-		const { data } = await this.#documentItemRepository.requestItems([unique]);
+		const { data } = await this.#elementItemRepository.requestItems([unique]);
 
-		const documentItem = data?.[0];
-		if (!documentItem) throw new Error('No document item found');
-		return documentItem;
+		const elementItem = data?.[0];
+		if (!elementItem) throw new Error('No element item found');
+		return elementItem;
 	}
 
-	async #selectEntityUserPermissionsForDocument(item: UmbDocumentItemModel, allowedVerbs: Array<string> = []) {
+	async #selectEntityUserPermissionsForElement(item: UmbElementItemModel, allowedVerbs: Array<string> = []) {
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
 		const headline = name ? `Permissions for ${name}` : 'Permissions';
@@ -154,8 +152,8 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		}
 	}
 
-	#removeGranularPermission(item: UmbDocumentItemModel) {
-		const permission = this.#getPermissionForDocument(item.unique);
+	#removeGranularPermission(item: UmbElementItemModel) {
+		const permission = this.#getPermissionForElement(item.unique);
 		if (!permission) return;
 
 		this.permissions = this.#permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
@@ -187,11 +185,11 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
-	#renderRef(item: UmbDocumentItemModel) {
+	#renderRef(item: UmbElementItemModel) {
 		if (!item.unique) return;
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
-		const permissionNames = this.#getPermissionNamesForDocument(item.unique);
+		const permissionNames = this.#getPermissionNamesForElement(item.unique);
 
 		return html`
 			<uui-ref-node .name=${name} .detail=${permissionNames || ''}>
@@ -203,17 +201,17 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		`;
 	}
 
-	#renderIcon(item: UmbDocumentItemModel) {
+	#renderIcon(item: UmbElementItemModel) {
 		if (!item.documentType.icon) return;
 		return html`<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>`;
 	}
 
-	#renderIsTrashed(item: UmbDocumentItemModel) {
+	#renderIsTrashed(item: UmbElementItemModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	#renderEditButton(item: UmbDocumentItemModel) {
+	#renderEditButton(item: UmbElementItemModel) {
 		return html`
 			<uui-button
 				@click=${() => this.#editGranularPermission(item)}
@@ -221,18 +219,18 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		`;
 	}
 
-	#renderRemoveButton(item: UmbDocumentItemModel) {
+	#renderRemoveButton(item: UmbElementItemModel) {
 		return html`<uui-button
 			@click=${() => this.#removeGranularPermission(item)}
 			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
-	#getPermissionForDocument(unique: string) {
-		return this.#permissions?.find((permission) => permission.document.id === unique);
+	#getPermissionForElement(unique: string) {
+		return this.#permissions?.find((permission) => permission.element.id === unique);
 	}
 
-	#getPermissionNamesForDocument(unique: string) {
-		const permission = this.#getPermissionForDocument(unique);
+	#getPermissionNamesForElement(unique: string) {
+		const permission = this.#getPermissionForElement(unique);
 		if (!permission) return;
 
 		return umbExtensionsRegistry
@@ -248,7 +246,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 
 	#getFallbackPermissionVerbsForEntityType(entityType: string) {
 		// get all permissions that are allowed for the entity type and have at least one of the fallback permissions
-		// this is used to determine the default permissions for a document
+		// this is used to determine the default permissions for a element
 		const verbs = umbExtensionsRegistry
 			.getByTypeAndFilter(
 				'entityUserPermission',
@@ -271,10 +269,10 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 	];
 }
 
-export default UmbInputDocumentGranularUserPermissionElement;
+export default UmbInputElementGranularUserPermissionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-granular-user-permission': UmbInputDocumentGranularUserPermissionElement;
+		'umb-element-granular-user-permission': UmbInputElementGranularUserPermissionElement;
 	}
 }

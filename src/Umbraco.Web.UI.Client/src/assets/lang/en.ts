@@ -2217,6 +2217,7 @@ export default {
 		delete_element: 'Allow access to delete an element',
 		duplicate: 'Duplicate',
 		duplicate_element: 'Allow access to duplicate an element',
+		granular_element: 'Assign permissions to specific elements',
 		move: 'Move',
 		move_element: 'Allow access to move an element',
 		publish: 'Publish',
