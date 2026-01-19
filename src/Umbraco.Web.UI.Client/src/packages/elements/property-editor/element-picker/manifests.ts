@@ -3,18 +3,32 @@ import { UMB_PICKER_DATA_SOURCE_TYPE } from '@umbraco-cms/backoffice/picker-data
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
-const dataSource: ManifestPropertyEditorDataSource = {
-	type: 'propertyEditorDataSource',
-	alias: 'Umb.PropertyEditorDataSource.Element',
-	dataSourceType: UMB_PICKER_DATA_SOURCE_TYPE,
-	name: 'Element Property Data Source',
-	api: () => import('./element-tree-data-source.js'),
-	meta: {
-		label: 'Elements',
-		description: 'Umbraco Elements data source for property editors.',
-		icon: 'icon-plugin',
+const dataSources: Array<ManifestPropertyEditorDataSource> = [
+	{
+		type: 'propertyEditorDataSource',
+		alias: 'Umb.PropertyEditorDataSource.Element',
+		dataSourceType: UMB_PICKER_DATA_SOURCE_TYPE,
+		name: 'Element Property Data Source',
+		api: () => import('./element-tree-data-source.js'),
+		meta: {
+			label: 'Elements',
+			description: 'Umbraco Elements data source for property editors.',
+			icon: 'icon-plugin',
+		},
 	},
-};
+	{
+		type: 'propertyEditorDataSource',
+		alias: 'Umb.PropertyEditorDataSource.ElementFolder',
+		dataSourceType: UMB_PICKER_DATA_SOURCE_TYPE,
+		name: 'Element Folder Property Data Source',
+		api: () => import('./element-folder-tree-data-source.js'),
+		meta: {
+			label: 'Element Folders',
+			description: 'Umbraco Element Folders data source for property editors.',
+			icon: 'icon-folder',
+		},
+	},
+];
 
 const propertyEditorUi: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -41,4 +55,4 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [dataSource, propertyEditorUi, schemaManifest];
+export const manifests: Array<UmbExtensionManifest> = [...dataSources, propertyEditorUi, schemaManifest];
