@@ -158,8 +158,10 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         if (_dictionarySettings.EnableValueSearch)
         {
             // Search in both keys and values
+            // Use a subquery to find dictionary items that have matching translations
+            // Then fetch ALL translations for those items
             sql.Where(
-                $"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)",
+                $"({QuotedColumn("key")} LIKE @0 OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1))",
                 $"{filter}%",
                 $"%{filter}%");
         }
