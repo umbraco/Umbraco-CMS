@@ -3,11 +3,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
+/// <summary>
+/// Thread-safe stack implementation for managing ambient EF Core scopes using AsyncLocal storage.
+/// </summary>
+/// <typeparam name="TDbContext">The type of DbContext.</typeparam>
 public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbContext> where TDbContext : DbContext
 {
     private static Lock _lock = new();
     private static AsyncLocal<ConcurrentStack<IEfCoreScope<TDbContext>>> _stack = new();
 
+    /// <inheritdoc />
     public IEfCoreScope<TDbContext>? AmbientScope
     {
         get
@@ -24,6 +29,7 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
         }
     }
 
+    /// <inheritdoc />
     public IEfCoreScope<TDbContext> Pop()
     {
         lock (_lock)
@@ -37,6 +43,7 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
         }
     }
 
+    /// <inheritdoc />
     public void Push(IEfCoreScope<TDbContext> scope)
     {
         lock (_lock)
