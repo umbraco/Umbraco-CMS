@@ -9,7 +9,7 @@
     "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig/Users/Permissions/User/MediaStartNodes",
+    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
     "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
     "releaseTest": "npx playwright test DefaultConfig --grep \"@release\"",
     "testWindows": "npx playwright test DefaultConfig --grep-invert \"RelationType\""
