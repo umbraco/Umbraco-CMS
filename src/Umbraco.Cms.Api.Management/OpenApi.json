@@ -14267,6 +14267,55 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/element/folder": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "operationId": "GetItemElementFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/recycle-bin/element": {
       "delete": {
         "tags": [
@@ -45502,6 +45551,34 @@
         "type": "object",
         "properties": {
           "alias": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FolderItemResponseModel": {
+        "required": [
+          "flags",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
             "type": "string"
           }
         },
