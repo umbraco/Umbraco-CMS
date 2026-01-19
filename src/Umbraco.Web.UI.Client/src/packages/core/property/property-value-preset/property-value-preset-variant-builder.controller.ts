@@ -6,6 +6,7 @@ import type {
 	UmbPropertyValuePreset,
 	UmbPropertyValuePresetApiCallArgs,
 } from './types.js';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
 type ReturnType = UmbElementValueModel;
@@ -20,8 +21,15 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 	 * Sets the cultures to generate values for.
 	 * Cannot be used together with setVariantOptions.
 	 * @param {Array<string>} cultures - Array of culture codes (e.g., ['en-US', 'da-DK'])
+	 * @deprecated Use setVariantOptions instead for more fine-grained control.
 	 */
 	setCultures(cultures: Array<string>): void {
+		new UmbDeprecation({
+			removeInVersion: '20.0.0',
+			deprecated: 'setCultures',
+			solution: 'Use .setVariantOptions method instead',
+		}).warn();
+
 		if (this.#variantOptions) {
 			throw new Error('setCultures cannot be used together with setVariantOptions.');
 		}
@@ -32,8 +40,15 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 	 * Sets the segments to generate values for.
 	 * Cannot be used together with setVariantOptions.
 	 * @param {Array<string>} segments - Array of segment aliases
+	 * @deprecated Use setVariantOptions instead for more fine-grained control.
 	 */
 	setSegments(segments: Array<string>): void {
+		new UmbDeprecation({
+			removeInVersion: '20.0.0',
+			deprecated: 'setSegments',
+			solution: 'Use .setVariantOptions method instead',
+		}).warn();
+
 		if (this.#variantOptions) {
 			throw new Error('setSegments cannot be used together with setVariantOptions.');
 		}
