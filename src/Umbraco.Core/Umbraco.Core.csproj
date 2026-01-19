@@ -49,6 +49,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Extensions\StringExtensions.Culture.cs">
+      <DependentUpon>StringExtensions.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Extensions\StringExtensions.Encoding.cs">
+      <DependentUpon>StringExtensions.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Extensions\StringExtensions.Manipulation.cs">
+      <DependentUpon>StringExtensions.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Extensions\StringExtensions.Parsing.cs">
+      <DependentUpon>StringExtensions.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Extensions\StringExtensions.Sanitization.cs">
+      <DependentUpon>StringExtensions.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Umbraco.Tests</_Parameter1>
     </AssemblyAttribute>
