@@ -2,7 +2,7 @@ import type { UmbWorkspaceModalData } from './workspace-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-workspace-modal')
 export class UmbWorkspaceModalElement extends UmbLitElement {
@@ -29,7 +29,9 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 	 *
 	 */
 	override render() {
-		return this.data ? html`<umb-workspace .entityType=${this.data.entityType}></umb-workspace>` : '';
+		return this.data
+			? html`<umb-workspace .entityType=${this.data.entityType} ${umbDestroyOnDisconnect()}></umb-workspace>`
+			: '';
 	}
 
 	static override styles: CSSResultGroup = [
