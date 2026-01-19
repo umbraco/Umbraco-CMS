@@ -58,7 +58,7 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     [Test]
     public override async Task As_Unauthorized_I_Have_Specified_Access()
     {
-        _currentUserEmail = "testUnaotherized@invalid.test";
+        _currentUserEmail = "testUnauthorized@invalid.test";
         var response = await ClientRequest();
         Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
