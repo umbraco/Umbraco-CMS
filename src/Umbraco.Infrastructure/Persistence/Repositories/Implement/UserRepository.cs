@@ -1172,15 +1172,21 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
         if (userState != null && userState.Length > 0)
         {
-            //the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
+            // the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
             if (userState.Contains(UserState.All) == false)
             {
                 var sb = new StringBuilder("(");
                 var appended = false;
+                var userDisabled = QuoteColumnName("userDisabled");
+                var userNoConsole = QuoteColumnName("userNoConsole");
+                var lastLoginDate = QuoteColumnName("lastLoginDate");
+                var invitedDate = QuoteColumnName("invitedDate");
 
+                var falseValue = SqlSyntax.ConvertIntegerToBoolean(0);
+                var trueValue = SqlSyntax.ConvertIntegerToBoolean(1);
                 if (userState.Contains(UserState.Active))
                 {
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NOT NULL)");
                     appended = true;
                 }
 
@@ -1191,7 +1197,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL)");
+                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NULL)");
                     appended = true;
                 }
 
@@ -1202,7 +1208,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(userDisabled = 1)");
+                    sb.Append($"({userDisabled} = {trueValue})");
                     appended = true;
                 }
 
@@ -1213,7 +1219,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(userNoConsole = 1)");
+                    sb.Append($"({userNoConsole} = {trueValue})");
                     appended = true;
                 }
 
@@ -1224,7 +1230,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
+                    sb.Append($"({lastLoginDate} IS NULL AND {userDisabled} = {trueValue} AND {invitedDate} IS NOT NULL)");
                     appended = true;
                 }
 
@@ -1264,10 +1270,10 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return @$"AND ({userIdQuoted} {inOrNotIn} (SELECT DISTINCT {userIdQuoted}
             FROM {QuoteTableName("umbracoUser")}
             INNER JOIN {QuoteTableName("umbracoUser2UserGroup")}
-            ON {SqlSyntax.GetQuotedColumn("umbracoUser2UserGroup", "userId")} = {userIdQuoted}
+            ON {QuoteColumnName("umbracoUser2UserGroup", "userId")} = {userIdQuoted}
             INNER JOIN {QuoteTableName("umbracoUserGroup")}
-            ON {SqlSyntax.GetQuotedColumn("umbracoUserGroup", "id")} = {SqlSyntax.GetQuotedColumn("umbracoUser2UserGroup", "userGroupId")}
-            WHERE {SqlSyntax.GetQuotedColumn("umbracoUserGroup", "userGroupAlias")} IN (@userGroups)))";
+            ON {QuoteColumnName("umbracoUserGroup", "id")} = {QuoteColumnName("umbracoUser2UserGroup", "userGroupId")}
+            WHERE {QuoteColumnName("umbracoUserGroup", "userGroupAlias")} IN (@userGroups)))";
     }
 
     public IEnumerable<string> GetAllClientIds()
