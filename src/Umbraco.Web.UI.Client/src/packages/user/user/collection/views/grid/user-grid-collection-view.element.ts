@@ -1,7 +1,7 @@
 import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
-import { UMB_USER_WORKSPACE_PATH } from '../../../paths.js';
+import { UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -64,7 +64,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		return html`
 			<umb-entity-collection-item-card
 				.item=${user}
-				href="${UMB_USER_WORKSPACE_PATH}/edit/${user.unique}"
+				href=${UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: user.unique })}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#collectionContext?.selection.isSelected(user.unique)}

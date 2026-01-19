@@ -20,6 +20,11 @@ public abstract class File : EntityBase, IFile
     private string? _name;
     private string _path;
 
+    /// <summary>
+    ///     File-based entities derive their Key from the file path, so Key must be allowed to change when the path changes.
+    /// </summary>
+    protected override bool CanChangeKey => true;
+
     protected File(string path, Func<File, string?>? getFileContent = null)
     {
         _path = SanitizePath(path);
