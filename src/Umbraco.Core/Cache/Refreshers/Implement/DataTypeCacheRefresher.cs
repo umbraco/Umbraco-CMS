@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -18,6 +20,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
+    private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
 
     public DataTypeCacheRefresher(
         AppCaches appCaches,
@@ -29,7 +32,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IPublishedContentTypeFactory publishedContentTypeFactory,
         IPublishedContentTypeCache publishedContentTypeCache,
         IDocumentCacheService documentCacheService,
-        IMediaCacheService mediaCacheService)
+        IMediaCacheService mediaCacheService,
+        IContentTypeCommonRepository contentTypeCommonRepository)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -38,6 +42,34 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         _publishedContentTypeCache = publishedContentTypeCache;
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
+        _contentTypeCommonRepository = contentTypeCommonRepository;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V18.")]
+    public DataTypeCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IDocumentCacheService documentCacheService,
+        IMediaCacheService mediaCacheService)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            eventAggregator,
+            factory,
+            publishedModelFactory,
+            publishedContentTypeFactory,
+            publishedContentTypeCache,
+            documentCacheService,
+            mediaCacheService,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeCommonRepository>())
+    {
     }
 
     #region Json
@@ -83,6 +115,9 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         ClearAllIsolatedCacheByEntityType<IMediaType>();
         ClearAllIsolatedCacheByEntityType<IMember>();
         ClearAllIsolatedCacheByEntityType<IMemberType>();
+
+        // Also clear the 5 minute runtime cache held in ContentTypeCommonRepository.
+        _contentTypeCommonRepository.ClearCache();
 
         Attempt<IAppPolicyCache?> dataTypeCache = AppCaches.IsolatedCaches.Get<IDataType>();
 

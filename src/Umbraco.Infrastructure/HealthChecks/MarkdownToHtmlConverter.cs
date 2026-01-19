@@ -1,4 +1,5 @@
-using HeyRed.MarkdownSharp;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 
@@ -6,10 +7,19 @@ namespace Umbraco.Cms.Infrastructure.HealthChecks;
 
 public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
 {
+    private readonly Core.Strings.IMarkdownToHtmlConverter _markdownToHtmlConverter;
+
+    public MarkdownToHtmlConverter(Core.Strings.IMarkdownToHtmlConverter markdownToHtmlConverter) => _markdownToHtmlConverter = markdownToHtmlConverter;
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public MarkdownToHtmlConverter()
+        : this(StaticServiceProvider.Instance.GetRequiredService<Core.Strings.IMarkdownToHtmlConverter>())
+    {
+    }
+
     public string ToHtml(HealthCheckResults results, HealthCheckNotificationVerbosity verbosity)
     {
-        var mark = new Markdown();
-        var html = mark.Transform(results.ResultsAsMarkDown(verbosity));
+        var html = _markdownToHtmlConverter.ToHtml(results.ResultsAsMarkDown(verbosity));
         html = ApplyHtmlHighlighting(html);
         return html;
     }

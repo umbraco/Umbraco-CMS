@@ -7,9 +7,14 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
+			${this.#renderFilterExtensions()}
 			<div id="slot"><slot></slot></div>
 			<umb-collection-view-bundle></umb-collection-view-bundle>
 		`;
+	}
+
+	#renderFilterExtensions() {
+		return html`<umb-extension-with-api-slot single type="collectionTextFilter"></umb-extension-with-api-slot>`;
 	}
 
 	static override styles = [

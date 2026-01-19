@@ -34,6 +34,7 @@ export class UmbVariantContext extends UmbContextBase {
 			let variantId = contextual.clone();
 			if (!local) return variantId;
 			if (!local.isCultureInvariant()) {
+				// if we vary, then set culture:
 				variantId = variantId.toCulture(local.culture);
 			}
 			if (!local.isSegmentInvariant()) {

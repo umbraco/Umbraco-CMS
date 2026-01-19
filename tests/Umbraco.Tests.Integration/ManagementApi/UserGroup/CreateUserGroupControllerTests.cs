@@ -47,6 +47,7 @@ public class CreateUserGroupControllerTests : ManagementApiUserGroupTestBase<Cre
         {
             Name = "CreatedTestGroup",
             Alias = "testAlias",
+            Description = "Test group description",
             FallbackPermissions = new HashSet<string>(),
             HasAccessToAllLanguages = true,
             Languages = [],

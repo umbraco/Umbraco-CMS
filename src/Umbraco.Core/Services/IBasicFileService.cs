@@ -2,20 +2,24 @@
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides basic file operations for entities that implement <see cref="IFile"/>.
+/// </summary>
+/// <typeparam name="TEntity">The type of file entity.</typeparam>
 public interface IBasicFileService<TEntity> where TEntity : IFile
 {
     /// <summary>
-    /// Gets <see cref="TEntity"/> by path.
+    /// Gets <typeparamref name="TEntity"/> by path.
     /// </summary>
-    /// <param name="path">The path to get <see cref="TEntity"/> from.</param>
-    /// <returns><see cref="TEntity"/>, or null if not found</returns>
+    /// <param name="path">The path to get <typeparamref name="TEntity"/> from.</param>
+    /// <returns><typeparamref name="TEntity"/>, or null if not found.</returns>
     Task<TEntity?> GetAsync(string path);
 
     /// <summary>
-    /// Gets all <see cref="TEntity"/> by path, or all if no paths are specified.
+    /// Gets all <typeparamref name="TEntity"/> by path, or all if no paths are specified.
     /// </summary>
-    /// <param name="paths">Optional paths of <see cref="TEntity"/> to get.</param>
-    /// <returns>IEnumerable of <see cref="TEntity"/></returns>
+    /// <param name="paths">Optional paths of <typeparamref name="TEntity"/> to get.</param>
+    /// <returns>IEnumerable of <typeparamref name="TEntity"/>.</returns>
     Task<IEnumerable<TEntity>> GetAllAsync(params string[] paths);
 
     /// <summary>
@@ -33,9 +37,9 @@ public interface IBasicFileService<TEntity> where TEntity : IFile
     Task SetContentStreamAsync(string path, Stream content);
 
     /// <summary>
-    ///
+    /// Gets the size of a file in bytes.
     /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
+    /// <param name="path">The path to the file.</param>
+    /// <returns>The file size in bytes.</returns>
     Task<long> GetFileSizeAsync(string path);
 }

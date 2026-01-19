@@ -30,10 +30,9 @@ test('can add accepted file extension', async ({ umbracoApi, umbracoUi }) => {
   // Act
   await umbracoUi.dataType.clickAddAcceptedFileExtensionsButton();
   await umbracoUi.dataType.enterAcceptedFileExtensions(fileExtensionValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'fileExtensions', [fileExtensionValue])).toBeTruthy();
 });
 
@@ -45,10 +44,9 @@ test('can remove accepted file extension', async ({ umbracoApi, umbracoUi }) => 
 
   // Act
   await umbracoUi.dataType.removeAcceptedFileExtensionsByValue(removedFileExtensionValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   const customDataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
   expect(customDataTypeData.values).toEqual([]);
 });

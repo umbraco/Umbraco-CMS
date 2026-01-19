@@ -44,9 +44,7 @@ public class TestHelper : TestHelperBase
     private readonly IApplicationShutdownRegistry _hostingLifetime;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IIpResolver _ipResolver;
-    private readonly IBackOfficeInfo _backOfficeInfo;
     private IHostingEnvironment _hostingEnvironment;
-    private readonly string _tempWorkingDir;
 
     public TestHelper()
         : base(typeof(TestHelper).Assembly)
