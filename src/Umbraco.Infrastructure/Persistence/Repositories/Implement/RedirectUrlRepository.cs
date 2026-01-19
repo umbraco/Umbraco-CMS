@@ -160,10 +160,6 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
             .WhereLike<RedirectUrlDto>(x => x.Url, "%" + searchTerm.Trim().ToLowerInvariant() + "%")
-            //.Where(
-            //    string.Format("{0}.{1} LIKE @url", QuoteTableName("umbracoRedirectUrl"),
-            //        QuoteColumnName("url")),
-            //    new { url = "%" + searchTerm.Trim().ToLowerInvariant() + "%" })
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
         total = Convert.ToInt32(result.TotalItems);
