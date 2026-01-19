@@ -29,6 +29,11 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     private readonly ILogger<SqliteSyntaxProvider> _log;
     private readonly IDictionary<Type, IScalarMapper> _scalarMappers;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqliteSyntaxProvider"/> class.
+    /// </summary>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="log">The logger.</param>
     public SqliteSyntaxProvider(IOptions<GlobalSettings> globalSettings, ILogger<SqliteSyntaxProvider> log)
     {
         _globalSettings = globalSettings;
@@ -58,8 +63,10 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     public override string ProviderName => Constants.ProviderName;
 
+    /// <inheritdoc />
     public override string StringColumnDefinition => "TEXT COLLATE NOCASE";
 
+    /// <inheritdoc />
     public override string StringLengthUnicodeColumnDefinitionFormat => "TEXT COLLATE NOCASE";
 
     /// <inheritdoc />
@@ -75,6 +82,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     public override bool SupportsClustered() => false;
 
+    /// <inheritdoc />
     public override string GetIndexType(IndexTypes indexTypes)
     {
         switch (indexTypes)
@@ -87,6 +95,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         }
     }
 
+    /// <inheritdoc />
     public override string Format(TableDefinition table)
     {
         var columns = Format(table.Columns);
@@ -113,11 +122,18 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sb.ToString();
     }
 
+    /// <inheritdoc />
     public override List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys)
     {
         return foreignKeys.Select(Format).ToList();
     }
 
+    // TODO (V18): Change 'virtual' to 'override' to properly override base class method (currently causes CS0114 warning).
+    /// <summary>
+    /// Formats a foreign key definition for SQLite inline table constraint syntax.
+    /// </summary>
+    /// <param name="foreignKey">The foreign key definition to format.</param>
+    /// <returns>The formatted foreign key constraint SQL.</returns>
     public virtual string Format(ForeignKeyDefinition foreignKey)
     {
         var constraintName = string.IsNullOrEmpty(foreignKey.Name)
@@ -156,14 +172,19 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
 
+    /// <inheritdoc />
     public override string ConvertIntegerToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
 
+    /// <inheritdoc />
     public override string ConvertDecimalToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
 
+    /// <inheritdoc />
     public override string ConvertDateToOrderableString => "{0}";
 
+    /// <inheritdoc />
     public override string ConvertUniqueIdentifierToString => "{0}";
 
+    /// <inheritdoc />
     public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
     /// <inheritdoc />
@@ -180,6 +201,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return false;
     }
 
+    /// <inheritdoc />
     public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
     {
         IEnumerable<string> items = db.Fetch<string>($"select sql from sqlite_master where type = 'table' and name = '{tableName}'")
@@ -188,6 +210,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return items.Any();
     }
 
+    /// <inheritdoc />
     public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
@@ -228,11 +251,13 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
     }
 
+    /// <inheritdoc />
     public override string GetConcat(params string[] args)
     {
         return string.Join(" || ", args.AsEnumerable());
     }
 
+    /// <inheritdoc />
     public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
     {
         if (forInsert)
@@ -243,6 +268,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return base.GetColumn(dbType, tableName, columnName, columnAlias!, referenceName, forInsert);
     }
 
+    /// <inheritdoc />
     public override string FormatPrimaryKey(TableDefinition table)
     {
         ColumnDefinition? columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
@@ -278,6 +304,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sql.Append($"LIMIT {top}");
     }
 
+    // TODO (V18): Change 'virtual' to 'override' to properly override base class method (currently causes CS0114 warning).
+    /// <inheritdoc />
     public virtual string Format(IEnumerable<ColumnDefinition> columns)
     {
         var sb = new StringBuilder();
@@ -289,6 +317,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sb.ToString().TrimStart(',');
     }
 
+    /// <inheritdoc />
     public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false)
     {
         var columns = Format(tableDefinition.Columns);
@@ -333,10 +362,12 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         }
     }
 
+    /// <inheritdoc />
     public override IEnumerable<string> GetTablesInSchema(IDatabase db) =>
         db.Fetch<string>("select name from sqlite_master where type='table'")
             .Where(x => !x.StartsWith("sqlite_"));
 
+    /// <inheritdoc />
     public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
     {
         IEnumerable<string> tables = GetTablesInSchema(db);
@@ -409,6 +440,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return foundConstraints.Select(x => Tuple.Create(x.TableName, x.ColumnName, x.ConstraintName));
     }
 
+    /// <inheritdoc />
     public override Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>,
@@ -436,6 +468,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sqlJoin;
     }
 
+    /// <inheritdoc />
     public override IDictionary<Type, IScalarMapper> ScalarMappers => _scalarMappers;
 
     private sealed class Constraint
@@ -476,6 +509,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         public bool IsUnique { get; set; }
     }
 
+    /// <inheritdoc />
     public override string Length => "length";
+
+    /// <inheritdoc />
     public override string Substring => "substr";
 }
