@@ -18,6 +18,7 @@ public class AddElements : AsyncMigrationBase
         EnsureElementTreeLock();
         EnsureElementTables();
         EnsureElementRecycleBin();
+        EnsureElementStartNodeColumn();
         return Task.CompletedTask;
     }
 
@@ -99,6 +100,17 @@ public class AddElements : AsyncMigrationBase
         if (SqlSyntax.SupportsIdentityInsert())
         {
             Database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(NodeDto.TableName)} {(toggleOn ? "ON" : "OFF")} "));
+        }
+    }
+
+    private void EnsureElementStartNodeColumn()
+    {
+        var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
+
+        if (columns.Any(x => x.TableName.InvariantEquals(Constants.DatabaseSchema.Tables.UserGroup)
+                             && x.ColumnName.InvariantEquals("startElementId")) == false)
+        {
+            AddColumn<UserGroupDto>(Constants.DatabaseSchema.Tables.UserGroup, "startElementId");
         }
     }
 }

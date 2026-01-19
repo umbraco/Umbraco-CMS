@@ -11,7 +11,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 [ApiVersion("1.0")]
 public class RootElementRecycleBinController : ElementRecycleBinControllerBase
 {
-    public RootElementRecycleBinController(IEntityService entityService, IElementPresentationFactory elementPresentationFactory)
+    public RootElementRecycleBinController(
+        IEntityService entityService,
+        IElementPresentationFactory elementPresentationFactory)
         : base(entityService, elementPresentationFactory)
     {
     }

@@ -228,12 +228,22 @@ public interface IUserService : IMembershipUserService
     Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(Guid userKey, IEnumerable<Guid> mediaKeys);
 
     /// <summary>
-    /// Get explicitly assigned media permissions for a user and node keys.
+    /// Get explicitly assigned document permissions for a user and node keys.
     /// </summary>
     /// <param name="userKey">Key of user to retrieve permissions for. </param>
     /// <param name="contentKeys">The keys of the content to get permissions for.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>, and an enumerable of permissions.</returns>
     Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(Guid userKey, IEnumerable<Guid> contentKeys);
+
+    /// <summary>
+    /// Get explicitly assigned element permissions for a user and node keys.
+    /// </summary>
+    /// <param name="userKey">Key of user to retrieve permissions for. </param>
+    /// <param name="elementKeys">The keys of the elements to get permissions for.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>, and an enumerable of permissions.</returns>
+    Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetElementPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> elementKeys) => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>
     ///     Get explicitly assigned permissions for a user and optional node ids

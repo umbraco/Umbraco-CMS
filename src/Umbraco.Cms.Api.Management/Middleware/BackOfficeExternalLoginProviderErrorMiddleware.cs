@@ -8,11 +8,11 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Middleware;
 
 /// <summary>
-///     Used to handle errors registered by external login providers
+///     Used to handle errors registered by external login providers.
 /// </summary>
 /// <remarks>
 ///     When an external login provider registers an error with
-///     <see cref="Extensions.HttpContextExtensions.SetExternalLoginProviderErrors" /> during the OAuth process,
+///     <see cref="HttpContextExtensions.SetExternalLoginProviderErrors" /> during the OAuth process,
 ///     this middleware will detect that, store the errors into cookie data and redirect to the back office login so we can
 ///     read the errors back out.
 /// </remarks>

@@ -1,17 +1,15 @@
 import { elementItemCache } from './element-item.server.cache.js';
-import {
-	UmbManagementApiItemDataCacheInvalidationManager,
-	type UmbManagementApiServerEventModel,
-} from '@umbraco-cms/backoffice/management-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbManagementApiItemDataCacheInvalidationManager } from '@umbraco-cms/backoffice/management-api';
 import type { ElementItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbManagementApiServerEventModel } from '@umbraco-cms/backoffice/management-api';
 
 export class UmbManagementApiElementItemDataCacheInvalidationManager extends UmbManagementApiItemDataCacheInvalidationManager<ElementItemResponseModel> {
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: elementItemCache,
-			/* The Element item model includes info about the Element Type.
-			We need to invalidate the cache for both Element and DocumentType events. */
+			/* The element item model includes info about the element Type.
+			We need to invalidate the cache for both element and DocumentType events. */
 			eventSources: ['Umbraco:CMS:Element', 'Umbraco:CMS:DocumentType'],
 			eventTypes: ['Updated', 'Deleted', 'Trashed'],
 		});
@@ -26,19 +24,19 @@ export class UmbManagementApiElementItemDataCacheInvalidationManager extends Umb
 	}
 
 	#onElementChange(event: UmbManagementApiServerEventModel) {
-		// Invalidate the specific Element
-		const ElementId = event.key;
-		this._dataCache.delete(ElementId);
+		// Invalidate the specific element
+		const elementId = event.key;
+		this._dataCache.delete(elementId);
 	}
 
 	#onElementTypeChange(event: UmbManagementApiServerEventModel) {
-		// Invalidate all Elements of the specified Element Type
-		const ElementTypeId = event.key;
-		const ElementIds = this._dataCache
+		// Invalidate all elements of the specified element Type
+		const elementTypeId = event.key;
+		const elementIds = this._dataCache
 			.getAll()
-			.filter((cachedItem) => cachedItem.documentType.id === ElementTypeId)
+			.filter((cachedItem) => cachedItem.documentType.id === elementTypeId)
 			.map((item) => item.id);
 
-		ElementIds.forEach((id) => this._dataCache.delete(id));
+		elementIds.forEach((id) => this._dataCache.delete(id));
 	}
 }

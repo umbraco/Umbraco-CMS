@@ -158,11 +158,11 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override IStatefulNotification UnpublishedNotification(IElement content, EventMessages eventMessages)
         => new ElementUnpublishedNotification(content, eventMessages);
 
-    protected override DeletingVersionsNotification<IElement> DeletingVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
-        => new ElementDeletingVersionsNotification(id, messages, specificVersion, deletePriorVersions, dateToRetain);
+    protected override RollingBackNotification<IElement> RollingBackNotification(IElement target, EventMessages messages)
+        => new ElementRollingBackNotification(target, messages);
 
-    protected override DeletedVersionsNotification<IElement> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
-        => new ElementDeletedVersionsNotification(id, messages, specificVersion, deletePriorVersions, dateToRetain);
+    protected override RolledBackNotification<IElement> RolledBackNotification(IElement target, EventMessages messages)
+        => new ElementRolledBackNotification(target, messages);
 
     #endregion
 }

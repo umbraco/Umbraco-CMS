@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
@@ -11,7 +11,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 [ApiVersion("1.0")]
 public class ChildrenElementRecycleBinController : ElementRecycleBinControllerBase
 {
-    public ChildrenElementRecycleBinController(IEntityService entityService, IElementPresentationFactory elementPresentationFactory)
+    public ChildrenElementRecycleBinController(
+        IEntityService entityService,
+        IElementPresentationFactory elementPresentationFactory)
         : base(entityService, elementPresentationFactory)
     {
     }

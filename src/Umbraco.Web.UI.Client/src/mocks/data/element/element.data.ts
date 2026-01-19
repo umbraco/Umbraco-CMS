@@ -51,6 +51,7 @@ export const data: Array<UmbMockElementModel> = [
 			},
 		],
 		flags: [],
+		noAccess: false,
 	},
 	{
 		ancestors: [],
@@ -65,6 +66,7 @@ export const data: Array<UmbMockElementModel> = [
 		variants: [],
 		values: [],
 		flags: [],
+		noAccess: false,
 	},
 	{
 		ancestors: [{ id: 'element-folder-id' }],
@@ -100,6 +102,7 @@ export const data: Array<UmbMockElementModel> = [
 			},
 		],
 		flags: [],
+		noAccess: false,
 	},
 	{
 		ancestors: [],
@@ -114,6 +117,7 @@ export const data: Array<UmbMockElementModel> = [
 		variants: [],
 		values: [],
 		flags: [],
+		noAccess: false,
 	},
 	{
 		ancestors: [{ id: 'element-folder-id' }, { id: 'element-subfolder-1-id' }],
@@ -149,5 +153,6 @@ export const data: Array<UmbMockElementModel> = [
 			},
 		],
 		flags: [],
+		noAccess: false,
 	},
 ];

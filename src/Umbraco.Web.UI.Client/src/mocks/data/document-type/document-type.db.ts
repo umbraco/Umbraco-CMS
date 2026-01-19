@@ -72,6 +72,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -100,6 +101,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -134,6 +136,7 @@ const documentTypeTreeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTyp
 		icon: item.icon,
 		isElement: item.isElement,
 		flags: item.flags,
+		noAccess: item.noAccess,
 	};
 };
 

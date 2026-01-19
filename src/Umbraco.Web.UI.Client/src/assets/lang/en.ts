@@ -2126,6 +2126,7 @@ export default {
 		languagesHelp: 'Limit the languages users have access to edit',
 		allowAccessToAllLanguages: 'Allow access to all languages',
 		allowAccessToAllDocuments: 'Allow access to all documents',
+		allowAccessToAllElements: 'Allow access to all elements',
 		allowAccessToAllMedia: 'Allow access to all media',
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
@@ -2204,6 +2205,8 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		selectElementStartNode: 'Select element start node',
+		selectElementStartNodeDescription: 'Limit the element library to a specific start node',
 	},
 	validation: {
 		validation: 'Validation',

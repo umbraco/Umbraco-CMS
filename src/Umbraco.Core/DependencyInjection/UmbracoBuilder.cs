@@ -298,8 +298,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITagService, TagService>();
             Services.AddUnique<IContentPermissionService, ContentPermissionService>();
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
+            Services.AddUnique<IElementPermissionService, ElementPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
             Services.AddUnique<IElementService, ElementService>();
+            Services.AddUnique<IElementVersionService, ElementVersionService>();
             Services.AddUnique<IElementContainerService, ElementContainerService>();
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
@@ -424,6 +426,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
             Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
             Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
+            Services.AddSingleton<IElementPermissionAuthorizer, ElementPermissionAuthorizer>();
             Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
             Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
             Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();

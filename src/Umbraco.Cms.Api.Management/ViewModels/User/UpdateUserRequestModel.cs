@@ -11,4 +11,8 @@ public class UpdateUserRequestModel : UserPresentationBase
     public ISet<ReferenceByIdModel> MediaStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasMediaRootAccess { get; init; }
+
+    public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
+
+    public bool HasElementRootAccess { get; init; }
 }

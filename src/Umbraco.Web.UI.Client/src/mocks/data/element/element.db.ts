@@ -53,6 +53,7 @@ const treeItemMapper = (model: UmbMockElementModel): ElementTreeItemResponseMode
 		createDate: model.createDate,
 		documentType: model.documentType,
 		variants: model.variants,
+		noAccess: model.noAccess,
 	};
 };
 
@@ -111,6 +112,7 @@ const createMockElementMapper = (request: CreateElementRequestModel): UmbMockEle
 			};
 		}),
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -141,6 +143,7 @@ const createMockElementFolderMapper = (request: CreateFolderRequestModel): UmbMo
 		values: [],
 		variants: [],
 		flags: [],
+		noAccess: false,
 	};
 };
 

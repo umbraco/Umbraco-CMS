@@ -1,5 +1,5 @@
 import { UMB_ELEMENT_WORKSPACE_CONTEXT } from '../../constants.js';
-import { UMB_ELEMENT_PROPERTY_DATASET_CONTEXT } from '../../../property-dataset-context/element-property-dataset-context.token.js';
+import { UMB_ELEMENT_WORKSPACE_PROPERTY_DATASET_CONTEXT } from '../../property-dataset-context/element-workspace-property-dataset-context.token.js';
 import type { UmbElementVariantModel } from '../../../types.js';
 import { UmbElementVariantState } from '../../../types.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
@@ -65,7 +65,7 @@ export class UmbElementWorkspaceViewInfoElement extends UmbLitElement {
 			this.#observeContent();
 		});
 
-		this.consumeContext(UMB_ELEMENT_PROPERTY_DATASET_CONTEXT, (context) => {
+		this.consumeContext(UMB_ELEMENT_WORKSPACE_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.observe(context?.currentVariant, (currentVariant) => {
 				this._variant = currentVariant as UmbElementVariantModel | undefined;
 			});

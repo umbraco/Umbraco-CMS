@@ -13,4 +13,11 @@ public interface IElementService : IPublishableContentService<IElement>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The created element.</returns>
     IElement Create(string name, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Gets elements.
+    /// </summary>
+    /// <param name="keys">The identifiers of the elements.</param>
+    /// <returns>The elements.</returns>
+    IEnumerable<IElement> GetByIds(IEnumerable<Guid> keys);
 }
