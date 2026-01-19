@@ -50,6 +50,9 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                            string.Equals(_connectionStrings.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     /// <inheritdoc />
+    /// <remarks>
+    /// With journal_mode=wal we can always read a snapshot.
+    /// </remarks>
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
         obtainLockTimeout ??= _globalSettings.DistributedLockingReadLockDefaultTimeout;
@@ -57,17 +60,30 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// With journal_mode=wal only a single write transaction can exist at a time.
+    /// </remarks>
     public IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
         obtainLockTimeout ??= _globalSettings.DistributedLockingWriteLockDefaultTimeout;
         return new SqliteDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
+    /// <summary>
+    /// Represents a distributed lock for SQLite databases.
+    /// </summary>
     private sealed class SqliteDistributedLock : IDistributedLock
     {
         private readonly SqliteDistributedLockingMechanism _parent;
         private readonly TimeSpan _timeout;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqliteDistributedLock"/> class.
+        /// </summary>
+        /// <param name="parent">The parent locking mechanism.</param>
+        /// <param name="lockId">The lock identifier.</param>
+        /// <param name="lockType">The type of lock to obtain.</param>
+        /// <param name="timeout">The timeout for obtaining the lock.</param>
         public SqliteDistributedLock(
             SqliteDistributedLockingMechanism parent,
             int lockId,
@@ -112,10 +128,13 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             }
         }
 
+        /// <inheritdoc />
         public int LockId { get; }
 
+        /// <inheritdoc />
         public DistributedLockType LockType { get; }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (_parent._logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
@@ -125,19 +144,21 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             }
         }
 
+        /// <inheritdoc />
         public override string ToString()
             => $"SqliteDistributedLock({LockId})";
 
-        // Can always obtain a read lock (snapshot isolation in wal mode)
-        // Mostly no-op just check that we didn't end up ReadUncommitted for real.
+        /// <summary>
+        /// Obtains a read lock for snapshot isolation in WAL mode.
+        /// </summary>
+        /// <remarks>
+        /// Can always obtain a read lock (snapshot isolation in wal mode).
+        /// Mostly no-op just check that we didn't end up ReadUncommitted for real.
+        /// </remarks>
         private void ObtainReadLock()
         {
-            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
-
-            if (db is null)
-            {
-                throw new PanicException("no database was found");
-            }
+            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope?.Database
+                ?? throw new PanicException("no database was found");
 
             if (!db.InTransaction)
             {
@@ -146,16 +167,17 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             }
         }
 
-        // Only one writer is possible at a time
-        // lock occurs for entire database as opposed to row/table.
+        /// <summary>
+        /// Obtains an exclusive write lock for the database.
+        /// </summary>
+        /// <remarks>
+        /// Only one writer is possible at a time.
+        /// Lock occurs for entire database as opposed to row/table.
+        /// </remarks>
         private void ObtainWriteLock()
         {
-            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
-
-            if (db is null)
-            {
-                throw new PanicException("no database was found");
-            }
+            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope?.Database
+                ?? throw new PanicException("no database was found");
 
             if (!db.InTransaction)
             {
