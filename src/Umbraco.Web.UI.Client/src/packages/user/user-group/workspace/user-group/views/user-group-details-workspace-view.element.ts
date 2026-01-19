@@ -314,7 +314,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 	}
 
 	#renderPermissionGroups() {
-		return html`<umb-user-group-entity-type-permission-groups></umb-user-group-entity-type-permission-groups> `;
+		return html`<umb-user-group-entity-type-permission-groups></umb-user-group-entity-type-permission-groups>`;
 	}
 
 	static override styles = [

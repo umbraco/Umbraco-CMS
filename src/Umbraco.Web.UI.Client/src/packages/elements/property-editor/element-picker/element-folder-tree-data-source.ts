@@ -10,7 +10,8 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 
 export class UmbElementFolderTreePropertyEditorDataSource extends UmbControllerBase implements UmbPickerTreeDataSource {
-	#item = new UmbElementItemRepository(this); // TODO: [LK] Change to `UmbElementFolderItemRepository` once we have the endpoint.
+	// TODO: [LK] Change to `UmbElementFolderItemRepository` ('Umb.Repository.ElementFolderItem') once we have the endpoint.
+	#item = new UmbElementItemRepository(this);
 	#tree = new UmbElementTreeRepository(this);
 
 	requestTreeRoot = () => this.#tree.requestTreeRoot();
