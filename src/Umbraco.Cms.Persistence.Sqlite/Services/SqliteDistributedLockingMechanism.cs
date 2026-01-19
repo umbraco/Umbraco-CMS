@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
+/// <summary>
+/// Implements distributed locking for SQLite using WAL mode transaction isolation.
+/// </summary>
 public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 {
     private ConnectionStrings _connectionStrings;
@@ -21,6 +24,13 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
     private readonly ILogger<SqliteDistributedLockingMechanism> _logger;
     private readonly Lazy<IScopeAccessor> _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqliteDistributedLockingMechanism"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="scopeAccessor">The scope accessor.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="connectionStrings">The connection strings.</param>
     public SqliteDistributedLockingMechanism(
         ILogger<SqliteDistributedLockingMechanism> logger,
         Lazy<IScopeAccessor> scopeAccessor,
@@ -39,14 +49,14 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
     public bool Enabled => _connectionStrings.IsConnectionStringConfigured() &&
                            string.Equals(_connectionStrings.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
-    // With journal_mode=wal we can always read a snapshot.
+    /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
         obtainLockTimeout ??= _globalSettings.DistributedLockingReadLockDefaultTimeout;
         return new SqliteDistributedLock(this, lockId, DistributedLockType.ReadLock, obtainLockTimeout.Value);
     }
 
-    // With journal_mode=wal only a single write transaction can exist at a time.
+    /// <inheritdoc />
     public IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
         obtainLockTimeout ??= _globalSettings.DistributedLockingWriteLockDefaultTimeout;
