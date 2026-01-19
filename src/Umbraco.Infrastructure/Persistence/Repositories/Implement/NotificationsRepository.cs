@@ -171,7 +171,7 @@ public class NotificationsRepository : INotificationsRepository
             .SelectDistinct<NodeDto>(c => c.NodeObjectType)
             .From<NodeDto>()
             .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
-        Guid nodeType = AmbientScope.Database.ExecuteScalar<Guid>(sql);
+        Guid nodeType = AmbientScope.Database.FirstOrDefault<Guid>(sql);
 
         var dto = new User2NodeNotifyDto { Action = action, NodeId = entity.Id, UserId = user.Id };
         AmbientScope.Database.Insert(dto);
