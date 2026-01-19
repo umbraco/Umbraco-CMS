@@ -8,6 +8,10 @@ import {
 	UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 } from '../constants.js';
 import { UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
+import {
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_DELETE,
+} from '../../user-permissions/constants.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -26,7 +30,16 @@ const elementActions: Array<UmbExtensionManifest> = [
 			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
-		conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
+
+		conditions: [
+			{
+				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+				allOf: [UMB_USER_PERMISSION_ELEMENT_DELETE],
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -40,7 +53,13 @@ const elementActions: Array<UmbExtensionManifest> = [
 			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
-		conditions: [{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS }],
+		conditions: [
+			{
+				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+				allOf: [UMB_USER_PERMISSION_ELEMENT_DELETE],
+			},
+			{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS },
+		],
 	},
 	// {
 	// 	type: 'entityAction',
@@ -73,7 +92,13 @@ const folderActions: Array<UmbExtensionManifest> = [
 			folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
 		},
-		conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
+		conditions: [
+			{
+				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+				allOf: [UMB_USER_PERMISSION_ELEMENT_DELETE],
+			},
+			{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS },
+		],
 	},
 ];
 
@@ -86,7 +111,13 @@ const emptyRecycleBin: UmbExtensionManifest = {
 	meta: {
 		recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 	},
-	conditions: [{ alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS }],
+	conditions: [
+		{
+			alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+			allOf: [UMB_USER_PERMISSION_ELEMENT_DELETE],
+		},
+		{ alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS },
+	],
 };
 
 const reloadTreeItemChildren: UmbExtensionManifest = {
@@ -95,7 +126,6 @@ const reloadTreeItemChildren: UmbExtensionManifest = {
 	alias: 'Umb.EntityAction.ElementRecycleBin.Tree.ReloadChildrenOf',
 	name: 'Reload Element Recycle Bin Tree Item Children Entity Action',
 	forEntityTypes: [UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
-	meta: {},
 };
 
 export const manifests: Array<UmbExtensionManifest> = [

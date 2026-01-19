@@ -1,5 +1,9 @@
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../../folder/constants.js';
+import {
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+} from '../../user-permissions/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
@@ -18,7 +22,15 @@ const createEntityAction: ManifestEntityAction = {
 		additionalOptions: true,
 		headline: '#create_createUnder #treeHeaders_elements',
 	},
-	conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
+	conditions: [
+		{
+			alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+			allOf: [UMB_USER_PERMISSION_ELEMENT_CREATE],
+		},
+		{
+			alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+		},
+	],
 };
 
 const elementCreateOptionAction: ManifestEntityCreateOptionAction = {
