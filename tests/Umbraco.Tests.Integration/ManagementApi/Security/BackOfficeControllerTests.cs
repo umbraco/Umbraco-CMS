@@ -10,64 +10,65 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Security;
 
 public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOfficeController>
 {
+    private string _currentUserEmail = string.Empty;
+
     protected override Expression<Func<BackOfficeController, object>> MethodSelector =>
         x => x.Login(CancellationToken.None, null);
 
-    // Admin
     [Test]
     public override async Task As_Admin_I_Have_Specified_Access()
     {
+        _currentUserEmail = "testAdmin@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.AdminGroupKey, "Admin");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    // Editor
     [Test]
     public override async Task As_Editor_I_Have_Specified_Access()
     {
+        _currentUserEmail = "testEditor@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.EditorGroupKey, "Editor");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    // SensitiveData
     [Test]
     public override async Task As_Sensitive_Data_I_Have_Specified_Access()
     {
+        _currentUserEmail = "testSensitiveData@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey, "SensitiveData");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    // Translator
     [Test]
     public override async Task As_Translator_I_Have_Specified_Access()
     {
+        _currentUserEmail = "testTranslator@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey, "Translator");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    // Writer
     [Test]
     public override async Task As_Writer_I_Have_Specified_Access()
     {
+        _currentUserEmail = "testWriter@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.WriterGroupKey, "Writer");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    // Unauthorized
     [Test]
     public override async Task As_Unauthorized_I_Have_Specified_Access()
     {
+        _currentUserEmail = "testUnaotherized@invalid.test";
         var response = await ClientRequest();
         Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        LoginRequestModel loginRequestModel = new() { Username = UserEmail, Password = UserPassword };
-
+        LoginRequestModel loginRequestModel = new() { Username = _currentUserEmail, Password = UserPassword };
         return await Client.PostAsync(Url, JsonContent.Create(loginRequestModel));
     }
 
     protected override async Task AuthenticateUser(Guid userGroupKey, string groupName) =>
-        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
+        await AuthenticateClientAsync(Client, _currentUserEmail, UserPassword, userGroupKey);
 }
