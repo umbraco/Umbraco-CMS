@@ -45587,6 +45587,7 @@
       "FolderResponseModel": {
         "required": [
           "id",
+          "isTrashed",
           "name"
         ],
         "type": "object",
@@ -45598,6 +45599,9 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

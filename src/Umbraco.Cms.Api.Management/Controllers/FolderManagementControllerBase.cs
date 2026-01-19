@@ -39,7 +39,8 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
         return Ok(new FolderResponseModel
         {
             Name = container.Name!,
-            Id = container.Key
+            Id = container.Key,
+            IsTrashed = container.Trashed
         });
     }
 
