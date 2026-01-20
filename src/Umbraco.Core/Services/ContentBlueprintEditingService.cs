@@ -214,7 +214,7 @@ internal sealed class ContentBlueprintEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    protected override IContent New(string? name, int parentId, Guid? parentKey, IContentType contentType)
+    protected override IContent New(string? name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
@@ -234,9 +234,9 @@ internal sealed class ContentBlueprintEditingService
     ///     NB: Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     ///     but there are others that are not required to be implemented in the case of blueprints, therefore they throw NotImplementedException as default.
     /// </summary>
-    protected override OperationResult? Move(IContent content, int newParentId, Guid? newParentKey, int userId) => throw new NotImplementedException();
+    protected override OperationResult? Move(IContent content, int newParentId, int userId) => throw new NotImplementedException();
 
-    protected override IContent? Copy(IContent content, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId) => throw new NotImplementedException();
 
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => throw new NotImplementedException();
 
