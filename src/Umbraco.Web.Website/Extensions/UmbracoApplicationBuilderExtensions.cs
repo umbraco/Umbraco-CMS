@@ -8,15 +8,15 @@ using Umbraco.Cms.Web.Website.Routing;
 namespace Umbraco.Extensions;
 
 /// <summary>
-///     <see cref="IApplicationBuilder" /> extensions for the umbraco front-end website
+/// <see cref="IApplicationBuilder" /> extensions for the Umbraco front-end website.
 /// </summary>
 public static class UmbracoApplicationBuilderExtensions
 {
     /// <summary>
-    ///     Adds all required middleware to run the website
+    /// Adds all required middleware to run the website.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
+    /// <param name="builder">The Umbraco application builder context.</param>
+    /// <returns>The <see cref="IUmbracoApplicationBuilderContext" /> for chaining.</returns>
     public static IUmbracoApplicationBuilderContext UseWebsite(this IUmbracoApplicationBuilderContext builder)
     {
         builder.AppBuilder.UseMiddleware<BasicAuthenticationMiddleware>();
@@ -24,8 +24,10 @@ public static class UmbracoApplicationBuilderExtensions
     }
 
     /// <summary>
-    ///     Sets up routes for the front-end umbraco website
+    /// Sets up routes for the front-end Umbraco website.
     /// </summary>
+    /// <param name="builder">The Umbraco endpoint builder context.</param>
+    /// <returns>The <see cref="IUmbracoEndpointBuilderContext" /> for chaining.</returns>
     public static IUmbracoEndpointBuilderContext UseWebsiteEndpoints(this IUmbracoEndpointBuilderContext builder)
     {
         if (builder == null)

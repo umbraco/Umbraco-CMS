@@ -153,6 +153,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	 * Ensure that there is a route to handle forbidden access.
 	 * This route will display a forbidden message when the user does not have permission to access certain resources.
 	 * Also handles not found routes.
+	 * @param routes
 	 */
 	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
 		routes.push({
