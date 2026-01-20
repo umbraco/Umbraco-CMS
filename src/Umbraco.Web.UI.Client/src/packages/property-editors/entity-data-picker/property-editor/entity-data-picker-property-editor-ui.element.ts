@@ -12,6 +12,7 @@ import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbCollectionLayoutConfiguration } from '@umbraco-cms/backoffice/collection';
 
 // import of local component
 import '../input/input-entity-data.element.js';
@@ -63,6 +64,9 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	@state()
 	private _dataSourceConfig?: UmbConfigCollectionModel;
 
+	@state()
+	private _pickerViews?: Array<UmbCollectionLayoutConfiguration>;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#propertyEditorConfigCollection = config;
 
@@ -74,6 +78,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
 
 		this._dataSourceConfig = this.#extractDataSourceConfig();
+		this._pickerViews = config?.getValueByAlias<Array<UmbCollectionLayoutConfiguration>>('pickerViews');
 	}
 
 	#propertyEditorConfigCollection?: UmbPropertyEditorConfigCollection;
@@ -140,6 +145,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			.selection=${this.value?.ids ?? []}
 			.dataSourceAlias="${this._dataSourceAlias}"
 			.dataSourceConfig=${this._dataSourceConfig}
+			.pickerViews=${this._pickerViews}
 			.min=${this._min}
 			.min-message=${this._minMessage}
 			.max=${this._max}

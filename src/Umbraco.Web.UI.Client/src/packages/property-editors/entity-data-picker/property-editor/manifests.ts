@@ -17,6 +17,17 @@ export const manifests: Array<UmbExtensionManifest> = [
 				enabled: true,
 				forDataSourceTypes: [UMB_PICKER_DATA_SOURCE_TYPE],
 			},
+			settings: {
+				properties: [
+					{
+						alias: 'pickerViews',
+						label: 'Picker Views',
+						description:
+							'Configure which collection views are available in the picker. Only applicable for collection-based data sources.',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.EntityDataPicker.PickerViewsConfiguration',
+					},
+				],
+			},
 		},
 	},
 	...schemaManifests,

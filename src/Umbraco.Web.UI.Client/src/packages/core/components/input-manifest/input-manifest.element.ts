@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
+// TODO: implement a propert input-manifest that can render picked items etc. [MR], supports multiple selection etc.
 @customElement('umb-input-manifest')
 export class UmbInputManifestElement extends UmbLitElement {
 	#extensions: Array<typeof umbExtensionsRegistry.MANIFEST_TYPES> = [];

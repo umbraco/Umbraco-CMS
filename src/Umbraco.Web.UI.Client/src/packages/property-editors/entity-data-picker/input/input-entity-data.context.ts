@@ -10,6 +10,7 @@ import {
 	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
 	type UmbCollectionItemPickerModalData,
 	type UmbCollectionItemPickerModalValue,
+	type UmbCollectionLayoutConfiguration,
 } from '@umbraco-cms/backoffice/collection';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -42,6 +43,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerDataSource;
 	#dataSourceConfig?: UmbConfigCollectionModel | undefined;
+	#pickerViews?: Array<UmbCollectionLayoutConfiguration>;
 
 	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
 
@@ -88,6 +90,24 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	 */
 	getDataSourceConfig(): UmbConfigCollectionModel | undefined {
 		return this.#dataSourceConfig;
+	}
+
+	/**
+	 * Sets the picker views configuration for the input context.
+	 * @param {(Array<UmbCollectionLayoutConfiguration> | undefined)} views The picker views configuration.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
+	setPickerViews(views: Array<UmbCollectionLayoutConfiguration> | undefined) {
+		this.#pickerViews = views;
+	}
+
+	/**
+	 * Gets the picker views configuration for the input context.
+	 * @returns {(Array<UmbCollectionLayoutConfiguration> | undefined)} The picker views configuration.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
+	getPickerViews(): Array<UmbCollectionLayoutConfiguration> | undefined {
+		return this.#pickerViews;
 	}
 
 	override async openPicker(pickerData?: Partial<UmbPickerModalData<UmbItemModel>>) {
@@ -183,6 +203,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 					collection: {
 						alias: UMB_ENTITY_DATA_PICKER_COLLECTION_ALIAS,
 						menuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+						views: this.#pickerViews,
 					},
 					// TODO: make specific pickable filter for collection to avoid type issues
 					pickableFilter: api.collectionPickableFilter,
