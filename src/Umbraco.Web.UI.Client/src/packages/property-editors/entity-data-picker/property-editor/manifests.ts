@@ -23,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						alias: 'pickerViews',
 						label: 'Picker Views',
 						description:
-							'Configure which collection views are available in the picker. Only applicable for collection-based data sources.',
+							'Configure which views are available in the picker. Only applicable for collection-based data sources.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.EntityDataPicker.PickerViewsConfiguration',
 					},
 				],
