@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -120,7 +121,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         if (ShouldRebuildAliases())
         {
             _logger.LogInformation("Rebuilding all document aliases.");
-            await RebuildAllAliasesInternalAsync();
+            await RebuildAllAliasesAsync();
         }
 
         _logger.LogInformation("Caching document aliases.");
@@ -131,10 +132,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         PopulateCultureToLanguageIdMap(languages);
 
         var aliasCount = 0;
+        var cancelled = false;
         foreach (PublishedDocumentUrlAlias alias in aliases)
         {
             if (cancellationToken.IsCancellationRequested)
             {
+                cancelled = true;
                 break;
             }
 
@@ -142,25 +145,32 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             aliasCount++;
         }
 
-        _logger.LogInformation("Cached {AliasCount} document aliases.", aliasCount);
+        if (cancelled)
+        {
+            _logger.LogWarning("Initialization was cancelled after caching {AliasCount} document aliases.", aliasCount);
+        }
+        else
+        {
+            _logger.LogInformation("Cached {AliasCount} document aliases.", aliasCount);
+            _isInitialized = true;
+        }
 
-        _isInitialized = true;
         scope.Complete();
     }
 
     /// <inheritdoc/>
-    public IEnumerable<Guid> GetDocumentKeysByAlias(string alias, string? culture)
+    public async Task<IEnumerable<Guid>> GetDocumentKeysByAliasAsync(string alias, string? culture)
     {
         ThrowIfNotInitialized();
 
-        var normalizedAlias = NormalizeAlias(alias);
+        var normalizedAlias = this.NormalizeAlias(alias);
         if (string.IsNullOrEmpty(normalizedAlias))
         {
             return [];
         }
 
         // Default to the default language when culture is not specified (like DocumentUrlService)
-        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        culture ??= await _languageService.GetDefaultIsoCodeAsync();
 
         if (TryGetLanguageId(culture, out var languageId) is false)
         {
@@ -179,12 +189,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetAliases(Guid documentKey, string? culture)
+    public async Task<IEnumerable<string>> GetAliasesAsync(Guid documentKey, string? culture)
     {
         ThrowIfNotInitialized();
 
         // Default to the default language when culture is not specified (like DocumentUrlService)
-        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        culture ??= await _languageService.GetDefaultIsoCodeAsync();
 
         if (TryGetLanguageId(culture, out var languageId) is false)
         {
@@ -294,12 +304,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
     /// <inheritdoc/>
     public async Task RebuildAllAliasesAsync()
-    {
-        ThrowIfNotInitialized();
-        await RebuildAllAliasesInternalAsync();
-    }
-
-    private async Task RebuildAllAliasesInternalAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
@@ -550,14 +554,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return true;
         });
 
-    private static string NormalizeAlias(string alias) =>
-        alias
-            .Trim()
-            .TrimStart('/')
-            .TrimEnd('/')
-            .ToLowerInvariant();
-
-    private static IEnumerable<string> NormalizeAliases(string? rawValue)
+    private IEnumerable<string> NormalizeAliases(string? rawValue)
     {
         if (string.IsNullOrWhiteSpace(rawValue))
         {
@@ -566,7 +563,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         foreach (var alias in rawValue.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
-            var normalized = NormalizeAlias(alias);
+            var normalized = this.NormalizeAlias(alias);
             if (!string.IsNullOrEmpty(normalized))
             {
                 yield return normalized;

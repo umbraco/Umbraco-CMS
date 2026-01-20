@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -142,11 +143,7 @@ public class ContentFinderByUrlAlias : IContentFinder
             return null;
         }
 
-        // Normalize alias (same as service)
-        var normalizedAlias = alias
-            .TrimStart('/')
-            .TrimEnd('/')
-            .ToLowerInvariant();
+        var normalizedAlias = _documentUrlAliasService.NormalizeAlias(alias);
 
         if (string.IsNullOrEmpty(normalizedAlias))
         {
@@ -154,9 +151,9 @@ public class ContentFinderByUrlAlias : IContentFinder
         }
 
         // Get all matching document keys for the alias
-        IEnumerable<Guid> documentKeys = _documentUrlAliasService.GetDocumentKeysByAlias(
+        IEnumerable<Guid> documentKeys = _documentUrlAliasService.GetDocumentKeysByAliasAsync(
             normalizedAlias,
-            culture);
+            culture).GetAwaiter().GetResult();
 
         Guid? matchingKey = null;
 

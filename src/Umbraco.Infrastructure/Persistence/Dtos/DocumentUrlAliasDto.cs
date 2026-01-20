@@ -29,6 +29,5 @@ internal class DocumentUrlAliasDto
     [Index(IndexTypes.NonClustered, ForColumns = "alias, languageId", Name = "IX_" + TableName + "_Lookup")]
     [Column("alias")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Length(255)]
     public string Alias { get; set; } = string.Empty;
 }

@@ -69,13 +69,13 @@ public class ContentFinderByUrlAliasTests
 
         public void SetupAliasReturnsDocuments(string alias, params Guid[] documentKeys) =>
             DocumentUrlAliasService
-                .Setup(x => x.GetDocumentKeysByAlias(alias, It.IsAny<string?>()))
-                .Returns(documentKeys);
+                .Setup(x => x.GetDocumentKeysByAliasAsync(alias, It.IsAny<string?>()))
+                .ReturnsAsync(documentKeys);
 
         public void SetupAliasReturnsEmpty() =>
             DocumentUrlAliasService
-                .Setup(x => x.GetDocumentKeysByAlias(It.IsAny<string>(), It.IsAny<string?>()))
-                .Returns([]);
+                .Setup(x => x.GetDocumentKeysByAliasAsync(It.IsAny<string>(), It.IsAny<string?>()))
+                .ReturnsAsync([]);
 
         public void SetupDomainRoot(int domainRootId, Guid domainRootKey) =>
             IdKeyMap
@@ -160,7 +160,7 @@ public class ContentFinderByUrlAliasTests
         // Assert - root path "/" should not trigger alias lookup
         Assert.That(result, Is.False);
         ctx.DocumentUrlAliasService.Verify(
-            x => x.GetDocumentKeysByAlias(It.IsAny<string>(), It.IsAny<string?>()),
+            x => x.GetDocumentKeysByAliasAsync(It.IsAny<string>(), It.IsAny<string?>()),
             Times.Never);
     }
 

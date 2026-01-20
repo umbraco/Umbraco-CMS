@@ -160,72 +160,72 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     #region GetDocumentKeysByAlias Tests
 
     [Test]
-    public async Task GetDocumentKeysByAlias_Returns_DocumentKey_For_Single_Alias()
+    public async Task GetDocumentKeysByAliasAsync_Returns_DocumentKey_For_Single_Alias()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode);
 
         Assert.That(result, Does.Contain(new Guid(PageWithSingleAliasKey)));
     }
 
     [Test]
-    public async Task GetDocumentKeysByAlias_Returns_DocumentKey_For_First_Of_Multiple_Aliases()
+    public async Task GetDocumentKeysByAliasAsync_Returns_DocumentKey_For_First_Of_Multiple_Aliases()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("first-alias", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("first-alias", isoCode);
 
         Assert.That(result, Does.Contain(new Guid(PageWithMultipleAliasesKey)));
     }
 
     [Test]
-    public async Task GetDocumentKeysByAlias_Returns_DocumentKey_For_Second_Of_Multiple_Aliases()
+    public async Task GetDocumentKeysByAliasAsync_Returns_DocumentKey_For_Second_Of_Multiple_Aliases()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("second-alias", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("second-alias", isoCode);
 
         Assert.That(result, Does.Contain(new Guid(PageWithMultipleAliasesKey)));
     }
 
     [Test]
-    public async Task GetDocumentKeysByAlias_Returns_DocumentKey_For_Third_Alias_With_Slashes_Normalized()
+    public async Task GetDocumentKeysByAliasAsync_Returns_DocumentKey_For_Third_Alias_With_Slashes_Normalized()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         // The alias was stored as "/third-alias/" but should be normalized to "third-alias"
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("third-alias", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("third-alias", isoCode);
 
         Assert.That(result, Does.Contain(new Guid(PageWithMultipleAliasesKey)));
     }
 
     [Test]
-    public async Task GetDocumentKeysByAlias_Returns_Empty_For_Non_Existent_Alias()
+    public async Task GetDocumentKeysByAliasAsync_Returns_Empty_For_Non_Existent_Alias()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("non-existent-alias", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("non-existent-alias", isoCode);
 
         Assert.That(result, Is.Empty);
     }
 
     [Test]
-    public async Task GetDocumentKeysByAlias_Is_Case_Insensitive()
+    public async Task GetDocumentKeysByAliasAsync_Is_Case_Insensitive()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("MY-SINGLE-ALIAS", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("MY-SINGLE-ALIAS", isoCode);
 
         Assert.That(result, Does.Contain(new Guid(PageWithSingleAliasKey)));
     }
 
     [Test]
-    public async Task GetDocumentKeysByAlias_Handles_Leading_Slash_In_Query()
+    public async Task GetDocumentKeysByAliasAsync_Handles_Leading_Slash_In_Query()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("/my-single-alias", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("/my-single-alias", isoCode);
 
         Assert.That(result, Does.Contain(new Guid(PageWithSingleAliasKey)));
     }
@@ -235,22 +235,22 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     #region GetAliases Tests
 
     [Test]
-    public async Task GetAliases_Returns_Single_Alias_For_Document()
+    public async Task GetAliasesAsync_Returns_Single_Alias_For_Document()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithSingleAliasKey), isoCode);
+        var result = await DocumentUrlAliasService.GetAliasesAsync(new Guid(PageWithSingleAliasKey), isoCode);
 
         Assert.That(result, Has.Exactly(1).Items);
         Assert.That(result, Does.Contain("my-single-alias"));
     }
 
     [Test]
-    public async Task GetAliases_Returns_Multiple_Aliases_For_Document()
+    public async Task GetAliasesAsync_Returns_Multiple_Aliases_For_Document()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithMultipleAliasesKey), isoCode).ToList();
+        var result = (await DocumentUrlAliasService.GetAliasesAsync(new Guid(PageWithMultipleAliasesKey), isoCode)).ToList();
 
         Assert.That(result, Has.Exactly(3).Items);
         Assert.That(result, Does.Contain("first-alias"));
@@ -259,30 +259,30 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetAliases_Returns_Empty_For_Document_Without_Aliases()
+    public async Task GetAliasesAsync_Returns_Empty_For_Document_Without_Aliases()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithNoAliasKey), isoCode);
+        var result = await DocumentUrlAliasService.GetAliasesAsync(new Guid(PageWithNoAliasKey), isoCode);
 
         Assert.That(result, Is.Empty);
     }
 
     [Test]
-    public async Task GetAliases_Returns_Empty_For_Non_Existent_Document()
+    public async Task GetAliasesAsync_Returns_Empty_For_Non_Existent_Document()
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var result = DocumentUrlAliasService.GetAliases(Guid.NewGuid(), isoCode);
+        var result = await DocumentUrlAliasService.GetAliasesAsync(Guid.NewGuid(), isoCode);
 
         Assert.That(result, Is.Empty);
     }
 
     [Test]
-    public async Task GetAliases_Uses_Default_Language_When_Culture_Is_Null()
+    public async Task GetAliasesAsync_Uses_Default_Language_When_Culture_Is_Null()
     {
         // GetAliases should work without specifying culture
-        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithSingleAliasKey), null);
+        var result = await DocumentUrlAliasService.GetAliasesAsync(new Guid(PageWithSingleAliasKey), null);
 
         Assert.That(result, Has.Exactly(1).Items);
         Assert.That(result, Does.Contain("my-single-alias"));
@@ -306,7 +306,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Manually trigger alias creation
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(newPage.Key);
 
-        var result = DocumentUrlAliasService.GetDocumentKeysByAlias("brand-new-alias", isoCode);
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("brand-new-alias", isoCode);
         Assert.That(result, Does.Contain(newPage.Key));
     }
 
@@ -316,7 +316,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         // Verify original alias exists
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Not.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Not.Empty);
 
         // Re-fetch the content to get the current version (after PublishBranch in setup)
         var content = ContentService.GetById(PageWithSingleAlias.Key)!;
@@ -329,10 +329,10 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 
         // Old alias should no longer resolve
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
 
         // New alias should resolve
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("updated-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("updated-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
     }
 
     [Test]
@@ -341,7 +341,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         // Verify original alias exists
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Not.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Not.Empty);
 
         // Re-fetch the content to get the current version (after PublishBranch in setup)
         var content = ContentService.GetById(PageWithSingleAlias.Key)!;
@@ -354,7 +354,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 
         // Alias should no longer resolve
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
     }
 
     [Test]
@@ -406,7 +406,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         // Verify child alias exists
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("child-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("child-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
 
         // Re-fetch the content to get the current versions (after PublishBranch in setup)
         var parentContent = ContentService.GetById(PageWithSingleAlias.Key)!;
@@ -424,12 +424,12 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         await DocumentUrlAliasService.CreateOrUpdateAliasesWithDescendantsAsync(parentContent.Key);
 
         // Old aliases should no longer resolve
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("child-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("child-alias", isoCode), Is.Empty);
 
         // New aliases should resolve
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("parent-new-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("child-new-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("parent-new-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("child-new-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
     }
 
     #endregion
@@ -442,12 +442,12 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         // Verify alias exists
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Not.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Not.Empty);
 
         await DocumentUrlAliasService.DeleteAliasesFromCacheAsync([new Guid(PageWithSingleAliasKey)]);
 
         // Alias should no longer resolve
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
     }
 
     [Test]
@@ -456,16 +456,16 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         // Verify aliases exist
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("first-alias", isoCode), Is.Not.Empty);
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("second-alias", isoCode), Is.Not.Empty);
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("third-alias", isoCode), Is.Not.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("first-alias", isoCode), Is.Not.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("second-alias", isoCode), Is.Not.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("third-alias", isoCode), Is.Not.Empty);
 
-        await DocumentUrlAliasService.DeleteAliasesFromCacheAsync(new[] { new Guid(PageWithMultipleAliasesKey) });
+        await DocumentUrlAliasService.DeleteAliasesFromCacheAsync([new Guid(PageWithMultipleAliasesKey)]);
 
         // All aliases should no longer resolve
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("first-alias", isoCode), Is.Empty);
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("second-alias", isoCode), Is.Empty);
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("third-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("first-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("second-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("third-alias", isoCode), Is.Empty);
     }
 
     #endregion
@@ -519,16 +519,16 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify cache is empty
         Assert.That(DocumentUrlAliasService.HasAny(), Is.False);
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
 
         // Act - rebuild from database
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
 
         // Assert - cache should be repopulated
         Assert.That(DocumentUrlAliasService.HasAny(), Is.True);
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("first-alias", isoCode), Does.Contain(new Guid(PageWithMultipleAliasesKey)));
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("child-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("first-alias", isoCode), Does.Contain(new Guid(PageWithMultipleAliasesKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("child-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
     }
 
     [Test]
@@ -546,8 +546,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
 
         // Assert - new alias should be available, old should not
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("rebuilt-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("rebuilt-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
     }
 
     [Test]
@@ -556,7 +556,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         // Arrange - verify alias exists
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Not.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Not.Empty);
 
         // Remove the alias from the document
         var content = ContentService.GetById(PageWithSingleAlias.Key)!;
@@ -568,7 +568,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
 
         // Assert - alias should no longer exist in cache or database
-        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
 
         // Verify in database
         List<PublishedDocumentUrlAlias> storedAliases;

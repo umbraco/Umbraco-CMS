@@ -18,7 +18,7 @@ public interface IDocumentUrlAliasService
     /// <param name="alias">The URL alias (normalized: lowercase, no leading slash).</param>
     /// <param name="culture">The culture code (null for invariant).</param>
     /// <returns>All document keys that have the specified alias, or empty if none found.</returns>
-    IEnumerable<Guid> GetDocumentKeysByAlias(string alias, string? culture);
+    Task<IEnumerable<Guid>> GetDocumentKeysByAliasAsync(string alias, string? culture);
 
     /// <summary>
     /// Gets all URL aliases for a given document.
@@ -26,7 +26,7 @@ public interface IDocumentUrlAliasService
     /// <param name="documentKey">The document key.</param>
     /// <param name="culture">The culture code (null for default language).</param>
     /// <returns>All aliases for the document in the specified culture, or empty if none found.</returns>
-    IEnumerable<string> GetAliases(Guid documentKey, string? culture);
+    Task<IEnumerable<string>> GetAliasesAsync(Guid documentKey, string? culture);
 
     /// <summary>
     /// Creates or updates the aliases for a single document.
