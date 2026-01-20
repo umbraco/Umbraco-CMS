@@ -4,10 +4,10 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 import '@umbraco-cms/backoffice/entity-item';
-import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-member-type')
 export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
