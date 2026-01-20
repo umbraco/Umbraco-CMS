@@ -4,6 +4,7 @@ import {
 	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_UPDATE,
 } from '../../user-permissions/constants.js';
+import { UMB_ELEMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
 import { UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestWorkspaceAction, ManifestWorkspaceRoutableKind } from '@umbraco-cms/backoffice/workspace';
@@ -30,12 +31,15 @@ const workspaceView: ManifestWorkspaceViewCollectionKind = {
 		label: 'Folder',
 		pathname: 'folder',
 		icon: 'icon-folder',
-		collectionAlias: 'Umb.Collection.Element',
+		collectionAlias: UMB_ELEMENT_COLLECTION_ALIAS,
 	},
 	conditions: [
 		{
 			alias: UMB_WORKSPACE_CONDITION_ALIAS,
 			oneOf: [UMB_ELEMENT_ROOT_WORKSPACE_ALIAS, UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS],
+		},
+		{
+			alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 		},
 	],
 };
