@@ -273,6 +273,6 @@ export default UmbInputElementGranularUserPermissionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-element-granular-user-permission': UmbInputElementGranularUserPermissionElement;
+		'umb-input-element-granular-user-permission': UmbInputElementGranularUserPermissionElement;
 	}
 }

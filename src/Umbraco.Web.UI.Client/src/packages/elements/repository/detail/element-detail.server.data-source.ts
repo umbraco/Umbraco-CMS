@@ -57,7 +57,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	 * @returns A new variant scaffold.
 	 */
 	/*
-	// TDOD: remove if not used
+	// TODO: remove if not used
 	createVariantScaffold(): UmbElementVariantModel {
 		return {
 			state: null,
