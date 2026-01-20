@@ -143,14 +143,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
     {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        ContentSourceDto? dto = await GetContentSourceDto(key);
 
-        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-
-        if (dto == null)
+        if (dto is null)
         {
             return null;
         }
@@ -160,6 +155,39 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return null;
         }
 
+        return CreateContentNodeKit(preview, dto);
+    }
+
+    /// <inheritdoc/>
+    public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key)
+    {
+        ContentSourceDto? dto = await GetContentSourceDto(key);
+
+        if (dto is null)
+        {
+            return (null, null);
+        }
+
+        ContentCacheNode draftNode = CreateContentNodeKit(true, dto);
+        ContentCacheNode? publishedNode = dto.PubDataRaw is null && dto.PubData is null
+            ? null
+            : CreateContentNodeKit(false, dto);
+
+        return (draftNode, publishedNode);
+    }
+
+    private async Task<ContentSourceDto?> GetContentSourceDto(Guid key)
+    {
+        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeKey(SqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+    }
+
+    private ContentCacheNode CreateContentNodeKit(bool preview, ContentSourceDto dto)
+    {
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
         return CreateContentNodeKit(dto, serializer, preview);

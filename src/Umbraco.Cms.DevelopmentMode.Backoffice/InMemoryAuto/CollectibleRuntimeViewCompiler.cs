@@ -145,7 +145,7 @@ internal sealed class CollectibleRuntimeViewCompiler : IViewCompiler
             // release the lock first.
             cacheEntryOptions = new MemoryCacheEntryOptions();
 
-            Debug.Assert(item.ExpirationTokens != null);
+            Debug.Assert(item.ExpirationTokens != null, "Expiration tokens should not be null.");
             for (var i = 0; i < item.ExpirationTokens.Count; i++)
             {
                 cacheEntryOptions.ExpirationTokens.Add(item.ExpirationTokens[i]);
@@ -159,7 +159,7 @@ internal sealed class CollectibleRuntimeViewCompiler : IViewCompiler
             else
             {
                 // If we can't compile, we should have already created the descriptor
-                Debug.Assert(item.Descriptor != null);
+                Debug.Assert(item.Descriptor != null, "Descriptor should not be null when compilation is not supported.");
                 taskSource.SetResult(item.Descriptor);
             }
 
@@ -169,13 +169,13 @@ internal sealed class CollectibleRuntimeViewCompiler : IViewCompiler
         // Now the lock has been released so we can do more expensive processing.
         if (item.SupportsCompilation)
         {
-            Debug.Assert(taskSource != null);
+            Debug.Assert(taskSource != null, "Task source should not be null when compilation is supported.");
 
             if (item.Descriptor?.Item != null &&
                 ChecksumValidator.IsItemValid(_projectEngine.FileSystem, item.Descriptor.Item))
             {
                 // If the item has checksums to validate, we should also have a precompiled view.
-                Debug.Assert(item.Descriptor != null);
+                Debug.Assert(item.Descriptor != null, "Descriptor should not be null when checksums are valid.");
 
                 taskSource.SetResult(item.Descriptor);
                 return taskSource.Task;
@@ -426,7 +426,7 @@ internal sealed class CollectibleRuntimeViewCompiler : IViewCompiler
 
     private string GetNormalizedPath(string relativePath)
     {
-        Debug.Assert(relativePath != null);
+        Debug.Assert(relativePath != null, "Relative path should not be null.");
         if (relativePath.Length == 0)
         {
             return relativePath;

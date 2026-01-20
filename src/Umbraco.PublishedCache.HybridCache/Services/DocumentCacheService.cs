@@ -180,13 +180,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true);
+        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = await _databaseCacheRepository.GetContentSourceForPublishStatesAsync(key);
+
         if (draftNode is not null)
         {
             await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(key));
         }
 
-        ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
         if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
