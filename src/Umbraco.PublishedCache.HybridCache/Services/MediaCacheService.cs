@@ -117,6 +117,7 @@ internal sealed class MediaCacheService : IMediaCacheService
             async cancel =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                scope.ReadLock(Constants.Locks.MediaTree);
                 ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
                 scope.Complete();
                 return mediaCacheNode;
@@ -201,6 +202,7 @@ internal sealed class MediaCacheService : IMediaCacheService
             }
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            scope.ReadLock(Constants.Locks.MediaTree);
 
             IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetMediaSourcesAsync(uncachedKeys);
 
@@ -231,6 +233,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.MediaTree);
 
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
         if (publishedNode is not null)
@@ -257,6 +260,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> mediaTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.MediaTree);
 
         IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType).Result), ContentCacheDataSerializerEntityType.Media);
 
@@ -301,6 +305,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.MediaTree);
         IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Media);
         scope.Complete();
 

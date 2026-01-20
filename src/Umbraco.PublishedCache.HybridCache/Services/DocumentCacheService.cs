@@ -121,6 +121,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             async cancel =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
 
                 // If we can resolve the content cache node, we still need to check if the ancestor path is published.
@@ -159,6 +160,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
         IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Document);
         scope.Complete();
 
@@ -237,6 +239,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             }
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            scope.ReadLock(Constants.Locks.ContentTree);
 
             IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetContentSourcesAsync(uncachedKeys);
 
@@ -354,6 +357,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
 
         IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result), ContentCacheDataSerializerEntityType.Document);
         scope.Complete();
