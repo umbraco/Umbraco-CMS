@@ -27,10 +27,13 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false) =>
+    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false)
+    {
+        var dictionarySettingsMonitor = new Mock<IOptionsMonitor<DictionarySettings>>();
+        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch });
 
         // Create a repository with a real runtime cache.
-        new DictionaryRepository(
+        return new DictionaryRepository(
             GetRequiredService<IScopeAccessor>(),
             cache,
             GetRequiredService<ILogger<DictionaryRepository>>(),
@@ -38,7 +41,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<ILanguageRepository>(),
             GetRequiredService<IRepositoryCacheVersionService>(),
             GetRequiredService<ICacheSyncService>(),
-            Options.Create(new DictionarySettings { EnableValueSearch = enableValueSearch }));
+            dictionarySettingsMonitor.Object);
+    }
 
     [Test]
     public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
@@ -574,6 +578,15 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             // Assert - Should find "Read More" because its Danish translation contains "Læs mere"
             Assert.That(results, Has.Length.EqualTo(1));
             Assert.That(results[0].ItemKey, Is.EqualTo("Read More"));
+
+            // - also verify that both languages have a translation
+            var translatedIsoCodes = results[0]
+                .Translations
+                .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)
+                .Select(translation => translation.LanguageIsoCode)
+                .ToArray();
+            Assert.That(translatedIsoCodes, Does.Contain("en-US"));
+            Assert.That(translatedIsoCodes, Does.Contain("da-DK"));
         }
     }
 

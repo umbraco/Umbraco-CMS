@@ -23,7 +23,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
-    private readonly DictionarySettings _dictionarySettings;
+    private readonly IOptionsMonitor<DictionarySettings> _dictionarySettings;
 
     private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
@@ -35,12 +35,12 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         ILanguageRepository languageRepository,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService,
-        IOptions<DictionarySettings> dictionarySettings)
+        IOptionsMonitor<DictionarySettings> dictionarySettings)
         : base(scopeAccessor, cache, logger, repositoryCacheVersionService, cacheSyncService)
     {
         _loggerFactory = loggerFactory;
         _languageRepository = languageRepository;
-        _dictionarySettings = dictionarySettings.Value;
+        _dictionarySettings = dictionarySettings;
     }
 
     public IDictionaryItem? Get(Guid uniqueId)
@@ -155,7 +155,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             return;
         }
 
-        if (_dictionarySettings.EnableValueSearch)
+        if (_dictionarySettings.CurrentValue.EnableValueSearch)
         {
             // Search in both keys and values
             // Use a subquery to find dictionary items that have matching translations
