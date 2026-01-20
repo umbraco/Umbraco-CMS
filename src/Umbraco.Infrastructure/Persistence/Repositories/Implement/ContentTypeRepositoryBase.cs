@@ -1078,7 +1078,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // select tags to insert: tags pointed to by a relation ship, for proper property/content types,
         // and of source language, and where we cannot left join to an existing tag with same text,
         // group and languageId
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullExtension<int?>();
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
         Sql<ISqlContext> sqlSelectTagsToInsert1 = Sql()
             .SelectDistinct<TagDto>(x => x.Text, x => x.Group)
             .Append($", {targetLanguageIdS} ")
@@ -1234,7 +1234,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         Database.Execute(sqlDelete);
 
         // now insert all property data into the target language that exists under the source language
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullExtension<int?>();
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
         var cols = Sql().ColumnsForInsert<PropertyDataDto>(
             x => x.VersionId,
             x => x.PropertyTypeId,

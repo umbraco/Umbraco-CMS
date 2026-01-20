@@ -256,7 +256,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
             }
             else
             {
-                sql.Append("NULL" + SqlSyntax.GetNullExtension<int?>());
+                sql.Append("NULL" + SqlSyntax.GetNullCastSuffix<int?>());
             }
             sql.Append(" AS languageid");
         }
