@@ -19,7 +19,7 @@ import '@umbraco-cms/backoffice/menu';
 import '@umbraco-cms/backoffice/property-action';
 import '@umbraco-cms/backoffice/property-editor-data-source';
 import '@umbraco-cms/backoffice/property-sort-mode';
-import './entity-item/global-components.js';
+import '@umbraco-cms/backoffice/entity-item';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
