@@ -109,14 +109,14 @@ public class DatabaseSchemaCreator
         ILoggerFactory loggerFactory,
         IUmbracoVersion umbracoVersion,
         IEventAggregator eventAggregator,
-        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
     {
         _database = database ?? throw new ArgumentNullException(nameof(database));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
         _eventAggregator = eventAggregator;
-        _installDefaultDataSettings = installDefaultDataSettings;
+        _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V18): Rename this parameter to installDefaultDataSettings.
 
         if (_database.SqlContext?.SqlSyntax == null)
         {
@@ -245,22 +245,23 @@ public class DatabaseSchemaCreator
 
         var unknownConstraintsInDatabase = allConstraintsInDatabase
             .Where(
-            x => x.InvariantStartsWith("FK_") == false
-                && x.InvariantStartsWith("PK_") == false
-                && x.InvariantStartsWith("IX_") == false).ToList();
+            x => x.InvariantStartsWith("FK_") == false &&
+                 x.InvariantStartsWith("PK_") == false &&
+                 x.InvariantStartsWith("IX_") == false)
+            .ToList();
 
         var foreignKeysInSchema = result.TableDefinitions
             .SelectMany(def =>
                 def.ForeignKeys
-                .Where(fk => fk is not null)
-                .Select(fk => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(fk.Name)))
+                   .Where(fk => fk.Name is not null)
+                   .Select(fk => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(fk.Name)))
             .ToList();
 
         var primaryKeysInSchema = result.TableDefinitions
             .SelectMany(def =>
                 def.Columns
-                .Where(col => col.PrimaryKeyName.IsNullOrWhiteSpace() == false)
-                .Select(col => SqlSyntax.TruncateConstraintName<ColumnDefinition>(col.PrimaryKeyName)))
+                   .Where(col => col.PrimaryKeyName.IsNullOrWhiteSpace() == false)
+                   .Select(col => SqlSyntax.TruncateConstraintName<ColumnDefinition>(col.PrimaryKeyName)))
             .ToList();
 
         // Add valid and invalid foreign key differences to the result object

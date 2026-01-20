@@ -1344,6 +1344,8 @@ export default {
 		configurationTitle: 'Dynamic Root Query',
 		pickDynamicRootOriginTitle: 'Pick origin',
 		pickDynamicRootOriginDesc: 'Define the origin for your Dynamic Root Query',
+		originContentRootTitle: 'Content Root',
+		originContentRootDesc: 'Root of the content tree',
 		originRootTitle: 'Root',
 		originRootDesc: 'Root node of this editing session',
 		originParentTitle: 'Parent',
