@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Services
             IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository,
             IAuditService auditService,
-            IAuditRepository auditRepository,   // TOOD (V18): Remove this parameter (it's only there to avoid ambiguity with obsolete constructors).
+            IAuditRepository auditRepository,   // TODO (V18): Remove this parameter (it's only there to avoid ambiguity with obsolete constructors).
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
