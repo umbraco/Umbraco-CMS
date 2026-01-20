@@ -159,7 +159,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string GetQuotedValue(string value) => $"'{value}'";
 
     /// <inheritdoc />
-    public virtual string GetNullExtension<T>() => string.Empty;
+    public virtual string GetNullCastSuffix<T>() => string.Empty;
 
     public virtual string GetIndexType(IndexTypes indexTypes)
     {
@@ -697,5 +697,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     protected abstract string FormatIdentity(ColumnDefinition column);
 
+    /// <inheritdoc />
     public virtual string? TruncateConstraintName<T>(string? constraintName) => constraintName;
 }
