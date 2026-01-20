@@ -2873,6 +2873,116 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public void GetPagedChildren_With_Null_PropertyAliases_Returns_All_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForPropertyAliasTests();
+
+        // Act - null propertyAliases should load all properties
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: null);
+
+        // Assert - All properties should have their values loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Not.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Empty_PropertyAliases_Returns_No_Property_Values()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForPropertyAliasTests();
+
+        // Act - empty propertyAliases should load no custom properties
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: []);
+
+        // Assert - Properties should not be present when propertyAliases is empty
+        Assert.That(retrievedChild.Properties.Contains("title"), Is.False, "title property should not be present");
+        Assert.That(retrievedChild.Properties.Contains("bodyText"), Is.False, "bodyText property should not be present");
+        Assert.That(retrievedChild.Properties.Contains("author"), Is.False, "author property should not be present");
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Single_PropertyAlias_Returns_Only_That_Property()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForPropertyAliasTests();
+
+        // Act - only "title" should be loaded
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title"]);
+
+        // Assert - Only "title" property should have its value loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Multiple_PropertyAliases_Returns_Only_Those_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForPropertyAliasTests();
+
+        // Act - "title" and "author" should be loaded, but not "bodyText"
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title", "author"]);
+
+        // Assert - Only "title" and "author" properties should have values loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_NonExistent_PropertyAlias_Returns_No_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForPropertyAliasTests();
+
+        // Act - non-existent property alias should result in no property values
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["nonExistentProperty"]);
+
+        // Assert - No property values should be loaded since the alias doesn't exist
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
+    }
+
+    /// <summary>
+    /// Creates a content type with properties (title, bodyText, author) and a parent with one child.
+    /// Returns the parent ID for use in GetPagedChildren tests.
+    /// </summary>
+    private int CreateContentWithChildForPropertyAliasTests()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+        ContentTypeService.Save(contentType);
+
+        var parent = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(parent);
+
+        var child = ContentBuilder.CreateSimpleContent(contentType, "Child", parent.Id);
+        ContentService.Save(child);
+
+        return parent.Id;
+    }
+
+    /// <summary>
+    /// Gets the single child of the parent using GetPagedChildren with the specified propertyAliases.
+    /// Asserts that exactly one child is returned.
+    /// </summary>
+    private IContent GetSingleChildWithPropertyAliases(int parentId, string[]? propertyAliases)
+    {
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases, filter: null, ordering: null).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(1));
+
+        return children[0];
+    }
+
+    [Test]
     public void PublishingTest()
     {
         var contentType = new ContentType(ShortStringHelper, Constants.System.Root) { Alias = "foo", Name = "Foo" };
