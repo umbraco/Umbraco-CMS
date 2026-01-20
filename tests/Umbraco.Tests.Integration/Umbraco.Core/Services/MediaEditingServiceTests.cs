@@ -50,6 +50,16 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Cannot_Create_Media_With_Guid_7_When_Default_Media_Path_Scheme_Is_Registered()
+    {
+        var imageModel = CreateMediaCreateModelWithFile("Image", Guid.CreateVersion7(), ArticleMediaType.Key);
+        var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(imageCreateAttempt.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidKey, imageCreateAttempt.Status);
+    }
+
+    [Test]
     public async Task Can_Create_Media_With_Optional_File_Property_Without_Providing_File()
     {
         ImageMediaType.PropertyTypes.First(x => x.Alias == Constants.Conventions.Media.File).Mandatory = false;
