@@ -1,7 +1,7 @@
 /**
  * This module detects duplicate TypeScript class names in the Umbraco backoffice.
  * It scans for class declarations and reports any duplicates found.
- * @example node devops/duplicate-class-names/index.js src
+ * @example node devops/check-duplicate-class-names/index.js src
  * @author Lee Kelleher, (using Claude Code)
  */
 
@@ -13,10 +13,14 @@ const IS_AZURE_PIPELINES = process.env.TF_BUILD === 'true';
 
 const baseDir = process.argv[2] || 'src';
 const ignoreTestFiles = process.argv.includes('--ignore-tests');
+const ignoreStoryFiles = process.argv.includes('--ignore-stories');
 
 console.log('Scanning for duplicate class names in:', baseDir);
 if (ignoreTestFiles) {
 	console.log('(Ignoring test files)');
+}
+if (ignoreStoryFiles) {
+	console.log('(Ignoring story files)');
 }
 console.log('-'.repeat(80));
 
@@ -43,6 +47,10 @@ function findTypeScriptFiles(dir, files = []) {
 			if (ignoreTestFiles && (entry.endsWith('.test.ts') || entry.endsWith('.spec.ts'))) {
 				continue;
 			}
+			// Skip story files if flag is set
+			if (ignoreStoryFiles && entry.endsWith('.stories.ts')) {
+				continue;
+			}
 			files.push(fullPath);
 		}
 	}
@@ -60,8 +68,8 @@ function extractClassNames(filePath) {
 	const classDeclarations = [];
 
 	// Match exported class declarations
-	// Patterns: "export class ClassName", "export abstract class ClassName"
-	const regex = /export\s+(?:abstract\s+)?class\s+(\w+)/g;
+	// Patterns: "export class ClassName", "export abstract class ClassName", "export default class ClassName", "export default abstract class ClassName"
+	const regex = /export\s+(?:default\s+)?(?:abstract\s+)?class\s+(\w+)/g;
 	let match;
 
 	while ((match = regex.exec(content)) !== null) {
