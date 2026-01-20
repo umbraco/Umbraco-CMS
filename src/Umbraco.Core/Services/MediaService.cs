@@ -823,7 +823,7 @@ namespace Umbraco.Cms.Core.Services
                 if (media.Key.Version == 7 && _mediaPathScheme.SupportsGuid7 is false)
                 {
                     _logger.LogWarning(
-                        "The registered implementation of IMediaPathScheme cannot be used with media keys using version 7 GUIDs due to an increased risk of collisions in the generated file paths." +
+                        "The registered implementation of IMediaPathScheme cannot be used with media keys using version 7 GUIDs due to an increased risk of collisions in the generated file paths. " +
                         "Please use version 4 GUIDs created via Guid.NewGuid() or implement and register a different IMediaPathScheme.");
                     return Attempt.Fail<OperationResult?>(
                         new OperationResult(OperationResultType.FailedInvalidKey, eventMessages));
