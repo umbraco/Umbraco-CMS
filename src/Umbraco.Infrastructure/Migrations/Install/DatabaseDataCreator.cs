@@ -292,7 +292,7 @@ internal sealed class DatabaseDataCreator
                 Level = 0,
                 Path = "-1",
                 SortOrder = 0,
-                UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"),
+                UniqueId = Constants.System.RootSystemKey,
                 Text = "SYSTEM DATA: umbraco master root",
                 NodeObjectType = Constants.ObjectTypes.SystemRoot,
                 CreateDate = DateTime.UtcNow,

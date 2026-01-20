@@ -9,8 +9,10 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
+// TODO (V18): Remove the default implementations in this interface.
+
 /// <summary>
-///     Defines an SqlSyntaxProvider
+///     Defines an SqlSyntaxProvider.
 /// </summary>
 public interface ISqlSyntaxProvider
 {
@@ -128,7 +130,7 @@ public interface ISqlSyntaxProvider
     /// A string containing the SQL type cast extension (null type annotation) that represents a null value for type
     /// <typeparamref name="T"/>, or an empty string if no extension is defined.
     /// </returns>
-    string GetNullExtension<T>() => throw new NotImplementedException();
+    string GetNullCastSuffix<T>() => string.Empty;
 
     bool DoesTableExist(IDatabase db, string tableName);
 
@@ -272,5 +274,5 @@ public interface ISqlSyntaxProvider
     /// <typeparam name="T">type of the entity.</typeparam>
     /// <param name="constraintName">unlimited name.</param>
     /// <returns>truncated name.</returns>
-    string? TruncateConstraintName<T>(string? constraintName) => throw new NotImplementedException();
+    string? TruncateConstraintName<T>(string? constraintName) => constraintName;
 }
