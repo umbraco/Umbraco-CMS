@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -24,6 +24,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
 
     protected abstract UmbracoObjectTypes ObjectType { get; }
 
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     protected abstract Task<IEnumerable<TContent>> SearchChildrenAsync(
         IQuery<TContent>? query,
         int parentId,
@@ -32,9 +33,19 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         int pageSize,
         out long total);
 
+    protected abstract Task<IEnumerable<TContent>> SearchChildrenAsync(
+        IQuery<TContent>? query,
+        int parentId,
+        string[]? propertyAliases,
+        Ordering? ordering,
+        long pageNumber,
+        int pageSize,
+        out long total);
+
     public async Task<PagedModel<TContent>> SearchChildrenAsync(
         string? query,
         Guid? parentId,
+        string[]? propertyAliases,
         Ordering? ordering,
         int skip = 0,
         int take = 100)
@@ -55,7 +66,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
         IQuery<TContent>? contentQuery = ParseQuery(query);
 
-        IEnumerable<TContent> items = await SearchChildrenAsync(contentQuery, parentIdAsInt, ordering, pageNumber, pageSize, out var total);
+        IEnumerable<TContent> items = await SearchChildrenAsync(contentQuery, parentIdAsInt, propertyAliases, ordering, pageNumber, pageSize, out var total);
         return new PagedModel<TContent>
         {
             Items = items,

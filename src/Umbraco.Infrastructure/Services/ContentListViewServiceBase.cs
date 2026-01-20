@@ -53,7 +53,11 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             return Attempt.FailWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(orderingAttempt.Status, null);
         }
 
-        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Key, filter, orderingAttempt.Result, skip, take);
+        // Extract non-system property aliases from configuration to optimize property loading (we'll optimize and only
+        // load the properties we need to populate the collection view).
+        string[]? customPropertyAliases = ExtractCustomPropertyAliases(configurationAttempt.Result, orderingAttempt.Result);
+
+        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Key, filter, orderingAttempt.Result, customPropertyAliases, skip, take);
 
         var result = new ListViewPagedModel<TContent>
         {
@@ -70,17 +74,16 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         string? orderCulture,
         Direction orderDirection)
     {
-        var listViewProperties = listViewConfiguration?.IncludeProperties;
+        ListViewConfiguration.Property[]? listViewProperties = listViewConfiguration?.IncludeProperties;
 
         if (listViewProperties == null || listViewProperties.Length == 0)
         {
             return Attempt.FailWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration, null);
         }
 
-        var listViewPropertyAliases = listViewProperties
+        IEnumerable<string> listViewPropertyAliases = listViewProperties
             .Select(p => p.Alias)
             .WhereNotNull();
-
 
         if (listViewPropertyAliases.Contains(orderBy) == false && orderBy.InvariantEquals("name") == false)
         {
@@ -207,9 +210,42 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         return await _dataTypeService.GetAsync(configuredListViewKey);
     }
 
-    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, int skip, int take)
+    /// <summary>
+    ///     Extracts non-system property aliases from the list view configuration.
+    /// </summary>
+    /// <param name="configuration">The list view configuration.</param>
+    /// <param name="ordering">The ordering information (to ensure the order-by field is included if it's a custom property).</param>
+    /// <returns>
+    ///     An array of custom property aliases to load. Returns empty array if only system properties are configured.
+    /// </returns>
+    private static string[]? ExtractCustomPropertyAliases(ListViewConfiguration? configuration, Ordering? ordering)
     {
-        PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, ordering, skip, take);
+        if (configuration?.IncludeProperties is null)
+        {
+            return null;
+        }
+
+        // Extract non-system property aliases.
+        var customAliases = configuration.IncludeProperties
+            .Where(p => p.IsSystem is false && p.Alias is not null)
+            .Select(p => p.Alias!)
+            .ToList();
+
+        // If ordering by a custom field, ensure it's included in the aliases
+        // (in case it's not in the configured display columns but is used for sorting).
+        if (ordering?.IsCustomField is true &&
+            string.IsNullOrEmpty(ordering.OrderBy) is false &&
+            customAliases.Contains(ordering.OrderBy, StringComparer.OrdinalIgnoreCase) is false)
+        {
+            customAliases.Add(ordering.OrderBy);
+        }
+
+        return [.. customAliases];
+    }
+
+    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, string[]? propertyAliases, int skip, int take)
+    {
+        PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, propertyAliases, ordering, skip, take);
 
         // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
         // This has been the case with this functionality in Umbraco for a long time.

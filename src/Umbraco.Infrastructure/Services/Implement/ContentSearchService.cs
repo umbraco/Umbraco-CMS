@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
@@ -16,9 +16,20 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
 
     protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Document;
 
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     protected override Task<IEnumerable<IContent>> SearchChildrenAsync(
         IQuery<IContent>? query,
         int parentId,
+        Ordering? ordering,
+        long pageNumber,
+        int pageSize,
+        out long total)
+        => SearchChildrenAsync(query, parentId, propertyAliases: null, ordering: ordering, pageNumber: pageNumber, pageSize: pageSize, total: out total);
+
+    protected override Task<IEnumerable<IContent>> SearchChildrenAsync(
+        IQuery<IContent>? query,
+        int parentId,
+        string[]? propertyAliases,
         Ordering? ordering,
         long pageNumber,
         int pageSize,
@@ -28,6 +39,7 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
             pageNumber,
             pageSize,
             out total,
+            propertyAliases,
             query,
             ordering));
 }

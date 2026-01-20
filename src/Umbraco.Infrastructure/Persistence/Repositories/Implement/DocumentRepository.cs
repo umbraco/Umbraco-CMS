@@ -249,7 +249,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         bool withCache = false,
         bool loadProperties = true,
         bool loadTemplates = true,
-        bool loadVariants = true)
+        bool loadVariants = true,
+        string[]? propertyAliases = null)
     {
         var temps = new List<TempContent<Content>>();
         var contentTypes = new Dictionary<int, IContentType?>();
@@ -331,7 +332,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         if (loadProperties)
         {
             // load all properties for all documents from database in 1 query - indexed by version id
-            properties = GetPropertyCollections(temps);
+            // if propertyAliases is provided, only load those specific properties
+            properties = GetPropertyCollections(temps, propertyAliases);
         }
 
         // assign templates and properties
@@ -1549,11 +1551,23 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     public void AddOrUpdatePermissions(ContentPermissionSet permission) => PermissionRepository.Save(permission);
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public override IEnumerable<IContent> GetPage(
         IQuery<IContent>? query,
         long pageIndex,
         int pageSize,
         out long totalRecords,
+        IQuery<IContent>? filter,
+        Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public override IEnumerable<IContent> GetPage(
+        IQuery<IContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
         IQuery<IContent>? filter,
         Ordering? ordering)
     {
@@ -1588,7 +1602,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             pageIndex,
             pageSize,
             out totalRecords,
-            x => MapDtosToContent(x),
+            x => MapDtosToContent(x, propertyAliases: propertyAliases),
             filterSql,
             ordering);
     }
