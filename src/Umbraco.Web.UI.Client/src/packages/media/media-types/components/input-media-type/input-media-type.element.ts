@@ -9,6 +9,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/entity-item';
 
@@ -139,9 +140,14 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 		return undefined;
 	}
 
+	#getPickableFilter() {
+		return (x: UmbTreeItemModel) => !x.isFolder;
+	}
+
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			pickableFilter: this.#getPickableFilter(),
 		});
 	}
 
