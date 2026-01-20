@@ -12,13 +12,14 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 // TODO: consider moving the components to the property editor folder as they are only used here
 import '../../local-components.js';
@@ -232,8 +233,14 @@ export class UmbPropertyEditorUIBlockGridElement
 			);
 		});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context?.getVariantId());
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeContextualVariantId',
+			);
 		});
 
 		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));

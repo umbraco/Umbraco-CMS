@@ -17,9 +17,18 @@ import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
 
+/**
+ *
+ * @param variants
+ */
 function isVariantsInvariant(variants: Array<{ culture: string | null }>): boolean {
 	return variants?.[0]?.culture === null;
 }
+/**
+ *
+ * @param variants
+ * @param culture
+ */
 function findVariant<T extends { culture: string | null }>(variants: Array<T>, culture: string): T | undefined {
 	return variants.find((x) => x.culture === culture);
 }
@@ -237,8 +246,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 		const variants = this.getData()?.variants;
 		if (variants) {
 			// Try fallback culture first, then first variant with any name
-			const fallbackName =
-				findVariant(variants, this.#fallbackCulture!)?.name ?? variants.find((x) => x.name)?.name;
+			const fallbackName = findVariant(variants, this.#fallbackCulture!)?.name ?? variants.find((x) => x.name)?.name;
 
 			if (fallbackName) {
 				this.#name.setValue(`(${fallbackName})`);

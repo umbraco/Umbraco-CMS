@@ -204,7 +204,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         }
 
         // is the content type allowed in the index?
-        if (_deliveryApiSettings.IsDisallowedContentType(content.ContentType.Alias))
+        if (_deliveryApiSettings.IsAllowedContentType(content.ContentType.Alias) is false)
         {
             return false;
         }

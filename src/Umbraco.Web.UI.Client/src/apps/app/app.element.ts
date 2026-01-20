@@ -319,6 +319,7 @@ export class UmbAppElement extends UmbLitElement {
 	static override styles = css`
 		:host {
 			overflow: hidden;
+			min-width: 920px;
 		}
 
 		:host,

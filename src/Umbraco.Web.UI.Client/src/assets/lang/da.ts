@@ -1006,6 +1006,7 @@ export default {
 		manifest: 'Manifest',
 		toggleFor: 'Toggle for %0%',
 		document: 'Dokument',
+		documentCount: (count: number) => (count === 1 ? '1 dokument' : `${count} dokumenter`),
 	},
 	colors: {
 		black: 'Sort',
@@ -2854,6 +2855,7 @@ export default {
 		modalManual: 'Manuel',
 		modalAnchorValidationMessage:
 			'Indtast et anker eller en querystring, vælg et dokument eller medieelement, eller konfigurer URL’en manuelt.',
+		modalUrlOrAnchorValidationMessage: 'Indtast en adresse eller et anker.',
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',

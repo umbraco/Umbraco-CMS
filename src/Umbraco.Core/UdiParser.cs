@@ -217,7 +217,7 @@ public sealed class UdiParser
             { Constants.UdiEntityType.Member, UdiType.GuidUdi },
             { Constants.UdiEntityType.MemberGroup, UdiType.GuidUdi },
             { Constants.UdiEntityType.MemberType, UdiType.GuidUdi },
-            { Constants.UdiEntityType.MemberTypeContainer, UdiType.GuidUdi },        
+            { Constants.UdiEntityType.MemberTypeContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.Relation, UdiType.GuidUdi },
             { Constants.UdiEntityType.RelationType, UdiType.GuidUdi },
             { Constants.UdiEntityType.Template, UdiType.GuidUdi },

@@ -39,10 +39,9 @@ test('can create content with content picker with allowed types', async ({umbrac
   await umbracoUi.content.isModalMenuItemWithNameDisabled(notAllowedContentPickerName);
   await umbracoUi.content.selectLinkByName(allowedContentPickerName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0]['unique']).toEqual(allowedContentPickerId);
   expect(contentData.values[0].value[0]['type']).toEqual('document');
@@ -78,10 +77,9 @@ test('can search and see only allowed content types', async ({umbracoApi, umbrac
   await umbracoUi.content.isModalMenuItemWithNameVisible(notAllowedContentPickerName, false);
   await umbracoUi.content.clickEntityItemByName(allowedContentPickerName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateIconVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0]['unique']).toEqual(allowedContentPickerId);
   expect(contentData.values[0].value[0]['type']).toEqual('document');
@@ -116,10 +114,9 @@ test('can search and see only allowed media types', async ({umbracoApi, umbracoU
   await umbracoUi.content.isMediaCardItemWithNameVisible(notAllowedMediaPickerName, false);
   await umbracoUi.content.clickMediaWithName(allowedMediaPickerName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateIconVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0]['unique']).toEqual(allowedMediaPickerId);
   expect(contentData.values[0].value[0]['type']).toEqual('media');
@@ -170,8 +167,7 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
   await umbracoUi.content.isModalMenuItemWithNameVisible(notAllowedTestMember.name, false);
   await umbracoUi.content.clickEntityItemByName(allowedTestMember.name);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.isSuccessStateIconVisible();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0]['unique']).toEqual(allowedTestMemberId);
   expect(contentData.values[0].value[0]['type']).toEqual('member');

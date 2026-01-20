@@ -1,3 +1,5 @@
+import { UmbCurrentUserHistoryStore } from './current-user-history.store.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'userProfileApp',
@@ -14,6 +16,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: 'Umb.Store.CurrentUser.History',
 		name: 'Current User History Store',
-		api: () => import('./current-user-history.store.js'),
+		api: UmbCurrentUserHistoryStore,
 	},
 ];

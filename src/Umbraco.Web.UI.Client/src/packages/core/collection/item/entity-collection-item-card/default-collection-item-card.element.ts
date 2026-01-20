@@ -49,7 +49,8 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 				?selected=${this.selected}
 				?disabled=${this.disabled}
 				@selected=${this.#onSelected}
-				@deselected=${this.#onDeselected}>
+				@deselected=${this.#onDeselected}
+				?readonly=${!this.href}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-card-content-node>

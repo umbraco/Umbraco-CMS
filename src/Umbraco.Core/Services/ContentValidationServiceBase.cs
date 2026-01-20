@@ -52,13 +52,12 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
         // We don't have managed segments, so we have to make do with the ones passed in the model.
         var segments =
-            new string?[] { null }
-                .Union(contentEditingModelBase.Variants
-                    .Where(variant => variant.Culture is null || cultures.Contains(variant.Culture))
-                    .DistinctBy(variant => variant.Segment).Select(variant => variant.Segment)
-                    .WhereNotNull()
-                )
-                .ToArray();
+        new string?[] { null }
+            .Union(contentEditingModelBase.Variants
+                .Where(variant => variant.Culture is null || cultures.Contains(variant.Culture))
+                .DistinctBy(variant => variant.Segment).Select(variant => variant.Segment)
+                .WhereNotNull())
+            .ToArray();
 
         foreach (IPropertyType propertyType in invariantPropertyTypes)
         {

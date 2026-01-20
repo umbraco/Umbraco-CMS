@@ -42,10 +42,9 @@ test('can bulk trash content nodes without a relation', async ({umbracoApi, umbr
   await umbracoUi.content.clickTrashSelectedListItems();
   // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
@@ -77,10 +76,9 @@ test('can bulk trash content nodes with a relation', async ({umbracoApi, umbraco
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(firstChildContentName);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);

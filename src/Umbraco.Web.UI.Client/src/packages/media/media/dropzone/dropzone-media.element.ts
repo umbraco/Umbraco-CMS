@@ -30,6 +30,8 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		return this._progressItems;
 	}
 
+	#dragCounter = 0;
+
 	protected override _manager = new UmbMediaDropzoneManager(this);
 	public progressItems = () => this._manager.progressItems;
 	public progress = () => this._manager.progress;
@@ -39,6 +41,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
+		document.addEventListener('dragover', this.#handleDragOver.bind(this));
 		document.addEventListener('drop', this.#handleDrop.bind(this));
 
 		// TODO: Revisit this. I am not sure why it is needed to call these methods here when they are already called in the constructor of the parent class.
@@ -65,6 +68,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		super.disconnectedCallback();
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
+		document.removeEventListener('dragover', this.#handleDragOver.bind(this));
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
 	}
 
@@ -78,21 +82,35 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 	#handleDragEnter(e: DragEvent) {
 		if (this.disabled) return;
-		// Avoid collision with UmbSorterController
-		const types = e.dataTransfer?.types;
-		if (!types?.length || !types?.includes('Files')) return;
 
+		// Normalize types for Safari
+		const types = Array.from(e.dataTransfer?.types || []).map((t) => t.toLowerCase());
+		if (!types.includes('files')) return;
+
+		this.#dragCounter++;
 		this.toggleAttribute('dragging', true);
+		e.preventDefault();
+	}
+
+	#handleDragOver(e: DragEvent) {
+		e.preventDefault();
 	}
 
 	#handleDragLeave() {
 		if (this.disabled) return;
-		this.toggleAttribute('dragging', false);
+
+		this.#dragCounter--;
+		if (this.#dragCounter <= 0) {
+			this.toggleAttribute('dragging', false);
+			this.#dragCounter = 0;
+		}
 	}
 
 	#handleDrop(event: DragEvent) {
 		event.preventDefault();
 		if (this.disabled) return;
+
+		this.#dragCounter = 0;
 		this.toggleAttribute('dragging', false);
 	}
 

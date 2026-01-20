@@ -108,8 +108,8 @@ export class UmbPropertyEditorUISliderElement
 		const initVal2 = Number(config.getValueByAlias('initVal2'));
 		this._initVal2 = isNaN(initVal2) ? this._initVal1 + this._step : initVal2;
 
-		this._min = this.#parseInt(config.getValueByAlias('minVal')) || 0;
-		this._max = this.#parseInt(config.getValueByAlias('maxVal')) || 100;
+		this._min = this.#parseNumber(config.getValueByAlias('minVal')) || 0;
+		this._max = this.#parseNumber(config.getValueByAlias('maxVal')) || 100;
 
 		if (this._min === this._max) {
 			this._max = this._min + 100;
@@ -137,9 +137,9 @@ export class UmbPropertyEditorUISliderElement
 		}
 	}
 
-	#parseInt(input: unknown): number | undefined {
+	#parseNumber(input: unknown): number | undefined {
 		const num = Number(input);
-		return Number.isNaN(num) ? undefined : num;
+		return Number.isFinite(num) ? num : undefined;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputSliderElement }) {

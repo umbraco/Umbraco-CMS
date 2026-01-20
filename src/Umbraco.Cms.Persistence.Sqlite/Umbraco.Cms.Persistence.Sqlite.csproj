@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <!--
-      TODO: Fix and remove overrides:
+      TODO (V18): Fix and remove overrides - Change 'virtual' to 'override' in SqliteSyntaxProvider.Format methods.
       [CS0114] Resolve hiding inherited members
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0114</WarningsNotAsErrors>

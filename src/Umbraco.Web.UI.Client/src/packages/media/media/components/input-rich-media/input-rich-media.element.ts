@@ -372,6 +372,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return html`<umb-dropzone-media
 			id="dropzone"
 			?multiple=${this.multiple}
+			.parentUnique=${this.startNode?.unique ?? null}
 			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 
@@ -447,6 +448,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		css`
 			:host {
 				position: relative;
+				display: block;
+				width: 100%;
 			}
 			.container {
 				display: grid;

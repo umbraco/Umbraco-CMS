@@ -17,8 +17,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegrationTestWithContent
 {
-    protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
-    protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {

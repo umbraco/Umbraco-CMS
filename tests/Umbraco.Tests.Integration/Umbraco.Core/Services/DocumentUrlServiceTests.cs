@@ -21,11 +21,11 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private const string SubSubPage2Key = "48AE405E-5142-4EBE-929F-55EB616F51F2";
     private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
 
-    protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 
-    protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
-    protected IDomainService DomainService => GetRequiredService<IDomainService>();
+    private IDomainService DomainService => GetRequiredService<IDomainService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -356,6 +356,28 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
     }
 
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await DocumentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(nonExistentKey));
+    }
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await DocumentUrlService.CreateOrUpdateUrlSegmentsAsync(nonExistentKey));
+    }
 
     //TODO test cases:
     // - Find the root, when a domain is set

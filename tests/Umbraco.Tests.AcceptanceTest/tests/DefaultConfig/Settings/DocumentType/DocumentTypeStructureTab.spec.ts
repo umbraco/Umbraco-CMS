@@ -21,10 +21,9 @@ test('can add allow as root to a document type', {tag: '@smoke'}, async ({umbrac
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickStructureTab();
   await umbracoUi.documentType.clickAllowAtRootButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedAsRoot).toBeTruthy();
 });
@@ -40,10 +39,9 @@ test('can add an allowed child node to a document type', {tag: '@smoke'}, async 
   await umbracoUi.documentType.clickChooseButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(documentTypeName);
   await umbracoUi.documentType.clickAllowedChildNodesButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedDocumentTypes[0].documentType.id).toBe(documentTypeData.id);
 });
@@ -61,10 +59,9 @@ test('can remove an allowed child node from a document type', async ({umbracoApi
   await umbracoUi.documentType.clickStructureTab();
   await umbracoUi.documentType.clickRemoveButtonForName(childDocumentTypeName);
   await umbracoUi.documentType.clickConfirmRemoveButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedDocumentTypes.length).toBe(0);
 
@@ -85,10 +82,9 @@ test('can configure a collection for a document type', {tag: '@release'}, async 
   await umbracoUi.documentType.clickStructureTab();
   await umbracoUi.documentType.clickAddCollectionButton();
   await umbracoUi.documentType.clickTextButtonWithName(collectionDataTypeName);
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.collection.id).toEqual(collectionDataTypeId);
 

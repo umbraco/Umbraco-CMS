@@ -575,7 +575,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	#itemDropped = async (_e: DragEvent) => {
 		this.#handleMoveEnd();
 	};

@@ -32,12 +32,11 @@ test('can add custom property editor to a document type', async ({umbracoApi, um
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(customPropertyEditorName);
-  await umbracoUi.dataType.clickSaveButton();
+  const dataTypeId = await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
+  expect(await umbracoApi.dataType.doesExist(dataTypeId)).toBe(true);
   await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeName);
-  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });
 
 test('can select custom property editor in property editor picker on data type', async ({umbracoApi, umbracoUi}) => {
@@ -52,10 +51,9 @@ test('can select custom property editor in property editor picker on data type',
   await umbracoUi.documentType.clickAddGroupButton();
   await umbracoUi.documentType.addPropertyEditor(dataTypeName);
   await umbracoUi.documentType.enterGroupName('Content');
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   // Checks if the correct property was added to the document type
@@ -79,7 +77,7 @@ test('can write and read value from custom property editor', async ({umbracoApi,
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterPropertyValue(dataTypeName, testValue);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);

@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let startTelemetryLevel = '';
@@ -189,7 +189,7 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
 
   // Act
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
   await umbracoUi.logViewer.clickSavedSearchByName(searchName);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 

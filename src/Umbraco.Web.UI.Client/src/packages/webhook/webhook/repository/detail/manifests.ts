@@ -1,3 +1,5 @@
+import { UmbWebhookDetailStore } from './webhook-detail.store.js';
+
 export const UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Webhook.Detail';
 export const UMB_WEBHOOK_DETAIL_STORE_ALIAS = 'Umb.Store.Webhook.Detail';
 
@@ -12,6 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_WEBHOOK_DETAIL_STORE_ALIAS,
 		name: 'Webhook Detail Store',
-		api: () => import('./webhook-detail.store.js'),
+		api: UmbWebhookDetailStore,
 	},
 ];

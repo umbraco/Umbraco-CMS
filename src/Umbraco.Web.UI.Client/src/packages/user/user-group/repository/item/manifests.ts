@@ -1,4 +1,5 @@
 import { UMB_USER_GROUP_ITEM_REPOSITORY_ALIAS, UMB_USER_GROUP_STORE_ALIAS } from './constants.js';
+import { UmbUserGroupItemStore } from './user-group-item.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,6 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'itemStore',
 		alias: UMB_USER_GROUP_STORE_ALIAS,
 		name: 'User Group Item Store',
-		api: () => import('./user-group-item.store.js'),
+		api: UmbUserGroupItemStore,
 	},
 ];

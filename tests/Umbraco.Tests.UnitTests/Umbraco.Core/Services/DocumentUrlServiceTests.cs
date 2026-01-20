@@ -10,11 +10,12 @@ public class DocumentUrlServiceTests
     [Test]
     public void ConvertToCacheModel_Converts_Single_Document_With_Single_Segment_To_Expected_Cache_Model()
     {
+        var documentKey = Guid.NewGuid();
         var segments = new List<PublishedDocumentUrlSegment>
         {
             new()
             {
-                DocumentKey = Guid.NewGuid(),
+                DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = true,
                 LanguageId = 1,
@@ -24,21 +25,23 @@ public class DocumentUrlServiceTests
         var cacheModels = DocumentUrlService.ConvertToCacheModel(segments).ToList();
 
         Assert.AreEqual(1, cacheModels.Count);
-        Assert.AreEqual(segments[0].DocumentKey, cacheModels[0].DocumentKey);
-        Assert.AreEqual(1, cacheModels[0].LanguageId);
-        Assert.AreEqual(1, cacheModels[0].UrlSegments.Count);
-        Assert.AreEqual("test-segment", cacheModels[0].UrlSegments[0].Segment);
-        Assert.IsTrue(cacheModels[0].UrlSegments[0].IsPrimary);
+        Assert.AreEqual(documentKey, cacheModels[0].Key.DocumentKey);
+        Assert.AreEqual(1, cacheModels[0].Key.LanguageId);
+        Assert.IsFalse(cacheModels[0].Key.IsDraft);
+        Assert.AreEqual("test-segment", cacheModels[0].Cache.PrimarySegment);
+        Assert.IsNull(cacheModels[0].Cache.AlternateSegments);
     }
 
     [Test]
     public void ConvertToCacheModel_Converts_Multiple_Documents_With_Single_Segment_To_Expected_Cache_Model()
     {
+        var documentKey1 = Guid.NewGuid();
+        var documentKey2 = Guid.NewGuid();
         var segments = new List<PublishedDocumentUrlSegment>
         {
             new()
             {
-                DocumentKey = Guid.NewGuid(),
+                DocumentKey = documentKey1,
                 IsDraft = false,
                 IsPrimary = true,
                 LanguageId = 1,
@@ -46,7 +49,7 @@ public class DocumentUrlServiceTests
             },
             new()
             {
-                DocumentKey = Guid.NewGuid(),
+                DocumentKey = documentKey2,
                 IsDraft = false,
                 IsPrimary = true,
                 LanguageId = 1,
@@ -56,16 +59,16 @@ public class DocumentUrlServiceTests
         var cacheModels = DocumentUrlService.ConvertToCacheModel(segments).ToList();
 
         Assert.AreEqual(2, cacheModels.Count);
-        Assert.AreEqual(segments[0].DocumentKey, cacheModels[0].DocumentKey);
-        Assert.AreEqual(segments[1].DocumentKey, cacheModels[1].DocumentKey);
-        Assert.AreEqual(1, cacheModels[0].LanguageId);
-        Assert.AreEqual(1, cacheModels[1].LanguageId);
-        Assert.AreEqual(1, cacheModels[0].UrlSegments.Count);
-        Assert.AreEqual("test-segment", cacheModels[0].UrlSegments[0].Segment);
-        Assert.AreEqual(1, cacheModels[1].UrlSegments.Count);
-        Assert.AreEqual("test-segment-2", cacheModels[1].UrlSegments[0].Segment);
-        Assert.IsTrue(cacheModels[0].UrlSegments[0].IsPrimary);
-        Assert.IsTrue(cacheModels[1].UrlSegments[0].IsPrimary);
+
+        var model1 = cacheModels.First(m => m.Key.DocumentKey == documentKey1);
+        var model2 = cacheModels.First(m => m.Key.DocumentKey == documentKey2);
+
+        Assert.AreEqual(1, model1.Key.LanguageId);
+        Assert.AreEqual(1, model2.Key.LanguageId);
+        Assert.AreEqual("test-segment", model1.Cache.PrimarySegment);
+        Assert.AreEqual("test-segment-2", model2.Cache.PrimarySegment);
+        Assert.IsNull(model1.Cache.AlternateSegments);
+        Assert.IsNull(model2.Cache.AlternateSegments);
     }
 
     [Test]
@@ -94,13 +97,12 @@ public class DocumentUrlServiceTests
         var cacheModels = DocumentUrlService.ConvertToCacheModel(segments).ToList();
 
         Assert.AreEqual(1, cacheModels.Count);
-        Assert.AreEqual(documentKey, cacheModels[0].DocumentKey);
-        Assert.AreEqual(1, cacheModels[0].LanguageId);
-        Assert.AreEqual(2, cacheModels[0].UrlSegments.Count);
-        Assert.AreEqual("test-segment", cacheModels[0].UrlSegments[0].Segment);
-        Assert.AreEqual("test-segment-2", cacheModels[0].UrlSegments[1].Segment);
-        Assert.IsTrue(cacheModels[0].UrlSegments[0].IsPrimary);
-        Assert.IsFalse(cacheModels[0].UrlSegments[1].IsPrimary);
+        Assert.AreEqual(documentKey, cacheModels[0].Key.DocumentKey);
+        Assert.AreEqual(1, cacheModels[0].Key.LanguageId);
+        Assert.AreEqual("test-segment", cacheModels[0].Cache.PrimarySegment);
+        Assert.IsNotNull(cacheModels[0].Cache.AlternateSegments);
+        Assert.AreEqual(1, cacheModels[0].Cache.AlternateSegments!.Length);
+        Assert.AreEqual("test-segment-2", cacheModels[0].Cache.AlternateSegments[0]);
     }
 
     [Test]
@@ -122,6 +124,7 @@ public class DocumentUrlServiceTests
 
         // Benchmarking (for NumberOfSegments = 50000):
         //  - Initial implementation (15.4): ~28s
-        //  - Current implementation: ~100ms
+        //  - Previous implementation (versions 15.5 through 17.0, optimized algorithm): ~75ms
+        //  - Current implementation (17.1+, refactored for memory optimization, same performance as previous): ~75ms
     }
 }

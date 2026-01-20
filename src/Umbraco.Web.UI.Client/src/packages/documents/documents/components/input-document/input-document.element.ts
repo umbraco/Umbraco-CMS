@@ -279,6 +279,11 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 
 	static override styles = [
 		css`
+			uui-ref-list:not(:has(:nth-child(1))) {
+				margin-top: -20px;
+				padding-top: 20px;
+			}
+
 			#btn-add {
 				display: block;
 			}

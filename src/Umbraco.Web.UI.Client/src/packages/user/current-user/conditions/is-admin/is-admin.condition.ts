@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbContentHasPropertiesWorkspaceCondition
+export class UmbCurrentUserIsAdminCondition
 	extends UmbConditionBase<UmbConditionConfigBase>
 	implements UmbExtensionCondition
 {
@@ -17,4 +17,4 @@ export class UmbContentHasPropertiesWorkspaceCondition
 	}
 }
 
-export { UmbContentHasPropertiesWorkspaceCondition as api };
+export { UmbCurrentUserIsAdminCondition as api };

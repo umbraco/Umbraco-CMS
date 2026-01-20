@@ -4,18 +4,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
+/// <summary>
+/// Represents a property of a published element with caching support for property value conversions.
+/// </summary>
 internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
 {
-    protected readonly IPublishedElement Element;
+    private readonly IPublishedElement _element;
 
     // define constant - determines whether to use cache when previewing
     // to store eg routes, property converted values, anything - caching
     // means faster execution, but uses memory - not sure if we want it
     // so making it configurable.
-    private readonly Lock _locko = new();
+    private readonly Lock _cacheLock = new();
     private readonly object? _sourceValue;
-    protected readonly bool IsMember;
-    protected readonly bool IsPreviewing;
+    private readonly bool _isMember;
+    private readonly bool _isPreviewing;
     private readonly VariationContext _variationContext;
     private readonly ICacheManager? _cacheManager;
     private CacheValues? _cacheValues;
@@ -24,6 +27,16 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
     private object? _interValue;
     private string? _valuesCacheKey;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedElementPropertyBase"/> class.
+    /// </summary>
+    /// <param name="propertyType">The published property type.</param>
+    /// <param name="element">The published element that owns this property.</param>
+    /// <param name="previewing">Whether this is a preview request.</param>
+    /// <param name="referenceCacheLevel">The reference cache level.</param>
+    /// <param name="variationContext">The variation context for culture and segment.</param>
+    /// <param name="cacheManager">The cache manager.</param>
+    /// <param name="sourceValue">The source value of the property.</param>
     public PublishedElementPropertyBase(
         IPublishedPropertyType propertyType,
         IPublishedElement element,
@@ -35,11 +48,11 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
         : base(propertyType, referenceCacheLevel)
     {
         _sourceValue = sourceValue;
-        Element = element;
-        IsPreviewing = previewing;
+        _element = element;
+        _isPreviewing = previewing;
         _variationContext = variationContext;
         _cacheManager = cacheManager;
-        IsMember = propertyType.ContentType?.ItemType == PublishedItemType.Member;
+        _isMember = propertyType.ContentType?.ItemType == PublishedItemType.Member;
     }
 
     // used to cache the CacheValues of this property
@@ -47,9 +60,11 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
     private string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValuesKey();
 
     private string PropertyCacheValuesKey() =>
-        $"PublishedSnapshot.Property.CacheValues[{(IsPreviewing ? "D:" : "P:")}{Element.Key}:{Alias}:{_variationContext.Culture.IfNullOrWhiteSpace("inv")}+{_variationContext.Segment.IfNullOrWhiteSpace("inv")}]";
+        $"PublishedSnapshot.Property.CacheValues[{(_isPreviewing ? "D:" : "P:")}{_element.Key}:{Alias}:{_variationContext.Culture.IfNullOrWhiteSpace("inv")}+{_variationContext.Segment.IfNullOrWhiteSpace("inv")}]";
 
     // ReSharper restore InconsistentlySynchronizedField
+
+    /// <inheritdoc />
     public override bool HasValue(string? culture = null, string? segment = null)
     {
         var hasValue = PropertyType.IsValue(_sourceValue, PropertyValueLevel.Source);
@@ -60,7 +75,7 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
 
         GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
 
-        lock (_locko)
+        lock (_cacheLock)
         {
             var value = GetInterValue();
             hasValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
@@ -73,7 +88,7 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
             if (!cacheValues.ObjectInitialized)
             {
                 cacheValues.ObjectValue =
-                    PropertyType.ConvertInterToObject(Element, referenceCacheLevel, value, IsPreviewing);
+                    PropertyType.ConvertInterToObject(_element, referenceCacheLevel, value, _isPreviewing);
                 cacheValues.ObjectInitialized = true;
             }
 
@@ -82,6 +97,7 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
+    /// <inheritdoc />
     public override object? GetSourceValue(string? culture = null, string? segment = null) => _sourceValue;
 
     private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
@@ -151,16 +167,17 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
             return _interValue;
         }
 
-        _interValue = PropertyType.ConvertSourceToInter(Element, _sourceValue, IsPreviewing);
+        _interValue = PropertyType.ConvertSourceToInter(_element, _sourceValue, _isPreviewing);
         _interInitialized = true;
         return _interValue;
     }
 
+    /// <inheritdoc />
     public override object? GetValue(string? culture = null, string? segment = null)
     {
         GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
 
-        lock (_locko)
+        lock (_cacheLock)
         {
             CacheValues cacheValues = GetCacheValues(cacheLevel);
             if (cacheValues.ObjectInitialized)
@@ -169,12 +186,13 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
             }
 
             cacheValues.ObjectValue =
-                PropertyType.ConvertInterToObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+                PropertyType.ConvertInterToObject(_element, referenceCacheLevel, GetInterValue(), _isPreviewing);
             cacheValues.ObjectInitialized = true;
             return cacheValues.ObjectValue;
         }
     }
 
+    /// <inheritdoc />
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
         PropertyCacheLevel cacheLevel, referenceCacheLevel;
@@ -187,11 +205,11 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
             GetDeliveryApiCacheLevels(out cacheLevel, out referenceCacheLevel);
         }
 
-        lock (_locko)
+        lock (_cacheLock)
         {
             CacheValues cacheValues = GetCacheValues(cacheLevel);
 
-            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing, expanding);
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_element, referenceCacheLevel, GetInterValue(), _isPreviewing, expanding);
             return expanding
                 ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
                 : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
@@ -220,15 +238,15 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
         return cacheValues.DeliveryApiExpandedObjectValue;
     }
 
-    protected class CacheValues
+    private class CacheValues
     {
-        public bool ObjectInitialized;
-        public object? ObjectValue;
-        public bool XPathInitialized;
-        public object? XPathValue;
-        public bool DeliveryApiDefaultObjectInitialized;
-        public object? DeliveryApiDefaultObjectValue;
-        public bool DeliveryApiExpandedObjectInitialized;
-        public object? DeliveryApiExpandedObjectValue;
+        public bool ObjectInitialized { get; set; }
+        public object? ObjectValue { get; set; }
+        public bool XPathInitialized { get; set; }
+        public object? XPathValue { get; set; }
+        public bool DeliveryApiDefaultObjectInitialized { get; set; }
+        public object? DeliveryApiDefaultObjectValue { get; set; }
+        public bool DeliveryApiExpandedObjectInitialized { get; set; }
+        public object? DeliveryApiExpandedObjectValue { get; set; }
     }
 }

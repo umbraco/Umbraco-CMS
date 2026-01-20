@@ -24,6 +24,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -32,6 +33,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.Common;
 
@@ -96,7 +98,8 @@ public abstract class TestHelperBase
                 Mock.Of<IMediaPathScheme>(),
                 loggerFactory.CreateLogger<MediaFileManager>(),
                 Mock.Of<IShortStringHelper>(),
-                Mock.Of<IServiceProvider>());
+                Mock.Of<IServiceProvider>(),
+                Mock.Of<Lazy<ICoreScopeProvider>>());
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();

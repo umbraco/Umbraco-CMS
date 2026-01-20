@@ -45,11 +45,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	setVariantId(variantId: UmbVariantId): void {
 		this.#variantId = variantId;
-		// @.culture == null && @.segment == null
+		// Setup a filter that will run when messages are added:
 		this.messages?.filter((msg) => {
-			// Figure out how many times '@.culture ==' is present in the path:
-			//const cultureMatches = (msg.path.match(/@\.culture ==/g) || []);
-			// I like a Regex that finds all the @.culture == and @.segment == in the path. they are adjacent. and I like to know the value following '== '
+			// Regex that finds all the @.culture == and @.segment == in the path.
 			const variantMatches = [...msg.path.matchAll(Regex)];
 
 			// if not cultures, then we like to keep it:

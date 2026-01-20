@@ -92,7 +92,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				this._navigationSlotHasChildren
 					? ''
 					: 'none'}">
-				${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
+				${this.headline ? html`<h3 id="headline" title=${this.headline}>${this.headline}</h3>` : nothing}
 
 				<slot
 					id="header-slot"
@@ -203,6 +203,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				align-items: center;
 				box-sizing: border-box;
 				min-width: 0;
+				flex-shrink: 0;
 			}
 			#navigation-slot {
 				margin-left: auto;
@@ -211,6 +212,10 @@ export class UmbBodyLayoutElement extends LitElement {
 			#headline {
 				display: block;
 				margin: 0 var(--uui-size-layout-1);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
 			}
 
 			#main {
