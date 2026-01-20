@@ -13,6 +13,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Locking;
 
+/// <summary>
+/// Implements distributed locking for SQLite databases using EF Core.
+/// </summary>
+/// <typeparam name="T">The type of DbContext.</typeparam>
 internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
@@ -21,6 +25,13 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
     private GlobalSettings _globalSettings;
     private ConnectionStrings _connectionStrings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqliteEFCoreDistributedLockingMechanism{T}"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="efCoreScopeAccessor">The EF Core scope accessor.</param>
+    /// <param name="globalSettings">The global settings monitor.</param>
+    /// <param name="connectionStrings">The connection strings monitor.</param>
     public SqliteEFCoreDistributedLockingMechanism(
         ILogger<SqliteEFCoreDistributedLockingMechanism<T>> logger,
         Lazy<IEFCoreScopeAccessor<T>> efCoreScopeAccessor,
@@ -36,6 +47,7 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
         connectionStrings.OnChange(x => _connectionStrings = x);
     }
 
+    /// <inheritdoc />
     public bool HasActiveRelatedScope => _efCoreScopeAccessor.Value.AmbientScope is not null;
 
     /// <inheritdoc />
@@ -44,19 +56,31 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
         string.Equals(_connectionStrings.ProviderName, Constants.ProviderNames.SQLLite, StringComparison.InvariantCultureIgnoreCase) &&
         _efCoreScopeAccessor.Value.AmbientScope is not null;
 
-    // With journal_mode=wal we can always read a snapshot.
+    /// <inheritdoc />
+    /// <remarks>With journal_mode=wal we can always read a snapshot.</remarks>
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
         => new SqliteDistributedLock(this, lockId, DistributedLockType.ReadLock, obtainLockTimeout ?? _globalSettings.DistributedLockingReadLockDefaultTimeout);
 
-    // With journal_mode=wal only a single write transaction can exist at a time.
+    /// <inheritdoc />
+    /// <remarks>With journal_mode=wal only a single write transaction can exist at a time.</remarks>
     public IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null)
         => new SqliteDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout ?? _globalSettings.DistributedLockingWriteLockDefaultTimeout);
 
+    /// <summary>
+    /// Represents a distributed lock for SQLite databases.
+    /// </summary>
     private sealed class SqliteDistributedLock : IDistributedLock
     {
         private readonly SqliteEFCoreDistributedLockingMechanism<T> _parent;
         private readonly TimeSpan _timeout;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqliteDistributedLock"/> class.
+        /// </summary>
+        /// <param name="parent">The parent locking mechanism.</param>
+        /// <param name="lockId">The lock identifier.</param>
+        /// <param name="lockType">The type of lock.</param>
+        /// <param name="timeout">The timeout for obtaining the lock.</param>
         public SqliteDistributedLock(
             SqliteEFCoreDistributedLockingMechanism<T> parent,
             int lockId,
@@ -97,14 +121,18 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
             _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
         }
 
+        /// <inheritdoc />
         public int LockId { get; }
 
+        /// <inheritdoc />
         public DistributedLockType LockType { get; }
 
+        /// <inheritdoc />
+        /// <remarks>Mostly no-op, cleaned up by completing transaction in scope.</remarks>
         public void Dispose()
-            // Mostly no op, cleaned up by completing transaction in scope.
             => _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
 
+        /// <inheritdoc />
         public override string ToString()
             => $"SqliteDistributedLock({LockId})";
 
