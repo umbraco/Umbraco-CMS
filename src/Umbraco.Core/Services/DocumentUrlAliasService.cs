@@ -172,12 +172,13 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Default to the default language when culture is not specified (like DocumentUrlService)
         culture ??= await _languageService.GetDefaultIsoCodeAsync();
 
-        if (TryGetLanguageId(culture, out var languageId) is false)
+        var languageId = await TryGetLanguageIdAsync(culture);
+        if (languageId is null)
         {
             return [];
         }
 
-        var cacheKey = new AliasCacheKey(normalizedAlias, languageId);
+        var cacheKey = new AliasCacheKey(normalizedAlias, languageId.Value);
 
         if (_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) is false || documentKeys.Count == 0)
         {
@@ -196,7 +197,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Default to the default language when culture is not specified (like DocumentUrlService)
         culture ??= await _languageService.GetDefaultIsoCodeAsync();
 
-        if (TryGetLanguageId(culture, out var languageId) is false)
+        var languageId = await TryGetLanguageIdAsync(culture);
+        if (languageId is null)
         {
             return [];
         }
@@ -208,7 +210,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         // Filter by language and return the alias strings.
         return aliasKeys
-            .Where(key => key.LanguageId == languageId)
+            .Where(key => key.LanguageId == languageId.Value)
             .Select(key => key.NormalizedAlias)
             .ToList();
     }
@@ -447,15 +449,28 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         }
     }
 
-    private bool TryGetLanguageId(string? culture, out int languageId)
+    private async Task<int?> TryGetLanguageIdAsync(string? culture)
     {
         if (string.IsNullOrEmpty(culture))
         {
-            languageId = 0;
-            return false;
+            return null;
         }
 
-        return _cultureToLanguageIdMap.TryGetValue(culture, out languageId);
+        if (_cultureToLanguageIdMap.TryGetValue(culture, out var languageId))
+        {
+            return languageId;
+        }
+
+        // Not found in map, try to retrieve from language service.
+        // This ensures there's no chance of missing existing languages if this method is called with a newly introduced culture.
+        ILanguage? language = await _languageService.GetAsync(culture);
+        if (language is not null)
+        {
+            _cultureToLanguageIdMap[culture] = language.Id;
+            return language.Id;
+        }
+
+        return null;
     }
 
     /// <summary>

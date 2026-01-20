@@ -63,14 +63,10 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public async Task Setup()
+    public async Task SetupTestData()
     {
-        DocumentUrlAliasService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        await CreateTestData();
-    }
+        await DocumentUrlAliasService.InitAsync(false, CancellationToken.None);
 
-    private async Task CreateTestData()
-    {
         // Create template
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         FileService.SaveTemplate(template);
@@ -157,6 +153,53 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         return (ContentType)contentType;
     }
 
+    private ContentType CreateCultureVariantContentTypeWithUrlAlias(int templateId, string alias = "pageWithAliasVariant")
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias(alias)
+            .WithName("Page With Alias Variant")
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithSortOrder(1)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias("bodyText")
+                    .WithName("Body text")
+                    .WithSortOrder(2)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias("author")
+                    .WithName("Author")
+                    .WithSortOrder(3)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlAlias)
+                    .WithName("URL Alias")
+                    .WithSortOrder(4)
+                    .WithDataTypeId(Constants.DataTypes.Textbox)
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                    .WithValueStorageType(ValueStorageType.Nvarchar)
+                    .WithVariations(ContentVariation.Culture)
+                    .Done()
+                .Done()
+            .AddAllowedTemplate()
+                .WithId(templateId)
+                .WithAlias("variantTemplate")
+                .WithName("Variant Template")
+                .Done()
+            .WithDefaultTemplateId(templateId)
+            .Build();
+
+        return (ContentType)contentType;
+    }
+
     #region GetDocumentKeysByAlias Tests
 
     [Test]
@@ -230,6 +273,40 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         Assert.That(result, Does.Contain(new Guid(PageWithSingleAliasKey)));
     }
 
+    [Test]
+    public async Task GetDocumentKeysByAliasAsync_Works_For_Language_Added_After_Initialization()
+    {
+        // Arrange - Add a new language AFTER the service has been initialized
+        var newLanguage = new LanguageBuilder()
+            .WithCultureInfo("fr-FR")
+            .WithIsDefault(false)
+            .Build();
+        await LanguageService.CreateAsync(newLanguage, Constants.Security.SuperUserKey);
+
+        // Create a culture-variant content type
+        var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
+        FileService.SaveTemplate(template);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id);
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        // Create content with an alias for the new language
+        var content = ContentBuilder.CreateSimpleContent(variantContentType, "French Page", RootPage.Id);
+        content.SetCultureName("French Page", "fr-FR");
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "french-alias", "fr-FR");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["fr-FR"]);
+
+        // Trigger alias creation
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Act - Try to retrieve the alias for the new language
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("french-alias", "fr-FR");
+
+        // Assert - The alias should be found even though the language was added after initialization
+        Assert.That(result, Does.Contain(content.Key));
+    }
+
     #endregion
 
     #region GetAliases Tests
@@ -286,6 +363,40 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         Assert.That(result, Has.Exactly(1).Items);
         Assert.That(result, Does.Contain("my-single-alias"));
+    }
+
+    [Test]
+    public async Task GetAliasesAsync_Works_For_Language_Added_After_Initialization()
+    {
+        // Arrange - Add a new language AFTER the service has been initialized
+        var newLanguage = new LanguageBuilder()
+            .WithCultureInfo("de-DE")
+            .WithIsDefault(false)
+            .Build();
+        await LanguageService.CreateAsync(newLanguage, Constants.Security.SuperUserKey);
+
+        // Create a culture-variant content type
+        var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate2");
+        FileService.SaveTemplate(template);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasVariant2");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        // Create content with an alias for the new language
+        var content = ContentBuilder.CreateSimpleContent(variantContentType, "German Page", RootPage.Id);
+        content.SetCultureName("German Page", "de-DE");
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "german-alias", "de-DE");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["de-DE"]);
+
+        // Trigger alias creation
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Act - Try to retrieve the aliases for the new language
+        var result = await DocumentUrlAliasService.GetAliasesAsync(content.Key, "de-DE");
+
+        // Assert - The alias should be found even though the language was added after initialization
+        Assert.That(result, Does.Contain("german-alias"));
     }
 
     #endregion
