@@ -672,7 +672,7 @@ export default {
 		reset: 'リセット',
 	},
 	rollback: {
-		diffHelp: '<del>赤い</del>テキストは選択したバージョンで削除され、<ins>緑のテキスト</ins>が追加されます。',
+		diffHelp: '<del>赤いテキスト</del>は選択したバージョンで削除され、<ins>緑のテキスト</ins>が追加されます。',
 		showDiff: '現在の（下書き）バージョンと選択したバージョンの違いを表示。',
 		documentRolledBack: 'ドキュメントは以前の版に戻りました',
 		htmlHelp: '選択した版をhtmlで表示します。２つの版の比較を表示したいときは、Diff を選択してください。',

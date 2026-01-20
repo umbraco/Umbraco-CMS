@@ -1220,7 +1220,7 @@ export default {
 	rollback: {
 		changes: 'Modifiche',
 		headline: 'Seleziona una versione da confrontare con la versione corrente',
-		diffHelp: 'Il testo <del>in rosso</del> verrà rimosso nella versione selezionata, il testo <ins>in verde</ins> verrà aggiunto.',
+		diffHelp: '<del>Il testo rosso</del> verrà rimosso nella versione selezionata, <ins>il testo verde</ins> verrà aggiunto.',
 		showDiff: 'Mostra le differenze tra la versione corrente (bozza) e la versione selezionata.',
 		documentRolledBack: 'Il documento è stato riportato alla versione scelta.',
 		htmlHelp:

@@ -818,7 +818,7 @@ export default {
 		reset: 'Nullstill',
 	},
 	rollback: {
-		diffHelp: '<del>Rød</del> tekst vil bli fjernet i den valgte versjonen, <ins>grønn tekst</ins> vil bli lagt til.',
+		diffHelp: '<del>Rød tekst</del> vil bli fjernet i den valgte versjonen, <ins>grønn tekst</ins> vil bli lagt til.',
 		showDiff: 'Vis forskjeller mellom gjeldende (utkast) versjon og valgt versjon.',
 		documentRolledBack: 'Dokumentet er tilbakeført til en tidligere versjon',
 		htmlHelp:

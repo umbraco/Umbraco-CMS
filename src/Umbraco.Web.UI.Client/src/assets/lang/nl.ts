@@ -1146,7 +1146,7 @@ export default {
 		created: 'Aangemaakt',
 		headline: 'Selecteer een versie om te vergelijken met de huidige versie',
 		currentVersion: 'Huidige versie',
-		diffHelp: '<del>Rode</del> tekst wordt verwijderd in de geselecteerde versie, <ins>groene tekst</ins> wordt toegevoegd.',
+		diffHelp: '<del>Rode tekst</del> wordt verwijderd in de geselecteerde versie, <ins>groene tekst</ins> wordt toegevoegd.',
 		showDiff: 'Toon verschillen tussen de huidige (concept) versie en de geselecteerde versie.',
 		documentRolledBack: 'Document is teruggezet',
 		htmlHelp:

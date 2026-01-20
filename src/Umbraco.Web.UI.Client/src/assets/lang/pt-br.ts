@@ -365,7 +365,7 @@ export default {
 		removeLink: 'Remover Link',
 	},
 	rollback: {
-		diffHelp: 'Texto <del>vermelho</del> será removido na versão selecionada, texto <ins>verde</ins> será adicionado.',
+		diffHelp: '<del>Texto vermelho</del> será removido na versão selecionada, <ins>texto verde</ins> será adicionado.',
 		showDiff: 'Mostrar diferenças entre a versão atual (rascunho) e a versão selecionada.',
 		documentRolledBack: 'Documento foi revertido',
 		htmlHelp:

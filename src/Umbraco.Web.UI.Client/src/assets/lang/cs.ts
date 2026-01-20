@@ -1082,7 +1082,7 @@ export default {
 	},
 	rollback: {
 		headline: 'Vyberte verzi, kterou chcete porovnat s aktuální verzí',
-		diffHelp: '<del>Červený</del> text bude ve vybrané verzi odstraněn, <ins>zelený text</ins> bude přidán.',
+		diffHelp: '<del>Červený text</del> bude ve vybrané verzi odstraněn, <ins>zelený text</ins> bude přidán.',
 		showDiff: 'Zobrazit rozdíly mezi aktuální (koncept) verzí a vybranou verzí.',
 		documentRolledBack: 'Dokument byl vrácen na starší verzi',
 		htmlHelp:

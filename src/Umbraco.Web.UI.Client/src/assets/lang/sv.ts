@@ -823,7 +823,7 @@ export default {
 		reset: 'Återställ',
 	},
 	rollback: {
-		diffHelp: '<del>Röd</del> text kommer att tas bort i den valda versionen, <ins>grön text</ins> kommer att läggas till.',
+		diffHelp: '<del>Röd text</del> kommer att tas bort i den valda versionen, <ins>grön text</ins> kommer att läggas till.',
 		showDiff: 'Visa skillnader mellan nuvarande (utkast) version och vald version.',
 		documentRolledBack: 'Dokumentet har återgått till en tidigare version',
 		htmlHelp:

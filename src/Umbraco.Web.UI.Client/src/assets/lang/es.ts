@@ -876,7 +876,7 @@ export default {
 		reset: 'Reiniciar',
 	},
 	rollback: {
-		diffHelp: 'El texto en <del>rojo</del> se eliminará en la versión seleccionada, el texto en <ins>verde</ins> se añadirá.',
+		diffHelp: '<del>El texto rojo</del> se eliminará en la versión seleccionada, <ins>el texto verde</ins> se añadirá.',
 		showDiff: 'Mostrar diferencias entre la versión actual (borrador) y la versión seleccionada.',
 		documentRolledBack: 'Se ha recuperado la última versión del documento.',
 		htmlHelp:

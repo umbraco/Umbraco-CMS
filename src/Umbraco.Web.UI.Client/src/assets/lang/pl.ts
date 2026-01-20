@@ -836,7 +836,7 @@ export default {
 		reset: 'Resetuj',
 	},
 	rollback: {
-		diffHelp: '<del>Czerwony</del> tekst zostanie usunięty w wybranej wersji, <ins>zielony tekst</ins> zostanie dodany.',
+		diffHelp: '<del>Czerwony tekst</del> zostanie usunięty w wybranej wersji, <ins>zielony tekst</ins> zostanie dodany.',
 		showDiff: 'Pokaż różnice między bieżącą (wersją roboczą) a wybraną wersją.',
 		documentRolledBack: 'Dokument został przywrócony',
 		htmlHelp:
