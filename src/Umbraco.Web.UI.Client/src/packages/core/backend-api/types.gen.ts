@@ -1163,9 +1163,16 @@ export type FlagModel = {
     alias: string;
 };
 
+export type FolderItemResponseModel = {
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+};
+
 export type FolderResponseModel = {
     name: string;
     id: string;
+    isTrashed: boolean;
 };
 
 export type HealthCheckActionRequestModel = {
@@ -8486,6 +8493,31 @@ export type GetItemElementResponses = {
 };
 
 export type GetItemElementResponse = GetItemElementResponses[keyof GetItemElementResponses];
+
+export type GetItemElementFolderData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/element/folder';
+};
+
+export type GetItemElementFolderErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementFolderResponses = {
+    /**
+     * OK
+     */
+    200: Array<FolderItemResponseModel>;
+};
+
+export type GetItemElementFolderResponse = GetItemElementFolderResponses[keyof GetItemElementFolderResponses];
 
 export type DeleteRecycleBinElementData = {
     body?: never;
