@@ -1226,9 +1226,9 @@ export default {
 		changes: 'Promjene',
 		created: 'Kreirano',
 		currentVersion: 'Trenutna verzija',
-		diffHelp:
-			'Ovo pokazuje razlike između trenutne verzije i odabrane verzije<br /><del>Crveni tekst</del> bit će uklonjen u odabranoj verziji, <ins>zeleni tekst</ins> će biti dodan',
-		noDiff: 'Nema razlike između trenutne verzije i odabrane verzije',
+		diffHelp: '<del>Crveni tekst</del> bit će uklonjen u odabranoj verziji, <ins>zeleni tekst</ins> će biti dodan.',
+		showDiff: 'Prikaži razlike između trenutne verzije i odabrane verzije.',
+		noDiff: 'Nema razlike između trenutne verzije i odabrane verzije.',
 		documentRolledBack: 'Dokument je vraćen',
 		headline: 'Odaberite verziju koju želite usporediti sa trenutnom verzijom',
 		htmlHelp:
