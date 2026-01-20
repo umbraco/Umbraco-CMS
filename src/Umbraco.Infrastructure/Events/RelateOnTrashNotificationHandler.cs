@@ -5,6 +5,7 @@ using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
@@ -13,14 +14,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
 
-// TODO: lots of duplicate code in this one, refactor
 public sealed class RelateOnTrashNotificationHandler :
     INotificationHandler<ContentMovedNotification>,
     INotificationHandler<ContentMovedToRecycleBinNotification>,
     INotificationAsyncHandler<ContentMovedToRecycleBinNotification>,
     INotificationHandler<MediaMovedNotification>,
     INotificationHandler<MediaMovedToRecycleBinNotification>,
-    INotificationAsyncHandler<MediaMovedToRecycleBinNotification>
+    INotificationAsyncHandler<MediaMovedToRecycleBinNotification>,
+    INotificationHandler<ElementMovedNotification>,
+    INotificationAsyncHandler<ElementMovedToRecycleBinNotification>,
+    INotificationHandler<EntityContainerMovedNotification>,
+    INotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification>
 {
     private readonly IAuditService _auditService;
     private readonly IEntityService _entityService;
@@ -67,136 +71,179 @@ public sealed class RelateOnTrashNotificationHandler :
     {
     }
 
+    /// <inheritdoc />
     public void Handle(ContentMovedNotification notification)
-    {
-        foreach (MoveEventInfo<IContent> item in notification.MoveInfoCollection.Where(x =>
-                     x.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
-        {
-            const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
-            IEnumerable<IRelation> relations = _relationService.GetByChildId(item.Entity.Id);
-
-            foreach (IRelation relation in
-                     relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
-            {
-                _relationService.Delete(relation);
-            }
-        }
-    }
+        => DeleteRelationsOnRestore(
+            notification.MoveInfoCollection,
+            Constants.System.RecycleBinContentString,
+            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
 
     /// <inheritdoc />
     public async Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-    {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        {
-            const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
-            IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
+        => await CreateRelationsOnTrashAsync(
+            notification.MoveInfoCollection,
+            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Document);
 
-            // check that the relation-type exists, if not, then recreate it
-            if (relationType == null)
-            {
-                Guid documentObjectType = Constants.ObjectTypes.Document;
-                const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
-
-                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType, false);
-                _relationService.Save(relationType);
-            }
-
-            foreach (MoveToRecycleBinEventInfo<IContent> item in notification.MoveInfoCollection)
-            {
-                IList<string> originalPath = item.OriginalPath.ToDelimitedList();
-                var originalParentId = originalPath.Count > 2
-                    ? int.Parse(originalPath[originalPath.Count - 2], CultureInfo.InvariantCulture)
-                    : Constants.System.Root;
-
-                // before we can create this relation, we need to ensure that the original parent still exists which
-                // may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
-                if (_entityService.Exists(originalParentId))
-                {
-                    // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
-                    IRelation relation =
-                        _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
-                        new Relation(originalParentId, item.Entity.Id, relationType);
-                    _relationService.Save(relation);
-
-                    await _auditService.AddAsync(
-                        AuditType.Delete,
-                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(item.Entity.WriterId),
-                        item.Entity.Id,
-                        UmbracoObjectTypes.Document.GetName(),
-                        string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id, originalParentId));
-                }
-            }
-
-            scope.Complete();
-        }
-    }
-
+    /// <inheritdoc />
     [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
     public void Handle(ContentMovedToRecycleBinNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public void Handle(MediaMovedNotification notification)
+        => DeleteRelationsOnRestore(
+            notification.MoveInfoCollection,
+            Constants.System.RecycleBinMediaString,
+            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias);
+
+    /// <inheritdoc />
+    public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => await CreateRelationsOnTrashAsync(
+            notification.MoveInfoCollection,
+            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
+            Constants.ObjectTypes.Media,
+            Constants.ObjectTypes.Media);
+
+    /// <inheritdoc />
+    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
+    public void Handle(MediaMovedToRecycleBinNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public void Handle(ElementMovedNotification notification)
+        => DeleteRelationsOnRestore(
+            notification.MoveInfoCollection,
+            Constants.System.RecycleBinElementString,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias);
+
+    /// <inheritdoc />
+    public async Task HandleAsync(ElementMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => await CreateRelationsOnTrashAsync(
+            notification.MoveInfoCollection,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.Element);
+
+    /// <inheritdoc />
+    public void Handle(EntityContainerMovedNotification notification)
     {
-        foreach (MoveEventInfo<IMedia> item in notification.MoveInfoCollection.Where(x =>
-                     x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)))
+        // Only handle Element containers
+        IEnumerable<MoveEventInfo<EntityContainer>> elementContainerItems = notification.MoveInfoCollection
+            .Where(x => x.Entity.ContainedObjectType == Constants.ObjectTypes.Element);
+
+        DeleteRelationsOnRestore(
+            elementContainerItems,
+            Constants.System.RecycleBinElementString,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias);
+    }
+
+    /// <inheritdoc />
+    public async Task HandleAsync(
+        EntityContainerMovedToRecycleBinNotification notification,
+        CancellationToken cancellationToken)
+    {
+        // Only handle Element containers
+        IEnumerable<MoveToRecycleBinEventInfo<EntityContainer>> elementContainerItems = notification.MoveInfoCollection
+            .Where(x => x.Entity.ContainedObjectType == Constants.ObjectTypes.Element)
+            .ToArray();
+
+        if (elementContainerItems.Any() is false)
         {
-            const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
+            return;
+        }
+
+        await CreateRelationsOnTrashAsync(
+            elementContainerItems,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.ElementContainer);
+    }
+
+    private void DeleteRelationsOnRestore<T>(
+        IEnumerable<MoveEventInfo<T>> moveInfoCollection,
+        string recycleBinPathString,
+        string relationTypeAlias)
+        where T : IEntity
+    {
+        foreach (MoveEventInfo<T> item in moveInfoCollection.Where(x => x.OriginalPath.Contains(recycleBinPathString)))
+        {
             IEnumerable<IRelation> relations = _relationService.GetByChildId(item.Entity.Id);
-            foreach (IRelation relation in
-                     relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
+            foreach (IRelation relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
             {
                 _relationService.Delete(relation);
             }
         }
     }
 
-    /// <inheritdoc />
-    public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+    private async Task CreateRelationsOnTrashAsync<T>(
+        IEnumerable<MoveToRecycleBinEventInfo<T>> moveInfoCollection,
+        string relationTypeAlias,
+        string relationTypeName,
+        Guid parentObjectType,
+        Guid childObjectType)
+        where T : ITreeEntity
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
+
+        // Check that the relation-type exists, if not, then recreate it
+        if (relationType == null)
         {
-            const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
-            IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
-
-            // check that the relation-type exists, if not, then recreate it
-            if (relationType == null)
-            {
-                Guid documentObjectType = Constants.ObjectTypes.Document;
-                const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName;
-                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType, false);
-                _relationService.Save(relationType);
-            }
-
-            foreach (MoveToRecycleBinEventInfo<IMedia> item in notification.MoveInfoCollection)
-            {
-                IList<string> originalPath = item.OriginalPath.ToDelimitedList();
-                var originalParentId = originalPath.Count > 2
-                    ? int.Parse(originalPath[originalPath.Count - 2], CultureInfo.InvariantCulture)
-                    : Constants.System.Root;
-
-                // before we can create this relation, we need to ensure that the original parent still exists which
-                // may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
-                if (_entityService.Exists(originalParentId))
-                {
-                    // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
-                    IRelation relation =
-                        _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
-                        new Relation(originalParentId, item.Entity.Id, relationType);
-                    _relationService.Save(relation);
-                    await _auditService.AddAsync(
-                        AuditType.Delete,
-                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(item.Entity.WriterId),
-                        item.Entity.Id,
-                        UmbracoObjectTypes.Media.GetName(),
-                        string.Format(_textService.Localize("recycleBin", "mediaTrashed"), item.Entity.Id, originalParentId));
-                }
-            }
-
-            scope.Complete();
+            relationType = new RelationType(relationTypeName, relationTypeAlias, false, parentObjectType, childObjectType, false);
+            _relationService.Save(relationType);
         }
+
+        UmbracoObjectTypes entityObjectType = ObjectTypes.GetUmbracoObjectType(childObjectType);
+        var localizationKey = GetLocalizationKey(entityObjectType);
+
+        foreach (MoveToRecycleBinEventInfo<T> item in moveInfoCollection)
+        {
+            IList<string> originalPath = item.OriginalPath.ToDelimitedList();
+            var originalParentId = originalPath.Count > 2
+                ? int.Parse(originalPath[^2], CultureInfo.InvariantCulture)
+                : Constants.System.Root;
+
+            // Before we can create this relation, we need to ensure that the original parent still exists which
+            // may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
+            if (!_entityService.Exists(originalParentId))
+            {
+                continue;
+            }
+
+            // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
+            IRelation relation =
+                _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
+                new Relation(originalParentId, item.Entity.Id, relationType);
+            _relationService.Save(relation);
+
+            await _auditService.AddAsync(
+                AuditType.Delete,
+                _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(GetFallbackPerformingUserId(item.Entity)),
+                item.Entity.Id,
+                entityObjectType.GetName(),
+                string.Format(_textService.Localize("recycleBin", localizationKey), item.Entity.Id, originalParentId));
+        }
+
+        scope.Complete();
     }
 
-    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
-    public void Handle(MediaMovedToRecycleBinNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+    private static int GetFallbackPerformingUserId(ITreeEntity entity)
+        => entity is IContentBase contentBase ? contentBase.WriterId : entity.CreatorId;
+
+    private static string GetLocalizationKey(UmbracoObjectTypes entityObjectType)
+        => entityObjectType switch
+        {
+            UmbracoObjectTypes.Document => "contentTrashed",
+            UmbracoObjectTypes.Media => "mediaTrashed",
+            UmbracoObjectTypes.Element => "elementTrashed",
+            UmbracoObjectTypes.ElementContainer => "elementContainerTrashed",
+            _ => throw new ArgumentOutOfRangeException(nameof(entityObjectType), entityObjectType, "Unsupported entity object type for recycle bin localization."),
+        };
 }
