@@ -609,7 +609,7 @@ namespace Umbraco.Cms.Core.Services
             scope.ReadLock(Constants.Locks.MediaTree);
 
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
         }
 
         /// <inheritdoc />
@@ -667,7 +667,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentNullException(nameof(ordering));
             }
 
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
         }
 
         /// <summary>
@@ -721,7 +721,7 @@ namespace Umbraco.Cms.Core.Services
 
             scope.ReadLock(Constants.Locks.MediaTree);
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
 
         /// <summary>

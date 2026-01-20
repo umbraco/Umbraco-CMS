@@ -356,7 +356,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             // The tree is locked, counting and comparing to total is safe.
             IEnumerable<IContent> descendants =
-                _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                _documentRepository.GetPage(query, pageIndex++, groupSize, out total, propertyAliases: null, filter: null, Ordering.By("Path"));
             var items = new List<ContentNuDto>();
             var count = 0;
             foreach (IContent c in descendants)
@@ -407,7 +407,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             // The tree is locked, counting and comparing to total is safe.
             IEnumerable<IMedia> descendants =
-                _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, propertyAliases: null, filter: null, Ordering.By("Path"));
             ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
@@ -442,7 +442,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         do
         {
             IEnumerable<IMember> descendants =
-                _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                _memberRepository.GetPage(query, pageIndex++, groupSize, out total, propertyAliases: null, filter: null, Ordering.By("Path"));
             ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;

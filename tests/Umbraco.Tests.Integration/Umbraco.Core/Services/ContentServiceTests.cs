@@ -1413,7 +1413,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
                 parentId,
                 0,
                 500,
-                out var totalChildren); // we only want the first so page size, etc.. is abitrary
+                out var totalChildren,
+                propertyAliases: null,
+                filter: null,
+                ordering: null); // we only want the first so page size, etc.. is abitrary
 
         // children are published including ... that was released 5 mins ago
         Assert.IsTrue(children.First(x => x.Id == Subpage.Id).Published);
@@ -2256,7 +2259,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
 
         var child = ContentService.GetById(Subpage.Id);
-        var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
+        var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total, propertyAliases: null, filter: null, ordering: null).First();
         Assert.AreEqual(childCopy.Name, child.Name);
         Assert.AreNotEqual(childCopy.Id, child.Id);
         Assert.AreNotEqual(childCopy.Key, child.Key);
@@ -2815,10 +2818,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             ContentService.Save(c1);
         }
 
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total).ToArray();
+        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
@@ -2853,18 +2856,18 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         }
 
         // children in root including the folder - not the descendants in the folder
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total).ToArray();
+        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
 
         // children in folder
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
@@ -3129,7 +3132,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         }
 
         // get all
-        var list = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total).ToList();
+        var list = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToList();
 
         Console.WriteLine("ALL");
         WriteList(list);
@@ -3146,6 +3149,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -3158,6 +3162,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
             Ordering.By("name", culture: langDa.IsoCode)).ToList();
 
@@ -3173,6 +3178,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -3192,6 +3198,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
             Ordering.By("name", Direction.Descending, langFr.IsoCode)).ToList();
 

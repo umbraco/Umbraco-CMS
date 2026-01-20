@@ -2,11 +2,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 

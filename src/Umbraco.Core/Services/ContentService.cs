@@ -923,7 +923,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(ordering));
         }
 
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
     }
 
     /// <summary>
@@ -1014,7 +1014,7 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
             IQuery<IContent>? query = Query<IContent>()?
                 .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
     }
 
