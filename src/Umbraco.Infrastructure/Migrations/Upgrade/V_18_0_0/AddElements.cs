@@ -1,5 +1,6 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
@@ -19,6 +20,8 @@ public class AddElements : AsyncMigrationBase
         EnsureElementTables();
         EnsureElementRecycleBin();
         EnsureElementStartNodeColumn();
+        EnsureAdminGroupElementAccess();
+        EnsureAdminGroupElementPermissions();
         return Task.CompletedTask;
     }
 
@@ -112,5 +115,55 @@ public class AddElements : AsyncMigrationBase
         {
             AddColumn<UserGroupDto>(Constants.DatabaseSchema.Tables.UserGroup, "startElementId");
         }
+    }
+
+    private void EnsureAdminGroupElementAccess()
+    {
+        // Set startElementId to -1 (root) for admin group if not already set
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
+            .Update<UserGroupDto>(u => u.Set(x => x.StartElementId, Constants.System.Root))
+            .Where<UserGroupDto>(x => x.Key == Constants.Security.AdminGroupKey && x.StartElementId == null);
+
+        Database.Execute(sql);
+    }
+
+    private void EnsureAdminGroupElementPermissions()
+    {
+        // Check if admin group already has any element permissions
+        Sql<ISqlContext> existingPermissionsSql = Database.SqlContext.Sql()
+            .Select<UserGroup2PermissionDto>()
+            .From<UserGroup2PermissionDto>()
+            .Where<UserGroup2PermissionDto>(x =>
+                x.UserGroupKey == Constants.Security.AdminGroupKey &&
+                x.Permission == ActionElementBrowse.ActionLetter);
+
+        if (Database.Fetch<UserGroup2PermissionDto>(existingPermissionsSql).Count != 0)
+        {
+            return;
+        }
+
+        // Add all element permissions for admin group
+        var elementPermissions = new[]
+        {
+            ActionElementNew.ActionLetter,
+            ActionElementUpdate.ActionLetter,
+            ActionElementDelete.ActionLetter,
+            ActionElementMove.ActionLetter,
+            ActionElementCopy.ActionLetter,
+            ActionElementPublish.ActionLetter,
+            ActionElementUnpublish.ActionLetter,
+            ActionElementBrowse.ActionLetter,
+            ActionElementRollback.ActionLetter,
+        };
+
+        UserGroup2PermissionDto[] permissionDtos = elementPermissions
+            .Select(permission => new UserGroup2PermissionDto
+            {
+                UserGroupKey = Constants.Security.AdminGroupKey,
+                Permission = permission,
+            })
+            .ToArray();
+
+        Database.InsertBulk(permissionDtos);
     }
 }
