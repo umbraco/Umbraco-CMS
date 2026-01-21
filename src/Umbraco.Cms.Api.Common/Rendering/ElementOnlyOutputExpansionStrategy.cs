@@ -16,9 +16,6 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     /// <summary>
     ///     The parameter value indicating all properties should be included.
     /// </summary>
-    /// <summary>
-    ///     The parameter value indicating all properties should be included.
-    /// </summary>
     protected const string All = "$all";
 
     /// <summary>
