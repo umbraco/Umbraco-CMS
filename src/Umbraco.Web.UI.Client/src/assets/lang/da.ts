@@ -1398,9 +1398,9 @@ export default {
 	rollback: {
 		changes: 'Ændringer',
 		headline: 'Vælg en version at sammenligne med den nuværende version',
-		diffHelp:
-			'Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>',
-		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version',
+		diffHelp: '<del>Rød tekst</del> vil blive fjernet i den valgte version, <ins>grøn tekst</ins> vil blive tilføjet.',
+		showDiff: 'Vis forskelle mellem den nuværende version og den valgte version.',
+		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version.',
 		documentRolledBack: 'Dokument tilbagerullet',
 		htmlHelp:
 			"Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner\n      på samme tid, brug 'diff'-oversigten\n    ",
