@@ -10,6 +10,7 @@ export const UmbLink = Link.extend({
 			// @ts-expect-error
 			...this.parent?.(),
 			'data-anchor': { default: null },
+			'data-culture': { default: null },
 			title: { default: null },
 			type: { default: 'external' },
 		};

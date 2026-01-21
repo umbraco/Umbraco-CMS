@@ -22,7 +22,9 @@ export interface UmbTreePickerModalData<
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;
 	startNode?: UmbTreeStartNode;
 	foldersOnly?: boolean;
+	isVariant?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
+export interface UmbTreePickerModalValue extends UmbPickerModalValue {
+	culture?: string;
+}

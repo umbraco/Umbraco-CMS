@@ -54,6 +54,22 @@ export class UmbPickerInputContext<
 	}
 	private _min = 0;
 
+	private _culture?: string;
+
+	public get culture() {
+		return this._culture;
+	}
+
+	public setCulture(value: string | undefined){
+		this._culture = value;
+		this._onCultureChange(value);
+	}
+
+	protected _onCultureChange(_culture: string | undefined) {
+		// Base implementation does nothing
+		// Subclasses can override to update resolvers, etc.
+	}
+
 	/**
 	 * Creates an instance of UmbPickerInputContext.
 	 * @param {UmbControllerHost} host - The host for the controller.
@@ -114,6 +130,7 @@ export class UmbPickerInputContext<
 		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);
+		this._culture = modalValue.culture;
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
