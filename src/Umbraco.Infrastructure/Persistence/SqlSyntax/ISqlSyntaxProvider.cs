@@ -183,19 +183,28 @@ public interface ISqlSyntaxProvider
     /// <summary>
     /// Alters the database sequences to match the current schema requirements.
     /// </summary>
-    /// <remarks>This method should be called when schema changes require updates to database sequences, such
-    /// as after a migration. The specific changes applied depend on the current state of the database and the expected
-    /// schema.</remarks>
-    /// <param name="database">The database connection to use for altering sequences. Must not be null.</param>
-    void AlterSequences(IUmbracoDatabase database)
-    {
-    }
+    /// Alters the database sequences to match the current schema requirements for providers that support sequences.
+    /// </summary>
+    /// <remarks>
+    /// This is an optional extension point for SQL providers that support database sequences. Providers that support
+    /// sequences should override this method and implement any required changes when schema updates (for example, after
+    /// a migration) require sequence adjustments. Callers should typically check <see cref="SupportsSequences"/> before
+    /// invoking this method. The default implementation throws <see cref="NotImplementedException"/>.
+    /// </remarks>
+    /// <param name="database">The database connection to use for altering sequences.</param>
+    void AlterSequences(IUmbracoDatabase database) => throw new NotImplementedException();
 
     /// <summary>
-    /// Alters the database sequences associated with the specified table.
+    /// Alters the database sequences associated with the specified table for providers that support sequences.
     /// </summary>
-    /// <param name="database">The database connection to use for altering the sequences. Cannot be null.</param>
-    /// <param name="tableName">The name of the table whose sequences will be altered. Cannot be null or empty.</param>
+    /// <remarks>
+    /// This is an optional extension point for SQL providers that support database sequences. Providers that support
+    /// sequences should override this method to update sequences associated with the specified table when schema changes
+    /// require it. Callers should typically check <see cref="SupportsSequences"/> before invoking this method. The default
+    /// implementation throws <see cref="NotImplementedException"/>.
+    /// </remarks>
+    /// <param name="database">The database connection to use for altering the sequences.</param>
+    /// <param name="tableName">The name of the table whose sequences will be altered.</param>
     void AlterSequences(IUmbracoDatabase database, string tableName)
     {
     }
