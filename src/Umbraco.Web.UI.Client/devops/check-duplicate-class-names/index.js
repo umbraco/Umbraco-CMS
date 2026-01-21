@@ -5,6 +5,8 @@
  * @author Lee Kelleher, (using Claude Code)
  */
 
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
 
@@ -64,7 +66,14 @@ function findTypeScriptFiles(dir, files = []) {
  * @returns {{ className: string, filePath: string }[]} Array of class declarations.
  */
 function extractClassNames(filePath) {
-	const content = readFileSync(filePath, 'utf-8');
+	let content;
+	try {
+		content = readFileSync(filePath, 'utf-8');
+	} catch (err) {
+		console.warn(`Warning: Could not read ${filePath}: ${err.message}`);
+		return [];
+	}
+
 	const classDeclarations = [];
 
 	// Match exported class declarations
