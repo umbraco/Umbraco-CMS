@@ -48,7 +48,7 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 	private _isCollectionDataSource = false;
 
 	@state()
-	private _resolvedManifests: Array<ManifestCollectionView> = [];
+	private _manifestByAlias: Map<string, ManifestCollectionView> = new Map();
 
 	constructor() {
 		super();
@@ -68,14 +68,14 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 	#observeManifests() {
 		const aliases = this.#value.map((entry) => entry.alias);
 		if (aliases.length === 0) {
-			this._resolvedManifests = [];
+			this._manifestByAlias = new Map();
 			return;
 		}
 
 		this.observe(
 			umbExtensionsRegistry.byTypeAndAliases<ManifestCollectionView>('collectionView', aliases),
 			(manifests) => {
-				this._resolvedManifests = manifests;
+				this._manifestByAlias = new Map(manifests.map((m) => [m.alias, m]));
 			},
 			'observeCollectionViewManifests',
 		);
@@ -140,25 +140,38 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 	}
 
 	#renderItems() {
-		if (this._resolvedManifests.length === 0) return nothing;
+		if (this.#value.length === 0) return nothing;
 
-		return html` <uui-ref-list>
+		return html`<uui-ref-list>
 			${repeat(
-				this._resolvedManifests,
-				(manifest) => manifest.alias,
-				(manifest) => this.#renderItem(manifest),
+				this.#value,
+				(entry) => entry.alias,
+				(entry) => this.#renderItem(entry.alias),
 			)}
 		</uui-ref-list>`;
 	}
 
-	#renderItem(manifest: ManifestCollectionView) {
+	#renderItem(alias: string) {
+		const manifest = this._manifestByAlias.get(alias);
+
+		if (!manifest) {
+			return html`
+				<uui-ref-node name=${this.localize.term('general_notFound')} detail=${alias} readonly class="not-found">
+					<umb-icon slot="icon" name="icon-alert"></umb-icon>
+					<uui-action-bar slot="actions">
+						<uui-button
+							label=${this.localize.term('general_remove')}
+							@click=${() => this.#onRemove(alias)}></uui-button>
+					</uui-action-bar>
+				</uui-ref-node>
+			`;
+		}
+
 		return html`
-			<uui-ref-node name="${manifest.meta.label || manifest.meta.name}" detail=${manifest.alias} readonly>
+			<uui-ref-node name=${manifest.meta.label} detail=${alias} readonly>
 				<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
 				<uui-action-bar slot="actions">
-					<uui-button
-						label=${this.localize.term('general_remove')}
-						@click=${() => this.#onRemove(manifest.alias)}></uui-button>
+					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#onRemove(alias)}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -181,6 +194,10 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 				color: var(--uui-color-text-alt);
 				font-style: italic;
 				padding: var(--uui-size-3);
+			}
+
+			.not-found {
+				color: var(--uui-color-danger);
 			}
 		`,
 	];
