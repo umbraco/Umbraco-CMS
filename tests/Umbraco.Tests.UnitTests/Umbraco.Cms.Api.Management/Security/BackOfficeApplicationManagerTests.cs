@@ -4,6 +4,7 @@
 using System.Collections.Immutable;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -26,6 +27,7 @@ public class BackOfficeApplicationManagerTests
     private Mock<IWebHostEnvironment> _mockWebHostEnvironment = null!;
     private Mock<IRuntimeState> _mockRuntimeState = null!;
     private IOptions<SecuritySettings> _securitySettings = null!;
+    private Mock<ILogger<BackOfficeApplicationManager>> _mockLogger = null!;
 
     [SetUp]
     public void SetUp()
@@ -33,6 +35,7 @@ public class BackOfficeApplicationManagerTests
         _mockApplicationManager = new Mock<IOpenIddictApplicationManager>();
         _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
         _mockRuntimeState = new Mock<IRuntimeState>();
+        _mockLogger = new Mock<ILogger<BackOfficeApplicationManager>>();
 
         _securitySettings = Options.Create(new SecuritySettings
         {
@@ -65,7 +68,8 @@ public class BackOfficeApplicationManagerTests
             _mockApplicationManager.Object,
             _mockWebHostEnvironment.Object,
             _securitySettings,
-            _mockRuntimeState.Object);
+            _mockRuntimeState.Object,
+            _mockLogger.Object);
 
         var newHosts = new[] { new Uri("https://server1.local/") };
 
@@ -103,11 +107,7 @@ public class BackOfficeApplicationManagerTests
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingRedirectUris);
 
-        var sut = new BackOfficeApplicationManager(
-            _mockApplicationManager.Object,
-            _mockWebHostEnvironment.Object,
-            _securitySettings,
-            _mockRuntimeState.Object);
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
 
         var newHosts = new[] { new Uri("https://server3.local/") };
 
@@ -141,11 +141,7 @@ public class BackOfficeApplicationManagerTests
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingRedirectUris);
 
-        var sut = new BackOfficeApplicationManager(
-            _mockApplicationManager.Object,
-            _mockWebHostEnvironment.Object,
-            _securitySettings,
-            _mockRuntimeState.Object);
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
 
         // Note: The method validates input and throws ArgumentException for non-absolute URIs
         // So this test verifies the validation works correctly
@@ -186,11 +182,7 @@ public class BackOfficeApplicationManagerTests
                 capturedDescriptor = descriptor)
             .Returns(ValueTask.CompletedTask);
 
-        var sut = new BackOfficeApplicationManager(
-            _mockApplicationManager.Object,
-            _mockWebHostEnvironment.Object,
-            _securitySettings,
-            _mockRuntimeState.Object);
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
 
         var newHosts = new[] { new Uri("https://new.local/") };
 
@@ -235,11 +227,7 @@ public class BackOfficeApplicationManagerTests
                 capturedDescriptor = descriptor)
             .Returns(ValueTask.CompletedTask);
 
-        var sut = new BackOfficeApplicationManager(
-            _mockApplicationManager.Object,
-            _mockWebHostEnvironment.Object,
-            _securitySettings,
-            _mockRuntimeState.Object);
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
 
         var newHosts = new[] { new Uri("https://server1.local/") }; // Lowercase - should deduplicate
 
@@ -285,7 +273,8 @@ public class BackOfficeApplicationManagerTests
             _mockApplicationManager.Object,
             _mockWebHostEnvironment.Object,
             _securitySettings,
-            _mockRuntimeState.Object);
+            _mockRuntimeState.Object,
+            _mockLogger.Object);
 
         var newHosts = new[] { new Uri("https://server1.local/") }; // Same host
 
@@ -307,11 +296,7 @@ public class BackOfficeApplicationManagerTests
         // Arrange
         _mockRuntimeState.Setup(x => x.Level).Returns(RuntimeLevel.Install);
 
-        var sut = new BackOfficeApplicationManager(
-            _mockApplicationManager.Object,
-            _mockWebHostEnvironment.Object,
-            _securitySettings,
-            _mockRuntimeState.Object);
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
 
         var newHosts = new[] { new Uri("https://server1.local/") };
 
@@ -323,4 +308,12 @@ public class BackOfficeApplicationManagerTests
             x => x.FindByClientIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
+
+    private BackOfficeApplicationManager CreateDefaultMockedBackofficeApplicationManager() =>
+        new BackOfficeApplicationManager(
+        _mockApplicationManager.Object,
+        _mockWebHostEnvironment.Object,
+        _securitySettings,
+        _mockRuntimeState.Object,
+        _mockLogger.Object);
 }
