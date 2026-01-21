@@ -6,14 +6,25 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
+/// <summary>
+///     Default handler for generating OpenAPI operation IDs for Umbraco API controllers.
+/// </summary>
+/// <remarks>
+///     Left unsealed on purpose, so it is extendable by consuming APIs.
+/// </remarks>
 // NOTE: Left unsealed on purpose, so it is extendable.
 public class OperationIdHandler : IOperationIdHandler
 {
     private readonly ApiVersioningOptions _apiVersioningOptions;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="OperationIdHandler"/> class.
+    /// </summary>
+    /// <param name="apiVersioningOptions">The API versioning options.</param>
     public OperationIdHandler(IOptions<ApiVersioningOptions> apiVersioningOptions)
         => _apiVersioningOptions = apiVersioningOptions.Value;
 
+    /// <inheritdoc/>
     public bool CanHandle(ApiDescription apiDescription)
     {
         if (apiDescription.ActionDescriptor is not ControllerActionDescriptor controllerActionDescriptor)
@@ -24,9 +35,16 @@ public class OperationIdHandler : IOperationIdHandler
         return CanHandle(apiDescription, controllerActionDescriptor);
     }
 
+    /// <summary>
+    ///     Determines whether this handler can process the API description based on the controller namespace.
+    /// </summary>
+    /// <param name="apiDescription">The API description.</param>
+    /// <param name="controllerActionDescriptor">The controller action descriptor.</param>
+    /// <returns><c>true</c> if the controller is in an Umbraco.Cms.Api namespace; otherwise, <c>false</c>.</returns>
     protected virtual bool CanHandle(ApiDescription apiDescription, ControllerActionDescriptor controllerActionDescriptor)
         => controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("Umbraco.Cms.Api") is true;
 
+    /// <inheritdoc/>
     public virtual string Handle(ApiDescription apiDescription)
         => UmbracoOperationId(apiDescription);
 

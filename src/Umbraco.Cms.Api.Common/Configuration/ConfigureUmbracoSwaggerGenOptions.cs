@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
 
+/// <summary>
+///     Configures Swagger/OpenAPI generation options for Umbraco APIs.
+/// </summary>
 public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
     private readonly IOperationIdSelector _operationIdSelector;
@@ -15,6 +18,13 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     private readonly ISubTypesSelector _subTypesSelector;
     private readonly IDocumentInclusionSelector _documentInclusionSelector;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ConfigureUmbracoSwaggerGenOptions"/> class.
+    /// </summary>
+    /// <param name="operationIdSelector">The operation ID selector.</param>
+    /// <param name="schemaIdSelector">The schema ID selector.</param>
+    /// <param name="subTypesSelector">The sub-types selector for polymorphism support.</param>
+    /// <param name="documentInclusionSelector">The document inclusion selector.</param>
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,
         ISchemaIdSelector schemaIdSelector,
@@ -27,6 +37,12 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         _documentInclusionSelector = documentInclusionSelector;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ConfigureUmbracoSwaggerGenOptions"/> class.
+    /// </summary>
+    /// <param name="operationIdSelector">The operation ID selector.</param>
+    /// <param name="schemaIdSelector">The schema ID selector.</param>
+    /// <param name="subTypesSelector">The sub-types selector for polymorphism support.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,
@@ -40,6 +56,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     {
     }
 
+    /// <inheritdoc/>
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
         swaggerGenOptions.SwaggerDoc(
@@ -64,6 +81,14 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.SupportNonNullableReferenceTypes();
     }
 
+    /// <summary>
+    ///     Generates a sort key for API actions.
+    /// </summary>
+    /// <param name="apiDesc">The API description.</param>
+    /// <returns>A string used to sort API operations in the documentation.</returns>
+    /// <remarks>
+    ///     See https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting.
+    /// </remarks>
     // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
     private static string ActionOrderBy(ApiDescription apiDesc)
         => $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{(apiDesc.ActionDescriptor.RouteValues.TryGetValue("action", out var action) ? action : null)}_{apiDesc.HttpMethod}";

@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
+/// <summary>
+///     Selects sub-types for polymorphic OpenAPI schemas using registered handlers.
+/// </summary>
 public class SubTypesSelector : ISubTypesSelector
 {
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -15,6 +18,13 @@ public class SubTypesSelector : ISubTypesSelector
     private readonly IEnumerable<ISubTypesHandler> _subTypeHandlers;
     private readonly IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SubTypesSelector"/> class.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    /// <param name="subTypeHandlers">The registered sub-type handlers.</param>
+    /// <param name="umbracoJsonTypeInfoResolver">The JSON type info resolver for finding sub-types.</param>
     public SubTypesSelector(
         IHostingEnvironment hostingEnvironment,
         IHttpContextAccessor httpContextAccessor,
@@ -27,6 +37,7 @@ public class SubTypesSelector : ISubTypesSelector
         _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
     }
 
+    /// <inheritdoc/>
     public IEnumerable<Type> SubTypes(Type type)
     {
         var backOfficePath = _hostingEnvironment.GetBackOfficePath();
@@ -36,7 +47,7 @@ public class SubTypesSelector : ISubTypesSelector
         {
             // Split the path into segments
             var segments = _httpContextAccessor.HttpContext.Request.Path.Value!
-                .Substring(swaggerPath.Length)
+[swaggerPath.Length..]
                 .TrimStart(Constants.CharArrays.ForwardSlash)
                 .Split(Constants.CharArrays.ForwardSlash);
 
