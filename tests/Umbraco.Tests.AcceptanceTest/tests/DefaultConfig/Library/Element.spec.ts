@@ -4,7 +4,7 @@ import {expect} from "@playwright/test";
 let elementTypeId = '';
 let elementId = '';
 const elementName = 'TestElement';
-const elementTypeName = 'TestElementTypeForElement1';
+const elementTypeName = 'TestElementTypeForElement3';
 const dataTypeName = 'Textstring';
 const elementText = 'This is test element text';
 
@@ -166,7 +166,7 @@ test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => 
 test('can duplicate a element node to other parent', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementFolderName = 'TestElementFolder';
-  const elementFolderId = await umbracoApi.element.createFolder(elementFolderName);
+  await umbracoApi.element.createDefaultElementFolder(elementFolderName);
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
@@ -191,7 +191,7 @@ test('can duplicate a element node to other parent', async ({umbracoApi, umbraco
 test('can move a element node to other parent', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementFolderName = 'TestElementFolder';
-  const elementFolderId = await umbracoApi.element.createFolder(elementFolderName);
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
