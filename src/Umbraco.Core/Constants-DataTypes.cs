@@ -84,6 +84,7 @@ public static partial class Constants
             /// <summary>
             ///     Guid for Member as string
             /// </summary>
+            [Obsolete("Use the constant defined in Umbraco.Core.Constants.MemberTypes.Guids.Member. Scheduled for removal in Umbraco 19.")]
             public const string Member = "d59be02f-1df9-4228-aa1e-01917d806cda";
 
             /// <summary>
@@ -274,6 +275,7 @@ public static partial class Constants
             /// <summary>
             ///     Guid for Member
             /// </summary>
+            [Obsolete("Use the constant defined in Umbraco.Core.Constants.MemberTypes.Guids.MemberGuid. Scheduled for removal in Umbraco 19.")]
             public static readonly Guid MemberGuid = new(Member);
 
             /// <summary>

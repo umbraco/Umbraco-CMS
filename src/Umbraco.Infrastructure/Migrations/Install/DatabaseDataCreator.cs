@@ -1073,7 +1073,7 @@ internal sealed class DatabaseDataCreator
     {
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
-            Constants.DataTypes.Guids.Member,
+            Constants.MemberTypes.Guids.Member,
             new NodeDto
             {
                 NodeId = 1044,
@@ -1083,7 +1083,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1044",
                 SortOrder = 0,
-                UniqueId = Constants.DataTypes.Guids.MemberGuid,
+                UniqueId = Constants.MemberTypes.Guids.MemberGuid,
                 Text = Constants.Conventions.MemberTypes.DefaultAlias,
                 NodeObjectType = Constants.ObjectTypes.MemberType,
                 CreateDate = DateTime.UtcNow,
