@@ -9,6 +9,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UmbLanguageCollectionRepository, UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
@@ -64,6 +65,20 @@ export class UmbDocumentPickerInputVariantContext extends UmbPickerInputContext<
 			culture,
 			...pickerData?.search?.queryParams,
 		};
+
+		// Fetch available languages and pass to picker modal
+		const languageRepo = new UmbLanguageCollectionRepository(this);
+		const { data } = await languageRepo.requestCollection({});
+		if (data?.items) {
+			combinedPickerData.availableLanguages = data.items.map((lang) => ({
+				unique: lang.unique,
+				name: lang.name ?? lang.unique,
+			}));
+		}
+
+		// Get initial culture from app language context
+		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		combinedPickerData.initialCulture = appLanguageContext?.getAppCulture() ?? culture ?? undefined;
 
 		await super.openPicker(combinedPickerData);
 	}

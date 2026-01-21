@@ -23,8 +23,17 @@ export interface UmbTreePickerModalData<
 	startNode?: UmbTreeStartNode;
 	foldersOnly?: boolean;
 	isVariant?: boolean;
+	/** Optional list of available languages. If not provided, will be fetched automatically when isVariant is true. */
+	availableLanguages?: Array<UmbTreePickerLanguageOption>;
+	/** Optional initial culture to select. If not provided, will use app language context. */
+	initialCulture?: string;
 }
 
 export interface UmbTreePickerModalValue extends UmbPickerModalValue {
 	culture?: string;
+}
+
+export interface UmbTreePickerLanguageOption {
+	unique: string;
+	name: string;
 }

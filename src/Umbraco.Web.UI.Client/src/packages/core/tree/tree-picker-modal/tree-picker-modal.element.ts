@@ -1,7 +1,7 @@
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreeElement } from '../tree.element.js';
 import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
-import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
+import type { UmbTreePickerLanguageOption, UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
 import {
 	customElement,
 	html,
@@ -18,10 +18,7 @@ import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
-import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
@@ -55,7 +52,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _selectedLanguage?: string;
 
 	@state()
-	private _availableLanguages: Array<UmbLanguageDetailModel> = [];
+	private _availableLanguages: Array<UmbTreePickerLanguageOption> = [];
 
 	@state()
 	private _isLanguageDropdownOpen = false;
@@ -65,9 +62,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
-	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
-
-	#variantContext = new UmbVariantContext(this);
+	#variantContext?: UmbVariantContext;
 
 	constructor() {
 		super();
@@ -83,33 +78,34 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#initCreateAction();
-		this.#observeLanguages();
+		this.#initLanguages();
 	}
 
-	async #observeLanguages() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({});
-		if (data) {
-			this._availableLanguages = data.items;
+	async #initLanguages() {
+		// Only init languages if availableLanguages is provided in modal data
+		if (!this.data?.availableLanguages || this.data.availableLanguages.length === 0) {
+			return;
 		}
 
-		if (this._availableLanguages && this._availableLanguages.length > 0) {
-			// Set default/fallback language (first language in the list)
-			const defaultLanguage = this._availableLanguages[0];
-			await this.#variantContext.setFallbackCulture(defaultLanguage.unique);
+		this._availableLanguages = this.data.availableLanguages;
 
-			// Set initial display culture from app language context
-			const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
-			if (appLanguageContext) {
-				const appCulture = appLanguageContext.getAppCulture();
-				if (appCulture) {
-					this._selectedLanguage = appCulture;
-					await this.#variantContext.setCulture(appCulture);
-				} else {
-					// If no app culture, use default language
-					this._selectedLanguage = defaultLanguage.unique;
-					await this.#variantContext.setCulture(defaultLanguage.unique);
-				}
-			}
+		// Create variant context only when we have languages
+		// This prevents overriding parent context when not needed
+		if (!this.#variantContext) {
+			this.#variantContext = new UmbVariantContext(this);
+		}
+
+		// Set default/fallback language (first language in the list)
+		const defaultLanguage = this._availableLanguages[0];
+		await this.#variantContext.setFallbackCulture(defaultLanguage.unique);
+
+		// Use initial culture from modal data, or fallback to first language
+		if (this.data?.initialCulture) {
+			this._selectedLanguage = this.data.initialCulture;
+			await this.#variantContext.setCulture(this.data.initialCulture);
+		} else {
+			this._selectedLanguage = defaultLanguage.unique;
+			await this.#variantContext.setCulture(defaultLanguage.unique);
 		}
 	}
 
@@ -330,9 +326,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			this._selectedLanguage = value;
 
 			// Update variant context - this will trigger tree items to re-render
-			await this.#variantContext.setCulture(value);
+			if (this.#variantContext) {
+				await this.#variantContext.setCulture(value);
+			}
 
-			// Force re-render
 			this.requestUpdate();
 			this._languagePopoverElement?.hidePopover();
 		}

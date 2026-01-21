@@ -354,7 +354,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					.max=${1}
 					.value=${this.value.link.unique && this.value.link.type === 'document' ? this.value.link.unique : ''}
 					.culture=${this.value.link.culture}
-					variant-aware
 					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'document')}>
 				</umb-input-document-variant>
 			</umb-property-layout>
