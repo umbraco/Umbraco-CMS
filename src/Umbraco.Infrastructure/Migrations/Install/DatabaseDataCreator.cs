@@ -10,7 +10,9 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -1033,6 +1035,7 @@ internal sealed class DatabaseDataCreator
         Insert(new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
         Insert(new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
         Insert(new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
+        Insert(new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
     }
 
     private void CreateContentTypeData()
@@ -2207,7 +2210,7 @@ internal sealed class DatabaseDataCreator
                 EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                 EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                 DbType = "Ntext",
-                Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
+                Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
                                     "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
             });
         }
@@ -2220,7 +2223,7 @@ internal sealed class DatabaseDataCreator
                 EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                 EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                 DbType = "Ntext",
-                Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
+                Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
                                     "\", \"multiple\": true}",
             });
         }
