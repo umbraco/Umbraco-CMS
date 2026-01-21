@@ -106,6 +106,12 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
 			if (popover) {
 				if (open) {
+					// 1) Get the host element's position
+					const hostRect = this.getBoundingClientRect();
+					// 2) Position the popover
+					popover.style.top = `${hostRect.bottom}px`;
+					popover.style.left = `${hostRect.right}px`;
+					// 3) Show the popover
 					popover.showPopover();
 				} else {
 					popover.hidePopover();
@@ -166,7 +172,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
-				anchor-name: --entity-sign;
 				position: relative;
 				--offset-h: 12px;
 				--icon-w: 0.75rem;
@@ -177,9 +182,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 			.infobox {
 				position: absolute;
-				position-anchor: --entity-sign;
-				top: anchor(bottom);
-				left: anchor(right);
 				background-color: transparent;
 				padding: var(--uui-size-2) var(--uui-size-3);
 				font-size: 8px;
@@ -191,23 +193,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				min-height: fit-content;
 				border: none;
 				margin: 0;
-			}
-			.infobox::before {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 100%;
-				bottom: 100%;
-				opacity: 0;
-				border-radius: 3px;
-				box-shadow: var(--uui-shadow-depth-2);
-				display: none;
-				transition:
-					right 120ms var(--ease-bounce),
-					bottom 120ms var(--ease-bounce),
-					opacity 120ms linear,
-					display 0 120ms;
 			}
 
 			.infobox > .sign-container {
@@ -235,20 +220,12 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				font-size: 12px;
 				color: var(--uui-color-text);
 				clip-path: inset(-12px);
+				background-color: var(--uui-color-surface); /* Move from ::before */
+				box-shadow: var(--uui-shadow-depth-2); /* Move from ::before */
+				border-radius: 3px;
 				--umb-sign-bundle-bg: var(--uui-color-surface);
 			}
-			.infobox:popover-open::before {
-				right: 0;
-				bottom: 0;
-				opacity: 100;
-				background-color: var(--uui-color-surface);
-				display: block;
-				transition:
-					right 120ms var(--ease-bounce),
-					bottom 120ms var(--ease-bounce),
-					opacity 120ms var(--ease),
-					display 0 0;
-			}
+
 			.infobox:popover-open > .sign-container {
 				transform: none;
 				align-items: center;
