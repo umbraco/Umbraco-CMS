@@ -48,8 +48,8 @@ export const handlers = [
 		}
 	}),
 
-	http.post<HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async ({ request }) => {
-		const body = await request.json<HealthCheckActionRequestModel>();
+	http.post<object, HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async ({ request }) => {
+		const body = await request.json();
 		const healthCheckId = body.healthCheck.id;
 		// Find the health check based on the healthCheckId from the healthGroups[].checks
 		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.id === healthCheckId);

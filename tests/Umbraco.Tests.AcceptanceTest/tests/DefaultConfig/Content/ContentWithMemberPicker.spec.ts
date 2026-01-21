@@ -91,3 +91,23 @@ test('can remove a member picker in the content', async ({umbracoApi, umbracoUi}
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });
+
+test('can remove a not-found member picker in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
+  await umbracoApi.member.delete(memberId); // Delete the member to simulate not-found member
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.removeNotFoundItem(memberId);
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
+});

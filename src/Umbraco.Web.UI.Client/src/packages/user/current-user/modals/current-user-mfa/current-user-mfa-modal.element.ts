@@ -22,6 +22,12 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	@state()
 	private _items: Array<UmbMfaLoginProviderOption> = [];
 
+	@state()
+	private _isLoading = true;
+
+	@state()
+	private _error?: string;
+
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 
 	constructor() {
@@ -30,56 +36,83 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const serverLoginProviders$ = (await this.#currentUserRepository.requestMfaLoginProviders()).asObservable();
-		const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
+		this._isLoading = true;
+		this._error = undefined;
 
-		// Merge the server and manifest providers to get the final list of providers
-		const mfaLoginProviders$ = mergeObservables(
-			[serverLoginProviders$, manifestLoginProviders$],
-			([serverLoginProviders, manifestLoginProviders]) => {
-				return manifestLoginProviders.map((manifestLoginProvider) => {
-					const serverLoginProvider = serverLoginProviders.find(
-						(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
-					);
-					return {
-						existsOnServer: !!serverLoginProvider,
-						isEnabledOnUser: serverLoginProvider?.isEnabledOnUser ?? false,
-						providerName: serverLoginProvider?.providerName ?? manifestLoginProvider.forProviderName,
-						displayName:
-							manifestLoginProvider.meta?.label ?? serverLoginProvider?.providerName ?? manifestLoginProvider.name,
-					} satisfies UmbMfaLoginProviderOption;
-				});
-			},
-		);
+		try {
+			const serverLoginProvidersResponse = await this.#currentUserRepository.requestMfaLoginProviders();
+			if (serverLoginProvidersResponse.error) {
+				this._error = this.localize.term('errors_defaultError');
+				this._isLoading = false;
+				return;
+			}
 
-		this.observe(
-			mfaLoginProviders$,
-			(providers) => {
-				this._items = providers;
-			},
-			'_mfaLoginProviders',
-		);
+			const serverLoginProviders$ = serverLoginProvidersResponse.asObservable();
+			const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
+
+			// Merge the server and manifest providers to get the final list of providers
+			const mfaLoginProviders$ = mergeObservables(
+				[serverLoginProviders$, manifestLoginProviders$],
+				([serverLoginProviders, manifestLoginProviders]) => {
+					return manifestLoginProviders.map((manifestLoginProvider) => {
+						const serverLoginProvider = serverLoginProviders.find(
+							(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
+						);
+						return {
+							existsOnServer: !!serverLoginProvider,
+							isEnabledOnUser: serverLoginProvider?.isEnabledOnUser ?? false,
+							providerName: serverLoginProvider?.providerName ?? manifestLoginProvider.forProviderName,
+							displayName:
+								manifestLoginProvider.meta?.label ?? serverLoginProvider?.providerName ?? manifestLoginProvider.name,
+						} satisfies UmbMfaLoginProviderOption;
+					});
+				},
+			);
+
+			this.observe(
+				mfaLoginProviders$,
+				(providers) => {
+					this._items = providers;
+					this._isLoading = false;
+				},
+				'_mfaLoginProviders',
+			);
+		} catch {
+			this._error = this.localize.term('errors_defaultError');
+			this._isLoading = false;
+		}
 	}
 
 	#close() {
 		this.modalContext?.submit();
 	}
 
+	#renderContent() {
+		if (this._isLoading) {
+			return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		}
+
+		if (this._error) {
+			return html`<p>${this._error}</p>`;
+		}
+
+		if (this._items.length > 0) {
+			return html`
+				${repeat(
+					this._items,
+					(item) => item.providerName,
+					(item) => this.#renderProvider(item),
+				)}
+			`;
+		}
+
+		return nothing;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('member_2fa')}">
-				<div id="main">
-					${when(
-						this._items.length > 0,
-						() => html`
-							${repeat(
-								this._items,
-								(item) => item.providerName,
-								(item) => this.#renderProvider(item),
-							)}
-						`,
-					)}
-				</div>
+				<div id="main">${this.#renderContent()}</div>
 				<div slot="actions">
 					<uui-button @click=${this.#close} look="secondary" .label=${this.localize.term('general_close')}></uui-button>
 				</div>
@@ -163,6 +196,12 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		css`
 			uui-box {
 				margin-bottom: var(--uui-size-space-3);
+			}
+
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];
