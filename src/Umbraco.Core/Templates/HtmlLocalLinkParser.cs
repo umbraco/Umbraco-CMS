@@ -27,6 +27,8 @@ public sealed class HtmlLocalLinkParser
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
+    private static readonly Regex CulturePattern = new( """culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider)
     {
         _publishedUrlProvider = publishedUrlProvider;
@@ -65,13 +67,13 @@ public sealed class HtmlLocalLinkParser
             {
                 var newLink = tagData.Udi?.EntityType switch
                 {
-                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid, urlMode),
+                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid, urlMode, tagData.Culture),
                     Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid, urlMode),
                     _ => string.Empty,
                 };
 
                 text = StripTypeAttributeFromTag(text, tagData.Udi!.EntityType);
-                text = text.Replace(tagData.TagHref, newLink);
+                text = ReplaceLink(text, tagData.TagHref, newLink, tagData.Culture);
             }
             else if (tagData.IntId.HasValue)
             {
@@ -81,6 +83,19 @@ public sealed class HtmlLocalLinkParser
         }
 
         return text;
+    }
+
+    private string ReplaceLink(string text, string tagHref, string newLink, string? culture = null)
+    {
+        if (string.IsNullOrEmpty(culture))
+        {
+            return text.Replace(tagHref, newLink);
+        }
+        else
+        {
+            var pattern = $@"(<a\b(?=[^>]*data-culture=""{Regex.Escape(culture)}"")(?=[^>]*href="")[^>]*href="")[^""]*""";
+            return Regex.Replace(text, pattern, $"$1{newLink}\"");
+        }
     }
 
     // under normal circumstances, the type attribute is preceded by a space
@@ -106,10 +121,15 @@ public sealed class HtmlLocalLinkParser
                 continue;
             }
 
+            // Find the culture attribute if it exists
+            Match cultureMatch = CulturePattern.Match(linkTag.Value);
+
             yield return new LocalLinkTag(
                 null,
                 new GuidUdi(typeMatch.Groups["type"].Value, guid),
-                linkTag.Groups["locallink"].Value);
+                linkTag.Groups["locallink"].Value,
+                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null
+            );
         }
 
         // also return legacy results for values that have not been migrated
@@ -152,11 +172,12 @@ public sealed class HtmlLocalLinkParser
     [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
     public class LocalLinkTag
     {
-        public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
+        public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref, string? culture = null)
         {
             IntId = intId;
             Udi = udi;
             TagHref = tagHref;
+            Culture = culture;
         }
 
         public int? IntId { get; }
@@ -164,5 +185,7 @@ public sealed class HtmlLocalLinkParser
         public GuidUdi? Udi { get; }
 
         public string TagHref { get; }
+
+        public string? Culture { get; set; }
     }
 }

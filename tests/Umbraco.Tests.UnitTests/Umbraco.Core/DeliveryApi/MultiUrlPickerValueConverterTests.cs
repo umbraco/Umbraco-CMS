@@ -307,4 +307,99 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     }
 
     private IJsonSerializer Serializer() => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+    [Test]
+    public void MultiUrlPickerValueConverter_DeliveryApi_ContentLinkWithCulture_IncludesCultureInApiLink()
+    {
+        // Arrange
+        var publishedDataType = new PublishedDataType(
+            123, "test", "test",
+            new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        // Setup culture-specific URL path
+        PublishedUrlProviderMock
+            .Setup(p => p.GetUrl(
+                PublishedContent,
+                It.IsAny<UrlMode>(),
+                "fr-FR",
+                It.IsAny<Uri?>()))
+            .Returns("/fr/the-page-url");
+
+        var valueConverter = MultiUrlPickerValueConverter();
+
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto
+            {
+                Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+                Culture = "fr-FR"
+            }
+        });
+
+        // Act
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            inter,
+            false,
+            false) as IEnumerable<ApiLink>;
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.AreEqual(1, result.Count());
+        var link = result.First();
+        Assert.AreEqual(PublishedContent.Name, link.Title);
+        Assert.AreEqual(LinkType.Content, link.LinkType);
+        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
+        Assert.AreEqual("TheContentType", link.DestinationType);
+        Assert.Null(link.Url);
+        Assert.Null(link.Target);
+        Assert.AreEqual("fr-FR", link.Culture);
+        var route = link.Route;
+        Assert.NotNull(route);
+        Assert.AreEqual("/fr/the-page-url/", route.Path);
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertToObject_ContentLinkWithCulture_GeneratesUrlWithCorrectCulture()
+    {
+        // Arrange
+        var publishedDataType = new PublishedDataType(
+            123, "test", "test",
+            new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        PublishedUrlProviderMock
+            .Setup(p => p.GetUrl(
+                PublishedContent,
+                It.IsAny<UrlMode>(),
+                "fr-FR",
+                It.IsAny<Uri?>()))
+            .Returns("/fr/the-page-url");
+        var valueConverter = MultiUrlPickerValueConverter();
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto
+            {
+                Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+                Culture = "fr-FR"
+            }
+        });
+
+        // Act
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            inter,
+            false);
+
+        // Assert
+        Assert.NotNull(result);
+        var link = result as Link;
+        Assert.AreEqual("/fr/the-page-url", link.Url);
+    }
 }
