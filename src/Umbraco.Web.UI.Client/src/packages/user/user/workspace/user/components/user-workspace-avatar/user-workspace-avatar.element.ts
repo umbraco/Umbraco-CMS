@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 
 @customElement('umb-user-workspace-avatar')
-export class UmbUserAvatarElement extends UmbLitElement {
+export class UmbUserWorkspaceAvatarElement extends UmbLitElement {
 	@state()
 	private _user?: UmbUserDetailModel;
 
@@ -158,10 +158,10 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserAvatarElement;
+export default UmbUserWorkspaceAvatarElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-workspace-avatar': UmbUserAvatarElement;
+		'umb-user-workspace-avatar': UmbUserWorkspaceAvatarElement;
 	}
 }
