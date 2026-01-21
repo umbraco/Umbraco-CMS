@@ -38,6 +38,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         int parentId,
         string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates,
         long pageNumber,
         int pageSize,
         out long total);
@@ -47,6 +48,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         Guid? parentId,
         string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates = true,
         int skip = 0,
         int take = 100)
     {
@@ -66,7 +68,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
         IQuery<TContent>? contentQuery = ParseQuery(query);
 
-        IEnumerable<TContent> items = await SearchChildrenAsync(contentQuery, parentIdAsInt, propertyAliases, ordering, pageNumber, pageSize, out var total);
+        IEnumerable<TContent> items = await SearchChildrenAsync(contentQuery, parentIdAsInt, propertyAliases, ordering, loadTemplates, pageNumber, pageSize, out var total);
         return new PagedModel<TContent>
         {
             Items = items,

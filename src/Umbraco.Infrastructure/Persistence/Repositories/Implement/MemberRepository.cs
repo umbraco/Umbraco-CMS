@@ -377,8 +377,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         out long totalRecords,
         string[]? propertyAliases,
         IQuery<IMember>? filter,
-        Ordering? ordering)
+        Ordering? ordering,
+        bool loadTemplates = true)
     {
+        // Note: loadTemplates parameter is ignored for members as member items don't have templates
+
         Sql<ISqlContext>? filterSql = null;
 
         if (filter != null)

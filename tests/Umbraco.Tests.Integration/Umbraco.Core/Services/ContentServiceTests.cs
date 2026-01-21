@@ -2876,7 +2876,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     public void GetPagedChildren_With_Null_PropertyAliases_Returns_All_Properties()
     {
         // Arrange
-        var parentId = CreateContentWithChildForPropertyAliasTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - null propertyAliases should load all properties
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: null);
@@ -2891,7 +2891,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     public void GetPagedChildren_With_Empty_PropertyAliases_Returns_No_Property_Values()
     {
         // Arrange
-        var parentId = CreateContentWithChildForPropertyAliasTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - empty propertyAliases should load no custom properties
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: []);
@@ -2906,7 +2906,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     public void GetPagedChildren_With_Single_PropertyAlias_Returns_Only_That_Property()
     {
         // Arrange
-        var parentId = CreateContentWithChildForPropertyAliasTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - only "title" should be loaded
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title"]);
@@ -2921,7 +2921,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     public void GetPagedChildren_With_Multiple_PropertyAliases_Returns_Only_Those_Properties()
     {
         // Arrange
-        var parentId = CreateContentWithChildForPropertyAliasTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - "title" and "author" should be loaded, but not "bodyText"
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title", "author"]);
@@ -2936,7 +2936,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     public void GetPagedChildren_With_NonExistent_PropertyAlias_Returns_No_Properties()
     {
         // Arrange
-        var parentId = CreateContentWithChildForPropertyAliasTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - non-existent property alias should result in no property values
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["nonExistentProperty"]);
@@ -2947,11 +2947,52 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
     }
 
+    [Test]
+    public void GetPagedChildren_With_LoadTemplates_True_Loads_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - loadTemplates: true (default) should load templates
+        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: true);
+
+        // Assert - Template should be loaded
+        Assert.That(retrievedChild.TemplateId, Is.Not.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_LoadTemplates_False_Does_Not_Load_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - loadTemplates: false should not load templates
+        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: false);
+
+        // Assert - Template should not be loaded
+        Assert.That(retrievedChild.TemplateId, Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_Default_LoadTemplates_Loads_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - default (no loadTemplates specified) should load templates (backwards compatible)
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+
+        // Assert - Template should be loaded by default
+        Assert.That(children[0].TemplateId, Is.Not.Null);
+    }
+
     /// <summary>
     /// Creates a content type with properties (title, bodyText, author) and a parent with one child.
     /// Returns the parent ID for use in GetPagedChildren tests.
     /// </summary>
-    private int CreateContentWithChildForPropertyAliasTests()
+    private int CreateContentWithChildForGetPagedChildrenParameterTests()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -2975,6 +3016,20 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     private IContent GetSingleChildWithPropertyAliases(int parentId, string[]? propertyAliases)
     {
         var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases, filter: null, ordering: null).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(1));
+
+        return children[0];
+    }
+
+    /// <summary>
+    /// Gets the single child of the parent using GetPagedChildren with the specified loadTemplates parameter.
+    /// Asserts that exactly one child is returned.
+    /// </summary>
+    private IContent GetSingleChildWithLoadTemplates(int parentId, bool loadTemplates)
+    {
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null, loadTemplates: loadTemplates).ToArray();
 
         Assert.That(children.Length, Is.EqualTo(1));
         Assert.That(total, Is.EqualTo(1));

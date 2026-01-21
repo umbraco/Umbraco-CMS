@@ -618,7 +618,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </param>
         /// <param name="filter">Additional query filter.</param>
         /// <param name="ordering">Ordering information.</param>
-        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering);
+        /// <param name="loadTemplates">
+        ///     Whether to load templates. Set to false for performance when templates are not needed.
+        ///     Only applies to Document content; ignored for Media/Member.
+        /// </param>
+        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering, bool loadTemplates = true);
 
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {

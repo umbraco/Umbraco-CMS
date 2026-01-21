@@ -288,7 +288,11 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering);
+    /// <param name="loadTemplates">
+    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
+    ///     (e.g., collection views). Default is true.
+    /// </param>
+    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true);
 
     /// <summary>
     ///     Gets descendant documents of a given parent.

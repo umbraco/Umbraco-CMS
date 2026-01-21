@@ -38,6 +38,10 @@ public interface IContentSearchService<TContent>
     ///     If empty array, no custom properties are loaded.
     /// </param>
     /// <param name="ordering">The ordering.</param>
+    /// <param name="loadTemplates">
+    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
+    ///     (e.g., collection views). Default is true. Only applies to Document content; ignored for Media/Member.
+    /// </param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The number of items to take.</param>
     /// <returns>A paged model of content items.</returns>
@@ -46,6 +50,7 @@ public interface IContentSearchService<TContent>
         Guid? parentId,
         string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates = true,
         int skip = 0,
         int take = 100);
 }

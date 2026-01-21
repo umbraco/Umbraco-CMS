@@ -24,13 +24,14 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
         long pageNumber,
         int pageSize,
         out long total)
-        => SearchChildrenAsync(query, parentId, propertyAliases: null, ordering: ordering, pageNumber: pageNumber, pageSize: pageSize, total: out total);
+        => SearchChildrenAsync(query, parentId, propertyAliases: null, ordering: ordering, loadTemplates: true, pageNumber: pageNumber, pageSize: pageSize, total: out total);
 
     protected override Task<IEnumerable<IContent>> SearchChildrenAsync(
         IQuery<IContent>? query,
         int parentId,
         string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates,
         long pageNumber,
         int pageSize,
         out long total)
@@ -41,5 +42,6 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
             out total,
             propertyAliases,
             query,
-            ordering));
+            ordering,
+            loadTemplates));
 }

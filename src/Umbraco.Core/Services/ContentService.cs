@@ -845,7 +845,7 @@ public class ContentService : RepositoryService, IContentService
         => GetPagedChildren(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
 
     /// <inheritdoc />
-    public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
+    public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
     {
         if (pageIndex < 0)
         {
@@ -864,7 +864,7 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
 
             IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering, loadTemplates);
         }
     }
 

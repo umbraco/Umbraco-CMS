@@ -247,10 +247,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private IEnumerable<IContent> MapDtosToContent(
         List<DocumentDto> dtos,
         bool withCache = false,
-        bool loadProperties = true,
+        string[]? propertyAliases = null,
         bool loadTemplates = true,
-        bool loadVariants = true,
-        string[]? propertyAliases = null)
+        bool loadVariants = true)
     {
         var temps = new List<TempContent<Content>>();
         var contentTypes = new Dictionary<int, IContentType?>();
@@ -328,10 +327,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 .ToDictionary(x => x.Id, x => x);
         }
 
+        // An empty array of propertyAliases indicates that no properties need to be loaded (null = load all properties).
+        var loadProperties = propertyAliases is { Length: 0 } is false;
+
         IDictionary<int, PropertyCollection>? properties = null;
         if (loadProperties)
         {
-            // load all properties for all documents from database in 1 query - indexed by version id
+            // load properties for all documents from database in 1 query - indexed by version id
             // if propertyAliases is provided, only load those specific properties
             properties = GetPropertyCollections(temps, propertyAliases);
         }
@@ -365,6 +367,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 {
                     throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
                 }
+            }
+            else
+            {
+                // When loadProperties is false (propertyAliases is empty array), clear the property collection
+                temp.Content!.Properties = new PropertyCollection();
             }
         }
 
@@ -890,8 +897,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             Database.Page<DocumentDto>(pageIndex + 1, take, sql).Items,
             true,
             // load bare minimum, need variants though since this is used to rollback with variants
-            false,
-            false);
+            propertyAliases: [],
+            loadTemplates: false,
+            loadVariants: true);
     }
 
     public override IContent? GetVersion(int versionId)
@@ -1569,7 +1577,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         out long totalRecords,
         string[]? propertyAliases,
         IQuery<IContent>? filter,
-        Ordering? ordering)
+        Ordering? ordering,
+        bool loadTemplates = true)
     {
         Sql<ISqlContext>? filterSql = null;
 
@@ -1602,7 +1611,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             pageIndex,
             pageSize,
             out totalRecords,
-            x => MapDtosToContent(x, propertyAliases: propertyAliases),
+            x => MapDtosToContent(x, propertyAliases: propertyAliases, loadTemplates: loadTemplates),
             filterSql,
             ordering);
     }

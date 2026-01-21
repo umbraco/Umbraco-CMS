@@ -245,7 +245,8 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 
     private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, string[]? propertyAliases, int skip, int take)
     {
-        PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, propertyAliases, ordering, skip, take);
+        // Collection views don't need templates loaded, so we pass loadTemplates: false for performance
+        PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, propertyAliases, ordering, loadTemplates: false, skip, take);
 
         // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
         // This has been the case with this functionality in Umbraco for a long time.
