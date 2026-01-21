@@ -622,7 +622,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         ///     Whether to load templates. Set to false for performance when templates are not needed.
         ///     Only applies to Document content; ignored for Media/Member.
         /// </param>
-        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering, bool loadTemplates = true);
+        // TODO (V19): Make this method abstract.
+#pragma warning disable CS0618 // Type or member is obsolete
+        public virtual IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering, bool loadTemplates = true)
+            => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
