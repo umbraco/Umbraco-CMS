@@ -9,6 +9,7 @@ import {
 	state,
 	query,
 } from '@umbraco-cms/backoffice/external/lit';
+import { UmbScrollEvent } from "../../event/scroll.event.ts";
 
 //TODO: Add the following attributes to JSDocs: header-transparent, main-no-padding, header-no-padding, header-fit-height
 
@@ -61,11 +62,9 @@ export class UmbBodyLayoutElement extends LitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
-		if (this.headerTransparent) {
-			requestAnimationFrame(() => {
-				this._scrollContainer?.addEventListener('scroll', this.#onScroll);
-			});
-		}
+		requestAnimationFrame(() => {
+			this._scrollContainer?.addEventListener('scroll', this.#onScroll);
+		});
 	}
 
 	override disconnectedCallback(): void {
@@ -75,7 +74,13 @@ export class UmbBodyLayoutElement extends LitElement {
 
 	#onScroll = () => {
 		if (!this._scrollContainer) return;
-		this.toggleAttribute('scrolling', this._scrollContainer.scrollTop > 0);
+
+		if (this.headerTransparent) {
+			this.toggleAttribute('scrolling', this._scrollContainer.scrollTop > 0);
+		}
+
+		// Mimic native scroll behavior to allow underlying web components to react to scrolling
+		this.dispatchEvent(new UmbScrollEvent());
 	};
 
 	#setSlotVisibility(target: HTMLElement, hasChildren: boolean) {
