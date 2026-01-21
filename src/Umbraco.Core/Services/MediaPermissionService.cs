@@ -14,7 +14,6 @@ internal sealed class MediaPermissionService : IMediaPermissionService
     private readonly AppCaches _appCaches;
 
     public MediaPermissionService(
-        IMediaService mediaService,
         IEntityService entityService,
         AppCaches appCaches)
     {

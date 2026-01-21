@@ -34,6 +34,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
     /// <param name="key">The unique identifier of the list view item to check access for.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the user
     /// has access to the specified list view item; otherwise, <see langword="false"/>.</returns>
+    [Obsolete("This is no longer used as we now authorize collection view items as a collection via FilterAuthorizedKeysAsync rather than one by one. Scheduled for removal in Umbraco 19.")]
     protected abstract Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key);
 
     /// <summary>

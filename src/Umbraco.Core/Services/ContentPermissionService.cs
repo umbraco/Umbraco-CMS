@@ -39,6 +39,11 @@ internal sealed class ContentPermissionService : IContentPermissionService
     {
         Guid[] keysArray = contentKeys.ToArray();
 
+        if (keysArray.Length == 0)
+        {
+            return Task.FromResult(ContentAuthorizationStatus.Success);
+        }
+
         // Use GetAllPaths instead of loading full content items - we only need paths for authorization
         TreeEntityPath[] entityPaths = _entityService.GetAllPaths(UmbracoObjectTypes.Document, keysArray).ToArray();
 

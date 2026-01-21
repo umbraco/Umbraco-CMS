@@ -50,7 +50,7 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.
     // However, we cannot pass in all the items; we want only the ones that comply, as opposed to
     // a general response whether the user has access to all nodes.
-    [Obsolete("This is no longer used as we now authorize collection view items as a collection rather than one by one. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("This is no longer used as we now authorize collection view items as a collection via FilterAuthorizedKeysAsync rather than one by one. Scheduled for removal in Umbraco 19.")]
     protected override async Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key)
     {
         var isDenied = await _contentPermissionAuthorizer.IsDeniedAsync(
