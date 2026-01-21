@@ -22,6 +22,12 @@ public class DocumentUrlServiceInitializerNotificationHandler : INotificationAsy
             return;
         }
 
+        // Skip if already initialized (e.g., by ContentCacheRefresher after migration)
+        if (_documentUrlService.IsInitialized)
+        {
+            return;
+        }
+
         await _documentUrlService.InitAsync(
             _runtimeState.Level <= RuntimeLevel.Install,
             cancellationToken);
