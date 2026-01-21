@@ -49,7 +49,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             throw new InvalidOperationException("No index found by name " + indexName);
         }
 
-        return _populators.Any(x => x.IsRegistered(index));
+        return HasRegisteredPopulator(index);
     }
 
     /// <inheritdoc/>
