@@ -147,9 +147,26 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	#renderBundle() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
-		const first = this._signs?.[0];
-		if (!first) return nothing;
-		return html`<div id="entity-sign-popover" popover="hint" class="infobox" style=${`--count:${this._signs.length}`}>
+		return html` ${this.#renderPreview()} ${this.#renderPopover()} `;
+	}
+
+	#renderPreview() {
+		if (!this._signs || this._signs.length === 0) return nothing;
+
+		// Show first 2 icons in preview
+		const previewSigns = this._signs.slice(0, 2);
+
+		return html`<div class="preview">
+			${repeat(
+				previewSigns,
+				(c) => c.alias,
+				(c, i) => html`<span class="preview-icon" style=${`--i:${i}`}>${c.component}</span>`,
+			)}
+		</div>`;
+	}
+
+	#renderPopover() {
+		return html`<div id="entity-sign-popover" popover="hint" class="infobox" style=${`--count:${this._signs?.length}`}>
 			${this.#renderOptions()}
 		</div>`;
 	}
@@ -161,8 +178,8 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					(c) => c.alias,
 					(c, i) => {
 						return html`<div class="sign-container ${i > 1 ? 'hide-in-overview' : ''}" style=${`--i:${i}`}>
-							<span class="badge-icon">${c.component}</span
-							><span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
+							<span class="badge-icon">${c.component}</span>
+							<span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
 						</div>`;
 					},
 				)
@@ -235,6 +252,19 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			.infobox:popover-open .sign-container .label {
 				opacity: 1;
 				pointer-events: auto;
+			}
+
+			.preview {
+				pointer-events: none;
+			}
+
+			.preview-icon {
+				position: absolute;
+				top: 10px;
+				left: 12px;
+				transform: translateX(calc(var(--i) * -5px));
+				font-size: 8px;
+				z-index: calc(2 - var(--i));
 			}
 		`,
 	];
