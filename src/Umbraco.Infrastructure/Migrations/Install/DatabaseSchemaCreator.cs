@@ -72,6 +72,7 @@ public class DatabaseSchemaCreator
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
         typeof(DocumentUrlDto),
+        typeof(DocumentUrlAliasDto),
         typeof(KeyValueDto),
         typeof(UserLoginDto),
         typeof(ConsentDto),
@@ -229,11 +230,6 @@ public class DatabaseSchemaCreator
             .DistinctBy(x => x.Item3)
             .Select(x => x.Item3)
             .ToList();
-
-        if (allConstraintsInDatabase.Count == 0)
-        {
-            return;
-        }
 
         var foreignKeysInDatabase = allConstraintsInDatabase
             .Where(x => x.InvariantStartsWith("FK_"))
