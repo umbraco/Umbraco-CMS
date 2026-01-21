@@ -1103,8 +1103,8 @@ export default {
 	},
 	rollback: {
 		headline: 'Sélectionnez une version à comparer avec la version actuelle',
-		diffHelp:
-			"Ceci affiche les différences entre la version actuelle et la version choisie<br />Le texte en <del>Rouge</del> signifie qu'il a été supprimé de la version choisie, <ins>vert signifie ajouté</ins>",
+		diffHelp: "<del>Le texte rouge</del> sera supprimé dans la version sélectionnée, <ins>le texte vert</ins> sera ajouté.",
+		showDiff: 'Afficher les différences entre la version actuelle (brouillon) et la version sélectionnée.',
 		documentRolledBack: 'Le document a été restauré à une version antérieure',
 		htmlHelp:
 			'Ceci affiche la version choisie en tant que HTML, si vous souhaitez voir les différences entre les deux versions en même temps, utilisez la vue différentielle',
