@@ -150,6 +150,7 @@ public class UmbracoPlan : MigrationPlan
         // To 17.2.0
         To<V_17_2_0.AddDescriptionToUserGroup>("{F1A2B3C4-D5E6-4789-ABCD-1234567890AB}");
         To<V_17_2_0.AddSortableValueToPropertyData>("{9DBDB5CD-8679-4BB0-BF83-E8D508073CE0}");
+        To<V_17_2_0.PopulateSortableValueForDatePropertyData>("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
