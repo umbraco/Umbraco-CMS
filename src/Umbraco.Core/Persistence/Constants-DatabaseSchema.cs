@@ -157,6 +157,12 @@ public static partial class Constants
             public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
 
             /// <summary>
+            ///     The document URL alias.
+            /// </summary>
+            public const string DocumentUrlAlias = TableNamePrefix + "DocumentUrlAlias";
+          
+          
+            /// <summary>
             ///     The media version table name.
             /// </summary>
             public const string MediaVersion = TableNamePrefix + "MediaVersion";

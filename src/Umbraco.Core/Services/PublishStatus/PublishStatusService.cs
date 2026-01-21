@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -16,7 +17,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ILanguageService _languageService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
-    private readonly IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
+    private readonly ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
 
     /// <summary>
     /// Gets or sets the default culture ISO code used when no culture is specified.
@@ -134,7 +135,7 @@ public PublishStatusService(
     /// <inheritdoc/>
     public Task RemoveAsync(Guid documentKey, CancellationToken cancellationToken)
     {
-        _publishedCultures.Remove(documentKey);
+        _publishedCultures.TryRemove(documentKey, out _);
         return Task.CompletedTask;
     }
 
