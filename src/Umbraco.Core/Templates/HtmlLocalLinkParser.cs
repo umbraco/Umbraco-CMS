@@ -172,6 +172,11 @@ public sealed class HtmlLocalLinkParser
     [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
     public class LocalLinkTag
     {
+        public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
+        : this(intId, udi, tagHref, culture: null)
+        {
+        }
+
         public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref, string? culture = null)
         {
             IntId = intId;
@@ -186,6 +191,6 @@ public sealed class HtmlLocalLinkParser
 
         public string TagHref { get; }
 
-        public string? Culture { get; set; }
+        public string? Culture { get; }
     }
 }
