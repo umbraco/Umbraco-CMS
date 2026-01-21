@@ -2,8 +2,10 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 public sealed class ApiLink
 {
-    public static ApiLink Content(string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route, string? culture = null)
-        => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route, culture);
+    public static ApiLink Content(string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route)
+        => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route);
+    public static ApiLink Content( string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route, string? culture = null)
+       => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route, culture);
 
     public static ApiLink Media(string title, string url, string? queryString, string? target, Guid destinationId, string destinationType)
         => new(LinkType.Media, url, queryString, title, target, destinationId, destinationType, route: null);
