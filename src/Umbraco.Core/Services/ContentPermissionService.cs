@@ -182,7 +182,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
             return Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
         }
 
-        // Retrieve paths in a a single database query for all keys.
+        // Retrieve paths in a single database query for all keys.
         TreeEntityPath[] entityPaths = [.. _entityService.GetAllPaths(UmbracoObjectTypes.Document, keysArray)];
 
         if (entityPaths.Length == 0)

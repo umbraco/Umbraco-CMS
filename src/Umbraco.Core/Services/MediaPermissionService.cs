@@ -80,7 +80,7 @@ internal sealed class MediaPermissionService : IMediaPermissionService
             return Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
         }
 
-        // Retrieve paths in a a single database query for all keys.
+        // Retrieve paths in a single database query for all keys.
         TreeEntityPath[] entityPaths = _entityService.GetAllPaths(UmbracoObjectTypes.Media, keysArray).ToArray();
 
         if (entityPaths.Length == 0)
