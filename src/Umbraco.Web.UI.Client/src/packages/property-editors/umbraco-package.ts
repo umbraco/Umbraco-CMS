@@ -1,3 +1,5 @@
+import * as entryPointModule from './entry-point.js';
+
 export const name = 'Umbraco.Core.PropertyEditors';
 export const extensions = [
 	{
@@ -10,6 +12,6 @@ export const extensions = [
 		name: 'Property Editors Entry Point',
 		alias: 'Umb.EntryPoint.PropertyEditors',
 		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
+		js: entryPointModule,
 	},
 ];

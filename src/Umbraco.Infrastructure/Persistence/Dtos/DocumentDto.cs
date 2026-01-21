@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[PrimaryKey(INodeDto.NodeIdColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class DocumentDto : INodeDto
 {
@@ -43,7 +43,7 @@ public class DocumentDto : INodeDto
     // [NullSetting(NullSetting = NullSettings.Null)] // is documentVersionDto.TemplateId for the published version
     // public int? PublishTemplateId { get; set; }
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ContentDto.ReferenceMemberName)]
     public ContentDto ContentDto { get; set; } = null!;
 
     // although a content has many content versions,
