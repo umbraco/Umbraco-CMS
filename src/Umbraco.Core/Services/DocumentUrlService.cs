@@ -23,7 +23,10 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class DocumentUrlService : IDocumentUrlService
 {
-    private const string RebuildKey = "UmbracoUrlGeneration";
+    /// <summary>
+    /// Represents the key used to identify the URL generation rebuild operation.
+    /// </summary>
+    public const string RebuildKey = "UmbracoUrlGeneration";
 
     private readonly ILogger<DocumentUrlService> _logger;
     private readonly IDocumentUrlRepository _documentUrlRepository;
@@ -45,6 +48,9 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly ConcurrentDictionary<UrlCacheKey, UrlSegmentCache> _documentUrlCache = new();
     private readonly ConcurrentDictionary<string, int> _cultureToLanguageIdMap = new();
     private bool _isInitialized;
+
+    /// <inheritdoc/>
+    public bool IsInitialized => _isInitialized;
 
     /// <summary>
     /// Struct-based cache key for memory-efficient URL segment caching.
