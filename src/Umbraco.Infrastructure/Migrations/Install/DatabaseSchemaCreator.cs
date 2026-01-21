@@ -575,7 +575,8 @@ public class DatabaseSchemaCreator
             {
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
             }
-            else if (SqlSyntax.SupportsSequences())
+
+            if (SqlSyntax.SupportsSequences())
             {
                 SqlSyntax.AlterSequences(_database, tableName);
             }
