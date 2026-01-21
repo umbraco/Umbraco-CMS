@@ -420,6 +420,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
+		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
+		const contentTypeVariesBySegment = this.structure.getVariesByCulture();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
 				// TODO: Implement caching for data-type requests. [NL]
@@ -438,8 +440,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					propertyEditorSchemaAlias: dataType.editorAlias,
 					config: dataType.values,
 					typeArgs: {
-						variesByCulture: property.variesByCulture,
-						variesBySegment: property.variesBySegment,
+						// Only vary if the content type varies:
+						variesByCulture: contentTypeVariesByCulture ? property.variesByCulture : false,
+						variesBySegment: contentTypeVariesBySegment ? property.variesBySegment : false,
 					} as UmbPropertyTypePresetModelTypeModel,
 				} as UmbPropertyTypePresetModel;
 			}),
