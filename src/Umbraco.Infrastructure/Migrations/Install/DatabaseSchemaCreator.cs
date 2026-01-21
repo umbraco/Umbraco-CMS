@@ -281,7 +281,7 @@ public class DatabaseSchemaCreator
     {
         foreach (var unknown in unknownConstraintsInDatabase)
         {
-            if (foreignKeysInSchema!.InvariantContains(unknown) || primaryKeysInSchema!.InvariantContains(unknown))
+            if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown))
             {
                 result.ValidConstraints.Add(unknown);
             }
