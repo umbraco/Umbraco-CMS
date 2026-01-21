@@ -41,7 +41,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	@state()
 	private _labels: Map<string, string> = new Map();
 
-	private _open = false;
 	private _hoverTimer?: number;
 
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
@@ -104,20 +103,28 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	#handleHoverTimer(open: boolean, delay: number) {
 		if (this._hoverTimer) clearTimeout(this._hoverTimer);
 		this._hoverTimer = window.setTimeout(() => {
-			this._open = open;
-			this.requestUpdate();
+			const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
+			if (popover) {
+				if (open) {
+					popover.showPopover();
+				} else {
+					popover.hidePopover();
+				}
+			}
 			this._hoverTimer = undefined;
 		}, delay);
 	}
 
 	#openTooltip = () => {
-		if (!this._open) {
+		const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
+		if (popover && !popover.matches(':popover-open')) {
 			this.#handleHoverTimer(true, 240);
 		}
 	};
 
 	#cancelOpen = () => {
-		if (this._open) {
+		const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
+		if (popover?.matches(':popover-open')) {
 			this.#handleHoverTimer(false, 360);
 		} else if (this._hoverTimer) {
 			clearTimeout(this._hoverTimer);
@@ -136,7 +143,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 		const first = this._signs?.[0];
 		if (!first) return nothing;
-		return html`<div class="infobox ${this._open ? 'is-open' : ''}" style=${`--count:${this._signs.length}`}>
+		return html`<div id="entity-sign-popover" popover="hint" class="infobox" style=${`--count:${this._signs.length}`}>
 			${this.#renderOptions()}
 		</div>`;
 	}
@@ -161,20 +168,18 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			:host {
 				anchor-name: --entity-sign;
 				position: relative;
-				--offset-h: 12px; /* 22px / 16 */
-				--row-h: 1.36rem; /* 22px / 16 */
-				--icon-w: 0.75rem; /* 12px / 16 */
-				--pad-x: 0.25rem; /*  4px / 16 */
+				--offset-h: 12px;
+				--icon-w: 0.75rem;
+				--pad-x: 0.25rem;
 				--ease: cubic-bezier(0.1, 0, 0.3, 1);
 				--ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 			}
 
 			.infobox {
 				position: absolute;
-				top: 0;
-				margin-top: calc(-12px + var(--offset-h));
-				left: 19px;
-				margin-left: -6px;
+				position-anchor: --entity-sign;
+				top: anchor(bottom);
+				left: anchor(right);
 				background-color: transparent;
 				padding: var(--uui-size-2) var(--uui-size-3);
 				font-size: 8px;
@@ -183,8 +188,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					background-color 80ms 40ms linear,
 					clip-path 120ms var(--ease-bounce),
 					font-size 120ms var(--ease);
-				/*will-change: clip-path;*/
 				min-height: fit-content;
+				border: none;
+				margin: 0;
 			}
 			.infobox::before {
 				content: '';
@@ -214,7 +220,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					transform 120ms var(--ease),
 					visibility 0ms linear 120ms opacity 120ms linear;
 				z-index: calc(var(--count) - var(--i));
-				/*will-change: transform;*/
 				pointer-events: none;
 			}
 			.infobox > .sign-container.hide-in-overview {
@@ -226,44 +231,33 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				transition: opacity 120ms;
 			}
 
-			/*OPEN STATE -- Prevent the hover state in firefox(until support of the position-anchor)*/
-			@supports (position-anchor: --any-check) {
-				.infobox {
-					position: fixed;
-					position-anchor: --entity-sign;
-					top: anchor(bottom);
-					left: anchor(right);
-					z-index: 1;
-				}
-				.infobox.is-open {
-					z-index: 10;
-					font-size: 12px;
-					color: var(--uui-color-text);
-					clip-path: inset(-12px);
-					--umb-sign-bundle-bg: var(--uui-color-surface);
-				}
-				.infobox.is-open::before {
-					right: 0;
-					bottom: 0;
-					opacity: 100;
-					background-color: var(--uui-color-surface);
-					display: block;
-					transition:
-						right 120ms var(--ease-bounce),
-						bottom 120ms var(--ease-bounce),
-						opacity 120ms var(--ease),
-						display 0 0;
-				}
-				.infobox.is-open > .sign-container {
-					transform: none;
-					align-items: center;
-					transition: transform 120ms var(--ease);
-					visibility: visible;
-				}
-				.infobox.is-open .sign-container .label {
-					opacity: 1;
-					pointer-events: auto;
-				}
+			.infobox:popover-open {
+				font-size: 12px;
+				color: var(--uui-color-text);
+				clip-path: inset(-12px);
+				--umb-sign-bundle-bg: var(--uui-color-surface);
+			}
+			.infobox:popover-open::before {
+				right: 0;
+				bottom: 0;
+				opacity: 100;
+				background-color: var(--uui-color-surface);
+				display: block;
+				transition:
+					right 120ms var(--ease-bounce),
+					bottom 120ms var(--ease-bounce),
+					opacity 120ms var(--ease),
+					display 0 0;
+			}
+			.infobox:popover-open > .sign-container {
+				transform: none;
+				align-items: center;
+				transition: transform 120ms var(--ease);
+				visibility: visible;
+			}
+			.infobox:popover-open .sign-container .label {
+				opacity: 1;
+				pointer-events: auto;
 			}
 		`,
 	];
