@@ -2,11 +2,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
@@ -14,13 +17,14 @@ namespace Umbraco.Cms.Api.Management.Security;
 
 public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IBackOfficeApplicationManager
 {
-    private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IRuntimeState _runtimeState;
+    private readonly ILogger<BackOfficeApplicationManager> _logger;
     private readonly Uri? _backOfficeHost;
     private readonly string _authorizeCallbackPathName;
     private readonly string _authorizeCallbackLogoutPathName;
 
+    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v19")]
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
@@ -28,9 +32,25 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         IRuntimeState runtimeState)
         : base(applicationManager)
     {
-        _applicationManager = applicationManager;
         _webHostEnvironment = webHostEnvironment;
         _runtimeState = runtimeState;
+        _backOfficeHost = securitySettings.Value.BackOfficeHost;
+        _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
+        _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
+        _logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeApplicationManager>>();
+    }
+
+    public BackOfficeApplicationManager(
+        IOpenIddictApplicationManager applicationManager,
+        IWebHostEnvironment webHostEnvironment,
+        IOptions<SecuritySettings> securitySettings,
+        IRuntimeState runtimeState,
+        ILogger<BackOfficeApplicationManager> logger)
+        : base(applicationManager)
+    {
+        _webHostEnvironment = webHostEnvironment;
+        _runtimeState = runtimeState;
+        _logger = logger;
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
         _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
         _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
@@ -39,7 +59,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     public async Task EnsureBackOfficeApplicationAsync(IEnumerable<Uri> backOfficeHosts, CancellationToken cancellationToken = default)
     {
         // Install is okay without this, because we do not need a token to install,
-        // but upgrades do, so we need to execute for everything higher then or equal to upgrade.
+        // but upgrades do, so we need to execute for everything higher than or equal to upgrade.
         if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
@@ -123,16 +143,15 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private async Task<Uri[]> MergeWithExistingBackOfficeHostsAsync(Uri[] newHosts, CancellationToken cancellationToken)
     {
         // Find an existing back-office application
-        var application = await _applicationManager.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, cancellationToken);
+        var application = await ApplicationManager.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, cancellationToken);
         if (application is null)
         {
             // No existing application, return new hosts as-is
             return newHosts;
         }
 
-        // Get existing redirect URIs using OpenIddict API (no reflection needed)
-        // Note: GetRedirectUrisAsync returns ImmutableArray<string>, not URIs
-        ImmutableArray<string> existingRedirectUris = await _applicationManager.GetRedirectUrisAsync(application, cancellationToken);
+        // Get existing redirect URIs using OpenIddict API
+        ImmutableArray<string> existingRedirectUris = await ApplicationManager.GetRedirectUrisAsync(application, cancellationToken);
 
         // Use HashSet for O(n) performance and automatic deduplication
         // Case-insensitive comparison for authorities (host names)
@@ -174,6 +193,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         {
             // GetLeftPart can throw InvalidOperationException for some URI types
             // Skip malformed URIs
+            _logger.LogDebug("Could not extract authority from URI {Uri} as the left part could not be identified, skipping", uri);
         }
 
         authority = null;
@@ -193,6 +213,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         catch (UriFormatException)
         {
             // Skip URIs with invalid format
+            _logger.LogDebug("Could not extract authority from uriString {String} because of malformed uri format, skipping", uriString);
         }
 
         authority = null;

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Security;
 /// and edge cases in the MergeWithExistingBackOfficeHostsAsync method.
 /// </summary>
 [TestFixture]
-public class BackOfficeApplicationManagerUnitTests
+public class BackOfficeApplicationManagerTests
 {
     private Mock<IOpenIddictApplicationManager> _mockApplicationManager = null!;
     private Mock<IWebHostEnvironment> _mockWebHostEnvironment = null!;
