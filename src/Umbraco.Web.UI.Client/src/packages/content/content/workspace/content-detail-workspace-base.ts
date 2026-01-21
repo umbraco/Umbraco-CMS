@@ -421,7 +421,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
-		const contentTypeVariesBySegment = this.structure.getVariesByCulture();
+		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
 				// TODO: Implement caching for data-type requests. [NL]
