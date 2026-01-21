@@ -16,12 +16,12 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
 [ApiVersion("1.0")]
-public class OriginalParentElementRecycleBinController : ElementRecycleBinControllerBase
+public class OriginalParentElementFolderRecycleBinController : ElementRecycleBinControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IElementRecycleBinQueryService _elementRecycleBinQueryService;
 
-    public OriginalParentElementRecycleBinController(
+    public OriginalParentElementFolderRecycleBinController(
         IEntityService entityService,
         IElementPresentationFactory elementPresentationFactory,
         IAuthorizationService authorizationService,
@@ -32,12 +32,12 @@ public class OriginalParentElementRecycleBinController : ElementRecycleBinContro
         _elementRecycleBinQueryService = elementRecycleBinQueryService;
     }
 
-    [HttpGet("{id:guid}/original-parent")]
+    [HttpGet("folder/{id:guid}/original-parent")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ReferenceByIdModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> OriginalParent(CancellationToken cancellationToken, Guid id)
+    public async Task<IActionResult> OriginalParentFolder(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -49,14 +49,14 @@ public class OriginalParentElementRecycleBinController : ElementRecycleBinContro
             return Forbidden();
         }
 
-        Attempt<IEntitySlim?, RecycleBinQueryResultType> getParentAttempt = await _elementRecycleBinQueryService.GetOriginalParentAsync(id);
+        Attempt<IEntitySlim?, RecycleBinQueryResultType> getParentAttempt = await _elementRecycleBinQueryService.GetOriginalParentForContainerAsync(id);
         return getParentAttempt.Success switch
         {
             true when getParentAttempt.Status == RecycleBinQueryResultType.Success
                 => Ok(new ReferenceByIdModel(getParentAttempt.Result!.Key)),
             true when getParentAttempt.Status == RecycleBinQueryResultType.ParentIsRoot
                 => Ok(null),
-            _ => MapRecycleBinQueryAttemptFailure(getParentAttempt.Status, "element"),
+            _ => MapRecycleBinQueryAttemptFailure(getParentAttempt.Status, "element folder"),
         };
     }
 }
