@@ -205,12 +205,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
             EntityPermissionSet permissionSet = _userService.GetPermissionsForPath(user, entityPath.Path);
             if (permissionsToCheck.All(p => permissionSet.GetAllPermissions().Contains(p)))
             {
-                // Get the key for this entity's ID
-                Attempt<Guid> keyAttempt = _entityService.GetKey(entityPath.Id, UmbracoObjectTypes.Document);
-                if (keyAttempt.Success)
-                {
-                    authorizedKeys.Add(keyAttempt.Result);
-                }
+                authorizedKeys.Add(entityPath.Key);
             }
         }
 

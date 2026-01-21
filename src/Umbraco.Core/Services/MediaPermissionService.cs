@@ -99,12 +99,7 @@ internal sealed class MediaPermissionService : IMediaPermissionService
                 continue;
             }
 
-            // Get the key for this entity's ID
-            Attempt<Guid> keyAttempt = _entityService.GetKey(entityPath.Id, UmbracoObjectTypes.Media);
-            if (keyAttempt.Success)
-            {
-                authorizedKeys.Add(keyAttempt.Result);
-            }
+            authorizedKeys.Add(entityPath.Key);
         }
 
         return Task.FromResult<ISet<Guid>>(authorizedKeys);
