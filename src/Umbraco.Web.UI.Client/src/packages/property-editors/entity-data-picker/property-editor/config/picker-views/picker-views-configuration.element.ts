@@ -1,11 +1,5 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
-import {
-	css,
-	customElement,
-	html,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -18,9 +12,10 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
-import type { UmbCollectionLayoutConfiguration } from '@umbraco-cms/backoffice/collection';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/collection';
 
-type UmbEntityDataPickerPickerViewsConfigurationPropertyValue = Array<UmbEntityDataPickerPickerViewsConfigurationPropertyValueEntry>
+type UmbEntityDataPickerPickerViewsConfigurationPropertyValue =
+	Array<UmbEntityDataPickerPickerViewsConfigurationPropertyValueEntry>;
 
 interface UmbEntityDataPickerPickerViewsConfigurationPropertyValueEntry {
 	alias: string;
@@ -39,6 +34,7 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 	@property({ type: Array })
 	public set value(value: UmbEntityDataPickerPickerViewsConfigurationPropertyValue | undefined) {
 		this.#value = value ?? [];
+		this.#observeManifests();
 	}
 	public get value(): UmbEntityDataPickerPickerViewsConfigurationPropertyValue {
 		return this.#value;
@@ -50,6 +46,9 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 
 	@state()
 	private _isCollectionDataSource = false;
+
+	@state()
+	private _resolvedManifests: Array<ManifestCollectionView> = [];
 
 	constructor() {
 		super();
@@ -64,6 +63,22 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 				'observeDataSourceAlias',
 			);
 		});
+	}
+
+	#observeManifests() {
+		const aliases = this.#value.map((entry) => entry.alias);
+		if (aliases.length === 0) {
+			this._resolvedManifests = [];
+			return;
+		}
+
+		this.observe(
+			umbExtensionsRegistry.byTypeAndAliases<ManifestCollectionView>('collectionView', aliases),
+			(manifests) => {
+				this._resolvedManifests = manifests;
+			},
+			'observeCollectionViewManifests',
+		);
 	}
 
 	#initializeDataSource(dataSourceAlias: string | null | undefined) {
@@ -90,17 +105,27 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 		});
 	}
 
-	#onChange(event: UmbChangeEvent) {
+	#onAdd(event: UmbChangeEvent) {
 		const target = event.target as UmbInputManifestElement;
-		const value = target.value;
+		const pickedValue = target.value;
 
-		this.value = value?.map((view) => ({ alias: view })) ?? [];
-		debugger;
+		if (!pickedValue?.value) return;
+
+		// Check for duplicate
+		const isDuplicate = this.#value.some((entry) => entry.alias === pickedValue.value);
+		if (isDuplicate) {
+			return;
+		}
+
+		this.#value = [...this.#value, { alias: pickedValue.value }];
+		this.#observeManifests();
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#renderItem(item: UmbCollectionLayoutConfiguration) {
-		return html`<div><umb-icon name=${item.icon}></umb-icon>${item.name}${item.collectionView}</div>`
+	#onRemove(alias: string) {
+		this.#value = this.#value.filter((entry) => entry.alias !== alias);
+		this.#observeManifests();
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -108,8 +133,35 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 			return this.#renderDisabledState();
 		}
 
-		// TODO: Implement a proper input-manifest that can handle array of collection views
-		return html`<umb-input-manifest extension-type="collectionView" @change=${this.#onChange}></umb-input-manifest>`;
+		return html`
+			<div id="items">${this.#renderItems()}</div>
+			<umb-input-manifest extension-type="collectionView" @change=${this.#onAdd}></umb-input-manifest>
+		`;
+	}
+
+	#renderItems() {
+		if (this._resolvedManifests.length === 0) return nothing;
+
+		return html` <uui-ref-list>
+			${repeat(
+				this._resolvedManifests,
+				(manifest) => manifest.alias,
+				(manifest) => this.#renderItem(manifest),
+			)}
+		</uui-ref-list>`;
+	}
+
+	#renderItem(manifest: ManifestCollectionView) {
+		return html`
+			<uui-ref-node name="${manifest.meta.label || manifest.meta.name}" detail=${manifest.alias} readonly>
+				<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
+				<uui-action-bar slot="actions">
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						@click=${() => this.#onRemove(manifest.alias)}></uui-button>
+				</uui-action-bar>
+			</uui-ref-node>
+		`;
 	}
 
 	#renderDisabledState() {
@@ -134,7 +186,7 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 	];
 }
 
-export { UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement as element};
+export { UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
