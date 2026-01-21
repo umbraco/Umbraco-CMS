@@ -85,7 +85,7 @@ public static partial class Constants
             ///     Guid for Member as string
             /// </summary>
             [Obsolete("Use the constant defined in Umbraco.Core.Constants.MemberTypes.Guids.Member. Scheduled for removal in Umbraco 19.")]
-            public const string Member = "d59be02f-1df9-4228-aa1e-01917d806cda";
+            public const string Member = MemberTypes.Guids.Member;
 
             /// <summary>
             ///     Guid for Image Cropper as string
