@@ -112,6 +112,56 @@
 - **Object methods**: `Object.keys`, `Object.values`, `Object.entries`
 - **Private fields**: `#privateField`
 
+### Event Handler Guidelines
+
+**Event handlers must be arrow function properties** to prevent memory leaks:
+
+```typescript
+// ✅ GOOD: Arrow function property
+export class UmbMyElement extends LitElement {
+	#onStorageEvent = async (evt: StorageEvent) => {
+		// Handler logic
+	};
+
+	constructor() {
+		super();
+		window.addEventListener('storage', this.#onStorageEvent);
+	}
+
+	disconnectedCallback() {
+		window.removeEventListener('storage', this.#onStorageEvent);
+	}
+}
+
+// ❌ BAD: Using .bind(this) creates new function references
+export class UmbBadElement extends LitElement {
+	constructor() {
+		super();
+		// Each .bind(this) creates a NEW reference!
+		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	disconnectedCallback() {
+		// This creates ANOTHER reference - doesn't remove the original!
+		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	#onStorageEvent(evt: StorageEvent) {
+		// Handler logic
+	}
+}
+```
+
+**Placement in Class**:
+- Place event handler arrow functions near the top of the class with other properties
+- Place them after state properties but before constructor
+- Add a comment indicating they are event handlers
+
+**Naming**:
+- Private handlers: `#onEventName` or `#handleEventName`
+- Protected handlers: `_onEventName` or `_handleEventName`
+- Use descriptive names: `#onStorageEvent`, `#handleDragEnter`, `#onActionExecuted`
+
 ### Language Features to Avoid
 
 - `var` (use `const`/`let`)
