@@ -42,18 +42,15 @@ public class ElementPickerPropertyEditor : DataEditor
                 yield break;
             }
 
-            IEnumerable<string>? elementUdis = _jsonSerializer.Deserialize<IEnumerable<string>>(asString);
-            if (elementUdis is null)
+            IEnumerable<Guid>? elementIds = _jsonSerializer.Deserialize<IEnumerable<Guid>>(asString);
+            if (elementIds is null)
             {
                 yield break;
             }
 
-            foreach (var elementUdi in elementUdis)
+            foreach (Guid elementId in elementIds)
             {
-                if (UdiParser.TryParse(elementUdi, out Udi? udi))
-                {
-                    yield return new UmbracoEntityReference(udi);
-                }
+                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, elementId));
             }
         }
     }
