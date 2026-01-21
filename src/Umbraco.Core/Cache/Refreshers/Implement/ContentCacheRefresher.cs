@@ -399,7 +399,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
     {
-
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
             await _publishStatusManagementService.InitializeAsync(cancellationToken);
@@ -414,15 +413,19 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         {
             await _publishStatusManagementService.RemoveAsync(payload.Key.Value, cancellationToken);
         }
-        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) && HasPublishStatusUpdates(payload))
         {
             await _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key.Value, cancellationToken);
         }
-        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && HasPublishStatusUpdates(payload))
         {
             await _publishStatusManagementService.AddOrUpdateStatusWithDescendantsAsync(payload.Key.Value, cancellationToken);
         }
     }
+
+    private static bool HasPublishStatusUpdates(JsonPayload payload) =>
+        (payload.PublishedCultures is not null && payload.PublishedCultures.Length > 0) ||
+        (payload.UnpublishedCultures is not null && payload.UnpublishedCultures.Length > 0);
 
     private void HandleIdKeyMap(JsonPayload payload)
     {
