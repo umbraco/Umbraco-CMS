@@ -7,6 +7,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { isPickerCollectionDataSource, type UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -152,6 +153,21 @@ export class UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	async #onRequestRemove(alias: string) {
+		const manifest = this._manifestByAlias.get(alias);
+		const label = manifest?.meta.label;
+		const name = label ? `${label} (${alias})` : alias;
+
+		await umbConfirmModal(this, {
+			headline: `${this.localize.term('general_remove')}?`,
+			content: `#defaultdialogs_confirmremove ${name}?`,
+			color: 'danger',
+			confirmLabel: '#general_remove',
+		});
+
+		this.#onRemove(alias);
+	}
+
 	#onRemove(alias: string) {
 		this.#value = this.#value.filter((entry) => entry.alias !== alias);
 		this.#sorter.setModel(this.#value);
@@ -191,7 +207,7 @@ export class UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement
 					<uui-action-bar slot="actions">
 						<uui-button
 							label=${this.localize.term('general_remove')}
-							@click=${() => this.#onRemove(alias)}></uui-button>
+							@click=${() => this.#onRequestRemove(alias)}></uui-button>
 					</uui-action-bar>
 				</uui-ref-node>
 			`;
@@ -201,7 +217,9 @@ export class UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement
 			<uui-ref-node id=${alias} name=${manifest.meta.label} detail=${alias} readonly>
 				<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
 				<uui-action-bar slot="actions">
-					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#onRemove(alias)}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						@click=${() => this.#onRequestRemove(alias)}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
