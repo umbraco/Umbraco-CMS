@@ -45,6 +45,7 @@ public interface IContentSearchService<TContent>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The number of items to take.</param>
     /// <returns>A paged model of content items.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete
     Task<PagedModel<TContent>> SearchChildrenAsync(
         string? query,
         Guid? parentId,
@@ -52,5 +53,7 @@ public interface IContentSearchService<TContent>
         Ordering? ordering,
         bool loadTemplates = true,
         int skip = 0,
-        int take = 100);
+        int take = 100)
+        => SearchChildrenAsync(query, parentId, ordering, skip, take);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

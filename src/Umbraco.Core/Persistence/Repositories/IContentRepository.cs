@@ -101,6 +101,7 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     /// </param>
     /// <returns>A collection of content items for the specified page.</returns>
     /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
     IEnumerable<TEntity> GetPage(
         IQuery<TEntity>? query,
         long pageIndex,
@@ -109,7 +110,9 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
         string[]? propertyAliases,
         IQuery<TEntity>? filter,
         Ordering? ordering,
-        bool loadTemplates = true);
+        bool loadTemplates = true)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 }

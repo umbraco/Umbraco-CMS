@@ -673,6 +673,7 @@ public class ContentService : RepositoryService, IContentService
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }
@@ -705,6 +706,7 @@ public class ContentService : RepositoryService, IContentService
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }

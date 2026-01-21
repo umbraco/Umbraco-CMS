@@ -292,7 +292,10 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Whether to load templates. Set to false for performance optimization when templates are not needed
     ///     (e.g., collection views). Default is true.
     /// </param>
-    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true);
+#pragma warning disable CS0618 // Type or member is obsolete
+    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
+        => GetPagedChildren(id, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets descendant documents of a given parent.

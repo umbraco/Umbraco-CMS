@@ -477,7 +477,7 @@ namespace Umbraco.Cms.Core.Services
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, null, filter, ordering);
         }
 
         /// <inheritdoc />
@@ -506,7 +506,7 @@ namespace Umbraco.Cms.Core.Services
             scope.ReadLock(Constants.Locks.MediaTree);
 
             return _mediaRepository.GetPage(
-                Query<IMedia>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
+                Query<IMedia>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, null, filter, ordering);
         }
 
         /// <summary>
