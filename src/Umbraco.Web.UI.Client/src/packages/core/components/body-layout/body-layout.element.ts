@@ -9,7 +9,7 @@ import {
 	state,
 	query,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UmbScrollEvent } from "../../event/scroll.event.ts";
+import { UmbScrollEvent } from "../../event/scroll.event";
 
 //TODO: Add the following attributes to JSDocs: header-transparent, main-no-padding, header-no-padding, header-fit-height
 
