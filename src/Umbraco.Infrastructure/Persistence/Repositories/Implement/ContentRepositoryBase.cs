@@ -366,6 +366,51 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #endregion
 
+        #region Sortable Values
+
+        /// <summary>
+        /// Sets sortable values for property data DTOs that support custom sorting.
+        /// </summary>
+        /// <param name="entity">The content entity containing the properties.</param>
+        /// <param name="propertyDtos">The property data DTOs to update with sortable values.</param>
+        private protected void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
+        {
+            // Create a lookup of property DTOs by property type ID for efficient matching
+            var dtosByPropertyTypeId = propertyDtos
+                .GroupBy(d => d.PropertyTypeId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (IProperty property in entity.Properties)
+            {
+                if (PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false)
+                {
+                    continue;
+                }
+
+                if (editor.GetValueEditor() is not IDataValueSortable sortableProvider)
+                {
+                    continue;
+                }
+
+                if (dtosByPropertyTypeId.TryGetValue(property.PropertyTypeId, out List<PropertyDataDto>? dtos) is false)
+                {
+                    continue;
+                }
+
+                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+
+                // Set sortable values for each matching DTO
+                foreach (PropertyDataDto dto in dtos)
+                {
+                    // Get the stored value from the DTO
+                    object? value = dto.TextValue ?? dto.VarcharValue ?? (object?)dto.DateValue ?? dto.DecimalValue ?? dto.IntegerValue;
+                    dto.SortableValue = sortableProvider.GetSortableValue(value, configurationObject);
+                }
+            }
+        }
+
+        #endregion
+
         private Sql<ISqlContext> PreparePageSql(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, Ordering ordering)
         {
             // non-filtering, non-ordering = nothing to do
@@ -551,7 +596,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sortedString = "COALESCE(varcharValue,'')"; // assuming COALESCE is ok for all syntaxes
 
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
+            // sortableValue takes precedence when populated - this allows property editors to provide a custom
+            // sortable string representation for values that don't sort naturally (e.g., JSON-serialized dates)
             Sql<ISqlContext> innerSql = Sql().Select($@"CASE
+                            WHEN {QuoteColumnName("sortableValue")} IS NOT NULL THEN {QuoteColumnName("sortableValue")}
                             WHEN {QuoteColumnName("intValue")} IS NOT NULL THEN {sortedInt}
                             WHEN {QuoteColumnName("decimalValue")} IS NOT NULL THEN {sortedDecimal}
                             WHEN {QuoteColumnName("dateValue")} IS NOT NULL THEN {sortedDate}
@@ -1119,8 +1167,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected void InsertPropertyValues(TEntity entity, int publishedVersionId, out bool edited, out HashSet<string>? editedCultures)
         {
             // persist the property data
-            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
-            foreach (PropertyDataDto? propertyDataDto in propertyDataDtos)
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures).ToList();
+
+            // Set sortable values for property editors that support custom sorting.
+            SetEntitySortableValues(entity, propertyDataDtos);
+
+            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
             {
                 Database.Insert(propertyDataDto);
             }
@@ -1153,7 +1205,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
             }
 
-            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures).ToList();
+
+            // Set sortable values for property editors that support custom sorting.
+            SetEntitySortableValues(entity, propertyDataDtos);
 
             var toUpdate = new List<PropertyDataDto>();
             var toInsert = new List<PropertyDataDto>();

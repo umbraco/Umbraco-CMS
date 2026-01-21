@@ -1076,14 +1076,18 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
 
         // persist the property data
-        IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(
+        var propertyDataDtos = PropertyFactory.BuildDtos(
             entity.ContentType.Variations,
             entity.VersionId,
             entity.PublishedVersionId,
             entity.Properties,
             LanguageRepository,
             out var edited,
-            out HashSet<string>? editedCultures);
+            out HashSet<string>? editedCultures).ToList();
+
+        // Set sortable values for property editors that support custom sorting
+        SetEntitySortableValues(entity, propertyDataDtos);
+
         foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
         {
             Database.Insert(propertyDataDto);

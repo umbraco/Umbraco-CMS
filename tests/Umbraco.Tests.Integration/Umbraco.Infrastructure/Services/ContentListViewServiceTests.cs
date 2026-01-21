@@ -4,8 +4,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Models;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -13,7 +15,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsBase
 {
-    private static readonly Guid CustomListViewKey = new("AD8E2AAF-6801-408A-8CCF-EFAC0312729B");
+    private static readonly Guid _customListViewKey = new("AD8E2AAF-6801-408A-8CCF-EFAC0312729B");
+
+    private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
+
+    private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     private IContentListViewService ContentListViewService => GetRequiredService<IContentListViewService>();
 
@@ -294,7 +300,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             "updateDate",
             null,
             Direction.Ascending,
@@ -332,7 +338,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             "updateDate",
             null,
             Direction.Ascending,
@@ -347,7 +353,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
 
-            await AssertListViewConfiguration(result.Result.ListViewConfiguration, CustomListViewKey);
+            await AssertListViewConfiguration(result.Result.ListViewConfiguration, _customListViewKey);
         });
 
     }
@@ -561,7 +567,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             orderByField,
             null,
             orderAscending ? Direction.Ascending : Direction.Descending,
@@ -607,7 +613,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             orderByField,
             null,
             Direction.Ascending,
@@ -768,6 +774,177 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.AreEqual(0, result.Result.Items.Items.Count());
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Order_List_View_Items_By_Date_Property_With_Json_Storage(bool orderAscending)
+    {
+        // Arrange
+        // - create content items with dates intentionally out of order to verify sorting works
+        var dates = new[]
+        {
+            new DateTimeOffset(2024, 6, 15, 10, 30, 0, TimeSpan.Zero),  // Middle date
+            new DateTimeOffset(2024, 1, 1, 8, 0, 0, TimeSpan.Zero),    // Earliest date
+            new DateTimeOffset(2024, 12, 25, 14, 45, 0, TimeSpan.Zero), // Latest date
+            new DateTimeOffset(2024, 3, 10, 12, 0, 0, TimeSpan.Zero),  // Second earliest
+            new DateTimeOffset(2024, 9, 20, 16, 30, 0, TimeSpan.Zero), // Second latest
+        };
+
+        var root = await CreateRootContentWithChildrenHavingDateProperty(dates);
+
+        // Act
+        var result = await ContentListViewService.GetListViewItemsByKeyAsync(
+            SuperUser,
+            root.Key,
+            _customListViewKey,
+            "eventDate",
+            null,
+            orderAscending ? Direction.Ascending : Direction.Descending,
+            null,
+            0,
+            10);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
+            Assert.IsNotNull(result.Result);
+        });
+
+        PagedModel<IContent> collectionItemsResult = result.Result.Items;
+
+        // Expected chronological order (by date)
+        var expectedOrder = orderAscending
+            ? new[] { "Event 2", "Event 4", "Event 1", "Event 5", "Event 3" }  // Jan, Mar, Jun, Sep, Dec
+            : new[] { "Event 3", "Event 5", "Event 1", "Event 4", "Event 2" }; // Dec, Sep, Jun, Mar, Jan
+
+        var actualOrder = collectionItemsResult.Items.Select(c => c.Name).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(5, collectionItemsResult.Total);
+            Assert.AreEqual(expectedOrder.Length, actualOrder.Length);
+            CollectionAssert.AreEqual(expectedOrder, actualOrder, $"Expected order: [{string.Join(", ", expectedOrder)}], Actual order: [{string.Join(", ", actualOrder)}]");
+        });
+    }
+
+    private async Task<IContent> CreateRootContentWithChildrenHavingDateProperty(DateTimeOffset[] dates)
+    {
+        // Create custom list view configuration that includes our date property.
+        var listViewConfiguration = new Dictionary<string, object>
+        {
+            ["includeProperties"] = new[]
+            {
+                new Dictionary<string, object> { { "alias", "sortOrder" }, { "isSystem", true } },
+                new Dictionary<string, object> { { "alias", "updateDate" }, { "isSystem", true } },
+                new Dictionary<string, object> { { "alias", "eventDate" }, { "isSystem", false } },
+            },
+        };
+
+        var customListView = await CreateCustomListViewDataType(listViewConfiguration);
+
+        // Create a data type for the DateTimeWithTimeZone property editor.
+        var dateTimeDataType = await CreateDateTimeWithTimeZoneDataType();
+
+        // Create child content type with a date property.
+        var childContentType = new ContentTypeBuilder()
+            .WithAlias("event")
+            .WithName("Event")
+            .AddPropertyType()
+                .WithAlias("eventDate")
+                .WithName("Event Date")
+                .WithDataTypeId(dateTimeDataType.Id)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone)
+                .WithValueStorageType(ValueStorageType.Ntext)
+                .WithSortOrder(1)
+                .Done()
+            .Build();
+
+        var createdContentTypeResult = await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createdContentTypeResult.Success);
+        Assert.IsTrue(createdContentTypeResult.Success, "Failed to create child content type.");
+
+        // Create root content type with list view property
+        var contentTypeWithListViewPropertyType = new ContentTypeBuilder()
+            .WithAlias("events")
+            .WithName("Events")
+            .WithContentVariation(ContentVariation.Nothing)
+            .AddPropertyType()
+                .WithAlias("items")
+                .WithName("Items")
+                .WithDataTypeId(customListView.Id)
+                .WithPropertyEditorAlias(customListView.EditorAlias)
+                .Done()
+            .Build();
+
+        contentTypeWithListViewPropertyType.AllowedAsRoot = true;
+        contentTypeWithListViewPropertyType.AllowedContentTypes = new[]
+        {
+            new ContentTypeSort(childContentType.Key, 1, childContentType.Alias),
+        };
+        createdContentTypeResult = await ContentTypeService.CreateAsync(contentTypeWithListViewPropertyType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createdContentTypeResult.Success, "Failed to create root content type.");
+
+        // Create root content
+        var rootContentCreateModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentTypeWithListViewPropertyType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new () { Name = "Events" }]
+        };
+
+        var rootResult = await ContentEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(rootResult.Success, "Failed to create root content.");
+        var root = rootResult.Result.Content;
+
+        // Create child content items with date values.
+        for (var i = 0; i < dates.Length; i++)
+        {
+            // Pass the value in editor format (DateTimeEditorValue serialized as JSON).
+            // The DateTimeDataValueEditor.FromEditor will convert it to storage format.
+            var editorValue = new DateTimeEditorValue
+            {
+                Date = dates[i].ToString("O"), // ISO 8601 format.
+            };
+            var jsonEditorValue = JsonSerializer.Serialize(editorValue);
+
+            var createModel = new ContentCreateModel
+            {
+                ContentTypeKey = childContentType.Key,
+                ParentKey = root.Key,
+                Variants = [new() { Name = $"Event {i + 1}" }],
+                Key = (i + 1).ToGuid(),
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "eventDate", Value = jsonEditorValue }
+                ],
+            };
+
+            await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        }
+
+        return root;
+    }
+
+    private async Task<IDataType> CreateDateTimeWithTimeZoneDataType()
+    {
+        // Get the real DateTimeWithTimeZone property editor from the collection
+        // This ensures we use the editor that implements IDataValueSortable
+        var propertyEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.DateTimeWithTimeZone];
+        Assert.IsNotNull(propertyEditor, "DateTimeWithTimeZone property editor not found in collection");
+
+        var serializer = GetRequiredService<IConfigurationEditorJsonSerializer>();
+        var dataType = new DataType(propertyEditor, serializer)
+        {
+            Name = "DateTime With TimeZone (Test)",
+            DatabaseType = ValueStorageType.Ntext,
+        };
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to create data type: {result.Status}");
+        return result.Result;
+    }
+
     private async Task<IDataType> CreateCustomListViewDataType(IDictionary<string, object> listViewConfiguration)
     {
         // Overwrite default IncludeProperties added by ListViewConfiguration
@@ -775,7 +952,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         var dataType = new DataTypeBuilder()
             .WithId(0)
-            .WithKey(CustomListViewKey)
+            .WithKey(_customListViewKey)
             .WithName("Custom list view")
             .WithDatabaseType(ValueStorageType.Nvarchar)
             .AddEditor()
