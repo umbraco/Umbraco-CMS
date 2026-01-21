@@ -81,4 +81,15 @@ public interface IContentPermissionAuthorizer
     Task<bool> IsDeniedAtRecycleBinLevelAsync(IUser currentUser, ISet<string> permissionsToCheck);
 
     Task<bool> IsDeniedForCultures(IUser currentUser, ISet<string> culturesToCheck);
+
+    /// <summary>
+    ///     Filters the specified content keys to only those the user has access to.
+    /// </summary>
+    /// <param name="currentUser">The current user.</param>
+    /// <param name="contentKeys">The keys of the content items to filter.</param>
+    /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
+    /// <returns>Returns the keys of content items the user has access to.</returns>
+    // TODO (V18): Remove default implementation.
+    Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
+        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
 }

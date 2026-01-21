@@ -1,8 +1,8 @@
-using System.Globalization;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Extensions;
 
@@ -37,19 +37,33 @@ internal sealed class ContentPermissionService : IContentPermissionService
         IEnumerable<Guid> contentKeys,
         ISet<string> permissionsToCheck)
     {
-        var contentItems = _contentService.GetByIds(contentKeys).ToArray();
+        Guid[] keysArray = contentKeys.ToArray();
 
-        if (contentItems.Length == 0)
+        // Use GetAllPaths instead of loading full content items - we only need paths for authorization
+        TreeEntityPath[] entityPaths = _entityService.GetAllPaths(UmbracoObjectTypes.Document, keysArray).ToArray();
+
+        if (entityPaths.Length == 0)
         {
             return Task.FromResult(ContentAuthorizationStatus.NotFound);
         }
 
-        if (contentItems.Any(contentItem => user.HasPathAccess(contentItem, _entityService, _appCaches) == false))
+        // Check if all requested keys were found
+        if (entityPaths.Length != keysArray.Length)
         {
-            return Task.FromResult(ContentAuthorizationStatus.UnauthorizedMissingPathAccess);
+            return Task.FromResult(ContentAuthorizationStatus.NotFound);
         }
 
-        return Task.FromResult(HasPermissionAccess(user, contentItems.Select(c => c.Path), permissionsToCheck)
+        // Check path access using the paths directly
+        int[]? startNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            if (ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinContent) == false)
+            {
+                return Task.FromResult(ContentAuthorizationStatus.UnauthorizedMissingPathAccess);
+            }
+        }
+
+        return Task.FromResult(HasPermissionAccess(user, entityPaths.Select(p => p.Path), permissionsToCheck)
             ? ContentAuthorizationStatus.Success
             : ContentAuthorizationStatus.UnauthorizedMissingPermissionAccess);
     }
@@ -148,6 +162,54 @@ internal sealed class ContentPermissionService : IContentPermissionService
         return culturesToCheck.All(culture => allowedLanguageIsoCodes.InvariantContains(culture))
             ? ContentAuthorizationStatus.Success
             : ContentAuthorizationStatus.UnauthorizedMissingCulture;
+    }
+
+    /// <inheritdoc/>
+    public Task<ISet<Guid>> FilterAuthorizedAccessAsync(
+        IUser user,
+        IEnumerable<Guid> contentKeys,
+        ISet<string> permissionsToCheck)
+    {
+        Guid[] keysArray = [.. contentKeys];
+
+        if (keysArray.Length == 0)
+        {
+            return Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+        }
+
+        // Retrieve paths in a a single database query for all keys.
+        TreeEntityPath[] entityPaths = [.. _entityService.GetAllPaths(UmbracoObjectTypes.Document, keysArray)];
+
+        if (entityPaths.Length == 0)
+        {
+            return Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+        }
+
+        var authorizedKeys = new HashSet<Guid>();
+        int[]? startNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            // Check path access
+            if (ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinContent) == false)
+            {
+                continue;
+            }
+
+            // Check permission access
+            EntityPermissionSet permissionSet = _userService.GetPermissionsForPath(user, entityPath.Path);
+            if (permissionsToCheck.All(p => permissionSet.GetAllPermissions().Contains(p)))
+            {
+                // Get the key for this entity's ID
+                Attempt<Guid> keyAttempt = _entityService.GetKey(entityPath.Id, UmbracoObjectTypes.Document);
+                if (keyAttempt.Success)
+                {
+                    authorizedKeys.Add(keyAttempt.Result);
+                }
+            }
+        }
+
+        return Task.FromResult<ISet<Guid>>(authorizedKeys);
     }
 
     /// <summary>

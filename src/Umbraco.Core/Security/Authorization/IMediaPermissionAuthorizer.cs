@@ -38,4 +38,14 @@ public interface IMediaPermissionAuthorizer
     /// <param name="currentUser">The current user.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsDeniedAtRecycleBinLevelAsync(IUser currentUser);
+
+    /// <summary>
+    ///     Filters the specified media keys to only those the user has access to.
+    /// </summary>
+    /// <param name="currentUser">The current user.</param>
+    /// <param name="mediaKeys">The keys of the media items to filter.</param>
+    /// <returns>Returns the keys of media items the user has access to.</returns>
+    // TODO (V18): Remove default implementation.
+    Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> mediaKeys)
+        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
 }

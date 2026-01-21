@@ -59,4 +59,8 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
 
         return isDenied is false;
     }
+
+    /// <inheritdoc/>
+    protected override async Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys) =>
+        await _mediaPermissionAuthorizer.FilterAuthorizedAsync(user, keys);
 }
