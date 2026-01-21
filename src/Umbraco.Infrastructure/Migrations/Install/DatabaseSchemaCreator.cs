@@ -231,11 +231,6 @@ public class DatabaseSchemaCreator
             .Select(x => x.Item3)
             .ToList();
 
-        if (allConstraintsInDatabase.Count == 0)
-        {
-            return;
-        }
-
         var foreignKeysInDatabase = allConstraintsInDatabase
             .Where(x => x.InvariantStartsWith("FK_"))
             .ToList();
