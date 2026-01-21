@@ -6,8 +6,16 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for file system operations.
+/// </summary>
 public static class FileSystemExtensions
 {
+    /// <summary>
+    /// Computes the SHA1 hash of a stream.
+    /// </summary>
+    /// <param name="fileStream">The stream to hash.</param>
+    /// <returns>The hexadecimal string representation of the hash.</returns>
     public static string GetStreamHash(this Stream fileStream)
     {
         if (fileStream.CanSeek)
@@ -58,6 +66,12 @@ public static class FileSystemExtensions
         throw new ArgumentException("Retries must be greater than zero");
     }
 
+    /// <summary>
+    /// Copies a file from one path to another within the file system.
+    /// </summary>
+    /// <param name="fs">The file system.</param>
+    /// <param name="path">The source file path.</param>
+    /// <param name="newPath">The destination file path.</param>
     public static void CopyFile(this IFileSystem fs, string path, string newPath)
     {
         using (Stream stream = fs.OpenFile(path))
@@ -66,11 +80,28 @@ public static class FileSystemExtensions
         }
     }
 
+    /// <summary>
+    /// Gets the file extension from a path.
+    /// </summary>
+    /// <param name="fs">The file system.</param>
+    /// <param name="path">The file path.</param>
+    /// <returns>The file extension including the period.</returns>
     public static string GetExtension(this IFileSystem fs, string path) => Path.GetExtension(fs.GetFullPath(path));
 
+    /// <summary>
+    /// Gets the file name from a path.
+    /// </summary>
+    /// <param name="fs">The file system.</param>
+    /// <param name="path">The file path.</param>
+    /// <returns>The file name including extension.</returns>
     public static string GetFileName(this IFileSystem fs, string path) => Path.GetFileName(fs.GetFullPath(path));
 
     // TODO: Currently this is the only way to do this
+    /// <summary>
+    /// Creates a folder at the specified path.
+    /// </summary>
+    /// <param name="fs">The file system.</param>
+    /// <param name="folderPath">The folder path to create.</param>
     public static void CreateFolder(this IFileSystem fs, string folderPath)
     {
         var path = fs.GetRelativePath(folderPath);

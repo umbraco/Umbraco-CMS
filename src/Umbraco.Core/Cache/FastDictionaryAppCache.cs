@@ -14,8 +14,14 @@ public class FastDictionaryAppCache : IAppCache
     /// </summary>
     private readonly ConcurrentDictionary<string, Lazy<object?>> _items = new();
 
+    /// <summary>
+    ///     Gets all cache keys.
+    /// </summary>
     public IEnumerable<string> Keys => _items.Keys;
 
+    /// <summary>
+    ///     Gets the number of items in the cache.
+    /// </summary>
     public int Count => _items.Count;
 
     /// <inheritdoc />

@@ -10,7 +10,14 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class ImagingResizeSettings
 {
+    /// <summary>
+    ///     The default maximum width for image resizing.
+    /// </summary>
     internal const int StaticMaxWidth = 5000;
+
+    /// <summary>
+    ///     The default maximum height for image resizing.
+    /// </summary>
     internal const int StaticMaxHeight = 5000;
 
     /// <summary>

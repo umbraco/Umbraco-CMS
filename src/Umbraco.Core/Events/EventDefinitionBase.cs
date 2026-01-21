@@ -3,8 +3,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Provides a base class for event definitions that can be tracked and raised by an event dispatcher.
+/// </summary>
 public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDefinitionBase>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EventDefinitionBase" /> class.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="args">The event arguments.</param>
+    /// <param name="eventName">The optional name of the event.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="sender" /> or <paramref name="args" /> is null.</exception>
+    /// <exception cref="AmbiguousMatchException">Thrown when the event name cannot be automatically determined.</exception>
     protected EventDefinitionBase(object? sender, object? args, string? eventName = null)
     {
         Sender = sender ?? throw new ArgumentNullException(nameof(sender));
@@ -29,8 +40,10 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
         }
     }
 
+    /// <inheritdoc />
     public object Sender { get; }
 
+    /// <inheritdoc />
     public bool Equals(EventDefinitionBase? other)
     {
         if (ReferenceEquals(null, other))
@@ -46,14 +59,24 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
         return Args.Equals(other.Args) && string.Equals(EventName, other.EventName) && Sender.Equals(other.Sender);
     }
 
+    /// <inheritdoc />
     public object Args { get; }
 
+    /// <inheritdoc />
     public string? EventName { get; }
 
+    /// <summary>
+    ///     Determines whether two <see cref="EventDefinitionBase" /> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(EventDefinitionBase left, EventDefinitionBase right) => Equals(left, right);
 
+    /// <inheritdoc />
     public abstract void RaiseEvent();
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -74,6 +97,7 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
         return Equals((EventDefinitionBase)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -89,5 +113,11 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
         }
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="EventDefinitionBase" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(EventDefinitionBase left, EventDefinitionBase right) => Equals(left, right) == false;
 }

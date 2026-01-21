@@ -5,11 +5,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides utilities for manipulating URIs in the Umbraco routing context.
+/// </summary>
 public sealed class UriUtility
 {
     private static string? _appPath;
     private static string? _appPathPrefix;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UriUtility" /> class.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
     public UriUtility(IHostingEnvironment hostingEnvironment)
     {
         if (hostingEnvironment is null)
@@ -20,15 +27,21 @@ public sealed class UriUtility
         ResetAppDomainAppVirtualPath(hostingEnvironment);
     }
 
-    // will be "/" or "/foo"
+    /// <summary>
+    ///     Gets the application path. Will be "/" or "/foo".
+    /// </summary>
     public string? AppPath => _appPath;
 
-    // will be "" or "/foo"
+    /// <summary>
+    ///     Gets the application path prefix. Will be "" or "/foo".
+    /// </summary>
     public string? AppPathPrefix => _appPathPrefix;
 
-    // adds the virtual directory if any
-    // see also VirtualPathUtility.ToAbsolute
-    // TODO: Does this do anything differently than IHostingEnvironment.ToAbsolute? Seems it does less, maybe should be removed?
+    /// <summary>
+    ///     Converts a relative URL to an absolute URL by prepending the application path prefix.
+    /// </summary>
+    /// <param name="url">The relative URL.</param>
+    /// <returns>The absolute URL with the application path prefix.</returns>
     public string ToAbsolute(string url)
     {
         // return ResolveUrl(url);
@@ -36,7 +49,10 @@ public sealed class UriUtility
         return _appPathPrefix + url;
     }
 
-    // internal for unit testing only
+    /// <summary>
+    ///     Sets the application virtual path. Internal for unit testing only.
+    /// </summary>
+    /// <param name="appPath">The application path to set.</param>
     internal void SetAppDomainAppVirtualPath(string appPath)
     {
         _appPath = appPath ?? "/";
@@ -47,11 +63,18 @@ public sealed class UriUtility
         }
     }
 
+    /// <summary>
+    ///     Resets the application virtual path from the hosting environment.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
     internal void ResetAppDomainAppVirtualPath(IHostingEnvironment hostingEnvironment) =>
         SetAppDomainAppVirtualPath(hostingEnvironment.ApplicationVirtualPath);
 
-    // strips the virtual directory if any
-    // see also VirtualPathUtility.ToAppRelative
+    /// <summary>
+    ///     Converts a virtual path to an application-relative path by stripping the virtual directory if present.
+    /// </summary>
+    /// <param name="virtualPath">The virtual path.</param>
+    /// <returns>The application-relative path.</returns>
     public string ToAppRelative(string virtualPath)
     {
         if (_appPathPrefix is not null && virtualPath.InvariantStartsWith(_appPathPrefix)
@@ -69,8 +92,12 @@ public sealed class UriUtility
         return virtualPath;
     }
 
-    // maps an internal umbraco uri to a public uri
-    // ie with virtual directory, .aspx if required...
+    /// <summary>
+    ///     Maps an internal Umbraco URI to a public URI with virtual directory and appropriate suffixes.
+    /// </summary>
+    /// <param name="uri">The internal Umbraco URI.</param>
+    /// <param name="requestConfig">The request handler settings.</param>
+    /// <returns>The public URI.</returns>
     public Uri UriFromUmbraco(Uri uri, RequestHandlerSettings requestConfig)
     {
         var path = uri.GetSafeAbsolutePath();
@@ -85,8 +112,11 @@ public sealed class UriUtility
         return uri.Rewrite(path);
     }
 
-    // maps a media umbraco uri to a public uri
-    // ie with virtual directory - that is all for media
+    /// <summary>
+    ///     Maps a media Umbraco URI to a public URI with virtual directory.
+    /// </summary>
+    /// <param name="uri">The media URI.</param>
+    /// <returns>The public media URI.</returns>
     public Uri MediaUriFromUmbraco(Uri uri)
     {
         var path = uri.GetSafeAbsolutePath();
@@ -94,8 +124,11 @@ public sealed class UriUtility
         return uri.Rewrite(path);
     }
 
-    // maps a public uri to an internal umbraco uri
-    // ie no virtual directory, no .aspx, lowercase...
+    /// <summary>
+    ///     Maps a public URI to an internal Umbraco URI without virtual directory, lowercased.
+    /// </summary>
+    /// <param name="uri">The public URI.</param>
+    /// <returns>The internal Umbraco URI.</returns>
     public Uri UriToUmbraco(Uri uri)
     {
         // TODO: This is critical code that executes on every request, we should
@@ -124,11 +157,15 @@ public sealed class UriUtility
 
     #region ResolveUrl
 
-    // http://www.codeproject.com/Articles/53460/ResolveUrl-in-ASP-NET-The-Perfect-Solution
-    // note
-    // if browsing http://example.com/sub/page1.aspx then
-    // ResolveUrl("page2.aspx") returns "/page2.aspx"
-    // Page.ResolveUrl("page2.aspx") returns "/sub/page2.aspx" (relative...)
+    /// <summary>
+    ///     Resolves a relative URL to an absolute URL.
+    /// </summary>
+    /// <param name="relativeUrl">The relative URL to resolve.</param>
+    /// <returns>The resolved URL.</returns>
+    /// <remarks>
+    ///     If browsing http://example.com/sub/page1.aspx then
+    ///     ResolveUrl("page2.aspx") returns "/page2.aspx".
+    /// </remarks>
     public string ResolveUrl(string relativeUrl)
     {
         if (relativeUrl == null)

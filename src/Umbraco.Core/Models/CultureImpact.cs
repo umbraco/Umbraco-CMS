@@ -38,12 +38,30 @@ public sealed class CultureImpact
         AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault;
     }
 
+    /// <summary>
+    ///     Defines behavior flags for culture impact.
+    /// </summary>
     [Flags]
     public enum Behavior : byte
     {
+        /// <summary>
+        ///     Impacts all cultures.
+        /// </summary>
         AllCultures = 1,
+
+        /// <summary>
+        ///     Impacts only the invariant culture.
+        /// </summary>
         InvariantCulture = 2,
+
+        /// <summary>
+        ///     Impacts an explicit culture.
+        /// </summary>
         ExplicitCulture = 4,
+
+        /// <summary>
+        ///     Impacts invariant properties.
+        /// </summary>
         InvariantProperties = 8,
     }
 
@@ -107,6 +125,9 @@ public sealed class CultureImpact
                                                   !ImpactsAllCultures &&
                                                   (ImpactsOnlyDefaultCulture || AllowEditInvariantFromNonDefault);
 
+    /// <summary>
+    ///     Gets the behavior flags for this culture impact.
+    /// </summary>
     public Behavior CultureBehavior
     {
         get
@@ -205,5 +226,8 @@ public sealed class CultureImpact
         return new CultureImpact(culture, isDefault);
     }
 
+    /// <summary>
+    ///     Gets a value indicating whether editing invariant properties from a non-default language is allowed.
+    /// </summary>
     public bool AllowEditInvariantFromNonDefault { get; }
 }

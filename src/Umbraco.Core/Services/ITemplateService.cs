@@ -1,8 +1,11 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides methods for managing templates (views) used for rendering content.
+/// </summary>
 public interface ITemplateService : IService
 {
     /// <summary>

@@ -80,5 +80,11 @@ public interface IContentPermissionAuthorizer
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsDeniedAtRecycleBinLevelAsync(IUser currentUser, ISet<string> permissionsToCheck);
 
+    /// <summary>
+    ///     Authorizes whether the current user has access to the specified cultures.
+    /// </summary>
+    /// <param name="currentUser">The current user.</param>
+    /// <param name="culturesToCheck">The collection of cultures to check access for.</param>
+    /// <returns>Returns <c>true</c> if authorization is denied, otherwise <c>false</c>.</returns>
     Task<bool> IsDeniedForCultures(IUser currentUser, ISet<string> culturesToCheck);
 }

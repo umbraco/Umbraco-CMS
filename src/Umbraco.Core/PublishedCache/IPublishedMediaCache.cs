@@ -2,6 +2,13 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
+/// <summary>
+/// Provides access to cached published media items with async support.
+/// </summary>
+/// <remarks>
+/// This interface extends <see cref="IPublishedCache"/> with asynchronous methods
+/// for retrieving media items, supporting both integer IDs and GUIDs.
+/// </remarks>
 public interface IPublishedMediaCache : IPublishedCache
 {
     /// <summary>

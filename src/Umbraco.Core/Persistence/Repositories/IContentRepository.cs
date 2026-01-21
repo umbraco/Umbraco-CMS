@@ -81,5 +81,10 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
         IQuery<TEntity>? filter,
         Ordering? ordering);
 
+    /// <summary>
+    ///     Checks the data integrity of content items.
+    /// </summary>
+    /// <param name="options">The options for the data integrity check.</param>
+    /// <returns>A report containing the results of the integrity check.</returns>
     ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 }

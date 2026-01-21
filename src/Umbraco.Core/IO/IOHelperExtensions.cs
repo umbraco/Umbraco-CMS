@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IIOHelper"/> for common IO operations.
+/// </summary>
 public static class IOHelperExtensions
 {
     /// <summary>
@@ -51,6 +54,11 @@ public static class IOHelperExtensions
         }
     }
 
+    /// <summary>
+    /// Creates a random temporary file name for testing purposes.
+    /// </summary>
+    /// <param name="ioHelper">The IO helper.</param>
+    /// <returns>A random file name in the format "umbraco-test.{8-char-guid}".</returns>
     public static string CreateRandomFileName(this IIOHelper ioHelper) =>
         "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
 }
