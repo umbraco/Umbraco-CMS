@@ -23,10 +23,10 @@ interface UmbEntityDataPickerPickerViewsConfigurationPropertyValueEntry {
 }
 
 /**
- * @element umb-property-editor-ui-entity-data-picker-picker-views-configuration
+ * @element umb-entity-data-picker-picker-views-configuration-property-editor-ui
  */
-@customElement('umb-property-editor-ui-entity-data-picker-picker-views-configuration')
-export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
+@customElement('umb-entity-data-picker-picker-views-configuration-property-editor-ui')
+export class UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
@@ -233,10 +233,10 @@ export class UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement
 	];
 }
 
-export { UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement as element };
+export { UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-entity-data-picker-picker-views-configuration': UmbPropertyEditorUIEntityDataPickerPickerViewsConfigurationElement;
+		'umb-entity-data-picker-picker-views-configuration-property-editor-ui': UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement;
 	}
 }
