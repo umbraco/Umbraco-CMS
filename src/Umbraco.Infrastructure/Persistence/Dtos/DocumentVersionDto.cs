@@ -16,7 +16,7 @@ public class DocumentVersionDto : IContentVersionDto
     [Column(IContentVersionDto.IdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{IContentVersionDto.PublishedColumnName},{IContentVersionDto.PublishedColumnName}", IncludeColumns = TemplateIdColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{IContentVersionDto.IdColumnName},{IContentVersionDto.PublishedColumnName}", IncludeColumns = TemplateIdColumnName)]
     public int Id { get; set; }
 
     [Column(TemplateIdColumnName)]
