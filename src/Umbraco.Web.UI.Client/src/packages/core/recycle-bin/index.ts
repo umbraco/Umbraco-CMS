@@ -1,3 +1,4 @@
+export * from './collection-action/index.js';
 export * from './constants.js';
 export * from './entity-action/index.js';
 export * from './entity-bulk-action/index.js';
