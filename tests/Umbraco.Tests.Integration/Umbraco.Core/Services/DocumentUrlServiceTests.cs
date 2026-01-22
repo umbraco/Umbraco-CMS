@@ -93,6 +93,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
         base.Setup();
     }
+
     //
     // [Test]
     // [LongRunning]
