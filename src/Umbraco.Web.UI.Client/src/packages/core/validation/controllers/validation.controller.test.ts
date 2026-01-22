@@ -115,8 +115,6 @@ describe('UmbValidationController', () => {
 			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-other')].value.test", 'test');
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 
-			await Promise.resolve();
-
 			await ctrl.validate().catch(() => undefined);
 			await child.validate().catch(() => undefined);
 			expect(child.isValid).to.be.true;
@@ -340,7 +338,6 @@ describe('UmbValidationController', () => {
 			child.messages.addMessage('client', '$.localField', 'local-error', 'local-key');
 
 			// Wait for autoReport to sync
-			await Promise.resolve();
 
 			// Verify parent received it
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
@@ -350,7 +347,6 @@ describe('UmbValidationController', () => {
 			child.messages.removeMessageByKey('local-key');
 
 			// Wait for autoReport to sync the removal
-			await Promise.resolve();
 
 			// Verify parent no longer has it
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
@@ -362,35 +358,35 @@ describe('UmbValidationController', () => {
 
 			// Cycle 1: Add and remove
 			child.messages.addMessage('client', '$.field1', 'error-1', 'key-1');
-			await Promise.resolve();
+
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
 			child.messages.removeMessageByKey('key-1');
-			await Promise.resolve();
+
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
 
 			// Cycle 2: Add different message and remove
 			child.messages.addMessage('client', '$.field2', 'error-2', 'key-2');
-			await Promise.resolve();
+
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
 			child.messages.removeMessageByKey('key-2');
-			await Promise.resolve();
+
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
 
 			// Cycle 3: Add multiple, remove one at a time
 			child.messages.addMessage('client', '$.field3', 'error-3', 'key-3');
 			child.messages.addMessage('client', '$.field4', 'error-4', 'key-4');
-			await Promise.resolve();
+
 			expect(ctrl.messages.getMessages()?.length).to.equal(2);
 
 			child.messages.removeMessageByKey('key-3');
-			await Promise.resolve();
+
 			expect(ctrl.messages.getMessages()?.length).to.equal(1);
 			expect(ctrl.messages.getMessages()?.[0].body).to.equal('error-4');
 
 			child.messages.removeMessageByKey('key-4');
-			await Promise.resolve();
+
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
 		});
 
@@ -401,22 +397,18 @@ describe('UmbValidationController', () => {
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.autoReport();
 
-			await Promise.resolve();
-
 			// Child should have parent message
 			expect(child.messages.getHasAnyMessages()).to.be.true;
 			expect(child.messages.getMessages()?.some((m) => m.body === 'parent-error')).to.be.true;
 
 			// Child adds its own local message
 			child.messages.addMessage('client', '$.localField', 'local-error', 'local-key');
-			await Promise.resolve();
 
 			// Parent should have both (parent's original + child's local synced back)
 			expect(ctrl.messages.getMessages()?.length).to.equal(2);
 
 			// Child removes only the local message
 			child.messages.removeMessageByKey('local-key');
-			await Promise.resolve();
 
 			// Parent should still have original message, but not the local one
 			expect(ctrl.messages.getMessages()?.length).to.equal(1);
@@ -430,7 +422,6 @@ describe('UmbValidationController', () => {
 
 			// Parent adds message with full path
 			ctrl.messages.addMessage('server', `${parentPath}.nested.field`, 'from-parent');
-			await Promise.resolve();
 
 			// Child should receive with local path
 			const childMsg = child.messages.getMessages()?.[0];
@@ -438,7 +429,6 @@ describe('UmbValidationController', () => {
 
 			// Child adds message with local path
 			child.messages.addMessage('client', '$.other.field', 'from-child', 'child-key');
-			await Promise.resolve();
 
 			// Parent should receive with full path
 			const parentMsgs = ctrl.messages.getMessages();
@@ -456,7 +446,6 @@ describe('UmbValidationController', () => {
 			child.autoReport();
 
 			child.messages.addMessage('client', '$.field', 'child-error', 'child-key');
-			await Promise.resolve();
 
 			// Verify old parent has the message
 			expect(oldParent.messages.getHasAnyMessages()).to.be.true;
@@ -466,7 +455,6 @@ describe('UmbValidationController', () => {
 			child.inheritFrom(newParent, "$.values[?(@.alias == 'other-property')].value");
 
 			// Wait for cleanup and new sync
-			await Promise.resolve();
 
 			// Old parent should no longer have the child's message
 			expect(oldParent.messages.getHasAnyMessages()).to.be.false;
@@ -479,7 +467,6 @@ describe('UmbValidationController', () => {
 
 			// Add a new message to child - should sync to new parent
 			child.messages.addMessage('client', '$.newField', 'new-error', 'new-key');
-			await Promise.resolve();
 
 			// New parent should have the new message
 			expect(newParent.messages.getHasAnyMessages()).to.be.true;
@@ -498,7 +485,6 @@ describe('UmbValidationController', () => {
 			child.autoReport();
 
 			child.messages.addMessage('client', '$.field', 'error-at-path-1', 'key-1');
-			await Promise.resolve();
 
 			// Verify parent has the message at the first path
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
@@ -507,14 +493,12 @@ describe('UmbValidationController', () => {
 
 			// Child switches to same parent but different path
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'property-2')].value");
-			await Promise.resolve();
 
 			// Old message should be cleaned up
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
 
 			// Add new message at new path
 			child.messages.addMessage('client', '$.field', 'error-at-path-2', 'key-2');
-			await Promise.resolve();
 
 			// Parent should have message at new path
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
@@ -586,7 +570,6 @@ describe('UmbValidationController', () => {
 			child1.autoReport();
 			child2.autoReport();
 
-			await Promise.resolve();
 			// First they are invalid:
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.false;
@@ -627,7 +610,6 @@ describe('UmbValidationController', () => {
 			child1.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child2.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 
-			await Promise.resolve();
 			// First they are invalid:
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.false;
@@ -685,7 +667,6 @@ describe('UmbValidationController', () => {
 
 			// Make child invalid by adding a message
 			child.messages.addMessage('client', '$.field', 'error');
-			await Promise.resolve();
 
 			// Parent validation should fail because child validator is invalid
 			await ctrl.validate().catch(() => undefined);
@@ -708,7 +689,6 @@ describe('UmbValidationController', () => {
 
 			// Add a message that syncs to parent
 			child.messages.addMessage('client', '$.field', 'child-error', 'child-key');
-			await Promise.resolve();
 
 			// Verify parent has the message
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
@@ -716,7 +696,6 @@ describe('UmbValidationController', () => {
 			// Switch to a different parent (triggers stopInheritance which cleans up)
 			const otherParent = new UmbValidationController(host);
 			child.inheritFrom(otherParent, '$');
-			await Promise.resolve();
 
 			// Original parent should no longer have the child's message
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
@@ -798,13 +777,11 @@ describe('UmbValidationController', () => {
 			child.autoReport();
 
 			child.messages.addMessage('client', '$.field', 'error', 'key');
-			await Promise.resolve();
 
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
 			// Now inherit from undefined (disconnects from parent)
 			child.inheritFrom(undefined, '$');
-			await Promise.resolve();
 
 			// Old parent should be cleaned up
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
@@ -820,15 +797,12 @@ describe('UmbValidationController', () => {
 			// Rapidly switch parents while adding messages
 			child.inheritFrom(parent1, '$.path1');
 			child.messages.addMessage('client', '$.field', 'error-1', 'key-1');
-			await Promise.resolve();
 
 			child.inheritFrom(parent2, '$.path2');
 			child.messages.addMessage('client', '$.field', 'error-2', 'key-2');
-			await Promise.resolve();
 
 			child.inheritFrom(parent3, '$.path3');
 			child.messages.addMessage('client', '$.field', 'error-3', 'key-3');
-			await Promise.resolve();
 
 			// Only parent3 should have messages
 			expect(parent1.messages.getHasAnyMessages()).to.be.false;
@@ -903,13 +877,11 @@ describe('UmbValidationController', () => {
 			child.autoReport();
 
 			child.messages.addMessage('client', '$.field', 'error', 'key');
-			await Promise.resolve();
 
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
 			// Call inheritFrom again with same parent and path (should be no-op)
 			child.inheritFrom(ctrl, dataPath);
-			await Promise.resolve();
 
 			// Message should still be there (not cleared by redundant inheritFrom)
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
@@ -926,14 +898,12 @@ describe('UmbValidationController', () => {
 			);
 
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
-			await Promise.resolve();
 
 			// Child should have inherited the message
 			expect(child.messages.getHasAnyMessages()).to.be.true;
 
 			// Parent removes the message
 			ctrl.messages.removeMessageByKey('parent-key');
-			await Promise.resolve();
 
 			// Child should no longer have the message
 			expect(child.messages.getHasAnyMessages()).to.be.false;
@@ -1097,7 +1067,6 @@ describe('UmbValidationController', () => {
 				"$.blocks[?(@.key == 'block-1')].values[?(@.alias == 'prop-1')].value.field",
 				'root-error',
 			);
-			await Promise.resolve();
 
 			// Child should have the message (with block path stripped)
 			expect(child.messages.getHasAnyMessages()).to.be.true;
@@ -1118,11 +1087,8 @@ describe('UmbValidationController', () => {
 			grandchild.inheritFrom(child, "$.values[?(@.alias == 'prop-1')].value");
 			grandchild.autoReport();
 
-			await Promise.resolve();
-
 			// Grandchild adds a local message
 			grandchild.messages.addMessage('client', '$.field', 'grandchild-error', 'gc-key');
-			await Promise.resolve();
 
 			// Child should have the message (with property path prepended)
 			expect(child.messages.getHasAnyMessages()).to.be.true;
@@ -1143,16 +1109,12 @@ describe('UmbValidationController', () => {
 			grandchild.inheritFrom(child, "$.values[?(@.alias == 'prop-1')].value");
 			grandchild.autoReport();
 
-			await Promise.resolve();
-
 			// Grandchild adds and then removes a message
 			grandchild.messages.addMessage('client', '$.field', 'temp-error', 'temp-key');
-			await Promise.resolve();
 
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
 			grandchild.messages.removeMessageByKey('temp-key');
-			await Promise.resolve();
 
 			// All levels should be clean
 			expect(grandchild.messages.getHasAnyMessages()).to.be.false;
@@ -1168,17 +1130,13 @@ describe('UmbValidationController', () => {
 			grandchild.inheritFrom(child, "$.values[?(@.alias == 'prop-1')].value");
 			grandchild.autoReport();
 
-			await Promise.resolve();
-
 			// Grandchild adds a message
 			grandchild.messages.addMessage('client', '$.field', 'gc-error', 'gc-key');
-			await Promise.resolve();
 
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
 			// Destroy child (middle level) - this should clean up from root
 			child.destroy();
-			await Promise.resolve();
 
 			// Root should be clean (child's messages removed)
 			// Note: The actual behavior depends on destroy() implementation
@@ -1195,11 +1153,8 @@ describe('UmbValidationController', () => {
 			grandchild.inheritFrom(child, "$.values[?(@.alias == 'prop-1')].value");
 			grandchild.autoReport();
 
-			await Promise.resolve();
-
 			// Grandchild adds a message
 			grandchild.messages.addMessage('client', '$.field', 'gc-error', 'gc-key');
-			await Promise.resolve();
 
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 			expect(child.messages.getHasAnyMessages()).to.be.true;
@@ -1210,7 +1165,6 @@ describe('UmbValidationController', () => {
 			newChild.autoReport();
 
 			grandchild.inheritFrom(newChild, "$.values[?(@.alias == 'prop-2')].value");
-			await Promise.resolve();
 
 			// Old child should be clean
 			expect(child.messages.getHasAnyMessages()).to.be.false;
@@ -1237,7 +1191,6 @@ describe('UmbValidationController', () => {
 				'root-error',
 				'root-key',
 			);
-			await Promise.resolve();
 
 			// All levels should have the message
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
@@ -1246,7 +1199,6 @@ describe('UmbValidationController', () => {
 
 			// Root removes the message
 			ctrl.messages.removeMessageByKey('root-key');
-			await Promise.resolve();
 
 			// All levels should be clean
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
@@ -1262,15 +1214,12 @@ describe('UmbValidationController', () => {
 			grandchild.inheritFrom(child, "$.values[?(@.alias == 'prop-1')].value");
 			grandchild.autoReport();
 
-			await Promise.resolve();
-
 			// Initially all valid
 			await ctrl.validate();
 			expect(ctrl.isValid).to.be.true;
 
 			// Grandchild becomes invalid
 			grandchild.messages.addMessage('client', '$.field', 'error');
-			await Promise.resolve();
 
 			// Root validation should fail (grandchild is a validator via autoReport)
 			await ctrl.validate().catch(() => undefined);
@@ -1290,19 +1239,15 @@ describe('UmbValidationController', () => {
 			grandchild2.inheritFrom(child, "$.values[?(@.alias == 'prop-2')].value");
 			grandchild2.autoReport();
 
-			await Promise.resolve();
-
 			// Each grandchild adds a message
 			grandchild.messages.addMessage('client', '$.field', 'error-from-gc1', 'gc1-key');
 			grandchild2.messages.addMessage('client', '$.field', 'error-from-gc2', 'gc2-key');
-			await Promise.resolve();
 
 			// Root should have both messages
 			expect(ctrl.messages.getMessages()?.length).to.equal(2);
 
 			// Remove one grandchild's message
 			grandchild.messages.removeMessageByKey('gc1-key');
-			await Promise.resolve();
 
 			// Root should still have the other message
 			expect(ctrl.messages.getMessages()?.length).to.equal(1);
