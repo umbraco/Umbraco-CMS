@@ -54,7 +54,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         _elementService = elementService;
     }
 
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
