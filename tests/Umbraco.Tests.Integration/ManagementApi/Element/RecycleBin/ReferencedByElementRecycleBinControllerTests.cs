@@ -38,9 +38,11 @@ public class ReferencedByElementRecycleBinControllerTests : ElementRecycleBinCon
             Variants = [new VariantModel { Name = "Test Element Instance" }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
 
-        await ElementEditingService.MoveToRecycleBinAsync(_elementKey, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(_elementKey, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success, $"Failed to move element to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<ReferencedByElementRecycleBinController, object>> MethodSelector =>

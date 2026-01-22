@@ -63,7 +63,8 @@ public class OriginalParentElementRecycleBinControllerTests : ElementRecycleBinC
         Assert.IsTrue(response.Success, $"Create failed with status: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
 
-        await ElementEditingService.MoveToRecycleBinAsync(_elementKey, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(_elementKey, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success, $"Failed to move element to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<OriginalParentElementRecycleBinController, object>> MethodSelector =>

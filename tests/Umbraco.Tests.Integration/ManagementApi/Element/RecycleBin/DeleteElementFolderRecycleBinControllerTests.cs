@@ -17,9 +17,11 @@ public class DeleteElementFolderRecycleBinControllerTests : ElementRecycleBinCon
     public async Task Setup()
     {
         var result = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to create folder: {result.Status}");
         _folderKey = result.Result!.Key;
 
-        await ElementContainerService.MoveToRecycleBinAsync(_folderKey, Constants.Security.SuperUserKey);
+        var moveResult = await ElementContainerService.MoveToRecycleBinAsync(_folderKey, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success, $"Failed to move folder to recycle bin: {moveResult.Status}");
     }
 
     protected override Expression<Func<DeleteElementFolderRecycleBinController, object>> MethodSelector =>
