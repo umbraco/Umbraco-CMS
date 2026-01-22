@@ -47,8 +47,28 @@ export const HtmlClassAttribute = Extension.create<UmbTiptapHtmlClassAttributeOp
 				({ commands, editor }) => {
 					if (!className) return false;
 					const types = type ? [type] : this.options.types;
-					const existing = types.map((type) => editor.getAttributes(type)?.class as string).filter((x) => x);
-					return existing.length ? commands.unsetClassName(type) : commands.setClassName(className, type);
+
+					return types
+						.map((t) => {
+							const existingClass = (editor.getAttributes(t)?.class as string) ?? '';
+							const classes = existingClass.split(/\s+/).filter((c) => c);
+							const hasClass = classes.includes(className);
+
+							if (hasClass) {
+								// Remove the class
+								const newClasses = classes.filter((c) => c !== className);
+								if (newClasses.length === 0) {
+									// No classes left, remove the attribute entirely
+									return commands.resetAttributes(t, 'class');
+								}
+								return commands.updateAttributes(t, { class: newClasses.join(' ') });
+							} else {
+								// Add the class
+								const newClasses = [...classes, className];
+								return commands.updateAttributes(t, { class: newClasses.join(' ') });
+							}
+						})
+						.every((response) => response);
 				},
 			unsetClassName:
 				(type) =>
