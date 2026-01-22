@@ -40,10 +40,13 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 	@state()
 	private _labels: Map<string, string> = new Map();
+	@state()
+	private _popoverOpen = false;
 
 	private _hoverTimer?: number;
 
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
+	#previewElements: Map<string, HTMLElement> = new Map();
 
 	constructor() {
 		super();
@@ -75,6 +78,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				// Clean up old observers
 				this.#signLabelObservations.forEach((o) => this.removeUmbController(o));
 				this.#signLabelObservations = [];
+				this.#previewElements.clear();
 
 				// Setup label observers
 				signs.forEach((sign) => {
@@ -113,8 +117,10 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					popover.style.left = `${hostRect.right}px`;
 					// 3) Show the popover
 					popover.showPopover();
+					this._popoverOpen = true;
 				} else {
 					popover.hidePopover();
+					this._popoverOpen = false;
 				}
 			}
 			this._hoverTimer = undefined;
@@ -138,6 +144,21 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		}
 	};
 
+	#getOrCreatePreviewElement(sign: any): HTMLElement | undefined {
+		if (!sign.manifest) return undefined;
+
+		const existing = this.#previewElements.get(sign.alias);
+		if (existing) {
+			return existing;
+		}
+
+		const elementName = sign.manifest.elementName ?? 'umb-entity-sign-icon';
+		const el = document.createElement(elementName);
+		(el as any).manifest = sign.manifest;
+		this.#previewElements.set(sign.alias, el);
+		return el;
+	}
+
 	override render() {
 		return html`
 			<slot></slot>
@@ -153,14 +174,13 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	#renderPreview() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
-		// Show first 2 icons in preview
 		const previewSigns = this._signs.slice(0, 2);
 
-		return html`<div class="preview">
+		return html`<div class="preview ${this._popoverOpen ? 'hidden' : ''}">
 			${repeat(
 				previewSigns,
 				(c) => c.alias,
-				(c, i) => html`<span class="preview-icon" style=${`--i:${i}`}>${c.component}</span>`,
+				(c, i) => html`<span class="preview-icon" style=${`--i:${i}`}>${this.#getOrCreatePreviewElement(c)}</span>`,
 			)}
 		</div>`;
 	}
@@ -217,16 +237,16 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				align-items: start;
 				gap: 3px;
 				position: relative;
-				transform: translate(calc((var(--i) * -5px) - 10px), calc((-1 * var(--i) * var(--row-h)) - var(--offset-h)));
+				/* transform: translate(calc((var(--i) * -5px) - 10px), calc((-1 * var(--i) * var(--row-h)) - var(--offset-h)));
 				transition:
 					transform 120ms var(--ease),
 					visibility 0ms linear 120ms opacity 120ms linear;
-				z-index: calc(var(--count) - var(--i));
+				z-index: calc(var(--count) - var(--i)); */
 				pointer-events: none;
 			}
-			.infobox > .sign-container.hide-in-overview {
+			/* .infobox > .sign-container.hide-in-overview {
 				visibility: hidden;
-			}
+			} */
 
 			.infobox .sign-container .label {
 				opacity: 0;
@@ -237,8 +257,8 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				font-size: 12px;
 				color: var(--uui-color-text);
 				clip-path: inset(-12px);
-				background-color: var(--uui-color-surface); /* Move from ::before */
-				box-shadow: var(--uui-shadow-depth-2); /* Move from ::before */
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-2);
 				border-radius: 3px;
 				--umb-sign-bundle-bg: var(--uui-color-surface);
 			}
@@ -256,6 +276,11 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 			.preview {
 				pointer-events: none;
+				transition: opacity 120ms var(--ease);
+			}
+
+			.preview.hidden {
+				opacity: 0;
 			}
 
 			.preview-icon {
