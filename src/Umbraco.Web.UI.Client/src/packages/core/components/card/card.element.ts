@@ -27,11 +27,11 @@ export class UmbCardElement extends UUICardElement {
 	@property({ type: String })
 	description?: string;
 
-	@property({ type: String })
-	public get background(): string | undefined {
+	@property({ type: String, attribute: 'background-color' })
+	public get backgroundColor(): string | undefined {
 		return undefined;
 	}
-	public set background(value: string | undefined) {
+	public set backgroundColor(value: string | undefined) {
 		this.style.backgroundColor = value ?? '';
 	}
 

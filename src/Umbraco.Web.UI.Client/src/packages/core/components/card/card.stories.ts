@@ -15,10 +15,10 @@ const meta: Meta<UmbCardElement> = {
 		selectOnly: false,
 		selected: false,
 		disabled: false,
-		background: undefined,
+		backgroundColor: undefined,
 	},
 	argTypes: {
-		background: { control: { type: 'color' } },
+		backgroundColor: { control: { type: 'color' } },
 	},
 	render: (args) =>
 		html`<umb-card
@@ -28,7 +28,7 @@ const meta: Meta<UmbCardElement> = {
 			?select-only=${args.selectOnly}
 			?selected=${args.selected}
 			?disabled=${args.disabled}
-			background=${args.background}
+			background-color=${args.backgroundColor}
 			description=${args.description}>
 			<uui-icon name="icon-wand"></uui-icon>
 			<uui-button slot="actions" look="secondary" label="Remove">Remove</uui-button>
