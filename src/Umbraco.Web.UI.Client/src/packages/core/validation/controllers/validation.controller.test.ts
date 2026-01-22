@@ -1,5 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { UmbValidationController } from './validation.controller';
+import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -856,7 +857,7 @@ describe('UmbValidationController', () => {
 				reset: () => {},
 				destroy: () => {},
 				focusFirstInvalidElement: () => {},
-			};
+			} as unknown as UmbValidator;
 
 			ctrl.addValidator(customValidator);
 
@@ -876,7 +877,7 @@ describe('UmbValidationController', () => {
 				reset: () => {},
 				destroy: () => {},
 				focusFirstInvalidElement: () => {},
-			};
+			} as unknown as UmbValidator;
 
 			// Add the same validator multiple times
 			ctrl.addValidator(customValidator);
@@ -935,6 +936,135 @@ describe('UmbValidationController', () => {
 
 			// Child should no longer have the message
 			expect(child.messages.getHasAnyMessages()).to.be.false;
+		});
+	});
+
+	describe('Validators', () => {
+		it('validates added validator when in validation mode', async () => {
+			// Create a validator that will be invalid
+			const invalidValidator = {
+				isValid: false,
+				validate: async () => Promise.reject(),
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			} as unknown as UmbValidator;
+
+			// Put ctrl in validation mode first
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+
+			// Add invalid validator and explicitly validate again
+			ctrl.addValidator(invalidValidator);
+			await ctrl.validate().catch(() => undefined);
+
+			// Context should now be invalid
+			expect(ctrl.isValid).to.be.false;
+		});
+
+		it('becomes valid when invalid validator is removed', async () => {
+			const invalidValidator = {
+				isValid: false,
+				validate: async () => Promise.reject(),
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			} as unknown as UmbValidator;
+
+			ctrl.addValidator(invalidValidator);
+
+			// Put ctrl in validation mode - should be invalid
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+
+			// Remove the invalid validator
+			ctrl.removeValidator(invalidValidator);
+
+			// Validate again - should now be valid
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('calls focusFirstInvalidElement on first invalid validator', async () => {
+			let focusCalled = false;
+
+			const invalidValidator = {
+				isValid: false,
+				validate: async () => Promise.reject(),
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {
+					focusCalled = true;
+				},
+			} as unknown as UmbValidator;
+
+			ctrl.addValidator(invalidValidator);
+
+			// Validate - this should call focusFirstInvalidElement on the invalid validator
+			await ctrl.validate().catch(() => undefined);
+
+			expect(focusCalled).to.be.true;
+		});
+
+		it('validates all validators and collects results', async () => {
+			let validator1Called = false;
+			let validator2Called = false;
+
+			const validator1 = {
+				isValid: true,
+				validate: async () => {
+					validator1Called = true;
+					return Promise.resolve();
+				},
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			} as unknown as UmbValidator;
+
+			const validator2 = {
+				isValid: true,
+				validate: async () => {
+					validator2Called = true;
+					return Promise.resolve();
+				},
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			} as unknown as UmbValidator;
+
+			ctrl.addValidator(validator1);
+			ctrl.addValidator(validator2);
+
+			await ctrl.validate();
+
+			expect(validator1Called).to.be.true;
+			expect(validator2Called).to.be.true;
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('fails validation if any validator fails', async () => {
+			const validValidator = {
+				isValid: true,
+				validate: async () => Promise.resolve(),
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			} as unknown as UmbValidator;
+
+			const invalidValidator = {
+				isValid: false,
+				validate: async () => Promise.reject(),
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			} as unknown as UmbValidator;
+
+			ctrl.addValidator(validValidator);
+			ctrl.addValidator(invalidValidator);
+
+			await ctrl.validate().catch(() => undefined);
+
+			expect(ctrl.isValid).to.be.false;
 		});
 	});
 });
