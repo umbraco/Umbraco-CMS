@@ -669,4 +669,272 @@ describe('UmbValidationController', () => {
 			expect(child2.isValid, 'child2 context is valid').to.be.true;
 		});
 	});
+
+	describe('Lifecycle', () => {
+		let child: UmbValidationController;
+
+		beforeEach(() => {
+			child = new UmbValidationController(host);
+		});
+		afterEach(() => {
+			child.destroy();
+		});
+
+		it('child destruction removes it as validator from parent', async () => {
+			// Use inheritFrom with autoReport to establish proper parent-child relationship
+			// autoReport registers child as a validator on the parent
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			// Make child invalid by adding a message
+			child.messages.addMessage('client', '$.field', 'error');
+			await Promise.resolve();
+
+			// Parent validation should fail because child validator is invalid
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+
+			// Destroy the child - this should remove it as a validator from parent
+			child.destroy();
+
+			// Clear the synced message from parent (destroy doesn't do this automatically)
+			ctrl.messages.clear();
+
+			// Parent should now be valid since child validator is removed
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('stopInheritance cleans up synced messages from parent', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			// Add a message that syncs to parent
+			child.messages.addMessage('client', '$.field', 'child-error', 'child-key');
+			await Promise.resolve();
+
+			// Verify parent has the message
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+
+			// Switch to a different parent (triggers stopInheritance which cleans up)
+			const otherParent = new UmbValidationController(host);
+			child.inheritFrom(otherParent, '$');
+			await Promise.resolve();
+
+			// Original parent should no longer have the child's message
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+
+			otherParent.destroy();
+		});
+
+		it('handles validation rejection gracefully when context is destroyed mid-validation', async () => {
+			// Add a message so validation will fail
+			ctrl.messages.addMessage('server', '$.test', 'error');
+
+			// Start validation but don't await it
+			const validationPromise = ctrl.validate();
+
+			// Destroy the context
+			ctrl.destroy();
+
+			// The validation should reject without throwing
+			let rejected = false;
+			await validationPromise.catch(() => {
+				rejected = true;
+			});
+
+			expect(rejected).to.be.true;
+		});
+
+		it('handles reset clearing validation mode and messages', async () => {
+			// Put context in validation mode
+			ctrl.messages.addMessage('server', '$.test', 'error');
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+
+			// Reset
+			ctrl.reset();
+
+			// Messages should be cleared
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+
+			// Validation should pass now
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('reset also resets child validators', async () => {
+			// Add child as validator
+			ctrl.addValidator(child);
+
+			// Add messages to both
+			ctrl.messages.addMessage('server', '$.parent', 'parent-error');
+			child.messages.addMessage('client', '$.child', 'child-error');
+
+			// Both should be invalid
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+			expect(child.isValid).to.be.false;
+
+			// Reset parent (which resets children too)
+			ctrl.reset();
+
+			// Both should have cleared messages
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+			expect(child.messages.getHasAnyMessages()).to.be.false;
+		});
+	});
+
+	describe('Edge cases', () => {
+		let child: UmbValidationController;
+
+		beforeEach(() => {
+			child = new UmbValidationController(host);
+		});
+		afterEach(() => {
+			child.destroy();
+		});
+
+		it('handles inheritFrom with undefined parent gracefully', async () => {
+			// First inherit from a real parent
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			child.messages.addMessage('client', '$.field', 'error', 'key');
+			await Promise.resolve();
+
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+
+			// Now inherit from undefined (disconnects from parent)
+			child.inheritFrom(undefined, '$');
+			await Promise.resolve();
+
+			// Old parent should be cleaned up
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+		});
+
+		it('handles rapid parent switching without message leaks', async () => {
+			const parent1 = ctrl;
+			const parent2 = new UmbValidationController(host);
+			const parent3 = new UmbValidationController(host);
+
+			child.autoReport();
+
+			// Rapidly switch parents while adding messages
+			child.inheritFrom(parent1, '$.path1');
+			child.messages.addMessage('client', '$.field', 'error-1', 'key-1');
+			await Promise.resolve();
+
+			child.inheritFrom(parent2, '$.path2');
+			child.messages.addMessage('client', '$.field', 'error-2', 'key-2');
+			await Promise.resolve();
+
+			child.inheritFrom(parent3, '$.path3');
+			child.messages.addMessage('client', '$.field', 'error-3', 'key-3');
+			await Promise.resolve();
+
+			// Only parent3 should have messages
+			expect(parent1.messages.getHasAnyMessages()).to.be.false;
+			expect(parent2.messages.getHasAnyMessages()).to.be.false;
+			expect(parent3.messages.getHasAnyMessages()).to.be.true;
+			expect(parent3.messages.getMessages()?.[0].body).to.equal('error-3');
+
+			// Cleanup
+			parent2.destroy();
+			parent3.destroy();
+		});
+
+		it('handles messages added during validation process', async () => {
+			// Create a custom validator that adds a message during validation
+			const customValidator = {
+				isValid: false,
+				validate: async () => {
+					// Add a message during validation
+					ctrl.messages.addMessage('client', '$.dynamic', 'added-during-validation');
+					return Promise.reject();
+				},
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			};
+
+			ctrl.addValidator(customValidator);
+
+			// Validate
+			await ctrl.validate().catch(() => undefined);
+
+			// The dynamically added message should be present
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(ctrl.messages.getMessages()?.some((m) => m.body === 'added-during-validation')).to.be.true;
+			expect(ctrl.isValid).to.be.false;
+		});
+
+		it('does not add duplicate validators', async () => {
+			const customValidator = {
+				isValid: true,
+				validate: async () => Promise.resolve(),
+				reset: () => {},
+				destroy: () => {},
+				focusFirstInvalidElement: () => {},
+			};
+
+			// Add the same validator multiple times
+			ctrl.addValidator(customValidator);
+			ctrl.addValidator(customValidator);
+			ctrl.addValidator(customValidator);
+
+			// Validate should work without issues
+			await ctrl.validate();
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('throws when adding itself as a validator', () => {
+			let errorThrown = false;
+			try {
+				ctrl.addValidator(ctrl);
+			} catch (e) {
+				errorThrown = true;
+				expect((e as Error).message).to.include('Cannot add it self as validator');
+			}
+			expect(errorThrown).to.be.true;
+		});
+
+		it('handles same dataPath with same parent (no-op)', async () => {
+			const dataPath = "$.values[?(@.alias == 'my-property')].value";
+
+			child.inheritFrom(ctrl, dataPath);
+			child.autoReport();
+
+			child.messages.addMessage('client', '$.field', 'error', 'key');
+			await Promise.resolve();
+
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+
+			// Call inheritFrom again with same parent and path (should be no-op)
+			child.inheritFrom(ctrl, dataPath);
+			await Promise.resolve();
+
+			// Message should still be there (not cleared by redundant inheritFrom)
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child.messages.getHasAnyMessages()).to.be.true;
+		});
+
+		it('clears child messages when parent removes the source message', async () => {
+			// Parent has a message
+			ctrl.messages.addMessage('server', "$.values[?(@.alias == 'my-property')].value.test", 'parent-error', 'parent-key');
+
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			await Promise.resolve();
+
+			// Child should have inherited the message
+			expect(child.messages.getHasAnyMessages()).to.be.true;
+
+			// Parent removes the message
+			ctrl.messages.removeMessageByKey('parent-key');
+			await Promise.resolve();
+
+			// Child should no longer have the message
+			expect(child.messages.getHasAnyMessages()).to.be.false;
+		});
+	});
 });
