@@ -11,9 +11,6 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	#selectable = new UmbBooleanState(true);
 	public readonly selectable = this.#selectable.asObservable();
 
-	#selectOnly = new UmbBooleanState(false);
-	public readonly selectOnly = this.#selectOnly.asObservable();
-
 	#selection = new UmbArrayState(<Array<ValueType>>[], (x) => x);
 	public readonly selection = this.#selection.asObservable();
 	public readonly hasSelection = this.#selection.asObservablePart((x) => x.length > 0);
@@ -98,19 +95,6 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 			this.clearSelection();
 			this.select(first);
 		}
-	}
-
-	public setSelectOnly(value: boolean) {
-		this.#selectOnly.setValue(value);
-	}
-
-	/**
-	 * Returns whether select only mode is enabled.
-	 * @returns {*}
-	 * @memberof UmbSelectionManager
-	 */
-	public getSelectOnly() {
-		return this.#selectOnly.getValue();
 	}
 
 	/**

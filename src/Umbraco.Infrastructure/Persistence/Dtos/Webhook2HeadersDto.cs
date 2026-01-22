@@ -10,14 +10,20 @@ public class Webhook2HeadersDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Headers;
 
-    [Column("webhookId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_headers2WebhookDto", OnColumns = "webhookId, key")]
+    internal const string ReferenceMemberName = "WebhookId"; // should be WebhookIdColumnName, but for database compatibility we keep it like this
+
+    private const string WebhookIdColumnName = "webhookId";
+    private const string KeyColumnName = "Key";
+    private const string ValueColumnName = "Value";
+
+    [Column(WebhookIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_headers2WebhookDto", OnColumns = $"{WebhookIdColumnName}, {KeyColumnName}")]
     [ForeignKey(typeof(WebhookDto), OnDelete = Rule.Cascade)]
     public int WebhookId { get; set; }
 
-    [Column("Key")]
+    [Column(KeyColumnName)]
     public string Key { get; set; } = string.Empty;
 
-    [Column("Value")]
+    [Column(ValueColumnName)]
     public string Value { get; set; } = string.Empty;
 }

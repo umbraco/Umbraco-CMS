@@ -100,7 +100,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 
 	static override readonly styles = [
 		css`
-			host: {
+			:host {
 				display: block;
 			}
 
