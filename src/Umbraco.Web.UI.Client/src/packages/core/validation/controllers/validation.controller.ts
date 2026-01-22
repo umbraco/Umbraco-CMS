@@ -155,13 +155,14 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param {string} dataPath - The data path to bind this validation context to.
 	 */
 	inheritFrom(parent: UmbValidationController | undefined, dataPath: string): void {
+		if (this.#parent === parent && this.#baseDataPath === dataPath) return;
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
-		this.#parent = parent;
-
 		this.messages.clear();
 		this.#localMessages = undefined;
+		this.#parentMessages = undefined;
+		this.#parent = parent;
 
 		this.#baseDataPath = dataPath;
 		this.#readyToSync();
@@ -179,7 +180,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
 					this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 				}
-				this.#parentMessages = msgs;
 				if (this.#baseDataPath === '$') {
 					this.messages.addMessageObjects(msgs);
 				} else {
@@ -194,7 +194,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
 				}
-
+				this.#parentMessages = msgs;
 				this.#localMessages = this.messages.getNotFilteredMessages();
 				this.messages.finishChange();
 			},
@@ -203,7 +203,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	#stopInheritance(): void {
-		this.removeUmbControllerByAlias('observeTranslationData');
 		this.removeUmbControllerByAlias('observeParentMessages');
 
 		if (this.#parent) {
@@ -211,6 +210,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		}
 		this.messages.clear();
 		this.#localMessages = undefined;
+		this.#parentMessages = undefined;
 	}
 
 	#readyToSync() {
