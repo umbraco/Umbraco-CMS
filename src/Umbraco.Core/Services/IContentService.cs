@@ -331,17 +331,6 @@ public interface IContentService : IPublishableContentService<IContent>
     void DeleteOfType(int documentTypeId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Deletes all documents of given document types.
-    /// </summary>
-    /// <param name="contentTypeIds">The content type identifiers.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <remarks>
-    ///     <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
-    ///     <para>This operation is potentially dangerous and expensive.</para>
-    /// </remarks>
-    void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Deletes versions of a document prior to a given date.
     /// </summary>
     /// <param name="id">The document identifier.</param>
