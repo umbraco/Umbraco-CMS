@@ -320,6 +320,136 @@ describe('UmbValidationController', () => {
 		});
 	});
 
+	describe('Synchronization tracking', () => {
+		let child: UmbValidationController;
+
+		beforeEach(() => {
+			child = new UmbValidationController(host);
+		});
+		afterEach(() => {
+			child.destroy();
+		});
+
+		it('removes locally-created message from parent when removed locally with autoReport', async () => {
+			// This tests the fix: #latestLocalMessages being updated in #transferMessages
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			// Add a message locally (not from parent)
+			child.messages.addMessage('client', '$.localField', 'local-error', 'local-key');
+
+			// Wait for autoReport to sync
+			await Promise.resolve();
+
+			// Verify parent received it
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(ctrl.messages.getMessages()?.some((m) => m.body === 'local-error')).to.be.true;
+
+			// Remove the local message
+			child.messages.removeMessageByKey('local-key');
+
+			// Wait for autoReport to sync the removal
+			await Promise.resolve();
+
+			// Verify parent no longer has it
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+		});
+
+		it('handles multiple add/remove cycles with autoReport', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			// Cycle 1: Add and remove
+			child.messages.addMessage('client', '$.field1', 'error-1', 'key-1');
+			await Promise.resolve();
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+
+			child.messages.removeMessageByKey('key-1');
+			await Promise.resolve();
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+
+			// Cycle 2: Add different message and remove
+			child.messages.addMessage('client', '$.field2', 'error-2', 'key-2');
+			await Promise.resolve();
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+
+			child.messages.removeMessageByKey('key-2');
+			await Promise.resolve();
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+
+			// Cycle 3: Add multiple, remove one at a time
+			child.messages.addMessage('client', '$.field3', 'error-3', 'key-3');
+			child.messages.addMessage('client', '$.field4', 'error-4', 'key-4');
+			await Promise.resolve();
+			expect(ctrl.messages.getMessages()?.length).to.equal(2);
+
+			child.messages.removeMessageByKey('key-3');
+			await Promise.resolve();
+			expect(ctrl.messages.getMessages()?.length).to.equal(1);
+			expect(ctrl.messages.getMessages()?.[0].body).to.equal('error-4');
+
+			child.messages.removeMessageByKey('key-4');
+			await Promise.resolve();
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+		});
+
+		it('correctly tracks when mixing parent and local messages with autoReport', async () => {
+			// Parent adds a message
+			ctrl.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'my-property')].value.parentField",
+				'parent-error',
+			);
+
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			await Promise.resolve();
+
+			// Child should have parent message
+			expect(child.messages.getHasAnyMessages()).to.be.true;
+			expect(child.messages.getMessages()?.some((m) => m.body === 'parent-error')).to.be.true;
+
+			// Child adds its own local message
+			child.messages.addMessage('client', '$.localField', 'local-error', 'local-key');
+			await Promise.resolve();
+
+			// Parent should have both (parent's original + child's local synced back)
+			expect(ctrl.messages.getMessages()?.length).to.equal(2);
+
+			// Child removes only the local message
+			child.messages.removeMessageByKey('local-key');
+			await Promise.resolve();
+
+			// Parent should still have original message, but not the local one
+			expect(ctrl.messages.getMessages()?.length).to.equal(1);
+			expect(ctrl.messages.getMessages()?.[0].body).to.equal('parent-error');
+		});
+
+		it('verifies path transformation in both directions', async () => {
+			const parentPath = "$.values[?(@.alias == 'my-property')].value";
+			child.inheritFrom(ctrl, parentPath);
+			child.autoReport();
+
+			// Parent adds message with full path
+			ctrl.messages.addMessage('server', `${parentPath}.nested.field`, 'from-parent');
+			await Promise.resolve();
+
+			// Child should receive with local path
+			const childMsg = child.messages.getMessages()?.[0];
+			expect(childMsg?.path).to.equal('$.nested.field');
+
+			// Child adds message with local path
+			child.messages.addMessage('client', '$.other.field', 'from-child', 'child-key');
+			await Promise.resolve();
+
+			// Parent should receive with full path
+			const parentMsgs = ctrl.messages.getMessages();
+			const syncedMsg = parentMsgs?.find((m) => m.body === 'from-child');
+			expect(syncedMsg?.path).to.equal(`${parentPath}.other.field`);
+		});
+	});
+
 	describe('Double inheritance', () => {
 		let child1: UmbValidationController;
 		let child2: UmbValidationController;
