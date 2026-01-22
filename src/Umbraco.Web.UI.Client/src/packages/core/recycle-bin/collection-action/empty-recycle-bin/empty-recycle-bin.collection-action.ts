@@ -12,8 +12,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * Collection action for emptying the recycle bin.
  * @class UmbEmptyRecycleBinCollectionAction
- * @augments {UmbControllerBase}
- * @implements {UmbCollectionActionBase}
+ * @augments {UmbCollectionActionBase}
  */
 export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase {
 	#manifest: ManifestCollectionActionEmptyRecycleBinKind;
