@@ -22,7 +22,6 @@ export interface UmbPickerModalSearchConfig<
 
 export interface UmbPickerModalValue {
 	selection: Array<string | null>;
-	culture?: string;
 }
 
 export type UmbModalType = 'dialog' | 'sidebar' | 'custom';

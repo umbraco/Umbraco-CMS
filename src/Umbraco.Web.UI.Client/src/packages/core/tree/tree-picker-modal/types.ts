@@ -29,7 +29,9 @@ export interface UmbTreePickerModalData<
 	initialCulture?: string;
 }
 
-export interface UmbTreePickerModalValue extends UmbPickerModalValue {
+export type UmbPickerVariantModalValue = UmbPickerModalValue;
+
+export interface UmbTreePickerModalValue extends UmbPickerVariantModalValue {
 	culture?: string;
 }
 
