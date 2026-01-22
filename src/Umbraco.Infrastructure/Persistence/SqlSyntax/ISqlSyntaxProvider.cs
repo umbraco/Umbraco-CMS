@@ -287,5 +287,5 @@ public interface ISqlSyntaxProvider
     /// <typeparam name="T">type of the entity.</typeparam>
     /// <param name="constraintName">unlimited name.</param>
     /// <returns>truncated name.</returns>
-    string? TruncateConstraintName<T>(string? constraintName) => constraintName;
+    string TruncateConstraintName<T>(string constraintName) => constraintName;
 }
