@@ -204,7 +204,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v20.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
