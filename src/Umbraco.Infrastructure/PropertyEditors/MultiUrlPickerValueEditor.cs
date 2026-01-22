@@ -229,7 +229,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                     : dto.Udi.EntityType,
                     Unique = dto.Udi?.Guid,
                     Url = url ?? string.Empty,
-                    Culture = dto.Culture ?? null
+                    Culture = dto.Culture
                 });
             }
 
@@ -269,7 +269,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                     Target = link.Target,
                     Udi = TypeIsUdiBased(link) ? new GuidUdi(link.Type!, link.Unique!.Value) : null,
                     Url = TypeIsExternal(link) ? link.Url : null, // only save the URL for external links
-                    Culture = link.Culture ?? null,
+                    Culture = link.Culture,
                 }));
         }
         catch (Exception ex)

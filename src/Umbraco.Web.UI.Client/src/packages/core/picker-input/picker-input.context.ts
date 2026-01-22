@@ -114,8 +114,11 @@ export class UmbPickerInputContext<
 		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);
+		this.onModalValueReceived(modalValue);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
+
+	protected onModalValueReceived(_modalValue: PickerModalValueType) {}
 
 	protected async _requestItemName(unique: string) {
 		return this.getSelectedItemByUnique(unique)?.name ?? '#general_notFound';

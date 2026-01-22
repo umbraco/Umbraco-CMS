@@ -13,21 +13,22 @@ public sealed class HtmlLocalLinkParser
     // needs to support media and document links, order of attributes should not matter nor should other attributes mess with things
     // <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
     // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
-    internal static readonly Regex LocalLinkTagPattern = new(
+    private static readonly Regex _localLinkTagPattern = new(
         @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-    internal static readonly Regex TypePattern = new(
+    private static readonly Regex _typePattern = new(
         """type=['"](?<type>(?:media|document))['"]""",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-    internal static readonly Regex LocalLinkPattern = new(
+    private static readonly Regex _localLinkPattern = new(
         @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private static readonly Regex _culturePattern = new( """culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    private static readonly Regex CulturePattern = new( """culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex _linkPattern = new(@"(<a\b(?=[^>]*data-culture=['""](?<culture>[a-zA-Z0-9-_]+)['""])(?=[^>]*href=['""])[^>]*href=['""])[^""']*[""']", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
 
     public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider)
     {
@@ -93,8 +94,14 @@ public sealed class HtmlLocalLinkParser
         }
         else
         {
-            var pattern = $@"(<a\b(?=[^>]*data-culture=""{Regex.Escape(culture)}"")(?=[^>]*href="")[^>]*href="")[^""]*""";
-            return Regex.Replace(text, pattern, $"$1{newLink}\"");
+            return _linkPattern.Replace(text, match =>
+            {
+                if (match.Groups["culture"].Value.Equals(culture, StringComparison.OrdinalIgnoreCase))
+                {
+                    return match.Groups[1].Value + newLink + "\"";
+                }
+                return match.Value;
+            });
         }
     }
 
@@ -106,7 +113,7 @@ public sealed class HtmlLocalLinkParser
 
     private IEnumerable<LocalLinkTag> FindLocalLinkIds(string text)
     {
-        MatchCollection localLinkTagMatches = LocalLinkTagPattern.Matches(text);
+        MatchCollection localLinkTagMatches = _localLinkTagPattern.Matches(text);
         foreach (Match linkTag in localLinkTagMatches)
         {
             if (Guid.TryParse(linkTag.Groups["guid"].Value, out Guid guid) is false)
@@ -115,14 +122,14 @@ public sealed class HtmlLocalLinkParser
             }
 
             // Find the type attribute
-            Match typeMatch = TypePattern.Match(linkTag.Value);
+            Match typeMatch = _typePattern.Match(linkTag.Value);
             if (typeMatch.Success is false)
             {
                 continue;
             }
 
             // Find the culture attribute if it exists
-            Match cultureMatch = CulturePattern.Match(linkTag.Value);
+            Match cultureMatch = _culturePattern.Match(linkTag.Value);
 
             yield return new LocalLinkTag(
                 null,
@@ -143,7 +150,7 @@ public sealed class HtmlLocalLinkParser
     public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
-        MatchCollection tags = LocalLinkPattern.Matches(text);
+        MatchCollection tags = _localLinkPattern.Matches(text);
         foreach (Match tag in tags)
         {
             if (tag.Groups.Count <= 0)

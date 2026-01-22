@@ -458,9 +458,6 @@ public class HtmlLocalLinkParserTests
             new Mock<IPublishedContentStatusFilteringService>().Object);
     }
 
-    /// <summary>
-    /// Tests for culture attribute support - new feature added to ReplaceLink method
-    /// </summary>
     [TestCase(
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"en-US\" title=\"world\">world</a>",
         "<a href=\"/my-test-url\" data-culture=\"en-US\" title=\"world\">world</a>")]
@@ -595,61 +592,6 @@ public class HtmlLocalLinkParserTests
 
             // Assert
             Assert.AreEqual(expected, output);
-        }
-    }
-
-    [TestCase(
-        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"en-US\" title=\"world\">world</a>",
-        "<a href=\"/my-test-url\" data-culture=\"en-US\" title=\"world\">world</a>")]
-    [TestCase(
-        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"da-DK\" title=\"world\">world</a>",
-        "<a href=\"/my-test-url\" data-culture=\"da-DK\" title=\"world\">world</a>")]
-    public void EnsureInternalLinks_WithCultureAttribute_StripsTypeAttribute(string input, string expected)
-    {
-        // Arrange - verify that type attribute is properly stripped when culture is present
-        var contentUrlProvider = new Mock<IUrlProvider>();
-        contentUrlProvider
-            .Setup(x => x.GetUrl(
-                It.IsAny<IPublishedContent>(),
-                It.IsAny<UrlMode>(),
-                It.IsAny<string>(),
-                It.IsAny<Uri>()))
-            .Returns(UrlInfo.AsUrl("/my-test-url", "Test Provider"));
-
-        var contentType = new PublishedContentType(
-            Guid.NewGuid(),
-            666,
-            "alias",
-            PublishedItemType.Content,
-            Enumerable.Empty<string>(),
-            Enumerable.Empty<PublishedPropertyType>(),
-            ContentVariation.Nothing);
-        var publishedContent = new Mock<IPublishedContent>();
-        publishedContent.Setup(x => x.Id).Returns(1234);
-        publishedContent.Setup(x => x.ContentType).Returns(contentType);
-
-        var umbracoContextAccessor = new TestUmbracoContextAccessor();
-        var umbracoContextFactory = TestUmbracoContextFactory.Create(
-            umbracoContextAccessor: umbracoContextAccessor);
-
-        using (var reference = umbracoContextFactory.EnsureUmbracoContext())
-        {
-            var contentCache = Mock.Get(reference.UmbracoContext.Content);
-            contentCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(publishedContent.Object);
-
-            var publishedUrlProvider = CreatePublishedUrlProvider(
-                contentUrlProvider,
-                new Mock<IMediaUrlProvider>(),
-                umbracoContextAccessor);
-
-            var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
-
-            // Act
-            var output = linkParser.EnsureInternalLinks(input);
-
-            // Assert
-            Assert.AreEqual(expected, output);
-            Assert.That(output, Does.Not.Contain("type=\"document\""));
         }
     }
 }

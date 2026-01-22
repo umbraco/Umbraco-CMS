@@ -45,6 +45,12 @@ export class UmbDocumentPickerInputVariantContext extends UmbPickerInputContext<
 		}
 	}
 
+	override onModalValueReceived(modalValue: UmbDocumentPickerModalValue) {
+		if (modalValue.culture) {
+			this._culture = modalValue.culture;
+		}
+	}
+
 	override async openPicker(
 		pickerData?: Partial<UmbDocumentPickerModalData>,
 		args?: UmbDocumentPickerInputContextOpenArgs,
@@ -88,10 +94,6 @@ export class UmbDocumentPickerInputVariantContext extends UmbPickerInputContext<
 		// Get initial culture from app language context
 		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 		combinedPickerData.initialCulture = appLanguageContext?.getAppCulture() ?? culture ?? undefined;
-		if (culture) {
-			this._culture = culture;
-			this.onCultureChange(culture);
-		}
 		await super.openPicker(combinedPickerData);
 	}
 
