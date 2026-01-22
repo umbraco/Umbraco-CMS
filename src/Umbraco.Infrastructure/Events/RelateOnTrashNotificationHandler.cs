@@ -223,9 +223,15 @@ public sealed class RelateOnTrashNotificationHandler :
                 new Relation(originalParentId, item.Entity.Id, relationType);
             _relationService.Save(relation);
 
+            Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser switch
+            {
+                { } user => user.Key,
+                null when item.Entity is IContentBase contentBase => await _userIdKeyResolver.GetAsync(contentBase.WriterId),
+                _ => Constants.Security.SuperUserKey, // TODO: Not sure what to default to here (when deleting a container)? Shouldn't these audits be in the service itself where we have better user context?
+            };
             await _auditService.AddAsync(
                 AuditType.Delete,
-                _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(GetFallbackPerformingUserId(item.Entity)),
+                userKey,
                 item.Entity.Id,
                 entityObjectType.GetName(),
                 string.Format(_textService.Localize("recycleBin", localizationKey), item.Entity.Id, originalParentId));
@@ -233,9 +239,6 @@ public sealed class RelateOnTrashNotificationHandler :
 
         scope.Complete();
     }
-
-    private static int GetFallbackPerformingUserId(ITreeEntity entity)
-        => entity is IContentBase contentBase ? contentBase.WriterId : entity.CreatorId;
 
     private static string GetLocalizationKey(UmbracoObjectTypes entityObjectType)
         => entityObjectType switch

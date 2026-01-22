@@ -77,7 +77,12 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     /// <inheritdoc />
     public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> CreateAsync(Guid? key, string name, Guid? parentKey, Guid userKey)
     {
-        var container = new EntityContainer(ContainedObjectType) { Name = name };
+        var container = new EntityContainer(ContainedObjectType)
+        {
+            Name = name,
+            CreatorId = await _userIdKeyResolver.GetAsync(userKey),
+        };
+
         if (key.HasValue)
         {
             container.Key = key.Value;
