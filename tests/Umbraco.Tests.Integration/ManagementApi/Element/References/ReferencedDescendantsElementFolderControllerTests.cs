@@ -22,9 +22,10 @@ public class ReferencedDescendantsElementFolderControllerTests
     {
         var folderResult = await ElementContainerService.CreateAsync(
             null,
-            "Test Folder",
+            $"Test Folder {Guid.NewGuid()}",
             null,
             Constants.Security.SuperUserKey);
+        Assert.IsTrue(folderResult.Success);
         _folderKey = folderResult.Result!.Key;
     }
 
@@ -35,7 +36,7 @@ public class ReferencedDescendantsElementFolderControllerTests
         => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.NotFound };
+        => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
@@ -44,7 +45,7 @@ public class ReferencedDescendantsElementFolderControllerTests
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.NotFound };
+        => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
