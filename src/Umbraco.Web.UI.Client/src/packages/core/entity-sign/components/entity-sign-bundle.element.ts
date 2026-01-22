@@ -194,7 +194,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			? repeat(
 					this._signs,
 					(c) => c.alias,
-					(c, i) => {
+					(c) => {
 						return html`<div class="sign-container">
 							<span class="badge-icon">${c.component}</span>
 							<span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
