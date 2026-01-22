@@ -68,8 +68,8 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			//this.#control.addEventListener('change', this.#onControlChange);
 			// Legacy event, used by some controls:
 			//this.#control.addEventListener('property-value-change', this.#onControlChange);
+			this.#control.checkValidity();
 		}
-		this.#control.checkValidity();
 	}
 
 	#demolish() {
