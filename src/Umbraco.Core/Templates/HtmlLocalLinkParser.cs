@@ -6,35 +6,54 @@ using Umbraco.Cms.Core.Routing;
 namespace Umbraco.Cms.Core.Templates;
 
 /// <summary>
-///     Utility class used to parse internal links
+///     Utility class used to parse internal links.
 /// </summary>
-public sealed class HtmlLocalLinkParser
+/// <remarks>
+/// Needs to support media and document links, order of attributes should not matter nor should other attributes mess with things:
+/// <![CDATA[
+/// <a type = "media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
+/// <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
+/// ]]>
+/// </remarks>
+public sealed partial class HtmlLocalLinkParser
 {
-    // needs to support media and document links, order of attributes should not matter nor should other attributes mess with things
-    // <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
-    // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
-    private static readonly Regex _localLinkTagPattern = new(
-        @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+    [GeneratedRegex(@"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex GetLocalLinkTagPattern();
 
-    private static readonly Regex _typePattern = new(
-        """type=['"](?<type>(?:media|document))['"]""",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+    [GeneratedRegex("""type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex GetTypePattern();
 
-    private static readonly Regex _localLinkPattern = new(
-        @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+    [GeneratedRegex("""culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
+    private static partial Regex GetCulturePattern();
 
-    private static readonly Regex _culturePattern = new( """culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    [GeneratedRegex(@"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex GetLocalLinkPattern();
 
-    private static readonly Regex _linkPattern = new(@"(<a\b(?=[^>]*data-culture=['""](?<culture>[a-zA-Z0-9-_]+)['""])(?=[^>]*href=['""])[^>]*href=['""])[^""']*[""']", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    [GeneratedRegex(@"(<a\b(?=[^>]*data-culture=['""](?<culture>[a-zA-Z0-9-_]+)['""])(?=[^>]*href=['""])[^>]*href=['""])[^""']*[""']", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
+    private static partial Regex GetLinkPattern();
+
+    private static readonly Regex _localLinkTagPattern = GetLocalLinkTagPattern();
+
+    private static readonly Regex _typePattern = GetTypePattern();
+
+    private static readonly Regex _localLinkPattern = GetLocalLinkPattern();
+
+    private static readonly Regex _culturePattern = GetCulturePattern();
+
+    private static readonly Regex _linkPattern = GetLinkPattern();
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-    public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider)
-    {
-        _publishedUrlProvider = publishedUrlProvider;
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HtmlLocalLinkParser"/> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider) => _publishedUrlProvider = publishedUrlProvider;
 
+    /// <summary>
+    /// Retrieves a collection of unique document identifiers (UDIs) from local link tags found within the specified
+    /// text.
+    /// </summary>
+    /// <param name="text">The input string containing local link tags from which UDIs will be extracted. This parameter must not be null.</param>
     public IEnumerable<Udi?> FindUdisFromLocalLinks(string text)
     {
         foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
