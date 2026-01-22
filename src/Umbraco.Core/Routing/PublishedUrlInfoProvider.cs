@@ -59,7 +59,12 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     public async Task<ISet<UrlInfo>> GetAllAsync(IContent content)
     {
         HashSet<UrlInfo> urlInfos = [];
-        IEnumerable<string> cultures = await _languageService.GetAllIsoCodesAsync();
+
+        // For invariant content, only return the URL for the default language.
+        // Invariant content doesn't vary by culture, so it only has one URL.
+        IEnumerable<string> cultures = content.ContentType.VariesByCulture()
+            ? await _languageService.GetAllIsoCodesAsync()
+            : [(await _languageService.GetDefaultIsoCodeAsync())];
 
         // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
         foreach (var culture in cultures)
