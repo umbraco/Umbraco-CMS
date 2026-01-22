@@ -448,6 +448,82 @@ describe('UmbValidationController', () => {
 			const syncedMsg = parentMsgs?.find((m) => m.body === 'from-child');
 			expect(syncedMsg?.path).to.equal(`${parentPath}.other.field`);
 		});
+
+		it('cleans up messages from old parent when switching to a new parent', async () => {
+			// Simulates DOM update where child element moves from one parent to another
+			const oldParent = ctrl;
+			const newParent = new UmbValidationController(host);
+
+			// Child connects to old parent and syncs a message
+			child.inheritFrom(oldParent, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			child.messages.addMessage('client', '$.field', 'child-error', 'child-key');
+			await Promise.resolve();
+
+			// Verify old parent has the message
+			expect(oldParent.messages.getHasAnyMessages()).to.be.true;
+			expect(oldParent.messages.getMessages()?.some((m) => m.body === 'child-error')).to.be.true;
+
+			// Child switches to new parent (simulating DOM move)
+			child.inheritFrom(newParent, "$.values[?(@.alias == 'other-property')].value");
+
+			// Wait for cleanup and new sync
+			await Promise.resolve();
+
+			// Old parent should no longer have the child's message
+			expect(oldParent.messages.getHasAnyMessages()).to.be.false;
+
+			// Child's messages were cleared during the switch
+			expect(child.messages.getHasAnyMessages()).to.be.false;
+
+			// New parent should not have any messages yet (child was cleared)
+			expect(newParent.messages.getHasAnyMessages()).to.be.false;
+
+			// Add a new message to child - should sync to new parent
+			child.messages.addMessage('client', '$.newField', 'new-error', 'new-key');
+			await Promise.resolve();
+
+			// New parent should have the new message
+			expect(newParent.messages.getHasAnyMessages()).to.be.true;
+			expect(newParent.messages.getMessages()?.some((m) => m.body === 'new-error')).to.be.true;
+
+			// Old parent should still be clean
+			expect(oldParent.messages.getHasAnyMessages()).to.be.false;
+
+			// Cleanup
+			newParent.destroy();
+		});
+
+		it('cleans up messages from old parent when switching to same parent with different path', async () => {
+			// Child connects to parent at one path
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'property-1')].value");
+			child.autoReport();
+
+			child.messages.addMessage('client', '$.field', 'error-at-path-1', 'key-1');
+			await Promise.resolve();
+
+			// Verify parent has the message at the first path
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			const firstMsg = ctrl.messages.getMessages()?.[0];
+			expect(firstMsg?.path).to.equal("$.values[?(@.alias == 'property-1')].value.field");
+
+			// Child switches to same parent but different path
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'property-2')].value");
+			await Promise.resolve();
+
+			// Old message should be cleaned up
+			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+
+			// Add new message at new path
+			child.messages.addMessage('client', '$.field', 'error-at-path-2', 'key-2');
+			await Promise.resolve();
+
+			// Parent should have message at new path
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			const secondMsg = ctrl.messages.getMessages()?.[0];
+			expect(secondMsg?.path).to.equal("$.values[?(@.alias == 'property-2')].value.field");
+		});
 	});
 
 	describe('Double inheritance', () => {
