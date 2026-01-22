@@ -13,7 +13,13 @@ import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-a
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbBasicState,
+	UmbBooleanState,
+	UmbNumberState,
+	UmbObjectState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -56,6 +62,9 @@ export class UmbDefaultCollectionContext<
 
 	protected _filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this._filter.asObservable();
+
+	protected _selectOnly = new UmbBooleanState(undefined);
+	public readonly selectOnly = this._selectOnly.asObservable();
 
 	#workspacePathBuilder = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
 	public readonly workspacePathBuilder = this.#workspacePathBuilder.asObservable();
@@ -166,7 +175,7 @@ export class UmbDefaultCollectionContext<
 	protected _configure() {
 		if (!this.#config) return;
 
-		this.selection.setConfig(this.#config.selectionConfiguration);
+		this.#configureSelection();
 		this.bulkAction.setConfig(this.#config.bulkActionConfiguration);
 
 		// Observe bulk actions to enable selection when bulk actions are available
@@ -427,5 +436,20 @@ export class UmbDefaultCollectionContext<
 	 */
 	public async requestItemHref(_item: CollectionItemType): Promise<string | undefined> {
 		return undefined;
+	}
+
+	#configureSelection() {
+		const selectionConfiguration = this.#config?.selectionConfiguration;
+		this.selection.setConfig(selectionConfiguration);
+
+		const selectOnly = selectionConfiguration?.selectOnly;
+		this._selectOnly.setValue(selectOnly === true);
+
+		// If there is an selection, and selectOnly is not explicitly set, set selectOnly in context when there is more than 0 items selected.
+		this.observe(this.selection.selection, (selection) => {
+			if (selectOnly === undefined) {
+				this._selectOnly.setValue(selection.length > 0);
+			}
+		});
 	}
 }

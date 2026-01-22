@@ -63,11 +63,6 @@ describe('UmbCollectionSelectionManager', () => {
 			expect(manager.getMultiple()).to.equal(true);
 		});
 
-		it('sets selectOnly from config', () => {
-			manager.setConfig({ selectable: true, selectOnly: true });
-			expect(manager.getSelectOnly()).to.equal(true);
-		});
-
 		it('sets initial selection from config', () => {
 			manager.setConfig({ selectable: true, multiple: true, selection: ['1', '2'] });
 			expect(manager.getSelection()).to.deep.equal(['1', '2']);
@@ -85,7 +80,6 @@ describe('UmbCollectionSelectionManager', () => {
 			expect(manager.getConfig()).to.be.undefined;
 			expect(manager.getSelectable()).to.equal(false);
 			expect(manager.getMultiple()).to.equal(false);
-			expect(manager.getSelectOnly()).to.equal(false);
 			expect(manager.getSelection()).to.deep.equal([]);
 		});
 
@@ -97,11 +91,6 @@ describe('UmbCollectionSelectionManager', () => {
 		it('defaults multiple to false when not provided', () => {
 			manager.setConfig({});
 			expect(manager.getMultiple()).to.equal(false);
-		});
-
-		it('defaults selectOnly to false when not provided', () => {
-			manager.setConfig({});
-			expect(manager.getSelectOnly()).to.equal(false);
 		});
 	});
 
@@ -125,42 +114,15 @@ describe('UmbCollectionSelectionManager', () => {
 			manager.setConfig({ selectable: true, multiple: true });
 		});
 
-		it('enables select-only mode when selecting', () => {
-			expect(manager.getSelectOnly()).to.equal(false);
-			manager.select('1');
-			expect(manager.getSelectOnly()).to.equal(true);
-		});
-
 		it('selects the item', () => {
 			manager.select('1');
 			expect(manager.getSelection()).to.deep.equal(['1']);
-		});
-
-		it('enables select-only mode even when config has selectOnly false', () => {
-			manager.setConfig({ selectable: true, selectOnly: false });
-			manager.select('1');
-			expect(manager.getSelectOnly()).to.equal(true);
 		});
 	});
 
 	describe('deselect', () => {
 		beforeEach(() => {
 			manager.setConfig({ selectable: true, multiple: true, selection: ['1', '2'] });
-		});
-
-		it('disables select-only mode when deselecting all items (no selectOnly in config)', () => {
-			manager.setSelectOnly(true);
-			expect(manager.getSelectOnly()).to.equal(true);
-			manager.deselect('1');
-			expect(manager.getSelectOnly()).to.equal(true);
-			manager.deselect('2');
-			expect(manager.getSelectOnly()).to.equal(false);
-		});
-
-		it('preserves select-only mode when config.selectOnly is true', () => {
-			manager.setConfig({ selectable: true, selectOnly: true, selection: ['1', '2'] });
-			manager.deselect('1');
-			expect(manager.getSelectOnly()).to.equal(true);
 		});
 
 		it('deselects the item', () => {
@@ -172,19 +134,6 @@ describe('UmbCollectionSelectionManager', () => {
 	describe('clearSelection', () => {
 		beforeEach(() => {
 			manager.setConfig({ selectable: true, multiple: true, selection: ['1', '2'] });
-		});
-
-		it('disables select-only mode when clearing (no selectOnly in config)', () => {
-			manager.setSelectOnly(true);
-			expect(manager.getSelectOnly()).to.equal(true);
-			manager.clearSelection();
-			expect(manager.getSelectOnly()).to.equal(false);
-		});
-
-		it('preserves select-only mode when config.selectOnly is true', () => {
-			manager.setConfig({ selectable: true, selectOnly: true, selection: ['1', '2'] });
-			manager.clearSelection();
-			expect(manager.getSelectOnly()).to.equal(true);
 		});
 
 		it('clears all selected items', () => {
