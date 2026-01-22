@@ -53,6 +53,14 @@ export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase 
 		collectionContext?.loadCollection();
 
 		// Refresh the tree (if any)
+		await this.#reloadChildrenOfEntity();
+	}
+
+	/**
+	 * Requests a reload of the children of the current entity in the tree.
+	 * Silently returns if the required contexts are not available.
+	 */
+	async #reloadChildrenOfEntity() {
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) return;
 
