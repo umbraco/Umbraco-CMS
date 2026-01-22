@@ -10,7 +10,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	@query('#notifications')
 	private _notificationsElement?: HTMLElement;
 
-	@query('#sr-live') private _srLive?: HTMLDivElement;
+	#srContainer?: HTMLDivElement;
 
 	@state()
 	private _notifications?: UmbNotificationHandler[];
@@ -24,6 +24,50 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			this._notificationContext = instance;
 			this._observeNotifications();
 		});
+	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		this.#createSrContainer();
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#destroySrContainer();
+	}
+
+	#createSrContainer(): void {
+		if (this.#srContainer) return;
+
+		// Check if a global announcer container already exists
+		const existing = document.getElementById('umb-sr-announcer');
+		if (existing) {
+			this.#srContainer = existing as HTMLDivElement;
+			return;
+		}
+
+		this.#srContainer = document.createElement('div');
+		this.#srContainer.id = 'umb-sr-announcer';
+
+		// Visually hidden but accessible to screen readers
+		Object.assign(this.#srContainer.style, {
+			position: 'absolute',
+			width: '1px',
+			height: '1px',
+			padding: '0',
+			margin: '-1px',
+			overflow: 'hidden',
+			whiteSpace: 'nowrap',
+			clip: 'rect(0, 0, 0, 0)',
+			clipPath: 'inset(50%)',
+			border: '0',
+		});
+
+		document.body.appendChild(this.#srContainer);
+	}
+
+	#destroySrContainer(): void {
+		this.#srContainer = undefined;
 	}
 
 	private _observeNotifications() {
@@ -41,24 +85,35 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			// @ts-ignore
 			this._notificationsElement?.showPopover?.(); // To prevent issues in FireFox I added `?.` before `()`  [NL]
 
-			//Announce the newest notification
+			// Announce the newest notification
 			this._announceNewest(this._notifications);
 		});
 	}
 
-	private _getNotificationText(notificatonData: UmbNotificationHandler): string {
-		//Trick to be able to access to the data(notification messagge) inside a private propertity
-		const data = (notificatonData as any)._data ?? {};
+	private _getNotificationText(notificationData: UmbNotificationHandler): string {
+		// Trick to access the data (notification message) inside a private property
+		const data = (notificationData as any)._data ?? {};
 		const notificationText = data.message ?? '';
 		return notificationText;
 	}
 
 	private _announce(message: string) {
-		if (!this._srLive) return;
-		this._srLive.textContent = 'u00A0'; //to avoid same text suppression
+		if (!this.#srContainer || !message) return;
+
+		// Create a new element for each announcement - this is more reliable
+		// than updating text content of an existing live region
+		const alert = document.createElement('div');
+		alert.setAttribute('role', 'alert');
+		alert.setAttribute('aria-live', 'assertive');
+		alert.setAttribute('aria-atomic', 'true');
+		alert.textContent = message;
+
+		this.#srContainer.appendChild(alert);
+
+		// Clean up after announcement (screen readers will have captured it)
 		setTimeout(() => {
-			this._srLive!.textContent = message || '';
-		}, 0);
+			alert.remove();
+		}, 1000);
 	}
 
 	private _announceNewest(list?: UmbNotificationHandler[]) {
@@ -78,7 +133,6 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 						)
 					: ''}
 			</uui-toast-notification-container>
-			<div id="sr-live" aria-live="assertive" aria-role="true"></div>
 		`;
 	}
 
@@ -98,18 +152,6 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 				outline: 0;
 				border: 0;
 				margin: 0;
-			}
-			#sr-live {
-				position: absolute;
-				width: 1px;
-				height: 1px;
-				padding: 0;
-				margin: -1px;
-				overflow: hidden;
-				white-space: nowrap;
-				clip: rect(0 0 0 0);
-				clip-path: inset(50%);
-				border: 0;
 			}
 		`,
 	];

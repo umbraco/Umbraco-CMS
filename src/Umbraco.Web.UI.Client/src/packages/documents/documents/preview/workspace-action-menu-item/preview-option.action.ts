@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspa
 import type { ManifestWorkspaceActionMenuItemPreviewOptionKind } from './preview-option.workspace-action-menu-item.extension.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceActionBase {
+export class UmbDocumentSaveAndPreviewOptionWorkspaceAction extends UmbWorkspaceActionBase {
 	manifest?: ManifestWorkspaceActionMenuItemPreviewOptionKind;
 
 	override async execute() {
@@ -14,4 +14,4 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 	}
 }
 
-export { UmbDocumentSaveAndPreviewWorkspaceAction as api };
+export { UmbDocumentSaveAndPreviewOptionWorkspaceAction as api };
