@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.Extensions.Options;
 
 using Umbraco.Cms.Core.Configuration.Models;
@@ -37,7 +38,19 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
                     continue;
                 }
 
-                await WebhookFiringService.FireAsync(webhook, Alias, ConvertEntityToRequestPayload(entity), cancellationToken);
+                if (!Uri.TryCreate(webhook.Url, UriKind.Absolute, out Uri? endPoint))
+                {
+                    continue;
+                }
+
+                var ctx = new WebhookContext(endPoint, Alias, notification, webhook);
+
+                IWebhookPayloadProvider? provider = GetPayloadProviderProvider(notification, webhook);
+                var payload = provider is null
+                    ? ConvertEntityToRequestPayload(entity)
+                    : provider.BuildPayload(ctx);
+
+                await WebhookFiringService.FireAsync(webhook, Alias, payload, cancellationToken);
             }
         }
     }

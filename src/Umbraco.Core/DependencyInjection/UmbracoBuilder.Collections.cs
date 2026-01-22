@@ -106,7 +106,7 @@ public static partial class UmbracoBuilderExtensions
         }
 
         builder.WebhookEvents().AddCms(true, webhookPayloadType);
-
+        builder.WebhookPayloadProviders();
         builder.ContentTypeFilters();
     }
 
@@ -269,4 +269,7 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static ContentTypeFilterCollectionBuilder ContentTypeFilters(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentTypeFilterCollectionBuilder>();
+
+    public static WebhookPayloadProviderCollectionBuilder WebhookPayloadProviders(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<WebhookPayloadProviderCollectionBuilder>();
 }
