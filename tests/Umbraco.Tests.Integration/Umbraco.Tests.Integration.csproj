@@ -280,6 +280,9 @@
     <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.Query.cs">
       <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.ThreadSafety.cs">
+      <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceTests.ChildUserAccessEntities.cs">
       <DependentUpon>UserStartNodeEntitiesServiceTests.cs</DependentUpon>
     </Compile>
