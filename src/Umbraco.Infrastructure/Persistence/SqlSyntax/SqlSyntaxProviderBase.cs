@@ -698,5 +698,5 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     protected abstract string FormatIdentity(ColumnDefinition column);
 
     /// <inheritdoc />
-    public virtual string? TruncateConstraintName<T>(string? constraintName) => constraintName;
+    public virtual string TruncateConstraintName<T>(string constraintName) => constraintName;
 }
