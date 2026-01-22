@@ -2,13 +2,13 @@ import { property, nothing, ifDefined, html, css } from '@umbraco-cms/backoffice
 import { defineElement, UUICardElement } from '@umbraco-cms/backoffice/external/uui';
 
 /**
- * @element umb-card
+ * @element umb-figure-card
  * @slot - slot for the default content area
  * @slot tag - slot for the tag with support for `<uui-tag>` elements
  * @slot actions - slot for the actions with support for the `<uui-action-bar>` element
  */
-@defineElement('umb-card')
-export class UmbCardElement extends UUICardElement {
+@defineElement('umb-figure-card')
+export class UmbFigureCardElement extends UUICardElement {
 	/**
 	 * Name
 	 * @type {string}
@@ -240,6 +240,6 @@ export class UmbCardElement extends UUICardElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-card': UmbCardElement;
+		'umb-figure-card': UmbFigureCardElement;
 	}
 }

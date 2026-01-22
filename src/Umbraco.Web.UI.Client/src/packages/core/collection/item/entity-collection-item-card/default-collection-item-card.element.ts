@@ -44,7 +44,7 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 		if (!this.item) return nothing;
 
 		return html`
-			<umb-card
+			<umb-figure-card
 				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
 				href=${ifDefined(this.href)}
 				?selectable=${this.selectable}
@@ -57,7 +57,7 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 				background-color="var(--uui-color-surface)">
 				<slot name="actions" slot="actions"></slot>
 				${this.item.thumbnail ? this.#renderThumbnail(this.item) : this.#renderIcon(this.item)}
-			</umb-card>
+			</umb-figure-card>
 		`;
 	}
 

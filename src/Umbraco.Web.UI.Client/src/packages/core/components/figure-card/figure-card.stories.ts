@@ -1,12 +1,12 @@
-import type { UmbCardElement } from './card.element.js';
+import type { UmbFigureCardElement } from './figure-card.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
-import './card.element.js';
+import './figure-card.element.js';
 
-const meta: Meta<UmbCardElement> = {
-	title: 'Generic Components/Card',
-	component: 'umb-card',
+const meta: Meta<UmbFigureCardElement> = {
+	title: 'Generic Components/Figure Card',
+	component: 'umb-figure-card',
 	args: {
 		name: 'Card Name',
 		href: 'https://umbraco.com',
@@ -21,7 +21,7 @@ const meta: Meta<UmbCardElement> = {
 		backgroundColor: { control: { type: 'color' } },
 	},
 	render: (args) =>
-		html`<umb-card
+		html`<umb-figure-card
 			name=${args.name}
 			href=${ifDefined(args.href)}
 			?selectable=${args.selectable}
@@ -33,12 +33,12 @@ const meta: Meta<UmbCardElement> = {
 			<uui-icon name="icon-wand"></uui-icon>
 			<uui-button slot="actions" look="secondary" label="Remove">Remove</uui-button>
 			<uui-tag slot="tag">Tag</uui-tag>
-		</umb-card>`,
+		</umb-figure-card>`,
 };
 
 export default meta;
 
-type Story = StoryObj<UmbCardElement>;
+type Story = StoryObj<UmbFigureCardElement>;
 
 export const Docs: Story = {
 	args: {},
