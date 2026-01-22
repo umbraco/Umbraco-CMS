@@ -373,7 +373,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="entity">The content entity containing the properties.</param>
         /// <param name="propertyDtos">The property data DTOs to update with sortable values.</param>
-        protected void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
+        private void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
         {
             // Create a lookup of property DTOs by property type ID for efficient matching
             var dtosByPropertyTypeId = propertyDtos
@@ -1166,8 +1166,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </remarks>
         protected void InsertPropertyValues(TEntity entity, int publishedVersionId, out bool edited, out HashSet<string>? editedCultures)
         {
-            // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures).ToList();
+            // Persist the property data.
+            var propertyDataDtos = PropertyFactory.BuildDtos(
+                entity.ContentType.Variations,
+                entity.VersionId,
+                publishedVersionId,
+                entity.Properties,
+                LanguageRepository,
+                out edited,
+                out editedCultures).ToList();
 
             // Set sortable values for property editors that support custom sorting.
             SetEntitySortableValues(entity, propertyDataDtos);

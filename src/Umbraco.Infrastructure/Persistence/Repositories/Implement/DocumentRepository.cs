@@ -1076,22 +1076,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
 
         // persist the property data
-        var propertyDataDtos = PropertyFactory.BuildDtos(
-            entity.ContentType.Variations,
-            entity.VersionId,
-            entity.PublishedVersionId,
-            entity.Properties,
-            LanguageRepository,
-            out var edited,
-            out HashSet<string>? editedCultures).ToList();
-
-        // Set sortable values for property editors that support custom sorting
-        SetEntitySortableValues(entity, propertyDataDtos);
-
-        foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
-        {
-            Database.Insert(propertyDataDto);
-        }
+        InsertPropertyValues(entity, entity.PublishedVersionId, out var edited, out var editedCultures);
 
         // if !publishing, we may have a new name != current publish name,
         // also impacts 'edited'
