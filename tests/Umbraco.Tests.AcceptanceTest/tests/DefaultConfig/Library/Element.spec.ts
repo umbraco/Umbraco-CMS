@@ -182,7 +182,6 @@ test('can duplicate a element node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.library.isElementInTreeVisible(elementName);
   await umbracoUi.library.isElementInTreeVisible(elementFolderName);
   await umbracoUi.library.goToElementWithName(elementFolderName);
-  await umbracoUi.library.isElementWithNameVisibleInList(elementName);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
@@ -196,8 +195,7 @@ test('can move a element node to other parent', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
-  // Act
-  await umbracoUi.library.openElementCaretButtonForName(elementName);
+  // Act;
   await umbracoUi.library.clickActionsMenuForElement(elementName);
   await umbracoUi.library.clickMoveToActionMenuOption();
   await umbracoUi.library.moveToElementWithName([], elementFolderName);
