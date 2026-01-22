@@ -58,8 +58,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -72,8 +71,7 @@ test.skip('can read a specific document with read permission enabled', async ({u
 
   // Assert
   await umbracoUi.content.doesDocumentHaveName(firstDocumentName);
-  await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can create document blueprint for a specific document with create document blueprint permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -92,7 +90,7 @@ test('can create document blueprint for a specific document with create document
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.documentBlueprintCreated);
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can delete a specific content with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -109,7 +107,7 @@ test('can delete a specific content with delete permission enabled', async ({umb
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can create content from a specific content with create permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -125,7 +123,7 @@ test('can create content from a specific content with create permission enabled'
 
   // Assert
   await umbracoUi.content.isPermissionInActionsMenuVisible('Create…');
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can publish a specific content with publish permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -143,7 +141,7 @@ test('can publish a specific content with publish permission enabled', async ({u
 
   // Assert
   expect(await umbracoApi.document.isDocumentPublished(firstDocumentId)).toBeTruthy();
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can unpublish a specific content with unpublish permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -166,7 +164,7 @@ test('can unpublish a specific content with unpublish permission enabled', async
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   expect(await umbracoApi.document.isDocumentPublished(firstDocumentId)).toBeFalsy();
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can update a specific content with update permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -185,9 +183,7 @@ test('can update a specific content with update permission enabled', async ({umb
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
-  await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
-  await umbracoUi.content.isDocumentReadOnly(true);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can duplicate a specific content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -207,8 +203,7 @@ test('can duplicate a specific content with duplicate permission enabled', async
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
-  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Duplicate to…', false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -230,8 +225,7 @@ test('can move a specific content with move to permission enabled', async ({umbr
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
-  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Move to…', false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -248,7 +242,7 @@ test('can sort children with sort children permission enabled', async ({umbracoA
 
   // Assert
   await umbracoUi.content.isPermissionInActionsMenuVisible('Sort children…');
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can set culture and hostnames for a specific content with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -274,7 +268,7 @@ test('can set culture and hostnames for a specific content with culture and host
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);
   expect(domains.domains[0].isoCode).toEqual('da');
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can set public access for a specific content with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -295,7 +289,7 @@ test('can set public access for a specific content with public access permission
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publicAccessSettingCreated);
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 
   // Clean
   await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
@@ -325,5 +319,5 @@ test('can rollback a specific content with rollback permission enabled', async (
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
