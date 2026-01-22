@@ -250,20 +250,20 @@ public class DatabaseSchemaCreator
             .SelectMany(def =>
                 def.ForeignKeys
                    .Where(fk => fk.Name is not null)
-                   .Select(fk => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(fk.Name)))
+                   .Select(fk => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(fk.Name!)))
             .ToList();
 
         var primaryKeysInSchema = result.TableDefinitions
             .SelectMany(def =>
                 def.Columns
                    .Where(col => col.PrimaryKeyName.IsNullOrWhiteSpace() == false)
-                   .Select(col => SqlSyntax.TruncateConstraintName<ColumnDefinition>(col.PrimaryKeyName)))
+                   .Select(col => SqlSyntax.TruncateConstraintName<ColumnDefinition>(col.PrimaryKeyName!)))
             .ToList();
 
         // Add valid and invalid foreign key differences to the result object
         // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
         // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
-        HandleUnknownConstraints(result, unknownConstraintsInDatabase, foreignKeysInSchema, primaryKeysInSchema);
+        HandleUnknownConstraints(result, unknownConstraintsInDatabase, foreignKeysInSchema);
 
         // Foreign keys:
         AddValidForeignKeys(result, foreignKeysInDatabase, foreignKeysInSchema);
@@ -277,11 +277,11 @@ public class DatabaseSchemaCreator
         AddErrorsForInvalidPrimaryKeys(result, primaryKeysInDatabase, primaryKeysInSchema);
     }
 
-    private static void HandleUnknownConstraints(DatabaseSchemaResult result, List<string> unknownConstraintsInDatabase, List<string?> foreignKeysInSchema, List<string?> primaryKeysInSchema)
+    private static void HandleUnknownConstraints(DatabaseSchemaResult result, List<string> unknownConstraintsInDatabase, List<string> foreignKeysInSchema)
     {
-        foreach (var unknown in unknownConstraintsInDatabase)
+        foreach (string unknown in unknownConstraintsInDatabase)
         {
-            if (foreignKeysInSchema!.InvariantContains(unknown) || primaryKeysInSchema!.InvariantContains(unknown))
+            if (foreignKeysInSchema.InvariantContains(unknown) || foreignKeysInSchema.InvariantContains(unknown))
             {
                 result.ValidConstraints.Add(unknown);
             }
@@ -292,7 +292,7 @@ public class DatabaseSchemaCreator
         }
     }
 
-    private static void AddErrorsForInvalidForeignKeys(DatabaseSchemaResult result, List<string> foreignKeysInDatabase, List<string?> foreignKeysInSchema)
+    private static void AddErrorsForInvalidForeignKeys(DatabaseSchemaResult result, List<string> foreignKeysInDatabase, List<string> foreignKeysInSchema)
     {
         IEnumerable<string?> invalidForeignKeyDifferences = foreignKeysInDatabase
                     .Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
@@ -305,7 +305,7 @@ public class DatabaseSchemaCreator
         }
     }
 
-    private static void AddValidForeignKeys(DatabaseSchemaResult result, List<string> foreignKeysInDatabase, List<string?> foreignKeysInSchema)
+    private static void AddValidForeignKeys(DatabaseSchemaResult result, List<string> foreignKeysInDatabase, List<string> foreignKeysInSchema)
     {
         IEnumerable<string?> validForeignKeyDifferences = foreignKeysInDatabase
                     .Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
@@ -319,7 +319,7 @@ public class DatabaseSchemaCreator
         }
     }
 
-    private static void AddValidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string?> primaryKeysInSchema)
+    private static void AddValidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string> primaryKeysInSchema)
     {
         IEnumerable<string> validPrimaryKeyDifferences = primaryKeysInDatabase
             .Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
@@ -331,7 +331,7 @@ public class DatabaseSchemaCreator
         }
     }
 
-    private static void AddErrorsForInvalidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string?> primaryKeysInSchema)
+    private static void AddErrorsForInvalidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string> primaryKeysInSchema)
     {
         IEnumerable<string?> onlyInSchema = primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase);
         IEnumerable<string?> onlyInDatabase = primaryKeysInDatabase.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
@@ -575,7 +575,8 @@ public class DatabaseSchemaCreator
             {
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
             }
-            else if (SqlSyntax.SupportsSequences())
+
+            if (SqlSyntax.SupportsSequences())
             {
                 SqlSyntax.AlterSequences(_database, tableName);
             }
