@@ -6,15 +6,15 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@tiptap/core": "3.13.0",
-		"@tiptap/extension-image": "3.13.0",
-		"@tiptap/extension-subscript": "3.13.0",
-		"@tiptap/extension-superscript": "3.13.0",
-		"@tiptap/extension-table": "3.13.0",
-		"@tiptap/extension-text-align": "3.13.0",
-		"@tiptap/extension-text-style": "3.13.0",
-		"@tiptap/starter-kit": "3.13.0",
-		"@tiptap/extensions": "3.13.0",
-		"@tiptap/pm": "3.13.0"
+		"@tiptap/core": "3.16.0",
+		"@tiptap/extension-image": "3.16.0",
+		"@tiptap/extension-subscript": "3.16.0",
+		"@tiptap/extension-superscript": "3.16.0",
+		"@tiptap/extension-table": "3.16.0",
+		"@tiptap/extension-text-align": "3.16.0",
+		"@tiptap/extension-text-style": "3.16.0",
+		"@tiptap/starter-kit": "3.16.0",
+		"@tiptap/extensions": "3.16.0",
+		"@tiptap/pm": "3.16.0"
 	}
 }
