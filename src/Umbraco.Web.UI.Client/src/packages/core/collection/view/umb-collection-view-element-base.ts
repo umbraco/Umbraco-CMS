@@ -44,7 +44,7 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 			);
 
 			this.observe(
-				this.#collectionContext?.selection.selectOnly,
+				this.#collectionContext?.selectOnly,
 				(selectOnly) => {
 					this._selectOnly = selectOnly ?? false;
 				},
@@ -60,7 +60,7 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 			this.observe(
 				this.#collectionContext?.selection.multiple,
 				(multiple) => (this._multiple = multiple ?? false),
-				'umbCollectionSlectionMultipleObserver',
+				'umbCollectionSelectionMultipleObserver',
 			);
 
 			this.observe(

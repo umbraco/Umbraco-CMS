@@ -1,6 +1,15 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
 import { UmbUserPickerInputContext } from './user-input.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -144,13 +153,17 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), null);
 
-		this.observe(this.#pickerContext.modalRoute, (modalRoute) => {
-			this._modalRoute = modalRoute;
-		});
+		this.observe(
+			this.#pickerContext.modalRoute,
+			(modalRoute) => {
+				this._modalRoute = modalRoute;
+			},
+			null,
+		);
 	}
 
 	protected override getFormElement() {
@@ -171,7 +184,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				href=${this._modalRoute}
+				href=${ifDefined(this._modalRoute)}
 				label=${this.localize.term('general_choose')}
 				?disabled=${this.readonly}></uui-button>
 		`;

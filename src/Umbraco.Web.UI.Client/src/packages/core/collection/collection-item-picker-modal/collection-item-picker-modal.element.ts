@@ -86,6 +86,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		this.observe(
 			this.#pickerContext?.search.searchable,
 			(isSearchable) => (this._isSearchable = isSearchable ?? false),
+			null,
 		);
 
 		this.observe(
@@ -93,7 +94,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			(query) => {
 				this._searchQuery = query?.query;
 			},
-			'umbPickerSearchQueryObserver',
+			null,
 		);
 	}
 
@@ -112,14 +113,14 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	#searchSelectableFilter = () => true;
 
 	override render() {
-		const renderFullCollection = !!this.data?.collection.alias;
+		const renderCollection = !!this.data?.collection.alias;
 
 		return html`
 			<umb-body-layout
 				headline="${this.localize.term('general_choose')}"
-				?main-no-padding=${renderFullCollection}
+				?main-no-padding=${renderCollection}
 				class=${classMap({ 'has-search': this._isSearchable, 'is-searching': !!this._searchQuery })}>
-				${this.#renderSearch()} ${this.#renderMain(renderFullCollection)} ${this.#renderActions()}
+				${this.#renderSearch()} ${this.#renderMain(renderCollection)} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
@@ -145,7 +146,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	#renderCollection() {
 		return html`
 			<umb-collection
-				alias=${this.data?.collection.alias}
+				alias=${ifDefined(this.data?.collection.alias)}
 				.config=${{
 					layouts: this.data?.collection?.views,
 					selectionConfiguration: this._selectionConfiguration,

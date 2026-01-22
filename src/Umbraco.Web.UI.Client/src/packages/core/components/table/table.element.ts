@@ -18,6 +18,7 @@ export interface UmbTableItem {
 	icon?: string | null;
 	entityType?: string;
 	data: Array<UmbTableItemData>;
+	selectable?: boolean;
 }
 
 export interface UmbTableItemData {
@@ -33,7 +34,7 @@ export interface UmbTableColumn {
 	allowSorting?: boolean;
 	align?: 'left' | 'center' | 'right';
 	labelTemplate?: string;
-	clipText? : boolean;
+	clipText?: boolean;
 }
 
 export interface UmbTableColumnLayoutElement extends HTMLElement {
@@ -46,7 +47,6 @@ export interface UmbTableConfig {
 	allowSelection: boolean;
 	selectOnly?: boolean;
 	allowSelectAll?: boolean;
-	selectableFilter?(item: UmbTableItem): boolean;
 	hideIcon?: boolean;
 }
 
@@ -212,12 +212,16 @@ export class UmbTableElement extends UmbLitElement {
 		return this.selection.includes(key);
 	}
 
+	#isSelectableItem(item: UmbTableItem) {
+		return item.selectable !== false;
+	}
+
 	private _handleRowCheckboxChange(event: Event, item: UmbTableItem) {
 		const checkboxElement = event.target as HTMLInputElement;
 		if (checkboxElement.checked) {
-			this._selectRow(item.id);
+			this._selectRow(item);
 		} else {
-			this._deselectRow(item.id);
+			this._deselectRow(item);
 		}
 	}
 
@@ -241,7 +245,7 @@ export class UmbTableElement extends UmbLitElement {
 			throw new Error('Select all is not allowed in the current table configuration.');
 		}
 
-		this.selection = this.items.map((item: UmbTableItem) => item.id);
+		this.selection = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
 		this._selectionMode = true;
 		this.dispatchEvent(new UmbTableSelectedEvent());
 	}
@@ -256,16 +260,21 @@ export class UmbTableElement extends UmbLitElement {
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
-	private _selectRow(key: string) {
-		this.selection = [...this.selection, key];
+	private _selectRow(item: UmbTableItem) {
+		const isSelectble = this.#isSelectableItem(item);
+		if (!isSelectble) {
+			throw new Error(`Item with id ${item.id} is not selectable.`);
+		}
+
+		this.selection = [...this.selection, item.id];
 		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableSelectedEvent({ itemId: key }));
+		this.dispatchEvent(new UmbTableSelectedEvent({ itemId: item.id }));
 	}
 
-	private _deselectRow(key: string) {
-		this.selection = this.selection.filter((selectionKey) => selectionKey !== key);
+	private _deselectRow(item: UmbTableItem) {
+		this.selection = this.selection.filter((selectionKey) => selectionKey !== item.id);
 		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableDeselectedEvent({ itemId: key }));
+		this.dispatchEvent(new UmbTableDeselectedEvent({ itemId: item.id }));
 	}
 
 	override render() {
@@ -322,14 +331,15 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	private _renderRow = (item: UmbTableItem) => {
+		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
 				data-sortable-id=${item.id}
-				?selectable=${this.config.allowSelection && !this._sortable}
+				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
 				?select-only=${this._selectionMode || this.config.selectOnly}
 				?selected=${this._isSelected(item.id)}
-				@selected=${() => this._selectRow(item.id)}
-				@deselected=${() => this._deselectRow(item.id)}>
+				@selected=${() => this._selectRow(item)}
+				@deselected=${() => this._deselectRow(item)}>
 				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
 			</uui-table-row>
 		`;
@@ -346,11 +356,13 @@ export class UmbTableElement extends UmbLitElement {
 
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
+		const isItemSelectable = this.#isSelectableItem(item);
+
 		return html`
 			<uui-table-cell style="text-align: center;">
 				${when(!this.config.hideIcon, () => html`<umb-icon name="${ifDefined(item.icon ?? undefined)}"></umb-icon>`)}
 				${when(
-					this.config.allowSelection,
+					this.config.allowSelection && isItemSelectable,
 					() => html`
 						<uui-checkbox
 							aria-label=${this.localize.term('buttons_select')}

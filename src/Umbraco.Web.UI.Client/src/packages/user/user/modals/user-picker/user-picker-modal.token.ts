@@ -1,5 +1,5 @@
 import type { UmbUserDetailModel } from '../../types.js';
-import { UMB_USER_COLLECTION_ALIAS, UMB_USER_COLLECTION_MENU_ALIAS } from '../../collection/constants.js';
+import { UMB_USER_COLLECTION_ALIAS } from '../../collection/constants.js';
 import type {
 	UmbCollectionItemPickerModalData,
 	UmbCollectionItemPickerModalValue,
@@ -23,7 +23,6 @@ export const UMB_USER_PICKER_MODAL = new UmbModalToken<UmbUserPickerModalData, U
 		data: {
 			collection: {
 				alias: UMB_USER_COLLECTION_ALIAS,
-				menuAlias: UMB_USER_COLLECTION_MENU_ALIAS,
 			},
 		},
 	},
