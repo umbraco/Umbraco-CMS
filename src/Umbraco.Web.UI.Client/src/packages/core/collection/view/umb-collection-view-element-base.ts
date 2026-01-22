@@ -15,6 +15,12 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	protected _selectable = false;
 
 	@state()
+	protected _multiple = false;
+
+	@state()
+	protected _selectOnly = false;
+
+	@state()
 	protected _selection: Array<string | null> = [];
 
 	@state()
@@ -38,9 +44,23 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 			);
 
 			this.observe(
+				this.#collectionContext?.selectOnly,
+				(selectOnly) => {
+					this._selectOnly = selectOnly ?? false;
+				},
+				'umbCollectionSelectOnlyObserver',
+			);
+
+			this.observe(
 				this.#collectionContext?.selection.selection,
 				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
+			);
+
+			this.observe(
+				this.#collectionContext?.selection.multiple,
+				(multiple) => (this._multiple = multiple ?? false),
+				'umbCollectionSelectionMultipleObserver',
 			);
 
 			this.observe(
@@ -52,6 +72,23 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 				'umbCollectionItemsObserver',
 			);
 		});
+	}
+
+	/**
+	 * Determines if an item is selectable
+	 * @param {UmbCollectionItemModel} item - The item to check for selectability.
+	 * @returns {boolean} True if the item is selectable, false otherwise.
+	 */
+	protected _isSelectableItem(item: UmbCollectionItemModel): boolean {
+		if (!this._selectable) {
+			return false;
+		}
+
+		if (!this.#collectionContext?.selection.selectableFilter) {
+			return true;
+		}
+
+		return this.#collectionContext.selection.selectableFilter(item);
 	}
 
 	/**
@@ -68,6 +105,14 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	 */
 	protected _deselectItem(unique: UmbCollectionItemModel['unique']) {
 		this.#collectionContext?.selection.deselect(unique);
+	}
+
+	/**
+	 * Sets the current selection in the collection.
+	 * @param {Array<string>} selection - An array of unique identifiers representing the new selection.
+	 */
+	protected _setSelection(selection: Array<string>) {
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
 	/**
