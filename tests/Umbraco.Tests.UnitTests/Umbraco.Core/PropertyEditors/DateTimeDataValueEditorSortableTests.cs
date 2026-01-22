@@ -166,13 +166,13 @@ public class DateTimeDataValueEditorSortableTests
     {
         var editor = CreateValueEditor(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone);
 
-        // 01:00 at -08:00 should become 09:00 UTC (same day)
-        var storedValue = CreateStoredValue(new DateTimeOffset(2024, 6, 15, 1, 0, 0, TimeSpan.FromHours(-8)), null);
+        // 01:00 at +05:00 should become 20:00 UTC on the previous day
+        var storedValue = CreateStoredValue(new DateTimeOffset(2024, 6, 15, 1, 0, 0, TimeSpan.FromHours(5)), null);
 
         var result = editor.GetSortableValue(storedValue, null);
 
         Assert.IsNotNull(result);
-        Assert.That(result, Does.Contain("2024-06-15T09:00:00"));
+        Assert.That(result, Does.Contain("2024-06-14T20:00:00"));
     }
 
     [Test]

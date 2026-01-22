@@ -861,7 +861,6 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             .Build();
 
         var createdContentTypeResult = await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createdContentTypeResult.Success);
         Assert.IsTrue(createdContentTypeResult.Success, "Failed to create child content type.");
 
         // Create root content type with list view property

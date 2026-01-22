@@ -373,7 +373,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="entity">The content entity containing the properties.</param>
         /// <param name="propertyDtos">The property data DTOs to update with sortable values.</param>
-        private protected void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
+        protected void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
         {
             // Create a lookup of property DTOs by property type ID for efficient matching
             var dtosByPropertyTypeId = propertyDtos
