@@ -186,9 +186,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	#renderPopover() {
-		return html`<div id="entity-sign-popover" popover="hint" class="infobox" style=${`--count:${this._signs?.length}`}>
-			${this.#renderOptions()}
-		</div>`;
+		return html`<div id="entity-sign-popover" popover="hint" class="infobox">${this.#renderOptions()}</div>`;
 	}
 
 	#renderOptions() {
@@ -197,7 +195,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					this._signs,
 					(c) => c.alias,
 					(c, i) => {
-						return html`<div class="sign-container ${i > 1 ? 'hide-in-overview' : ''}" style=${`--i:${i}`}>
+						return html`<div class="sign-container">
 							<span class="badge-icon">${c.component}</span>
 							<span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
 						</div>`;
@@ -210,68 +208,29 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		css`
 			:host {
 				position: relative;
-				--offset-h: 12px;
-				--icon-w: 0.75rem;
-				--pad-x: 0.25rem;
 				--ease: cubic-bezier(0.1, 0, 0.3, 1);
 				--ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 			}
 
 			.infobox {
 				position: absolute;
-				background-color: transparent;
 				padding: var(--uui-size-2) var(--uui-size-3);
-				font-size: 8px;
-				clip-path: inset(-10px calc(100% - 30px) calc(100% - 10px) -20px);
-				transition:
-					background-color 80ms 40ms linear,
-					clip-path 120ms var(--ease-bounce),
-					font-size 120ms var(--ease);
-				min-height: fit-content;
+				font-size: 12px;
+				color: var(--uui-color-text);
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-2);
+				border-radius: 3px;
 				border: none;
 				margin: 0;
+				--umb-sign-bundle-bg: var(--uui-color-surface);
 			}
 
 			.infobox > .sign-container {
 				display: flex;
-				align-items: start;
+				align-items: center;
 				gap: 3px;
 				position: relative;
-				/* transform: translate(calc((var(--i) * -5px) - 10px), calc((-1 * var(--i) * var(--row-h)) - var(--offset-h)));
-				transition:
-					transform 120ms var(--ease),
-					visibility 0ms linear 120ms opacity 120ms linear;
-				z-index: calc(var(--count) - var(--i)); */
 				pointer-events: none;
-			}
-			/* .infobox > .sign-container.hide-in-overview {
-				visibility: hidden;
-			} */
-
-			.infobox .sign-container .label {
-				opacity: 0;
-				transition: opacity 120ms;
-			}
-
-			.infobox:popover-open {
-				font-size: 12px;
-				color: var(--uui-color-text);
-				clip-path: inset(-12px);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-2);
-				border-radius: 3px;
-				--umb-sign-bundle-bg: var(--uui-color-surface);
-			}
-
-			.infobox:popover-open > .sign-container {
-				transform: none;
-				align-items: center;
-				transition: transform 120ms var(--ease);
-				visibility: visible;
-			}
-			.infobox:popover-open .sign-container .label {
-				opacity: 1;
-				pointer-events: auto;
 			}
 
 			.preview {
