@@ -156,12 +156,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 */
 	inheritFrom(parent: UmbValidationController | undefined, dataPath: string): void {
 		if (this.#parent === parent && this.#baseDataPath === dataPath) return;
-		if (this.#parent) {
-			this.#parent.removeValidator(this);
-		}
-		this.messages.clear();
-		this.#localMessages = undefined;
-		this.#parentMessages = undefined;
+		this.#stopInheritance();
 		this.#parent = parent;
 
 		this.#baseDataPath = dataPath;
@@ -208,9 +203,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
+		// If set to 'autoReport'/#sync, the call to `clear()` will trigger the sync observation and clean up its messages from the parent validation context. [NL]
 		this.messages.clear();
 		this.#localMessages = undefined;
 		this.#parentMessages = undefined;
+		this.#parent = undefined;
 	}
 
 	#readyToSync() {
