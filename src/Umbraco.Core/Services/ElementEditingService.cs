@@ -369,10 +369,7 @@ internal sealed class ElementEditingService
     protected override OperationResult? Delete(IElement element, int userId)
         => ContentService.Delete(element, userId);
 
-    /// <summary>
-    ///     NB: Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
-    ///     but there are others that are not required to be implemented in the case of blueprints, therefore they throw NotImplementedException as default.
-    /// </summary>
+    // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
     protected override OperationResult? Move(IElement element, int newParentId, int userId) => throw new NotImplementedException();
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
