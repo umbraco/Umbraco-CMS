@@ -16,6 +16,8 @@ export const UmbLink = Link.extend({
 	},
 
 	// TODO: [LK] Review why `addOptions()` is not typed correctly here.
+	// ref: https://github.com/ueberdosis/tiptap/issues/6670
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
 	addOptions() {
 		return {
