@@ -1,3 +1,4 @@
+import { manifests as collectionManifests } from './collection-action/manifests.js';
 import { manifests as entityActionManifests } from './entity-action/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
@@ -11,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Condition.CurrentUser.AllowMediaRecycleBin',
 		api: () => import('./allow-media-recycle-bin.condition.js'),
 	},
+		...collectionManifests,
 	...entityActionManifests,
 	...menuManifests,
 	...repositoryManifests,
