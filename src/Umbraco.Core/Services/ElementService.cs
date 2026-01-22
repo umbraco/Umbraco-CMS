@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
@@ -90,6 +91,50 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
             return report;
         }
+    }
+
+    #endregion
+
+    #region Content Types
+
+    /// <inheritdoc/>
+    public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    {
+        var changes = new List<TreeChange<IElement>>();
+        var contentTypeIdsA = contentTypeIds.ToArray();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        IQuery<IElement> query = Query<IElement>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
+        IElement[] elements = _elementRepository.Get(query).ToArray();
+
+        if (elements.Length is 0)
+        {
+            scope.Complete();
+            return;
+        }
+
+        if (scope.Notifications.PublishCancelable(new ElementDeletingNotification(elements, eventMessages)))
+        {
+            scope.Complete();
+            return;
+        }
+
+        foreach (IElement element in elements)
+        {
+            // delete content
+            // triggers the deleted event
+            DeleteLocked(scope, element, eventMessages);
+            changes.Add(new TreeChange<IElement>(element, TreeChangeTypes.Remove));
+        }
+
+        scope.Notifications.Publish(new ElementTreeChangeNotification(changes, eventMessages));
+
+        Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete element of type {string.Join(",", contentTypeIdsA)}");
+
+        scope.Complete();
     }
 
     #endregion
