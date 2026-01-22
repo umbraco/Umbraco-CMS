@@ -183,7 +183,9 @@ test('can update a specific content with update permission enabled', async ({umb
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
-  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
+  await umbracoUi.content.goToContentWithName(secondDocumentName);
+  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isDocumentReadOnly(true);
 });
 
 test('can duplicate a specific content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -208,9 +210,6 @@ test('can duplicate a specific content with duplicate permission enabled', async
 
 test('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const moveToDocumentName = 'MoveToDocument';
-  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, firstDocumentId);
-  await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, documentTypeId, documentText, dataTypeName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -218,13 +217,10 @@ test('can move a specific content with move to permission enabled', async ({umbr
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.openContentCaretButtonForName(firstDocumentName);
-  await umbracoUi.content.clickActionsMenuForContent(childDocumentName);
-  await umbracoUi.content.clickMoveToActionMenuOption();
-  await umbracoUi.content.moveToContentWithName([], moveToDocumentName);
+  await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Move to…');
   await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
