@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Server;
+namespace Umbraco.Cms.Api.Management.ViewModels.Server;
 
 public class ServerConfigurationResponseModel
 {
@@ -7,4 +7,6 @@ public class ServerConfigurationResponseModel
     public int VersionCheckPeriod { get; set; }
 
     public bool AllowLocalLogin { get; set; }
+
+    public string UmbracoCssPath { get; set; } = string.Empty;
 }

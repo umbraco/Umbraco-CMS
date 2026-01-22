@@ -1,5 +1,6 @@
 import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS, UMB_SCRIPT_DETAIL_STORE_ALIAS } from './constants.js';
 import { manifests as itemManifests } from './item/manifests.js';
+import { UmbScriptDetailStore } from './script-detail.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -12,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_SCRIPT_DETAIL_STORE_ALIAS,
 		name: 'Script Detail Store',
-		api: () => import('./script-detail.store.js'),
+		api: UmbScriptDetailStore,
 	},
 	...itemManifests,
 ];

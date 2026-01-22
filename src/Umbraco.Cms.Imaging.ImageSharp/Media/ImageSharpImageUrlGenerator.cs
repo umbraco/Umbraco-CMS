@@ -29,7 +29,7 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// </summary>
     /// <param name="configuration">The ImageSharp configuration.</param>
     /// <param name="requestAuthorizationUtilities">Contains helpers that allow authorization of image requests.</param>
-    /// <param name="options"></param>
+    /// <param name="options">The ImageSharp middleware options.</param>
     public ImageSharpImageUrlGenerator(
         Configuration configuration,
         RequestAuthorizationUtilities? requestAuthorizationUtilities,

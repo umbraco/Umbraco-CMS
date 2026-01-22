@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -115,25 +113,25 @@ public class MemberTypeBuilder
             .WithAlias(alias)
             .WithName(name)
             .AddPropertyGroup()
-            .WithName("Content")
-            .WithSortOrder(1)
-            .AddPropertyType()
-            .WithAlias("title")
-            .WithName("Title")
-            .WithSortOrder(1)
-            .Done()
-            .AddPropertyType()
-            .WithAlias("bodyText")
-            .WithName("Body text")
-            .WithSortOrder(2)
-            .WithDataTypeId(-87)
-            .Done()
-            .AddPropertyType()
-            .WithAlias("author")
-            .WithName("Author")
-            .WithSortOrder(3)
-            .Done()
-            .Done()
+                .WithName("Content")
+                .WithSortOrder(1)
+                .AddPropertyType()
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithSortOrder(1)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias("bodyText")
+                    .WithName("Body text")
+                    .WithSortOrder(2)
+                    .WithDataTypeId(-87)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias("author")
+                    .WithName("Author")
+                    .WithSortOrder(3)
+                    .Done()
+                .Done()
             .Build();
 
         // Ensure that nothing is marked as dirty.

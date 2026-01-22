@@ -1,15 +1,16 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type {
+	InputMode as UUIInputMode,
+	InputType as UUIInputType,
+	UUIInputElement,
+} from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-type UuiInputTypeType = typeof UUIInputElement.prototype.type;
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement
@@ -41,13 +42,15 @@ export class UmbPropertyEditorUITextBoxElement
 	@property({ type: String })
 	name?: string;
 
-	#defaultType: UuiInputTypeType = 'text';
+	#defaultType: UUIInputType = 'text';
+
+	#defaultInputMode: UUIInputMode = 'text';
 
 	@state()
-	private _type: UuiInputTypeType = this.#defaultType;
+	private _type: UUIInputType = this.#defaultType;
 
 	@state()
-	private _inputMode?: string;
+	private _inputMode: UUIInputMode = this.#defaultInputMode;
 
 	@state()
 	private _maxChars?: number;
@@ -56,10 +59,12 @@ export class UmbPropertyEditorUITextBoxElement
 	private _placeholder?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._type = config?.getValueByAlias<UuiInputTypeType>('inputType') ?? this.#defaultType;
-		this._inputMode = config?.getValueByAlias('inputMode');
-		this._maxChars = config?.getValueByAlias('maxChars');
-		this._placeholder = config?.getValueByAlias('placeholder');
+		if (!config) return;
+
+		this._type = config.getValueByAlias<UUIInputType>('inputType') ?? this.#defaultType;
+		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
+		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
+		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
 	}
 
 	protected override firstUpdated(): void {
@@ -70,6 +75,16 @@ export class UmbPropertyEditorUITextBoxElement
 		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
+	#parseNumber(input: unknown): number | undefined {
+		const num = Number(input);
+		return Number.isFinite(num) ? num : undefined;
+	}
+
+	#getMaxLengthMessage(max: number, current: number) {
+		const exceeded = current - max;
+		return this.localize.term('textbox_characters_exceed', max, exceeded);
+	}
+
 	#onInput(e: InputEvent) {
 		const newValue = (e.target as HTMLInputElement).value;
 		if (newValue === this.value) return;
@@ -78,25 +93,24 @@ export class UmbPropertyEditorUITextBoxElement
 	}
 
 	override render() {
-		return html`<uui-input
-			.label=${this.localize.term('general_fieldFor', [this.name])}
-			.value=${this.value ?? ''}
-			.type=${this._type}
-			placeholder=${ifDefined(this._placeholder)}
-			inputMode=${ifDefined(this._inputMode)}
-			maxlength=${ifDefined(this._maxChars)}
-			@input=${this.#onInput}
-			?required=${this.mandatory}
-			.requiredMessage=${this.mandatoryMessage}
-			.maxlengthMessage=${() => {
-				const exceeded = (this.value?.length ?? 0) - (this._maxChars ?? 0);
-				return this.localize.term('textbox_characters_exceed', this._maxChars, exceeded);
-			}}
-			?readonly=${this.readonly}></uui-input>`;
+		return html`
+			<uui-input
+				.inputMode=${this._inputMode}
+				.label=${this.localize.term('general_fieldFor', [this.name])}
+				.maxlength=${this._maxChars}
+				.maxlengthMessage=${this.#getMaxLengthMessage.bind(this)}
+				.placeholder=${this._placeholder ?? ''}
+				.requiredMessage=${this.mandatoryMessage}
+				.type=${this._type}
+				.value=${this.value ?? ''}
+				?readonly=${this.readonly}
+				?required=${this.mandatory}
+				@input=${this.#onInput}>
+			</uui-input>
+		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			uui-input {
 				width: 100%;

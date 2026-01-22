@@ -46,5 +46,6 @@ internal static class SqlSyntaxProviderExtensions
                 : @"DELETE FROM {0} WHERE {1} NOT IN (SELECT {1} FROM ({2}) x)",
             sqlProvider.GetQuotedTableName(tableName),
             sqlProvider.GetQuotedColumnName(columnName),
-            subQuery.SQL), subQuery.Arguments);
+            subQuery.SQL),
+            subQuery.Arguments);
 }

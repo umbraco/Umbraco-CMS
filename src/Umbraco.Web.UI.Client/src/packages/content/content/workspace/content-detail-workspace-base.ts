@@ -9,6 +9,7 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
+import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
@@ -154,6 +155,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
+	getLanguages(): Array<UmbLanguageDetailModel> {
+		return this.#languages.getValue();
+	}
 
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
@@ -221,6 +225,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.validationContext,
 			this.view.hints,
 		);
+
+		new UmbContentDetailWorkspaceTypeTransformController(this as any);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
@@ -368,11 +374,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			(varies) => {
 				this._data.setVariesBySegment(varies);
 				this.#variesBySegment = varies;
-				if (varies) {
-					this.loadSegments();
-				} else {
-					this._segments.setValue([]);
-				}
 			},
 			null,
 		);
@@ -393,18 +394,26 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
+	/**
+	 * @deprecated Call `_loadSegmentsFor` instead. `loadSegments` will be removed in v.18.
+	 * (note this was introduced in v.17, and deprecated in v.17.0.1)
+	 */
 	protected async loadSegments() {
+		console.warn('Stop using loadSegments, call _loadSegmentsFor instead. loadSegments will be removed in v.18.');
+		const unique = await firstValueFrom(this.unique);
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
+		}
+		this._loadSegmentsFor(unique);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected async _loadSegmentsFor(unique: string): Promise<void> {
 		console.warn(
 			`UmbContentDetailWorkspaceContextBase: Segments are not implemented in the workspace context for "${this.getEntityType()}" types.`,
 		);
 		this._segments.setValue([]);
-	}
-
-	/**
-	 * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
-	 */
-	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		return this._processIncomingData(data);
 	}
 
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
@@ -415,24 +424,28 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
 
+		// Load segments if varying by segment, or reset to empty array:
+		if (this.#variesBySegment) {
+			await this._loadSegmentsFor(data.unique);
+		} else {
+			this._segments.setValue([]);
+		}
+
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
 
-		if (this.structure.variesBySegment) {
-			// TODO: v.17 Engage please note we have not implemented support for segments yet. [NL]
-			console.warn('Segments are not yet implemented for preset');
+		let segments: Array<string> | undefined;
+		if (this.#variesBySegment) {
+			segments = this._segments.getValue().map((s) => s.alias);
 		}
-		// TODO: Add Segments for Presets:
-		const segments: Array<string> | undefined = this.structure.variesBySegment ? [] : undefined;
 
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
-		const contentTypeVariesBySegment = this.structure.getVariesByCulture();
+		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
-				// TODO: Implement caching for data-type requests. [NL]
 				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
 				// This means if its not loaded this will never resolve and the error below will never happen.
 				if (!dataType) {
@@ -495,7 +508,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Get the name of a variant
-	 * @param {UmbVariantId } [variantId] - The variant id
+	 * @param {UmbVariantId } [variantId] - The variant id. If not provided, returns the name of the first active variant.
 	 * @returns { string | undefined} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
@@ -504,9 +517,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
-		} else {
-			return variants[0]?.name;
 		}
+		// Get the first active variant's name
+		const activeVariant = this.splitView.getActiveVariants()[0];
+		if (activeVariant) {
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name;
+		}
+		// Fallback to first variant if no active variant is set
+		return variants[0]?.name;
 	}
 
 	/**
@@ -521,14 +540,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Get an observable for the name of a variant
-	 * @param {UmbVariantId} [variantId] - The variant id
+	 * @param {UmbVariantId} [variantId] - The variant id. If not provided, observes the name of the first active variant.
 	 * @returns {Observable<string>} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public name(variantId?: UmbVariantId): Observable<string> {
-		return this._data.createObservablePartOfCurrent(
-			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
-		);
+		if (variantId) {
+			// Explicit variant requested
+			return this._data.createObservablePartOfCurrent(
+				(data) => data?.variants?.find((x) => variantId.compare(x))?.name ?? '',
+			);
+		}
+		// No variant specified - observe first active variant's name
+		return mergeObservables([this.splitView.activeVariantByIndex(0), this.variants], ([activeVariant, variants]) => {
+			if (!activeVariant || !variants) return '';
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name ?? '';
+		});
 	}
 
 	/* Variants */

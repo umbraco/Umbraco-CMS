@@ -10,7 +10,6 @@ import { UmbBasicState, type UmbObserverController } from '@umbraco-cms/backoffi
 import {
 	UUIModalCloseEvent,
 	type UUIModalElement,
-	type UUIDialogElement,
 	type UUIModalDialogElement,
 	type UUIModalSidebarElement,
 	type UUIModalSidebarSize,
@@ -127,8 +126,6 @@ export class UmbModalElement extends UmbLitElement {
 
 	#createDialogElement() {
 		const modalDialogElement = document.createElement('uui-modal-dialog');
-		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
-		modalDialogElement.appendChild(dialogElement);
 		return modalDialogElement;
 	}
 

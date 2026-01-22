@@ -24,7 +24,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     private IDocumentUrlService _documentUrlService;
 
     [SetUp]
-    public void Setup()
+    public override void Setup()
     {
         var contentTypeOneMock = new Mock<IPublishedContentType>();
         contentTypeOneMock.SetupGet(m => m.Alias).Returns("theContentType");
@@ -81,7 +81,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [Test]
     public void PublishedContentCache_CanGetById()
     {
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetById(_contentOneId);
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentOneId, content.Key);
@@ -92,7 +92,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [Test]
     public void PublishedContentCache_CanGetByRoute()
     {
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetByRoute("/content-two");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentTwoId, content.Key);
@@ -103,7 +103,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [Test]
     public void PublishedContentCache_CanGetByRoute_WithStartNodeIdPrefix()
     {
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetByRoute("1234/content-three");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentThreeId, content.Key);
@@ -114,7 +114,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [Test]
     public void PublishedContentCache_CanGetByIds()
     {
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
         Assert.AreEqual(2, content.Length);
         Assert.AreEqual(_contentOneId, content.First().Key);
@@ -123,10 +123,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void PublishedContentCache_GetById_SupportsDenyList(bool denied)
+    public void PublishedContentCache_GetById_SupportsDisallowList(bool denied)
     {
         var denyList = denied ? new[] { "theOtherContentType" } : null;
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetById(_contentTwoId);
 
         if (denied)
@@ -141,10 +141,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void PublishedContentCache_GetByRoute_SupportsDenyList(bool denied)
+    public void PublishedContentCache_GetByRoute_SupportsDisallowList(bool denied)
     {
         var denyList = denied ? new[] { "theContentType" } : null;
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByRoute("/content-one");
 
         if (denied)
@@ -159,10 +159,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     [TestCase("theContentType")]
     [TestCase("theOtherContentType")]
-    public void PublishedContentCache_GetByIds_SupportsDenyList(string deniedContentType)
+    public void PublishedContentCache_GetByIds_SupportsDisallowList(string deniedContentType)
     {
         var denyList = new[] { deniedContentType };
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
 
         Assert.AreEqual(1, content.Length);
@@ -177,10 +177,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_GetById_CanRetrieveContentTypesOutsideTheDenyList()
+    public void PublishedContentCache_GetById_CanRetrieveContentTypesOutsideTheDisallowList()
     {
         var denyList = new[] { "theContentType" };
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetById(_contentTwoId);
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentTwoId, content.Key);
@@ -189,10 +189,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_GetByRoute_CanRetrieveContentTypesOutsideTheDenyList()
+    public void PublishedContentCache_GetByRoute_CanRetrieveContentTypesOutsideTheDisallowList()
     {
         var denyList = new[] { "theOtherContentType" };
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByRoute("/content-one");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentOneId, content.Key);
@@ -204,7 +204,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [TestCase("da-DK")]
     public void PublishedContentCache_GetByRoute_CanRetrieveForCulture(string culture)
     {
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor(culture));
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(), culture);
         var content = publishedContentCache.GetByRoute("/content-four");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentFourId, content.Key);
@@ -216,7 +216,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [TestCase(null)]
     public void PublishedContentCache_GetByRoute_CannotRetrieveForMissingOrUnknownCulture(string? culture)
     {
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor(culture));
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(), culture);
         var content = publishedContentCache.GetByRoute("/content-four");
         Assert.IsNull(content);
     }
@@ -225,18 +225,129 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_GetByIds_CanDenyAllRequestedContent()
     {
         var denyList = new[] { "theContentType", "theOtherContentType" };
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
         Assert.IsEmpty(content);
     }
 
     [Test]
-    public void PublishedContentCache_DenyListIsCaseInsensitive()
+    public void PublishedContentCache_DisallowListIsCaseInsensitive()
     {
         var denyList = new[] { "THEcontentTYPE" };
-        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList), CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor());
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByRoute("/content-one");
         Assert.IsNull(content);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void PublishedContentCache_GetById_SupportsAllowList(bool allowed)
+    {
+        var allowList = allowed ? new[] { "theOtherContentType" } : new[] { "someOtherType" };
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
+        var content = publishedContentCache.GetById(_contentTwoId);
+
+        if (allowed)
+        {
+            Assert.IsNotNull(content);
+        }
+        else
+        {
+            Assert.IsNull(content);
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void PublishedContentCache_GetByRoute_SupportsAllowList(bool allowed)
+    {
+        var allowList = allowed ? new[] { "theContentType" } : new[] { "someOtherType" };
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
+        var content = publishedContentCache.GetByRoute("/content-one");
+
+        if (allowed)
+        {
+            Assert.IsNotNull(content);
+        }
+        else
+        {
+            Assert.IsNull(content);
+        }
+    }
+
+    [TestCase("theContentType")]
+    [TestCase("theOtherContentType")]
+    public void PublishedContentCache_GetByIds_SupportsAllowList(string allowedContentType)
+    {
+        var allowList = new[] { allowedContentType };
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
+        var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
+
+        Assert.AreEqual(1, content.Length);
+        if (allowedContentType == "theContentType")
+        {
+            Assert.AreEqual(_contentOneId, content.First().Key);
+        }
+        else
+        {
+            Assert.AreEqual(_contentTwoId, content.First().Key);
+        }
+    }
+
+    [Test]
+    public void PublishedContentCache_GetByIds_AllowListCanAllowMultipleContentTypes()
+    {
+        var allowList = new[] { "theContentType", "theOtherContentType" };
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
+        var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
+        Assert.AreEqual(2, content.Length);
+    }
+
+    [Test]
+    public void PublishedContentCache_AllowListIsCaseInsensitive()
+    {
+        var allowList = new[] { "THEcontentTYPE" };
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
+        var content = publishedContentCache.GetByRoute("/content-one");
+        Assert.IsNotNull(content);
+    }
+
+    [Test]
+    public void PublishedContentCache_AllowListTakesPrecedenceOverDisallowList()
+    {
+        var denyList = new[] { "theContentType" };
+        var allowList = new[] { "theContentType" };
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList, allowList));
+        var content = publishedContentCache.GetByRoute("/content-one");
+        Assert.IsNotNull(content);
+    }
+
+    [Test]
+    public void PublishedContentCache_AllowListIgnoresDisallowListCompletely()
+    {
+        var denyList = new[] { "theOtherContentType" };
+        var allowList = new[] { "theContentType" };
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList, allowList));
+
+        var contentOne = publishedContentCache.GetByRoute("/content-one");
+        Assert.IsNotNull(contentOne);
+
+        var contentTwo = publishedContentCache.GetById(_contentTwoId);
+        Assert.IsNull(contentTwo);
+    }
+
+    [Test]
+    public void PublishedContentCache_EmptyAllowListFallsBackToDisallowList()
+    {
+        var denyList = new[] { "theContentType" };
+        string[] allowList = Array.Empty<string>();
+        var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList, allowList));
+
+        var contentOne = publishedContentCache.GetByRoute("/content-one");
+        Assert.IsNull(contentOne);
+
+        var contentTwo = publishedContentCache.GetById(_contentTwoId);
+        Assert.IsNotNull(contentTwo);
     }
 
     private IVariationContextAccessor CreateVariationContextAccessor(string? culture = null)
@@ -253,16 +364,20 @@ public class PublishedContentCacheTests : DeliveryApiTests
         return previewServiceMock.Object;
     }
 
-    private IOptionsMonitor<DeliveryApiSettings> CreateDeliveryApiSettings(string[]? disallowedContentTypeAliases = null)
+    private IOptionsMonitor<DeliveryApiSettings> CreateDeliveryApiSettings(string[]? disallowedContentTypeAliases = null, string[]? allowedContentTypeAliases = null)
     {
         var deliveryApiSettings = new DeliveryApiSettings
         {
-            DisallowedContentTypeAliases = new HashSet<string>(disallowedContentTypeAliases ?? Array.Empty<string>())
+            DisallowedContentTypeAliases = new HashSet<string>(disallowedContentTypeAliases ?? Array.Empty<string>()),
+            AllowedContentTypeAliases = new HashSet<string>(allowedContentTypeAliases ?? Array.Empty<string>()),
         };
         var deliveryApiOptionsMonitorMock = new Mock<IOptionsMonitor<DeliveryApiSettings>>();
         deliveryApiOptionsMonitorMock.SetupGet(s => s.CurrentValue).Returns(deliveryApiSettings);
         return deliveryApiOptionsMonitorMock.Object;
     }
+
+    private ApiPublishedContentCache CreateApiPublishedContentCache(IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings, string? culture = null)
+        => new(CreateRequestPreviewService(), deliveryApiSettings, CreateApiDocumentUrlService(), _contentCache, CreateVariationContextAccessor(culture));
 
     private IApiDocumentUrlService CreateApiDocumentUrlService() => new ApiDocumentUrlService(_documentUrlService);
 }

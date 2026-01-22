@@ -170,7 +170,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 		item: T;
 		model: Array<T>;
 		from: UmbSorterController<T, ElementType> | undefined;
-	}) => void;
+	}) => void | Promise<void>;
 	onEnd?: (argument: { item: T; element: ElementType }) => void;
 	itemHasNestedContainersResolver?: (element: HTMLElement) => boolean;
 	/**
@@ -575,7 +575,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	#itemDropped = async (_e: DragEvent) => {
 		this.#handleMoveEnd();
 	};

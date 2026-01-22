@@ -22,17 +22,26 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		},
 	);
 
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT, UMB_BLOCK_LIST_ENTRIES_CONTEXT);
 	}
 
 	protected override _gotManager() {
+		if (!this._manager) return;
+
 		this.observe(
-			this._manager?.inlineEditingMode,
-			(inlineEditingMode) => {
-				this.#inlineEditingMode.setValue(inlineEditingMode);
-			},
+			this._manager.inlineEditingMode,
+			(inlineEditingMode) => this.#inlineEditingMode.setValue(inlineEditingMode),
 			'observeInlineEditingMode',
+		);
+
+		this.observe(
+			this._manager.isSortMode,
+			(isSortMode) => this.#isSortMode.setValue(isSortMode ?? false),
+			'observeIsSortMode',
 		);
 	}
 

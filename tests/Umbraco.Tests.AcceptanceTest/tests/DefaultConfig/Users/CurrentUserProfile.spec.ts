@@ -22,12 +22,13 @@ for (const userGroup of userGroups) {
     testUserCookieAndToken = await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
     await umbracoUi.goToBackOffice();
     await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait to ensure the UI is fully loaded
 
     // Act
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
     await umbracoUi.currentUserProfile.isErrorNotificationVisible(false);
     await umbracoUi.currentUserProfile.clickChangePasswordButton();
-    await umbracoUi.currentUserProfile.changePassword(userPassword, newPassword);
+    await umbracoUi.currentUserProfile.changePasswordAndWaitForSuccess(userPassword, newPassword);
 
     // Assert
     await umbracoUi.currentUserProfile.doesSuccessNotificationHaveText(NotificationConstantHelper.success.passwordChanged);

@@ -153,7 +153,9 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     public override int RecycleBinId => throw new NotSupportedException();
 
-    public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch,
+    public IEnumerable<IMember> FindMembersInRole(
+        string roleName,
+        string usernameToMatch,
         StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         //get the group id
@@ -374,7 +376,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             }
         }
 
-        return GetPage<MemberDto>(query, pageIndex, pageSize, out totalRecords,
+        return GetPage<MemberDto>(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
             x => MapDtosToContent(x),
             filterSql,
             ordering);

@@ -1,6 +1,15 @@
 import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
 import type { UmbPopoverToggleEvent } from './types.js';
-import { css, customElement, html, ifDefined, property, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	property,
+	query,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 

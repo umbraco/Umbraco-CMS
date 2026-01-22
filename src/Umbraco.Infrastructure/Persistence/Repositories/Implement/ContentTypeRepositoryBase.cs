@@ -171,7 +171,9 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
     protected abstract IEnumerable<TEntity>? GetAllWithFullCachePolicy();
 
-    protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType,
+    protected virtual PropertyType CreatePropertyType(
+        string propertyEditorAlias,
+        ValueStorageType storageType,
         string propertyTypeAlias) =>
         new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, propertyTypeAlias);
 
@@ -986,8 +988,12 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             // now we need to insert names into these 2 tables based on the invariant data
 
             // insert rows into the versionCultureVariationDto table based on the data from contentVersionDto for the default lang
-            var cols = Sql().ColumnsForInsert<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name,
-                x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
+            var cols = Sql().ColumnsForInsert<ContentVersionCultureVariationDto>(
+                x => x.VersionId,
+                x => x.Name,
+                x => x.UpdateUserId,
+                x => x.UpdateDate,
+                x => x.LanguageId);
             Sql<ISqlContext> sqlSelect2 = Sql().Select<ContentVersionDto>(x => x.Id, x => x.Text, x => x.UserId, x => x.VersionDate)
                 .Append($", {defaultLanguageId}") // default language ID
                 .From<ContentVersionDto>()
@@ -999,8 +1005,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             Database.Execute(sqlInsertContentVersion);
 
             // insert rows into the documentCultureVariation table
-            cols = Sql().ColumnsForInsert<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published,
-                x => x.Name, x => x.Available, x => x.LanguageId);
+            cols = Sql().ColumnsForInsert<DocumentCultureVariationDto>(
+                x => x.NodeId,
+                x => x.Edited,
+                x => x.Published,
+                x => x.Name,
+                x => x.Available,
+                x => x.LanguageId);
             Sql<ISqlContext> sqlSelectDocument = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
                 .AndSelect<NodeDto>(x => x.Text)
                 .Append($", {SqlSyntax.ConvertIntegerToBoolean(1)}, {defaultLanguageId}") // make Available + default language ID
@@ -1078,7 +1089,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .LeftJoin<TagDto>("xtags")
             .On<TagDto, TagDto>(
                 (tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group &&
-                               xtag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "xtags");
+                               xtag.LanguageId.SqlNullableEquals(targetLanguageId, -1),
+                aliasRight: "xtags");
 
         if (contentTypeIds != null)
         {
@@ -1112,7 +1124,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .InnerJoin<TagDto>("otag")
             .On<TagDto, TagDto>(
                 (tag, otag) => tag.Text == otag.Text && tag.Group == otag.Group &&
-                               otag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "otag");
+                               otag.LanguageId.SqlNullableEquals(targetLanguageId, -1),
+                aliasRight: "otag");
 
         if (contentTypeIds != null)
         {
@@ -1175,8 +1188,11 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <param name="targetLanguageId">The target language (can be null ie invariant)</param>
     /// <param name="propertyTypeIds">The property type identifiers.</param>
     /// <param name="contentTypeIds">The content type identifiers.</param>
-    private void CopyPropertyData(int? sourceLanguageId, int? targetLanguageId,
-        IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int>? contentTypeIds = null)
+    private void CopyPropertyData(
+        int? sourceLanguageId,
+        int? targetLanguageId,
+        IReadOnlyCollection<int> propertyTypeIds,
+        IReadOnlyCollection<int>? contentTypeIds = null)
     {
         // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
         var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
@@ -1219,11 +1235,24 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         // now insert all property data into the target language that exists under the source language
         var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
-        var cols = Sql().ColumnsForInsert<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment,
-            x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue,
+        var cols = Sql().ColumnsForInsert<PropertyDataDto>(
+            x => x.VersionId,
+            x => x.PropertyTypeId,
+            x => x.Segment,
+            x => x.IntegerValue,
+            x => x.DecimalValue,
+            x => x.DateValue,
+            x => x.VarcharValue,
+            x => x.TextValue,
             x => x.LanguageId);
-        Sql<ISqlContext> sqlSelectData = Sql().Select<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId,
-                x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue,
+        Sql<ISqlContext> sqlSelectData = Sql().Select<PropertyDataDto>(
+                x => x.VersionId,
+                x => x.PropertyTypeId,
+                x => x.Segment,
+                x => x.IntegerValue,
+                x => x.DecimalValue,
+                x => x.DateValue,
+                x => x.VarcharValue,
                 x => x.TextValue)
             .Append(", " + targetLanguageIdS) // default language ID
             .From<PropertyDataDto>();
@@ -1439,9 +1468,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             }
             else if (ev.Key.langId.HasValue)
             {
-                // This should never happen! If a property culture is flagged as edited then the culture must exist at the document level
-                throw new PanicException(
-                    $"The existing DocumentCultureVariationDto was not found for node {ev.Key.nodeId} and language {ev.Key.langId}");
+                // This can happen when a property changes from invariant to variant and the content
+                // was only created in non-default languages. The invariant property data gets migrated
+                // to the default language, but no DocumentCultureVariationDto exists for the default
+                // language because the content was never created in that language.
+                // In this case, we simply skip updating the edited flag since there's no document
+                // culture variation record to update.
+                continue;
             }
         }
 

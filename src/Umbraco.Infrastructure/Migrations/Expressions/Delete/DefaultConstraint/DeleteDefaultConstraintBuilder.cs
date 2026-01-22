@@ -23,7 +23,9 @@ public class DeleteDefaultConstraintBuilder : ExpressionBuilderBase<DeleteDefaul
         Expression.ColumnName = columnName;
         Expression.HasDefaultConstraint = _context.SqlContext.SqlSyntax.TryGetDefaultConstraint(
             _context.Database,
-            Expression.TableName, columnName, out var constraintName);
+            Expression.TableName,
+            columnName,
+            out var constraintName);
         Expression.ConstraintName = constraintName ?? string.Empty;
 
         return new ExecutableBuilder(Expression);

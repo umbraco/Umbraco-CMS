@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -99,7 +98,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : this(scopeAccessor,
+        : this(
+            scopeAccessor,
             cache,
             logger,
             loggerFactory,
@@ -115,8 +115,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             serializer,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
@@ -142,7 +141,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             }
         }
 
-        return GetPage<ContentDto>(query, pageIndex, pageSize, out totalRecords,
+        return GetPage<ContentDto>(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
             x => MapDtosToContent(x),
             filterSql,
             ordering);
@@ -226,15 +229,32 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Media;
 
+    /// <inheritdoc />
+    public override void Save(IMedia entity)
+    {
+        base.Save(entity);
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
+        _mediaByGuidReadRepository.PopulateCacheByKey(entity);
+    }
+
     protected override IMedia? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
             .Where<NodeDto>(x => x.NodeId == id);
 
         ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
-        return dto == null
-            ? null
-            : MapDtoToContent(dto);
+        if (dto == null)
+        {
+            return null;
+        }
+
+        IMedia media = MapDtoToContent(dto);
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
+        _mediaByGuidReadRepository.PopulateCacheByKey(media);
+
+        return media;
     }
 
     protected override IEnumerable<IMedia> PerformGetAll(params int[]? ids)
@@ -246,7 +266,13 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             sql.WhereIn<NodeDto>(x => x.NodeId, ids);
         }
 
-        return MapDtosToContent(Database.Fetch<ContentDto>(sql));
+        // MapDtosToContent returns a materialized array, so this is safe to enumerate multiple times
+        IEnumerable<IMedia> media = MapDtosToContent(Database.Fetch<ContentDto>(sql));
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
+        _mediaByGuidReadRepository.PopulateCacheByKey(media);
+
+        return media;
     }
 
     protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -581,6 +607,33 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     public bool Exists(Guid id) => _mediaByGuidReadRepository.Exists(id);
 
+    /// <summary>
+    /// Populates the int-keyed cache with the given entity.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IMedia entity)
+    {
+        if (entity.HasIdentity)
+        {
+            var cacheKey = GetCacheKey(entity.Id);
+            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+        }
+    }
+
+    /// <summary>
+    /// Populates the int-keyed cache with the given entities.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IEnumerable<IMedia> entities)
+    {
+        foreach (IMedia entity in entities)
+        {
+            PopulateCacheById(entity);
+        }
+    }
+
+    private static string GetCacheKey(int id) => RepositoryCacheKeys.GetKey<IMedia>() + id;
+
     // A reading repository purely for looking up by GUID
     // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
@@ -615,9 +668,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 return null;
             }
 
-            IMedia content = _outerRepo.MapDtoToContent(dto);
+            IMedia media = _outerRepo.MapDtoToContent(dto);
 
-            return content;
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(media);
+
+            return media;
         }
 
         protected override IEnumerable<IMedia> PerformGetAll(params Guid[]? ids)
@@ -628,7 +684,13 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
             }
 
-            return _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
+            // MapDtosToContent returns a materialized array, so this is safe to enumerate multiple times
+            IEnumerable<IMedia> media = _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
+
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(media);
+
+            return media;
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query) =>
@@ -648,6 +710,33 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
         protected override string GetBaseWhereClause() =>
             throw new InvalidOperationException("This method won't be implemented.");
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entity.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(IMedia entity)
+        {
+            if (entity.HasIdentity)
+            {
+                var cacheKey = GetCacheKey(entity.Key);
+                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            }
+        }
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entities.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(IEnumerable<IMedia> entities)
+        {
+            foreach (IMedia entity in entities)
+            {
+                PopulateCacheByKey(entity);
+            }
+        }
+
+        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IMedia>() + key;
     }
 
     #endregion

@@ -6,9 +6,9 @@ import type {
 } from '../../../types.js';
 import { UmbContentTypeContainerStructureHelper } from '../../../structure/index.js';
 import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
@@ -38,7 +38,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			onChange: ({ model }) => {
 				this._groups = model;
 			},
-			onContainerChange: ({ item }) => {
+			onContainerChange: async ({ item }) => {
 				if (this.#containerId === undefined) {
 					throw new Error('ContainerId is not set');
 				}
@@ -48,8 +48,23 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 						'OwnerId is not set for the given container, we cannot move containers that are not owned by the current Document.',
 					);
 				}
+
+				let containerId = this.#containerId;
+				// ensure container is local:
+				if (containerId !== null) {
+					const structureManager = this.#groupStructureHelper.getStructureManager();
+					if (!structureManager) {
+						throw new Error('Could not get Structure Manager from Structure Helper');
+					}
+					const container = await structureManager.ensureContainerOf(
+						containerId,
+						structureManager.getOwnerContentType()!.unique,
+					);
+					containerId = container?.id || null;
+				}
+
 				this.#groupStructureHelper.partialUpdateContainer(item.ownerId, {
-					parent: this.#containerId ? { id: this.#containerId } : null,
+					parent: containerId ? { id: containerId } : null,
 				});
 			},
 			onEnd: ({ item }) => {

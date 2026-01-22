@@ -75,6 +75,10 @@ public class PublishStatusRepository : IPublishStatusRepository
             .From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == rootDocumentKey);
         var rootPath = await Database.ExecuteScalarAsync<string>(pathSql);
+        if (string.IsNullOrWhiteSpace(rootPath))
+        {
+            return new Dictionary<Guid, ISet<string>>();
+        }
 
         Sql<ISqlContext> sql = GetBaseQuery()
             .InnerJoin<NodeDto>("rn").On<NodeDto, NodeDto>((n, rn) => n.Path.StartsWith(rootPath), "n", "rn") //rn = root node

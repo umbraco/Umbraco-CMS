@@ -90,7 +90,8 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 				: repeat(
 						this._groups,
 						(group) => group.key,
-						(group) => html` <uui-box .headline=${group.name}>${this.renderGroup(group)}</uui-box>`,
+						(group) =>
+							html`<uui-box .headline=${this.localize.string(group.name)}>${this.renderGroup(group)}</uui-box>`,
 					)}
 		`;
 	}

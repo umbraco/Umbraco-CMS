@@ -174,7 +174,7 @@ public static partial class UmbracoBuilderExtensions
             .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
-        builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
+        builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
@@ -321,7 +321,8 @@ public static partial class UmbracoBuilderExtensions
                 default:
                     return new FileSystemMainDomLock(
                         loggerFactory.CreateLogger<FileSystemMainDomLock>(),
-                        mainDomKeyGenerator, hostingEnvironment,
+                        mainDomKeyGenerator,
+                        hostingEnvironment,
                         factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
             }
         });

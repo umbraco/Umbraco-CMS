@@ -36,10 +36,9 @@ test('can create content with the media picker data type', {tag: '@smoke'}, asyn
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -65,10 +64,9 @@ test('can publish content with the media picker data type', async ({umbracoApi, 
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -90,10 +88,9 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeMediaPickerByName(mediaFileName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -146,10 +143,9 @@ test('can not publish a mandatory media picker with an empty value', async ({umb
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value[0].mediaKey).toEqual(mediaFileId);
@@ -173,17 +169,17 @@ test('can add a media image to a media picker in variant content, remove it and 
   // Adds media item to a media picker
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   // Removes media item from the media picker
   await umbracoUi.content.removeMediaPickerByName(mediaFileName);
-  await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Adds media item to a media picker again
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
   await umbracoUi.content.clickChooseModalButton();
 
   // Assert
+  // Wait for the media file to be visible
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.isMediaNameVisible(mediaFileName);
 });

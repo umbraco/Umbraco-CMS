@@ -34,15 +34,17 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 		return html`
 			<umb-ref-grid-block
 				standalone
-				href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
+				.readonly=${!(this.config?.showContentEdit ?? false)}
+				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				${when(
 					this.unpublished,
-					() =>
-						html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-							><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-						></uui-tag>`,
+					() => html`
+						<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
+							<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+						</uui-tag>
+					`,
 				)}
 				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
 			</umb-ref-grid-block>
@@ -54,8 +56,13 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 			umb-block-grid-areas-container {
 				margin-top: calc(var(--uui-size-2) + 1px);
 			}
+
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
+			}
+
+			umb-ufm-render {
+				user-select: none;
 			}
 
 			uui-tag {
@@ -64,9 +71,26 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 				margin-top: -0.3em;
 				vertical-align: text-top;
 			}
+
 			:host([unpublished]) umb-icon,
 			:host([unpublished]) umb-ufm-render {
 				opacity: 0.6;
+			}
+
+			@keyframes umb-icon-jiggle {
+				0%,
+				100% {
+					transform: rotate(6deg);
+				}
+				50% {
+					transform: rotate(-6deg);
+				}
+			}
+
+			:host(.sortable) {
+				umb-icon {
+					animation: umb-icon-jiggle 500ms infinite ease-in-out;
+				}
 			}
 		`,
 	];

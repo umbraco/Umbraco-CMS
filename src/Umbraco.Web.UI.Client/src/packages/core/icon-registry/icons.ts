@@ -1500,6 +1500,9 @@ path: () => import("./icons/icon-smiley.js"),
 name: "icon-snow",
 path: () => import("./icons/icon-snow.js"),
 },{
+name: "icon-sort",
+path: () => import("./icons/icon-sort.js"),
+},{
 name: "icon-sound-low",
 path: () => import("./icons/icon-sound-low.js"),
 },{

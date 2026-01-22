@@ -142,8 +142,33 @@ Web.UI → Web.Common → Infrastructure → Core
 ### Branching Strategy
 
 - **Main branch**: `main` (protected)
-- **Branch naming**:
-  - See `.github/CONTRIBUTING.md` for full guidelines
+- **Branch naming convention**: `v<version>/<type>/<description>`
+
+**Format**: `v{major-version}/{type}/{kebab-case-description}`
+
+**Version**: Read from `version.json` in the repository root. Use the major version number (e.g., `v17` for version 17.x.x).
+
+**Types**:
+| Type | Use Case |
+|------|----------|
+| `feature` | New feature being introduced to the product |
+| `bugfix` | Fix to an existing issue with the product |
+| `qa` | Adding or updating unit, integration, or end-to-end tests |
+| `improvement` | Update to something that already exists but isn't broken (UI finessing, refactoring) |
+| `task` | Update that doesn't directly impact product behavior (dependency updates, build pipeline) |
+
+**Description**: A short, kebab-case description (a few words). This should be prefixed with the GitHub issue number if the update is related to resolving a tracked issue.
+
+**Examples**:
+```
+v17/bugfix/12345-correct-display-of-pending-migrations
+v17/feature/add-webhook-support
+v17/improvement/optimize-content-cache
+v17/qa/add-media-service-tests
+v17/task/update-ef-core-dependency
+```
+
+See `.github/CONTRIBUTING.md` for full guidelines.
 
 ### Pull Request Process
 
@@ -154,6 +179,26 @@ Web.UI → Web.Common → Infrastructure → Core
   - No build warnings
 - **Merge Strategy**: Squash and merge (via GitHub UI)
 - **Reviews**: Required from code owners
+
+#### PR Naming Convention
+
+Use the format: `Area: Description (closes #IssueID)`
+
+**Examples**:
+| Area | Description | Issue |
+|------|-------------|-------|
+| Relations: | Move persistence of relations from repository into notification handlers | (closes #00000) |
+| Management API: | Correct the population of the parent for sibling items when retrieved under a folder | |
+| Docs: | Updated contributing guidelines to welcome contributions on bugfixes | |
+
+**Area**: The feature or aspect affected (e.g., UFM, TipTap, Docs, Segmentation, Migrations). Helps readers quickly understand what is being changed.
+
+**Description Best Practices**:
+- Include the area of change (Relations, Management API, etc.)
+- Describe the change and its impact
+- Be specific, not vague (describe "a golden retriever" not just "a dog")
+
+**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
 
 ### Commit Messages
 

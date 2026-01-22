@@ -1,8 +1,8 @@
 import type { UmbBlockGridTypeAreaType } from '../../types.js';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../block-grid-manager/constants.js';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * @description
@@ -56,24 +56,27 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._areas && this._areas.length > 0
-			? html` ${this._styleElement}
-					<div
-						class="umb-block-grid__area-container"
-						part="area-container"
-						style="--umb-block-grid--area-grid-columns: ${this._areaGridColumns}">
-						${repeat(
-							this._areas,
-							(area) => area.key,
-							(area) =>
-								html`<umb-block-grid-entries
-									part="area"
-									class="umb-block-grid__area"
-									.areaKey=${area.key}
-									.layoutColumns=${area.columnSpan}></umb-block-grid-entries>`,
-						)}
-					</div>`
-			: '';
+		if (!this._areas?.length) return nothing;
+		return html`
+			${this._styleElement}
+			<div
+				class="umb-block-grid__area-container"
+				part="area-container"
+				style="--umb-block-grid--area-grid-columns: ${this._areaGridColumns}">
+				${repeat(
+					this._areas!,
+					(area) => area.key,
+					(area) => html`
+						<umb-block-grid-entries
+							part="area"
+							class="umb-block-grid__area"
+							.areaKey=${area.key}
+							.layoutColumns=${area.columnSpan}>
+						</umb-block-grid-entries>
+					`,
+				)}
+			</div>
+		`;
 	}
 
 	static override styles = [

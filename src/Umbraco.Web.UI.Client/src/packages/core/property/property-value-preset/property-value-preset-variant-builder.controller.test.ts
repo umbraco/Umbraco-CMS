@@ -230,5 +230,6 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			expect(result[5]?.culture).to.be.equal('cultureB');
 			expect(result[5]?.segment).to.be.equal('segmentB');
 		});
+
 	});
 });

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -22,10 +21,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="runtimeState"></param>
-    /// <param name="distributedJobService"></param>
-    /// <param name="distributedJobSettings"></param>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
@@ -52,8 +47,17 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             await Task.Delay(_distributedJobSettings.Delay, stoppingToken);
         }
 
-        // Update all jobs, periods might have changed when restarting.
-        await _distributedJobService.EnsureJobsAsync();
+        try
+        {
+            // Update all jobs, periods might have changed when restarting.
+            await _distributedJobService.EnsureJobsAsync();
+        }
+        catch (Exception exception)
+        {
+            // We swallow exception here, don't want the app to crash if something goes wrong
+            _logger.LogError(exception, "An exception occurred while attempting to ensure distributed background jobs on startup.");
+        }
+
 
         using PeriodicTimer timer = new(_distributedJobSettings.Period);
 
@@ -61,7 +65,20 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                await RunRunnableJob();
+                try
+                {
+                    await RunRunnableJob();
+                }
+                catch (Exception exception)
+                {
+                    if (exception is OperationCanceledException)
+                    {
+                        // If the operation was canceled, just re-throw to stop the service
+                        throw;
+                    }
+
+                    _logger.LogError(exception, "An exception occurred while attempting to run a distributed background job.");
+                }
             }
         }
         catch (OperationCanceledException)

@@ -65,15 +65,11 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 			<uui-button-group>
 				<uui-button label=${this.localize.term('logViewer_startPolling')} @click=${this.#togglePolling}>
 					${this._poolingConfig.enabled
-						? html`<uui-icon name="icon-axis-rotation" id="polling-enabled-icon"></uui-icon
-							>${this.#getPollingLabel()}`
+						? html`<uui-icon name="icon-axis-rotation" id="polling-enabled-icon"></uui-icon>${this.#getPollingLabel()}`
 						: html`<umb-localize key="logViewer_polling">Polling</umb-localize>`}
 				</uui-button>
 
-				<umb-dropdown
-					id="polling-rate-dropdown"
-					compact
-					label=${this.localize.term('logViewer_choosePollingInterval')}>
+				<umb-dropdown id="polling-rate-dropdown" compact label=${this.localize.term('logViewer_choosePollingInterval')}>
 					${this.#pollingIntervals.map(
 						(interval: UmbPoolingInterval) =>
 							html`<uui-menu-item

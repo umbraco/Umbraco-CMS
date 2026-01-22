@@ -1,10 +1,10 @@
 import { UmbPreviewRepository } from '../repository/preview.repository.js';
 import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
+import type { UmbPopoverToggleEvent } from './types.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPopoverToggleEvent } from './types.js';
 
 type UmbPreviewEnvironmentItem = {
 	alias: string;

@@ -591,7 +591,7 @@ export default {
 		chooseMediaStartNode: 'Vælg startnode for medie',
 		selectMediaType: 'Vælg medietype',
 		selectIcon: 'Vælg ikon',
-		selectItem: 'Vælg item',
+		selectItem: 'Vælg element',
 		selectLink: 'Vælg link',
 		addLink: 'Tilføj Link',
 		updateLink: 'Opdater Link',
@@ -1006,6 +1006,7 @@ export default {
 		manifest: 'Manifest',
 		toggleFor: 'Toggle for %0%',
 		document: 'Dokument',
+		documentCount: (count: number) => (count === 1 ? '1 dokument' : `${count} dokumenter`),
 	},
 	colors: {
 		black: 'Sort',
@@ -1397,9 +1398,9 @@ export default {
 	rollback: {
 		changes: 'Ændringer',
 		headline: 'Vælg en version at sammenligne med den nuværende version',
-		diffHelp:
-			'Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>',
-		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version',
+		diffHelp: '<del>Rød tekst</del> vil blive fjernet i den valgte version, <ins>grøn tekst</ins> vil blive tilføjet.',
+		showDiff: 'Vis forskelle mellem den nuværende version og den valgte version.',
+		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version.',
 		documentRolledBack: 'Dokument tilbagerullet',
 		htmlHelp:
 			"Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner\n      på samme tid, brug 'diff'-oversigten\n    ",
@@ -2366,10 +2367,10 @@ export default {
 		labelUsedByDocuments: 'Brugt i Dokumenter',
 		labelUsedByMembers: 'Brugt i Medlemmer',
 		labelUsedByMedia: 'Brugt i Medier',
-		itemHasNoReferences: 'This item has no references.',
-		labelUsedByDocumentTypes: 'Referenced by the following Document Types',
-		labelUsedByItems: 'Referenced by the following items',
-		labelDependsOnThis: 'The following items depend on this',
+		itemHasNoReferences: 'Ingen referencer',
+		labelUsedByDocumentTypes: 'Refereret af følgende Dokument Typer',
+		labelUsedByItems: 'Refereret af',
+		labelDependsOnThis: 'Følgende elementer er afhængige af dette',
 		labelUsedItems: 'The following items are referenced',
 		labelUsedDescendants: 'The following descendant items have dependencies',
 		labelDependentDescendants: 'The following descending items have dependencies',
@@ -2854,6 +2855,7 @@ export default {
 		modalManual: 'Manuel',
 		modalAnchorValidationMessage:
 			'Indtast et anker eller en querystring, vælg et dokument eller medieelement, eller konfigurer URL’en manuelt.',
+		modalUrlOrAnchorValidationMessage: 'Indtast en adresse eller et anker.',
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',

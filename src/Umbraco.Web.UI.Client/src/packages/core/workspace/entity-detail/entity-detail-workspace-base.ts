@@ -157,6 +157,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Get the current data
+	 * @param {DetailModelType | undefined} data - New data of this workspace.
+	 */
+	setData(data: DetailModelType | undefined): void {
+		this._data.setCurrent(data);
+	}
+
+	/**
 	 * Get the persisted data
 	 * @returns { DetailModelType | undefined } The persisted data
 	 */
@@ -254,7 +262,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			}
 		} else if (data) {
 			const processedData = await this._processIncomingData(data);
-
 			this._data.setPersisted(processedData);
 			this._data.setCurrent(processedData);
 
@@ -275,8 +282,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const { data } = await this._detailRepository!.requestByUnique(unique);
 
 		if (data) {
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
+			const processedData = await this._processIncomingData(data);
+			this._data.setPersisted(processedData);
+			this._data.setCurrent(processedData);
 		}
 	}
 
@@ -311,7 +319,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			data = await this._processIncomingData(data);
 			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
@@ -336,7 +343,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns {Promise<DetailModelType>} The processed data.
 	 */
 	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		return data;
+		return await this._processIncomingData(data);
 	}
 	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		return data;

@@ -76,10 +76,12 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				'observeContentKey',
 			);
 		});
+
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
 			this.#parentUnique = entriesContext?.getParentUnique();
 			this.#areaKey = entriesContext?.getAreaKey();
 		});
+
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -188,30 +190,35 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			</span>
 			${when(
 				this.unpublished,
-				() =>
-					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`,
+				() => html`
+					<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
+						<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+					</uui-tag>
+				`,
 			)}
 		`;
 	}
 
 	#renderInside() {
 		if (this.unpublished === true) {
-			return html`<uui-button id="exposeButton" @click=${this.#expose}
-				><uui-icon name="icon-add"></uui-icon>
-				<umb-localize
-					key="blockEditor_createThisFor"
-					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
-			></uui-button>`;
+			return html`
+				<uui-button id="exposeButton" @click=${this.#expose}>
+					<uui-icon name="icon-add"></uui-icon>
+					<umb-localize
+						key="blockEditor_createThisFor"
+						.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize>
+				</uui-button>
+			`;
 		} else {
-			return html`<div id="inside" draggable="false">
-				<umb-property-type-based-property
-					.property=${this._inlineProperty}
-					.dataPath=${this._inlinePropertyDataPath ?? ''}
-					slot="areas"></umb-property-type-based-property>
-				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
-			</div>`;
+			return html`
+				<div id="inside" draggable="false">
+					<umb-property-type-based-property
+						.property=${this._inlineProperty}
+						.dataPath=${this._inlinePropertyDataPath ?? ''}
+						slot="areas"></umb-property-type-based-property>
+					<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
+				</div>
+			`;
 		}
 	}
 

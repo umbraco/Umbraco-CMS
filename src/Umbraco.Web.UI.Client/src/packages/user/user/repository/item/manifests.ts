@@ -1,4 +1,5 @@
 import { UMB_USER_ITEM_REPOSITORY_ALIAS, UMB_USER_ITEM_STORE_ALIAS } from './constants.js';
+import { UmbUserItemStore } from './user-item.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,6 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'itemStore',
 		alias: UMB_USER_ITEM_STORE_ALIAS,
 		name: 'User Item Store',
-		api: () => import('./user-item.store.js'),
+		api: UmbUserItemStore,
 	},
 ];

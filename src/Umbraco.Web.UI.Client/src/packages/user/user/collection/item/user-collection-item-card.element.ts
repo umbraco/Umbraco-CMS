@@ -15,9 +15,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbUserGroupItemRepository, type UmbUserGroupItemModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbEntityCollectionItemElement } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-user-collection-item-card')
-export class UmbUserCollectionItemCardElement extends UmbLitElement {
+export class UmbUserCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	#item?: UmbUserCollectionItemModel | undefined;
 
 	@property({ type: Object })
@@ -50,7 +51,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement {
 	#userGroupItemRepository = new UmbUserGroupItemRepository(this);
 
 	async #loadUserGroups() {
-		if (!this.item || this.item?.userGroupUniques.length === 0) {
+		if (!this.item || !this.item.userGroupUniques || this.item.userGroupUniques.length === 0) {
 			this._userGroupItems = [];
 			return;
 		}
@@ -80,7 +81,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement {
 		return html`
 			<uui-card-user
 				.name=${this.item.name ?? this.localize.term('general_unnamed')}
-				href=${this.href}
+				href=${ifDefined(this.href)}
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}

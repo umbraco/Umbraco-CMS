@@ -83,11 +83,15 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
-        string contentTypeAlias, string? contentTypeName, Guid userKey)
+        string contentTypeAlias,
+        string? contentTypeName,
+        Guid userKey)
     {
-        ITemplate template = new Template(_shortStringHelper, contentTypeName,
-
+        ITemplate template = new Template(
+            _shortStringHelper,
+            contentTypeName,
             // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
             // want to save template file names as camelCase, the Template ctor will clean the alias as
             // `alias.ToCleanString(CleanStringType.UnderscoreAlias)` which has been the default.
@@ -103,7 +107,7 @@ public class TemplateService : RepositoryService, ITemplateService
 
         // check that the template hasn't been created on disk before creating the content type
         // if it exists, set the new template content to the existing file content
-        var content = GetViewContent(contentTypeAlias);
+        var content = GetViewContent(template.Alias);
         if (content != null)
         {
             template.Content = content;
@@ -112,7 +116,7 @@ public class TemplateService : RepositoryService, ITemplateService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
-            if (scope.Notifications.PublishCancelable(savingEvent))
+            if (await scope.Notifications.PublishCancelableAsync(savingEvent))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
@@ -130,6 +134,22 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
+    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
+        string name,
+        string alias,
+        string contentTypeAlias,
+        Guid userKey)
+    {
+        ITemplate template =
+            new Template(_shortStringHelper, name, alias) { Key = Guid.CreateVersion7() };
+
+        Attempt<ITemplate, TemplateOperationStatus> result = await CreateAsync(template, userKey, contentTypeAlias);
+        return result.Success
+            ? Attempt.SucceedWithStatus<ITemplate?, TemplateOperationStatus>(result.Status, result.Result)
+            : Attempt<ITemplate?, TemplateOperationStatus>.Fail(result.Status);
+    }
+
+    /// <inheritdoc />
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(
         string name,
         string alias,
@@ -140,19 +160,7 @@ public class TemplateService : RepositoryService, ITemplateService
 
     /// <inheritdoc />
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey)
-    {
-        try
-        {
-            // file might already be on disk, if so grab the content to avoid overwriting
-            template.Content = GetViewContent(template.Alias) ?? template.Content;
-            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreate(template));
-        }
-        catch (PathTooLongException ex)
-        {
-            LoggerFactory.CreateLogger<TemplateService>().LogError(ex, "The template path was too long. Consider making the template alias shorter.");
-            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
-        }
-    }
+        => await CreateAsync(template, userKey, null);
 
     private TemplateOperationStatus ValidateCreate(ITemplate templateToCreate)
     {
@@ -262,7 +270,12 @@ public class TemplateService : RepositoryService, ITemplateService
         return TemplateOperationStatus.Success;
     }
 
-    private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(ITemplate template, AuditType auditType, Guid userKey, Func<TemplateOperationStatus>? scopeValidator = null)
+    private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(
+            ITemplate template,
+            AuditType auditType,
+            Guid userKey,
+            Func<TemplateOperationStatus>? scopeValidator = null,
+            string? contentTypeAlias = null)
     {
         if (IsValidAlias(template.Alias) == false)
         {
@@ -299,8 +312,12 @@ public class TemplateService : RepositoryService, ITemplateService
             await SetMasterTemplateAsync(template, masterTemplate, userKey);
 
             EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new TemplateSavingNotification(template, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            var savingNotification = new TemplateSavingNotification(
+                template,
+                eventMessages,
+                !contentTypeAlias.IsNullOrWhiteSpace(),
+                contentTypeAlias ?? string.Empty);
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
@@ -433,6 +450,26 @@ public class TemplateService : RepositoryService, ITemplateService
 
     private Task Audit(AuditType type, Guid userKey, int objectId, string? entityType) =>
         _auditService.AddAsync(type, userKey, objectId, entityType);
+
+    private async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey, string? contentTypeAlias)
+    {
+        if (IsValidAlias(template.Alias) is false)
+        {
+            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
+        }
+
+        try
+        {
+            // file might already be on disk, if so grab the content to avoid overwriting
+            template.Content = GetViewContent(template.Alias) ?? template.Content;
+            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreate(template), contentTypeAlias);
+        }
+        catch (PathTooLongException ex)
+        {
+            LoggerFactory.CreateLogger<TemplateService>().LogError(ex, "The template path was too long. Consider making the template alias shorter.");
+            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
+        }
+    }
 
     private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, Guid userKey)
     {

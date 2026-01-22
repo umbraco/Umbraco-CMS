@@ -684,8 +684,8 @@ export default {
 		reset: '重設',
 	},
 	rollback: {
-		diffHelp:
-			'這顯示目前版本以及所選版本的差異。<br /><del>紅色</del> 文字將不會顯示於所選版本，而<ins>綠色</ins>表示增加部分。',
+		diffHelp: '<del>紅色文字</del>將在所選版本中被移除，<ins>綠色文字</ins>將被新增。',
+		showDiff: '顯示目前（草稿）版本與所選版本之間的差異。',
 		documentRolledBack: '文檔已回滾',
 		htmlHelp: '這顯示所選版本的HTML格式，如果您想要比較兩版本的差異，請使用比較檢視',
 		rollbackTo: '回滾至',

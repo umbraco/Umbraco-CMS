@@ -1,12 +1,9 @@
-import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestEntityCollectionItemBase } from '../entity-collection-item.extension.js';
 
 export interface ManifestEntityCollectionItemCard<
 	MetaType extends MetaEntityCollectionItemCard = MetaEntityCollectionItemCard,
-> extends ManifestElement<any>,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+> extends ManifestEntityCollectionItemBase<MetaType> {
 	type: 'entityCollectionItemCard';
-	meta: MetaType;
-	forEntityTypes: Array<string>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

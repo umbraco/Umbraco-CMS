@@ -28,9 +28,7 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * To update the provided value dynamically, keep a state inside the provided context instance
  * and update that state as needed. The context instance itself should remain the same.
  * You can use any of the Umb{*}State classes.
- *
  * @param {UmbProvideOptions} options Configuration object containing the context token
- *
  * @example
  * ```ts
  * import {provideContext} from '@umbraco-cms/backoffice/context-api';
@@ -46,7 +44,6 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  *   workspaceContext = new UmbWorkspaceContext(this);
  * }
  * ```
- *
  * @example
  * ```ts
  * // For dynamic updates, store the state inside the context instance
@@ -63,7 +60,6 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  *   }
  * }
  * ```
- *
  * @returns {ProvideDecorator<InstanceType>} A property decorator function
  */
 export function provideContext<
@@ -98,6 +94,8 @@ export function provideContext<
  *
  * Note: Standard decorators currently don't work with @state()/@property()
  * decorators, which is why we still need the legacy branch.
+ * @param protoOrTarget
+ * @param context
  */
 function setupStandardDecorator<
 	BaseType extends UmbContextMinimal,
@@ -138,6 +136,9 @@ function setupStandardDecorator<
  * 1. addInitializer (if available, e.g., on LitElement classes)
  * 2. hostConnected wrapper (for UmbController classes)
  * 3. Warning (if neither is available)
+ * @param protoOrTarget
+ * @param propertyKey
+ * @param context
  */
 function setupLegacyDecorator<
 	BaseType extends UmbContextMinimal,

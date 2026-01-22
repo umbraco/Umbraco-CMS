@@ -238,6 +238,7 @@ export default {
 	},
 	content: {
 		isPublished: 'Is Published',
+		unpublishedChanges: 'Unpublished changes',
 		about: 'About this page',
 		alias: 'Alias',
 		alternativeTextHelp: '(how would you describe the picture over the phone)',
@@ -275,6 +276,7 @@ export default {
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
 		routeErrorCannotRoute: 'This document is published but its URL cannot be routed',
+		protected: 'Protected',
 		publish: 'Publish',
 		published: 'Published',
 		publishedPendingChanges: 'Published (pending changes)',
@@ -287,6 +289,7 @@ export default {
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
+		scheduledPublishing: 'Scheduled publishing',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
@@ -860,6 +863,7 @@ export default {
 		dividerPosition: (value: string | number) => `Divider at ${value}%`,
 		discard: 'Discard',
 		document: 'Document',
+		documentCount: (count: number) => (count === 1 ? '1 document' : `${count} documents`),
 		down: 'Down',
 		download: 'Download',
 		edit: 'Edit',
@@ -1340,6 +1344,8 @@ export default {
 		configurationTitle: 'Dynamic Root Query',
 		pickDynamicRootOriginTitle: 'Pick origin',
 		pickDynamicRootOriginDesc: 'Define the origin for your Dynamic Root Query',
+		originContentRootTitle: 'Content Root',
+		originContentRootDesc: 'Root of the content tree',
 		originRootTitle: 'Root',
 		originRootDesc: 'Root node of this editing session',
 		originParentTitle: 'Parent',
@@ -1411,9 +1417,9 @@ export default {
 		changes: 'Changes',
 		created: 'Created',
 		currentVersion: 'Current version',
-		diffHelp:
-			'This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added',
-		noDiff: 'There are no differences between the current (draft) version and the selected version',
+		showDiff: 'Show differences between the current (draft) version and the selected version.',
+		diffHelp: '<del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added.',
+		noDiff: 'There are no differences between the current (draft) version and the selected version.',
 		documentRolledBack: 'Document has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
@@ -2447,7 +2453,7 @@ export default {
 			'This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being used. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
-		labelUsedByItems: 'Referenced by the following items',
+		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
 		labelMoreReferences: (count: number) => {
@@ -2550,13 +2556,19 @@ export default {
 	profiling: {
 		performanceProfiling: 'Performance profiling',
 		performanceProfilingDescription:
-			"<p>Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.</p><p>If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.</p><p>If you want the profiler to be activated by default for all page renderings, you can use the toggle below. It will set a cookie in your browser, which then activates the profiler automatically. In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.</p>",
+			"<p>Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.</p><p>If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.</p><p>If you want the profiler to be activated by default for all page renderings, you can use the toggle below. It will set a cookie in your browser, which then activates the profiler automatically. In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.</p><p><strong>Note:</strong> This will only work if the Backoffice is currently located on the same URL as the front-end website.</p>",
 		activateByDefault: 'Activate the profiler by default',
 		reminder: 'Friendly reminder',
 		reminderDescription:
 			'<p>You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>',
 		profilerEnabledDescription:
 			"<p>Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.</p><p>Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>",
+		errorEnablingProfilerTitle: 'Error enabling profiler',
+		errorEnablingProfilerDescription:
+			'It was not possible to enable the profiler. Check that you are accessing the Backoffice on the same URL as the front-end website, and try again. If the problem persists, please check the log for more details.',
+		errorDisablingProfilerTitle: 'Error disabling profiler',
+		errorDisablingProfilerDescription:
+			'It was not possible to disable the profiler. Try again, and if the problem persists, please check the log for more details.',
 	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',
@@ -2863,6 +2875,7 @@ export default {
 		modalManual: 'Manual',
 		modalAnchorValidationMessage:
 			'Please enter an anchor or querystring, select a document or media item, or manually configure the URL.',
+		modalUrlOrAnchorValidationMessage: 'Please enter an URL or Anchor.',
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',

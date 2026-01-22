@@ -144,6 +144,13 @@ public class UmbracoPlan : MigrationPlan
         // To 17.0.1
         To<V_17_0_1.EnsureUmbracoPropertyDataColumnCasing>("{BE5CA411-E12D-4455-A59E-F12A669E5363}");
 
+        // To 17.1.0
+        To<V_17_1_0.ChangeValidationRegExpToNvarcharMax>("{1CE2E78B-E736-45D8-97A2-CE3EF2F31BCD}");
+
+        // To 17.2.0
+        To<V_17_2_0.AddDescriptionToUserGroup>("{F1A2B3C4-D5E6-4789-ABCD-1234567890AB}");
+        To<V_17_2_0.AddDocumentUrlAlias>("{A7B8C9D0-E1F2-4A5B-8C7D-9E0F1A2B3C4D}");
+
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
         //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");

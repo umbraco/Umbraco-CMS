@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Options;
 
+#pragma warning disable ASPDEPR003 // MvcRazorRuntimeCompilationOptions is obsolete - intentional use for development-mode runtime compilation
+
 namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 

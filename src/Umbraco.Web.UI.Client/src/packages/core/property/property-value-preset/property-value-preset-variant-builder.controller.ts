@@ -101,8 +101,20 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 		const variantId = new UmbVariantId(culture, segment);
 		const args: Partial<UmbPropertyValuePresetApiCallArgs> = {
 			variantId,
-			value: this._existingValues?.find((x) => x.alias === alias && variantId.compare(x))?.value,
+			value: this.#findExistingValue(alias, variantId),
 		};
 		return args;
+	}
+
+	#findExistingValue(alias: string, variantId: UmbVariantId): unknown {
+		if (!this._existingValues) {
+			return undefined;
+		}
+
+		const exactMatch = this._existingValues.find((x) => x.alias === alias && variantId.compare(x));
+		if (exactMatch) {
+			return exactMatch.value;
+		}
+		return undefined;
 	}
 }

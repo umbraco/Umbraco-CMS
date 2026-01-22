@@ -167,8 +167,14 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 							</li>`,
 					)}
 				</ul>
-				<umb-dropdown look="secondary" placement="bottom-start" id="search-button" label=${this.localize.term('general_search')}>
-					<span slot="label"><uui-icon name="icon-search"></uui-icon> <umb-localize key="general_search">Search</umb-localize></span>
+				<umb-dropdown
+					look="secondary"
+					placement="bottom-start"
+					id="search-button"
+					label=${this.localize.term('general_search')}>
+					<span slot="label"
+						><uui-icon name="icon-search"></uui-icon> <umb-localize key="general_search">Search</umb-localize></span
+					>
 					${this._getSearchMenuData().map(
 						(menuItem) => html`
 							<uui-menu-item

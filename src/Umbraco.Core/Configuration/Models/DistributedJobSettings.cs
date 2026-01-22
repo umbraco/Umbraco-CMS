@@ -10,6 +10,7 @@ public class DistributedJobSettings
 {
     internal const string StaticPeriod = "00:00:05";
     internal const string StaticDelay = "00:01:00";
+    internal const string StaticMaxExecutionTime = "00:05:00";
 
     /// <summary>
     ///     Gets or sets a value for the period of checking if there are any runnable distributed jobs.
@@ -22,4 +23,11 @@ public class DistributedJobSettings
     /// </summary>
     [DefaultValue(StaticDelay)]
     public TimeSpan Delay { get; set; } = TimeSpan.Parse(StaticDelay);
+
+    /// <summary>
+    ///     Gets or sets the maximum execution time for a distributed job before it is considered timed out.
+    ///     When a job exceeds this time, it is considered stale and can be picked up by another server for recovery and restarted.
+    /// </summary>
+    [DefaultValue(StaticMaxExecutionTime)]
+    public TimeSpan MaximumExecutionTime { get; set; } = TimeSpan.Parse(StaticMaxExecutionTime);
 }

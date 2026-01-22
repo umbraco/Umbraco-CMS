@@ -33,6 +33,7 @@ export interface UmbTableColumn {
 	allowSorting?: boolean;
 	align?: 'left' | 'center' | 'right';
 	labelTemplate?: string;
+	clipText?: boolean;
 }
 
 export interface UmbTableColumnLayoutElement extends HTMLElement {
@@ -156,6 +157,13 @@ export class UmbTableElement extends UmbLitElement {
 
 	@state()
 	private _selectionMode = false;
+
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('selection')) {
+			this._selectionMode = this.selection.length > 0;
+		}
+	}
 
 	#sorter = new UmbSorterController<UmbTableItem>(this, {
 		getUniqueOfElement: (element) => {
@@ -291,7 +299,7 @@ export class UmbTableElement extends UmbLitElement {
 		return html`
 			<uui-table-row
 				data-sortable-id=${item.id}
-				?selectable="${this.config.allowSelection && !this._sortable}"
+				?selectable=${this.config.allowSelection && !this._sortable}
 				?select-only=${this._selectionMode}
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item.id)}
@@ -332,7 +340,9 @@ export class UmbTableElement extends UmbLitElement {
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
 		return html`
 			<uui-table-cell
-				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};">
+				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};"
+				?clip-text=${column.clipText}
+				>
 					${this._renderCellContent(column, item)}
 			</uui-table-cell>
 		</uui-table-cell>

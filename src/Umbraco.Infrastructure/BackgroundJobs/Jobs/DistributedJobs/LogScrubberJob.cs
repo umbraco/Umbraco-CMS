@@ -34,7 +34,6 @@ internal class LogScrubberJob : IDistributedBackgroundJob
     /// <param name="auditService">Service for handling audit operations.</param>
     /// <param name="settings">The configuration for logging settings.</param>
     /// <param name="scopeProvider">Provides scopes for database operations.</param>
-    /// <param name="logger">The typed logger.</param>
     /// <param name="profilingLogger">The profiling logger.</param>
     public LogScrubberJob(
         IAuditService auditService,

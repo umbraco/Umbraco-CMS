@@ -25,7 +25,10 @@ public abstract class UmbracoIntegrationTestBase
     private static readonly Lock _dbLocker = new();
     private static ITestDatabase? _dbInstance;
     private static TestDbMeta _fixtureDbMeta;
+
+    // TODO (V18): Rename to s_testCount to follow naming conventions
     protected static int TestCount = 1;
+
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
     private bool _firstTestInFixture = true;

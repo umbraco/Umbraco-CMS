@@ -72,6 +72,7 @@ public class DatabaseSchemaCreator
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
         typeof(DocumentUrlDto),
+        typeof(DocumentUrlAliasDto),
         typeof(KeyValueDto),
         typeof(UserLoginDto),
         typeof(ConsentDto),
@@ -174,7 +175,8 @@ public class DatabaseSchemaCreator
         if (creatingNotification.Cancel == false)
         {
             var dataCreation = new DatabaseDataCreator(
-                _database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
+                _database,
+                _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
                 _installDefaultDataSettings);
             foreach (Type table in _orderedTables)

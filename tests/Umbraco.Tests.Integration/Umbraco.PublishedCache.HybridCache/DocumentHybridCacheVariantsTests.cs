@@ -128,8 +128,12 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeEditingBuilder.CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(
-            "cultureVariationTest", "Culture Variation Test", _variantTitleAlias, _variantTitleName,
-            _invariantTitleAlias, _invariantTitleName);
+            "cultureVariationTest",
+            "Culture Variation Test",
+            _variantTitleAlias,
+            _variantTitleName,
+            _invariantTitleAlias,
+            _invariantTitleName);
         var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         if (!contentTypeAttempt.Success)
         {
@@ -137,8 +141,12 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
         }
 
         var rootContentCreateModel =
-            ContentEditingBuilder.CreateContentWithTwoVariantProperties(contentTypeAttempt.Result.Key, "en-US", "da-DK",
-                _variantTitleAlias, _variantTitleName);
+            ContentEditingBuilder.CreateContentWithTwoVariantProperties(
+                contentTypeAttempt.Result.Key,
+                "en-US",
+                "da-DK",
+                _variantTitleAlias,
+                _variantTitleName);
         var result = await ContentEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
         VariantPage = result.Result.Content;
     }

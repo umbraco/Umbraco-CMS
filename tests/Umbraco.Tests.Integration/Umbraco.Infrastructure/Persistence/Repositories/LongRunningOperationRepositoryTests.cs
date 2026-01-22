@@ -142,7 +142,7 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         await CreateTestData(repository);
 
         var testOperation = _operations[1];
-        repository.UpdateStatusAsync(testOperation.Operation.Id, LongRunningOperationStatus.Failed, DateTimeOffset.UtcNow);
+        await repository.UpdateStatusAsync(testOperation.Operation.Id, LongRunningOperationStatus.Failed, DateTimeOffset.UtcNow);
 
         var result = await repository.GetAsync(testOperation.Operation.Id);
         Assert.IsNotNull(result);

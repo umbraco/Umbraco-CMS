@@ -133,10 +133,12 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				</div>
 				<div id="main">
 					${this._isLoading
-						? html` <span id="empty">
-								<uui-loader-circle></uui-loader-circle
-								><umb-localize key="logViewer_loadingLogs">Loading log messages...</umb-localize>
-							</span> `
+						? html`
+								<span id="empty">
+									<uui-loader-circle></uui-loader-circle
+									><umb-localize key="logViewer_loadingLogs">Loading log messages...</umb-localize>
+								</span>
+							`
 						: html`${this.#renderLogs()}`}
 				</div>
 			</uui-box>

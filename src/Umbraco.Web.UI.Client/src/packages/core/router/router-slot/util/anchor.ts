@@ -3,11 +3,13 @@
  * that has a relative HREF, uses the history API instead.
  */
 export function ensureAnchorHistory() {
-	const isWindows = navigator.platform.toUpperCase().indexOf('WIN') !== -1;
+	const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 	window.addEventListener('click', (e: MouseEvent) => {
-		// If we try to open link in a new tab, then we want to skip skip:
-		if ((isWindows && e.ctrlKey) || (!isWindows && e.metaKey)) return;
+		// If we try to open link in a new tab, we want to skip:
+		// - Mac uses Meta (⌘) + Click
+		// - Windows and Linux use Ctrl + Click
+		if ((isMac && e.metaKey) || (!isMac && e.ctrlKey)) return;
 
 		// Find the target by using the composed path to get the element through the shadow boundaries.
 		// Support both HTML anchor tags and SVG anchor tags

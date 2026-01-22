@@ -41,6 +41,7 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     /// <summary>
     ///     Gets a paginated list of the migration status of each installed package.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the installed packages migration status.</returns>
