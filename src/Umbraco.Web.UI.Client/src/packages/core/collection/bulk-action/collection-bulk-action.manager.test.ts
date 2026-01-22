@@ -45,6 +45,9 @@ describe('UmbCollectionBulkActionManager', () => {
 		});
 
 		it('it emits false if there are no actions', (done) => {
+			// Need to call setConfig to initialize the observer
+			manager.setConfig({ enabled: true });
+
 			manager.hasBulkActions.subscribe((value) => {
 				expect(value).to.equal(false);
 				done();
@@ -52,20 +55,17 @@ describe('UmbCollectionBulkActionManager', () => {
 		});
 
 		it('it emits true if there are actions', (done) => {
-			let isFirstValue = true;
-
 			// First, we need to add bulk action manifests to the registry
 			umbExtensionsRegistry.registerMany(bulkActionManifests);
 
-			manager.hasBulkActions.subscribe((value) => {
-				if (isFirstValue) {
-					// Skip the first emission which is false
-					isFirstValue = false;
-					return;
-				}
+			// Need to call setConfig to initialize the observer
+			manager.setConfig({ enabled: true });
 
-				expect(value).to.equal(true);
-				done();
+			manager.hasBulkActions.subscribe((value) => {
+				if (value === true) {
+					expect(value).to.equal(true);
+					done();
+				}
 			});
 		});
 	});

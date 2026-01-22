@@ -4,6 +4,7 @@ export * from './backoffice-modal-container/backoffice-modal-container.element.j
 export * from './backoffice-notification-container/backoffice-notification-container.element.js';
 export * from './badge/index.js';
 export * from './body-layout/body-layout.element.js';
+export * from './figure-card/figure-card.element.js';
 export * from './code-block/index.js';
 export * from './dropdown/index.js';
 export * from './entity-actions-bundle/index.js';
