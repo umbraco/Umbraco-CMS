@@ -40,7 +40,7 @@ test('can set up notification for a content item', async ({umbracoUi, umbracoApi
   // Act
   await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[0]);
   await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[1]);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForNotificationToBeCreated();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();

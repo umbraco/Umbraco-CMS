@@ -113,6 +113,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	#renderTypeContent() {
 		return html`<umb-input-document-type
 			@change=${this.#onChange}
+			.documentTypesOnly=${true}
 			.selection=${this.#selection}></umb-input-document-type>`;
 	}
 
