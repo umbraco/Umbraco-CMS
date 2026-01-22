@@ -60,7 +60,7 @@ export class UmbElementFolderServerDataSource implements UmbDetailDataSource<Umb
 				entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE,
 				unique: data.id,
 				name: data.name,
-				isTrashed: false, // TODO: [LK] We need to have `isTrashed` returned from the server.
+				isTrashed: data.isTrashed,
 			};
 
 			return { data: mappedData };

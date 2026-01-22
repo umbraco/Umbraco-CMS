@@ -1,5 +1,5 @@
-import { UmbElementItemRepository } from '../../item/index.js';
 import { UmbElementTreeRepository } from '../../tree/element-tree.repository.js';
+import { UmbElementItemRepository } from '../../item/repository/element-item.repository.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import type {

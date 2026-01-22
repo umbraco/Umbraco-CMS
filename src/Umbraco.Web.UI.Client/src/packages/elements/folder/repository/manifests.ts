@@ -1,4 +1,5 @@
 import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS, UMB_ELEMENT_FOLDER_STORE_ALIAS } from './constants.js';
+import { manifests as itemManifests } from './item/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,4 +14,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Element Folder Store',
 		api: () => import('./element-folder.store.js'),
 	},
+	...itemManifests,
 ];

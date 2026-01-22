@@ -93,6 +93,6 @@ export { UmbElementPickerPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'mb-element-picker-property-editor-ui': UmbElementPickerPropertyEditorUIElement;
+		'umb-element-picker-property-editor-ui': UmbElementPickerPropertyEditorUIElement;
 	}
 }

@@ -21,10 +21,8 @@ export class UmbMoveElementServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Move an item for the given id to the target unique
-	 * @param {string} unique
-	 * @param {(string | null)} targetUnique
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbMoveToRequestArgs} args - The move to request arguments
+	 * @returns {Promise} The result of the move operation
 	 * @memberof UmbMoveElementServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {

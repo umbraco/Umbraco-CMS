@@ -1,5 +1,9 @@
 import { UMB_ELEMENT_MENU_ITEM_ALIAS } from '../menu/constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_UPDATE,
+} from '../user-permissions/constants.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from './constants.js';
 import { manifests as elementRoot } from './element-root/manifests.js';
 import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
@@ -59,6 +63,10 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_ELEMENT_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+				allOf: [UMB_USER_PERMISSION_ELEMENT_UPDATE],
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,

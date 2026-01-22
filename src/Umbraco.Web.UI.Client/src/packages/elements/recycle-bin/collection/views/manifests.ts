@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_RECYCLE_BIN_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from '../constants.js';
+import { UMB_ELEMENT_RECYCLE_BIN_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: UMB_ELEMENT_RECYCLE_BIN_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
+				match: UMB_ELEMENT_RECYCLE_BIN_COLLECTION_ALIAS,
 			},
 		],
 	},

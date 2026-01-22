@@ -440,7 +440,7 @@ export type CreateUserGroupRequestModel = {
     elementStartNode?: ReferenceByIdModel | null;
     elementRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | ElementPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -501,7 +501,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | ElementPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -1021,6 +1021,12 @@ export type ElementItemResponseModel = {
     variants: Array<ElementVariantItemResponseModel>;
 };
 
+export type ElementPermissionPresentationModel = {
+    $type: string;
+    element: ReferenceByIdModel;
+    verbs: Array<string>;
+};
+
 export type ElementRecycleBinItemResponseModel = {
     id: string;
     createDate: string;
@@ -1157,9 +1163,16 @@ export type FlagModel = {
     alias: string;
 };
 
+export type FolderItemResponseModel = {
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+};
+
 export type FolderResponseModel = {
     name: string;
     id: string;
+    isTrashed: boolean;
 };
 
 export type HealthCheckActionRequestModel = {
@@ -3013,7 +3026,7 @@ export type UpdateUserGroupRequestModel = {
     elementStartNode?: ReferenceByIdModel | null;
     elementRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | ElementPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -3119,7 +3132,7 @@ export type UserGroupResponseModel = {
     elementStartNode?: ReferenceByIdModel | null;
     elementRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | ElementPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -8480,6 +8493,31 @@ export type GetItemElementResponses = {
 };
 
 export type GetItemElementResponse = GetItemElementResponses[keyof GetItemElementResponses];
+
+export type GetItemElementFolderData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/element/folder';
+};
+
+export type GetItemElementFolderErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementFolderResponses = {
+    /**
+     * OK
+     */
+    200: Array<FolderItemResponseModel>;
+};
+
+export type GetItemElementFolderResponse = GetItemElementFolderResponses[keyof GetItemElementFolderResponses];
 
 export type DeleteRecycleBinElementData = {
     body?: never;
@@ -17945,6 +17983,37 @@ export type GetUserCurrentPermissionsDocumentResponses = {
 };
 
 export type GetUserCurrentPermissionsDocumentResponse = GetUserCurrentPermissionsDocumentResponses[keyof GetUserCurrentPermissionsDocumentResponses];
+
+export type GetUserCurrentPermissionsElementData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/user/current/permissions/element';
+};
+
+export type GetUserCurrentPermissionsElementErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetUserCurrentPermissionsElementError = GetUserCurrentPermissionsElementErrors[keyof GetUserCurrentPermissionsElementErrors];
+
+export type GetUserCurrentPermissionsElementResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserPermissionsResponseModel>;
+};
+
+export type GetUserCurrentPermissionsElementResponse = GetUserCurrentPermissionsElementResponses[keyof GetUserCurrentPermissionsElementResponses];
 
 export type GetUserCurrentPermissionsMediaData = {
     body?: never;
