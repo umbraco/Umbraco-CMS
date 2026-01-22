@@ -24,13 +24,22 @@ export class UmbDocumentPickerInputVariantContext extends UmbPickerInputContext<
 > {
 	#resolvers = new Set<UmbDocumentItemDataResolver<any>>();
 
+	private _culture?: string;
+
+	public get culture() {
+		return this._culture;
+	}
+
+	public setCulture(value: string | undefined){
+		this._culture = value;
+		this.onCultureChange(value);
+	}
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_VARIANT_PICKER_MODAL);
 	}
 
-	protected override _onCultureChange(culture: string | undefined) {
-		super._onCultureChange(culture);
-
+	public onCultureChange(culture: string | undefined) {
 		for (const resolver of this.#resolvers) {
 			resolver.setCultureOverride(culture);
 		}
@@ -79,7 +88,10 @@ export class UmbDocumentPickerInputVariantContext extends UmbPickerInputContext<
 		// Get initial culture from app language context
 		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 		combinedPickerData.initialCulture = appLanguageContext?.getAppCulture() ?? culture ?? undefined;
-
+		if (culture) {
+			this._culture = culture;
+			this.onCultureChange(culture);
+		}
 		await super.openPicker(combinedPickerData);
 	}
 
