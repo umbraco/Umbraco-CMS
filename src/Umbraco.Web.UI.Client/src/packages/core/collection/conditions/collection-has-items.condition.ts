@@ -18,5 +18,3 @@ export class UmbCollectionHasItemsCondition
 		});
 	}
 }
-
-export { UmbCollectionHasItemsCondition as api };
