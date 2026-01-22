@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Condition.CurrentUser.AllowMediaRecycleBin',
 		api: () => import('./allow-media-recycle-bin.condition.js'),
 	},
-		...collectionManifests,
+	...collectionManifests,
 	...entityActionManifests,
 	...menuManifests,
 	...repositoryManifests,
