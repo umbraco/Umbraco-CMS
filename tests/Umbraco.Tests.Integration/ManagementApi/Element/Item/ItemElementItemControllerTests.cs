@@ -58,7 +58,4 @@ public class ItemElementItemControllerTests : ManagementApiUserGroupTestBase<Ite
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
-
-    protected override async Task<HttpResponseMessage> ClientRequest()
-        => await Client.GetAsync($"{Url}?id={_elementKey}");
 }
