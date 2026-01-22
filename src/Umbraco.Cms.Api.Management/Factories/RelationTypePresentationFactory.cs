@@ -115,7 +115,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         if (responseModel is null
             || slimEntities.FirstOrDefault(e => e.Key == relationItemModel.NodeKey) is not TEntity matchingEntity)
         {
-            return null;
+            return responseModel;
         }
 
         enrichResponse(responseModel, matchingEntity);
