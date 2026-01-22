@@ -266,7 +266,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 				if (path === undefined) {
 					throw new Error('Path was not transformed correctly and can therefor not be synced with parent messages.');
 				}
-				// Notice, the parent message uses the same key. [NL]
 				this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 			});
 		}
