@@ -107,8 +107,8 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     public IEnumerable<DocumentUrlAliasRaw> GetAllDocumentUrlAliases()
     {
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
-            .Append("SELECT n.uniqueId AS DocumentKey, pd.languageId")
-            .Append(", COALESCE(pd.textValue, pd.varcharValue) AS AliasValue")
+            .Append($"SELECT n.{QuotedColName("uniqueId")} AS {QuotedColName("DocumentKey")}, pd.{QuotedColName("languageId")}")
+            .Append($", COALESCE(pd.{QuotedColName("textValue")}, pd.{QuotedColName("varcharValue")}) AS {QuotedColName("AliasValue")}")
             .From<PropertyDataDto>("pd")
             .InnerJoin<PropertyTypeDto>("pt").On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id, "pd", "pt")
             .InnerJoin<ContentVersionDto>("cv").On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id, "pd", "cv")
@@ -117,11 +117,12 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
             .Where<ContentVersionDto>(cv => cv.Current == true, "cv")
             .Where<NodeDto>(n => n.Trashed == false, "n")
             .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Document, "n") // Exclude blueprints
-            .Append("AND (pd.textValue IS NOT NULL OR pd.varcharValue IS NOT NULL)");
+            .Append($"AND (pd.{QuotedColName("textValue")} IS NOT NULL OR pd.{QuotedColName("varcharValue")} IS NOT NULL)");
 
         return Database.Fetch<DocumentUrlAliasRaw>(sql);
     }
 
+    private string QuotedColName(string name) => Database.SqlContext.SqlSyntax.GetQuotedColumnName(name);
     private PublishedDocumentUrlAlias BuildModel(DocumentUrlAliasDto dto) =>
         new()
         {
