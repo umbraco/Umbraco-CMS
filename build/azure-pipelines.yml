@@ -200,54 +200,54 @@ stages:
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
-      # C# API Reference
-      - job:
-        displayName: Build C# API Reference
-        pool:
-          vmImage: "windows-latest"
-        steps:
-          - task: UseDotNet@2
-            displayName: Use .NET SDK from global.json
-            inputs:
-              useGlobalJson: true
-          - task: PowerShell@2
-            displayName: Install DocFX
-            inputs:
-              targetType: inline
-              script: |
-                choco install docfx --version=2.59.4 -y
-                if ($lastexitcode -ne 0){
-                    throw ("Error installing DocFX")
-                }
-          - task: PowerShell@2
-            displayName: Generate metadata
-            inputs:
-              targetType: inline
-              script: |
-                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                if ($lastexitcode -ne 0){
-                    throw ("Error generating metadata.")
-                }
-          - task: PowerShell@2
-            displayName: Generate documentation
-            inputs:
-              targetType: inline
-              script: |
-                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                if ($lastexitcode -ne 0){
-                      throw ("Error generating documentation.")
-                }
-          - task: ArchiveFiles@2
-            displayName: Archive C# Docs
-            inputs:
-              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
-              includeRootFolder: false
-              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-          - task: PublishPipelineArtifact@1
-            displayName: Publish C# Docs
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-              artifact: csharp-docs
+      # # C# API Reference
+      # - job:
+        # displayName: Build C# API Reference
+        # pool:
+          # vmImage: "windows-latest"
+        # steps:
+          # - task: UseDotNet@2
+            # displayName: Use .NET SDK from global.json
+            # inputs:
+              # useGlobalJson: true
+          # - task: PowerShell@2
+            # displayName: Install DocFX
+            # inputs:
+              # targetType: inline
+              # script: |
+                # choco install docfx --version=2.59.4 -y
+                # if ($lastexitcode -ne 0){
+                    # throw ("Error installing DocFX")
+                # }
+          # - task: PowerShell@2
+            # displayName: Generate metadata
+            # inputs:
+              # targetType: inline
+              # script: |
+                # docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                # if ($lastexitcode -ne 0){
+                    # throw ("Error generating metadata.")
+                # }
+          # - task: PowerShell@2
+            # displayName: Generate documentation
+            # inputs:
+              # targetType: inline
+              # script: |
+                # docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                # if ($lastexitcode -ne 0){
+                      # throw ("Error generating documentation.")
+                # }
+          # - task: ArchiveFiles@2
+            # displayName: Archive C# Docs
+            # inputs:
+              # rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
+              # includeRootFolder: false
+              # archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+          # - task: PublishPipelineArtifact@1
+            # displayName: Publish C# Docs
+            # inputs:
+              # targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              # artifact: csharp-docs
 
       # js API Reference
       - job:
@@ -882,30 +882,30 @@ stages:
       - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
-      - job:
-        displayName: Upload C# Docs
-        steps:
-          - checkout: none
-          - task: DownloadPipelineArtifact@2
-            displayName: Download artifact
-            inputs:
-              artifact: csharp-docs
-              path: $(Build.SourcesDirectory)
-          - task: ExtractFiles@1
-            inputs:
-              archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
-              destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
-              overwriteExistingFiles: true
-          - task: AzureFileCopy@4
-            displayName: "Copy C# Docs to blob storage"
-            inputs:
-              SourcePath: "$(Build.ArtifactStagingDirectory)/csharp-docs/*"
-              azureSubscription: umbraco-storage
-              Destination: AzureBlob
-              storage: umbracoapidocs
-              ContainerName: "$web"
-              BlobPrefix: v$(umbracoMajorVersion)/csharp
-              CleanTargetBeforeCopy: true
+      # - job:
+        # displayName: Upload C# Docs
+        # steps:
+          # - checkout: none
+          # - task: DownloadPipelineArtifact@2
+            # displayName: Download artifact
+            # inputs:
+              # artifact: csharp-docs
+              # path: $(Build.SourcesDirectory)
+          # - task: ExtractFiles@1
+            # inputs:
+              # archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
+              # destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
+              # overwriteExistingFiles: true
+          # - task: AzureFileCopy@4
+            # displayName: "Copy C# Docs to blob storage"
+            # inputs:
+              # SourcePath: "$(Build.ArtifactStagingDirectory)/csharp-docs/*"
+              # azureSubscription: umbraco-storage
+              # Destination: AzureBlob
+              # storage: umbracoapidocs
+              # ContainerName: "$web"
+              # BlobPrefix: v$(umbracoMajorVersion)/csharp
+              # CleanTargetBeforeCopy: true
       - job:
         displayName: Upload Storybook
         steps:
