@@ -89,7 +89,7 @@ internal sealed class DatabaseDataCreator
     ];
 
     private readonly IDatabase _database;
-    
+
     private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>
     {
         {
@@ -276,8 +276,6 @@ internal sealed class DatabaseDataCreator
                 nodeDto);
         }
 
-        //var primaryKeyName = GetPrimaryKeyName("id");
-
         Insert(
             new NodeDto
             {
@@ -309,7 +307,6 @@ internal sealed class DatabaseDataCreator
             CreateDate = DateTime.UtcNow,
         });
 
-
         Insert(new NodeDto
         {
             NodeId = Constants.System.RecycleBinMedia,
@@ -330,36 +327,43 @@ internal sealed class DatabaseDataCreator
             35,
             Constants.DataTypes.Guids.LabelString,
             "Label (string)");
+
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelInt,
             36,
             Constants.DataTypes.Guids.LabelInt,
             "Label (integer)");
+
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelBigint,
             36,
             Constants.DataTypes.Guids.LabelBigInt,
             "Label (bigint)");
+
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelDateTime,
             37,
             Constants.DataTypes.Guids.LabelDateTime,
             "Label (datetime)");
+
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelTime,
             38,
             Constants.DataTypes.Guids.LabelTime,
             "Label (time)");
+
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelDecimal,
             39,
             Constants.DataTypes.Guids.LabelDecimal,
             "Label (decimal)");
+
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelBytes,
             40,
             Constants.DataTypes.Guids.LabelBytes,
             "Label (bytes)");
+
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelPixels,
             41,
@@ -383,6 +387,7 @@ internal sealed class DatabaseDataCreator
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.UtcNow,
             });
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.UploadVideo,
@@ -400,6 +405,7 @@ internal sealed class DatabaseDataCreator
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.UtcNow,
             });
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.UploadAudio,
@@ -417,6 +423,7 @@ internal sealed class DatabaseDataCreator
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.UtcNow,
             });
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.UploadArticle,
@@ -434,6 +441,7 @@ internal sealed class DatabaseDataCreator
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.UtcNow,
             });
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.UploadVectorGraphics,
@@ -451,6 +459,7 @@ internal sealed class DatabaseDataCreator
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.UtcNow,
             });
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.Textarea,
@@ -1288,6 +1297,7 @@ internal sealed class DatabaseDataCreator
 
     private void CreateUserGroup2AppData()
     {
+        // UserGroupId = 1
         Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Content });
         Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Packages });
         Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Media });
@@ -1297,12 +1307,15 @@ internal sealed class DatabaseDataCreator
         Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Forms });
         Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Translation });
 
+        // UserGroupId = 2
         Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Content });
 
+        // UserGroupId = 3
         Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Content });
         Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Media });
         Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Forms });
 
+        // UserGroupId = 4
         Insert(new UserGroup2AppDto { UserGroupId = 4, AppAlias = Constants.Applications.Translation });
     }
 
@@ -1414,358 +1427,359 @@ internal sealed class DatabaseDataCreator
         if (_database.Exists<PropertyTypeGroupDto>(3))
         {
             Insert(new PropertyTypeDto
-                {
-                    Id = 6,
-                    UniqueId = new Guid("B646CA8F-E469-4FC2-A48A-D4DC1AA64A53"),
-                    DataTypeId = Constants.DataTypes.ImageCropper,
-                    ContentTypeId = 1032,
-                    PropertyTypeGroupId = 3,
-                    Alias = Constants.Conventions.Media.File,
-                    Name = "Image",
-                    SortOrder = 0,
-                    Mandatory = true,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
-            Insert(new PropertyTypeDto
-                {
-                    Id = 7,
-                    UniqueId = new Guid("A68D453B-1F62-44F4-9F71-0B6BBD43C355"),
-                    DataTypeId = Constants.DataTypes.LabelPixels,
-                    ContentTypeId = 1032,
-                    PropertyTypeGroupId = 3,
-                    Alias = Constants.Conventions.Media.Width,
-                    Name = "Width",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 6,
+                UniqueId = new Guid("B646CA8F-E469-4FC2-A48A-D4DC1AA64A53"),
+                DataTypeId = Constants.DataTypes.ImageCropper,
+                ContentTypeId = 1032,
+                PropertyTypeGroupId = 3,
+                Alias = Constants.Conventions.Media.File,
+                Name = "Image",
+                SortOrder = 0,
+                Mandatory = true,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 8,
-                    UniqueId = new Guid("854087F6-648B-40ED-BC98-B8A9789E80B9"),
-                    DataTypeId = Constants.DataTypes.LabelPixels,
-                    ContentTypeId = 1032,
-                    PropertyTypeGroupId = 3,
-                    Alias = Constants.Conventions.Media.Height,
-                    Name = "Height",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 7,
+                UniqueId = new Guid("A68D453B-1F62-44F4-9F71-0B6BBD43C355"),
+                DataTypeId = Constants.DataTypes.LabelPixels,
+                ContentTypeId = 1032,
+                PropertyTypeGroupId = 3,
+                Alias = Constants.Conventions.Media.Width,
+                Name = "Width",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 9,
-                    UniqueId = new Guid("BD4C5ACE-26E3-4A8B-AF1A-E8206A35FA07"),
-                    DataTypeId = Constants.DataTypes.LabelBytes,
-                    ContentTypeId = 1032,
-                    PropertyTypeGroupId = 3,
-                    Alias = Constants.Conventions.Media.Bytes,
-                    Name = "File size",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 8,
+                UniqueId = new Guid("854087F6-648B-40ED-BC98-B8A9789E80B9"),
+                DataTypeId = Constants.DataTypes.LabelPixels,
+                ContentTypeId = 1032,
+                PropertyTypeGroupId = 3,
+                Alias = Constants.Conventions.Media.Height,
+                Name = "Height",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 10,
-                    UniqueId = new Guid("F7786FE8-724A-4ED0-B244-72546DB32A92"),
-                    DataTypeId = Constants.DataTypes.LabelString,
-                    ContentTypeId = 1032,
-                    PropertyTypeGroupId = 3,
-                    Alias = Constants.Conventions.Media.Extension,
-                    Name = "File extension",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 9,
+                UniqueId = new Guid("BD4C5ACE-26E3-4A8B-AF1A-E8206A35FA07"),
+                DataTypeId = Constants.DataTypes.LabelBytes,
+                ContentTypeId = 1032,
+                PropertyTypeGroupId = 3,
+                Alias = Constants.Conventions.Media.Bytes,
+                Name = "File size",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
+
+            Insert(new PropertyTypeDto
+            {
+                Id = 10,
+                UniqueId = new Guid("F7786FE8-724A-4ED0-B244-72546DB32A92"),
+                DataTypeId = Constants.DataTypes.LabelString,
+                ContentTypeId = 1032,
+                PropertyTypeGroupId = 3,
+                Alias = Constants.Conventions.Media.Extension,
+                Name = "File extension",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(4))
         {
             Insert(new PropertyTypeDto
-                {
-                    Id = 24,
-                    UniqueId = new Guid("A0FB68F3-F427-47A6-AFCE-536FFA5B64E9"),
-                    DataTypeId = Constants.DataTypes.Upload,
-                    ContentTypeId = 1033,
-                    PropertyTypeGroupId = 4,
-                    Alias = Constants.Conventions.Media.File,
-                    Name = "File",
-                    SortOrder = 0,
-                    Mandatory = true,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 24,
+                UniqueId = new Guid("A0FB68F3-F427-47A6-AFCE-536FFA5B64E9"),
+                DataTypeId = Constants.DataTypes.Upload,
+                ContentTypeId = 1033,
+                PropertyTypeGroupId = 4,
+                Alias = Constants.Conventions.Media.File,
+                Name = "File",
+                SortOrder = 0,
+                Mandatory = true,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 25,
-                    UniqueId = new Guid("3531C0A3-4E0A-4324-A621-B9D3822B071F"),
-                    DataTypeId = Constants.DataTypes.LabelString,
-                    ContentTypeId = 1033,
-                    PropertyTypeGroupId = 4,
-                    Alias = Constants.Conventions.Media.Extension,
-                    Name = "File extension",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 25,
+                UniqueId = new Guid("3531C0A3-4E0A-4324-A621-B9D3822B071F"),
+                DataTypeId = Constants.DataTypes.LabelString,
+                ContentTypeId = 1033,
+                PropertyTypeGroupId = 4,
+                Alias = Constants.Conventions.Media.Extension,
+                Name = "File extension",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 26,
-                    UniqueId = new Guid("F9527050-59BC-43E4-8FA8-1658D1319FF5"),
-                    DataTypeId = Constants.DataTypes.LabelBytes,
-                    ContentTypeId = 1033,
-                    PropertyTypeGroupId = 4,
-                    Alias = Constants.Conventions.Media.Bytes,
-                    Name = "File size",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 26,
+                UniqueId = new Guid("F9527050-59BC-43E4-8FA8-1658D1319FF5"),
+                DataTypeId = Constants.DataTypes.LabelBytes,
+                ContentTypeId = 1033,
+                PropertyTypeGroupId = 4,
+                Alias = Constants.Conventions.Media.Bytes,
+                Name = "File size",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(52))
         {
             Insert(new PropertyTypeDto
-                {
-                    Id = 40,
-                    UniqueId = new Guid("BED8AB97-D85F-44D2-A8B9-AEF6893F9610"),
-                    DataTypeId = Constants.DataTypes.UploadVideo,
-                    ContentTypeId = 1034,
-                    PropertyTypeGroupId = 52,
-                    Alias = Constants.Conventions.Media.File,
-                    Name = "Video",
-                    SortOrder = 0,
-                    Mandatory = true,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 40,
+                UniqueId = new Guid("BED8AB97-D85F-44D2-A8B9-AEF6893F9610"),
+                DataTypeId = Constants.DataTypes.UploadVideo,
+                ContentTypeId = 1034,
+                PropertyTypeGroupId = 52,
+                Alias = Constants.Conventions.Media.File,
+                Name = "Video",
+                SortOrder = 0,
+                Mandatory = true,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 41,
-                    UniqueId = new Guid("EDD2B3FD-1E57-4E57-935E-096DEFCCDC9B"),
-                    DataTypeId = Constants.DataTypes.LabelString,
-                    ContentTypeId = 1034,
-                    PropertyTypeGroupId = 52,
-                    Alias = Constants.Conventions.Media.Extension,
-                    Name = "File extension",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 41,
+                UniqueId = new Guid("EDD2B3FD-1E57-4E57-935E-096DEFCCDC9B"),
+                DataTypeId = Constants.DataTypes.LabelString,
+                ContentTypeId = 1034,
+                PropertyTypeGroupId = 52,
+                Alias = Constants.Conventions.Media.Extension,
+                Name = "File extension",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 42,
-                    UniqueId = new Guid("180EEECF-1F00-409E-8234-BBA967E08B0A"),
-                    DataTypeId = Constants.DataTypes.LabelBytes,
-                    ContentTypeId = 1034,
-                    PropertyTypeGroupId = 52,
-                    Alias = Constants.Conventions.Media.Bytes,
-                    Name = "File size",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 42,
+                UniqueId = new Guid("180EEECF-1F00-409E-8234-BBA967E08B0A"),
+                DataTypeId = Constants.DataTypes.LabelBytes,
+                ContentTypeId = 1034,
+                PropertyTypeGroupId = 52,
+                Alias = Constants.Conventions.Media.Bytes,
+                Name = "File size",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(53))
         {
             Insert(new PropertyTypeDto
-                {
-                    Id = 43,
-                    UniqueId = new Guid("1F48D730-F174-4684-AFAD-A335E59D84A0"),
-                    DataTypeId = Constants.DataTypes.UploadAudio,
-                    ContentTypeId = 1035,
-                    PropertyTypeGroupId = 53,
-                    Alias = Constants.Conventions.Media.File,
-                    Name = "Audio",
-                    SortOrder = 0,
-                    Mandatory = true,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 43,
+                UniqueId = new Guid("1F48D730-F174-4684-AFAD-A335E59D84A0"),
+                DataTypeId = Constants.DataTypes.UploadAudio,
+                ContentTypeId = 1035,
+                PropertyTypeGroupId = 53,
+                Alias = Constants.Conventions.Media.File,
+                Name = "Audio",
+                SortOrder = 0,
+                Mandatory = true,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 44,
-                    UniqueId = new Guid("1BEE433F-A21A-4031-8E03-AF01BB8D2DE9"),
-                    DataTypeId = Constants.DataTypes.LabelString,
-                    ContentTypeId = 1035,
-                    PropertyTypeGroupId = 53,
-                    Alias = Constants.Conventions.Media.Extension,
-                    Name = "File extension",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 44,
+                UniqueId = new Guid("1BEE433F-A21A-4031-8E03-AF01BB8D2DE9"),
+                DataTypeId = Constants.DataTypes.LabelString,
+                ContentTypeId = 1035,
+                PropertyTypeGroupId = 53,
+                Alias = Constants.Conventions.Media.Extension,
+                Name = "File extension",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 45,
-                    UniqueId = new Guid("3CBF538A-29AB-4317-A9EB-BBCDF1A54260"),
-                    DataTypeId = Constants.DataTypes.LabelBytes,
-                    ContentTypeId = 1035,
-                    PropertyTypeGroupId = 53,
-                    Alias = Constants.Conventions.Media.Bytes,
-                    Name = "File size",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 45,
+                UniqueId = new Guid("3CBF538A-29AB-4317-A9EB-BBCDF1A54260"),
+                DataTypeId = Constants.DataTypes.LabelBytes,
+                ContentTypeId = 1035,
+                PropertyTypeGroupId = 53,
+                Alias = Constants.Conventions.Media.Bytes,
+                Name = "File size",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(54))
         {
             Insert(new PropertyTypeDto
-                {
-                    Id = 46,
-                    UniqueId = new Guid("E5C8C2D0-2D82-4F01-B53A-45A1D1CBF19C"),
-                    DataTypeId = Constants.DataTypes.UploadArticle,
-                    ContentTypeId = 1036,
-                    PropertyTypeGroupId = 54,
-                    Alias = Constants.Conventions.Media.File,
-                    Name = "Article",
-                    SortOrder = 0,
-                    Mandatory = true,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 46,
+                UniqueId = new Guid("E5C8C2D0-2D82-4F01-B53A-45A1D1CBF19C"),
+                DataTypeId = Constants.DataTypes.UploadArticle,
+                ContentTypeId = 1036,
+                PropertyTypeGroupId = 54,
+                Alias = Constants.Conventions.Media.File,
+                Name = "Article",
+                SortOrder = 0,
+                Mandatory = true,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 47,
-                    UniqueId = new Guid("EF1B4AF7-36DE-45EB-8C18-A2DE07319227"),
-                    DataTypeId = Constants.DataTypes.LabelString,
-                    ContentTypeId = 1036,
-                    PropertyTypeGroupId = 54,
-                    Alias = Constants.Conventions.Media.Extension,
-                    Name = "File extension",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 47,
+                UniqueId = new Guid("EF1B4AF7-36DE-45EB-8C18-A2DE07319227"),
+                DataTypeId = Constants.DataTypes.LabelString,
+                ContentTypeId = 1036,
+                PropertyTypeGroupId = 54,
+                Alias = Constants.Conventions.Media.Extension,
+                Name = "File extension",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 48,
-                    UniqueId = new Guid("AAB7D00C-7209-4337-BE3F-A4421C8D79A0"),
-                    DataTypeId = Constants.DataTypes.LabelBytes,
-                    ContentTypeId = 1036,
-                    PropertyTypeGroupId = 54,
-                    Alias = Constants.Conventions.Media.Bytes,
-                    Name = "File size",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 48,
+                UniqueId = new Guid("AAB7D00C-7209-4337-BE3F-A4421C8D79A0"),
+                DataTypeId = Constants.DataTypes.LabelBytes,
+                ContentTypeId = 1036,
+                PropertyTypeGroupId = 54,
+                Alias = Constants.Conventions.Media.Bytes,
+                Name = "File size",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(55))
         {
             Insert(new PropertyTypeDto
-                {
-                    Id = 49,
-                    UniqueId = new Guid("E2A2BDF2-971B-483E-95A1-4104CC06AF26"),
-                    DataTypeId = Constants.DataTypes.UploadVectorGraphics,
-                    ContentTypeId = 1037,
-                    PropertyTypeGroupId = 55,
-                    Alias = Constants.Conventions.Media.File,
-                    Name = "Vector Graphics",
-                    SortOrder = 0,
-                    Mandatory = true,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 49,
+                UniqueId = new Guid("E2A2BDF2-971B-483E-95A1-4104CC06AF26"),
+                DataTypeId = Constants.DataTypes.UploadVectorGraphics,
+                ContentTypeId = 1037,
+                PropertyTypeGroupId = 55,
+                Alias = Constants.Conventions.Media.File,
+                Name = "Vector Graphics",
+                SortOrder = 0,
+                Mandatory = true,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 50,
-                    UniqueId = new Guid("0F25A89E-2EB7-49BC-A7B4-759A7E4C69F2"),
-                    DataTypeId = Constants.DataTypes.LabelString,
-                    ContentTypeId = 1037,
-                    PropertyTypeGroupId = 55,
-                    Alias = Constants.Conventions.Media.Extension,
-                    Name = "File extension",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 50,
+                UniqueId = new Guid("0F25A89E-2EB7-49BC-A7B4-759A7E4C69F2"),
+                DataTypeId = Constants.DataTypes.LabelString,
+                ContentTypeId = 1037,
+                PropertyTypeGroupId = 55,
+                Alias = Constants.Conventions.Media.Extension,
+                Name = "File extension",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
 
             Insert(new PropertyTypeDto
-                {
-                    Id = 51,
-                    UniqueId = new Guid("09A07AFF-861D-4769-A2B0-C165EBD43D39"),
-                    DataTypeId = Constants.DataTypes.LabelBytes,
-                    ContentTypeId = 1037,
-                    PropertyTypeGroupId = 55,
-                    Alias = Constants.Conventions.Media.Bytes,
-                    Name = "File size",
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 51,
+                UniqueId = new Guid("09A07AFF-861D-4769-A2B0-C165EBD43D39"),
+                DataTypeId = Constants.DataTypes.LabelBytes,
+                ContentTypeId = 1037,
+                PropertyTypeGroupId = 55,
+                Alias = Constants.Conventions.Media.Bytes,
+                Name = "File size",
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
         }
 
         // Membership property types.
         if (_database.Exists<PropertyTypeGroupDto>(11))
         {
             Insert(new PropertyTypeDto
-                {
-                    Id = 28,
-                    UniqueId = new Guid("70F24C26-1C0E-4053-BD8E-E9E6E4EC4C01"),
-                    DataTypeId = Constants.DataTypes.Textarea,
-                    ContentTypeId = 1044,
-                    PropertyTypeGroupId = 11,
-                    Alias = Constants.Conventions.Member.Comments,
-                    Name = Constants.Conventions.Member.CommentsLabel,
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
-                    Variations = (byte)ContentVariation.Nothing,
-                });
+            {
+                Id = 28,
+                UniqueId = new Guid("70F24C26-1C0E-4053-BD8E-E9E6E4EC4C01"),
+                DataTypeId = Constants.DataTypes.Textarea,
+                ContentTypeId = 1044,
+                PropertyTypeGroupId = 11,
+                Alias = Constants.Conventions.Member.Comments,
+                Name = Constants.Conventions.Member.CommentsLabel,
+                SortOrder = 0,
+                Mandatory = false,
+                ValidationRegExp = null,
+                Description = null,
+                Variations = (byte)ContentVariation.Nothing,
+            });
         }
     }
 
@@ -1953,42 +1967,49 @@ internal sealed class DatabaseDataCreator
             "Umb.PropertyEditorUi.Label",
             "Nvarchar",
             "{\"umbracoDataValueType\":\"STRING\"}");
+
         InsertDataTypeDto(
             Constants.DataTypes.LabelInt,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Integer",
             "{\"umbracoDataValueType\":\"INT\"}");
+
         InsertDataTypeDto(
             Constants.DataTypes.LabelBigint,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Nvarchar",
             "{\"umbracoDataValueType\":\"BIGINT\"}");
+
         InsertDataTypeDto(
             Constants.DataTypes.LabelDateTime,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Date",
             "{\"umbracoDataValueType\":\"DATETIME\"}");
+
         InsertDataTypeDto(
             Constants.DataTypes.LabelDecimal,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Decimal",
             "{\"umbracoDataValueType\":\"DECIMAL\"}");
+
         InsertDataTypeDto(
             Constants.DataTypes.LabelTime,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Date",
             "{\"umbracoDataValueType\":\"TIME\"}");
+
         InsertDataTypeDto(
             Constants.DataTypes.LabelBytes,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Nvarchar",
             "{\"umbracoDataValueType\":\"BIGINT\", \"labelTemplate\":\"{=value | bytes}\"}");
+
         InsertDataTypeDto(
             Constants.DataTypes.LabelPixels,
             Constants.PropertyEditors.Aliases.Label,
@@ -2291,6 +2312,7 @@ internal sealed class DatabaseDataCreator
             Constants.ObjectTypes.Document,
             true,
             false);
+
         CreateRelationTypeData(
             2,
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
@@ -2299,6 +2321,7 @@ internal sealed class DatabaseDataCreator
             Constants.ObjectTypes.Document,
             false,
             false);
+
         CreateRelationTypeData(
             3,
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
@@ -2307,6 +2330,7 @@ internal sealed class DatabaseDataCreator
             Constants.ObjectTypes.Media,
             false,
             false);
+
         CreateRelationTypeData(
             4,
             Constants.Conventions.RelationTypes.RelatedMediaAlias,
@@ -2315,6 +2339,7 @@ internal sealed class DatabaseDataCreator
             null,
             false,
             true);
+
         CreateRelationTypeData(
             5,
             Constants.Conventions.RelationTypes.RelatedDocumentAlias,
@@ -2323,6 +2348,7 @@ internal sealed class DatabaseDataCreator
             null,
             false,
             true);
+
         CreateRelationTypeData(
             6,
             Constants.Conventions.RelationTypes.RelatedMemberAlias,
@@ -2385,10 +2411,6 @@ internal sealed class DatabaseDataCreator
 
     private void ConditionalInsert<TDto>(string configKey, string id, TDto dto)
     {
-
-        // var alwaysInsert = _entitiesToAlwaysCreate.ContainsKey(configKey) &&
-        //                   _entitiesToAlwaysCreate[configKey].InvariantContains(id);
-        // copilot rewrite:
         var alwaysInsert = false;
         if (_entitiesToAlwaysCreate.TryGetValue(configKey, out IList<string>? alwaysCreateIds))
         {
@@ -2423,46 +2445,19 @@ internal sealed class DatabaseDataCreator
         Insert(dto);
     }
 
-    private object Insert<T>(T poco)
+    private void Insert<T>(T poco)
     {
         ArgumentNullException.ThrowIfNull(poco);
         ArgumentNullException.ThrowIfNull(_pocoDataFactory);
 
         PocoData pocoData = _pocoDataFactory.ForType(poco.GetType());
-        var autoIncrement = UseAutoIncrement(); // GetAutoIncrementByInt(pocoData, poco);
+        var autoIncrement = UseAutoIncrement();
 
-        return _database.Insert<T>(
+        _database.Insert<T>(
             pocoData.TableInfo.TableName,
             null,
             autoIncrement,
             poco);
-    }
-
-    private bool GetAutoIncrementByInt<T>(PocoData pocoData, T poco)
-    {
-        ArgumentNullException.ThrowIfNull(pocoData);
-
-        var autoIncrement = pocoData.TableInfo.AutoIncrement;
-        bool useAutoIncrement = ((IUmbracoDatabase)_database).SqlContext.DatabaseType is PostgreSQLDatabaseType;
-
-        if (useAutoIncrement || autoIncrement)
-        {
-            var primaryColumnValues = pocoData.GetPrimaryKeyValues(poco);
-            if (primaryColumnValues.Length == 0)
-            {
-                autoIncrement = false;
-            }
-            else if (primaryColumnValues.Length > 1)
-            {
-                autoIncrement = false;
-            }
-            else if (primaryColumnValues.FirstOrDefault() is int)
-            {
-                autoIncrement = false;
-            }
-        }
-
-        return autoIncrement;
     }
 
     private bool UseAutoIncrement()
