@@ -197,7 +197,8 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
             // Check permission access
             EntityPermissionSet permissionSet = _userService.GetPermissionsForPath(user, entityPath.Path);
-            if (permissionsToCheck.All(p => permissionSet.GetAllPermissions().Contains(p)))
+            ISet<string> permissionSetPermissions = permissionSet.GetAllPermissions();
+            if (permissionsToCheck.All(p => permissionSetPermissions.Contains(p)))
             {
                 authorizedKeys.Add(entityPath.Key);
             }
