@@ -318,7 +318,17 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	}
 
 	setPollingInterval(interval: UmbPoolingInterval) {
+		const wasEnabled = this.#polling.getValue().enabled;
 		this.#polling.update({ interval });
+
+		// If polling was already enabled, restart it with the new interval
+		if (wasEnabled) {
+			this.stopPolling();
+			this.#intervalID = setInterval(() => {
+				this.currentPage = 1;
+				this.getLogs();
+			}, interval) as unknown as number;
+		}
 	}
 
 	toggleSortOrder() {
