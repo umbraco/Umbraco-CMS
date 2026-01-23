@@ -45,7 +45,16 @@ public interface IMediaPermissionAuthorizer
     /// <param name="currentUser">The current user.</param>
     /// <param name="mediaKeys">The keys of the media items to filter.</param>
     /// <returns>Returns the keys of media items the user has access to.</returns>
-    // TODO (V18): Remove default implementation.
-    Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> mediaKeys)
-        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+    /// <remarks>
+    ///     The default implementation falls back to calling <see cref="IsDeniedAsync(IUser, IEnumerable{Guid})"/>
+    ///     for each key individually. Override this method for better performance with batch authorization.
+    /// </remarks>
+    // TODO (V18): Remove default implementation and make this method required.
+    async Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> mediaKeys)
+    {
+        var results = await Task.WhenAll(mediaKeys.Select(async key =>
+            (key, isAuthorized: await IsDeniedAsync(currentUser, [key]) == false)));
+
+        return results.Where(r => r.isAuthorized).Select(r => r.key).ToHashSet();
+    }
 }

@@ -89,7 +89,22 @@ public interface IContentPermissionAuthorizer
     /// <param name="contentKeys">The keys of the content items to filter.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns the keys of content items the user has access to.</returns>
+    /// <remarks>
+    ///     The default implementation falls back to calling <see cref="IsDeniedAsync(IUser, IEnumerable{Guid}, ISet{string})"/>
+    ///     for each key individually. Override this method for better performance with batch authorization.
+    /// </remarks>
     // TODO (V18): Remove default implementation.
-    Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
-        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+    async Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
+    {
+        var authorizedKeys = new HashSet<Guid>();
+        foreach (Guid key in contentKeys)
+        {
+            if (await IsDeniedAsync(currentUser, [key], permissionsToCheck) == false)
+            {
+                authorizedKeys.Add(key);
+            }
+        }
+
+        return authorizedKeys;
+    }
 }
