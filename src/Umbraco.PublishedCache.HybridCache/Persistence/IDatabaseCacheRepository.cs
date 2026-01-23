@@ -16,11 +16,28 @@ internal interface IDatabaseCacheRepository
     /// <summary>
     /// Gets a single cache node for a document key.
     /// </summary>
+    /// <param name="key">The document key.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
+
+    /// <summary>
+    /// Gets both draft and published cache nodes for a document key in a single query.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    /// <returns>A tuple containing the draft and published cache nodes (either may be null).</returns>
+    // TODO (V18): Remove the default implementation on this method.
+    async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key)
+    {
+        ContentCacheNode? draftNode = await GetContentSourceAsync(key, preview: true);
+        ContentCacheNode? publishedNode = await GetContentSourceAsync(key, preview: false);
+        return (draftNode, publishedNode);
+    }
 
     /// <summary>
     /// Gets a collection of cache nodes for a collection of document keys.
     /// </summary>
+    /// <param name="keys">The document keys.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
     // TODO (V18): Remove the default implementation on this method.
     async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
@@ -73,6 +90,27 @@ internal interface IDatabaseCacheRepository
     /// <param name="published">A flag indicating whether to restrict to just published content.</param>
     /// <returns>The keys of all content use specific document types.</returns>
     IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false);
+
+    /// <summary>
+    /// Gets content keys and their draft/published status for specific document types.
+    /// </summary>
+    /// <param name="contentTypeKeys">The document type keys to find content for.</param>
+    /// <returns>Tuples of content key and whether the cache entry is a draft.</returns>
+    // TODO (V18): Remove the default implementation on this method.
+    IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys)
+        => GetContentByContentTypeKey(contentTypeKeys, ContentCacheDataSerializerEntityType.Document)
+            .Select(x => (x.Key, x.IsDraft));
+
+    /// <summary>
+    /// Gets all media content keys for specific media types.
+    /// Uses a lightweight query that avoids loading serialized data.
+    /// </summary>
+    /// <param name="mediaTypeKeys">The media type keys to find media for.</param>
+    /// <returns>The keys of all media items using the specified media types.</returns>
+    // TODO (V18): Remove the default implementation on this method.
+    IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys)
+        => GetContentByContentTypeKey(mediaTypeKeys, ContentCacheDataSerializerEntityType.Media)
+            .Select(x => x.Key);
 
     /// <summary>
     /// Refreshes the cache for the given document cache node.

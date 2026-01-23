@@ -9,8 +9,20 @@ public static partial class Constants
         // TODO: Why aren't all table names with the same prefix?
         public const string TableNamePrefix = "umbraco";
 
+        public static class Columns
+        {
+            // Defines constants for common field names used throughout the database, to ensure
+            // casing is aligned wherever used.
+            public const string PrimaryKeyNameId = "id";
+            public const string PrimaryKeyNamePk = "pk";
+            public const string PrimaryKeyNameKey = "key";
+            public const string NodeIdName = "nodeId";
+            public const string UniqueIdName = "uniqueId";
+        }
+
         public static class Tables
         {
+
             public const string Lock = TableNamePrefix + "Lock";
             public const string Log = TableNamePrefix + "Log";
 
@@ -38,6 +50,7 @@ public static partial class Constants
             public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
             public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
             public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
+            public const string DocumentUrlAlias = TableNamePrefix + "DocumentUrlAlias";
             public const string MediaVersion = TableNamePrefix + "MediaVersion";
             public const string ContentSchedule = TableNamePrefix + "ContentSchedule";
 

@@ -1,3 +1,5 @@
+import * as entryPointModule from './entry-point.js';
+
 export const name = 'Umbraco.Core.Templating';
 export const extensions = [
 	{
@@ -10,6 +12,6 @@ export const extensions = [
 		name: 'Template Management Backoffice Entry Point',
 		alias: 'Umb.BackofficeEntryPoint.TemplateManagement',
 		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
+		js: entryPointModule,
 	},
 ];

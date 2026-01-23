@@ -4,6 +4,7 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 import '@umbraco-cms/backoffice/entity-item';
@@ -105,9 +106,14 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 		return undefined;
 	}
 
+	#getPickableFilter() {
+		return (x: UmbTreeItemModel) => !x.isFolder;
+	}
+
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			pickableFilter: this.#getPickableFilter(),
 		});
 	}
 
