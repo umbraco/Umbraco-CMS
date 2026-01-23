@@ -46,9 +46,7 @@ test('can insert specific preset values into text box and text area properties',
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(initialPresetValue);
   await umbracoUi.content.doesTextAreaHaveExpectedValue(initialAreaPresetValue);
-  //await umbracoUi.content.clickSaveButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(3000);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values.find(item => item.editorAlias === dataTypeData.editorAlias).value).toBe(initialPresetValue);
@@ -75,9 +73,7 @@ test('can insert preset value into textstring property that vary by culture in s
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(variantPresetValue);
   await umbracoUi.content.clickSaveButtonForContent();
-  //await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(3000);
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
   expect(await umbracoApi.document.doesNameExist(secondContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(secondContentName);
   expect(contentData.values.find(item=>item.culture === languageData.isoCode).value).toBe(variantPresetValue);
@@ -100,11 +96,9 @@ test('can insert preset value into textstring property that shared across segmen
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(3000);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.waitForTimeout(3000);
 
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(initialPresetValue);
@@ -127,14 +121,11 @@ test('can insert preset value in textstring property that vary by segment in con
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  //await umbracoUi.content.clickSaveButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(3000);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(expectedString);
-  //await umbracoUi.content.clickSaveButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values.find(item => item.segment === vipMemberSegmentAlias).value).toBe(expectedString);
