@@ -96,7 +96,6 @@ test('can insert preset value into textstring property that shared across segmen
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
@@ -123,7 +122,6 @@ test('can insert preset value in textstring property that vary by segment in con
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
   // Assert
