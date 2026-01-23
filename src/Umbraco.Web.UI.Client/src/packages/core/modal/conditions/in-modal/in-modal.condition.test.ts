@@ -3,19 +3,19 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { UMB_MODAL_CONTEXT } from '../../context/modal.context-token.js';
-import { UmbIsModalCondition } from './is-modal.condition.js';
-import { UMB_IS_MODAL_CONDITION_ALIAS } from './constants.js';
+import { UmbInModalCondition } from './in-modal.condition.js';
+import { UMB_IN_MODAL_CONDITION_ALIAS } from './constants.js';
 
-@customElement('test-controller-host-is-modal')
+@customElement('test-controller-host-in-modal')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-@customElement('test-controller-child-is-modal')
+@customElement('test-controller-child-in-modal')
 class UmbTestControllerChildElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbIsModalCondition', () => {
+describe('UmbInModalCondition', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let childElement: UmbTestControllerChildElement;
-	let condition: UmbIsModalCondition;
+	let condition: UmbInModalCondition;
 
 	beforeEach(async () => {
 		hostElement = new UmbTestControllerHostElement();
@@ -39,10 +39,10 @@ describe('UmbIsModalCondition', () => {
 			provider.hostConnected();
 
 			let callbackCount = 0;
-			condition = new UmbIsModalCondition(childElement, {
+			condition = new UmbInModalCondition(childElement, {
 				host: childElement,
 				config: {
-					alias: UMB_IS_MODAL_CONDITION_ALIAS,
+					alias: UMB_IN_MODAL_CONDITION_ALIAS,
 					// match defaults to true
 				},
 				onChange: () => {
@@ -58,10 +58,10 @@ describe('UmbIsModalCondition', () => {
 
 		it('should return false when modal context is not available', async () => {
 			let callbackCount = 0;
-			condition = new UmbIsModalCondition(childElement, {
+			condition = new UmbInModalCondition(childElement, {
 				host: childElement,
 				config: {
-					alias: UMB_IS_MODAL_CONDITION_ALIAS,
+					alias: UMB_IN_MODAL_CONDITION_ALIAS,
 					match: true,
 				},
 				onChange: () => {
@@ -86,10 +86,10 @@ describe('UmbIsModalCondition', () => {
 			let callbackCount = 0;
 			let permittedValue: boolean | undefined;
 
-			condition = new UmbIsModalCondition(childElement, {
+			condition = new UmbInModalCondition(childElement, {
 				host: childElement,
 				config: {
-					alias: UMB_IS_MODAL_CONDITION_ALIAS,
+					alias: UMB_IN_MODAL_CONDITION_ALIAS,
 					match: false,
 				},
 				onChange: (permitted) => {
@@ -116,10 +116,10 @@ describe('UmbIsModalCondition', () => {
 			provider.hostConnected();
 
 			let callbackCount = 0;
-			condition = new UmbIsModalCondition(childElement, {
+			condition = new UmbInModalCondition(childElement, {
 				host: childElement,
 				config: {
-					alias: UMB_IS_MODAL_CONDITION_ALIAS,
+					alias: UMB_IN_MODAL_CONDITION_ALIAS,
 					match: false,
 				},
 				onChange: () => {

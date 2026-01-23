@@ -1,7 +1,7 @@
-import type { UMB_IS_MODAL_CONDITION_ALIAS } from './constants.js';
+import type { UMB_IN_MODAL_CONDITION_ALIAS } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbIsModalConditionConfig extends UmbConditionConfigBase<typeof UMB_IS_MODAL_CONDITION_ALIAS> {
+export interface UmbInModalConditionConfig extends UmbConditionConfigBase<typeof UMB_IN_MODAL_CONDITION_ALIAS> {
 	/**
 	 * The expected modal state to match.
 	 * - `true`: Condition is permitted when inside a modal (default)
@@ -12,6 +12,6 @@ export interface UmbIsModalConditionConfig extends UmbConditionConfigBase<typeof
 
 declare global {
 	interface UmbExtensionConditionConfigMap {
-		UmbIsModalConditionConfig: UmbIsModalConditionConfig;
+		UmbInModalConditionConfig: UmbInModalConditionConfig;
 	}
 }

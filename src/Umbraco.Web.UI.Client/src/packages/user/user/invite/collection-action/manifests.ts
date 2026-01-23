@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import { UMB_IS_MODAL_CONDITION_ALIAS } from '@umbraco-cms/backoffice/modal';
+import { UMB_IN_MODAL_CONDITION_ALIAS } from '@umbraco-cms/backoffice/modal';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -19,7 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: 'Umb.Collection.User',
 			},
 			{
-				alias: UMB_IS_MODAL_CONDITION_ALIAS,
+				alias: UMB_IN_MODAL_CONDITION_ALIAS,
 				match: false,
 			},
 		],

@@ -1,1 +1,1 @@
-export type * from './is-modal/is-modal.condition-config.js';
+export type * from './in-modal/in-modal.condition-config.js';

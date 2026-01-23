@@ -1,11 +1,11 @@
+import type { UmbInModalConditionConfig } from './in-modal.condition-config.js';
 import { UMB_MODAL_CONTEXT } from '../../context/modal.context-token.js';
-import type { UmbIsModalConditionConfig } from './is-modal.condition-config.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbIsModalCondition extends UmbConditionBase<UmbIsModalConditionConfig> implements UmbExtensionCondition {
-	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbIsModalConditionConfig>) {
+export class UmbInModalCondition extends UmbConditionBase<UmbInModalConditionConfig> implements UmbExtensionCondition {
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbInModalConditionConfig>) {
 		super(host, args);
 
 		// Default match value is true (checking if we are in a modal)
@@ -24,4 +24,4 @@ export class UmbIsModalCondition extends UmbConditionBase<UmbIsModalConditionCon
 	}
 }
 
-export { UmbIsModalCondition as api };
+export { UmbInModalCondition as api };
