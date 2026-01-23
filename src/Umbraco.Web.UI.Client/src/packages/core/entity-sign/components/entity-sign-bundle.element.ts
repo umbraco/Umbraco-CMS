@@ -1,7 +1,10 @@
 import { UmbLitElement } from '../../lit-element/lit-element.element.js';
 import type { ManifestEntitySign } from '../types.js';
 import { customElement, html, nothing, property, repeat, state, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbExtensionsElementAndApiInitializer,
+	createExtensionElementWithApi,
+} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
@@ -46,7 +49,8 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	private _hoverTimer?: number;
 
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
-	#previewElements: Map<string, HTMLElement> = new Map();
+	@state()
+	private _popoverSigns?: Array<HTMLElement | undefined>;
 
 	constructor() {
 		super();
@@ -65,6 +69,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		if (!this.#entityType || !this.#entityFlagAliases) {
 			this.removeUmbControllerByAlias('extensionsInitializer');
 			this._signs = [];
+			this._popoverSigns = undefined;
 			return;
 		}
 
@@ -78,7 +83,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				// Clean up old observers
 				this.#signLabelObservations.forEach((o) => this.removeUmbController(o));
 				this.#signLabelObservations = [];
-				this.#previewElements.clear();
+				this._popoverSigns = undefined;
 
 				// Setup label observers
 				signs.forEach((sign) => {
@@ -104,12 +109,24 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
-	#handleHoverTimer(open: boolean, delay: number) {
+	async #handleHoverTimer(open: boolean, delay: number) {
 		if (this._hoverTimer) clearTimeout(this._hoverTimer);
-		this._hoverTimer = window.setTimeout(() => {
+		this._hoverTimer = window.setTimeout(async () => {
 			const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
 			if (popover) {
 				if (open) {
+					// Create popover elements lazily on first open
+					if (this._signs && !this._popoverSigns) {
+						this._popoverSigns = await Promise.all(
+							this._signs.map(async (sign) => {
+								const { element } = await createExtensionElementWithApi(sign.manifest, [{ meta: sign.manifest.meta }]);
+								if (element) {
+									(element as any).manifest = sign.manifest;
+								}
+								return element;
+							}),
+						);
+					}
 					// 1) Get the host element's position
 					const hostRect = this.getBoundingClientRect();
 					// 2) Position the popover
@@ -144,21 +161,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		}
 	};
 
-	#getOrCreatePreviewElement(sign: any): HTMLElement | undefined {
-		if (!sign.manifest) return undefined;
-
-		const existing = this.#previewElements.get(sign.alias);
-		if (existing) {
-			return existing;
-		}
-
-		const elementName = sign.manifest.elementName ?? 'umb-entity-sign-icon';
-		const el = document.createElement(elementName);
-		(el as any).manifest = sign.manifest;
-		this.#previewElements.set(sign.alias, el);
-		return el;
-	}
-
 	override render() {
 		return html`
 			<slot></slot>
@@ -180,7 +182,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			${repeat(
 				previewSigns,
 				(c) => c.alias,
-				(c, i) => html`<span class="preview-icon" style=${`--i:${i}`}>${this.#getOrCreatePreviewElement(c)}</span>`,
+				(c, i) => html`<span class="preview-icon" style=${`--i:${i}`}>${c.component}</span>`,
 			)}
 		</div>`;
 	}
@@ -190,18 +192,18 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	#renderOptions() {
-		return this._signs
-			? repeat(
-					this._signs,
-					(c) => c.alias,
-					(c) => {
-						return html`<div class="sign-container">
-							<span class="badge-icon">${c.component}</span>
-							<span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
-						</div>`;
-					},
-				)
-			: nothing;
+		if (!this._signs || !this._popoverSigns) return nothing;
+
+		return repeat(
+			this._signs,
+			(c) => c.alias,
+			(c, index) => {
+				return html`<div class="sign-container">
+					<span class="badge-icon">${this._popoverSigns![index]}</span>
+					<span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
+				</div>`;
+			},
+		);
 	}
 
 	static override styles = [
