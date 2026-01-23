@@ -2945,6 +2945,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Null);
         Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
         Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties.Contains("nonExistentProperty"), Is.False);
     }
 
     [Test]
