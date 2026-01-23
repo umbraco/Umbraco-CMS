@@ -263,7 +263,7 @@ public class DatabaseSchemaCreator
         // Add valid and invalid foreign key differences to the result object
         // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
         // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
-        HandleUnknownConstraints(result, unknownConstraintsInDatabase, foreignKeysInSchema);
+        HandleUnknownConstraints(result, unknownConstraintsInDatabase, foreignKeysInSchema, primaryKeysInSchema);
 
         // Foreign keys:
         AddValidForeignKeys(result, foreignKeysInDatabase, foreignKeysInSchema);
@@ -277,11 +277,15 @@ public class DatabaseSchemaCreator
         AddErrorsForInvalidPrimaryKeys(result, primaryKeysInDatabase, primaryKeysInSchema);
     }
 
-    private static void HandleUnknownConstraints(DatabaseSchemaResult result, List<string> unknownConstraintsInDatabase, List<string> foreignKeysInSchema)
+    private static void HandleUnknownConstraints(
+        DatabaseSchemaResult result,
+        List<string> unknownConstraintsInDatabase,
+        List<string> foreignKeysInSchema,
+        List<string> primaryKeysInSchema)
     {
         foreach (string unknown in unknownConstraintsInDatabase)
         {
-            if (foreignKeysInSchema.InvariantContains(unknown) || foreignKeysInSchema.InvariantContains(unknown))
+            if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown))
             {
                 result.ValidConstraints.Add(unknown);
             }
