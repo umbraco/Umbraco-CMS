@@ -63,7 +63,13 @@ npm run dev
 
 See **[Commands](./docs/commands.md)** for all available commands.
 
-**Development**: `npm run dev` | **Testing**: `npm test` | **Build**: `npm run build` | **Lint**: `npm run lint:fix`
+| Task | Command |
+|------|---------|
+| Development | `npm run dev` |
+| Testing (all) | `npm test` |
+| Testing (specific file) | `npm test -- --files "src/packages/path/to/file.test.ts"` |
+| Build | `npm run build` |
+| Lint | `npm run lint:fix` |
 
 ---
 
