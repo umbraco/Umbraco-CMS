@@ -21,7 +21,6 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     private readonly IPublicAccessService _publicAccessService;
     private readonly IMemberUserStore _store;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly ILocalizedTextService _localizedTextService;
 
     private MemberIdentityUser? _currentMember;
 
@@ -38,8 +37,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         IOptionsSnapshot<MemberPasswordConfigurationSettings> passwordConfiguration,
         IPublicAccessService publicAccessService,
         IHttpContextAccessor httpContextAccessor,
-        IPublishedModelFactory publishedModelFactory,
-        ILocalizedTextService localizedTextService)
+        IPublishedModelFactory publishedModelFactory)
         : base(
             ipResolver,
             store,
@@ -56,40 +54,6 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         _publicAccessService = publicAccessService;
         _httpContextAccessor = httpContextAccessor;
         _publishedModelFactory = publishedModelFactory;
-        _localizedTextService = localizedTextService;
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberManager(
-        IIpResolver ipResolver,
-        IMemberUserStore store,
-        IOptions<IdentityOptions> optionsAccessor,
-        IPasswordHasher<MemberIdentityUser> passwordHasher,
-        IEnumerable<IUserValidator<MemberIdentityUser>> userValidators,
-        IEnumerable<IPasswordValidator<MemberIdentityUser>> passwordValidators,
-        IdentityErrorDescriber errors,
-        IServiceProvider services,
-        ILogger<UserManager<MemberIdentityUser>> logger,
-        IOptionsSnapshot<MemberPasswordConfigurationSettings> passwordConfiguration,
-        IPublicAccessService publicAccessService,
-        IHttpContextAccessor httpContextAccessor,
-        IPublishedModelFactory publishedModelFactory)
-        : this(
-            ipResolver,
-            store,
-            optionsAccessor,
-            passwordHasher,
-            userValidators,
-            passwordValidators,
-            errors,
-            services,
-            logger,
-            passwordConfiguration,
-            publicAccessService,
-            httpContextAccessor,
-            publishedModelFactory,
-            StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
-    {
     }
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
@@ -192,20 +156,6 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
 
         return memberIdentity is not null &&
                memberIdentity.IsAuthenticated;
-    }
-
-    /// <inheritdoc/>
-    public override async Task<IdentityResult> ChangePasswordAsync(MemberIdentityUser member, string currentPassword, string newPassword)
-    {
-        IdentityResult result = await base.ChangePasswordAsync(member, currentPassword, newPassword);
-
-        if (result.Succeeded is false)
-        {
-            IdentityError? passwordMismatchError = result.Errors.FirstOrDefault(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch));
-            passwordMismatchError?.Description = _localizedTextService.Localize("member", "incorrectPassword");
-        }
-
-        return result;
     }
 
     /// <inheritdoc />

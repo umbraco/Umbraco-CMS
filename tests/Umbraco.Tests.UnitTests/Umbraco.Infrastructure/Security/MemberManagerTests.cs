@@ -75,11 +75,6 @@ public class MemberManagerTests
 
         var pwdValidators = new List<PasswordValidator<MemberIdentityUser>> { new() };
 
-        var mockLocalizedTextService = new Mock<ILocalizedTextService>();
-        mockLocalizedTextService
-            .Setup(x => x.Localize("member", "incorrectPassword", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string?>>()))
-            .Returns("The provided password is incorrect");
-
         var userManager = new MemberManager(
             new Mock<IIpResolver>().Object,
             _fakeMemberStore,
@@ -93,8 +88,7 @@ public class MemberManagerTests
             _mockPasswordConfiguration.Object,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IHttpContextAccessor>(),
-            Mock.Of<IPublishedModelFactory>(),
-            mockLocalizedTextService.Object);
+            Mock.Of<IPublishedModelFactory>());
 
         validator.Setup(v => v.ValidateAsync(
                 userManager,
@@ -252,7 +246,7 @@ public class MemberManagerTests
     }
 
     [Test]
-    public async Task GivenAUserExists_AndIncorrectCurrentPasswordIsProvided_ThenChangePasswordShouldReturnLocalizedError()
+    public async Task GivenAUserExists_AndIncorrectCurrentPasswordIsProvided_ThenChangePasswordShouldReturnPasswordMismatchError()
     {
         // arrange
         var currentPassword = "wrongPassword";
@@ -279,7 +273,6 @@ public class MemberManagerTests
         Assert.IsFalse(result.Succeeded);
         var passwordMismatchError = result.Errors.FirstOrDefault(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch));
         Assert.IsNotNull(passwordMismatchError);
-        Assert.That(passwordMismatchError!.Description, Is.EqualTo("The provided password is incorrect"));
     }
 
     private static MemberIdentityUser CreateValidUser() =>
