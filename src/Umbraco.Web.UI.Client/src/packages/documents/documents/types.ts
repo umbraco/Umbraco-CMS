@@ -52,8 +52,9 @@ export interface UmbDocumentUrlInfoModel {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {}
+export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {
+	documentCount?: number;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentVariantPublishModel extends UmbEntityVariantPublishModel {}

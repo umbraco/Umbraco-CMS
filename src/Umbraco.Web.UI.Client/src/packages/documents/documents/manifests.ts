@@ -21,6 +21,7 @@ import { manifests as urlManifests } from './url/manifests.js';
 import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as allowEditInvariantFromNonDefaultManifests } from './allow-edit-invariant-from-non-default/manifests.js';
+import * as entryPointModule from './entry-point.js';
 
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -52,6 +53,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		name: 'Document Backoffice Entry Point',
 		alias: 'Umb.BackofficeEntryPoint.Document',
 		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
+		js: entryPointModule,
 	},
 ];

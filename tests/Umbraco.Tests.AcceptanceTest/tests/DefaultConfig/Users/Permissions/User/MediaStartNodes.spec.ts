@@ -155,7 +155,7 @@ test("see no-access view when deep-linking to restricted media", async ({
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.page.goto(
-    `${umbracoUi.page.url()}/workspace/media/edit/${rootFolderId!}`
+    `${umbracoUi.page.url().replace('/collection', '')}/workspace/media/edit/${rootFolderId!}`
   );
   await umbracoUi.waitForTimeout(100); // Wait for workspace to load
   await umbracoUi.media.doesMediaWorkspaceHaveText("Access denied");
