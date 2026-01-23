@@ -142,7 +142,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	#renderStatusFilter() {
 		return html`
-			<uui-button popovertarget="popover-user-status-filter" label="status">
+			<uui-button popovertarget="popover-user-status-filter" label="status" compact>
 				<umb-localize key="general_status"></umb-localize>: <b>${this.#getStatusFilterLabel()}</b>
 			</uui-button>
 			<uui-popover-container id="popover-user-status-filter" placement="bottom">
@@ -164,7 +164,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	#renderUserGroupFilter() {
 		return html`
-			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')}>
+			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')} compact>
 				<umb-localize key="general_groups"></umb-localize>: <b>${this.#getUserGroupFilterLabel()}</b>
 			</uui-button>
 			<uui-popover-container id="popover-user-group-filter" placement="bottom">
@@ -188,7 +188,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	#renderOrderBy() {
 		return html`
-			<uui-button popovertarget="popover-order-by-filter" label="order by">
+			<uui-button popovertarget="popover-order-by-filter" label="order by" compact>
 				<umb-localize key="general_orderBy"></umb-localize>:
 				<b> ${this._activeOrderByOption ? this.localize.string(this._activeOrderByOption.label) : ''}</b>
 			</uui-button>
@@ -224,7 +224,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			#toolbar {
 				flex: 1;
 				display: flex;
-				gap: var(--uui-size-space-5);
+				gap: var(--uui-size-space-4);
 				justify-content: space-between;
 				align-items: center;
 			}
