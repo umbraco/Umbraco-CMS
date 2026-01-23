@@ -466,6 +466,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantOptions = (await firstValueFrom(this.variantOptions)).map(
 			(o) => new UmbVariantId(o.culture, o.segment),
 		);
+		if (contentTypeVariesByCulture) {
+			variantOptions.push(UmbVariantId.CreateInvariant()); // Ensure invariant is included, when the contentType varies by culture, because we do not have a invariant-variant in our variant-options. [NL]
+		}
 		controller.setVariantOptions(variantOptions);
 
 		controller.setValues(data.values);
