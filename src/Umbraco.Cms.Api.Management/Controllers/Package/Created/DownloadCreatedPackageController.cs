@@ -26,8 +26,8 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
     /// <returns>The XML or ZIP file of the package or not found result.</returns>
     [HttpGet("{id:guid}/download")]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK, MediaTypeNames.Text.Xml, MediaTypeNames.Application.Zip)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Download(CancellationToken cancellationToken, Guid id)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);

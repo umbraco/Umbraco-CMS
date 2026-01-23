@@ -24,7 +24,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
     {
         var backOfficePath = HostingEnvironment.GetBackOfficePath();
 
-        var swaggerPath = $"{backOfficePath}/swagger/delivery/swagger.json";
+        var swaggerPath = $"{backOfficePath}/openapi/delivery.json";
 
         var generatedOpenApiContract = await Client.GetStringAsync(swaggerPath);
         var generatedOpenApiJson = JsonNode.Parse(generatedOpenApiContract);
@@ -39,7 +39,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
     private const string ExpectedOpenApiContract =
     """
     {
-      "openapi": "3.0.4",
+      "openapi": "3.1.1",
       "info": {
         "title": "Umbraco Delivery API",
         "description": "You can find out more about the Umbraco Delivery API in [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api).",
@@ -96,7 +96,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 },
                 "examples": {
                   "Default filter": {
-                    "value": ""
+                    "value": [
+                      ""
+                    ]
                   },
                   "Filter by content type (equals)": {
                     "value": [
@@ -132,7 +134,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 },
                 "examples": {
                   "Default sort": {
-                    "value": ""
+                    "value": [
+                      ""
+                    ]
                   },
                   "Sort by create date": {
                     "value": [
@@ -266,14 +270,6 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 }
               },
               {
-                "name": "Api-Key",
-                "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
                 "name": "Preview",
                 "in": "header",
                 "description": "Whether to request draft content.",
@@ -296,11 +292,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "content": {
                   "application/json": {
                     "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/PagedIApiContentResponseModel"
-                        }
-                      ]
+                      "$ref": "#/components/schemas/PagedIApiContentResponseModel"
                     }
                   }
                 }
@@ -310,11 +302,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "content": {
                   "application/json": {
                     "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/ProblemDetails"
-                        }
-                      ]
+                      "$ref": "#/components/schemas/ProblemDetails"
                     }
                   }
                 }
@@ -322,154 +310,12 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "404": {
                 "description": "Not Found"
               }
-            }
-          }
-        },
-        "/umbraco/delivery/api/v2/content/item/{path}": {
-          "get": {
-            "tags": [
-              "Content"
-            ],
-            "operationId": "GetContentItemByPath2.0",
-            "parameters": [
+            },
+            "security": [
               {
-                "name": "path",
-                "in": "path",
-                "required": true,
-                "schema": {
-                  "type": "string",
-                  "default": ""
-                }
-              },
-              {
-                "name": "expand",
-                "in": "query",
-                "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "Expand none": {
-                    "value": ""
-                  },
-                  "Expand all properties": {
-                    "value": "properties[$all]"
-                  },
-                  "Expand specific property": {
-                    "value": "properties[alias1]"
-                  },
-                  "Expand specific properties": {
-                    "value": "properties[alias1,alias2]"
-                  },
-                  "Expand nested properties": {
-                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
-                  }
-                }
-              },
-              {
-                "name": "fields",
-                "in": "query",
-                "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "Include all properties": {
-                    "value": "properties[$all]"
-                  },
-                  "Include only specific property": {
-                    "value": "properties[alias1]"
-                  },
-                  "Include only specific properties": {
-                    "value": "properties[alias1,alias2]"
-                  },
-                  "Include only specific nested properties": {
-                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
-                  }
-                }
-              },
-              {
-                "name": "Accept-Language",
-                "in": "header",
-                "description": "Defines the language to return. Use this when querying language variant content items.",
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "Default": {
-                    "value": ""
-                  },
-                  "English culture": {
-                    "value": "en-us"
-                  }
-                }
-              },
-              {
-                "name": "Accept-Segment",
-                "in": "header",
-                "description": "Defines the segment to return. Use this when querying segment variant content items.",
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "Default": {
-                    "value": ""
-                  },
-                  "Segment One": {
-                    "value": "segment-one"
-                  }
-                }
-              },
-              {
-                "name": "Api-Key",
-                "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "name": "Preview",
-                "in": "header",
-                "description": "Whether to request draft content.",
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              {
-                "name": "Start-Item",
-                "in": "header",
-                "description": "URL segment or GUID of a root content item.",
-                "schema": {
-                  "type": "string"
-                }
+                "ApiKeyAuth": [ ]
               }
-            ],
-            "responses": {
-              "200": {
-                "description": "OK",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/ApiContentResponseModel"
-                        }
-                      ]
-                    }
-                  }
-                }
-              },
-              "401": {
-                "description": "Unauthorized"
-              },
-              "403": {
-                "description": "Forbidden"
-              },
-              "404": {
-                "description": "Not Found"
-              }
-            }
+            ]
           }
         },
         "/umbraco/delivery/api/v2/content/item/{id}": {
@@ -568,11 +414,143 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 }
               },
               {
-                "name": "Api-Key",
+                "name": "Preview",
                 "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
+                "description": "Whether to request draft content.",
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              {
+                "name": "Start-Item",
+                "in": "header",
+                "description": "URL segment or GUID of a root content item.",
                 "schema": {
                   "type": "string"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/IApiContentResponseModel"
+                    }
+                  }
+                }
+              },
+              "401": {
+                "description": "Unauthorized"
+              },
+              "403": {
+                "description": "Forbidden"
+              },
+              "404": {
+                "description": "Not Found"
+              }
+            },
+            "security": [
+              {
+                "ApiKeyAuth": [ ]
+              }
+            ]
+          }
+        },
+        "/umbraco/delivery/api/v2/content/item/{path}": {
+          "get": {
+            "tags": [
+              "Content"
+            ],
+            "operationId": "GetContentItemByPath2.0",
+            "parameters": [
+              {
+                "name": "path",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "default": ""
+                }
+              },
+              {
+                "name": "expand",
+                "in": "query",
+                "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Expand none": {
+                    "value": ""
+                  },
+                  "Expand all properties": {
+                    "value": "properties[$all]"
+                  },
+                  "Expand specific property": {
+                    "value": "properties[alias1]"
+                  },
+                  "Expand specific properties": {
+                    "value": "properties[alias1,alias2]"
+                  },
+                  "Expand nested properties": {
+                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+                  }
+                }
+              },
+              {
+                "name": "fields",
+                "in": "query",
+                "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Include all properties": {
+                    "value": "properties[$all]"
+                  },
+                  "Include only specific property": {
+                    "value": "properties[alias1]"
+                  },
+                  "Include only specific properties": {
+                    "value": "properties[alias1,alias2]"
+                  },
+                  "Include only specific nested properties": {
+                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+                  }
+                }
+              },
+              {
+                "name": "Accept-Language",
+                "in": "header",
+                "description": "Defines the language to return. Use this when querying language variant content items.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Default": {
+                    "value": ""
+                  },
+                  "English culture": {
+                    "value": "en-us"
+                  }
+                }
+              },
+              {
+                "name": "Accept-Segment",
+                "in": "header",
+                "description": "Defines the segment to return. Use this when querying segment variant content items.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Default": {
+                    "value": ""
+                  },
+                  "Segment One": {
+                    "value": "segment-one"
+                  }
                 }
               },
               {
@@ -598,11 +576,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "content": {
                   "application/json": {
                     "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/ApiContentResponseModel"
-                        }
-                      ]
+                      "$ref": "#/components/schemas/IApiContentResponseModel"
                     }
                   }
                 }
@@ -616,7 +590,12 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "404": {
                 "description": "Not Found"
               }
-            }
+            },
+            "security": [
+              {
+                "ApiKeyAuth": [ ]
+              }
+            ]
           }
         },
         "/umbraco/delivery/api/v2/content/items": {
@@ -630,7 +609,6 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "name": "id",
                 "in": "query",
                 "schema": {
-                  "uniqueItems": true,
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -718,14 +696,6 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 }
               },
               {
-                "name": "Api-Key",
-                "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
                 "name": "Preview",
                 "in": "header",
                 "description": "Whether to request draft content.",
@@ -750,11 +720,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                     "schema": {
                       "type": "array",
                       "items": {
-                        "oneOf": [
-                          {
-                            "$ref": "#/components/schemas/ApiContentResponseModel"
-                          }
-                        ]
+                        "$ref": "#/components/schemas/IApiContentResponseModel"
                       }
                     }
                   }
@@ -766,7 +732,12 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "403": {
                 "description": "Forbidden"
               }
-            }
+            },
+            "security": [
+              {
+                "ApiKeyAuth": [ ]
+              }
+            ]
           }
         },
         "/umbraco/delivery/api/v2/media": {
@@ -807,7 +778,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 },
                 "examples": {
                   "Default filter": {
-                    "value": ""
+                    "value": [
+                      ""
+                    ]
                   },
                   "Filter by media type": {
                     "value": [
@@ -833,7 +806,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 },
                 "examples": {
                   "Default sort": {
-                    "value": ""
+                    "value": [
+                      ""
+                    ]
                   },
                   "Sort by create date": {
                     "value": [
@@ -927,14 +902,6 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                     "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
                   }
                 }
-              },
-              {
-                "name": "Api-Key",
-                "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
-                "schema": {
-                  "type": "string"
-                }
               }
             ],
             "responses": {
@@ -943,11 +910,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "content": {
                   "application/json": {
                     "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/PagedIApiMediaWithCropsResponseModel"
-                        }
-                      ]
+                      "$ref": "#/components/schemas/PagedIApiMediaWithCropsResponseModel"
                     }
                   }
                 }
@@ -957,108 +920,17 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "content": {
                   "application/json": {
                     "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/ProblemDetails"
-                        }
-                      ]
+                      "$ref": "#/components/schemas/ProblemDetails"
                     }
                   }
                 }
               }
-            }
-          }
-        },
-        "/umbraco/delivery/api/v2/media/item/{path}": {
-          "get": {
-            "tags": [
-              "Media"
-            ],
-            "operationId": "GetMediaItemByPath2.0",
-            "parameters": [
+            },
+            "security": [
               {
-                "name": "path",
-                "in": "path",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "name": "expand",
-                "in": "query",
-                "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "Expand none": {
-                    "value": ""
-                  },
-                  "Expand all properties": {
-                    "value": "properties[$all]"
-                  },
-                  "Expand specific property": {
-                    "value": "properties[alias1]"
-                  },
-                  "Expand specific properties": {
-                    "value": "properties[alias1,alias2]"
-                  },
-                  "Expand nested properties": {
-                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
-                  }
-                }
-              },
-              {
-                "name": "fields",
-                "in": "query",
-                "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
-                "schema": {
-                  "type": "string"
-                },
-                "examples": {
-                  "Include all properties": {
-                    "value": "properties[$all]"
-                  },
-                  "Include only specific property": {
-                    "value": "properties[alias1]"
-                  },
-                  "Include only specific properties": {
-                    "value": "properties[alias1,alias2]"
-                  },
-                  "Include only specific nested properties": {
-                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
-                  }
-                }
-              },
-              {
-                "name": "Api-Key",
-                "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
-                "schema": {
-                  "type": "string"
-                }
+                "ApiKeyAuth": [ ]
               }
-            ],
-            "responses": {
-              "200": {
-                "description": "OK",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-                        }
-                      ]
-                    }
-                  }
-                }
-              },
-              "404": {
-                "description": "Not Found"
-              }
-            }
+            ]
           }
         },
         "/umbraco/delivery/api/v2/media/item/{id}": {
@@ -1123,13 +995,90 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                     "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
                   }
                 }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
+                    }
+                  }
+                }
               },
+              "404": {
+                "description": "Not Found"
+              }
+            },
+            "security": [
               {
-                "name": "Api-Key",
-                "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
+                "ApiKeyAuth": [ ]
+              }
+            ]
+          }
+        },
+        "/umbraco/delivery/api/v2/media/item/{path}": {
+          "get": {
+            "tags": [
+              "Media"
+            ],
+            "operationId": "GetMediaItemByPath2.0",
+            "parameters": [
+              {
+                "name": "path",
+                "in": "path",
+                "required": true,
                 "schema": {
                   "type": "string"
+                }
+              },
+              {
+                "name": "expand",
+                "in": "query",
+                "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Expand none": {
+                    "value": ""
+                  },
+                  "Expand all properties": {
+                    "value": "properties[$all]"
+                  },
+                  "Expand specific property": {
+                    "value": "properties[alias1]"
+                  },
+                  "Expand specific properties": {
+                    "value": "properties[alias1,alias2]"
+                  },
+                  "Expand nested properties": {
+                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+                  }
+                }
+              },
+              {
+                "name": "fields",
+                "in": "query",
+                "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Include all properties": {
+                    "value": "properties[$all]"
+                  },
+                  "Include only specific property": {
+                    "value": "properties[alias1]"
+                  },
+                  "Include only specific properties": {
+                    "value": "properties[alias1,alias2]"
+                  },
+                  "Include only specific nested properties": {
+                    "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+                  }
                 }
               }
             ],
@@ -1139,11 +1088,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "content": {
                   "application/json": {
                     "schema": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-                        }
-                      ]
+                      "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
                     }
                   }
                 }
@@ -1151,7 +1096,12 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "404": {
                 "description": "Not Found"
               }
-            }
+            },
+            "security": [
+              {
+                "ApiKeyAuth": [ ]
+              }
+            ]
           }
         },
         "/umbraco/delivery/api/v2/media/items": {
@@ -1165,7 +1115,6 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "name": "id",
                 "in": "query",
                 "schema": {
-                  "uniqueItems": true,
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -1219,14 +1168,6 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                     "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
                   }
                 }
-              },
-              {
-                "name": "Api-Key",
-                "in": "header",
-                "description": "API key specified through configuration to authorize access to the API.",
-                "schema": {
-                  "type": "string"
-                }
               }
             ],
             "responses": {
@@ -1237,47 +1178,48 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                     "schema": {
                       "type": "array",
                       "items": {
-                        "oneOf": [
-                          {
-                            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-                          }
-                        ]
+                        "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
                       }
                     }
                   }
                 }
               }
-            }
+            },
+            "security": [
+              {
+                "ApiKeyAuth": [ ]
+              }
+            ]
           }
         }
       },
       "components": {
         "schemas": {
-          "ApiContentResponseModel": {
+          "IApiContentResponseModel": {
+            "type": "object",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IApiContentResponseModelApiContentResponseModel"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "$type"
+            }
+          },
+          "IApiContentResponseModelApiContentResponseModel": {
             "required": [
               "contentType",
-              "createDate",
-              "cultures",
-              "id",
               "name",
-              "properties",
+              "createDate",
+              "updateDate",
               "route",
-              "updateDate"
+              "id",
+              "properties",
+              "cultures"
             ],
-            "type": "object",
             "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid"
-              },
               "contentType": {
                 "type": "string"
-              },
-              "properties": {
-                "type": "object",
-                "additionalProperties": {
-                  "nullable": true
-                }
               },
               "name": {
                 "type": "string"
@@ -1291,26 +1233,24 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "format": "date-time"
               },
               "route": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiContentRouteModel"
-                  }
-                ]
+                "$ref": "#/components/schemas/IApiContentRouteModel"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "properties": {
+                "type": "object"
               },
               "cultures": {
                 "type": "object",
                 "additionalProperties": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiContentRouteModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/IApiContentRouteModel"
                 }
               }
-            },
-            "additionalProperties": false
+            }
           },
-          "ApiContentRouteModel": {
+          "IApiContentRouteModel": {
             "required": [
               "path",
               "startItem"
@@ -1318,23 +1258,23 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             "type": "object",
             "properties": {
               "path": {
-                "type": "string"
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "queryString": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "startItem": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiContentStartItemModel"
-                  }
-                ]
+                "$ref": "#/components/schemas/IApiContentStartItemModel"
               }
-            },
-            "additionalProperties": false
+            }
           },
-          "ApiContentStartItemModel": {
+          "IApiContentStartItemModel": {
             "required": [
               "id",
               "path"
@@ -1346,92 +1286,31 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "format": "uuid"
               },
               "path": {
-                "type": "string"
+                "type": [
+                  "null",
+                  "string"
+                ]
               }
-            },
-            "additionalProperties": false
+            }
           },
-          "ApiMediaWithCropsResponseModel": {
+          "IApiMediaWithCropsResponseModel": {
             "required": [
-              "createDate",
-              "id",
-              "mediaType",
-              "name",
               "path",
-              "properties",
+              "createDate",
               "updateDate",
-              "url"
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
             ],
             "type": "object",
             "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "readOnly": true
-              },
-              "name": {
-                "type": "string",
-                "readOnly": true
-              },
-              "mediaType": {
-                "type": "string",
-                "readOnly": true
-              },
-              "url": {
-                "type": "string",
-                "readOnly": true
-              },
-              "extension": {
-                "type": "string",
-                "nullable": true,
-                "readOnly": true
-              },
-              "width": {
-                "type": "integer",
-                "format": "int32",
-                "nullable": true,
-                "readOnly": true
-              },
-              "height": {
-                "type": "integer",
-                "format": "int32",
-                "nullable": true,
-                "readOnly": true
-              },
-              "bytes": {
-                "type": "integer",
-                "format": "int32",
-                "nullable": true,
-                "readOnly": true
-              },
-              "properties": {
-                "type": "object",
-                "additionalProperties": {
-                  "nullable": true
-                },
-                "readOnly": true
-              },
-              "focalPoint": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/ImageFocalPointModel"
-                  }
-                ],
-                "nullable": true
-              },
-              "crops": {
-                "type": "array",
-                "items": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ImageCropModel"
-                    }
-                  ]
-                },
-                "nullable": true
-              },
               "path": {
-                "type": "string"
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "createDate": {
                 "type": "string",
@@ -1440,15 +1319,81 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "updateDate": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "focalPoint": {
+                "$ref": "#/components/schemas/ImageFocalPointModel"
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "$ref": "#/components/schemas/ImageCropModel"
+                }
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
               }
-            },
-            "additionalProperties": false
+            }
           },
           "ImageCropCoordinatesModel": {
             "required": [
               "x1",
-              "x2",
               "y1",
+              "x2",
               "y2"
             ],
             "type": "object",
@@ -1469,19 +1414,22 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "type": "number",
                 "format": "double"
               }
-            },
-            "additionalProperties": false
+            }
           },
           "ImageCropModel": {
             "required": [
+              "alias",
+              "width",
               "height",
-              "width"
+              "coordinates"
             ],
             "type": "object",
             "properties": {
               "alias": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "width": {
                 "type": "integer",
@@ -1492,15 +1440,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "format": "int32"
               },
               "coordinates": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/ImageCropCoordinatesModel"
-                  }
-                ],
-                "nullable": true
+                "$ref": "#/components/schemas/ImageCropCoordinatesModel"
               }
-            },
-            "additionalProperties": false
+            }
           },
           "ImageFocalPointModel": {
             "required": [
@@ -1517,13 +1459,12 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                 "type": "number",
                 "format": "double"
               }
-            },
-            "additionalProperties": false
+            }
           },
           "PagedIApiContentResponseModel": {
             "required": [
-              "items",
-              "total"
+              "total",
+              "items"
             ],
             "type": "object",
             "properties": {
@@ -1534,20 +1475,15 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "items": {
                 "type": "array",
                 "items": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiContentResponseModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/IApiContentResponseModel"
                 }
               }
-            },
-            "additionalProperties": false
+            }
           },
           "PagedIApiMediaWithCropsResponseModel": {
             "required": [
-              "items",
-              "total"
+              "total",
+              "items"
             ],
             "type": "object",
             "properties": {
@@ -1558,45 +1494,62 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "items": {
                 "type": "array",
                 "items": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
                 }
               }
-            },
-            "additionalProperties": false
+            }
           },
           "ProblemDetails": {
             "type": "object",
             "properties": {
               "type": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "title": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "status": {
-                "type": "integer",
-                "format": "int32",
-                "nullable": true
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
               },
               "detail": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "instance": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "null",
+                  "string"
+                ]
               }
-            },
-            "additionalProperties": { }
+            }
+          }
+        },
+        "securitySchemes": {
+          "ApiKeyAuth": {
+            "type": "apiKey",
+            "description": "API key specified through configuration to authorize access to the API.",
+            "name": "Api-Key",
+            "in": "header"
           }
         }
       },
+      "security": [
+        {
+          "ApiKeyAuth": [ ]
+        }
+      ],
       "tags": [
         {
           "name": "Content"
