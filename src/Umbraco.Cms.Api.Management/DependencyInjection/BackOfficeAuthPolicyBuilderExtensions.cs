@@ -67,7 +67,8 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             Constants.Applications.Users,
             Constants.Applications.Settings,
             Constants.Applications.Packages,
-            Constants.Applications.Members);
+            Constants.Applications.Members,
+            Constants.Applications.Library);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForMediaTree,
             Constants.Applications.Content,
@@ -75,12 +76,14 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             Constants.Applications.Users,
             Constants.Applications.Settings,
             Constants.Applications.Packages,
-            Constants.Applications.Members);
+            Constants.Applications.Members,
+            Constants.Applications.Library);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForMemberTree,
             Constants.Applications.Content,
             Constants.Applications.Media,
-            Constants.Applications.Members);
+            Constants.Applications.Members,
+            Constants.Applications.Library);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForElementTree,
             Constants.Applications.Content,
