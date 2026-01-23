@@ -20,10 +20,9 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a data type folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.createDataTypeFolder(dataTypeFolderName);
+  await umbracoUi.dataType.createDataTypeFolderAndWaitForDataTypeToBeCreated(dataTypeFolderName);
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
 });
 
@@ -39,11 +38,9 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
   await umbracoUi.dataType.clickRenameActionMenuOption();
   await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
-  await umbracoUi.dataType.clickConfirmRenameButton();
+  await umbracoUi.dataType.clickConfirmRenameButtonAndWaitForDataTypeToBeRenamed();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeRenamed();
-  await umbracoUi.waitForTimeout(500); // Wait for the rename to be fully processed
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeFolderName)).toBeFalsy();
 });
@@ -55,10 +52,9 @@ test('can delete a data type folder', {tag: '@smoke'}, async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
-  await umbracoUi.dataType.deleteDataTypeFolder(dataTypeFolderName);
+  await umbracoUi.dataType.deleteDataTypeFolderAndWaitForDataTypeToBeDeleted(dataTypeFolderName);
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderName)).toBeFalsy();
 });
 
@@ -76,10 +72,9 @@ test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(propertyEditorName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
   expect(dataTypeChildren[0].name).toBe(dataTypeName);
@@ -96,11 +91,9 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-  await umbracoUi.dataType.createDataTypeFolder(childFolderName);
+  await umbracoUi.dataType.createDataTypeFolderAndWaitForDataTypeToBeCreated(childFolderName);
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
-  await umbracoUi.waitForTimeout(500); // Wait for folder to be created
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
   const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
   expect(dataTypeChildren[0].name).toBe(childFolderName);
@@ -118,11 +111,9 @@ test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.openCaretButtonForName(dataTypeFolderName);
   await umbracoUi.dataType.clickActionsMenuForDataType(childFolderName);
-  await umbracoUi.dataType.createDataTypeFolder(childOfChildFolderName);
+  await umbracoUi.dataType.createDataTypeFolderAndWaitForDataTypeToBeCreated(childOfChildFolderName);
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
-  await umbracoUi.waitForTimeout(500); // Wait for folder to be created
   expect(await umbracoApi.dataType.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const childrenFolderData = await umbracoApi.dataType.getChildren(childFolderId);
   expect(childrenFolderData[0].name).toBe(childOfChildFolderName);

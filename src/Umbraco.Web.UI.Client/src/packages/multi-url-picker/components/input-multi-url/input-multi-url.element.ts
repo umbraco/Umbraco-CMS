@@ -428,6 +428,11 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 			#btn-add {
 				width: 100%;
 			}
+
+			uui-ref-list:not(:has(:nth-child(1))) {
+				margin-top: -20px;
+				padding-top: 20px;
+			}
 		`,
 	];
 }

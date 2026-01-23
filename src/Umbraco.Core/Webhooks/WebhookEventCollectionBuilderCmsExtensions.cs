@@ -40,6 +40,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the default webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -68,6 +69,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Removes the default webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -99,6 +101,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -134,6 +137,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds all available content type (document, media and member type) webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -165,6 +169,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the data type webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -194,6 +199,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the dictionary webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -221,6 +227,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the domain webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -248,6 +255,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds all available file (partial view, script, stylesheet and template) webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -280,6 +288,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the health check webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -305,6 +314,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the language webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -332,6 +342,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the media webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -374,6 +385,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -409,6 +421,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the package webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -434,6 +447,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the public access webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -461,6 +475,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the relation webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -488,6 +503,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// Adds the relation type webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -516,6 +532,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>

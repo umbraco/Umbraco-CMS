@@ -81,7 +81,8 @@ export class UmbPropertyEditorUITextBoxElement
 	}
 
 	#getMaxLengthMessage(max: number, current: number) {
-		return this.localize.term('textbox_characters_exceed', max, current);
+		const exceeded = current - max;
+		return this.localize.term('textbox_characters_exceed', max, exceeded);
 	}
 
 	#onInput(e: InputEvent) {

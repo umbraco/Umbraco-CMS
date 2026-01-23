@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -48,13 +48,19 @@ internal partial class BlockListElementLevelVariationTests
             },
             true);
 
-        AssertPropertyValues("en-US",
-            "The first invariant content value", "The first content value in English",
-            "The first invariant settings value", "The first settings value in English");
+        AssertPropertyValues(
+            "en-US",
+            "The first invariant content value",
+            "The first content value in English",
+            "The first invariant settings value",
+            "The first settings value in English");
 
-        AssertPropertyValues("da-DK",
-            "The first invariant content value", "The first content value in Danish",
-            "The first invariant settings value", "The first settings value in Danish");
+        AssertPropertyValues(
+            "da-DK",
+            "The first invariant content value",
+            "The first content value in Danish",
+            "The first invariant settings value",
+            "The first settings value in Danish");
 
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
         blockListValue.ContentData[0].Values[0].Value = "The second invariant content value";
@@ -68,23 +74,35 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
         PublishContent(content, contentType, ["en-US"]);
 
-        AssertPropertyValues("en-US",
-            "The second invariant content value", "The second content value in English",
-            "The second invariant settings value", "The second settings value in English");
+        AssertPropertyValues(
+            "en-US",
+            "The second invariant content value",
+            "The second content value in English",
+            "The second invariant settings value",
+            "The second settings value in English");
 
-        AssertPropertyValues("da-DK",
-            "The second invariant content value", "The first content value in Danish",
-            "The second invariant settings value", "The first settings value in Danish");
+        AssertPropertyValues(
+            "da-DK",
+            "The second invariant content value",
+            "The first content value in Danish",
+            "The second invariant settings value",
+            "The first settings value in Danish");
 
         PublishContent(content, contentType, ["da-DK"]);
 
-        AssertPropertyValues("da-DK",
-            "The second invariant content value", "The second content value in Danish",
-            "The second invariant settings value", "The second settings value in Danish");
+        AssertPropertyValues(
+            "da-DK",
+            "The second invariant content value",
+            "The second content value in Danish",
+            "The second invariant settings value",
+            "The second settings value in Danish");
 
-        void AssertPropertyValues(string culture,
-            string expectedInvariantContentValue, string expectedVariantContentValue,
-            string expectedInvariantSettingsValue, string expectedVariantSettingsValue)
+        void AssertPropertyValues(
+            string culture,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
         {
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
@@ -151,13 +169,19 @@ internal partial class BlockListElementLevelVariationTests
             },
             true);
 
-        AssertPropertyValues("en-US",
-            "English invariantText content value", "English variantText content value",
-            "English invariantText settings value", "English variantText settings value");
+        AssertPropertyValues(
+            "en-US",
+            "English invariantText content value",
+            "English variantText content value",
+            "English invariantText settings value",
+            "English variantText settings value");
 
-        AssertPropertyValues("da-DK",
-            "Danish invariantText content value", "Danish variantText content value",
-            "Danish invariantText settings value", "Danish variantText settings value");
+        AssertPropertyValues(
+            "da-DK",
+            "Danish invariantText content value",
+            "Danish variantText content value",
+            "Danish invariantText settings value",
+            "Danish variantText settings value");
 
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue("en-US")!);
         blockListValue.ContentData[0].Values[0].Value = "English invariantText content value (updated)";
@@ -176,23 +200,35 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
         PublishContent(content, contentType, ["en-US"]);
 
-        AssertPropertyValues("en-US",
-            "English invariantText content value (updated)", "English variantText content value (updated)",
-            "English invariantText settings value (updated)", "English variantText settings value (updated)");
+        AssertPropertyValues(
+            "en-US",
+            "English invariantText content value (updated)",
+            "English variantText content value (updated)",
+            "English invariantText settings value (updated)",
+            "English variantText settings value (updated)");
 
-        AssertPropertyValues("da-DK",
-            "Danish invariantText content value", "Danish variantText content value",
-            "Danish invariantText settings value", "Danish variantText settings value");
+        AssertPropertyValues(
+            "da-DK",
+            "Danish invariantText content value",
+            "Danish variantText content value",
+            "Danish invariantText settings value",
+            "Danish variantText settings value");
 
         PublishContent(content, contentType, ["da-DK"]);
 
-        AssertPropertyValues("da-DK",
-            "Danish invariantText content value (updated)", "Danish variantText content value (updated)",
-            "Danish invariantText settings value (updated)", "Danish variantText settings value (updated)");
+        AssertPropertyValues(
+            "da-DK",
+            "Danish invariantText content value (updated)",
+            "Danish variantText content value (updated)",
+            "Danish invariantText settings value (updated)",
+            "Danish variantText settings value (updated)");
 
-        void AssertPropertyValues(string culture,
-            string expectedInvariantContentValue, string expectedVariantContentValue,
-            string expectedInvariantSettingsValue, string expectedVariantSettingsValue)
+        void AssertPropertyValues(
+            string culture,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
         {
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
@@ -681,23 +717,41 @@ internal partial class BlockListElementLevelVariationTests
             [],
             true);
 
-        AssertPropertyValues("en-US", null,
-            "The first invariant content value", "The first content value in English");
+        AssertPropertyValues(
+            "en-US",
+            null,
+            "The first invariant content value",
+            "The first content value in English");
 
-        AssertPropertyValues("en-US", "s1",
-            "The first invariant content value", "The first content value in English (Segment 1)");
+        AssertPropertyValues(
+            "en-US",
+            "s1",
+            "The first invariant content value",
+            "The first content value in English (Segment 1)");
 
-        AssertPropertyValues("en-US", "s2",
-            "The first invariant content value", "The first content value in English (Segment 2)");
+        AssertPropertyValues(
+            "en-US",
+            "s2",
+            "The first invariant content value",
+            "The first content value in English (Segment 2)");
 
-        AssertPropertyValues("da-DK", null,
-            "The first invariant content value", "The first content value in Danish");
+        AssertPropertyValues(
+            "da-DK",
+            null,
+            "The first invariant content value",
+            "The first content value in Danish");
 
-        AssertPropertyValues("da-DK", "s1",
-            "The first invariant content value", "The first content value in Danish (Segment 1)");
+        AssertPropertyValues(
+            "da-DK",
+            "s1",
+            "The first invariant content value",
+            "The first content value in Danish (Segment 1)");
 
-        AssertPropertyValues("da-DK", "s2",
-            "The first invariant content value", "The first content value in Danish (Segment 2)");
+        AssertPropertyValues(
+            "da-DK",
+            "s2",
+            "The first invariant content value",
+            "The first content value in Danish (Segment 2)");
 
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
         blockListValue.ContentData[0].Values[0].Value = "The second invariant content value";
@@ -712,36 +766,67 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
         PublishContent(content, contentType, ["en-US"]);
 
-        AssertPropertyValues("en-US", null,
-            "The second invariant content value", "The second content value in English");
+        AssertPropertyValues(
+            "en-US",
+            null,
+            "The second invariant content value",
+            "The second content value in English");
 
-        AssertPropertyValues("en-US", "s1",
-            "The second invariant content value", "The second content value in English (Segment 1)");
+        AssertPropertyValues(
+            "en-US",
+            "s1",
+            "The second invariant content value",
+            "The second content value in English (Segment 1)");
 
-        AssertPropertyValues("en-US", "s2",
-            "The second invariant content value", "The second content value in English (Segment 2)");
+        AssertPropertyValues(
+            "en-US",
+            "s2",
+            "The second invariant content value",
+            "The second content value in English (Segment 2)");
 
-        AssertPropertyValues("da-DK", null,
-            "The second invariant content value", "The first content value in Danish");
+        AssertPropertyValues(
+            "da-DK",
+            null,
+            "The second invariant content value",
+            "The first content value in Danish");
 
-        AssertPropertyValues("da-DK", "s1",
-            "The second invariant content value", "The first content value in Danish (Segment 1)");
+        AssertPropertyValues(
+            "da-DK",
+            "s1",
+            "The second invariant content value",
+            "The first content value in Danish (Segment 1)");
 
-        AssertPropertyValues("da-DK", "s2",
-            "The second invariant content value", "The first content value in Danish (Segment 2)");
+        AssertPropertyValues(
+            "da-DK",
+            "s2",
+            "The second invariant content value",
+            "The first content value in Danish (Segment 2)");
 
         PublishContent(content, contentType, ["da-DK"]);
 
-        AssertPropertyValues("da-DK", null,
-            "The second invariant content value", "The second content value in Danish");
+        AssertPropertyValues(
+            "da-DK",
+            null,
+            "The second invariant content value",
+            "The second content value in Danish");
 
-        AssertPropertyValues("da-DK", "s1",
-            "The second invariant content value", "The second content value in Danish (Segment 1)");
+        AssertPropertyValues(
+            "da-DK",
+            "s1",
+            "The second invariant content value",
+            "The second content value in Danish (Segment 1)");
 
-        AssertPropertyValues("da-DK", "s2",
-            "The second invariant content value", "The second content value in Danish (Segment 2)");
+        AssertPropertyValues(
+            "da-DK",
+            "s2",
+            "The second invariant content value",
+            "The second content value in Danish (Segment 2)");
 
-        void AssertPropertyValues(string culture, string? segment, string expectedInvariantContentValue, string expectedVariantContentValue)
+        void AssertPropertyValues(
+            string culture,
+            string? segment,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue)
         {
             SetVariationContext(culture, segment);
             var publishedContent = GetPublishedContent(content.Key);
@@ -1570,11 +1655,8 @@ internal partial class BlockListElementLevelVariationTests
                             new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -1613,11 +1695,8 @@ internal partial class BlockListElementLevelVariationTests
                             new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -1656,11 +1735,8 @@ internal partial class BlockListElementLevelVariationTests
                             new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -1700,11 +1776,8 @@ internal partial class BlockListElementLevelVariationTests
                             new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -1745,11 +1818,8 @@ internal partial class BlockListElementLevelVariationTests
                             new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -1793,11 +1863,8 @@ internal partial class BlockListElementLevelVariationTests
                             new() { Alias = "variantText", Value = $"{(invalidSettingsValue ? "Invalid" : "Valid")} settings value in Danish", Culture = "da-DK" },
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
@@ -1841,11 +1908,8 @@ internal partial class BlockListElementLevelVariationTests
                             new() { Alias = "variantText", Value = "Valid settings value in English", Culture = "en-US" },
                         },
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         // make sure all blocks are exposed
         blockListValue.Expose =
@@ -1973,19 +2037,28 @@ internal partial class BlockListElementLevelVariationTests
             },
             true);
 
-        AssertPropertyValuesWithFallback("en-US",
-            "English invariantText content value", "English variantText content value",
-            "English invariantText settings value", "English variantText settings value");
+        AssertPropertyValuesWithFallback(
+            "en-US",
+            "English invariantText content value",
+            "English variantText content value",
+            "English invariantText settings value",
+            "English variantText settings value");
 
         AssetEmptyPropertyValues("da-DK");
 
-        AssertPropertyValuesWithFallback("da-DK",
-            "English invariantText content value", "English variantText content value",
-            "English invariantText settings value", "English variantText settings value");
+        AssertPropertyValuesWithFallback(
+            "da-DK",
+            "English invariantText content value",
+            "English variantText content value",
+            "English invariantText settings value",
+            "English variantText settings value");
 
-        void AssertPropertyValuesWithFallback(string culture,
-            string expectedInvariantContentValue, string expectedVariantContentValue,
-            string expectedInvariantSettingsValue, string expectedVariantSettingsValue)
+        void AssertPropertyValuesWithFallback(
+            string culture,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
         {
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
@@ -2221,8 +2294,7 @@ internal partial class BlockListElementLevelVariationTests
                     new() { Alias = "variantText", Value = "The original invariant value for settings" },
                 },
                 null,
-                null)
-        );
+                null));
 
         blockListValue.Expose =
         [

@@ -13,6 +13,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
@@ -390,8 +391,11 @@ export abstract class UmbTreeItemContextBase<
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
-		// TODO: Encode uniques [NL]
-		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
+		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+			sectionName: pathname,
+			entityType,
+			unique: unique ?? 'null',
+		});
 	}
 
 	override destroy(): void {

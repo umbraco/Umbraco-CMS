@@ -49,7 +49,9 @@ public class UdiTests
 
         Assert.AreEqual("/this is a test", Uri.UnescapeDataString(uri.AbsolutePath));
         Assert.AreEqual("%2Fthis%20is%20a%20test", Uri.EscapeDataString("/this is a test"));
+#pragma warning disable SYSLIB0013 // Uri.EscapeUriString is obsolete - testing legacy Uri escaping behavior
         Assert.AreEqual("/this%20is%20a%20test", Uri.EscapeUriString("/this is a test"));
+#pragma warning restore SYSLIB0013
 
         var udi = UdiParser.Parse("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
         Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
@@ -72,7 +74,9 @@ public class UdiTests
         // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
         // unreserved = alpha digit - . _ ~
         Assert.AreEqual("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2B%2C%3B%3D.-_~%25", Uri.EscapeDataString(":/?#[]@!$&'()+,;=.-_~%"));
+#pragma warning disable SYSLIB0013 // Uri.EscapeUriString is obsolete - testing legacy Uri escaping behavior
         Assert.AreEqual(":/?#[]@!$&'()+,;=.-_~%25", Uri.EscapeUriString(":/?#[]@!$&'()+,;=.-_~%"));
+#pragma warning restore SYSLIB0013
 
         // we cannot have reserved chars at random places
         // we want to keep the / in string udis

@@ -21,11 +21,11 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private const string SubSubPage2Key = "48AE405E-5142-4EBE-929F-55EB616F51F2";
     private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
 
-    protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 
-    protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
-    protected IDomainService DomainService => GetRequiredService<IDomainService>();
+    private IDomainService DomainService => GetRequiredService<IDomainService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -93,6 +93,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
         base.Setup();
     }
+
     //
     // [Test]
     // [LongRunning]
