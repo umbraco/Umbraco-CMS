@@ -183,8 +183,6 @@ public interface ISqlSyntaxProvider
     /// <summary>
     /// Alters the database sequences to match the current schema requirements.
     /// </summary>
-    /// Alters the database sequences to match the current schema requirements for providers that support sequences.
-    /// </summary>
     /// <remarks>
     /// This is an optional extension point for SQL providers that support database sequences. Providers that support
     /// sequences should override this method and implement any required changes when schema updates (for example, after
@@ -205,9 +203,7 @@ public interface ISqlSyntaxProvider
     /// </remarks>
     /// <param name="database">The database connection to use for altering the sequences.</param>
     /// <param name="tableName">The name of the table whose sequences will be altered.</param>
-    void AlterSequences(IUmbracoDatabase database, string tableName)
-    {
-    }
+    void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotImplementedException();
 
     IEnumerable<string> GetTablesInSchema(IDatabase db);
 
