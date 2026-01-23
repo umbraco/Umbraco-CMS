@@ -187,10 +187,10 @@ public interface ISqlSyntaxProvider
     /// This is an optional extension point for SQL providers that support database sequences. Providers that support
     /// sequences should override this method and implement any required changes when schema updates (for example, after
     /// a migration) require sequence adjustments. Callers should typically check <see cref="SupportsSequences"/> before
-    /// invoking this method. The default implementation throws <see cref="NotImplementedException"/>.
+    /// invoking this method. The default implementation throws <see cref="NotSupportedException"/>.
     /// </remarks>
     /// <param name="database">The database connection to use for altering sequences.</param>
-    void AlterSequences(IUmbracoDatabase database) => throw new NotImplementedException();
+    void AlterSequences(IUmbracoDatabase database) => throw new NotSupportedException();
 
     /// <summary>
     /// Alters the database sequences associated with the specified table for providers that support sequences.
@@ -199,11 +199,11 @@ public interface ISqlSyntaxProvider
     /// This is an optional extension point for SQL providers that support database sequences. Providers that support
     /// sequences should override this method to update sequences associated with the specified table when schema changes
     /// require it. Callers should typically check <see cref="SupportsSequences"/> before invoking this method. The default
-    /// implementation throws <see cref="NotImplementedException"/>.
+    /// implementation throws <see cref="NotSupportedException"/>.
     /// </remarks>
     /// <param name="database">The database connection to use for altering the sequences.</param>
     /// <param name="tableName">The name of the table whose sequences will be altered.</param>
-    void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotImplementedException();
+    void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotSupportedException();
 
     IEnumerable<string> GetTablesInSchema(IDatabase db);
 
