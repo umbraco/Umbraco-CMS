@@ -295,6 +295,7 @@ public static partial class Constants
         ///     The configuration key for backoffice token cookie settings.
         /// </summary>
         public const string ConfigBackOfficeTokenCookie = ConfigSecurity + ":BackOfficeTokenCookie";
+        public const string ConfigDictionary = ConfigPrefix + "Dictionary";
 
         /// <summary>
         ///     Contains constants for named options used in configuration.
