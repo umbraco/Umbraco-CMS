@@ -1569,7 +1569,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         out long totalRecords,
         IQuery<IContent>? filter,
         Ordering? ordering)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering);
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering, loadTemplates: true);
 
     /// <inheritdoc />
     public override IEnumerable<IContent> GetPage(
@@ -1579,8 +1579,19 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         out long totalRecords,
         string[]? propertyAliases,
         IQuery<IContent>? filter,
+        Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering, loadTemplates: true);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPage(
+        IQuery<IContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IContent>? filter,
         Ordering? ordering,
-        bool loadTemplates = true)
+        bool loadTemplates)
     {
         Sql<ISqlContext>? filterSql = null;
 

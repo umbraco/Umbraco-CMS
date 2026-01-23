@@ -140,10 +140,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         out long totalRecords,
         string[]? propertyAliases,
         IQuery<IMedia>? filter,
-        Ordering? ordering,
-        bool loadTemplates = true)
+        Ordering? ordering)
     {
-        // Note: loadTemplates parameter is ignored for media as media items don't have templates
 
         Sql<ISqlContext>? filterSql = null;
 

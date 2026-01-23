@@ -95,10 +95,6 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     /// </param>
     /// <param name="filter">Optional filter query.</param>
     /// <param name="ordering">The ordering specification.</param>
-    /// <param name="loadTemplates">
-    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
-    ///     (e.g., collection views). Default is true. Only applies to Document content; ignored for Media/Member.
-    /// </param>
     /// <returns>A collection of content items for the specified page.</returns>
     /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -109,8 +105,7 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
         out long totalRecords,
         string[]? propertyAliases,
         IQuery<TEntity>? filter,
-        Ordering? ordering,
-        bool loadTemplates = true)
+        Ordering? ordering)
         => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
 #pragma warning restore CS0618 // Type or member is obsolete
 
