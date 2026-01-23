@@ -79,6 +79,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 						() => html`<div id="invalid-badge"><uui-badge color="invalid" attention>!</uui-badge></div>`,
 					)}
 				</uui-label>
+				${this.#renderAlias()}
 				<slot name="action-menu"></slot>
 				${this.#renderDescription()}
 				<slot name="description"></slot>
@@ -89,6 +90,12 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				</umb-form-validation-message>
 			</div>
 		`;
+	}
+
+	#renderAlias() {
+		// Show alias below label when it's different from the label and not empty
+		if (!this.alias || this.alias === this.label) return;
+		return html`<div id="alias">${this.alias}</div>`;
 	}
 
 	#renderDescription() {
@@ -152,6 +159,12 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				//height: var(--uui-color-invalid);
 				background-color: var(--umb-temp-uui-color-invalid);
 				color: var(--uui-color-invalid-contrast);
+			}
+
+			#alias {
+				color: var(--uui-color-text-alt);
+				font-size: var(--uui-font-size-3);
+				margin-top: var(--uui-size-space-1);
 			}
 
 			#description {
