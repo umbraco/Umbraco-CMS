@@ -93,6 +93,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         ignoreHTTPSErrors: true,
+        trace: 'on',
       }
     },
     // This project is used to test the install steps, for that we do not need to authenticate.
