@@ -22,8 +22,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// </summary>
 internal sealed class DatabaseDataCreator
 {
-#pragma warning disable CS8604 // Possible null reference argument.
-#pragma warning disable SA1117 // Parameters should be on same line or separate lines
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 
     internal const string EditorGroupAlias = "editor";
@@ -2466,6 +2464,4 @@ internal sealed class DatabaseDataCreator
     }
 
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-#pragma warning restore CS8604 // Possible null reference argument.
-#pragma warning restore SA1117 // Parameters should be on same line or separate lines
 }
