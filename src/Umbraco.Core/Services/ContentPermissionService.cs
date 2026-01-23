@@ -52,12 +52,6 @@ internal sealed class ContentPermissionService : IContentPermissionService
             return Task.FromResult(ContentAuthorizationStatus.NotFound);
         }
 
-        // Check if all requested keys were found
-        if (entityPaths.Length != keysArray.Length)
-        {
-            return Task.FromResult(ContentAuthorizationStatus.NotFound);
-        }
-
         // Check path access using the paths directly
         int[]? startNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
         foreach (TreeEntityPath entityPath in entityPaths)

@@ -39,12 +39,6 @@ internal sealed class MediaPermissionService : IMediaPermissionService
             return Task.FromResult(MediaAuthorizationStatus.NotFound);
         }
 
-        // Check if all requested keys were found
-        if (entityPaths.Length != keysArray.Length)
-        {
-            return Task.FromResult(MediaAuthorizationStatus.NotFound);
-        }
-
         // Check path access using the paths directly
         int[]? startNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
         foreach (TreeEntityPath entityPath in entityPaths)
