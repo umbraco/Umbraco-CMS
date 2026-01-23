@@ -264,10 +264,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual bool SupportsSequences() => false;
 
     /// <inheritdoc />
-    public virtual void AlterSequences(IUmbracoDatabase database) => throw new NotImplementedException();
+    public virtual void AlterSequences(IUmbracoDatabase database) => throw new NotSupportedException();
 
     /// <inheritdoc />
-    public virtual void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotImplementedException();
+    public virtual void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotSupportedException();
 
     /// <summary>
     ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
