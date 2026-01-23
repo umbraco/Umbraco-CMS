@@ -14,7 +14,7 @@ export function ufm(plugins: Array<UfmPlugin> = []): MarkedExtension {
 				level: 'inline',
 				start: (src: string) => src.search(`{${prefix}`),
 				tokenizer: (src: string) => {
-					const pattern = `^\\{${prefix}([^}]*)\\}`;
+					const pattern = `^\\{\\s*${prefix}([^}]*)\\}`;
 					const regex = new RegExp(pattern);
 					const match = src.match(regex);
 
