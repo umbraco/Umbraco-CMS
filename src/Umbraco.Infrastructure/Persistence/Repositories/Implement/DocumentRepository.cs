@@ -850,6 +850,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
       $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Access)} WHERE {QuoteColumnName("noAccessNodeId")} = @id",
       $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentUrl)} WHERE {uniqueId} IN
         (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
+      $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} WHERE {uniqueId} IN
+        (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
       $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;

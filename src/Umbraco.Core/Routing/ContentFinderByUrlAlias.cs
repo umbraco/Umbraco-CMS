@@ -1,12 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
@@ -23,25 +24,73 @@ namespace Umbraco.Cms.Core.Routing;
 public class ContentFinderByUrlAlias : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrlAlias> _logger;
-    private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IDocumentUrlAliasService _documentUrlAliasService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
+    private readonly IIdKeyMap _idKeyMap;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
     /// </summary>
+    // TODO (V18): Remove this constructor and the unused parameters from the remaining one. They are only retained to avoid
+    // an ambiguous constructor error. Also removed the internal "Simplified constructor for testing purposes".
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
         IPublishedValueFallback publishedValueFallback,
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        : this(
+            logger,
+            publishedValueFallback,
+            umbracoContextAccessor,
+            documentNavigationQueryService,
+            publishedContentStatusFilteringService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlAliasService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
     {
-        _publishedValueFallback = publishedValueFallback;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
+    /// </summary>
+    public ContentFinderByUrlAlias(
+        ILogger<ContentFinderByUrlAlias> logger,
+#pragma warning disable IDE0060 // Remove unused parameter
+        IPublishedValueFallback publishedValueFallback,
+#pragma warning restore IDE0060 // Remove unused parameter
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+#pragma warning disable IDE0060 // Remove unused parameter
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+#pragma warning restore IDE0060 // Remove unused parameter
+        IDocumentUrlAliasService documentUrlAliasService,
+        IIdKeyMap idKeyMap)
+    {
+        _logger = logger;
         _umbracoContextAccessor = umbracoContextAccessor;
         _documentNavigationQueryService = documentNavigationQueryService;
-        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+        _documentUrlAliasService = documentUrlAliasService;
+        _idKeyMap = idKeyMap;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
+    /// </summary>
+    /// <remarks>Simplified constructor for testing purposes.</remarks>
+    internal ContentFinderByUrlAlias(
+        ILogger<ContentFinderByUrlAlias> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentUrlAliasService documentUrlAliasService,
+        IIdKeyMap idKeyMap)
+    {
         _logger = logger;
+        _umbracoContextAccessor = umbracoContextAccessor;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _documentUrlAliasService = documentUrlAliasService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -63,7 +112,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         {
             node = FindContentByAlias(
                 umbracoContext.Content,
-                frequest.Domain != null ? frequest.Domain.ContentId : 0,
+                frequest.Domain?.ContentId ?? 0,
                 frequest.Culture,
                 frequest.AbsolutePathDecoded);
 
@@ -73,7 +122,9 @@ public class ContentFinderByUrlAlias : IContentFinder
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
-                        "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, node.Id);
+                        "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}",
+                        frequest.Uri.AbsolutePath,
+                        node.Id);
                 }
             }
         }
@@ -81,90 +132,80 @@ public class ContentFinderByUrlAlias : IContentFinder
         return Task.FromResult(node != null);
     }
 
-    private IPublishedContent? FindContentByAlias(IPublishedContentCache? cache, int rootNodeId, string? culture, string alias)
+    private IPublishedContent? FindContentByAlias(
+        IPublishedContentCache? cache,
+        int rootNodeId,
+        string? culture,
+        string alias)
     {
-        if (alias == null)
+        if (cache is null)
         {
-            throw new ArgumentNullException(nameof(alias));
+            return null;
         }
 
-        // the alias may be "foo/bar" or "/foo/bar"
-        // there may be spaces as in "/foo/bar,  /foo/nil"
-        // these should probably be taken care of earlier on
+        var normalizedAlias = _documentUrlAliasService.NormalizeAlias(alias);
 
-        // TODO: can we normalize the values so that they contain no whitespaces, and no leading slashes?
-        // and then the comparisons in IsMatch can be way faster - and allocate way less strings
-        const string propertyAlias = Constants.Conventions.Content.UrlAlias;
-
-        var test1 = alias.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
-        var test2 = ",/" + test1; // test2 is ",/alias,"
-        test1 = "," + test1; // test1 is ",alias,"
-
-        bool IsMatch(IPublishedContent c, string a1, string a2)
+        if (string.IsNullOrEmpty(normalizedAlias))
         {
-            // this basically implements the original XPath query ;-(
-            //
-            // "//* [@isDoc and (" +
-            // "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')" +
-            // " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')" +
-            // ")]"
-            if (!c.HasProperty(propertyAlias))
-            {
-                return false;
-            }
-
-            IPublishedProperty? p = c.GetProperty(propertyAlias);
-            var varies = p?.PropertyType?.VariesByCulture();
-            string? v;
-            if (varies ?? false)
-            {
-                if (!c.HasCulture(culture))
-                {
-                    return false;
-                }
-
-                v = c.Value<string>(_publishedValueFallback, propertyAlias, culture);
-            }
-            else
-            {
-                v = c.Value<string>(_publishedValueFallback, propertyAlias);
-            }
-
-            if (string.IsNullOrWhiteSpace(v))
-            {
-                return false;
-            }
-
-            v = "," + v.Replace(" ", string.Empty) + ",";
-            return v.InvariantContains(a1) || v.InvariantContains(a2);
+            return null;
         }
 
-        // TODO: even with Linq, what happens below has to be horribly slow
-        // but the only solution is to entirely refactor URL providers to stop being dynamic
+        // Get all matching document keys for the alias
+        IEnumerable<Guid> documentKeys = _documentUrlAliasService.GetDocumentKeysByAliasAsync(
+            normalizedAlias,
+            culture).GetAwaiter().GetResult();
+
+        Guid? matchingKey = null;
+
+        // Convert domain root ID to Guid for scoping.
+        Guid? domainRootKey = null;
         if (rootNodeId > 0)
         {
-            IPublishedContent? rootNode = cache?.GetById(rootNodeId);
-            return rootNode?.Descendants(_documentNavigationQueryService, _publishedContentStatusFilteringService).FirstOrDefault(x => IsMatch(x, test1, test2));
+            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(rootNodeId, UmbracoObjectTypes.Document);
+            domainRootKey = attempt.Success ? attempt.Result : null;
         }
 
-        if (cache is not null)
+        // If we have a domain root, find the first document that's under that domain.
+        if (domainRootKey.HasValue)
         {
-            if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+            foreach (Guid documentKey in documentKeys)
+            {
+                if (IsDocumentUnderDomainRoot(documentKey, domainRootKey.Value))
+                {
+                    matchingKey = documentKey;
+                    break;
+                }
+            }
+
+            // If under a domain, and no match found, return null.
+            if (matchingKey == null)
             {
                 return null;
             }
-
-            foreach (IPublishedContent rootContent in rootKeys.Select(x => cache.GetById(false, x)).WhereNotNull())
-            {
-                IPublishedContent? c = rootContent.DescendantsOrSelf(_documentNavigationQueryService, _publishedContentStatusFilteringService)
-                    .FirstOrDefault(x => IsMatch(x, test1, test2));
-                if (c != null)
-                {
-                    return c;
-                }
-            }
+        }
+        else
+        {
+            // Use first match if no domain).
+            matchingKey = documentKeys.FirstOrDefault();
         }
 
-        return null;
+        return matchingKey != default ? cache.GetById(matchingKey.Value) : null;
+    }
+
+    private bool IsDocumentUnderDomainRoot(Guid documentKey, Guid domainRootKey)
+    {
+        // Document is the domain root itself
+        if (documentKey == domainRootKey)
+        {
+            return true;
+        }
+
+        // Check if document is a descendant of the domain root
+        if (_documentNavigationQueryService.TryGetAncestorsKeys(documentKey, out IEnumerable<Guid> ancestorKeys))
+        {
+            return ancestorKeys.Contains(domainRootKey);
+        }
+
+        return false;
     }
 }
