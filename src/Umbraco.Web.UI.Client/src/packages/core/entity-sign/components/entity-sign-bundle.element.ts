@@ -109,24 +109,27 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
+	async #createPopoverSigns(): Promise<void> {
+		if (!this._signs || this._popoverSigns) return;
+
+		this._popoverSigns = await Promise.all(
+			this._signs.map(async (sign) => {
+				const { element } = await createExtensionElementWithApi(sign.manifest, [{ meta: sign.manifest.meta }]);
+				if (element) {
+					(element as any).manifest = sign.manifest;
+				}
+				return element;
+			}),
+		);
+	}
+
 	async #handleHoverTimer(open: boolean, delay: number) {
 		if (this._hoverTimer) clearTimeout(this._hoverTimer);
 		this._hoverTimer = window.setTimeout(async () => {
 			const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
 			if (popover) {
 				if (open) {
-					// Create popover elements lazily on first open
-					if (this._signs && !this._popoverSigns) {
-						this._popoverSigns = await Promise.all(
-							this._signs.map(async (sign) => {
-								const { element } = await createExtensionElementWithApi(sign.manifest, [{ meta: sign.manifest.meta }]);
-								if (element) {
-									(element as any).manifest = sign.manifest;
-								}
-								return element;
-							}),
-						);
-					}
+					await this.#createPopoverSigns();
 					// 1) Get the host element's position
 					const hostRect = this.getBoundingClientRect();
 					// 2) Position the popover
