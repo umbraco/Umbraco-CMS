@@ -45,6 +45,12 @@ internal sealed class SchemaValidationTest : UmbracoIntegrationTest
     [Test]
     public void Validate_DatabaseSchemaResult_with_CustomTables_has_Errors()
     {
+        if (!IsSQLiteDatabase())
+        {
+            Assert.Ignore("This test is only valid for SQLite databases.");
+            return;
+        }
+
         DatabaseSchemaResult result;
         DatabaseSchemaCreator schema;
 
@@ -89,6 +95,14 @@ internal sealed class SchemaValidationTest : UmbracoIntegrationTest
         foreach (var expectedError in expectedErrors)
         {
             Assert.That(result.Errors.Contains(expectedError), Is.True);
+        }
+    }
+
+    private bool IsSQLiteDatabase()
+    {
+        using (ScopeProvider.CreateScope(autoComplete: true))
+        {
+            return ScopeAccessor.AmbientScope.Database.SqlContext.DatabaseType is NPoco.DatabaseTypes.SQLiteDatabaseType;
         }
     }
 
