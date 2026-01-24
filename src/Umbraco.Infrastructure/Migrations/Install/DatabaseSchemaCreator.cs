@@ -22,7 +22,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// </summary>
 public class DatabaseSchemaCreator
 {
-    // all tables, in order
+    /// <summary>
+    /// Gets a read-only list of all data transfer object (DTO) types representing database tables in the order they should be processed.
+    /// </summary>
     internal static readonly List<Type> _orderedTables = new()
     {
         typeof(UserDto),
@@ -104,6 +106,9 @@ public class DatabaseSchemaCreator
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DatabaseSchemaCreator"/> class.
+    /// </summary>
     public DatabaseSchemaCreator(
         IUmbracoDatabase? database,
         ILogger<DatabaseSchemaCreator> logger,
@@ -195,6 +200,10 @@ public class DatabaseSchemaCreator
     /// </summary>
     internal DatabaseSchemaResult ValidateSchema() => ValidateSchema(_orderedTables);
 
+    /// <summary>
+    ///     Validates the schema of the current database for the provided collection of tables represented by their DTO types.
+    /// </summary>
+    /// <param name="orderedTables">The ordered collection of table DTO types to validate.</param>
     internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
     {
         var result = new DatabaseSchemaResult();
@@ -241,10 +250,10 @@ public class DatabaseSchemaCreator
 
         var unknownConstraintsInDatabase = allConstraintsInDatabase
             .Where(
-            x => x.InvariantStartsWith("FK_") == false &&
-                 x.InvariantStartsWith("PK_") == false &&
-                 x.InvariantStartsWith("IX_") == false)
-            .ToList();
+                x => x.InvariantStartsWith("FK_") == false &&
+                     x.InvariantStartsWith("PK_") == false &&
+                     x.InvariantStartsWith("IX_") == false)
+                .ToList();
 
         var foreignKeysInSchema = result.TableDefinitions
             .SelectMany(def =>
