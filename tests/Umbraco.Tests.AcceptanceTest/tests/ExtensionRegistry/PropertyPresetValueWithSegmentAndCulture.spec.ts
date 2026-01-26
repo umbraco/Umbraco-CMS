@@ -47,7 +47,9 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.doesTextStringHaveExpectedValue(presetValue);
   await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -64,6 +66,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
@@ -73,7 +76,9 @@ test('can insert preset value into textstring property that vary by culture and 
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(presetValue);
   await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values.find(item => item.culture === 'en-US' && item.segment === vipMemberSegmentAlias).value).toBe(presetValue);
 });
@@ -90,6 +95,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(languageData.name);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
@@ -99,7 +105,9 @@ test('can insert preset value into textstring property that vary by culture and 
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(presetValue);
   await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values.find(item => item.culture === languageData.isoCode && item.segment === vipMemberSegmentAlias).value).toBe(presetValue);
 });
