@@ -3,7 +3,7 @@ import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token
 import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from './block-rte-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { mergeObservables, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT.TYPE,
@@ -32,23 +32,7 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 
 	protected override _gotManager() {}
 
-	protected override _gotEntries() {
-		// Secure displayInline fits configuration:
-		this.observe(
-			observeMultiple([this.displayInline, this.displayInlineConfig]),
-			([displayInline, displayInlineConfig]) => {
-				if (displayInlineConfig !== undefined && displayInline !== undefined && displayInlineConfig !== displayInline) {
-					const layoutValue = this._layout.getValue();
-					if (!layoutValue) return;
-					this._layout.setValue({
-						...layoutValue,
-						displayInline: displayInlineConfig,
-					});
-				}
-			},
-			'displayInlineCorrection',
-		);
-	}
+	protected override _gotEntries() {}
 
 	protected override _gotContentType() {}
 }
