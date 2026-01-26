@@ -767,6 +767,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -785,7 +787,6 @@ namespace Umbraco.Cms.Core.Services
                     throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
                 }
 
-                scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                 {
                     if (_entityRepository.Get(media.Key, UmbracoObjectTypes.Media.GetGuid()) is not null)
@@ -825,6 +826,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(mediasA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -833,8 +836,6 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 IEnumerable<TreeChange<IMedia>> treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
-
-                scope.WriteLock(Constants.Locks.MediaTree);
                 foreach (IMedia media in mediasA)
                 {
                     if (media.HasIdentity == false)
