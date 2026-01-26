@@ -112,9 +112,8 @@ test('can delete element permanently from recycle bin', async ({umbracoApi, umbr
   await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
 
   // Act
-  await umbracoUi.library.clickActionsMenuForElement(elementName);
-  await umbracoUi.library.clickDeleteActionMenuOption();
-  await umbracoUi.library.clickConfirmToDeleteButton();
+  await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(elementName);
+  await umbracoUi.library.clickConfirmToDeleteButtonAndWaitForElementToBeDeleted();
 
   // Assert
   expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
