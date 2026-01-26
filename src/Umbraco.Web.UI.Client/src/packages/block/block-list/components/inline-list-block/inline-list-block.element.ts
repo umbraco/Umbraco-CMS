@@ -59,6 +59,11 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.#setupBlockListEntryContext();
+		this.#setupWorkspaceContext();
+	}
+
+	#setupBlockListEntryContext() {
 		this.consumeContext(UMB_BLOCK_LIST_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
@@ -70,7 +75,9 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				'observeContentKey',
 			);
 		});
+	}
 
+	#setupWorkspaceContext() {
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -79,54 +86,70 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			(permitted, ctrl) => {
 				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 				if (permitted && context) {
-					this.#workspaceContext = context;
-					this.#workspaceContext.establishLiveSync();
-					this.#load();
-
-					this.observe(
-						this.#workspaceContext.exposed,
-						(exposed) => {
-							this._exposed = exposed;
-							// If block is newly created (not exposed yet) and we haven't auto-expanded yet, expand it automatically
-							// This restores the Umbraco 13 behavior where newly added blocks are expanded for immediate editing
-							if (!this.#hasAutoExpanded && exposed === false && this._isOpen === false) {
-								this._isOpen = true;
-								this.#hasAutoExpanded = true;
-							}
-						},
-						'observeExposed',
-					);
-
-					this.observe(
-						context.content.structure.ownerContentTypeName,
-						(name) => {
-							this._ownerContentTypeName = name;
-						},
-						'observeContentTypeName',
-					);
-
-					this.observe(
-						context.variantId,
-						async (variantId) => {
-							if (variantId) {
-								context.content.setup(this, variantId);
-								// TODO: Support segment name?
-								const culture = variantId.culture;
-								if (culture) {
-									const languageRepository = new UmbLanguageItemRepository(this);
-									const { data } = await languageRepository.requestItems([culture]);
-									const name = data?.[0].name;
-									this._variantName = name ? this.localize.string(name) : undefined;
-								}
-							}
-						},
-						'observeVariant',
-					);
-
-					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this.#workspaceContext]);
+					this.#initializeWorkspaceContext(context);
 				}
 			},
 		);
+	}
+
+	#initializeWorkspaceContext(context: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE) {
+		this.#workspaceContext = context;
+		this.#workspaceContext.establishLiveSync();
+		this.#load();
+
+		this.#observeExposed();
+		this.#observeContentTypeName(context);
+		this.#observeVariant(context);
+
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this.#workspaceContext]);
+	}
+
+	#observeExposed() {
+		this.observe(
+			this.#workspaceContext!.exposed,
+			(exposed) => {
+				this._exposed = exposed;
+				// If block is newly created (not exposed yet) and we haven't auto-expanded yet, expand it automatically
+				// This restores the Umbraco 13 behavior where newly added blocks are expanded for immediate editing
+				if (!this.#hasAutoExpanded && exposed === false && this._isOpen === false) {
+					this._isOpen = true;
+					this.#hasAutoExpanded = true;
+				}
+			},
+			'observeExposed',
+		);
+	}
+
+	#observeContentTypeName(context: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE) {
+		this.observe(
+			context.content.structure.ownerContentTypeName,
+			(name) => {
+				this._ownerContentTypeName = name;
+			},
+			'observeContentTypeName',
+		);
+	}
+
+	#observeVariant(context: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE) {
+		this.observe(
+			context.variantId,
+			async (variantId) => {
+				if (!variantId) return;
+
+				context.content.setup(this, variantId);
+				await this.#updateVariantName(variantId);
+			},
+			'observeVariant',
+		);
+	}
+
+	async #updateVariantName(variantId: { culture?: string }) {
+		if (!variantId.culture) return;
+
+		const languageRepository = new UmbLanguageItemRepository(this);
+		const { data } = await languageRepository.requestItems([variantId.culture]);
+		const name = data?.[0].name;
+		this._variantName = name ? this.localize.string(name) : undefined;
 	}
 
 	#load() {
