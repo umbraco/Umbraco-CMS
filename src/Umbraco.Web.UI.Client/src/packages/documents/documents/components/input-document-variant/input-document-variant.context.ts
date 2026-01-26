@@ -45,8 +45,8 @@ export class UmbDocumentPickerInputVariantContext extends UmbPickerInputContext<
 		}
 	}
 
-	override onModalValueReceived(modalValue: UmbDocumentPickerModalValue) {
-		if (modalValue.culture) {
+	override onModalValueReceived(modalValue: UmbDocumentPickerModalValue | undefined) {
+		if (modalValue && modalValue.culture) {
 			this._culture = modalValue.culture;
 		}
 	}
