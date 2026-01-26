@@ -282,7 +282,18 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentPatchResult { Content = null! });
         }
 
-        // Apply variant changes (name only for now - Phase 1 minimal implementation)
+        // Validate cultures - check all requested cultures are valid
+        if (patchModel.AffectedCultures.Any())
+        {
+            var availableCultures = (await _languageService.GetAllIsoCodesAsync()).ToArray();
+            var invalidCultures = patchModel.AffectedCultures.Except(availableCultures).ToArray();
+            if (invalidCultures.Any())
+            {
+                return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentPatchResult { Content = content });
+            }
+        }
+
+        // Apply variant changes (name only for now - Phase 2: added culture support)
         if (patchModel.Variants is not null)
         {
             foreach (var variantPatch in patchModel.Variants)
