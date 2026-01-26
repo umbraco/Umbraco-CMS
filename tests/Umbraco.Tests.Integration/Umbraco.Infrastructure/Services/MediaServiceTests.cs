@@ -1,15 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -23,10 +24,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     [Test]
-    public void Can_Update_Media_Property_Values()
+    public async Task Can_Update_Media_Property_Values()
     {
         IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
         IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
         media.SetValue("title", "title of mine");
         media.SetValue("bodyText", "hello world");
@@ -84,12 +85,12 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_Paged_Children_With_Media_Type_Filter()
+    public async Task Get_Paged_Children_With_Media_Type_Filter()
     {
         var mediaType1 = MediaTypeBuilder.CreateImageMediaType("Image2");
-        MediaTypeService.Save(mediaType1);
+        await MediaTypeService.CreateAsync(mediaType1, Constants.Security.SuperUserKey);
         var mediaType2 = MediaTypeBuilder.CreateImageMediaType("Image3");
-        MediaTypeService.Save(mediaType2);
+        await MediaTypeService.CreateAsync(mediaType2, Constants.Security.SuperUserKey);
 
         for (var i = 0; i < 10; i++)
         {
@@ -176,38 +177,22 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cannot_Save_Media_With_Empty_Name()
+    public async Task Cannot_Save_Media_With_Empty_Name()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateNewMediaType();
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
         var media = MediaService.CreateMedia(string.Empty, -1, Constants.Conventions.MediaTypes.VideoAlias);
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => MediaService.Save(media));
     }
 
-
-    // [Test]
-    // public void Ensure_Content_Xml_Created()
-    // {
-    //     var mediaType = MediaTypeBuilder.CreateVideoMediaType();
-    //     MediaTypeService.Save(mediaType);
-    //     var media = MediaService.CreateMedia("Test", -1, Constants.Conventions.MediaTypes.VideoAlias);
-    //
-    //     MediaService.Save(media);
-    //
-    //     using (var scope = ScopeProvider.CreateScope())
-    //     {
-    //         Assert.IsTrue(scope.Database.Exists<ContentXmlDto>(media.Id));
-    //     }
-    // }
-
     [Test]
-    public void Can_Get_Media_By_Path()
+    public async Task Can_Get_Media_By_Path()
     {
         var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         var media = MediaBuilder.CreateMediaImage(mediaType, -1);
         MediaService.Save(media);
@@ -220,10 +205,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Media_With_Crop_By_Path()
+    public async Task Can_Get_Media_With_Crop_By_Path()
     {
         var mediaType = MediaTypeBuilder.CreateImageMediaTypeWithCrop("Image2");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         var media = MediaBuilder.CreateMediaImageWithCrop(mediaType, -1);
         MediaService.Save(media);
@@ -236,10 +221,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Paged_Children()
+    public async Task Can_Get_Paged_Children()
     {
         var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(mediaType, -1);
@@ -257,10 +242,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Paged_Children_Dont_Get_Descendants()
+    public async Task Can_Get_Paged_Children_Dont_Get_Descendants()
     {
         var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         // Only add 9 as we also add a folder with children.
         for (var i = 0; i < 9; i++)
@@ -270,7 +255,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         }
 
         var mediaTypeForFolder = MediaTypeBuilder.CreateImageMediaType("Folder2");
-        MediaTypeService.Save(mediaTypeForFolder);
+        await MediaTypeService.CreateAsync(mediaTypeForFolder, Constants.Security.SuperUserKey);
         var mediaFolder = MediaBuilder.CreateMediaFolder(mediaTypeForFolder, -1);
         MediaService.Save(mediaFolder);
         for (var i = 0; i < 10; i++)
@@ -326,4 +311,181 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
         return new Tuple<IMedia, IMedia, IMedia, IMedia, IMedia>(folder, folder2, image, folderTrashed, imageTrashed);
     }
+
+    #region Concurrency Tests
+
+    public static void ConfigureConcurrencyTest(IUmbracoBuilder builder) =>
+        builder.AddNotificationHandler<MediaSavingNotification, ReadLockAcquiringMediaSavingHandler>();
+
+    /// <summary>
+    /// Verifies that parallel media saves don't deadlock when a notification handler acquires a read lock.
+    /// </summary>
+    /// <remarks>
+    /// Before the fix (issue #21125), this test would deadlock because:
+    /// 1. Thread A publishes MediaSavingNotification, handler calls GetById (acquires read lock).
+    /// 2. Thread B publishes MediaSavingNotification, handler calls GetById (acquires read lock).
+    /// 3. Thread A tries to acquire write lock - blocked waiting for Thread B's read lock.
+    /// 4. Thread B tries to acquire write lock - blocked waiting for Thread A's read lock.
+    /// = Deadlock
+    /// After the fix, write locks are acquired before publishing notifications, so the deadlock cannot occur.
+    /// </remarks>
+    [Test]
+    [Timeout(10000)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
+    public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock()
+    {
+        // Arrange
+        var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+
+        const int numberOfMediaItems = 5;
+        var mediaItems = new List<IMedia>();
+
+        // Create media items first so they have an identity and will be handled by the notification handler.
+        for (var i = 0; i < numberOfMediaItems; i++)
+        {
+            var media = MediaBuilder.CreateSimpleMedia(mediaType, $"Test Media {i}", Constants.System.Root);
+            MediaService.Save(media);
+            mediaItems.Add(media);
+        }
+
+        var exceptions = new List<Exception>();
+        var lockObj = new Lock();
+
+        // Act - update all media items in parallel.
+        var tasks = mediaItems.Select(media => RunWithSuppressedExecutionContext(() =>
+        {
+            try
+            {
+                media.Name += " Updated";
+                MediaService.Save(media);
+            }
+            catch (Exception ex)
+            {
+                lock (lockObj)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            return Task.CompletedTask;
+        })).ToList();
+
+        await Task.WhenAll(tasks);
+
+        // Assert
+        Assert.IsEmpty(
+            exceptions,
+            $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
+
+        // Verify all media items were updated successfully
+        foreach (var media in mediaItems)
+        {
+            var retrieved = MediaService.GetById(media.Id);
+            Assert.That(retrieved, Is.Not.Null, $"Media '{media.Name}' should be retrievable after save");
+            Assert.That(retrieved!.Name, Does.EndWith("Updated"), $"Media should have been updated");
+        }
+    }
+
+    /// <summary>
+    /// Verifies that parallel media deletes don't deadlock when a notification handler is registered.
+    /// </summary>
+    [Test]
+    [Timeout(10000)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
+    public async Task Parallel_Media_Delete_Does_Not_Deadlock()
+    {
+        // Arrange
+        var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+
+        const int numberOfMediaItems = 5;
+        var mediaItems = new List<IMedia>();
+
+        // Create media items.
+        for (var i = 0; i < numberOfMediaItems; i++)
+        {
+            var media = MediaBuilder.CreateSimpleMedia(mediaType, $"Test Media {i}", Constants.System.Root);
+            MediaService.Save(media);
+            mediaItems.Add(media);
+        }
+
+        var exceptions = new List<Exception>();
+        var lockObj = new Lock();
+
+        // Act - delete all media items in parallel.
+        var tasks = mediaItems.Select(media => RunWithSuppressedExecutionContext(() =>
+        {
+            try
+            {
+                MediaService.Delete(media);
+            }
+            catch (Exception ex)
+            {
+                lock (lockObj)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            return Task.CompletedTask;
+        })).ToList();
+
+        await Task.WhenAll(tasks);
+
+        // Assert
+        Assert.IsEmpty(
+            exceptions,
+            $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
+
+        // Verify all media items were deleted
+        foreach (var media in mediaItems)
+        {
+            var retrieved = MediaService.GetById(media.Id);
+            Assert.That(retrieved, Is.Null, $"Media '{media.Name}' should have been deleted");
+        }
+    }
+
+    private static Task RunWithSuppressedExecutionContext(Func<Task> action)
+    {
+        using (ExecutionContext.SuppressFlow())
+        {
+            return Task.Run(action);
+        }
+    }
+
+    /// <summary>
+    /// A notification handler that acquires a read lock by calling MediaService.GetById.
+    /// This simulates real-world scenarios where handlers need to read related data.
+    /// </summary>
+    /// <remarks>
+    /// Before the fix for issue #21125, this handler would cause deadlocks when multiple
+    /// media items are saved in parallel because:
+    /// 1. The notification is published BEFORE the write lock is acquired
+    /// 2. This handler calls GetById which acquires a read lock
+    /// 3. Multiple threads each hold read locks and then try to upgrade to write locks
+    /// 4. SQL Server detects this as a deadlock; SQLite hangs indefinitely
+    /// </remarks>
+    internal sealed class ReadLockAcquiringMediaSavingHandler : INotificationHandler<MediaSavingNotification>
+    {
+        private readonly IMediaService _mediaService;
+
+        public ReadLockAcquiringMediaSavingHandler(IMediaService mediaService) =>
+            _mediaService = mediaService;
+
+        public void Handle(MediaSavingNotification notification)
+        {
+            foreach (var media in notification.SavedEntities)
+            {
+                // This call acquires a read lock on MediaTree.
+                // Before the fix, this could cause deadlocks when combined with parallel saves.
+                if (media.HasIdentity)
+                {
+                    _mediaService.GetById(media.Id);
+                }
+            }
+        }
+    }
+
+    #endregion
 }
