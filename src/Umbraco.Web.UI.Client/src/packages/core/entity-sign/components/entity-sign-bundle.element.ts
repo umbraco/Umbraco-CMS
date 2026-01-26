@@ -148,7 +148,8 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					(c) => c.alias,
 					(c, i) => {
 						return html`<div class="sign-container ${i > 1 ? 'hide-in-overview' : ''}" style=${`--i:${i}`}>
-							<span class="badge-icon">${c.component}</span><span class="label">${this._labels.get(c.alias)}</span>
+							<span class="badge-icon">${c.component}</span
+							><span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
 						</div>`;
 					},
 				)
@@ -175,8 +176,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				left: 19px;
 				margin-left: -6px;
 				background-color: transparent;
-				padding: var(--uui-size-2);
-				padding-left: var(--uui-size-3);
+				padding: var(--uui-size-2) var(--uui-size-3);
 				font-size: 8px;
 				clip-path: inset(-10px calc(100% - 30px) calc(100% - 10px) -20px);
 				transition:
@@ -237,10 +237,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				}
 				.infobox.is-open {
 					z-index: 10;
-					background-color: var(--uui-color-surface);
 					font-size: 12px;
 					color: var(--uui-color-text);
-					clip-path: inset(-6px);
+					clip-path: inset(-12px);
 					--umb-sign-bundle-bg: var(--uui-color-surface);
 				}
 				.infobox.is-open::before {

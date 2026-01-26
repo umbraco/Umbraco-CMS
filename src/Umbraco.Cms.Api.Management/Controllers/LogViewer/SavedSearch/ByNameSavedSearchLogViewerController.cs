@@ -23,6 +23,7 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <summary>
     ///     Gets a saved log search by name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the saved log search.</param>
     /// <returns>The saved log search or not found result.</returns>
     [HttpGet("{name}")]

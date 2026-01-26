@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Extensions;
@@ -28,7 +29,7 @@ public class UmbracoUserTimeoutFilterAttribute : TypeFilterAttribute
             }
 
             var remainingSeconds = context.HttpContext.User.GetRemainingAuthSeconds();
-            context.HttpContext.Response.Headers.Add(
+            context.HttpContext.Response.Headers.Append(
                 "X-Umb-User-Seconds",
                 remainingSeconds.ToString(CultureInfo.InvariantCulture));
         }

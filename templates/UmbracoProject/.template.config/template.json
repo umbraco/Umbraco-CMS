@@ -32,7 +32,8 @@
           "condition": "(!Docker)",
           "exclude": [
             "Dockerfile",
-            ".dockerignore"
+            ".dockerignore",
+            "entrypoint.sh"
           ]
         }
       ]
@@ -98,7 +99,7 @@
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "17.0.0"
+            "value": "17.1.0"
           }
         ]
       }

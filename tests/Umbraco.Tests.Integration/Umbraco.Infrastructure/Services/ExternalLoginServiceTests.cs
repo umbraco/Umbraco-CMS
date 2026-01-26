@@ -239,7 +239,10 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         var tokens = ExternalLoginService.GetExternalLoginTokens(user.Key).OrderBy(x => x.LoginProvider).ToList();
 
         tokens.RemoveAt(0); // remove the first one
-        tokens.Add(new IdentityUserToken(externalLogins[1].LoginProvider, "hello2b", "world2b",
+        tokens.Add(new IdentityUserToken(
+            externalLogins[1].LoginProvider,
+            "hello2b",
+            "world2b",
             user.Id.ToString())); // add a new one
         tokens[0].Value = "abcd123"; // update
 

@@ -682,7 +682,8 @@ export default {
 		reset: 'Reset',
 	},
 	rollback: {
-		diffHelp: '显示当前版本和选择版本的差异<br /><del>红色</del>是选中版本中没有的。<ins>绿色是新增的</ins>',
+		diffHelp: '<del>红色文字</del>将在所选版本中被移除，<ins>绿色文字</ins>将被添加。',
+		showDiff: '显示当前（草稿）版本与所选版本之间的差异。',
 		documentRolledBack: '文档已回滚',
 		htmlHelp: '将选中版本显示为HTML，如果您想看到版本间的差异比较，请使用对比视图。',
 		rollbackTo: '回滚至',

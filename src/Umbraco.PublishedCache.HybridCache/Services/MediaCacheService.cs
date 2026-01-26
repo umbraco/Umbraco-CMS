@@ -256,41 +256,35 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> mediaTypeIds)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
-        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType).Result), ContentCacheDataSerializerEntityType.Media);
-
-        foreach (ContentCacheNode content in contentByContentTypeKey)
+        // Use lightweight query to get only keys - avoids loading all serialized data.
+        IReadOnlyList<Guid> mediaKeys;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
-
-            if (content.IsDraft is false)
-            {
-                await ClearPublishedCacheAsync(content.Key);
-            }
+            mediaKeys = _databaseCacheRepository.GetMediaKeysByContentTypeKeys(
+                mediaTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType).Result)).ToList();
+            scope.Complete();
         }
 
-        scope.Complete();
+        // Media items don't have published state - they're always stored as draft.
+        // Clear the cache entry for each media item.
+        foreach (Guid key in mediaKeys)
+        {
+            await ClearPublishedCacheAsync(key);
+        }
     }
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _databaseCacheRepository.Rebuild(mediaTypeIds: contentTypeIds.ToList());
-
-        IEnumerable<Guid> mediaTypeKeys = contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType))
-            .Where(x => x.Success)
-            .Select(x => x.Result);
-
-        IEnumerable<ContentCacheNode> mediaCacheNodesByContentTypeKey =
-            _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeKeys, ContentCacheDataSerializerEntityType.Media);
-
-        foreach (ContentCacheNode media in mediaCacheNodesByContentTypeKey)
-        {
-            ClearPublishedCacheAsync(media.Key).GetAwaiter().GetResult();
-        }
-
         scope.Complete();
+
+        RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
+
+        // Clear the entire published content cache.
+        // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a media item,
+        // an elements within the media item, an ancestor, or a composition.
+        _publishedContentCache.Clear();
     }
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)

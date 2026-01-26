@@ -25,6 +25,7 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     /// <summary>
     ///     Gets the count for each log level from the logs for a specific date range.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="startDate">The start date for the date range (can be null).</param>
     /// <param name="endDate">The end date for the date range (can be null).</param>
     /// <returns>The log level counts from the (filtered) logs.</returns>

@@ -25,10 +25,9 @@ test('can include label', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickIncludeLabelsToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'useLabel', true)).toBeTruthy();
 });
 
@@ -39,10 +38,9 @@ test('can add color', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.addColor(colorValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesApprovedColorHaveColor(customDataTypeName, colorValue)).toBeTruthy();
 });
 
@@ -53,10 +51,9 @@ test('can remove color', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.removeColorByValue(colorValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesApprovedColorHaveColor(customDataTypeName, colorValue)).toBeFalsy();;
 });
 

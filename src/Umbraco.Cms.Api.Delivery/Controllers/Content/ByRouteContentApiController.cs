@@ -99,8 +99,8 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
 
     private IActionResult RedirectTo(IApiContentRoute redirectRoute)
     {
-        Response.Headers.Add("Location-Start-Item-Path", redirectRoute.StartItem.Path);
-        Response.Headers.Add("Location-Start-Item-Id", redirectRoute.StartItem.Id.ToString("D"));
+        Response.Headers.Append("Location-Start-Item-Path", redirectRoute.StartItem.Path);
+        Response.Headers.Append("Location-Start-Item-Id", redirectRoute.StartItem.Id.ToString("D"));
         return RedirectPermanent(redirectRoute.Path);
     }
 }

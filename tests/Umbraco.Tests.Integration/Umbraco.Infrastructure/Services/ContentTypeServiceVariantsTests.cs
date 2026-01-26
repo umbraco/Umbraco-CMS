@@ -847,9 +847,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.IsFalse(document.IsCultureEdited("fr"));
         Assert.IsFalse(document.Edited);
 
-        document.SetValue("value1", "v1en",
+        document.SetValue(
+            "value1",
+            "v1en",
             "en"); // change the property culture value, so now this culture will be edited
-        document.SetValue("value1", "v1fr",
+        document.SetValue(
+            "value1",
+            "v1fr",
             "fr"); // change the property culture value, so now this culture will be edited
         ContentService.Save(document);
 
@@ -893,9 +897,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.IsNull(document.GetValue("value1", "en")); // The values are there but the business logic returns null
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "en",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "en",
             published: true)); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "fr",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "fr",
             published: true)); // The values are there but the business logic returns null
         Assert.AreEqual("v1inv", document.GetValue("value1"));
         Assert.AreEqual("v1inv", document.GetValue("value1", published: true));
@@ -1025,7 +1033,9 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             document.GetValue("value1")); // The variant property value gets copied over to the invariant
         Assert.AreEqual("v1en2", document.GetValue("value1", published: true));
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "fr",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "fr",
             published: true)); // The values are there but the business logic returns null
         Assert.IsFalse(
             document.IsCultureEdited("en")); // The variant published AND edited values are copied over to the invariant
@@ -1082,10 +1092,11 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentTypeService.Save(composed);
 
         // both value11 and value21 are invariant
+        // Note: After rebuild, property order changes to direct properties first (value21, value22), then composed (value11, value12)
         Console.WriteLine(GetJson(document.Id));
         AssertJsonStartsWith(
             document.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composed.Variations = ContentVariation.Culture;
         ContentTypeService.Save(composed);
@@ -1094,7 +1105,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document.Id));
         AssertJsonStartsWith(
             document.Id,
-            "{'pd':{'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composed.PropertyTypes.First(x => x.Alias == "value21").Variations = ContentVariation.Culture;
         ContentTypeService.Save(composed);
@@ -1103,7 +1114,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document.Id));
         AssertJsonStartsWith(
             document.Id,
-            "{'pd':{'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.Variations = ContentVariation.Nothing;
         ContentTypeService.Save(composing);
@@ -1112,7 +1123,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document.Id));
         AssertJsonStartsWith(
             document.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.Variations = ContentVariation.Culture;
         ContentTypeService.Save(composing);
@@ -1121,7 +1132,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document.Id));
         AssertJsonStartsWith(
             document.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.PropertyTypes.First(x => x.Alias == "value11").Variations = ContentVariation.Culture;
         ContentTypeService.Save(composing);
@@ -1130,7 +1141,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document.Id));
         AssertJsonStartsWith(
             document.Id,
-            "{'pd':{'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
     }
 
     [Test]
@@ -1206,11 +1217,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentTypeService.Save(composed1);
 
         // both value11 and value21 are invariant
+        // Note: After rebuild, property order changes to direct properties first, then composed properties
         Console.WriteLine(GetJson(document1.Id));
         AssertJsonStartsWith(
             document1.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
+        // document2 uses composed2 (not composed1), so it's not rebuilt - order stays the same
         Console.WriteLine(GetJson(document2.Id));
         AssertJsonStartsWith(
             document2.Id,
@@ -1223,8 +1236,9 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document1.Id));
         AssertJsonStartsWith(
             document1.Id,
-            "{'pd':{'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
+        // document2 uses composed2 (not composed1), so it's not rebuilt - order stays the same
         Console.WriteLine(GetJson(document2.Id));
         AssertJsonStartsWith(
             document2.Id,
@@ -1237,8 +1251,9 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document1.Id));
         AssertJsonStartsWith(
             document1.Id,
-            "{'pd':{'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
+        // document2 uses composed2 (not composed1), so it's not rebuilt - order stays the same
         Console.WriteLine(GetJson(document2.Id));
         AssertJsonStartsWith(
             document2.Id,
@@ -1251,12 +1266,12 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document1.Id));
         AssertJsonStartsWith(
             document1.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         Console.WriteLine(GetJson(document2.Id));
         AssertJsonStartsWith(
             document2.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}],'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}]},'cd':");
+            "{'pd':{'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}],'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.Variations = ContentVariation.Culture;
         ContentTypeService.Save(composing);
@@ -1265,12 +1280,12 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document1.Id));
         AssertJsonStartsWith(
             document1.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         Console.WriteLine(GetJson(document2.Id));
         AssertJsonStartsWith(
             document2.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}],'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}]},'cd':");
+            "{'pd':{'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}],'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.PropertyTypes.First(x => x.Alias == "value11").Variations = ContentVariation.Culture;
         ContentTypeService.Save(composing);
@@ -1279,12 +1294,12 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Console.WriteLine(GetJson(document1.Id));
         AssertJsonStartsWith(
             document1.Id,
-            "{'pd':{'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
+            "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         Console.WriteLine(GetJson(document2.Id));
         AssertJsonStartsWith(
             document2.Id,
-            "{'pd':{'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}],'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}]},'cd':");
+            "{'pd':{'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}],'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
     }
 
     private async Task CreateFrenchAndEnglishLangs()

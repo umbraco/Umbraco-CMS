@@ -238,6 +238,7 @@ export default {
 	},
 	content: {
 		isPublished: 'Is Published',
+		unpublishedChanges: 'Unpublished changes',
 		about: 'About this page',
 		alias: 'Alias',
 		alternativeTextHelp: '(how would you describe the picture over the phone)',
@@ -275,6 +276,7 @@ export default {
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
 		routeErrorCannotRoute: 'This document is published but its URL cannot be routed',
+		protected: 'Protected',
 		publish: 'Publish',
 		published: 'Published',
 		publishedPendingChanges: 'Published (pending changes)',
@@ -287,6 +289,7 @@ export default {
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
+		scheduledPublishing: 'Scheduled publishing',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
@@ -860,6 +863,7 @@ export default {
 		dividerPosition: (value: string | number) => `Divider at ${value}%`,
 		discard: 'Discard',
 		document: 'Document',
+		documentCount: (count: number) => (count === 1 ? '1 document' : `${count} documents`),
 		down: 'Down',
 		download: 'Download',
 		edit: 'Edit',
@@ -1340,6 +1344,8 @@ export default {
 		configurationTitle: 'Dynamic Root Query',
 		pickDynamicRootOriginTitle: 'Pick origin',
 		pickDynamicRootOriginDesc: 'Define the origin for your Dynamic Root Query',
+		originContentRootTitle: 'Content Root',
+		originContentRootDesc: 'Root of the content tree',
 		originRootTitle: 'Root',
 		originRootDesc: 'Root node of this editing session',
 		originParentTitle: 'Parent',
@@ -1411,9 +1417,9 @@ export default {
 		changes: 'Changes',
 		created: 'Created',
 		currentVersion: 'Current version',
-		diffHelp:
-			'This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added',
-		noDiff: 'There are no differences between the current (draft) version and the selected version',
+		showDiff: 'Show differences between the current (draft) version and the selected version.',
+		diffHelp: '<del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added.',
+		noDiff: 'There are no differences between the current (draft) version and the selected version.',
 		documentRolledBack: 'Document has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:

@@ -1,17 +1,18 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { PagedTagResponseModel, TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
-	rest.get(umbracoPath('/tag'), (_req, res, ctx) => {
+	http.get(umbracoPath('/tag'), ({ request }) => {
 		// didnt add culture logic here
 
-		const query = _req.url.searchParams.get('query');
+		const url = new URL(request.url);
+		const query = url.searchParams.get('query');
 		if (!query || !query.length) return;
 
-		const tagGroup = _req.url.searchParams.get('tagGroup') ?? 'default';
-		const skip = parseInt(_req.url.searchParams.get('skip') ?? '0', 10);
-		const take = parseInt(_req.url.searchParams.get('take') ?? '5', 10);
+		const tagGroup = url.searchParams.get('tagGroup') ?? 'default';
+		const skip = parseInt(url.searchParams.get('skip') ?? '0', 10);
+		const take = parseInt(url.searchParams.get('take') ?? '5', 10);
 
 		const TagsByGroup = TagData.filter((tag) => tag.group?.toLocaleLowerCase() === tagGroup.toLocaleLowerCase());
 		const TagsMatch = TagsByGroup.filter((tag) => tag.text?.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
@@ -23,7 +24,7 @@ export const handlers = [
 			items: Tags,
 		};
 
-		return res(ctx.status(200), ctx.json<PagedTagResponseModel>(PagedData));
+		return HttpResponse.json<PagedTagResponseModel>(PagedData);
 	}),
 ];
 

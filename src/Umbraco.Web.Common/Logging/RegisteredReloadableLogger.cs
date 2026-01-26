@@ -5,8 +5,7 @@ namespace Umbraco.Cms.Web.Common.Logging;
 
 /// <remarks>
 ///     HACK:
-///     Ensures freeze is only called a single time even when resolving a logger from the snapshot container
-///     built for <see cref="RefreshingRazorViewEngine" />.
+///     Ensures freeze is only called a single time even when resolving a logger from a snapshot container.
 /// </remarks>
 internal sealed class RegisteredReloadableLogger
 {

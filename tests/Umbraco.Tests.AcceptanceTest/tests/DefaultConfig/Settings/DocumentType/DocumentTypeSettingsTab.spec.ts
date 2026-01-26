@@ -21,10 +21,9 @@ test('can add allow vary by culture for a document type', {tag: '@smoke'}, async
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
   await umbracoUi.documentType.clickVaryByCultureButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.variesByCulture).toBeTruthy();
 });
@@ -39,10 +38,9 @@ test.skip('can add allow segmentation for a document type', async ({umbracoApi, 
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
   await umbracoUi.documentType.clickVaryBySegmentsButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.variesBySegment).toBeTruthy();
 });
@@ -56,10 +54,9 @@ test('can set is an element type for a document type', {tag: '@smoke'}, async ({
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
   await umbracoUi.documentType.clickTextButtonWithName('Element Type');
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.isElement).toBeTruthy();
 });
@@ -74,10 +71,9 @@ test('can disable history cleanup for a document type', async ({umbracoApi, umbr
   // Is needed
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
   await umbracoUi.documentType.clickPreventCleanupButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.cleanup.preventCleanup).toBeTruthy();
 });
