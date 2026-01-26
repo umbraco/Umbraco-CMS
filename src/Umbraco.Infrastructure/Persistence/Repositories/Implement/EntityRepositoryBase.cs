@@ -61,9 +61,13 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     {
     }
 
+// TODO (V18): Make these fields into read-only properties.
+
+#pragma warning disable IDE1006 // Naming Styles
     protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
 
     protected readonly ICacheSyncService CacheSyncService;
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Gets the logger
