@@ -70,7 +70,7 @@ export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase 
 		const entityType = entityContext.getEntityType();
 		if (!entityType) return;
 
-		const unique = entityContext.getUnique(); // NOTE: In recycle bin context, unique is assumed to be `null`.
+		const unique = entityContext.getUnique();
 
 		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
 		eventContext.dispatchEvent(event);
