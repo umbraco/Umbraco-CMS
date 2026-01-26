@@ -885,6 +885,9 @@ stages:
       - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
+      # This job is disabled due to failures in correct generation of the docs when running on the pipeline.
+      # API docs are currently manually generated locally and uploaded to blob storage.
+      # TODO: Investigate and resolve this issue such that doc generation and upload can be restored to the pipeline.
       # - job:
         # displayName: Upload C# Docs
         # steps:
