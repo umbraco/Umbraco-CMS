@@ -1,3 +1,4 @@
+import { manifests as withThumbnailManifests } from './with-thumbnail/manifests.js';
 import { UMB_PICKER_DATA_SOURCE_TYPE } from '@umbraco-cms/backoffice/picker-data-source';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -101,4 +102,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			description: 'Pick a user',
 		},
 	},
+	...withThumbnailManifests,
 ];

@@ -1146,8 +1146,8 @@ export default {
 		created: 'Aangemaakt',
 		headline: 'Selecteer een versie om te vergelijken met de huidige versie',
 		currentVersion: 'Huidige versie',
-		diffHelp:
-			'Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie, <ins>groen betekent toegevoegd</ins>',
+		diffHelp: '<del>Rode tekst</del> wordt verwijderd in de geselecteerde versie, <ins>groene tekst</ins> wordt toegevoegd.',
+		showDiff: 'Toon verschillen tussen de huidige (concept) versie en de geselecteerde versie.',
 		documentRolledBack: 'Document is teruggezet',
 		htmlHelp:
 			'Hiermee wordt de geselecteerde versie als html getoond, als u de verschillen tussen de twee\n      versies tegelijk wilt zien, gebruik dan de diff view\n    ',
