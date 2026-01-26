@@ -12,6 +12,7 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	UmbBlockRteTypeModel,
 	UmbBlockRteLayoutModel
 > {
+	/** @deprecated Use `displayInlineConfig` instead. This field will be removed in Umbraco 19. [LK] */
 	readonly displayInline = this._layout.asObservablePart((x) => (x ? (x.displayInline ?? false) : undefined));
 	readonly displayInlineConfig = this._blockType.asObservablePart((x) => (x ? (x.displayInline ?? false) : undefined));
 
