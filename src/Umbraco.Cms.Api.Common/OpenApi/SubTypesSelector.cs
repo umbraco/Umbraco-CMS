@@ -46,8 +46,7 @@ public class SubTypesSelector : ISubTypesSelector
         if (_httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments(swaggerPath) ?? false)
         {
             // Split the path into segments
-            var segments = _httpContextAccessor.HttpContext.Request.Path.Value!
-[swaggerPath.Length..]
+            var segments = _httpContextAccessor.HttpContext.Request.Path.Value![swaggerPath.Length..]
                 .TrimStart(Constants.CharArrays.ForwardSlash)
                 .Split(Constants.CharArrays.ForwardSlash);
 
