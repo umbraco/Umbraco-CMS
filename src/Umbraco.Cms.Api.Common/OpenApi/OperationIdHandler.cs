@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// <remarks>
 ///     Left unsealed on purpose, so it is extendable by consuming APIs.
 /// </remarks>
-// NOTE: Left unsealed on purpose, so it is extendable.
 public class OperationIdHandler : IOperationIdHandler
 {
     private readonly ApiVersioningOptions _apiVersioningOptions;

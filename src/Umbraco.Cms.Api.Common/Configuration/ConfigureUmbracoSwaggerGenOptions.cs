@@ -89,7 +89,6 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     /// <remarks>
     ///     See https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting.
     /// </remarks>
-    // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
     private static string ActionOrderBy(ApiDescription apiDesc)
         => $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{(apiDesc.ActionDescriptor.RouteValues.TryGetValue("action", out var action) ? action : null)}_{apiDesc.HttpMethod}";
 }

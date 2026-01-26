@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 ///     Left unsealed on purpose, so it is extendable by consuming APIs.
 ///     Adds "Model" suffix to avoid TypeScript name clashes and removes invalid characters.
 /// </remarks>
-// NOTE: Left unsealed on purpose, so it is extendable.
 public class SchemaIdHandler : ISchemaIdHandler
 {
     /// <inheritdoc/>
