@@ -75,6 +75,14 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         _dataTypeByGuidReadRepository.PopulateCacheByKey(entity);
     }
 
+    public override void Delete(IDataType entity)
+    {
+        base.Delete(entity);
+
+        // Also clear the GUID cache so subsequent lookups by GUID don't return stale data.
+        _dataTypeByGuidReadRepository.ClearCacheByKey(entity.Key);
+    }
+
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
         var parentId = -1;
@@ -650,6 +658,16 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
             {
                 PopulateCacheByKey(entity);
             }
+        }
+
+        /// <summary>
+        /// Clears the GUID-keyed cache entry for the given key.
+        /// This ensures deleted entities are not returned from the cache.
+        /// </summary>
+        public void ClearCacheByKey(Guid key)
+        {
+            var cacheKey = GetCacheKey(key);
+            IsolatedCache.Clear(cacheKey);
         }
 
         private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IDataType>() + key;

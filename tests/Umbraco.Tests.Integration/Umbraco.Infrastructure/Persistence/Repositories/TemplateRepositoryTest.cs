@@ -80,10 +80,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void Retrieval_By_Id_After_Retrieval_By_Id_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateAppCaches();
 
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
@@ -118,10 +115,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void Retrieval_By_Key_After_Retrieval_By_Key_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateAppCaches();
 
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
@@ -156,10 +150,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateAppCaches();
 
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
@@ -192,10 +183,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateAppCaches();
 
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
@@ -233,10 +221,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateAppCaches();
 
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
@@ -270,6 +255,32 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         repository.Get(template.Id);
         Assert.AreEqual(0, database.SqlCount);
     }
+
+    [Test]
+    public void Retrieval_By_Id_After_Deletion_Returns_Null()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        var template = CreateTemplate(repository);
+        var retrievedTemplate = repository.Get(template.Key);
+        Assert.IsNotNull(retrievedTemplate);
+
+        repository.Delete(template);
+
+        retrievedTemplate = repository.Get(template.Key);
+        Assert.IsNull(retrievedTemplate);
+    }
+
+    private static AppCaches CreateAppCaches() =>
+        new(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
 
     private static ITemplate CreateTemplate(ITemplateRepository repository)
     {

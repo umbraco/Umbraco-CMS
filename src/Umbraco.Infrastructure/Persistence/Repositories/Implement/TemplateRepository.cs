@@ -100,6 +100,14 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _templateByGuidReadRepository.PopulateCacheByKey(entity);
     }
 
+    public override void Delete(ITemplate entity)
+    {
+        base.Delete(entity);
+
+        // Also clear the GUID cache so subsequent lookups by GUID don't return stale data.
+        _templateByGuidReadRepository.ClearCacheByKey(entity.Key);
+    }
+
     public Stream GetFileContentStream(string filepath)
     {
         IFileSystem? fileSystem = GetFileSystem(filepath);
@@ -807,6 +815,16 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             {
                 PopulateCacheByKey(entity);
             }
+        }
+
+        /// <summary>
+        /// Clears the GUID-keyed cache entry for the given key.
+        /// This ensures deleted entities are not returned from the cache.
+        /// </summary>
+        public void ClearCacheByKey(Guid key)
+        {
+            var cacheKey = GetCacheKey(key);
+            IsolatedCache.Clear(cacheKey);
         }
 
         private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<ITemplate>() + key;
