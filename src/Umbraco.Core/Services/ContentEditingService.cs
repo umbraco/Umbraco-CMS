@@ -274,6 +274,35 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
     }
 
+    public async Task<Attempt<ContentPatchResult, ContentEditingOperationStatus>> PatchAsync(Guid key, ContentPatchModel patchModel, Guid userKey)
+    {
+        IContent? content = ContentService.GetById(key);
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentPatchResult { Content = null! });
+        }
+
+        // Apply variant changes (name only for now - Phase 1 minimal implementation)
+        if (patchModel.Variants is not null)
+        {
+            foreach (var variantPatch in patchModel.Variants)
+            {
+                content.SetCultureName(variantPatch.Name, variantPatch.Culture);
+            }
+        }
+
+        // Save the content
+        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
+        return saveStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentPatchResult
+            {
+                Content = content,
+                AffectedCultures = patchModel.AffectedCultures,
+                AffectedProperties = patchModel.Properties?.Select(p => p.Alias).Distinct() ?? Array.Empty<string>()
+            })
+            : Attempt.FailWithStatus(saveStatus, new ContentPatchResult { Content = content });
+    }
+
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
         => await HandleMoveToRecycleBinAsync(key, userKey);
 

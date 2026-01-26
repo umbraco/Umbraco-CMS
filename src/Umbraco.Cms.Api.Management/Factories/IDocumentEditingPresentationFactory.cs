@@ -9,5 +9,7 @@ public interface IDocumentEditingPresentationFactory
 
     ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel);
 
+    ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel);
+
     ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel);
 }
