@@ -55,10 +55,9 @@ test('invariant document type with invariant tiptap RTE with invariant block wit
   await umbracoUi.content.clickBlockElementWithName(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.clickBlockElementInRTEWithName(blockName);
@@ -120,10 +119,9 @@ test('variant document type with variant tiptap RTE with variant block with an v
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.clickBlockElementInRTEWithName(blockName);
@@ -146,10 +144,9 @@ test('variant document type with invariant tiptap RTE with variant block with an
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.clickBlockElementInRTEWithName(blockName);
@@ -172,10 +169,9 @@ test('variant document type with invariant tiptap RTE with variant block with an
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.clickBlockElementInRTEWithName(blockName);

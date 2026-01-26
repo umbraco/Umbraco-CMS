@@ -481,6 +481,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.UpdateDate,
                 x => x.Alias,
                 x => x.Name,
+                x => x.Description,
                 x => x.HasAccessToAllLanguages,
                 x => x.Key,
                 x => x.DefaultPermissions)

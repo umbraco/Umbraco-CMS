@@ -6,6 +6,8 @@ import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 export class UmbMediaTreeItemContext extends UmbDefaultTreeItemContext<UmbMediaTreeItemModel, UmbMediaTreeRootModel> {
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
+	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 

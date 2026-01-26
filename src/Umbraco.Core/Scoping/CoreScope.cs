@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Scoping;
 
 public class CoreScope : ICoreScope
 {
+    // TODO (V18): Rename to _completed to comply with SA1306 (field names should begin with lowercase), or consider converting to a property.
     protected bool? Completed;
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;

@@ -113,10 +113,9 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
   await umbracoUi.content.clickUpdateButtonForModalWithElementTypeNameAndGroupName(textStringElementTypeName, textStringElementGroupName);
   await umbracoUi.content.clickUpdateButtonForModalWithElementTypeNameAndGroupName(blockListElementTypeName, blockListGroupName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Checks if published
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');

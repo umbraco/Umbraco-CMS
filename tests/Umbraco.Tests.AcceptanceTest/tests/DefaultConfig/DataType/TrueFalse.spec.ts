@@ -23,10 +23,9 @@ test('can update preset value state', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickPresetValueToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'default', true)).toBeTruthy();
 });
 
@@ -37,10 +36,9 @@ test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickShowToggleLabelsToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'showLabels', true)).toBeTruthy();
 });
 
@@ -52,10 +50,9 @@ test('can update label on', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterLabelOnValue(labelOnValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'labelOn', labelOnValue)).toBeTruthy();
 });
 
@@ -67,10 +64,9 @@ test('can update label off', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterLabelOffValue(labelOffValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'labelOff', labelOffValue)).toBeTruthy();
 });
 
