@@ -25,7 +25,7 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		h5: this.#headingCommand(5),
 		h6: this.#headingCommand(6),
 		p: { type: 'paragraph', command: (chain) => chain.setParagraph() },
-		a: { type: 'umbLink' },
+		a: { type: 'umbLink', command: (chain) => chain.ensureUmbLink({ type: 'external', href: '#' }) },
 		blockquote: { type: 'blockquote', command: (chain) => chain.toggleBlockquote() },
 		code: { type: 'code', command: (chain) => chain.toggleCode() },
 		codeBlock: { type: 'codeBlock', command: (chain) => chain.toggleCodeBlock() },
