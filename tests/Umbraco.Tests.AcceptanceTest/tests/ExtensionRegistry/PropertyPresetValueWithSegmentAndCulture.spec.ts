@@ -65,6 +65,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickExpendSegmentButton(contentName);
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
@@ -90,6 +91,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickExpendSegmentButton(contentName);
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
