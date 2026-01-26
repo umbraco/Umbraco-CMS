@@ -78,7 +78,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             root = c1; // make a hierarchy
         }
 
-        var ascendingOrder = Ordering.By("Path", Direction.Ascending);
+        var ascendingOrder = Ordering.By("Path"); // same as Ordering.By("Path"), Direction.Ascending);
         var entities = EntityService.GetPagedDescendants(
             rootId,
             UmbracoObjectTypes.Document,
