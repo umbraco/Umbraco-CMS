@@ -111,13 +111,20 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				this._exposed = exposed;
 				// If block is newly created (not exposed yet) and we haven't auto-expanded yet, expand it automatically
 				// This restores the Umbraco 13 behavior where newly added blocks are expanded for immediate editing
-				if (!this.#hasAutoExpanded && exposed === false && this._isOpen === false) {
+				if (this.#shouldAutoExpand(exposed)) {
 					this._isOpen = true;
 					this.#hasAutoExpanded = true;
 				}
 			},
 			'observeExposed',
 		);
+	}
+
+	#shouldAutoExpand(exposed: boolean): boolean {
+		if (this.#hasAutoExpanded) return false;
+		if (exposed !== false) return false;
+		if (this._isOpen !== false) return false;
+		return true;
 	}
 
 	#observeContentTypeName(context: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE) {
