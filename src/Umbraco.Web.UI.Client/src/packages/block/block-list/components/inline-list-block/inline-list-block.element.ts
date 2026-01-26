@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
@@ -111,7 +112,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				this._exposed = exposed;
 				// If block is newly created (not exposed yet) and we haven't auto-expanded yet, expand it automatically
 				// This restores the Umbraco 13 behavior where newly added blocks are expanded for immediate editing
-				if (this.#shouldAutoExpand(exposed)) {
+				if (exposed !== undefined && this.#shouldAutoExpand(exposed)) {
 					this._isOpen = true;
 					this.#hasAutoExpanded = true;
 				}
@@ -150,7 +151,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		);
 	}
 
-	async #updateVariantName(variantId: { culture?: string }) {
+	async #updateVariantName(variantId: UmbVariantId) {
 		if (!variantId.culture) return;
 
 		const languageRepository = new UmbLanguageItemRepository(this);
