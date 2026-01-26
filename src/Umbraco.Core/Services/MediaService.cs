@@ -28,11 +28,40 @@ namespace Umbraco.Cms.Core.Services
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
-
         private readonly MediaFileManager _mediaFileManager;
+        private readonly IMediaPathScheme _mediaPathScheme;
+        private readonly ILogger<MediaService> _logger;
 
         #region Constructors
 
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditService auditService,
+            IAuditRepository auditRepository,   // TODO (V18): Remove this parameter (it's only there to avoid ambiguity with obsolete constructors).
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver,
+            IMediaPathScheme mediaPathScheme,
+            ILogger<MediaService> logger)
+            : base(provider, loggerFactory, eventMessagesFactory)
+        {
+            _mediaFileManager = mediaFileManager;
+            _mediaRepository = mediaRepository;
+            _auditService = auditService;
+            _mediaTypeRepository = mediaTypeRepository;
+            _entityRepository = entityRepository;
+            _shortStringHelper = shortStringHelper;
+            _userIdKeyResolver = userIdKeyResolver;
+            _mediaPathScheme = mediaPathScheme;
+            _logger = logger;
+        }
+
+        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -44,18 +73,24 @@ namespace Umbraco.Cms.Core.Services
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
             IUserIdKeyResolver userIdKeyResolver)
-            : base(provider, loggerFactory, eventMessagesFactory)
+            : this(
+                provider,
+                mediaFileManager,
+                loggerFactory,
+                eventMessagesFactory,
+                mediaRepository,
+                auditService,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditRepository>(),
+                mediaTypeRepository,
+                entityRepository,
+                shortStringHelper,
+                userIdKeyResolver,
+                StaticServiceProvider.Instance.GetRequiredService<IMediaPathScheme>(),
+                StaticServiceProvider.Instance.GetRequiredService<ILogger<MediaService>>())
         {
-            _mediaFileManager = mediaFileManager;
-            _mediaRepository = mediaRepository;
-            _auditService = auditService;
-            _mediaTypeRepository = mediaTypeRepository;
-            _entityRepository = entityRepository;
-            _shortStringHelper = shortStringHelper;
-            _userIdKeyResolver = userIdKeyResolver;
         }
 
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -81,7 +116,7 @@ namespace Umbraco.Cms.Core.Services
         {
         }
 
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -785,6 +820,15 @@ namespace Umbraco.Cms.Core.Services
                 if (media.Name != null && media.Name.Length > 255)
                 {
                     throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
+
+                if (media.Key.Version == 7 && _mediaPathScheme.SupportsGuid7 is false)
+                {
+                    _logger.LogWarning(
+                        "The registered implementation of IMediaPathScheme cannot be used with media keys using version 7 GUIDs due to an increased risk of collisions in the generated file paths. " +
+                        "Please use version 4 GUIDs created via Guid.NewGuid() or implement and register a different IMediaPathScheme.");
+                    return Attempt.Fail<OperationResult?>(
+                        new OperationResult(OperationResultType.FailedInvalidKey, eventMessages));
                 }
 
                 if (media.HasIdentity == false)

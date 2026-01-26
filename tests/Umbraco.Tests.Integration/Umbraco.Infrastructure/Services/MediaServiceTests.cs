@@ -24,6 +24,44 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     [Test]
+    public async Task Can_Create_Media()
+    {
+        var mediaType = await CreateMediaType();
+
+        IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "Media", -1);
+        media.SetValue("title", "Title");
+        media.SetValue("bodyText", "Body text");
+        MediaService.Save(media);
+
+        media = MediaService.GetById(media.Id);
+
+        Assert.IsNotNull(media);
+        Assert.AreEqual("Title", media.GetValue("title"));
+        Assert.AreEqual("Body text", media.GetValue("bodyText"));
+    }
+
+    [Test]
+    public async Task Cannot_Create_Media_With_Guid_7_When_Default_Media_Path_Scheme_Is_Registered()
+    {
+        var mediaType = await CreateMediaType();
+
+        IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "Media", -1);
+        media.Key = Guid.CreateVersion7();
+        var mediaSaveAttempt = MediaService.Save(media);
+
+        Assert.IsFalse(mediaSaveAttempt.Success);
+        Assert.AreEqual(OperationResultType.FailedInvalidKey, mediaSaveAttempt.Result.Result);
+    }
+
+    private async Task<IMediaType> CreateMediaType()
+    {
+        IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
+        var createMediaTypeResult = await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createMediaTypeResult.Success);
+        return mediaType;
+    }
+
+    [Test]
     public async Task Can_Update_Media_Property_Values()
     {
         IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
