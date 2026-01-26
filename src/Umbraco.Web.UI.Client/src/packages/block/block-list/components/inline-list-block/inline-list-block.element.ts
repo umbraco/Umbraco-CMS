@@ -54,6 +54,8 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	@state()
 	private _variantName?: string;
 
+	#hasAutoExpanded = false;
+
 	constructor() {
 		super();
 
@@ -85,6 +87,11 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 						this.#workspaceContext.exposed,
 						(exposed) => {
 							this._exposed = exposed;
+							// If block is newly created (not exposed yet) and we haven't auto-expanded yet, expand it automatically
+							if (!this.#hasAutoExpanded && exposed === false && this._isOpen === false) {
+								this._isOpen = true;
+								this.#hasAutoExpanded = true;
+							}
 						},
 						'observeExposed',
 					);
