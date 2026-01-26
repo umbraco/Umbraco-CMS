@@ -200,7 +200,10 @@ stages:
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
-      # # C# API Reference
+      # C# API Reference
+      # This job is disabled due to failures in correct generation of the docs when running on the pipeline.
+      # API docs are currently manually generated locally and uploaded to blob storage.
+      # TODO: Investigate and resolve this issue such that doc generation and upload can be restored to the pipeline.
       # - job:
         # displayName: Build C# API Reference
         # pool:
