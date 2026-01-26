@@ -872,13 +872,13 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(media, messages)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
-
-                scope.WriteLock(Constants.Locks.MediaTree);
 
                 DeleteLocked(scope, media, messages);
 
