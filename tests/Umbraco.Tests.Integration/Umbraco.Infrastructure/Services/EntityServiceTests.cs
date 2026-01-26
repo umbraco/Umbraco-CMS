@@ -78,25 +78,38 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             root = c1; // make a hierarchy
         }
 
-        var entities = EntityService.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 0, 6, out var total)
-            .ToArray();
+        var ascendingOrder = Ordering.By("Path", Direction.Ascending);
+        var entities = EntityService.GetPagedDescendants(
+            rootId,
+            UmbracoObjectTypes.Document,
+            0,
+            6,
+            out var total,
+            ordering: ascendingOrder).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         Assert.AreEqual(ids[0], entities[0].Id);
 
-        entities = EntityService.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
+        entities = EntityService.GetPagedDescendants(
+            rootId,
+            UmbracoObjectTypes.Document,
+            1,
+            6,
+            out total,
+            ordering: ascendingOrder).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
         Assert.AreEqual(ids[6], entities[0].Id);
 
         // Test ordering direction
+        var descendingOrder = Ordering.By("Path", Direction.Descending);
         entities = EntityService.GetPagedDescendants(
             rootId,
             UmbracoObjectTypes.Document,
             0,
             6,
             out total,
-            ordering: Ordering.By("Path", Direction.Descending)).ToArray();
+            ordering: descendingOrder).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         Assert.AreEqual(ids[^1], entities[0].Id);
@@ -107,7 +120,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             1,
             6,
             out total,
-            ordering: Ordering.By("Path", Direction.Descending)).ToArray();
+            ordering: descendingOrder).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
         Assert.AreEqual(ids[ids.Count - 1 - 6], entities[0].Id);
