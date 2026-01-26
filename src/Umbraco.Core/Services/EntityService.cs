@@ -560,9 +560,6 @@ public class EntityService : RepositoryService, IEntityService
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)
     {
-        // Ensure deterministic results. Descendants are expected to be ordered by Path by default.
-        ordering ??= Ordering.By("Path");
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             Guid objectTypeGuid = objectType.GetGuid();
