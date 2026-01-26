@@ -7,7 +7,8 @@ import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbViewController } from '@umbraco-cms/backoffice/view';
-import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
+// Import directly from token file to avoid circular dependency with router package
+import { UMB_ROUTE_CONTEXT } from '../../router/route/route.context-token.js';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
