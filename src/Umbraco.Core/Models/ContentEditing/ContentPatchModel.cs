@@ -1,29 +1,28 @@
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 /// <summary>
-/// Model for partial content updates (PATCH operations).
+/// Model for operation-based partial content updates (PATCH with JSONPath).
 /// </summary>
 public class ContentPatchModel
 {
     /// <summary>
-    /// Template to apply. Null means preserve existing.
+    /// Collection of PATCH operations to apply.
     /// </summary>
-    public Guid? TemplateKey { get; set; }
+    public PatchOperationModel[] Operations { get; set; } = Array.Empty<PatchOperationModel>();
 
     /// <summary>
-    /// Variants to patch. Only these variants will be modified.
-    /// Null means preserve all existing variants.
-    /// </summary>
-    public IEnumerable<VariantPatchModel>? Variants { get; set; }
-
-    /// <summary>
-    /// Property values to patch. Only these properties will be modified.
-    /// Null means preserve all existing property values.
-    /// </summary>
-    public IEnumerable<PropertyPatchModel>? Properties { get; set; }
-
-    /// <summary>
-    /// Cultures explicitly affected by this patch. Used for authorization checks.
+    /// Cultures explicitly affected by this patch (extracted from operation paths).
+    /// Used for authorization checks.
     /// </summary>
     public IEnumerable<string> AffectedCultures { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Segments explicitly affected by this patch (extracted from operation paths).
+    /// </summary>
+    public IEnumerable<string> AffectedSegments { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Property aliases explicitly affected by this patch (extracted from operation paths).
+    /// </summary>
+    public IEnumerable<string> AffectedProperties { get; set; } = Array.Empty<string>();
 }

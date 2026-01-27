@@ -274,46 +274,6 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
     }
 
-    public async Task<Attempt<ContentPatchResult, ContentEditingOperationStatus>> PatchAsync(Guid key, ContentPatchModel patchModel, Guid userKey)
-    {
-        IContent? content = ContentService.GetById(key);
-        if (content is null)
-        {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentPatchResult { Content = null! });
-        }
-
-        // Validate cultures - check all requested cultures are valid
-        if (patchModel.AffectedCultures.Any())
-        {
-            var availableCultures = (await _languageService.GetAllIsoCodesAsync()).ToArray();
-            var invalidCultures = patchModel.AffectedCultures.Except(availableCultures).ToArray();
-            if (invalidCultures.Any())
-            {
-                return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentPatchResult { Content = content });
-            }
-        }
-
-        // Apply variant changes (name only for now - Phase 2: added culture support)
-        if (patchModel.Variants is not null)
-        {
-            foreach (var variantPatch in patchModel.Variants)
-            {
-                content.SetCultureName(variantPatch.Name, variantPatch.Culture);
-            }
-        }
-
-        // Save the content
-        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
-        return saveStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentPatchResult
-            {
-                Content = content,
-                AffectedCultures = patchModel.AffectedCultures,
-                AffectedProperties = patchModel.Properties?.Select(p => p.Alias).Distinct() ?? Array.Empty<string>()
-            })
-            : Attempt.FailWithStatus(saveStatus, new ContentPatchResult { Content = content });
-    }
-
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
         => await HandleMoveToRecycleBinAsync(key, userKey);
 

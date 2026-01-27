@@ -1,22 +1,17 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
 /// <summary>
-/// Request model for PATCH operations on documents.
+/// Request model for operation-based PATCH on documents using JSON Patch with JSONPath.
 /// </summary>
 public class PatchDocumentRequestModel
 {
     /// <summary>
-    /// Template to apply. Null preserves existing, explicit null reference clears.
+    /// Collection of PATCH operations to apply to the document.
+    /// Operations are applied sequentially and atomically (all-or-nothing).
     /// </summary>
-    public ReferenceByIdModel? Template { get; set; }
-
-    /// <summary>
-    /// Variants to update. Only variants present will be modified.
-    /// </summary>
-    public DocumentVariantPatchModel[]? Variants { get; set; }
-
-    /// <summary>
-    /// Property values to update. Only values present will be modified.
-    /// </summary>
-    public DocumentValuePatchModel[]? Values { get; set; }
+    [Required]
+    [MinLength(1)]
+    public PatchOperationRequestModel[] Operations { get; set; } = Array.Empty<PatchOperationRequestModel>();
 }

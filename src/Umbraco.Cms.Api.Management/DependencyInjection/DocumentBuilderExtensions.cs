@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Document;
+using Umbraco.Cms.Api.Management.Patchers;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -21,6 +22,7 @@ internal static class DocumentBuilderExtensions
         builder.Services.AddTransient<IDomainPresentationFactory, DomainPresentationFactory>();
         builder.Services.AddTransient<IDocumentVersionPresentationFactory, DocumentVersionPresentationFactory>();
         builder.Services.AddTransient<IDocumentCollectionPresentationFactory, DocumentCollectionPresentationFactory>();
+        builder.Services.AddTransient<DocumentPatcher>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<DocumentMapDefinition>()

@@ -16,12 +16,6 @@ public interface IContentEditingService
 
     Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey);
 
-    /// <summary>
-    /// Partially updates a Content Item (PATCH operation).
-    /// Only the specified properties and variants will be modified.
-    /// </summary>
-    Task<Attempt<ContentPatchResult, ContentEditingOperationStatus>> PatchAsync(Guid key, ContentPatchModel patchModel, Guid userKey);
-
     Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey);
 
     /// <summary>

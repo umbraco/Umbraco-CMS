@@ -21,27 +21,36 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
 
     public ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel)
     {
+        var cultureExtractor = new Umbraco.Cms.Core.PropertyEditors.JsonPath.JsonPathCultureExtractor();
+        var operations = requestModel.Operations.Select(op => new PatchOperationModel
+        {
+            Op = MapOperationType(op.Op),
+            Path = op.Path,
+            Value = op.Value
+        }).ToArray();
+
+        var affectedCultures = cultureExtractor.ExtractCulturesFromOperations(operations.Select(o => o.Path)).ToArray();
+        var affectedSegments = operations
+            .SelectMany(o => cultureExtractor.ExtractSegments(o.Path))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
         return new ContentPatchModel
         {
-            TemplateKey = requestModel.Template?.Id,
-            Variants = requestModel.Variants?.Select(v => new VariantPatchModel
-            {
-                Culture = v.Culture,
-                Segment = v.Segment,
-                Name = v.Name
-            }),
-            Properties = requestModel.Values?.Select(v => new PropertyPatchModel
-            {
-                Alias = v.Alias,
-                Culture = v.Culture,
-                Segment = v.Segment,
-                Value = v.Value
-            }),
-            AffectedCultures = requestModel.Variants?
-                .Where(v => v.Culture != null)
-                .Select(v => v.Culture!)
-                .Distinct()
-                .ToArray() ?? Array.Empty<string>()
+            Operations = operations,
+            AffectedCultures = affectedCultures,
+            AffectedSegments = affectedSegments
+        };
+    }
+
+    private static PatchOperationType MapOperationType(string op)
+    {
+        return op.ToLowerInvariant() switch
+        {
+            "replace" => PatchOperationType.Replace,
+            "add" => PatchOperationType.Add,
+            "remove" => PatchOperationType.Remove,
+            _ => throw new ArgumentException($"Unsupported operation type: {op}", nameof(op))
         };
     }
 
