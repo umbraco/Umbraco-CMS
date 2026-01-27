@@ -172,6 +172,7 @@ internal sealed class MediaEditingService
                 OperationResultType.Success => ContentEditingOperationStatus.Success,
                 OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
                 OperationResultType.FailedDuplicateKey => ContentEditingOperationStatus.DuplicateKey,
+                OperationResultType.FailedInvalidKey => ContentEditingOperationStatus.InvalidKey,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
                 _ => ContentEditingOperationStatus.Unknown

@@ -73,6 +73,7 @@
     <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
   </area>
   <area alias="member">
+    <key alias="incorrectPassword">The provided password is incorrect</key>
     <key alias="duplicateMemberLogin">A member with this login already exists</key>
     <key alias="memberHasGroup">The member is already in group '%0%'</key>
     <key alias="memberHasPassword">The member already has a password set</key>
