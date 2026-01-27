@@ -90,7 +90,7 @@ internal static class UmbracoDatabaseExtensions
         // We need to copy the sql into a new object, to avoid this method from changing the sql.
         Sql query = new Sql().Select("COUNT(*)").From().Append("(").Append(new Sql(sql.SQL, sql.Arguments)).Append(") as count_query");
 
-        return await database.ExecuteScalarAsync<long>(query);
+        return await database.FirstOrDefaultAsync<long>(query);
     }
 
     public static async Task<PagedModel<TResult>> PagedAsync<TDto, TResult>(
