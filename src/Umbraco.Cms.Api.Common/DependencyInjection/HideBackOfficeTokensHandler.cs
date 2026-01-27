@@ -13,6 +13,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
+/// <summary>
+///     Handles secure storage of back-office authentication tokens in HTTP-only cookies.
+/// </summary>
+/// <remarks>
+///     This handler intercepts OpenIddict token responses for the back-office client and stores
+///     access tokens, refresh tokens, and PKCE codes in encrypted HTTP-only cookies. The tokens
+///     are redacted from the response to prevent client-side JavaScript access.
+/// </remarks>
 internal sealed class HideBackOfficeTokensHandler
     : IOpenIddictServerHandler<OpenIddictServerEvents.ApplyTokenResponseContext>,
         IOpenIddictServerHandler<OpenIddictServerEvents.ApplyAuthorizationResponseContext>,
@@ -34,6 +42,13 @@ internal sealed class HideBackOfficeTokensHandler
     private readonly BackOfficeTokenCookieSettings _backOfficeTokenCookieSettings;
     private readonly GlobalSettings _globalSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HideBackOfficeTokensHandler"/> class.
+    /// </summary>
+    /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    /// <param name="dataProtectionProvider">The data protection provider for encrypting cookie values.</param>
+    /// <param name="backOfficeTokenCookieSettings">The back-office token cookie settings.</param>
+    /// <param name="globalSettings">The global settings.</param>
     public HideBackOfficeTokensHandler(
         IHttpContextAccessor httpContextAccessor,
         IDataProtectionProvider dataProtectionProvider,
@@ -163,6 +178,7 @@ internal sealed class HideBackOfficeTokensHandler
         return ValueTask.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public void Handle(UserLogoutSuccessNotification notification)
     {
         HttpContext? httpContext = _httpContextAccessor.HttpContext;

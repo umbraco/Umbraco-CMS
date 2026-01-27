@@ -259,7 +259,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	override render() {
 		return html`
 			${
-				this.#containerId
+				this.#containerId !== undefined
 					? html`
 							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
 								<umb-content-type-design-editor-properties
