@@ -32,8 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {
-
-    private static readonly Dictionary<string, TokenModel> _tokenCache = new();
+    private static readonly Dictionary<string, string> _tokenCache = new();
     private static readonly SHA256 _sha256 = SHA256.Create();
 
     protected abstract Expression<Func<T, object>> MethodSelector { get; set; }
@@ -126,8 +125,9 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         // Check cache first
         if (!string.IsNullOrEmpty(cacheKey) && _tokenCache.TryGetValue(cacheKey, out var cachedToken))
         {
+            client.DefaultRequestHeaders.Add("Cookie", $"__Host-umbAccessToken={cachedToken}");
             client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", cachedToken.AccessToken);
+                new AuthenticationHeaderValue("Bearer", "[redacted]");
             return;
         }
 
@@ -194,20 +194,20 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                     backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault().AbsoluteUri,
             }));
 
-        var tokenModel = await tokenResponse.Content.ReadFromJsonAsync<TokenModel>();
+        CookieContainer cookies = new CookieContainer();
+        foreach (var cookieHeader in tokenResponse.Headers.GetValues("Set-Cookie"))
+        {
+            cookies.SetCookies(tokenResponse.RequestMessage!.RequestUri!, cookieHeader);
+        }
 
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenModel.AccessToken);
+        string cookieTokenValue = cookies.GetCookies(tokenResponse.RequestMessage!.RequestUri!).FirstOrDefault(c => c.Name == "__Host-umbAccessToken")!.Value;
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "[redacted]");
 
         // Cache the token if cache key provided
         if (!string.IsNullOrEmpty(cacheKey))
         {
-            _tokenCache[cacheKey] = tokenModel;
+            _tokenCache[cacheKey] = cookieTokenValue;
         }
-    }
-
-    private class TokenModel
-    {
-        [JsonPropertyName("access_token")]
-        public string AccessToken { get; set; }
     }
 }
