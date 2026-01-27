@@ -32,7 +32,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         var rootContent = ContentService.GetRootContent().First();
         _rootPage = rootContent;
-        var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _).ToList();
+        var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _, propertyAliases: null, filter: null, ordering: null).ToList();
         _testPage = subPages[0];
     }
 
