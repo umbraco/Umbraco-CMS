@@ -25,6 +25,8 @@ export class UmbUserGroupWorkspaceContext
 	);
 	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
 	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);
+	readonly elementStartNode = this._data.createObservablePartOfCurrent((data) => data?.elementStartNode || null);
+	readonly elementRootAccess = this._data.createObservablePartOfCurrent((data) => data?.elementRootAccess || false);
 	readonly mediaStartNode = this._data.createObservablePartOfCurrent((data) => data?.mediaStartNode || null);
 	readonly mediaRootAccess = this._data.createObservablePartOfCurrent((data) => data?.mediaRootAccess || false);
 	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);

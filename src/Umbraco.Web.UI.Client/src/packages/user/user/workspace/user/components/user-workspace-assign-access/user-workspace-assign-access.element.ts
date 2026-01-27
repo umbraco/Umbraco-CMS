@@ -1,11 +1,14 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../../types.js';
-import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, when, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbInputEntityDataElement } from '@umbraco-cms/backoffice/entity-data-picker';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+
+import '@umbraco-cms/backoffice/entity-data-picker';
 
 const elementName = 'umb-user-workspace-assign-access';
 @customElement(elementName)
@@ -20,7 +23,13 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	private _documentRootAccess: UmbUserDetailModel['hasDocumentRootAccess'] = false;
 
 	@state()
-	private _mediaStartNodeUniques: UmbUserDetailModel['documentStartNodeUniques'] = [];
+	private _elementStartNodeUniques: UmbUserDetailModel['elementStartNodeUniques'] = [];
+
+	@state()
+	private _elementRootAccess: UmbUserDetailModel['hasElementRootAccess'] = false;
+
+	@state()
+	private _mediaStartNodeUniques: UmbUserDetailModel['mediaStartNodeUniques'] = [];
 
 	@state()
 	private _mediaRootAccess: UmbUserDetailModel['hasMediaRootAccess'] = false;
@@ -49,6 +58,18 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				this.#workspaceContext?.documentStartNodeUniques,
 				(value) => (this._documentStartNodeUniques = value ?? []),
 				'_observeDocumentStartNode',
+			);
+
+			this.observe(
+				this.#workspaceContext?.hasElementRootAccess,
+				(value) => (this._elementRootAccess = value ?? false),
+				'_observeElementRootAccess',
+			);
+
+			this.observe(
+				this.#workspaceContext?.elementStartNodeUniques,
+				(value) => (this._elementStartNodeUniques = value ?? []),
+				'_observeElementStartNode',
 			);
 
 			this.observe(
@@ -88,13 +109,31 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		// TODO: get back to this when media have been decoupled from users.
 		// The event target is deliberately set to any to avoid an import cycle with media.
 		const target = event.target as any;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => {
-			return { unique };
-		});
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('documentStartNodeUniques', selection);
 		// When specific start nodes are selected, disable root access
 		this.#workspaceContext?.updateProperty('hasDocumentRootAccess', false);
+	}
+
+	#onAllowAllElementsChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('hasElementRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('elementStartNodeUniques', []);
+	}
+
+	#onElementStartNodeChange(event: CustomEvent & { target: UmbInputEntityDataElement }) {
+		event.stopPropagation();
+		// TODO: get back to this when media have been decoupled from users.
+		// The event target is deliberately set to any to avoid an import cycle with media.
+		const target = event.target;
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('elementStartNodeUniques', selection);
+		// When specific start nodes are selected, disable root access
+		this.#workspaceContext?.updateProperty('hasElementRootAccess', false);
 	}
 
 	#onAllowAllMediaChange(event: UUIBooleanInputEvent) {
@@ -110,9 +149,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		// TODO: get back to this when media have been decoupled from users.
 		// The event target is deliberately set to any to avoid an import cycle with media.
 		const target = event.target as any;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => {
-			return { unique };
-		});
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', selection);
 		// When specific start nodes are selected, disable root access
@@ -125,20 +162,23 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>
 				<div id="assign-access">
 					${this.#renderGroupAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
+					${this.#renderElementAccess()}
 				</div>
 			</uui-box>
 		`;
 	}
 
 	#renderGroupAccess() {
-		return html`<umb-property-layout
-			label="${this.localize.term('general_groups')}"
-			description="${this.localize.term('user_groupsHelp')}">
-			<umb-user-group-input
-				slot="editor"
-				.selection=${this._userGroupUniques.map((reference) => reference.unique)}
-				@change=${this.#onUserGroupsChange}></umb-user-group-input>
-		</umb-property-layout>`;
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('general_groups')}
+				description=${this.localize.term('user_groupsHelp')}>
+				<umb-user-group-input
+					slot="editor"
+					.selection=${this._userGroupUniques.map((reference) => reference.unique)}
+					@change=${this.#onUserGroupsChange}></umb-user-group-input>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderDocumentAccess() {
@@ -149,19 +189,48 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				<div slot="editor">
 					<uui-toggle
 						style="margin-bottom: var(--uui-size-space-3);"
-						label="${this.localize.term('user_allowAccessToAllDocuments')}"
+						label=${this.localize.term('user_allowAccessToAllDocuments')}
 						.checked=${this._documentRootAccess}
 						@change=${this.#onAllowAllDocumentsChange}></uui-toggle>
 				</div>
+				${when(
+					this._documentRootAccess === false,
+					() => html`
+						<umb-input-document
+							slot="editor"
+							.selection=${this._documentStartNodeUniques.map((reference) => reference.unique)}
+							@change=${this.#onDocumentStartNodeChange}>
+						</umb-input-document>
+					`,
+				)}
+			</umb-property-layout>
+		`;
+	}
 
-				${this._documentRootAccess === false
-					? html`
-							<umb-input-document
-								slot="editor"
-								.selection=${this._documentStartNodeUniques.map((reference) => reference.unique)}
-								@change=${this.#onDocumentStartNodeChange}></umb-input-document>
-						`
-					: nothing}
+	#renderElementAccess() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('user_selectElementStartNode')}
+				description=${this.localize.term('user_selectElementStartNodeDescription')}>
+				<div slot="editor">
+					<uui-toggle
+						style="margin-bottom: var(--uui-size-space-3);"
+						label=${this.localize.term('user_allowAccessToAllElements')}
+						.checked=${this._elementRootAccess}
+						@change=${this.#onAllowAllElementsChange}></uui-toggle>
+				</div>
+				${when(
+					this._elementRootAccess === false,
+					() => html`
+						<umb-input-entity-data
+							slot="editor"
+							.selection=${this._elementStartNodeUniques.map((reference) => reference.unique)}
+							.dataSourceAlias=${'Umb.PropertyEditorDataSource.ElementFolder'}
+							.dataSourceConfig=${[]}
+							@change=${this.#onElementStartNodeChange}>
+						</umb-input-entity-data>
+					`,
+				)}
 			</umb-property-layout>
 		`;
 	}
@@ -174,19 +243,20 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				<div slot="editor">
 					<uui-toggle
 						style="margin-bottom: var(--uui-size-space-3);"
-						label="${this.localize.term('user_allowAccessToAllMedia')}"
+						label=${this.localize.term('user_allowAccessToAllMedia')}
 						.checked=${this._mediaRootAccess}
 						@change=${this.#onAllowAllMediaChange}></uui-toggle>
 				</div>
-
-				${this._mediaRootAccess === false
-					? html`
-							<umb-input-media
-								slot="editor"
-								.selection=${this._mediaStartNodeUniques.map((reference) => reference.unique)}
-								@change=${this.#onMediaStartNodeChange}></umb-input-media>
-						`
-					: nothing}
+				${when(
+					this._mediaRootAccess === false,
+					() => html`
+						<umb-input-media
+							slot="editor"
+							.selection=${this._mediaStartNodeUniques.map((reference) => reference.unique)}
+							@change=${this.#onMediaStartNodeChange}>
+						</umb-input-media>
+					`,
+				)}
 			</umb-property-layout>
 		`;
 	}

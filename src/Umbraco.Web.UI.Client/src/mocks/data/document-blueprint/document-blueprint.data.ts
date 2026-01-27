@@ -43,6 +43,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 			},
 		],
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: 'forbidden',
@@ -77,5 +78,6 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 			},
 		],
 		flags: [],
+		noAccess: false,
 	},
 ];

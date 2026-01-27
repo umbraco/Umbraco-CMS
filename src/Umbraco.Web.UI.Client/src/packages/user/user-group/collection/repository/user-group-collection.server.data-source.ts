@@ -38,6 +38,8 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 					aliasCanBeChanged: item.aliasCanBeChanged,
 					documentRootAccess: item.documentRootAccess,
 					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
+					elementRootAccess: item.elementRootAccess,
+					elementStartNode: item.elementStartNode ? { unique: item.elementStartNode.id } : null,
 					entityType: UMB_USER_GROUP_ENTITY_TYPE,
 					fallbackPermissions: item.fallbackPermissions,
 					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
