@@ -91,7 +91,8 @@ Umbraco-CMS/
 ├── .claude/
 │   ├── settings.json      # Shared Claude AI permissions (committed)
 │   └── settings.local.json # Local Claude overrides (gitignored)
-└── .gitignore             # Ignores .env.local and settings.local.json
+├── .gitignore             # Ignores .env.local and settings.local.json
+└── MCP.md                 # This documentation (you are here)
 ```
 
 ## Claude AI Permissions
@@ -132,7 +133,7 @@ Create `.claude/settings.local.json` to override permissions for your environmen
 
 ### MCP server not starting
 
-- Ensure Node.js is installed (v18+ recommended)
+- Ensure Node.js is installed (v22+ recommended, matching .nvmrc)
 - Run `npx @umbraco-cms/mcp-dev@17 --help` to verify the package works
 
 ## Further Reading
