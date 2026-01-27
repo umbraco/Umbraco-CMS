@@ -14,4 +14,9 @@ public class TreeEntityPath
     ///     Gets or sets the path of the entity.
     /// </summary>
     public string Path { get; set; } = null!;
+
+    /// <summary>
+    ///     Gets or sets the unique key of the entity.
+    /// </summary>
+    public Guid Key { get; set; }
 }

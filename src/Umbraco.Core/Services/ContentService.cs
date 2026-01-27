@@ -506,7 +506,12 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
+        => GetPagedChildren(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
     {
         if (pageIndex < 0)
         {
@@ -525,7 +530,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.ReadLock(Constants.Locks.ContentTree);
 
             IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering, loadTemplates);
         }
     }
 
@@ -584,7 +589,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             throw new ArgumentNullException(nameof(ordering));
         }
 
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
     }
 
     /// <summary>
@@ -639,7 +644,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.ReadLock(Constants.Locks.ContentTree);
             IQuery<IContent>? query = Query<IContent>()?
                 .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
     }
 

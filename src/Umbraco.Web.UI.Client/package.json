@@ -183,6 +183,7 @@
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
 		"check:paths": "node ./devops/build/check-path-length.js dist-cms 120",
 		"check:circular": "node ./devops/circular/index.js src",
+		"check:duplicate-class-names": "node ./devops/check-duplicate-class-names/index.js src --ignore-tests --ignore-stories",
 		"check:module-dependencies": "node ./devops/module-dependencies/index.js",
 		"compile": "tsc",
 		"dev": "vite",

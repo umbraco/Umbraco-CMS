@@ -364,6 +364,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }
@@ -396,6 +397,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }

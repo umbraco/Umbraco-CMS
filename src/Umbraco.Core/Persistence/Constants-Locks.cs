@@ -102,8 +102,13 @@ public static partial class Constants
         public const int DistributedJobs = -347;
 
         /// <summary>
+        ///     All document URL aliases.
+        /// </summary>
+        public const int DocumentUrlAliases = -348;
+
+        /// <summary>
         ///     The entire element tree, i.e. all element items.
         /// </summary>
-        public const int ElementTree = -348;
+        public const int ElementTree = -349;
     }
 }
