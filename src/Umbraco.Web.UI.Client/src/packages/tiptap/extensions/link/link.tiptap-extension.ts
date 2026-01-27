@@ -36,6 +36,20 @@ export const UmbLink = Link.extend({
 			// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
+			ensureUmbLink: (attributes) => {
+				// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-expect-error
+				return ({ editor, chain }) => {
+					if (editor.isActive(this.name)) {
+						return true;
+					}
+					return chain().setMark(this.name, attributes).setMeta('preventAutolink', true).run();
+				};
+			},
+			// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-expect-error
 			setUmbLink: (attributes) => {
 				// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -59,6 +73,14 @@ export const UmbLink = Link.extend({
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		umbLink: {
+			ensureUmbLink: (attributes: {
+				type: string;
+				href: string;
+				'data-anchor'?: string | null;
+				target?: string | null;
+				title?: string | null;
+			}) => ReturnType;
+
 			setUmbLink: (attributes: {
 				type: string;
 				href: string;
