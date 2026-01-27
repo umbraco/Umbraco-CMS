@@ -12,4 +12,6 @@ public interface IElementContainerService : IEntityTypeContainerService<IElement
     Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey);
 
     Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey);
+
+    Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
 }

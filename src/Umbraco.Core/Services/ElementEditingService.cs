@@ -180,50 +180,13 @@ internal sealed class ElementEditingService
             : (null, ContentEditingOperationStatus.ParentNotFound);
     }
 
-    public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
-    {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ElementTree);
+    /// <inheritdoc/>
+    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
+        => await HandleElementMoveAsync(key, containerKey, userKey);
 
-        var parentId = Constants.System.Root;
-        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
-        {
-            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
-            if (container is null)
-            {
-                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
-            }
-
-            if (container.Trashed)
-            {
-                // cannot move to a trashed container
-                return Attempt.Fail(ContentEditingOperationStatus.InTrash);
-            }
-
-            parentId = container.Id;
-        }
-
-        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
-            scope,
-            key,
-            parentId,
-            false,
-            userKey,
-            (element, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
-                return new ElementMovingNotification(moveEventInfo, eventMessages);
-            },
-            (element, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
-                return new ElementMovedNotification(moveEventInfo, eventMessages);
-            });
-
-        scope.Complete();
-
-        return moveResult;
-    }
+    /// <inheritdoc/>
+    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? containerKey, Guid userKey)
+        => await HandleElementMoveAsync(key, containerKey, userKey, mustBeInRecycleBin: true);
 
     public async Task<Attempt<ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
     {
@@ -252,6 +215,69 @@ internal sealed class ElementEditingService
         scope.Complete();
 
         return moveResult;
+    }
+
+    private async Task<Attempt<IElement?, ContentEditingOperationStatus>> HandleElementMoveAsync(
+        Guid key,
+        Guid? containerKey,
+        Guid userKey,
+        bool mustBeInRecycleBin = false)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        IElement? element = await GetAsync(key);
+        if (element is null)
+        {
+            return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotFound, null);
+        }
+
+        if (mustBeInRecycleBin && element.Trashed is false)
+        {
+            return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, element);
+        }
+
+        var parentId = Constants.System.Root;
+        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        {
+            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
+            if (container is null)
+            {
+                return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentNotFound, element);
+            }
+
+            if (container.Trashed)
+            {
+                return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.InTrash, element);
+            }
+
+            parentId = container.Id;
+        }
+
+        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
+            scope,
+            key,
+            parentId,
+            false,
+            userKey,
+            (elem, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, elem.Path, parentId, containerKey);
+                return new ElementMovingNotification(moveEventInfo, eventMessages);
+            },
+            (elem, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, elem.Path, parentId, containerKey);
+                return new ElementMovedNotification(moveEventInfo, eventMessages);
+            });
+
+        if (!moveResult.Success)
+        {
+            return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(moveResult.Result, element);
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, await GetAsync(key));
     }
 
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)

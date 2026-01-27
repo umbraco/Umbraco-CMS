@@ -45,65 +45,13 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ElementTree);
+        => await HandleMoveAsync(key, parentKey, userKey);
 
-        var parentId = Constants.System.Root;
-        var parentPath = parentId.ToString();
-        var parentLevel = 0;
-        if (parentKey.HasValue && parentKey.Value != Guid.Empty)
-        {
-            EntityContainer? parent = _entityContainerRepository.Get(parentKey.Value);
-            if (parent is null)
-            {
-                return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.ParentNotFound, null);
-            }
-
-            if (parent.Trashed)
-            {
-                // cannot move to a trashed container
-                return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.InTrash, null);
-            }
-
-            parentId = parent.Id;
-            parentPath = parent.Path;
-            parentLevel = parent.Level;
-        }
-
-        Attempt<EntityContainer?, EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
-            scope,
-            key,
-            parentId,
-            parentPath,
-            parentLevel,
-            false,
-            userKey,
-            container =>
-            {
-                if (parentPath.StartsWith(container.Path))
-                {
-                    // cannot move to descendant of self
-                    return EntityContainerOperationStatus.InvalidParent;
-                }
-
-                return EntityContainerOperationStatus.Success;
-            },
-            (container, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(container, container.Path, parentId, parentKey);
-                return new EntityContainerMovingNotification(moveEventInfo, eventMessages);
-            },
-            (container, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(container, container.Path, parentId, parentKey);
-                return new EntityContainerMovedNotification(moveEventInfo, eventMessages);
-            });
-
-        scope.Complete();
-        return moveResult;
-    }
+    /// <inheritdoc/>
+    public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
+        => await HandleMoveAsync(key, parentKey, userKey, mustBeInRecycleBin: true);
 
     public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
     {
@@ -149,6 +97,74 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         scope.Complete();
         return deleteResult;
+    }
+
+    private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> HandleMoveAsync(
+        Guid key,
+        Guid? parentKey,
+        Guid userKey,
+        bool mustBeInRecycleBin = false)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        EntityContainer? container = _entityContainerRepository.Get(key);
+        if (container is null)
+        {
+            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotFound, null);
+        }
+
+        if (mustBeInRecycleBin && container.Trashed is false)
+        {
+            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotInTrash, container);
+        }
+
+        var parentId = Constants.System.Root;
+        var parentPath = parentId.ToString();
+        var parentLevel = 0;
+        if (parentKey.HasValue && parentKey.Value != Guid.Empty)
+        {
+            EntityContainer? parent = _entityContainerRepository.Get(parentKey.Value);
+            if (parent is null)
+            {
+                return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.ParentNotFound, null);
+            }
+
+            if (parent.Trashed)
+            {
+                // cannot move to a trashed container
+                return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.InTrash, null);
+            }
+
+            parentId = parent.Id;
+            parentPath = parent.Path;
+            parentLevel = parent.Level;
+        }
+
+        Attempt<EntityContainer?, EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
+            scope,
+            key,
+            parentId,
+            parentPath,
+            parentLevel,
+            false,
+            userKey,
+            cont => parentPath.StartsWith(cont.Path) ?
+                EntityContainerOperationStatus.InvalidParent // cannot move to descendant of self
+                : EntityContainerOperationStatus.Success,
+            (cont, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, cont.Path, parentId, parentKey);
+                return new EntityContainerMovingNotification(moveEventInfo, eventMessages);
+            },
+            (cont, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, cont.Path, parentId, parentKey);
+                return new EntityContainerMovedNotification(moveEventInfo, eventMessages);
+            });
+
+        scope.Complete();
+        return moveResult;
     }
 
     public async Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)

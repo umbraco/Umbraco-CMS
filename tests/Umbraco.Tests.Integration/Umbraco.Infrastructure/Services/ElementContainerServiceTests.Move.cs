@@ -450,7 +450,7 @@ public partial class ElementContainerServiceTests
     }
 
     [Test]
-    public async Task Restoring_Trashed_Container_Performs_Explicit_Unpublish_Of_All_Descendant_Elements()
+    public async Task Moving_Trashed_Container_Performs_Explicit_Unpublish_Of_All_Descendant_Elements()
     {
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
