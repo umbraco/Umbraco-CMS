@@ -1,18 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__umbraco__create-data-type",
-      "mcp__umbraco__create-document-type-folder",
-      "mcp__umbraco__create-document-type",
-      "mcp__umbraco__create-document",
-      "mcp__umbraco__create-element-type",
-      "mcp__umbraco__get-all-data-types",
-      "mcp__umbraco__get-all-document-types",
-      "mcp__umbraco__get-data-type-property-editor-template",
-      "mcp__umbraco__get-document-property-value-template",
-      "mcp__umbraco__get-document-type-by-id",
-      "mcp__umbraco__get-document-type-root",
-      "mcp__umbraco__get-icons",
+      "mcp__umbraco__create*",
+      "mcp__umbraco__get*",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_type",
       "mcp__playwright__browser_wait_for"
