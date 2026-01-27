@@ -18,6 +18,7 @@ describe('UmbMarkedUfm', () => {
 			},
 			{ ufm: '{umbValue:prop1}', expected: '<ufm-label-value alias="prop1"></ufm-label-value>' },
 			{ ufm: '{ umbValue:prop1 }', expected: '<ufm-label-value alias="prop1"></ufm-label-value>' },
+			{ ufm: '{ umbValue: prop1 }', expected: '<ufm-label-value alias="prop1"></ufm-label-value>' },
 			{ ufm: '{#general_add}', expected: '<ufm-localize alias="general_add"></ufm-localize>' },
 			{ ufm: '{umbLocalize:general_add}', expected: '<ufm-localize alias="general_add"></ufm-localize>' },
 			{ ufm: '{~contentPicker}', expected: '<ufm-content-name alias="contentPicker"></ufm-content-name>' },

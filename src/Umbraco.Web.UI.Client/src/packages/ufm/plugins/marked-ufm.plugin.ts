@@ -9,10 +9,11 @@ export function ufm(plugins: Array<UfmPlugin> = []): MarkedExtension {
 	return {
 		extensions: plugins.map(({ alias, marker, render }) => {
 			const prefix = `(${alias}:${marker ? `|${marker}` : ''})`;
+			const startPattern = new RegExp(`\\{\\s*${prefix}`);
 			return {
 				name: alias,
 				level: 'inline',
-				start: (src: string) => src.search(`{${prefix}`),
+				start: (src: string) => src.search(startPattern),
 				tokenizer: (src: string) => {
 					const pattern = `^\\{\\s*${prefix}([^}]*)\\}`;
 					const regex = new RegExp(pattern);
