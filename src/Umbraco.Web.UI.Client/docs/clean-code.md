@@ -170,6 +170,86 @@ export class UmbMyController extends UmbControllerBase {
 #controller = new UmbMyController(this, new UmbContentRepository());
 ```
 
+### Event Listener Cleanup Pattern
+
+**Critical for Memory Leak Prevention**:
+
+When adding event listeners, you must ensure they can be properly removed. Using `.bind(this)` creates a new function reference each time, making cleanup impossible.
+
+**Wrong Pattern - Memory Leak**:
+
+```typescript
+export class UmbMyElement extends LitElement {
+	constructor() {
+		super();
+		// ❌ BAD: Each .bind(this) creates a NEW function reference
+		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	disconnectedCallback() {
+		// ❌ This creates ANOTHER function reference - doesn't remove the original listener!
+		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	#onStorageEvent(evt: StorageEvent) {
+		// Handler logic
+	}
+}
+```
+
+**Correct Pattern - Arrow Function Property**:
+
+```typescript
+export class UmbMyElement extends LitElement {
+	// ✅ GOOD: Arrow function property maintains consistent reference
+	#onStorageEvent = async (evt: StorageEvent) => {
+		// Handler logic
+		if (evt.key === 'myKey') {
+			await this.handleStorageChange();
+		}
+	};
+
+	constructor() {
+		super();
+		// ✅ GOOD: No .bind() needed - arrow function preserves 'this'
+		window.addEventListener('storage', this.#onStorageEvent);
+	}
+
+	disconnectedCallback() {
+		// ✅ GOOD: Removes the SAME function reference
+		window.removeEventListener('storage', this.#onStorageEvent);
+	}
+}
+```
+
+**Key Points**:
+- Use arrow function properties for event handlers
+- Arrow functions automatically bind `this` without creating new references
+- Each `addEventListener` and `removeEventListener` must use the SAME function reference
+- Always remove event listeners in `disconnectedCallback()` for custom elements
+- This pattern prevents memory leaks by ensuring proper cleanup
+
+**Common Event Listener Scenarios**:
+
+```typescript
+// Document/window events
+document.addEventListener('dragenter', this.#onDragEnter);
+window.addEventListener('storage', this.#onStorage);
+
+// Programmatically created elements
+this.#element = new MyElement();
+this.#element.addEventListener('action-executed', this.#onAction);
+
+// Always clean up in disconnectedCallback
+disconnectedCallback() {
+	document.removeEventListener('dragenter', this.#onDragEnter);
+	window.removeEventListener('storage', this.#onStorage);
+	if (this.#element) {
+		this.#element.removeEventListener('action-executed', this.#onAction);
+	}
+}
+```
+
 ### Avoid Code Smells
 
 **Magic Numbers/Strings**:

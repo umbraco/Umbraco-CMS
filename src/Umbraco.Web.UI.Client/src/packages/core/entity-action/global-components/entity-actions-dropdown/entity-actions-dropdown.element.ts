@@ -22,6 +22,11 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 	#entityType?: UmbEntityModel['entityType'];
 	#unique?: UmbEntityModel['unique'];
 
+	// Event handler as arrow function to maintain consistent reference
+	#onActionExecuted = () => {
+		this._dropdownElement?.closeDropdown();
+	};
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
@@ -39,8 +44,11 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 		});
 	}
 
-	#onActionExecuted() {
-		this._dropdownElement?.closeDropdown();
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		if (this.#entityActionListElement) {
+			this.#entityActionListElement.removeEventListener('action-executed', this.#onActionExecuted);
+		}
 	}
 
 	#onDropdownClick(event: Event) {
@@ -57,7 +65,7 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 		// Programmatically create the elements so they are cached if the dropdown is opened again
 		this.#scrollContainerElement = new UUIScrollContainerElement();
 		this.#entityActionListElement = new UmbEntityActionListElement();
-		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted.bind(this));
+		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted);
 		this.#entityActionListElement.entityType = this.#entityType;
 		this.#entityActionListElement.unique = this.#unique;
 		this.#entityActionListElement.setAttribute('label', this.label ?? '');

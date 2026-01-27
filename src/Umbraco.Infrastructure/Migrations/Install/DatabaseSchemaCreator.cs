@@ -22,7 +22,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// </summary>
 public class DatabaseSchemaCreator
 {
-    // all tables, in order
+    /// <summary>
+    /// Gets a read-only list of all data transfer object (DTO) types representing database tables in the order they should be processed.
+    /// </summary>
     internal static readonly List<Type> _orderedTables = new()
     {
         typeof(UserDto),
@@ -74,6 +76,7 @@ public class DatabaseSchemaCreator
         typeof(DocumentVersionDto),
         typeof(ElementVersionDto),
         typeof(DocumentUrlDto),
+        typeof(DocumentUrlAliasDto),
         typeof(KeyValueDto),
         typeof(UserLoginDto),
         typeof(ConsentDto),
@@ -106,22 +109,25 @@ public class DatabaseSchemaCreator
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseSchemaCreator(
-            IUmbracoDatabase? database,
-            ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
-            IEventAggregator eventAggregator,
-            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
-        {
-            _database = database ?? throw new ArgumentNullException(nameof(database));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
-            _eventAggregator = eventAggregator;
-            _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V13): Rename this parameter to installDefaultDataSettings.
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DatabaseSchemaCreator"/> class.
+    /// </summary>
+    public DatabaseSchemaCreator(
+        IUmbracoDatabase? database,
+        ILogger<DatabaseSchemaCreator> logger,
+        ILoggerFactory loggerFactory,
+        IUmbracoVersion umbracoVersion,
+        IEventAggregator eventAggregator,
+        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+    {
+        _database = database ?? throw new ArgumentNullException(nameof(database));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+        _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
+        _eventAggregator = eventAggregator;
+        _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V18): Rename this parameter to installDefaultDataSettings.
 
-        if (_database?.SqlContext?.SqlSyntax == null)
+        if (_database.SqlContext?.SqlSyntax == null)
         {
             throw new InvalidOperationException("No SqlContext has been assigned to the database");
         }
@@ -197,6 +203,10 @@ public class DatabaseSchemaCreator
     /// </summary>
     internal DatabaseSchemaResult ValidateSchema() => ValidateSchema(_orderedTables);
 
+    /// <summary>
+    ///     Validates the schema of the current database for the provided collection of tables represented by their DTO types.
+    /// </summary>
+    /// <param name="orderedTables">The ordered collection of table DTO types to validate.</param>
     internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
     {
         var result = new DatabaseSchemaResult();
@@ -226,28 +236,68 @@ public class DatabaseSchemaCreator
     /// </remarks>
     private void ValidateDbConstraints(DatabaseSchemaResult result)
     {
-        //Check constraints in configured database against constraints in schema
-        var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
-        var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_"))
-            .Select(x => x.Item3).ToList();
-        var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_"))
-            .Select(x => x.Item3).ToList();
+        // Check constraints in configured database against constraints in schema
+        var allConstraintsInDatabase = SqlSyntax
+            .GetConstraintsPerColumn(_database)
+            .DistinctBy(x => x.Item3)
+            .Select(x => x.Item3)
+            .ToList();
 
-        var unknownConstraintsInDatabase = constraintsInDatabase.Where(
-            x => x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
-                 x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
+        var foreignKeysInDatabase = allConstraintsInDatabase
+            .Where(x => x.InvariantStartsWith("FK_"))
+            .ToList();
 
-        var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name))
-            .Where(x => x is not null).ToList();
-        var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
-            .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
+        var primaryKeysInDatabase = allConstraintsInDatabase
+            .Where(x => x.InvariantStartsWith("PK_"))
+            .ToList();
+
+        var unknownConstraintsInDatabase = allConstraintsInDatabase
+            .Where(
+                x => x.InvariantStartsWith("FK_") == false &&
+                     x.InvariantStartsWith("PK_") == false &&
+                     x.InvariantStartsWith("IX_") == false)
+                .ToList();
+
+        var foreignKeysInSchema = result.TableDefinitions
+            .SelectMany(def =>
+                def.ForeignKeys
+                   .Where(fk => fk.Name is not null)
+                   .Select(fk => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(fk.Name!)))
+            .ToList();
+
+        var primaryKeysInSchema = result.TableDefinitions
+            .SelectMany(def =>
+                def.Columns
+                   .Where(col => col.PrimaryKeyName.IsNullOrWhiteSpace() == false)
+                   .Select(col => SqlSyntax.TruncateConstraintName<ColumnDefinition>(col.PrimaryKeyName!)))
+            .ToList();
 
         // Add valid and invalid foreign key differences to the result object
         // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
         // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
-        foreach (var unknown in unknownConstraintsInDatabase)
+        HandleUnknownConstraints(result, unknownConstraintsInDatabase, foreignKeysInSchema, primaryKeysInSchema);
+
+        // Foreign keys:
+        AddValidForeignKeys(result, foreignKeysInDatabase, foreignKeysInSchema);
+
+        AddErrorsForInvalidForeignKeys(result, foreignKeysInDatabase, foreignKeysInSchema);
+
+        // Primary keys:
+        // Add valid and invalid primary key differences to the result object
+        AddValidPrimaryKeys(result, primaryKeysInDatabase, primaryKeysInSchema);
+
+        AddErrorsForInvalidPrimaryKeys(result, primaryKeysInDatabase, primaryKeysInSchema);
+    }
+
+    private static void HandleUnknownConstraints(
+        DatabaseSchemaResult result,
+        List<string> unknownConstraintsInDatabase,
+        List<string> foreignKeysInSchema,
+        List<string> primaryKeysInSchema)
+    {
+        foreach (string unknown in unknownConstraintsInDatabase)
         {
-            if (foreignKeysInSchema!.InvariantContains(unknown) || primaryKeysInSchema!.InvariantContains(unknown))
+            if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown))
             {
                 result.ValidConstraints.Add(unknown);
             }
@@ -256,10 +306,26 @@ public class DatabaseSchemaCreator
                 result.Errors.Add(new Tuple<string, string>("Unknown", unknown));
             }
         }
+    }
 
-        // Foreign keys:
-        IEnumerable<string?> validForeignKeyDifferences =
-            foreignKeysInDatabase.Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+    private static void AddErrorsForInvalidForeignKeys(DatabaseSchemaResult result, List<string> foreignKeysInDatabase, List<string> foreignKeysInSchema)
+    {
+        IEnumerable<string?> invalidForeignKeyDifferences = foreignKeysInDatabase
+                    .Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+                    .Union(foreignKeysInSchema
+                        .Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
+
+        foreach (var foreignKey in invalidForeignKeyDifferences)
+        {
+            result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey ?? "NULL"));
+        }
+    }
+
+    private static void AddValidForeignKeys(DatabaseSchemaResult result, List<string> foreignKeysInDatabase, List<string> foreignKeysInSchema)
+    {
+        IEnumerable<string?> validForeignKeyDifferences = foreignKeysInDatabase
+                    .Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+
         foreach (var foreignKey in validForeignKeyDifferences)
         {
             if (foreignKey is not null)
@@ -267,27 +333,27 @@ public class DatabaseSchemaCreator
                 result.ValidConstraints.Add(foreignKey);
             }
         }
+    }
 
-        IEnumerable<string?> invalidForeignKeyDifferences = foreignKeysInDatabase
-            .Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
-            .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
-        foreach (var foreignKey in invalidForeignKeyDifferences)
-        {
-            result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey ?? "NULL"));
-        }
+    private static void AddValidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string> primaryKeysInSchema)
+    {
+        IEnumerable<string> validPrimaryKeyDifferences = primaryKeysInDatabase
+            .Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+            .Where(k => k is not null).Select(k => k!);
 
-        // Primary keys:
-        // Add valid and invalid primary key differences to the result object
-        IEnumerable<string> validPrimaryKeyDifferences =
-            primaryKeysInDatabase!.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!;
         foreach (var primaryKey in validPrimaryKeyDifferences)
         {
             result.ValidConstraints.Add(primaryKey);
         }
+    }
 
-        IEnumerable<string> invalidPrimaryKeyDifferences =
-            primaryKeysInDatabase!.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!
-                .Union(primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase))!;
+    private static void AddErrorsForInvalidPrimaryKeys(DatabaseSchemaResult result, List<string> primaryKeysInDatabase, List<string> primaryKeysInSchema)
+    {
+        IEnumerable<string?> onlyInSchema = primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase);
+        IEnumerable<string?> onlyInDatabase = primaryKeysInDatabase.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+        IEnumerable<string> invalidPrimaryKeyDifferences = onlyInDatabase.Union(onlyInSchema)
+            .Where(x => x is not null).Select(x => x!);
+
         foreach (var primaryKey in invalidPrimaryKeyDifferences)
         {
             result.Errors.Add(new Tuple<string, string>("Constraint", primaryKey));
@@ -519,9 +585,17 @@ public class DatabaseSchemaCreator
 
         dataCreation.InitializeBaseData(tableName);
 
-        if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+        if (tableDefinition.Columns.Any(x => x.IsIdentity))
         {
-            _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
+            if (SqlSyntax.SupportsIdentityInsert())
+            {
+                _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
+            }
+
+            if (SqlSyntax.SupportsSequences())
+            {
+                SqlSyntax.AlterSequences(_database, tableName);
+            }
         }
 
         if (overwrite)

@@ -143,6 +143,13 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		return html`<div class="label" slot="label">
 			<strong> ${option.language.name} </strong>
 			<div class="label-status">${UmbDocumentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
+			${option.documentCount !== undefined
+				? html`<div class="label-status">
+						<umb-localize key="general_documentCount" .args=${[option.documentCount]}>
+							${option.documentCount} documents
+						</umb-localize>
+					</div>`
+				: nothing}
 			${option.language.isMandatory && mustSelect
 				? html`<div class="label-status">
 						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>
