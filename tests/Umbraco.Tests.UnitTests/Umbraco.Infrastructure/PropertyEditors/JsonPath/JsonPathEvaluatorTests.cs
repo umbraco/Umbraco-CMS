@@ -253,4 +253,37 @@ public class JsonPathEvaluatorTests
         // Act & Assert
         Assert.Throws<ArgumentException>(() => _evaluator.Select(doc, string.Empty));
     }
+
+    [Test]
+    public void Select_ThreeFiltersWithSegment_ReturnsMatchingElements()
+    {
+        // Arrange
+        var json = """
+        {
+            "values": [
+                { "alias": "price", "culture": "en-US", "segment": "standard", "value": "100" },
+                { "alias": "price", "culture": "en-US", "segment": "premium", "value": "150" },
+                { "alias": "price", "culture": "da-DK", "segment": "premium", "value": "1000" }
+            ]
+        }
+        """;
+        var doc = JsonDocument.Parse(json);
+
+        // Act
+        var results = _evaluator.Select(doc, "$.values[?(@.alias == 'price' && @.culture == 'en-US' && @.segment == 'premium')]");
+
+        // Assert
+        Assert.That(results, Has.Count.EqualTo(1));
+        Assert.That(results[0].GetProperty("value").GetString(), Is.EqualTo("150"));
+    }
+
+    [Test]
+    public void IsValidExpression_ThreeFiltersWithSegment_ReturnsTrue()
+    {
+        // Act
+        var isValid = _evaluator.IsValidExpression("$.values[?(@.alias == 'price' && @.culture == 'en-US' && @.segment == 'premium')].value");
+
+        // Assert
+        Assert.That(isValid, Is.True);
+    }
 }

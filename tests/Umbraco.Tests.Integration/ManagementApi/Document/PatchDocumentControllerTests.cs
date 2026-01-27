@@ -11,11 +11,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Common.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
-[NonParallelizable]
 public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<PatchDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
@@ -620,5 +618,82 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         // Assert
         Assert.AreEqual(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Test]
+    public async Task PatchDocument_SegmentProperty_UpdatesCorrectSegment()
+    {
+        // Arrange - Authenticate as admin
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+
+        // Arrange - Create language
+        var langEnUs = new LanguageBuilder()
+            .WithCultureInfo("en-US")
+            .Build();
+        await LanguageService.CreateAsync(langEnUs, Constants.Security.SuperUserKey);
+
+        // Arrange - Create content type with segment variation property
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("segmentTest")
+            .WithName("Segment Test")
+            .WithContentVariation(ContentVariation.CultureAndSegment) // Content type must support segments
+            .AddPropertyType()
+            .WithAlias("price")
+            .WithName("Price")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.CultureAndSegment)
+            .Done()
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // Create document with en-US variant using ContentBuilder and ContentService
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "English Name")
+            .Build();
+
+        // Set property values for different segments (including default segment)
+        content.SetValue("price", "75", culture: "en-US", segment: null); // Default segment
+        content.SetValue("price", "100", culture: "en-US", segment: "standard");
+        content.SetValue("price", "150", culture: "en-US", segment: "premium");
+        ContentService.Save(content);
+
+        var documentKey = content.Key;
+
+        // Patch only premium segment
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "replace",
+                    Path = "$.values[?(@.alias == 'price' && @.culture == 'en-US' && @.segment == 'premium')].value",
+                    Value = "200"
+                }
+            }
+        };
+
+        // Act
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+
+        // Assert
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error Response: {errorContent}");
+        }
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        // Verify only premium segment was updated
+        var updatedContent = await ContentEditingService.GetAsync(documentKey);
+        Assert.IsNotNull(updatedContent);
+        Assert.AreEqual("200", updatedContent.GetValue<string>("price", "en-US", "premium"));
+        Assert.AreEqual("100", updatedContent.GetValue<string>("price", "en-US", "standard")); // Unchanged
     }
 }

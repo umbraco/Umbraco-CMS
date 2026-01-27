@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors.JsonPath;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Patchers;
 
@@ -146,6 +147,40 @@ public class DocumentPatcher
                 if (propertyType is null)
                 {
                     return Attempt.FailWithStatus(ContentPatchingOperationStatus.PropertyTypeNotFound, default(ContentUpdateModel)!);
+                }
+
+                // Ensure variant exists for this culture/segment combination
+                // This is required for segment variation support
+                var key = (culture, segment);
+                if (!variants.ContainsKey(key))
+                {
+                    // Get the current name from the content
+                    var currentName = content.GetCultureName(culture) ?? string.Empty;
+
+                    variants[key] = new VariantModel
+                    {
+                        Culture = culture,
+                        Segment = segment,
+                        Name = currentName
+                    };
+                }
+
+                // If content type varies by segment and we're updating a specific segment,
+                // ensure we also have a default (null segment) variant to satisfy validation
+                if (segment != null && contentType.VariesBySegment())
+                {
+                    var defaultKey = (culture, (string?)null);
+                    if (!variants.ContainsKey(defaultKey))
+                    {
+                        var currentName = content.GetCultureName(culture) ?? string.Empty;
+
+                        variants[defaultKey] = new VariantModel
+                        {
+                            Culture = culture,
+                            Segment = null,
+                            Name = currentName
+                        };
+                    }
                 }
 
                 if (operation.Op == PatchOperationType.Replace || operation.Op == PatchOperationType.Add)
