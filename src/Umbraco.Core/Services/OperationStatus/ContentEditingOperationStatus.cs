@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
+namespace Umbraco.Cms.Core.Services.OperationStatus;
 
 public enum ContentEditingOperationStatus
 {
@@ -24,4 +24,5 @@ public enum ContentEditingOperationStatus
     Unknown,
     CannotDeleteWhenReferenced,
     CannotMoveToRecycleBinWhenReferenced,
+    InvalidKey,
 }
