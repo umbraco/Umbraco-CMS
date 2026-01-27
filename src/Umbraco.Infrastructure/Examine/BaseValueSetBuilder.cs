@@ -22,7 +22,7 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
     /// <inheritdoc />
     public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
-    protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values, IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
+    protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object>>? values, IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
     {
         IDataEditor? editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
         if (editor == null)
@@ -57,9 +57,9 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                         }
 
                         var key = $"{indexValue.FieldName}{cultureSuffix}";
-                        if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
+                        if (values?.TryGetValue(key, out IEnumerable<object>? v) ?? false)
                         {
-                            values[key] = new List<object?>(v) { val }.ToArray();
+                            values[key] = new List<object>(v) { val }.ToArray();
                         }
                         else
                         {
@@ -71,9 +71,9 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                     default:
                         {
                         var key = $"{indexValue.FieldName}{cultureSuffix}";
-                        if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
+                        if (values?.TryGetValue(key, out IEnumerable<object>? v) ?? false)
                         {
-                            values[key] = new List<object?>(v) { val }.ToArray();
+                            values[key] = new List<object>(v) { val }.ToArray();
                         }
                         else
                         {
