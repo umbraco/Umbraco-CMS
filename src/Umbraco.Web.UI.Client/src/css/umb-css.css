@@ -3,6 +3,7 @@
 	--umb-header-layout-height: 70px;
 	--umb-section-sidebar-width: 300px;
 	--umb-card-medium-min-width: 160px;
+	--umb-card-large-min-width: 250px;
 }
 
 @font-face {

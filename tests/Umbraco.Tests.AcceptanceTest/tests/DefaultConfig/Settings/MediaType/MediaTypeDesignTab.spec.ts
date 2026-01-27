@@ -206,7 +206,7 @@ test('can create a media type with multiple groups', {tag: '@smoke'}, async ({um
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickAddGroupButton();
   await umbracoUi.mediaType.enterGroupName(secondGroupName, 1);
-  await umbracoUi.mediaType.addPropertyEditor(secondDataTypeName, 1);
+  await umbracoUi.mediaType.addPropertyEditor(secondDataTypeName, 2);
   await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
   // Assert

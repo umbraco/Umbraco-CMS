@@ -1,5 +1,15 @@
 import { UmbEntityDataPickerInputContext } from './input-entity-data.context.js';
-import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	nothing,
+	when,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -133,6 +143,9 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
+	@state()
+	private _modalRoute?: string;
+
 	#pickerInputContext = new UmbEntityDataPickerInputContext(this);
 
 	constructor() {
@@ -163,6 +176,10 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		);
 
 		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+
+		this.observe(this.#pickerInputContext.modalRoute, (modalRoute) => {
+			this._modalRoute = modalRoute;
+		});
 	}
 
 	protected override getFormElement() {
@@ -184,7 +201,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				@click=${() => this.#pickerInputContext.openPicker()}
+				href=${ifDefined(this._modalRoute)}
 				label="${this.localize.term('general_choose')}"
 				?disabled=${this.readonly}></uui-button>
 		`;

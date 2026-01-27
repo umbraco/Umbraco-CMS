@@ -593,7 +593,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // would ensure that items without a value always come last, both in ASC and DESC-ending sorts
         }
 
+        /// <summary>
+        ///     Gets a page of content items.
+        /// </summary>
+        /// <param name="query">The query to filter by parent.</param>
+        /// <param name="pageIndex">The page index.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of records.</param>
+        /// <param name="filter">Additional query filter.</param>
+        /// <param name="ordering">Ordering information.</param>
+        [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
         public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, IQuery<TEntity>? filter, Ordering? ordering);
+
+        /// <summary>
+        ///     Gets a page of content items with optional property filtering.
+        /// </summary>
+        /// <param name="query">The query to filter by parent.</param>
+        /// <param name="pageIndex">The page index.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of records.</param>
+        /// <param name="propertyAliases">
+        ///     The property aliases to load. If null, all properties are loaded.
+        ///     If empty array, no custom properties are loaded.
+        /// </param>
+        /// <param name="filter">Additional query filter.</param>
+        /// <param name="ordering">Ordering information.</param>
+        // TODO (V19): Make this method abstract.
+#pragma warning disable CS0618 // Type or member is obsolete
+        public virtual IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering)
+            => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
@@ -756,7 +785,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return mapDtos(pagedResult.Items);
         }
 
+        /// <summary>
+        ///     Gets property collections for content items, loading all properties.
+        /// </summary>
         protected IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps)
+            where T : class, IContentBase
+            => GetPropertyCollections(temps, propertyAliases: null);
+
+        /// <summary>
+        ///     Gets property collections for content items with optional property filtering.
+        /// </summary>
+        /// <param name="temps">The temporary content items.</param>
+        /// <param name="propertyAliases">
+        ///     The property aliases to load. If null, all properties are loaded.
+        ///     If empty array, no custom properties are loaded.
+        /// </param>
+        protected IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, string[]? propertyAliases)
             where T : class, IContentBase
         {
             var versions = new List<int>();
@@ -774,6 +818,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return new Dictionary<int, PropertyCollection>();
             }
 
+            // If propertyAliases is an empty array, return empty property collections (no custom properties to load).
+            if (propertyAliases is { Length: 0 })
+            {
+                return temps.ToDictionary(
+                    temp => temp.VersionId,
+                    _ => new PropertyCollection(new List<IProperty>()));
+            }
+
             // TODO: This is a bugger of a query and I believe is the main issue with regards to SQL performance drain when querying content
             // which is done when rebuilding caches/indexes/etc... in bulk. We are using an "IN" query on umbracoPropertyData.VersionId
             // which then performs a Clustered Index Scan on PK_umbracoPropertyData which means it iterates the entire table which can be enormous!
@@ -781,16 +833,35 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // So is it possible to return this property data without doing an index scan on PK_umbracoPropertyData and without iterating every row
             // in the table?
 
-            // get all PropertyDataDto for all definitions / versions
-            var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
-                SqlContext.Sql()
-                    .Select<PropertyDataDto>()
-                    .From<PropertyDataDto>()
-                    .WhereIn<PropertyDataDto>(x => x.VersionId, batch))
-                .ToList();
+            List<PropertyDataDto> propertyDataDtos;
+
+            if (propertyAliases is { Length: > 0 })
+            {
+                // Only specific properties are requested.
+                // Filter by property alias at SQL level using INNER JOIN to PropertyTypeDto.
+                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
+                    SqlContext.Sql()
+                        .Select<PropertyDataDto>()
+                        .From<PropertyDataDto>()
+                        .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id)
+                        .WhereIn<PropertyDataDto>(x => x.VersionId, batch)
+                        .WhereIn<PropertyTypeDto>(x => x.Alias, propertyAliases))
+                    .ToList();
+            }
+            else
+            {
+                // Get all properties (no filtering by property alias).
+                // This provides the existing behavior from before property alias filtering was implemented.
+                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
+                    SqlContext.Sql()
+                        .Select<PropertyDataDto>()
+                        .From<PropertyDataDto>()
+                        .WhereIn<PropertyDataDto>(x => x.VersionId, batch))
+                    .ToList();
+            }
 
             // get PropertyDataDto distinct PropertyTypeDto
-            var allPropertyTypeIds = allPropertyDataDtos.Select(x => x.PropertyTypeId).Distinct().ToList();
+            var allPropertyTypeIds = propertyDataDtos.Select(x => x.PropertyTypeId).Distinct().ToList();
             IEnumerable<PropertyTypeDto> allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, Constants.Sql.MaxParameterCount, batch =>
                 SqlContext.Sql()
                     .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
@@ -800,7 +871,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // index the types for perfs, and assign to PropertyDataDto
             var indexedPropertyTypeDtos = allPropertyTypeDtos.ToDictionary(x => x.Id, x => x);
-            foreach (PropertyDataDto a in allPropertyDataDtos)
+            foreach (PropertyDataDto a in propertyDataDtos)
             {
                 a.PropertyTypeDto = indexedPropertyTypeDtos[a.PropertyTypeId];
             }
@@ -810,7 +881,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // - all property data dtos
             // - tag editors (Actually ... no we don't since i removed that code, but we don't need them anyways it seems)
             // and we need to build the proper property collections
-            return GetPropertyCollections(temps, allPropertyDataDtos);
+            return GetPropertyCollections(temps, propertyDataDtos);
         }
 
         private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos)
