@@ -305,6 +305,41 @@ public class ImageSharpImageUrlGeneratorTests
     }
 
     /// <summary>
+    /// Test that format parameter is placed before width/height in the query string.
+    /// ImageSharp.Web processes commands in query string order, so format must come first
+    /// to ensure the configured encoder settings are applied correctly.
+    /// </summary>
+    [Test]
+    public void GetImageUrl_FormatBeforeWidthHeight()
+    {
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        {
+            Width = 800,
+            Height = 600,
+            FurtherOptions = "format=webp",
+        });
+
+        Assert.AreEqual(MediaPath + "?format=webp&width=800&height=600", urlString);
+    }
+
+    /// <summary>
+    /// Test that format parameter is placed before width/height even with other options.
+    /// </summary>
+    [Test]
+    public void GetImageUrl_FormatBeforeWidthHeightWithQuality()
+    {
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        {
+            Width = 800,
+            Height = 600,
+            Quality = 75,
+            FurtherOptions = "format=webp",
+        });
+
+        Assert.AreEqual(MediaPath + "?format=webp&width=800&height=600&quality=75", urlString);
+    }
+
+    /// <summary>
     /// Test to check result when using a HMAC security key.
     /// </summary>
     [Test]

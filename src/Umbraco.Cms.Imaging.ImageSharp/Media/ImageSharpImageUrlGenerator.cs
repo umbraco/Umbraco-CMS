@@ -88,6 +88,15 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add(ResizeWebProcessor.Anchor, imageCropAnchor.ToString().ToLowerInvariant());
         }
 
+        // Format must be added before width/height to ensure ImageSharp.Web applies the
+        // configured encoder settings correctly. ImageSharp.Web processes commands in query
+        // string order, and placing format after resize can cause incorrect encoder selection
+        // when the resize is a no-op (dimensions match original).
+        if (furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
+        {
+            queryString.Add(FormatWebProcessor.Format, format.ToString());
+        }
+
         if (options.Width is int width)
         {
             queryString.Add(ResizeWebProcessor.Width, width.ToString(CultureInfo.InvariantCulture));
@@ -96,11 +105,6 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
         if (options.Height is int height)
         {
             queryString.Add(ResizeWebProcessor.Height, height.ToString(CultureInfo.InvariantCulture));
-        }
-
-        if (furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
-        {
-            queryString.Add(FormatWebProcessor.Format, format.ToString());
         }
 
         if (options.Quality is int quality)
