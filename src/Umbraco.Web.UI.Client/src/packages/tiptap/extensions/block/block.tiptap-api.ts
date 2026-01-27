@@ -28,7 +28,7 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 				(contents) => {
 					this.#updateBlocks(contents);
 				},
-				'_observeLayouts',
+				'_observeContents',
 			);
 		});
 	}
