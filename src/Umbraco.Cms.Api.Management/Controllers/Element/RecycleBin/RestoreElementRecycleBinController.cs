@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -13,54 +14,46 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Element;
+namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
 [ApiVersion("1.0")]
-public class MoveElementController : ElementControllerBase
+public class RestoreElementRecycleBinController : ElementRecycleBinControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public MoveElementController(
+    public RestoreElementRecycleBinController(
         IAuthorizationService authorizationService,
         IElementEditingService elementEditingService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IEntityService entityService,
+        IElementPresentationFactory elementPresentationFactory)
+        : base(entityService, elementPresentationFactory)
     {
         _authorizationService = authorizationService;
         _elementEditingService = elementEditingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{id:guid}/move")]
+    [HttpPut("{id:guid}/restore")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveElementRequestModel moveElementRequestModel)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Restore(CancellationToken cancellationToken, Guid id, MoveElementRequestModel moveElementRequestModel)
     {
-        // Check Move permission on source element
-        AuthorizationResult sourceAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementPermissionResource.WithKeys(ActionElementMove.ActionLetter, id),
+            ElementPermissionResource.RecycleBin(ActionElementMove.ActionLetter),
             AuthorizationPolicies.ElementPermissionByResource);
 
-        if (!sourceAuthorizationResult.Succeeded)
+        if (!authorizationResult.Succeeded)
         {
             return Forbidden();
         }
 
-        // Check Create permission on target (where we're moving to)
-        AuthorizationResult targetAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
-            User,
-            ElementPermissionResource.WithKeys(ActionElementNew.ActionLetter, moveElementRequestModel.Target?.Id),
-            AuthorizationPolicies.ElementPermissionByResource);
-
-        if (!targetAuthorizationResult.Succeeded)
-        {
-            return Forbidden();
-        }
-
-        Attempt<IElement?, ContentEditingOperationStatus> result = await _elementEditingService.MoveAsync(
+        Attempt<IElement?, ContentEditingOperationStatus> result = await _elementEditingService.RestoreAsync(
             id,
             moveElementRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
