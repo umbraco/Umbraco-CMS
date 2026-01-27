@@ -112,6 +112,8 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('documentStartNodeUniques', selection);
+		// When specific start nodes are selected, disable root access
+		this.#workspaceContext?.updateProperty('hasDocumentRootAccess', false);
 	}
 
 	#onAllowAllElementsChange(event: UUIBooleanInputEvent) {
@@ -130,6 +132,8 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('elementStartNodeUniques', selection);
+		// When specific start nodes are selected, disable root access
+		this.#workspaceContext?.updateProperty('hasElementRootAccess', false);
 	}
 
 	#onAllowAllMediaChange(event: UUIBooleanInputEvent) {
@@ -148,6 +152,8 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', selection);
+		// When specific start nodes are selected, disable root access
+		this.#workspaceContext?.updateProperty('hasMediaRootAccess', false);
 	}
 
 	override render() {
