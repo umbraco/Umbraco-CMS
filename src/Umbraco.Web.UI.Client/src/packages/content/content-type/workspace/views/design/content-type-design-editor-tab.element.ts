@@ -38,7 +38,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			onChange: ({ model }) => {
 				this._groups = model;
 			},
-			onContainerChange: ({ item }) => {
+			onContainerChange: async ({ item }) => {
 				if (this.#containerId === undefined) {
 					throw new Error('ContainerId is not set');
 				}
@@ -48,8 +48,23 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 						'OwnerId is not set for the given container, we cannot move containers that are not owned by the current Document.',
 					);
 				}
+
+				let containerId = this.#containerId;
+				// ensure container is local:
+				if (containerId !== null) {
+					const structureManager = this.#groupStructureHelper.getStructureManager();
+					if (!structureManager) {
+						throw new Error('Could not get Structure Manager from Structure Helper');
+					}
+					const container = await structureManager.ensureContainerOf(
+						containerId,
+						structureManager.getOwnerContentType()!.unique,
+					);
+					containerId = container?.id || null;
+				}
+
 				this.#groupStructureHelper.partialUpdateContainer(item.ownerId, {
-					parent: this.#containerId ? { id: this.#containerId } : null,
+					parent: containerId ? { id: containerId } : null,
 				});
 			},
 			onEnd: ({ item }) => {
@@ -244,7 +259,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	override render() {
 		return html`
 			${
-				this.#containerId
+				this.#containerId !== undefined
 					? html`
 							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
 								<umb-content-type-design-editor-properties

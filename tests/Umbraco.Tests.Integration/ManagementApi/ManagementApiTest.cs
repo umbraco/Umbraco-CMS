@@ -207,6 +207,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     private class TokenModel
     {
-        [JsonPropertyName("access_token")] public string AccessToken { get; set; }
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; }
     }
 }

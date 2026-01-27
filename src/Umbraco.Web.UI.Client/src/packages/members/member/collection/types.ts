@@ -1,10 +1,8 @@
 import type { UmbMemberDetailModel } from '../types.js';
+import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
-export interface UmbMemberCollectionFilterModel {
-	skip?: number;
-	take?: number;
+export interface UmbMemberCollectionFilterModel extends UmbCollectionFilterModel {
 	memberTypeId?: string;
-	filter?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

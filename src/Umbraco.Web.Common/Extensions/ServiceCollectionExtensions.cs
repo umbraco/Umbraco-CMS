@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
     ///     Create and configure the logger.
     /// </summary>
     /// <remarks>
-    ///     Additional Serilog services are registered during <see cref="HostBuilderExtensions.ConfigureUmbracoDefaults" />.
+    ///     Additional Serilog services are registered during <see cref="HostBuilderExtensions.ConfigureUmbracoDefaults(IHostBuilder)" />.
     /// </remarks>
     public static IServiceCollection AddLogger(
         this IServiceCollection services,

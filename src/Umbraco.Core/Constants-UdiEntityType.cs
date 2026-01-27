@@ -30,7 +30,7 @@ public static partial class Constants
         public const string MemberTypeContainer = "member-type-container";
         public const string MemberGroup = "member-group";
         public const string Member = "member";
-      
+
         public const string DataType = "data-type";
         public const string DataTypeContainer = "data-type-container";
 
@@ -39,7 +39,7 @@ public static partial class Constants
         public const string MediaType = "media-type";
         public const string MediaTypeContainer = "media-type-container";
         public const string Relation = "relation";
-      
+
         public const string RelationType = "relation-type";
         public const string Template = "template";
         public const string User = "user";

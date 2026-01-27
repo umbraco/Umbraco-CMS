@@ -15,6 +15,12 @@ import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
 
+/**
+ * Template alias pattern - allows first character to be a letter, digit, or underscore.
+ * Mirrors server-side CleanStringType.UnderscoreAlias behavior.
+ */
+const UMB_TEMPLATE_ALIAS_PATTERN = '^[A-Za-z0-9_][A-Za-z0-9_-]{0,254}$';
+
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#modalContext?: UmbModalManagerContext;
@@ -169,6 +175,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					placeholder=${this.localize.term('placeholders_entername')}
 					.value=${this._name}
 					.alias=${this._alias}
+					alias-pattern=${UMB_TEMPLATE_ALIAS_PATTERN}
 					?auto-generate-alias=${this.#isNew}
 					@change=${this.#onNameAndAliasChange}
 					required

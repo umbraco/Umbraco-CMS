@@ -459,7 +459,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
     {
         // NodeId is named Id on TreeEntityPath = use an alias
-        Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, nameof(TreeEntityPath.Id)), x => x.Path)
+        Sql<ISqlContext> sql = Sql().Select<NodeDto>(
+                x => Alias(x.NodeId, nameof(TreeEntityPath.Id)),
+                x => x.Path,
+                x => Alias(x.UniqueId, nameof(TreeEntityPath.Key)))
             .From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
         filter?.Invoke(sql);
         return Database.Fetch<TreeEntityPath>(sql);
