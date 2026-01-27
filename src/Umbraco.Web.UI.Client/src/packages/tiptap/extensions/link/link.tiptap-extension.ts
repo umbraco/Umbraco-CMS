@@ -32,9 +32,6 @@ export const UmbLink = Link.extend({
 	addCommands() {
 		return {
 			ensureUmbLink: (attributes) => {
-				// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				return ({ editor, chain }) => {
 					if (editor.isActive(this.name)) {
 						return true;
@@ -42,9 +39,6 @@ export const UmbLink = Link.extend({
 					return chain().setMark(this.name, attributes).setMeta('preventAutolink', true).run();
 				};
 			},
-			// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			setUmbLink: (attributes) => {
 				return ({ chain }) => {
 					return chain().setMark(this.name, attributes).setMeta('preventAutolink', true).run();
