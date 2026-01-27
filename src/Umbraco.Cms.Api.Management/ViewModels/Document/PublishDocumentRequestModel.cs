@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
+namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
 public class PublishDocumentRequestModel
 {
     public required IEnumerable<CultureAndScheduleRequestModel> PublishSchedules { get; set; }
 }
-
 
 public class CultureAndScheduleRequestModel
 {
