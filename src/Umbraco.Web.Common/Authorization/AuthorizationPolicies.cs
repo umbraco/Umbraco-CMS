@@ -55,10 +55,12 @@ public static class AuthorizationPolicies
 
     // Custom access based on multiple trees
     public const string TreeAccessDocumentsOrDocumentTypes = nameof(TreeAccessDocumentsOrDocumentTypes);
+    public const string TreeAccessDocumentsOrElementsOrDocumentTypes = nameof(TreeAccessDocumentsOrElementsOrDocumentTypes);
     public const string TreeAccessMediaOrMediaTypes = nameof(TreeAccessMediaOrMediaTypes);
     public const string TreeAccessDictionaryOrTemplates = nameof(TreeAccessDictionaryOrTemplates);
     public const string TreeAccessDocumentOrMediaOrContentTypes = nameof(TreeAccessDocumentOrMediaOrContentTypes);
     public const string TreeAccessDocumentsOrMediaOrMembersOrContentTypes = nameof(TreeAccessDocumentsOrMediaOrMembersOrContentTypes);
+    public const string TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes = nameof(TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes);
     public const string TreeAccessStylesheetsOrDocumentOrMediaOrMember = nameof(TreeAccessStylesheetsOrDocumentOrMediaOrMember);
     public const string TreeAccessMembersOrMemberTypes = nameof(TreeAccessMembersOrMemberTypes);
 

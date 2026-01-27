@@ -79,13 +79,13 @@ internal sealed class MemberContentEditingService
     public async Task<Attempt<IMember?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, false);
 
-    protected override IMember New(string? name, int parentId, Guid? parentKey, IMemberType memberType)
+    protected override IMember New(string? name, int parentId, IMemberType memberType)
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
-    protected override OperationResult? Move(IMember member, int newParentId, Guid? newParentKey, int userId)
+    protected override OperationResult? Move(IMember member, int newParentId, int userId)
         => throw new InvalidOperationException("Move is not supported for members");
 
-    protected override IMember? Copy(IMember member, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     protected override OperationResult? MoveToRecycleBin(IMember member, int userId)

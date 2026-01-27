@@ -54,7 +54,7 @@ public class EmptyElementRecycleBinControllerTests : ElementRecycleBinController
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.OK };
+        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };

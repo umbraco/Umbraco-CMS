@@ -28,6 +28,17 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     OperationResult Delete(TContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Deletes all content of given types.
+    /// </summary>
+    /// <param name="contentTypeIds">The content type identifiers.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <remarks>
+    ///     <para>All non-deleted descendants of the deleted content is moved to the recycle bin.</para>
+    ///     <para>This operation is potentially dangerous and expensive.</para>
+    /// </remarks>
+    void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>
     /// <param name="contentId">The unique identifier of the content to load schedule for.</param>

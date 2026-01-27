@@ -20,6 +20,7 @@ internal sealed class ElementEditingService
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
+    private readonly IIdKeyMap _idKeyMap;
 
     public ElementEditingService(
         IElementService elementService,
@@ -34,7 +35,8 @@ internal sealed class ElementEditingService
         IRelationService relationService,
         IElementContainerService containerService,
         ContentTypeFilterCollection contentTypeFilters,
-        IEventMessagesFactory eventMessagesFactory)
+        IEventMessagesFactory eventMessagesFactory,
+        IIdKeyMap idKeyMap)
         : base(
             elementService,
             contentTypeService,
@@ -52,6 +54,7 @@ internal sealed class ElementEditingService
         _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
         _eventMessagesFactory = eventMessagesFactory;
+        _idKeyMap = idKeyMap;
     }
 
     public Task<IElement?> GetAsync(Guid key)
@@ -135,7 +138,7 @@ internal sealed class ElementEditingService
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, true);
 
-    protected override IElement New(string? name, int parentId, Guid? parentKey, IContentType contentType)
+    protected override IElement New(string? name, int parentId, IContentType contentType)
         => new Element(name, parentId, contentType);
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
@@ -305,8 +308,24 @@ internal sealed class ElementEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    protected override IElement? Copy(IElement element, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override IElement? Copy(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
     {
+        Guid? newParentKey;
+        if (newParentId is Constants.System.Root)
+        {
+            newParentKey = Constants.System.RootKey;
+        }
+        else
+        {
+            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(newParentId, UmbracoObjectTypes.ElementContainer);
+            if (parentKeyAttempt.Success is false)
+            {
+                return null;
+            }
+
+            newParentKey = parentKeyAttempt.Result;
+        }
+
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
 
@@ -350,11 +369,8 @@ internal sealed class ElementEditingService
     protected override OperationResult? Delete(IElement element, int userId)
         => ContentService.Delete(element, userId);
 
-    /// <summary>
-    ///     NB: Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
-    ///     but there are others that are not required to be implemented in the case of blueprints, therefore they throw NotImplementedException as default.
-    /// </summary>
-    protected override OperationResult? Move(IElement element, int newParentId, Guid? newParentKey, int userId) => throw new NotImplementedException();
+    // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
+    protected override OperationResult? Move(IElement element, int newParentId, int userId) => throw new NotImplementedException();
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
     {

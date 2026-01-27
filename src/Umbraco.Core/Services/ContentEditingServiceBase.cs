@@ -57,11 +57,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         _contentTypeFilters = contentTypeFilters;
     }
 
-    protected abstract TContent New(string? name, int parentId, Guid? parentKey, TContentType contentType);
+    protected abstract TContent New(string? name, int parentId, TContentType contentType);
 
-    protected abstract OperationResult? Move(TContent content, int newParentId, Guid? newParentKey, int userId);
+    protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
 
-    protected abstract TContent? Copy(TContent content, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId);
+    protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId);
 
     protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
 
@@ -99,7 +99,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         //       instead, the error state and validation errors will be communicated in the return value.
         Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
 
-        TContent content = New(null, parent.ParentId ?? Constants.System.Root, contentCreationModelBase.ParentKey, contentType);
+        TContent content = New(null, parent.ParentId ?? Constants.System.Root, contentType);
         if (contentCreationModelBase.Key.HasValue)
         {
             content.Key = contentCreationModelBase.Key.Value;
@@ -281,7 +281,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, parentKey, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
 
         scope.Complete();
 
@@ -306,7 +306,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, parentKey, relateToOriginal, includeDescendants, userId);
+        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here

@@ -33,7 +33,7 @@ export interface UmbTableColumn {
 	allowSorting?: boolean;
 	align?: 'left' | 'center' | 'right';
 	labelTemplate?: string;
-	clipText? : boolean;
+	clipText?: boolean;
 }
 
 export interface UmbTableColumnLayoutElement extends HTMLElement {
