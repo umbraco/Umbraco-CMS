@@ -696,4 +696,82 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         Assert.AreEqual("200", updatedContent.GetValue<string>("price", "en-US", "premium"));
         Assert.AreEqual("100", updatedContent.GetValue<string>("price", "en-US", "standard")); // Unchanged
     }
+
+    [Test]
+    public async Task PatchDocument_DocumentInRecycleBin_AllowsPatch()
+    {
+        // Arrange - Authenticate as admin
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+
+        // Create simple content type
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("simpleDoc")
+            .WithName("Simple Document")
+            .WithContentVariation(ContentVariation.Nothing)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // Create and immediately delete document (move to recycle bin)
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .Build();
+        ContentService.Save(content);
+        ContentService.MoveToRecycleBin(content);
+
+        var documentKey = content.Key;
+
+        // Try to patch document in recycle bin
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "replace",
+                    Path = "$.variants[?(@.culture == null && @.segment == null)].name",
+                    Value = "Updated Name"
+                }
+            }
+        };
+
+        // Act
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+
+        // Assert - Umbraco allows patching documents in recycle bin (they can be edited before permanent deletion)
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Test]
+    public async Task PatchDocument_NonExistentDocument_ReturnsNotFound()
+    {
+        // Arrange - Authenticate as admin
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+
+        var nonExistentKey = Guid.NewGuid();
+
+        // Try to patch non-existent document
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "replace",
+                    Path = "$.variants[?(@.culture == null && @.segment == null)].name",
+                    Value = "Updated Name"
+                }
+            }
+        };
+
+        // Act
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{nonExistentKey}", httpContent);
+
+        // Assert
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }
