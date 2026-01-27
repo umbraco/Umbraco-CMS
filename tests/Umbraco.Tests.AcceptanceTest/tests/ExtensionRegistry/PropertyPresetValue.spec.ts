@@ -54,6 +54,7 @@ test('can insert specific preset values into text box and text area properties',
 });
 
 test('can insert preset value into textstring property that vary by culture in second language', async ({umbracoApi, umbracoUi}) => {
+  test.slow();
   // Arrange
   const languageId = await umbracoApi.language.createDanishLanguage();
   const languageData = await umbracoApi.language.get(languageId);

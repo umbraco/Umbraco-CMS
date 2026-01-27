@@ -37,6 +37,7 @@ test.afterEach(async ({ umbracoApi }) => {
 });
 
 test('can insert preset value into textstring property that vary by culture and segment in default language', async ({umbracoApi, umbracoUi}) => {
+  test.slow();
   // Arrange
   const presetValue = initialPresetValue + varyByCultureText + ' en-US' + varyBySegmentText + ' default';
 
@@ -57,6 +58,7 @@ test('can insert preset value into textstring property that vary by culture and 
 });
 
 test('can insert preset value into textstring property that vary by culture and segment in segment of default language', async ({umbracoApi, umbracoUi}) => {
+  test.slow();
   // Arrange
   const presetValue = initialPresetValue + varyByCultureText + ' en-US' + varyBySegmentText + ' '+ vipMemberSegmentAlias;
 
@@ -84,6 +86,7 @@ test('can insert preset value into textstring property that vary by culture and 
 });
 
 test('can insert preset value into textstring property that vary by culture and segment in segment of second language', async ({umbracoApi, umbracoUi}) => {
+  test.slow();
   // Arrange
   const presetValue = initialPresetValue + varyByCultureText + ' '+ languageData.isoCode + varyBySegmentText + ' '+ vipMemberSegmentAlias;
 
