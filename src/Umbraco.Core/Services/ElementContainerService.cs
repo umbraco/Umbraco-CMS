@@ -1,5 +1,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -18,6 +20,8 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     private readonly IElementRepository _elementRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementService _elementService;
+    private readonly IOptionsMonitor<ContentSettings> _contentSettingsOptions;
+    private readonly IRelationService _relationService;
     private readonly ILogger<ElementContainerService> _logger;
 
     // internal so the tests can reach it
@@ -34,6 +38,8 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IEntityService entityService,
         IElementRepository elementRepository,
         IElementService elementService,
+        IOptionsMonitor<ContentSettings> contentSettingsOptions,
+        IRelationService relationService,
         ILogger<ElementContainerService> logger)
         : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
@@ -42,6 +48,8 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         _entityService = entityService;
         _elementRepository = elementRepository;
         _elementService = elementService;
+        _contentSettingsOptions = contentSettingsOptions;
+        _relationService = relationService;
         _logger = logger;
     }
 
@@ -151,6 +159,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return deleteResult;
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -165,41 +174,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
 
-        long total;
-        do
-        {
-            IEnumerable<IEntitySlim> recycleBinRootItems = _entityService.GetPagedChildren(
-                Constants.System.RecycleBinElementKey,
-                [UmbracoObjectTypes.ElementContainer],
-                [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
-                0, // pageIndex = 0 because we continuously delete items as we move through the descendants
-                DescendantsIteratorPageSize,
-                trashed: true,
-                out total);
-
-            foreach (IEntitySlim recycleBinRootItem in recycleBinRootItems)
-            {
-                DeleteDescendantsLocked(recycleBinRootItem.Key);
-
-                if (recycleBinRootItem.NodeObjectType == Constants.ObjectTypes.Element)
-                {
-                    IElement? element = _elementRepository.Get(recycleBinRootItem.Key);
-                    if (element is not null)
-                    {
-                        _elementRepository.Delete(element);
-                    }
-                }
-                else
-                {
-                    EntityContainer? container = await GetAsync(recycleBinRootItem.Key);
-                    if (container is not null)
-                    {
-                        _entityContainerRepository.Delete(container);
-                    }
-                }
-            }
-        }
-        while (total > DescendantsIteratorPageSize);
+        DeleteDescendantsLocked(Constants.System.RecycleBinElementKey, scope, eventMessages);
 
         await AuditAsync(AuditType.Delete, userKey, Constants.System.RecycleBinElement, "Recycle bin emptied");
 
@@ -346,7 +321,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 
-        DeleteDescendantsLocked(container.Key);
+        DeleteDescendantsLocked(container.Key, scope, eventMessages);
 
         _entityContainerRepository.Delete(container);
 
@@ -358,9 +333,13 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
     }
 
-    private void DeleteDescendantsLocked(Guid key)
+    private void DeleteDescendantsLocked(Guid key, ICoreScope scope, EventMessages eventMessages)
     {
         long total;
+        var skip = 0;
+
+        // Order by path descending to ensure children are deleted before parents
+        var pathDescendingOrdering = Ordering.By("Path", Direction.Descending);
 
         do
         {
@@ -368,27 +347,46 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                 key,
                 UmbracoObjectTypes.ElementContainer,
                 [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
-                0, // pageIndex = 0 because we continuously delete items as we move through the descendants
+                skip,
                 DescendantsIteratorPageSize,
-                out total);
+                out total,
+                ordering: pathDescendingOrdering);
 
+            var skippedThisIteration = 0;
             foreach (IEntitySlim descendant in descendants)
             {
-                if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
+                // Check if referenced before fetching the full entity
+                if (_contentSettingsOptions.CurrentValue.DisableDeleteWhenReferenced
+                    && _relationService.IsRelated(descendant.Id, RelationDirectionFilter.Child, null))
                 {
-                    EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
-                                                          ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
-                    _entityContainerRepository.Delete(descendantContainer);
+                    skippedThisIteration++;
+                    continue;
                 }
-                else
-                {
-                    IElement descendantElement = _elementRepository.Get(descendant.Id)
-                                                 ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
-                    _elementRepository.Delete(descendantElement);
-                }
+
+                DeleteItem(scope, descendant, eventMessages);
             }
+
+            skip += skippedThisIteration;
         }
-        while (total > DescendantsIteratorPageSize);
+        while (total > skip + DescendantsIteratorPageSize);
+    }
+
+    private void DeleteItem(ICoreScope scope, IEntitySlim descendant, EventMessages eventMessages)
+    {
+        if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
+        {
+            EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
+                                                  ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
+            _entityContainerRepository.Delete(descendantContainer);
+            scope.Notifications.Publish(new EntityContainerDeletedNotification(descendantContainer, eventMessages));
+        }
+        else
+        {
+            IElement descendantElement = _elementRepository.Get(descendant.Id)
+                                         ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
+            _elementRepository.Delete(descendantElement);
+            scope.Notifications.Publish(new ElementDeletedNotification(descendantElement, eventMessages));
+        }
     }
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.Element;

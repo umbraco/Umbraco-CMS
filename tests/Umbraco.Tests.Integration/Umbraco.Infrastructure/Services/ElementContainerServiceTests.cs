@@ -33,7 +33,8 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         .AddNotificationHandler<EntityContainerMovingToRecycleBinNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerMovedToRecycleBinNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerDeletingNotification, EntityContainerNotificationHandler>()
-        .AddNotificationHandler<EntityContainerDeletedNotification, EntityContainerNotificationHandler>();
+        .AddNotificationHandler<EntityContainerDeletedNotification, EntityContainerNotificationHandler>()
+        .AddNotificationHandler<ElementDeletedNotification, ElementNotificationHandler>();
 
     private IEntitySlim[] GetAtRoot()
         => EntityService.GetRootEntities(UmbracoObjectTypes.ElementContainer).Union(EntityService.GetRootEntities(UmbracoObjectTypes.Element)).ToArray();
@@ -195,5 +196,12 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         public void Handle(EntityContainerDeletingNotification notification) => DeletingContainer?.Invoke(notification);
 
         public void Handle(EntityContainerDeletedNotification notification) => DeletedContainer?.Invoke(notification);
+    }
+
+    private sealed class ElementNotificationHandler : INotificationHandler<ElementDeletedNotification>
+    {
+        public static Action<ElementDeletedNotification>? DeletedElement { get; set; }
+
+        public void Handle(ElementDeletedNotification notification) => DeletedElement?.Invoke(notification);
     }
 }
