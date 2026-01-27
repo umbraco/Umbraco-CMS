@@ -31,8 +31,9 @@ public class DocumentUrlDto
     public bool IsDraft { get; set; }
 
     [Column(LanguageIdColumnName)]
+    [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(LanguageDto))]
-    public int LanguageId { get; set; }
+    public int? LanguageId { get; set; }
 
     [Column(UrlSegmentColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]

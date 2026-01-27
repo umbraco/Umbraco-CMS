@@ -127,4 +127,66 @@ public class DocumentUrlServiceTests
         //  - Previous implementation (versions 15.5 through 17.0, optimized algorithm): ~75ms
         //  - Current implementation (17.1+, refactored for memory optimization, same performance as previous): ~75ms
     }
+
+    [Test]
+    public void ConvertToCacheModel_Handles_Null_LanguageId_For_Invariant_Content()
+    {
+        var documentKey = Guid.NewGuid();
+        var segments = new List<PublishedDocumentUrlSegment>
+        {
+            new()
+            {
+                DocumentKey = documentKey,
+                IsDraft = false,
+                IsPrimary = true,
+                LanguageId = null, // Invariant content uses NULL
+                UrlSegment = "test-segment",
+            },
+        };
+        var cacheModels = DocumentUrlService.ConvertToCacheModel(segments).ToList();
+
+        Assert.AreEqual(1, cacheModels.Count);
+        Assert.AreEqual(documentKey, cacheModels[0].Key.DocumentKey);
+        Assert.IsNull(cacheModels[0].Key.LanguageId, "Invariant content should have NULL LanguageId");
+        Assert.IsFalse(cacheModels[0].Key.IsDraft);
+        Assert.AreEqual("test-segment", cacheModels[0].Cache.PrimarySegment);
+        Assert.IsNull(cacheModels[0].Cache.AlternateSegments);
+    }
+
+    [Test]
+    public void ConvertToCacheModel_Handles_Mixed_Invariant_And_Variant_Content()
+    {
+        var invariantDocKey = Guid.NewGuid();
+        var variantDocKey = Guid.NewGuid();
+        var segments = new List<PublishedDocumentUrlSegment>
+        {
+            new()
+            {
+                DocumentKey = invariantDocKey,
+                IsDraft = false,
+                IsPrimary = true,
+                LanguageId = null, // Invariant content
+                UrlSegment = "invariant-segment",
+            },
+            new()
+            {
+                DocumentKey = variantDocKey,
+                IsDraft = false,
+                IsPrimary = true,
+                LanguageId = 1, // Variant content
+                UrlSegment = "variant-segment",
+            },
+        };
+        var cacheModels = DocumentUrlService.ConvertToCacheModel(segments).ToList();
+
+        Assert.AreEqual(2, cacheModels.Count);
+
+        var invariantModel = cacheModels.First(m => m.Key.DocumentKey == invariantDocKey);
+        var variantModel = cacheModels.First(m => m.Key.DocumentKey == variantDocKey);
+
+        Assert.IsNull(invariantModel.Key.LanguageId, "Invariant content should have NULL LanguageId");
+        Assert.AreEqual(1, variantModel.Key.LanguageId, "Variant content should have specific LanguageId");
+        Assert.AreEqual("invariant-segment", invariantModel.Cache.PrimarySegment);
+        Assert.AreEqual("variant-segment", variantModel.Cache.PrimarySegment);
+    }
 }

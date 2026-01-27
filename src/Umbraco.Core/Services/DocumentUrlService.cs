@@ -65,9 +65,9 @@ public class DocumentUrlService : IDocumentUrlService
         public Guid DocumentKey { get; }
 
         /// <summary>
-        /// Gets the language Id.
+        /// Gets the language Id. NULL indicates invariant content (not language-specific).
         /// </summary>
-        public int LanguageId { get; }
+        public int? LanguageId { get; }
 
         /// <summary>
         /// Gets a value indicating whether the URL is for a draft or published version.
@@ -78,9 +78,9 @@ public class DocumentUrlService : IDocumentUrlService
         /// Initializes a new instance of the <see cref="UrlCacheKey"/> struct.
         /// </summary>
         /// <param name="documentKey">The document key.</param>
-        /// <param name="languageId">The language Id.</param>
+        /// <param name="languageId">The language Id. NULL for invariant content.</param>
         /// <param name="isDraft">A value indicating the draft or published value.</param>
-        public UrlCacheKey(Guid documentKey, int languageId, bool isDraft)
+        public UrlCacheKey(Guid documentKey, int? languageId, bool isDraft)
         {
             DocumentKey = documentKey;
             LanguageId = languageId;
@@ -97,7 +97,7 @@ public class DocumentUrlService : IDocumentUrlService
         public override bool Equals(object? obj) => obj is UrlCacheKey other && Equals(other);
 
         /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(DocumentKey, LanguageId, IsDraft);
+        public override int GetHashCode() => HashCode.Combine(DocumentKey, LanguageId ?? 0, IsDraft);
     }
 
     /// <summary>
@@ -300,12 +300,12 @@ public class DocumentUrlService : IDocumentUrlService
     internal static IEnumerable<(UrlCacheKey Key, UrlSegmentCache Cache)> ConvertToCacheModel(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
     {
         // Group segments by document/language/draft and collect primary + alternates.
-        var grouped = new Dictionary<(Guid DocumentKey, int LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)>();
+        var grouped = new Dictionary<(Guid DocumentKey, int? LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)>();
 
         foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
             // Group using composite key of document/language/draft.
-            (Guid DocumentKey, int LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
+            (Guid DocumentKey, int? LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
 
             if (grouped.TryGetValue(key, out (string? Primary, List<string> Alternates) segments) is false)
             {
@@ -325,9 +325,9 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         // Prepare output as a collection of key value pairs of the cache key (UrlCacheKey struct) and cache entry (UrlSegmentCache object).
-        foreach (KeyValuePair<(Guid DocumentKey, int LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)> kvp in grouped)
+        foreach (KeyValuePair<(Guid DocumentKey, int? LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)> kvp in grouped)
         {
-            (Guid documentKey, int languageId, bool isDraft) = kvp.Key;
+            (Guid documentKey, int? languageId, bool isDraft) = kvp.Key;
             (string? primary, List<string>? alternates) = kvp.Value;
 
             // Use first alternate as primary if no primary was marked.
@@ -354,7 +354,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, int languageId, bool isDraft)
+    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, int? languageId, bool isDraft)
     {
         UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
 
@@ -380,7 +380,7 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static UrlCacheKey CreateCacheKey(Guid documentKey, int languageId, bool isDraft) => new(documentKey, languageId, isDraft);
+    private static UrlCacheKey CreateCacheKey(Guid documentKey, int? languageId, bool isDraft) => new(documentKey, languageId, isDraft);
 
     /// <summary>
     /// Calculates the estimated memory usage of the document URL cache.
@@ -448,8 +448,16 @@ public class DocumentUrlService : IDocumentUrlService
             return null;
         }
 
+        // Try culture-specific lookup first
         UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
-        return _documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache) ? cache.PrimarySegment : null;
+        if (_documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache))
+        {
+            return cache.PrimarySegment;
+        }
+
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+        UrlCacheKey invariantKey = CreateCacheKey(documentKey, null, isDraft);
+        return _documentUrlCache.TryGetValue(invariantKey, out cache) ? cache.PrimarySegment : null;
     }
 
     private bool TryGetLanguageIdFromCulture(string culture, out int languageId)
@@ -481,8 +489,16 @@ public class DocumentUrlService : IDocumentUrlService
             return Enumerable.Empty<string>();
         }
 
+        // Try culture-specific lookup first
         UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
-        return _documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache)
+        if (_documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache))
+        {
+            return cache.GetAllSegments();
+        }
+
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+        UrlCacheKey invariantKey = CreateCacheKey(documentKey, null, isDraft);
+        return _documentUrlCache.TryGetValue(invariantKey, out cache)
             ? cache.GetAllSegments()
             : Enumerable.Empty<string>();
     }
@@ -552,9 +568,18 @@ public class DocumentUrlService : IDocumentUrlService
                 _logger.LogTrace("Rebuilding urls for document with key {DocumentKey}", document.Key);
             }
 
-            foreach ((string culture, ILanguage language) in languageDictionary)
+            if (document.ContentType.VariesByCulture())
             {
-                HandleCaching(_coreScopeProvider.Context!, document, document.ContentType.VariesByCulture() ? culture : null, language, toSave);
+                // Variant content: process per language
+                foreach ((string culture, ILanguage language) in languageDictionary)
+                {
+                    HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave);
+                }
+            }
+            else
+            {
+                // Invariant content: process once with NULL languageId
+                HandleCaching(_coreScopeProvider.Context!, document, null, null, toSave);
             }
         }
 
@@ -575,9 +600,9 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<PublishedDocumentUrlSegment> toSave)
+    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, int? languageId, List<PublishedDocumentUrlSegment> toSave)
     {
-        foreach ((UrlCacheKey cacheKey, UrlSegmentCache? cache, bool shouldCache) in GenerateCacheEntries(document, culture, language))
+        foreach ((UrlCacheKey cacheKey, UrlSegmentCache? cache, bool shouldCache) in GenerateCacheEntries(document, culture, languageId))
         {
             if (shouldCache is false || cache is null)
             {
@@ -591,7 +616,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private IEnumerable<(UrlCacheKey CacheKey, UrlSegmentCache? Cache, bool ShouldCache)> GenerateCacheEntries(IContent document, string? culture, ILanguage language)
+    private IEnumerable<(UrlCacheKey CacheKey, UrlSegmentCache? Cache, bool ShouldCache)> GenerateCacheEntries(IContent document, string? culture, int? languageId)
     {
         // Published version
         if (document.Trashed is false
@@ -604,7 +629,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                var cacheKey = new UrlCacheKey(document.Key, language.Id, isDraft: false);
+                var cacheKey = new UrlCacheKey(document.Key, languageId, isDraft: false);
                 var cache = new UrlSegmentCache
                 {
                     PrimarySegment = publishedUrlSegments[0],
@@ -615,7 +640,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
         else
         {
-            var cacheKey = new UrlCacheKey(document.Key, language.Id, isDraft: false);
+            var cacheKey = new UrlCacheKey(document.Key, languageId, isDraft: false);
             yield return (cacheKey, null, false);
         }
 
@@ -629,7 +654,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
         else
         {
-            var cacheKey = new UrlCacheKey(document.Key, language.Id, isDraft: true);
+            var cacheKey = new UrlCacheKey(document.Key, languageId, isDraft: true);
             var cache = new UrlSegmentCache
             {
                 PrimarySegment = draftUrlSegments[0],
@@ -686,9 +711,14 @@ public class DocumentUrlService : IDocumentUrlService
 
         IEnumerable<Guid> documentKeys = documentKeysEnumerable as Guid[] ?? documentKeysEnumerable.ToArray();
 
-        foreach (ILanguage language in languages)
+        foreach (Guid documentKey in documentKeys)
         {
-            foreach (Guid documentKey in documentKeys)
+            // Remove invariant entries (NULL languageId)
+            RemoveFromCache(_coreScopeProvider.Context!, documentKey, null, true);
+            RemoveFromCache(_coreScopeProvider.Context!, documentKey, null, false);
+
+            // Remove language-specific entries
+            foreach (ILanguage language in languages)
             {
                 RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.Id, true);
                 RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.Id, false);
@@ -1077,11 +1107,21 @@ public class DocumentUrlService : IDocumentUrlService
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)
     {
-        if (TryGetLanguageIdFromCulture(culture, out int languageId) &&
-            _documentUrlCache.TryGetValue(CreateCacheKey(documentKey, languageId, isDraft), out UrlSegmentCache? cache))
+        if (TryGetLanguageIdFromCulture(culture, out int languageId))
         {
-            segment = cache.PrimarySegment;
-            return true;
+            // Try culture-specific lookup first
+            if (_documentUrlCache.TryGetValue(CreateCacheKey(documentKey, languageId, isDraft), out UrlSegmentCache? cache))
+            {
+                segment = cache.PrimarySegment;
+                return true;
+            }
+
+            // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+            if (_documentUrlCache.TryGetValue(CreateCacheKey(documentKey, null, isDraft), out cache))
+            {
+                segment = cache.PrimarySegment;
+                return true;
+            }
         }
 
         segment = null;

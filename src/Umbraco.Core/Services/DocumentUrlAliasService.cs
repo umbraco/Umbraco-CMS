@@ -57,8 +57,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         /// Initializes a new instance of the <see cref="AliasCacheKey"/> struct.
         /// </summary>
         /// <param name="normalizedAlias">The alias string that has been normalized for consistent comparison.</param>
-        /// <param name="languageId">The identifier of the language associated with the alias.</param>
-        public AliasCacheKey(string normalizedAlias, int languageId)
+        /// <param name="languageId">The identifier of the language associated with the alias. NULL for invariant content.</param>
+        public AliasCacheKey(string normalizedAlias, int? languageId)
         {
             NormalizedAlias = normalizedAlias;
             LanguageId = languageId;
@@ -70,9 +70,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         public string NormalizedAlias { get; }
 
         /// <summary>
-        /// Gets the unique identifier for the language associated with this instance.
+        /// Gets the unique identifier for the language associated with this instance. NULL indicates invariant content.
         /// </summary>
-        public int LanguageId { get; }
+        public int? LanguageId { get; }
 
         /// <inheritdoc/>
         public bool Equals(AliasCacheKey other) =>
@@ -83,7 +83,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         public override bool Equals(object? obj) => obj is AliasCacheKey other && Equals(other);
 
         /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId);
+        public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId ?? 0);
     }
 
     /// <summary>
@@ -178,15 +178,21 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return [];
         }
 
+        // Try culture-specific lookup first
         var cacheKey = new AliasCacheKey(normalizedAlias, languageId.Value);
-
-        if (_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) is false || documentKeys.Count == 0)
+        if (_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) && documentKeys.Count > 0)
         {
-            return [];
+            return documentKeys;
         }
 
-        // Return all matching document keys.
-        return documentKeys;
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+        var invariantKey = new AliasCacheKey(normalizedAlias, null);
+        if (_aliasCache.TryGetValue(invariantKey, out documentKeys) && documentKeys.Count > 0)
+        {
+            return documentKeys;
+        }
+
+        return [];
     }
 
     /// <inheritdoc/>
@@ -208,10 +214,11 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return [];
         }
 
-        // Filter by language and return the alias strings.
+        // Get aliases for requested language OR invariant (NULL languageId)
         return aliasKeys
-            .Where(key => key.LanguageId == languageId.Value)
+            .Where(key => key.LanguageId == languageId.Value || key.LanguageId == null)
             .Select(key => key.NormalizedAlias)
+            .Distinct()
             .ToList();
     }
 
@@ -322,21 +329,18 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         foreach (DocumentUrlAliasRaw raw in rawAliases)
         {
-            // Invariant content (LanguageId = null) is stored for ALL languages (like DocumentUrlService)
-            // This avoids cache invalidation when languages change or content varies by culture changes
+            // Invariant content (LanguageId = null) is stored with NULL languageId
+            // This is more memory-efficient and semantically explicit
             if (raw.LanguageId is null)
             {
-                foreach (ILanguage language in languages)
+                foreach (var alias in NormalizeAliases(raw.AliasValue))
                 {
-                    foreach (var alias in NormalizeAliases(raw.AliasValue))
+                    toSave.Add(new PublishedDocumentUrlAlias
                     {
-                        toSave.Add(new PublishedDocumentUrlAlias
-                        {
-                            DocumentKey = raw.DocumentKey,
-                            LanguageId = language.Id,
-                            Alias = alias,
-                        });
-                    }
+                        DocumentKey = raw.DocumentKey,
+                        LanguageId = null, // NULL for invariant content
+                        Alias = alias,
+                    });
                 }
             }
             else
@@ -380,27 +384,23 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private async Task<List<PublishedDocumentUrlAlias>> ExtractAliasesFromDocumentAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
-        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 
-        // Handle invariant content - store alias for ALL languages (like DocumentUrlService).
-        // This avoids cache invalidation when languages change or content varies by culture changes.
+        // Handle invariant content - store alias with NULL languageId
+        // This is more memory-efficient and semantically explicit
         if (document.ContentType.VariesByCulture() is false)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
 
             if (!string.IsNullOrWhiteSpace(aliasValue))
             {
-                foreach (ILanguage language in languages)
+                foreach (var alias in NormalizeAliases(aliasValue))
                 {
-                    foreach (var alias in NormalizeAliases(aliasValue))
+                    aliases.Add(new PublishedDocumentUrlAlias
                     {
-                        aliases.Add(new PublishedDocumentUrlAlias
-                        {
-                            DocumentKey = document.Key,
-                            LanguageId = language.Id,
-                            Alias = alias,
-                        });
-                    }
+                        DocumentKey = document.Key,
+                        LanguageId = null, // NULL for invariant content
+                        Alias = alias,
+                    });
                 }
             }
 
@@ -408,6 +408,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         }
 
         // Handle culture-variant content
+        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         foreach (ILanguage language in languages)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode);
@@ -478,7 +479,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// </summary>
     private void AddToCache(PublishedDocumentUrlAlias alias)
     {
-        var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId);
+        var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId); // LanguageId is now int?
 
         _aliasCache.AddOrUpdate(
             cacheKey,
