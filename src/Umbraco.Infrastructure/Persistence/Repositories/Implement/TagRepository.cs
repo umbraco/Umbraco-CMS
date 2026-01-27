@@ -152,7 +152,7 @@ SELECT tagset.tag, tagset.{group}, tagset.languageid
 FROM {tagSetSql}
 LEFT OUTER JOIN {cmsTags}
 ON (LOWER(tagset.tag) = LOWER({cmsTags}.tag) AND LOWER(tagset.{group}) = LOWER({cmsTags}.{group}) AND COALESCE(tagset.languageid, -1) = COALESCE({cmsTagsLanguageIdCol}, -1))
-WHERE {cmsTags}.id IS NULL"; // cmsTags.id is never null
+WHERE {cmsTags}.id IS NULL";
 
         Database.Execute(sql1);
 
@@ -160,13 +160,13 @@ WHERE {cmsTags}.id IS NULL"; // cmsTags.id is never null
         var sql2 = $@"INSERT INTO {QuoteTableName(TagRelationshipDto.TableName)} ({nodeId}, {QuoteColumnName("propertyTypeId")}, {QuoteColumnName("tagId")})
 SELECT {contentId}, {propertyTypeId}, tagset2.Id
 FROM (
-    SELECT t.{QuoteColumnName("Id")}
+    SELECT t.id
     FROM {tagSetSql}
     INNER JOIN {cmsTags} as t ON (LOWER(tagset.tag) = LOWER(t.tag) AND LOWER(tagset.{group}) = LOWER(t.{group}) AND COALESCE(tagset.languageid, -1) = COALESCE(t.{languageIdCol}, -1))
 ) AS tagset2
 LEFT OUTER JOIN {QuoteTableName(TagRelationshipDto.TableName)} r
-ON (tagset2.id = r.{QuoteColumnName("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteColumnName("propertyTypeID")} = {propertyTypeId})
-WHERE r.{QuoteColumnName("tagId")} IS NULL"; // cmsTagRelationship.tagId is never null
+ON (tagset2.id = r.{QuoteColumnName("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteColumnName("propertyTypeId")} = {propertyTypeId})
+WHERE r.{QuoteColumnName("tagId")} IS NULL";
 
         Database.Execute(sql2);
     }
@@ -256,7 +256,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
             }
             else
             {
-                sql.Append("NULL");
+                sql.Append("NULL" + SqlSyntax.GetNullCastSuffix<int?>());
             }
             sql.Append(" AS languageid");
         }
@@ -452,7 +452,8 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
         }
 
         sql = sql
-            .GroupBy<TagDto>(x => x.Id, x => x.Text, x => x.Group, x => x.LanguageId);
+            .GroupBy<TagDto>(x => x.Id, x => x.Text, x => x.Group, x => x.LanguageId)
+            .OrderBy<TagDto>(o => o.Text);
 
         return ExecuteTagsQuery(sql);
     }
@@ -472,6 +473,9 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
             sql = sql
                 .Where<TagDto>(dto => dto.Group == group);
         }
+
+        sql = sql
+            .OrderBy<TagDto>(o => o.Text);
 
         return ExecuteTagsQuery(sql);
     }
