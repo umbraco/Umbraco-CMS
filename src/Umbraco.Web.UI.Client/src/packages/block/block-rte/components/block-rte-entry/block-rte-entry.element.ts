@@ -258,41 +258,71 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	async #copyToClipboard() {
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
-		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
-			throw new Error('Could not get required contexts to copy.');
-		}
+		const contexts = await this.#getCopyContexts();
+		const entryName = this.#buildEntryName(contexts);
+		const propertyValue = this.#buildPropertyValue();
 
-		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.localize.string(propertyContext?.getLabel());
-		const blockLabel = this.#context.getName();
-
-		const entryName = workspaceName
-			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
-			: `${propertyLabel} - ${blockLabel}`;
-
-		const content = this.#context.getContent();
-		const layout = this.#context.getLayout();
-		const settings = this.#context.getSettings();
-		const expose = this.#context.getExpose();
-
-		const propertyValue: UmbBlockRteValueModel = {
-			contentData: content ? [structuredClone(content)] : [],
-			layout: {
-				[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
-			},
-			settingsData: settings ? [structuredClone(settings)] : [],
-			expose: expose ? [structuredClone(expose)] : [],
-		};
-
-		clipboardContext.write({
+		contexts.clipboardContext.write({
 			icon: this._icon,
 			name: entryName,
 			propertyValue,
 			propertyEditorUiAlias: 'Umb.PropertyEditorUi.RichText',
 		});
+	}
+
+	async #getCopyContexts() {
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		if (!propertyDatasetContext) {
+			throw new Error('Property dataset context not found.');
+		}
+
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		if (!propertyContext) {
+			throw new Error('Property context not found.');
+		}
+
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!clipboardContext) {
+			throw new Error('Clipboard context not found.');
+		}
+
+		return { propertyDatasetContext, propertyContext, clipboardContext };
+	}
+
+	#buildEntryName(contexts: {
+		propertyDatasetContext: NonNullable<Awaited<ReturnType<typeof this.getContext<typeof UMB_PROPERTY_DATASET_CONTEXT>>>>;
+		propertyContext: NonNullable<Awaited<ReturnType<typeof this.getContext<typeof UMB_PROPERTY_CONTEXT>>>>;
+		clipboardContext: NonNullable<Awaited<ReturnType<typeof this.getContext<typeof UMB_CLIPBOARD_PROPERTY_CONTEXT>>>>;
+	}) {
+		const workspaceName = this.localize.string(contexts.propertyDatasetContext.getName());
+		const propertyLabel = this.localize.string(contexts.propertyContext.getLabel());
+		const blockLabel = this.#context.getName();
+
+		if (workspaceName) {
+			return `${workspaceName} - ${propertyLabel} - ${blockLabel}`;
+		}
+		return `${propertyLabel} - ${blockLabel}`;
+	}
+
+	#buildPropertyValue(): UmbBlockRteValueModel {
+		const content = this.#context.getContent();
+		const layout = this.#context.getLayout();
+		const settings = this.#context.getSettings();
+		const expose = this.#context.getExpose();
+
+		const contentData = content ? [structuredClone(content)] : [];
+		const layoutData = layout ? [structuredClone(layout)] : undefined;
+		const settingsData = settings ? [structuredClone(settings)] : [];
+		const exposeData = expose ? [structuredClone(expose)] : [];
+
+		return {
+			contentData,
+			layout: {
+				[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layoutData,
+			},
+			settingsData,
+			expose: exposeData,
+		};
 	}
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
