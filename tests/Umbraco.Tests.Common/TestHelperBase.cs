@@ -82,7 +82,10 @@ public abstract class TestHelperBase
     }
 
     public IShortStringHelper ShortStringHelper { get; } =
-        new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        new DefaultShortStringHelper(
+            new DefaultShortStringHelperConfig(),
+            Utf8ToAsciiConverterStatic.Instance);
+
     public IScopeProvider ScopeProvider
     {
         get

@@ -1,0 +1,23 @@
+{
+  "name": "Special Latin",
+  "description": "Latin characters that do not decompose via Unicode normalization",
+  "priority": 0,
+  "mappings": {
+    "Ð": "D",
+    "ð": "d",
+    "Đ": "D",
+    "đ": "d",
+    "Ħ": "H",
+    "ħ": "h",
+    "Ł": "L",
+    "ł": "l",
+    "Ŀ": "L",
+    "ŀ": "l",
+    "Ø": "O",
+    "ø": "o",
+    "Þ": "TH",
+    "þ": "th",
+    "Ŧ": "T",
+    "ŧ": "t"
+  }
+}

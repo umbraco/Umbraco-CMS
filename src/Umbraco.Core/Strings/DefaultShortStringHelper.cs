@@ -19,15 +19,17 @@ namespace Umbraco.Cms.Core.Strings
     {
         #region Ctor, consts and vars
 
-        public DefaultShortStringHelper(IOptions<RequestHandlerSettings> settings)
+        public DefaultShortStringHelper(IOptions<RequestHandlerSettings> settings, IUtf8ToAsciiConverter asciiConverter)
         {
             _config = new DefaultShortStringHelperConfig().WithDefault(settings.Value);
+            _asciiConverter = asciiConverter;
         }
 
         // clones the config so it cannot be changed at runtime
-        public DefaultShortStringHelper(DefaultShortStringHelperConfig config)
+        public DefaultShortStringHelper(DefaultShortStringHelperConfig config, IUtf8ToAsciiConverter asciiConverter)
         {
             _config = config.Clone();
+            _asciiConverter = asciiConverter;
         }
 
         // see notes for CleanAsciiString
@@ -36,6 +38,7 @@ namespace Umbraco.Cms.Core.Strings
         //readonly static char[] ValidStringCharacters;
 
         private readonly DefaultShortStringHelperConfig _config;
+        private readonly IUtf8ToAsciiConverter _asciiConverter;
 
         // see notes for CleanAsciiString
         //static DefaultShortStringHelper()
@@ -278,11 +281,11 @@ namespace Umbraco.Cms.Core.Strings
             switch (codeType)
             {
                 case CleanStringType.Ascii:
-                    text = Utf8ToAsciiConverter.ToAsciiString(text);
+                    text = _asciiConverter.Convert(text);
                     break;
                 case CleanStringType.TryAscii:
                     const char ESC = (char) 27;
-                    var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
+                    var ctext = _asciiConverter.Convert(text, ESC);
                     if (ctext.Contains(ESC) == false)
                     {
                         text = ctext;

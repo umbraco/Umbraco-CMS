@@ -147,9 +147,13 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
+        builder.Services.AddSingleton<ICharacterMappingLoader, CharacterMappingLoader>();
+        builder.Services.AddSingleton<IUtf8ToAsciiConverter, Utf8ToAsciiConverter>();
         builder.Services.AddSingleton<IShortStringHelper>(factory
-            => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(
-                factory.GetRequiredService<IOptionsMonitor<RequestHandlerSettings>>().CurrentValue)));
+            => new DefaultShortStringHelper(
+                new DefaultShortStringHelperConfig().WithDefault(
+                    factory.GetRequiredService<IOptionsMonitor<RequestHandlerSettings>>().CurrentValue),
+                factory.GetRequiredService<IUtf8ToAsciiConverter>()));
 
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
