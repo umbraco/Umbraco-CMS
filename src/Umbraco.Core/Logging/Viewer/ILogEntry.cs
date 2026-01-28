@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
+/// <summary>
+///     Defines the contract for a log entry with its associated metadata and content.
+/// </summary>
 public interface ILogEntry
 {
     /// <summary>

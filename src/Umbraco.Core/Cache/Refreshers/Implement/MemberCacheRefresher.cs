@@ -10,13 +10,27 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+///     Cache refresher for member caches.
+/// </summary>
 public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
 {
+    /// <summary>
+    ///     The unique identifier for this cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 
     private readonly IIdKeyMap _idKeyMap;
     private readonly IMemberPartialViewCacheInvalidator _memberPartialViewCacheInvalidator;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="idKeyMap">The ID-key mapping service.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
     [Obsolete("Use the non obsoleted contructor instead. Planned for removal in V18")]
     public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : this(
@@ -29,6 +43,15 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="idKeyMap">The ID-key mapping service.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="memberPartialViewCacheInvalidator">The member partial view cache invalidator.</param>
     public MemberCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -44,13 +67,25 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
 
     #region Indirect
 
+    /// <summary>
+    ///     Refreshes member type caches by clearing all cached members.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
     public static void RefreshMemberTypes(AppCaches appCaches) => appCaches.IsolatedCaches.ClearCache<IMember>();
 
     #endregion
 
+    /// <summary>
+    ///     Represents the JSON payload for member cache refresh operations.
+    /// </summary>
     public class JsonPayload
     {
-        // [JsonConstructor]
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="id">The identifier of the member.</param>
+        /// <param name="username">The username of the member.</param>
+        /// <param name="removed">Whether the member was removed.</param>
         public JsonPayload(int id, string? username, bool removed)
         {
             Id = id;
@@ -58,31 +93,48 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
             Removed = removed;
         }
 
+        /// <summary>
+        ///     Gets the identifier of the member.
+        /// </summary>
         public int Id { get; }
 
+        /// <summary>
+        ///     Gets the username of the member.
+        /// </summary>
         public string? Username { get; }
 
+        /// <summary>
+        ///     Gets or sets the previous username of the member, if changed.
+        /// </summary>
         public string? PreviousUsername { get; set; }
 
+        /// <summary>
+        ///     Gets a value indicating whether the member was removed.
+        /// </summary>
         public bool Removed { get; }
     }
 
+    /// <inheritdoc />
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc />
     public override string Name => "Member Cache Refresher";
 
+    /// <inheritdoc />
     public override void RefreshInternal(JsonPayload[] payloads)
     {
         ClearCache(payloads);
         base.RefreshInternal(payloads);
     }
 
+    /// <inheritdoc />
     public override void Refresh(int id)
     {
         ClearCache(new JsonPayload(id, null, false));
         base.Refresh(id);
     }
 
+    /// <inheritdoc />
     public override void Remove(int id)
     {
         ClearCache(new JsonPayload(id, null, false));

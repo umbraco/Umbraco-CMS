@@ -24,10 +24,18 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
     // events will be enlisted in the order they are raised
     private List<IEventDefinition>? _events;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="QueuingEventDispatcherBase" /> class.
+    /// </summary>
+    /// <param name="raiseCancelable">A value indicating whether cancelable events should be raised immediately.</param>
     protected QueuingEventDispatcherBase(bool raiseCancelable) => _raiseCancelable = raiseCancelable;
 
+    /// <summary>
+    ///     Gets the list of queued events.
+    /// </summary>
     private List<IEventDefinition> Events => _events ??= new List<IEventDefinition>();
 
+    /// <inheritdoc />
     public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args, string? eventName = null)
     {
         if (eventHandler == null)
@@ -44,6 +52,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return args.Cancel;
     }
 
+    /// <inheritdoc />
     public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string? eventName = null)
         where TArgs : CancellableEventArgs
     {
@@ -61,6 +70,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return args.Cancel;
     }
 
+    /// <inheritdoc />
     public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? eventName = null)
         where TArgs : CancellableEventArgs
     {
@@ -78,6 +88,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return args.Cancel;
     }
 
+    /// <inheritdoc />
     public void Dispatch(EventHandler eventHandler, object sender, EventArgs args, string? eventName = null)
     {
         if (eventHandler == null)
@@ -88,6 +99,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         Events.Add(new EventDefinition(eventHandler, sender, args, eventName));
     }
 
+    /// <inheritdoc />
     public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string? eventName = null)
     {
         if (eventHandler == null)
@@ -98,6 +110,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         Events.Add(new EventDefinition<TArgs>(eventHandler, sender, args, eventName));
     }
 
+    /// <inheritdoc />
     public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? eventName = null)
     {
         if (eventHandler == null)
@@ -108,6 +121,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         Events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args, eventName));
     }
 
+    /// <inheritdoc />
     public IEnumerable<IEventDefinition> GetEvents(EventDefinitionFilter filter)
     {
         if (_events == null)
@@ -146,6 +160,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return FilterSupersededAndUpdateToLatestEntity(events);
     }
 
+    /// <inheritdoc />
     public void ScopeExit(bool completed)
     {
         if (_events == null)
@@ -175,9 +190,16 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
     // due to scopes, they should not expected eg a saved entity to still be around - however, now,
     // going to write a ugly condition to deal with U4-10764
 
-    // iterates over the events (latest first) and filter out any events or entities in event args that are included
-    // in more recent events that Supersede previous ones. For example, If an Entity has been Saved and then Deleted, we don't want
-    // to raise the Saved event (well actually we just don't want to include it in the args for that saved event)
+    /// <summary>
+    ///     Iterates over the events (latest first) and filters out any events or entities in event args that are included
+    ///     in more recent events that supersede previous ones.
+    /// </summary>
+    /// <param name="events">The list of event definitions to filter.</param>
+    /// <returns>The filtered event definitions with superseded events removed and entities updated to latest versions.</returns>
+    /// <remarks>
+    ///     For example, if an Entity has been Saved and then Deleted, we don't want
+    ///     to raise the Saved event (we just don't want to include it in the args for that saved event).
+    /// </remarks>
     internal static IEnumerable<IEventDefinition> FilterSupersededAndUpdateToLatestEntity(
         IReadOnlyList<IEventDefinition> events)
     {
@@ -304,9 +326,16 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return result;
     }
 
+    /// <summary>
+    ///     Called when the scope exits and has been completed. Implementations should raise the queued events.
+    /// </summary>
     protected abstract void ScopeExitCompleted();
 
-    // edits event args to use the latest instance of each entity
+    /// <summary>
+    ///     Edits event args to use the latest instance of each entity.
+    /// </summary>
+    /// <param name="entities">The collection of entities and their event info.</param>
+    /// <param name="args">The event args to update.</param>
     private static void UpdateToLatestEntities(
         IEnumerable<Tuple<IEntity, EventDefinitionInfos>> entities,
         IEnumerable<CancellableObjectEventArgs> args)
@@ -414,10 +443,19 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         }
     }
 
+    /// <summary>
+    ///     Contains information about an event definition and its supersede types.
+    /// </summary>
     private sealed class EventDefinitionInfos
     {
+        /// <summary>
+        ///     Gets or sets the event definition.
+        /// </summary>
         public IEventDefinition? EventDefinition { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the types of event arguments that this event supersedes.
+        /// </summary>
         public Type[]? SupersedeTypes { get; set; }
     }
 }

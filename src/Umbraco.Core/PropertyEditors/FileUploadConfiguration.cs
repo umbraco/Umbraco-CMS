@@ -5,6 +5,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class FileUploadConfiguration
 {
+    /// <summary>
+    /// Gets or sets the allowed file extensions for uploads.
+    /// </summary>
     [ConfigurationField("fileExtensions")]
     public IEnumerable<string> FileExtensions { get; set; } = Enumerable.Empty<string>();
 }

@@ -8,17 +8,25 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// </summary>
 public class LottieFiles : OEmbedProviderBase
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LottieFiles"/> class.
+    /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer.</param>
     public LottieFiles(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
     {
     }
 
+    /// <inheritdoc />
     public override string ApiEndpoint => "https://embed.lottiefiles.com/oembed";
 
+    /// <inheritdoc />
     public override string[] UrlSchemeRegex => new[] { @"lottiefiles\.com/*" };
 
+    /// <inheritdoc />
     public override Dictionary<string, string> RequestParams => new();
 
+    /// <inheritdoc />
     public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
     {
         var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);

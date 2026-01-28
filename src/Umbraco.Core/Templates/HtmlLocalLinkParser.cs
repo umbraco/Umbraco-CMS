@@ -10,28 +10,50 @@ namespace Umbraco.Cms.Core.Templates;
 /// </summary>
 public sealed class HtmlLocalLinkParser
 {
-    // needs to support media and document links, order of attributes should not matter nor should other attributes mess with things
-    // <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
-    // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
+    /// <summary>
+    ///     Regex pattern to match local link tags with type and href attributes.
+    /// </summary>
+    /// <remarks>
+    ///     Needs to support media and document links. Order of attributes should not matter
+    ///     nor should other attributes mess with things.
+    ///     Examples:
+    ///     &lt;a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media"&gt;media&lt;/a&gt;
+    ///     &lt;a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page"&gt;other page&lt;/a&gt;
+    /// </remarks>
     internal static readonly Regex LocalLinkTagPattern = new(
         @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
+    /// <summary>
+    ///     Regex pattern to match the type attribute (media or document) in local link tags.
+    /// </summary>
     internal static readonly Regex TypePattern = new(
         """type=['"](?<type>(?:media|document))['"]""",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
+    /// <summary>
+    ///     Regex pattern to match legacy local link href patterns.
+    /// </summary>
     internal static readonly Regex LocalLinkPattern = new(
         @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HtmlLocalLinkParser"/> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider for resolving content and media URLs.</param>
     public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider)
     {
         _publishedUrlProvider = publishedUrlProvider;
     }
 
+    /// <summary>
+    ///     Finds all UDIs from local link references in the specified text.
+    /// </summary>
+    /// <param name="text">The text to search for local links.</param>
+    /// <returns>An enumerable of <see cref="Udi"/> objects found in the text.</returns>
     public IEnumerable<Udi?> FindUdisFromLocalLinks(string text)
     {
         foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
@@ -119,6 +141,11 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
+    /// <summary>
+    ///     Finds legacy local link identifiers in the specified text.
+    /// </summary>
+    /// <param name="text">The text to search for legacy local links.</param>
+    /// <returns>An enumerable of <see cref="LocalLinkTag"/> objects representing legacy links.</returns>
     [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
     public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
@@ -149,9 +176,18 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
+    /// <summary>
+    ///     Represents a local link tag extracted from HTML content.
+    /// </summary>
     [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
     public class LocalLinkTag
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LocalLinkTag"/> class.
+        /// </summary>
+        /// <param name="intId">The integer identifier for legacy links.</param>
+        /// <param name="udi">The <see cref="GuidUdi"/> for the linked content or media.</param>
+        /// <param name="tagHref">The original href value from the tag.</param>
         public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
         {
             IntId = intId;
@@ -159,10 +195,19 @@ public sealed class HtmlLocalLinkParser
             TagHref = tagHref;
         }
 
+        /// <summary>
+        ///     Gets the integer identifier for legacy local links.
+        /// </summary>
         public int? IntId { get; }
 
+        /// <summary>
+        ///     Gets the <see cref="GuidUdi"/> for the linked content or media.
+        /// </summary>
         public GuidUdi? Udi { get; }
 
+        /// <summary>
+        ///     Gets the original href value from the local link tag.
+        /// </summary>
         public string TagHref { get; }
     }
 }

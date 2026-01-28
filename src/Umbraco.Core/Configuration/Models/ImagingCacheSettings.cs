@@ -10,10 +10,29 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class ImagingCacheSettings
 {
+    /// <summary>
+    ///     The default browser cache maximum age.
+    /// </summary>
     internal const string StaticBrowserMaxAge = "7.00:00:00";
+
+    /// <summary>
+    ///     The default image cache maximum age.
+    /// </summary>
     internal const string StaticCacheMaxAge = "365.00:00:00";
+
+    /// <summary>
+    ///     The default image cache hash length.
+    /// </summary>
     internal const int StaticCacheHashLength = 12;
+
+    /// <summary>
+    ///     The default image cache folder depth.
+    /// </summary>
     internal const int StaticCacheFolderDepth = 8;
+
+    /// <summary>
+    ///     The default image cache folder path.
+    /// </summary>
     internal const string StaticCacheFolder = Constants.SystemDirectories.TempData + "/MediaCache";
 
     /// <summary>

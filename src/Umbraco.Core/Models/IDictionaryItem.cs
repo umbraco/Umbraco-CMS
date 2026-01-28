@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a dictionary item for localization.
+/// </summary>
 public interface IDictionaryItem : IEntity, IRememberBeingDirty
 {
     /// <summary>

@@ -21,6 +21,12 @@ internal sealed class ReferenceResolver
     private readonly List<Assembly> _lookup = new();
     private readonly HashSet<string> _umbracoAssemblies;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferenceResolver" /> class.
+    /// </summary>
+    /// <param name="targetAssemblies">The target assembly names to check for references.</param>
+    /// <param name="entryPointAssemblies">The entry point assemblies to start resolution from.</param>
+    /// <param name="logger">The logger instance.</param>
     public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> entryPointAssemblies, ILogger<ReferenceResolver> logger)
     {
         _umbracoAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
@@ -34,20 +40,38 @@ internal sealed class ReferenceResolver
         }
     }
 
+    /// <summary>
+    /// Classification states for assembly reference resolution.
+    /// </summary>
     private enum Classification
     {
+        /// <summary>
+        /// The assembly classification is not yet determined.
+        /// </summary>
         Unknown,
+
+        /// <summary>
+        /// The assembly does not reference Umbraco.
+        /// </summary>
         DoesNotReferenceUmbraco,
+
+        /// <summary>
+        /// The assembly references Umbraco directly or transitively.
+        /// </summary>
         ReferencesUmbraco,
+
+        /// <summary>
+        /// The assembly is part of Umbraco core.
+        /// </summary>
         IsUmbraco,
     }
 
     /// <summary>
-    ///     Returns a list of assemblies that directly reference or transitively reference the targetAssemblies
+    /// Returns a list of assemblies that directly reference or transitively reference the target assemblies.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A collection of assemblies that reference the target assemblies.</returns>
     /// <remarks>
-    ///     This includes all assemblies in the same location as the entry point assemblies
+    /// This includes all assemblies in the same location as the entry point assemblies.
     /// </remarks>
     public IEnumerable<Assembly> ResolveAssemblies()
     {

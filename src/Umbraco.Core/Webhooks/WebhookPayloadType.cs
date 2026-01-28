@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Webhooks;
 
+/// <summary>
+/// Specifies the type of payload to include in webhook requests.
+/// </summary>
 public enum WebhookPayloadType
 {
     /// <summary>

@@ -9,17 +9,25 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// </summary>
 public class Flickr : OEmbedProviderBase
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Flickr"/> class.
+    /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer.</param>
     public Flickr(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
     {
     }
 
+    /// <inheritdoc />
     public override string ApiEndpoint => "http://www.flickr.com/services/oembed/";
 
+    /// <inheritdoc />
     public override string[] UrlSchemeRegex => new[] { @"flickr.com\/photos\/*", @"flic.kr\/p\/*" };
 
+    /// <inheritdoc />
     public override Dictionary<string, string> RequestParams => new();
 
+    /// <inheritdoc />
     public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
     {
         var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);

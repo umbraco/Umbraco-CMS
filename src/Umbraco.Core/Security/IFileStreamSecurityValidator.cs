@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Validates file streams for security using registered <see cref="IFileStreamSecurityAnalyzer" /> implementations.
+/// </summary>
 public interface IFileStreamSecurityValidator
 {
     /// <summary>
