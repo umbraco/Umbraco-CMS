@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 /// Optimizes URL and alias storage for invariant documents by making languageId nullable.
 /// Invariant content will use NULL languageId instead of duplicating records for each language.
 /// </summary>
-public class OptimizeInvariantUrlRecords : MigrationBase
+public class OptimizeInvariantUrlRecords : AsyncMigrationBase
 {
     private readonly IKeyValueService _keyValueService;
 
@@ -25,7 +25,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
     }
 
     /// <inheritdoc/>
-    protected override void Migrate()
+    protected override async Task MigrateAsync()
     {
         if (DatabaseType == DatabaseType.SQLite)
         {

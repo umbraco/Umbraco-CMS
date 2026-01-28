@@ -47,10 +47,9 @@ public class DocumentUrlService : IDocumentUrlService
 
     private readonly ConcurrentDictionary<UrlCacheKey, UrlSegmentCache> _documentUrlCache = new();
     private readonly ConcurrentDictionary<string, int> _cultureToLanguageIdMap = new();
-    private bool _isInitialized;
 
     /// <inheritdoc/>
-    public bool IsInitialized => _isInitialized;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Struct-based cache key for memory-efficient URL segment caching.
@@ -217,7 +216,7 @@ public class DocumentUrlService : IDocumentUrlService
         if (forceEmpty)
         {
             // We have this use case when umbraco is installing, we know there is no routes. And we can execute the normal logic because the connection string is missing.
-            _isInitialized = true;
+            IsInitialized = true;
             return;
         }
 
@@ -260,7 +259,7 @@ public class DocumentUrlService : IDocumentUrlService
                 estimatedMemoryBytes);
         }
 
-        _isInitialized = true;
+        IsInitialized = true;
         scope.Complete();
     }
 
@@ -505,7 +504,7 @@ public class DocumentUrlService : IDocumentUrlService
 
     private void ThrowIfNotInitialized()
     {
-        if (_isInitialized is false)
+        if (IsInitialized is false)
         {
             throw new InvalidOperationException("The service needs to be initialized before it can be used.");
         }
@@ -570,7 +569,7 @@ public class DocumentUrlService : IDocumentUrlService
 
             if (document.ContentType.VariesByCulture())
             {
-                // Variant content: process per language
+                // Variant content: process per language.
                 foreach ((string culture, ILanguage language) in languageDictionary)
                 {
                     HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave);
@@ -578,8 +577,27 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                // Invariant content: process once with NULL languageId
-                HandleCaching(_coreScopeProvider.Context!, document, null, null, toSave);
+                // Invariant content: check if segments are identical across all cultures.
+                // In most case we expect them to be, but it's possible custom IUrlSegmentProvider implementations may return
+                // different segments for different cultures.
+                // If invariant segments are identical, we store once with NULL languageId.
+                // If they differ, we store per-language (like variant content) to ensure we correctly reflect what the URL provider
+                // has reported.
+                var useNullLanguageId = ShouldStoreNullLanguageIdForInvariantDocument(document, languageDictionary);
+
+                if (useNullLanguageId)
+                {
+                    // All segments identical (or single language): store once with NULL languageId.
+                    HandleCaching(_coreScopeProvider.Context!, document, null, null, toSave);
+                }
+                else
+                {
+                    // Segments differ by culture: store per-language (like variant content).
+                    foreach ((string culture, ILanguage language) in languageDictionary)
+                    {
+                        HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave);
+                    }
+                }
             }
         }
 
@@ -598,6 +616,91 @@ public class DocumentUrlService : IDocumentUrlService
         {
             _cultureToLanguageIdMap[language.IsoCode] = language.Id;
         }
+    }
+
+    /// <summary>
+    /// Determines if invariant content should use NULL languageId storage.
+    /// Returns true if URL segments are identical across all cultures.
+    /// </summary>
+    /// <remarks>
+    /// Custom <see cref="IUrlSegmentProvider"/> implementations may return different segments for different cultures,
+    /// even for invariant content. This method detects that case and returns false to ensure correct storage.
+    /// </remarks>
+    private bool ShouldStoreNullLanguageIdForInvariantDocument(IContent document, IDictionary<string, ILanguage> languageDictionary)
+    {
+        if (languageDictionary.Count <= 1)
+        {
+            return true; // 0 or 1 language = use NULL (no comparison needed).
+        }
+
+        // Check published segment consistency (if document is published).
+        if (document.Published && document.Trashed is false)
+        {
+            if (AreSegmentsIdenticalForAllCultures(document, languageDictionary, published: true) is false)
+            {
+                return false;
+            }
+        }
+
+        // Check draft segment consistency.
+        if (document.Trashed is false)
+        {
+            if (AreSegmentsIdenticalForAllCultures(document, languageDictionary, published: false) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Checks if URL segments are identical across all cultures for the given document.
+    /// </summary>
+    private bool AreSegmentsIdenticalForAllCultures(
+        IContent document,
+        IDictionary<string, ILanguage> languageDictionary,
+        bool published)
+    {
+        string[]? firstSegments = null;
+
+        foreach ((string culture, _) in languageDictionary)
+        {
+            var segments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture, published).ToArray();
+
+            if (firstSegments is null)
+            {
+                firstSegments = segments;
+            }
+            else if (AreSegmentArraysEqual(firstSegments, segments) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Compares two segment arrays for equality.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool AreSegmentArraysEqual(string[] first, string[] second)
+    {
+        if (first.Length != second.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < first.Length; i++)
+        {
+            if (string.Equals(first[i], second[i], StringComparison.Ordinal) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, int? languageId, List<PublishedDocumentUrlSegment> toSave)
