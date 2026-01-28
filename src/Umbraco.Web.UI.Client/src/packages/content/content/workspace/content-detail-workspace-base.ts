@@ -165,6 +165,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// @ts-ignore
 	// TODO: fix type error
 	public readonly variantOptions;
+
+	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
+		return await firstValueFrom(this.variantOptions);
+	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
@@ -720,7 +724,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {
 		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
 
-		const cultureOptions = await firstValueFrom(this.variantOptions);
+		const cultureOptions = await this.getVariantOptions();
 		let valueVariantIds: Array<UmbVariantId> = [];
 
 		// Find inner values to determine if any of this holds variants that needs to be created.
@@ -785,7 +789,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		options: VariantOptionModelType[];
 		selected: string[];
 	}> {
-		const options = (await firstValueFrom(this.variantOptions)).filter((option) => option.segment === null);
+		const options = (await this.getVariantOptions()).filter((option) => option.segment === null);
 
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
@@ -988,6 +992,27 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected async _validateVariantsAndLog(variantIds?: Array<UmbVariantId>): Promise<void> {
+		// Make sure that each variant-id for a given culture, has gotten all the valid segment variant-ids present too. See variant-options for which are available. [NL]
+		if (variantIds && this.getVariesBySegment()) {
+			const variantOptions = await this.getVariantOptions();
+			const expandedVariantIds: Array<UmbVariantId> = [];
+
+			for (const variantId of variantIds) {
+				// If a culture variant without segment, add all segment variants for that culture:
+				if (variantId.culture !== null && variantId.segment === null) {
+					for (const option of variantOptions) {
+						if (option.culture === variantId.culture) {
+							expandedVariantIds.push(UmbVariantId.Create(option));
+						}
+					}
+				} else {
+					expandedVariantIds.push(variantId);
+				}
+			}
+
+			variantIds = expandedVariantIds;
+		}
+
 		await this.#validateByVariantIds(variantIds).catch(async () => {
 			// TODO: Implement developer-mode logging here. [NL]
 			console.warn(
