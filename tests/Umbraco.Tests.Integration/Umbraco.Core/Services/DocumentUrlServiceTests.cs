@@ -32,6 +32,10 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
     private IDocumentUrlRepository DocumentUrlRepository => GetRequiredService<IDocumentUrlRepository>();
 
+    private IDocumentUrlAliasRepository DocumentUrlAliasRepository => GetRequiredService<IDocumentUrlAliasRepository>();
+
+    private IDocumentUrlAliasService DocumentUrlAliasService => GetRequiredService<IDocumentUrlAliasService>();
+
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -458,6 +462,121 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         {
             Assert.That(segment.LanguageId, Is.Null, "Invariant content should have NULL LanguageId in database");
         }
+    }
+
+    [Test]
+    public async Task Changing_ContentType_From_Invariant_To_Variant_Updates_Url_LanguageIds()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
+
+        // Publish invariant content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Verify URLs are stored with NULL languageId (invariant)
+        List<PublishedDocumentUrlSegment> segmentsBefore;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            segmentsBefore = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(segmentsBefore, Has.Count.GreaterThan(0), "Should have URL segments before change");
+        Assert.That(segmentsBefore.All(s => s.LanguageId == null), Is.True, "All segments should have NULL languageId before change");
+
+        // Act - change content type from invariant to variant
+        ContentType.Variations = ContentVariation.Culture;
+        ContentTypeService.Save(ContentType);
+
+        // Reload content from database to pick up the new content type variation
+        var subpage = ContentService.GetById(Subpage.Key)!;
+
+        // Update content to have culture-specific names (required for variant content)
+        subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);
+        ContentService.Save(subpage, -1);
+        ContentService.Publish(subpage, [defaultLanguage.IsoCode]);
+
+        // Assert - URLs should now be stored with specific languageId
+        List<PublishedDocumentUrlSegment> segmentsAfter;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            segmentsAfter = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change");
+        Assert.That(segmentsAfter.All(s => s.LanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+        Assert.That(segmentsAfter.Any(s => s.LanguageId == defaultLanguage.Id), Is.True, "Should have segment for default language");
+    }
+
+    [Test]
+    public async Task Changing_ContentType_From_Variant_To_Invariant_Updates_Url_LanguageIds()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
+
+        // Publish invariant content first
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Verify invariant URLs are stored with NULL languageId
+        List<PublishedDocumentUrlSegment> invariantSegments;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            invariantSegments = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(invariantSegments, Has.Count.GreaterThan(0), "Should have invariant URL segments");
+        Assert.That(invariantSegments.All(s => s.LanguageId == null), Is.True, "Invariant segments should have NULL languageId");
+
+        // Change content type to variant
+        ContentType.Variations = ContentVariation.Culture;
+        ContentTypeService.Save(ContentType);
+
+        // Reload content from database to pick up the new content type variation
+        var subpage = ContentService.GetById(Subpage.Key)!;
+
+        // Update content with culture-specific name and republish as variant
+        subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);
+        ContentService.Save(subpage, -1);
+        ContentService.Publish(subpage, [defaultLanguage.IsoCode]);
+
+        // Verify URLs are stored with specific languageId (variant)
+        List<PublishedDocumentUrlSegment> variantSegments;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            variantSegments = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(variantSegments, Has.Count.GreaterThan(0), "Should have variant URL segments after change to variant");
+        Assert.That(variantSegments.All(s => s.LanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+
+        // Act - change content type from variant to invariant
+        ContentType.Variations = ContentVariation.Nothing;
+        ContentTypeService.Save(ContentType);
+
+        // Assert - URLs should now be stored with NULL languageId
+        List<PublishedDocumentUrlSegment> segmentsAfter;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            segmentsAfter = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change to invariant");
+        Assert.That(segmentsAfter.All(s => s.LanguageId == null), Is.True, "All segments should have NULL languageId after change to invariant");
     }
 
     #endregion
