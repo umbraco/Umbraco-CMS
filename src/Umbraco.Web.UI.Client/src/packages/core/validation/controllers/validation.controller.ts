@@ -8,7 +8,7 @@ import type { UmbContextProviderController } from '@umbraco-cms/backoffice/conte
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g; //
+const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
 /**
  * Filters a validation message by a given variantId.
