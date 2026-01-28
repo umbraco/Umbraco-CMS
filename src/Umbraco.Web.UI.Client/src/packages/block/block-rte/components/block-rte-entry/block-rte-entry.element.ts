@@ -290,8 +290,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#buildEntryName(contexts: {
-		propertyDatasetContext: { getName(): string };
-		propertyContext: { getLabel(): string };
+		propertyDatasetContext: { getName(): string | undefined };
+		propertyContext: { getLabel(): string | undefined };
 		clipboardContext: { write(data: unknown): void };
 	}) {
 		const workspaceName = this.localize.string(contexts.propertyDatasetContext.getName());
