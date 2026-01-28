@@ -1,8 +1,10 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
+import { UmbEntityDeletedEvent } from '../../entity-deleted.event.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 import type { MetaEntityActionDeleteKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -73,6 +75,20 @@ export class UmbDeleteEntityAction<
 		});
 
 		actionEventContext.dispatchEvent(event);
+
+		const deletedEvent = new UmbEntityDeletedEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(deletedEvent);
+
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		if (notificationContext) {
+			notificationContext.peek('positive', {
+				data: { message: this.#localize.term('general_deleted') },
+			});
+		}
 	}
 }
 export default UmbDeleteEntityAction;
