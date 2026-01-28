@@ -159,7 +159,12 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			this._imageCropperValue.focalPoint = value.focalPoint;
 		}
 
-		this.value = { key: this._key, unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
+		this.value = {
+			key: this._key,
+			unique: this._unique,
+			crops: value.crops,
+			focalPoint: value.focalPoint ?? null,
+		};
 	}
 
 	override render() {
