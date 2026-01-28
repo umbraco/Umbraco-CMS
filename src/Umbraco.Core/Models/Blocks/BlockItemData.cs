@@ -70,6 +70,7 @@ public class BlockItemData
     ///     The UDI.
     /// </value>
     [Obsolete("Use Key instead. Will be removed in V18.")]
+    [JsonIgnore]
     public Udi? Udi { get; set; }
 
     /// <summary>

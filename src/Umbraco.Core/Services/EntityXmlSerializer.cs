@@ -103,7 +103,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             while (page * pageSize < total)
             {
                 IEnumerable<IContent> children =
-                    _contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
+                    _contentService.GetPagedChildren(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
                 SerializeChildren(children, xml, published);
             }
         }
@@ -725,7 +725,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             while (page * pageSize < total)
             {
                 IEnumerable<IContent> grandChildren =
-                    _contentService.GetPagedChildren(child.Id, page++, pageSize, out total);
+                    _contentService.GetPagedChildren(child.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
                 // recurse
                 SerializeChildren(grandChildren, childXml, published);

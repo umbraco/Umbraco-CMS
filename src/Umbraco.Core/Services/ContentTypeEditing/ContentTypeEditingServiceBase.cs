@@ -612,6 +612,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         contentType.SetVariesBy(ContentVariation.Culture, model.VariesByCulture);
         contentType.SetVariesBy(ContentVariation.Segment, model.VariesBySegment);
 
+        // update/map all properties
+        await UpdatePropertiesAsync(contentType, model);
+
         // update the allowed content types
         UpdateAllowedContentTypes(contentType, model, allContentTypeCompositions);
 
@@ -620,9 +623,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
         // ensure parent content type assignment (inheritance) if any
         UpdateParentContentType(contentType, model, allContentTypeCompositions);
-
-        // update/map all properties
-        await UpdatePropertiesAsync(contentType, model);
 
         return contentType;
     }

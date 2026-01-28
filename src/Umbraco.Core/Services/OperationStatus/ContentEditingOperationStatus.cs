@@ -114,4 +114,5 @@ public enum ContentEditingOperationStatus
     ///     The content item cannot be moved to the recycle bin because it is referenced by other items.
     /// </summary>
     CannotMoveToRecycleBinWhenReferenced,
+    InvalidKey,
 }

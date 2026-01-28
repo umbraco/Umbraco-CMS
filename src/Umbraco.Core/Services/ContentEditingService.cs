@@ -385,7 +385,7 @@ internal sealed class ContentEditingService
 
     /// <inheritdoc />
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
     /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)

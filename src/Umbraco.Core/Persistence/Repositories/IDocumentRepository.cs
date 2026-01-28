@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -9,6 +11,36 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// </summary>
 public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
 {
+    /// <summary>
+    ///     Gets paged documents.
+    /// </summary>
+    /// <param name="query">The base query for documents.</param>
+    /// <param name="pageIndex">The page index (zero-based).</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">Output parameter with total record count.</param>
+    /// <param name="propertyAliases">
+    ///     Optional array of property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded (only system properties).
+    /// </param>
+    /// <param name="filter">Optional filter query.</param>
+    /// <param name="ordering">The ordering specification.</param>
+    /// <param name="loadTemplates">
+    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
+    ///     (e.g., collection views). Default is true.
+    /// </param>
+    /// <returns>A collection of documents for the specified page.</returns>
+    /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
+    IEnumerable<IContent> GetPage(
+        IQuery<IContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IContent>? filter,
+        Ordering? ordering,
+        bool loadTemplates)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering);
+
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>

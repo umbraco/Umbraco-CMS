@@ -28,8 +28,9 @@ namespace Umbraco.Cms.Core.Services
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
-
         private readonly MediaFileManager _mediaFileManager;
+        private readonly IMediaPathScheme _mediaPathScheme;
+        private readonly ILogger<MediaService> _logger;
 
         #region Constructors
 
@@ -53,10 +54,13 @@ namespace Umbraco.Cms.Core.Services
             IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository,
             IAuditService auditService,
+            IAuditRepository auditRepository,   // TODO (V18): Remove this parameter (it's only there to avoid ambiguity with obsolete constructors).
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
+            IUserIdKeyResolver userIdKeyResolver,
+            IMediaPathScheme mediaPathScheme,
+            ILogger<MediaService> logger)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileManager = mediaFileManager;
@@ -66,6 +70,8 @@ namespace Umbraco.Cms.Core.Services
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
             _userIdKeyResolver = userIdKeyResolver;
+            _mediaPathScheme = mediaPathScheme;
+            _logger = logger;
         }
 
         /// <summary>
@@ -81,7 +87,36 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
         /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
         /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditService auditService,
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver)
+            : this(
+                provider,
+                mediaFileManager,
+                loggerFactory,
+                eventMessagesFactory,
+                mediaRepository,
+                auditService,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditRepository>(),
+                mediaTypeRepository,
+                entityRepository,
+                shortStringHelper,
+                userIdKeyResolver,
+                StaticServiceProvider.Instance.GetRequiredService<IMediaPathScheme>(),
+                StaticServiceProvider.Instance.GetRequiredService<ILogger<MediaService>>())
+        {
+        }
+
+        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -121,7 +156,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
         /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
         /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -550,7 +585,7 @@ namespace Umbraco.Cms.Core.Services
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, null, filter, ordering);
         }
 
         /// <inheritdoc />
@@ -579,7 +614,7 @@ namespace Umbraco.Cms.Core.Services
             scope.ReadLock(Constants.Locks.MediaTree);
 
             return _mediaRepository.GetPage(
-                Query<IMedia>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
+                Query<IMedia>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, null, filter, ordering);
         }
 
         /// <summary>
@@ -682,7 +717,7 @@ namespace Umbraco.Cms.Core.Services
             scope.ReadLock(Constants.Locks.MediaTree);
 
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
         }
 
         /// <inheritdoc />
@@ -755,7 +790,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentNullException(nameof(ordering));
             }
 
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
         }
 
         /// <summary>
@@ -809,7 +844,7 @@ namespace Umbraco.Cms.Core.Services
 
             scope.ReadLock(Constants.Locks.MediaTree);
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
 
         /// <summary>
@@ -855,6 +890,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -873,7 +910,15 @@ namespace Umbraco.Cms.Core.Services
                     throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
                 }
 
-                scope.WriteLock(Constants.Locks.MediaTree);
+                if (media.Key.Version == 7 && _mediaPathScheme.SupportsGuid7 is false)
+                {
+                    _logger.LogWarning(
+                        "The registered implementation of IMediaPathScheme cannot be used with media keys using version 7 GUIDs due to an increased risk of collisions in the generated file paths. " +
+                        "Please use version 4 GUIDs created via Guid.NewGuid() or implement and register a different IMediaPathScheme.");
+                    return Attempt.Fail<OperationResult?>(
+                        new OperationResult(OperationResultType.FailedInvalidKey, eventMessages));
+                }
+
                 if (media.HasIdentity == false)
                 {
                     if (_entityRepository.Get(media.Key, UmbracoObjectTypes.Media.GetGuid()) is not null)
@@ -913,6 +958,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(mediasA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -921,8 +968,6 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 IEnumerable<TreeChange<IMedia>> treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
-
-                scope.WriteLock(Constants.Locks.MediaTree);
                 foreach (IMedia media in mediasA)
                 {
                     if (media.HasIdentity == false)
@@ -959,13 +1004,13 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(media, messages)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
-
-                scope.WriteLock(Constants.Locks.MediaTree);
 
                 DeleteLocked(scope, media, messages);
 
@@ -1041,15 +1086,15 @@ namespace Umbraco.Cms.Core.Services
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
+            if (wlock)
+            {
+                scope.WriteLock(Constants.Locks.MediaTree);
+            }
+
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 return;
-            }
-
-            if (wlock)
-            {
-                scope.WriteLock(Constants.Locks.MediaTree);
             }
 
             _mediaRepository.DeleteVersions(id, versionDate);
@@ -1071,6 +1116,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
@@ -1083,12 +1130,8 @@ namespace Umbraco.Cms.Core.Services
                 IMedia? media = GetVersion(versionId);
                 if (media is not null)
                 {
-                    DeleteVersions(scope, true, id, media.UpdateDate, userId);
+                    DeleteVersions(scope, false, id, media.UpdateDate, userId);
                 }
-            }
-            else
-            {
-                scope.WriteLock(Constants.Locks.MediaTree);
             }
 
             _mediaRepository.DeleteVersion(versionId);
@@ -1364,6 +1407,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -1372,8 +1417,6 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 var saved = new List<IMedia>();
-
-                scope.WriteLock(Constants.Locks.MediaTree);
                 var sortOrder = 0;
 
                 foreach (IMedia media in itemsA)
@@ -1646,6 +1689,5 @@ namespace Umbraco.Cms.Core.Services
         }
 
         #endregion
-
     }
 }

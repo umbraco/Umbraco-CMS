@@ -48,4 +48,8 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
         // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
+
+    /// <inheritdoc/>
+    public async Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> mediaKeys) =>
+        await _mediaPermissionService.FilterAuthorizedAccessAsync(currentUser, mediaKeys);
 }
