@@ -141,6 +141,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             parentLevel = parent.Level;
         }
 
+        var originalPath = container.Path;
         Attempt<EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
             scope,
             key,
@@ -154,12 +155,12 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                 : EntityContainerOperationStatus.Success,
             (cont, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, cont.Path, parentId, parentKey);
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentId, parentKey);
                 return new EntityContainerMovingNotification(moveEventInfo, eventMessages);
             },
             (cont, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, cont.Path, parentId, parentKey);
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentId, parentKey);
                 return new EntityContainerMovedNotification(moveEventInfo, eventMessages);
             });
 

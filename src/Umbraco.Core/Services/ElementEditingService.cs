@@ -254,6 +254,7 @@ internal sealed class ElementEditingService
             parentId = container.Id;
         }
 
+        var originalPath = element.Path;
         Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
             scope,
             key,
@@ -262,12 +263,12 @@ internal sealed class ElementEditingService
             userKey,
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, elem.Path, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
                 return new ElementMovingNotification(moveEventInfo, eventMessages);
             },
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, elem.Path, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
                 return new ElementMovedNotification(moveEventInfo, eventMessages);
             });
 
