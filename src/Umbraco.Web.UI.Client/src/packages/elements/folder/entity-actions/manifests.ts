@@ -18,7 +18,7 @@ const folderDelete: UmbExtensionManifest = {
 	forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
 		icon: 'icon-trash-empty',
-		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
+		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS, // TODO: [LK] This needs to call the recycle-bin repository instead.
 	},
 	conditions: [
 		{

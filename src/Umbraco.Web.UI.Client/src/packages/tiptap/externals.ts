@@ -1,7 +1,4 @@
-// Work-in-progress upgrade to Tiptap v3. [LK]
-// Watch this issue: https://github.com/ueberdosis/tiptap/issues/6670
-//
-// Docs:
+// Tiptap v3 Docs:
 // https://tiptap.dev/docs/guides/upgrade-tiptap-v2
 // https://tiptap.dev/docs/resources/whats-new
 // https://github.com/ueberdosis/tiptap/issues

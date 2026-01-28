@@ -1343,6 +1343,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             TryGetParentKey(parentId, out Guid? parentKey);
             if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
             {
@@ -1354,8 +1356,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             // it's just part of the Copied event args so the RelateOnCopyHandler knows what to do
             // meaning that the event has to trigger for every copied content including descendants
             var copies = new List<Tuple<IContent, IContent>>();
-
-            scope.WriteLock(Constants.Locks.ContentTree);
 
             // a copy is not published (but not really unpublishing either)
             // update the create author and last edit author
