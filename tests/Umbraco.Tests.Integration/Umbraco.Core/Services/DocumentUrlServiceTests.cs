@@ -1,8 +1,11 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
@@ -26,6 +29,10 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IDomainService DomainService => GetRequiredService<IDomainService>();
+
+    private IDocumentUrlRepository DocumentUrlRepository => GetRequiredService<IDocumentUrlRepository>();
+
+    private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -392,4 +399,66 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is false
 
     // - All of the above when having Constants.Conventions.Content.UrlName set to a value
+
+    #region Invariant vs Variant Content Tests
+
+    [Test]
+    public async Task GetUrlSegment_For_Invariant_Content_Works_With_Any_Culture()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        // Publish the content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act - query with French culture for invariant content (stored with NULL languageId)
+        var urlSegment = DocumentUrlService.GetUrlSegment(Subpage.Key, "fr-FR", false);
+
+        // Assert - should find invariant content even though queried with non-default culture
+        Assert.That(urlSegment, Is.EqualTo("text-page-1-custom"), "Invariant content URL segment should be accessible with any culture");
+    }
+
+    [Test]
+    public async Task GetDocumentKeyByRoute_For_Invariant_Content_Works_With_Any_Culture()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        // Publish the content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act - query with French culture for invariant content (stored with NULL languageId)
+        var documentKey = DocumentUrlService.GetDocumentKeyByRoute("/text-page-1-custom", "fr-FR", null, false);
+
+        // Assert - should find invariant content even though queried with non-default culture
+        Assert.That(documentKey, Is.EqualTo(Subpage.Key), "Invariant content should be found by route with any culture");
+    }
+
+    [Test]
+    public async Task Invariant_Content_Stores_Null_LanguageId_In_Database()
+    {
+        // Arrange - publish content to create URL records
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act - check stored URL segments in database
+        List<PublishedDocumentUrlSegment> storedSegments;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedSegments = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key)
+                .ToList();
+        }
+
+        // Assert - invariant content should have NULL languageId (not a language-specific ID)
+        Assert.That(storedSegments, Has.Count.GreaterThan(0), "Should have stored URL segments");
+
+        foreach (var segment in storedSegments)
+        {
+            Assert.That(segment.LanguageId, Is.Null, "Invariant content should have NULL LanguageId in database");
+        }
+    }
+
+    #endregion
 }
