@@ -364,6 +364,9 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.DeleteFromRecycleBin.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Validate.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.ChildUserAccessEntities.cs">
       <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
     </Compile>
