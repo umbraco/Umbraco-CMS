@@ -85,7 +85,7 @@ test('can empty recycle bin', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.library.clickRecycleBinButton();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.library.clickEmptyRecycleBinButton();
-  await umbracoUi.library.clickConfirmEmptyRecycleBinButtonAndWaitForElementRecycleBinToBeEmptied();
+  await umbracoUi.library.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
   expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
