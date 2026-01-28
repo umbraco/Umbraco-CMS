@@ -99,8 +99,8 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 		expect(data?.values[0]?.segment).to.be.null;
 	});
 
-	it('migrates variant value to invariant when property variation changes', async () => {
-		// Set up initial data with variant values
+	it('migrates variant value to invariant when property variation changes, keeping only default language value', async () => {
+		// Set up initial data with variant values for multiple cultures
 		mockWorkspace.setData({
 			unique: 'test-doc',
 			values: [
@@ -150,15 +150,12 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 		// Wait for observation to trigger
 		await new Promise((resolve) => setTimeout(resolve, 0));
 
-		// Check that both values were migrated to invariant
+		// Check that only the default language value was kept and migrated to invariant
 		const data = mockWorkspace.getData();
-		expect(data?.values.length).to.equal(2);
+		expect(data?.values.length).to.equal(1);
 		expect(data?.values[0]?.alias).to.equal('testProperty');
-		expect(data?.values[0]?.value).to.equal('en-US value');
+		expect(data?.values[0]?.value).to.equal('en-US value'); // Default language value preserved
 		expect(data?.values[0]?.culture).to.be.null;
-		expect(data?.values[1]?.alias).to.equal('testProperty');
-		expect(data?.values[1]?.value).to.equal('da-DK value');
-		expect(data?.values[1]?.culture).to.be.null;
 	});
 
 	it('preserves values during variation change', async () => {
@@ -337,5 +334,236 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 		const prop2 = data?.values.find((v) => v.alias === 'property2');
 		expect(prop2?.value).to.equal('variant value');
 		expect(prop2?.culture).to.be.null;
+	});
+
+	it('keeps first value when default language value does not exist during variant to invariant change', async () => {
+		// Set up initial data with only non-default language values
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'da-DK value',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (variant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to be invariant
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Should keep the only available value (da-DK) since default language value doesn't exist
+		const data = mockWorkspace.getData();
+		expect(data?.values.length).to.equal(1);
+		expect(data?.values[0]?.alias).to.equal('testProperty');
+		expect(data?.values[0]?.value).to.equal('da-DK value');
+		expect(data?.values[0]?.culture).to.be.null;
+	});
+
+	it('correctly handles multiple cultures preferring default language during invariant migration', async () => {
+		// Set up initial data with three culture values, default language in the middle
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'da-DK value',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'en-US value',
+					culture: 'en-US',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'de-DE value',
+					culture: 'de-DE',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (variant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to be invariant
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Should keep only the default language (en-US) value
+		const data = mockWorkspace.getData();
+		expect(data?.values.length).to.equal(1);
+		expect(data?.values[0]?.alias).to.equal('testProperty');
+		expect(data?.values[0]?.value).to.equal('en-US value');
+		expect(data?.values[0]?.culture).to.be.null;
+	});
+
+	it('does not affect other properties when consolidating values for invariant migration', async () => {
+		// Set up initial data with multiple properties, some variant some invariant
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'variantProperty',
+					value: 'en-US variant',
+					culture: 'en-US',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'variantProperty',
+					value: 'da-DK variant',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'invariantProperty',
+					value: 'invariant value',
+					culture: null,
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'staysVariantProperty',
+					value: 'en-US stays variant',
+					culture: 'en-US',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'staysVariantProperty',
+					value: 'da-DK stays variant',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'variantProperty',
+				variesByCulture: true,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+			{
+				alias: 'invariantProperty',
+				variesByCulture: false,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+			{
+				alias: 'staysVariantProperty',
+				variesByCulture: true,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Only change variantProperty to invariant, others stay the same
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'variantProperty',
+				variesByCulture: false, // Changed to invariant
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+			{
+				alias: 'invariantProperty',
+				variesByCulture: false, // Stays invariant
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+			{
+				alias: 'staysVariantProperty',
+				variesByCulture: true, // Stays variant
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		const data = mockWorkspace.getData();
+
+		// variantProperty: should be consolidated to single invariant value
+		const variantPropValues = data?.values.filter((v) => v.alias === 'variantProperty');
+		expect(variantPropValues?.length).to.equal(1);
+		expect(variantPropValues?.[0]?.value).to.equal('en-US variant');
+		expect(variantPropValues?.[0]?.culture).to.be.null;
+
+		// invariantProperty: should remain unchanged
+		const invariantPropValues = data?.values.filter((v) => v.alias === 'invariantProperty');
+		expect(invariantPropValues?.length).to.equal(1);
+		expect(invariantPropValues?.[0]?.value).to.equal('invariant value');
+		expect(invariantPropValues?.[0]?.culture).to.be.null;
+
+		// staysVariantProperty: should remain unchanged with both culture values
+		const staysVariantPropValues = data?.values.filter((v) => v.alias === 'staysVariantProperty');
+		expect(staysVariantPropValues?.length).to.equal(2);
+		expect(staysVariantPropValues?.find((v) => v.culture === 'en-US')?.value).to.equal('en-US stays variant');
+		expect(staysVariantPropValues?.find((v) => v.culture === 'da-DK')?.value).to.equal('da-DK stays variant');
 	});
 });

@@ -1,4 +1,4 @@
-import type { UmbContentDetailModel } from '../index.js';
+import type { UmbContentDetailModel, UmbContentValueModel } from '../index.js';
 import type { UmbContentDetailWorkspaceContextBase } from './content-detail-workspace-base.js';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -46,24 +46,15 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 		}
 
 		const defaultLanguage = this.#getDefaultLanguage();
+		const result = this.#transformValuesForVariationChanges(
+			currentData.values,
+			oldPropertyTypes,
+			newPropertyTypes,
+			defaultLanguage,
+		);
 
-		// To spare a bit of energy we keep awareness of whether this brings any changes:
-		let hasChanges = false;
-		const values = currentData.values.map((v) => {
-			const transformation = this.#transformValueForVariationChange(
-				v,
-				oldPropertyTypes,
-				newPropertyTypes,
-				defaultLanguage,
-			);
-			if (transformation.changed) {
-				hasChanges = true;
-			}
-			return transformation.value;
-		});
-
-		if (hasChanges) {
-			this.#workspace.setData({ ...currentData, values });
+		if (result.hasChanges) {
+			this.#workspace.setData({ ...currentData, values: result.values });
 		}
 	}
 
@@ -76,32 +67,65 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 		return defaultLanguage;
 	}
 
-	#transformValueForVariationChange(
-		value: any,
+	/**
+	 * Transforms all values based on property variation changes.
+	 * Handles both invariant→variant and variant→invariant transitions, including cleanup of duplicate values.
+	 * @param {Array<UmbContentValueModel>} values - All content values
+	 * @param {Array<UmbPropertyTypeModel>} oldPropertyTypes - Previous property type definitions
+	 * @param {Array<UmbPropertyTypeModel>} newPropertyTypes - New property type definitions
+	 * @param {string} defaultLanguage - The default language code
+	 * @returns {{ values: Array<UmbContentValueModel>; hasChanges: boolean }} Transformed values and change flag
+	 */
+	#transformValuesForVariationChanges(
+		values: Array<UmbContentValueModel>,
 		oldPropertyTypes: Array<UmbPropertyTypeModel>,
 		newPropertyTypes: Array<UmbPropertyTypeModel>,
 		defaultLanguage: string,
-	): { value: any; changed: boolean } {
-		const oldType = oldPropertyTypes.find((p) => p.alias === value.alias);
-		const newType = newPropertyTypes.find((p) => p.alias === value.alias);
-
-		// If we cant find both, we do not dare changing anything. Notice a composition may not have been loaded yet.
-		if (!oldType || !newType) {
-			return { value, changed: false };
+	): { values: Array<UmbContentValueModel>; hasChanges: boolean } {
+		// Group values by property alias for efficient processing
+		const valuesByAlias = new Map<string, Array<UmbContentValueModel>>();
+		for (const value of values) {
+			const existing = valuesByAlias.get(value.alias) ?? [];
+			existing.push(value);
+			valuesByAlias.set(value.alias, existing);
 		}
 
-		// If variation hasn't changed, return unchanged
-		if (oldType.variesByCulture === newType.variesByCulture) {
-			return { value, changed: false };
+		const result: Array<UmbContentValueModel> = [];
+		let hasChanges = false;
+
+		for (const [alias, aliasValues] of valuesByAlias) {
+			const oldType = oldPropertyTypes.find((p) => p.alias === alias);
+			const newType = newPropertyTypes.find((p) => p.alias === alias);
+
+			// If we can't find both types, keep values unchanged (composition may not have been loaded yet)
+			if (!oldType || !newType) {
+				result.push(...aliasValues);
+				continue;
+			}
+
+			// No variation change - keep all values as-is
+			if (oldType.variesByCulture === newType.variesByCulture) {
+				result.push(...aliasValues);
+				continue;
+			}
+
+			hasChanges = true;
+
+			if (newType.variesByCulture) {
+				// Invariant → Variant: assign default language to the single invariant value
+				for (const value of aliasValues) {
+					result.push({ ...value, culture: defaultLanguage });
+				}
+			} else {
+				// Variant → Invariant: keep only the default language value (or first if default doesn't exist)
+				const defaultLanguageValue = aliasValues.find((v) => v.culture === defaultLanguage);
+				const valueToKeep = defaultLanguageValue ?? aliasValues[0];
+				if (valueToKeep) {
+					result.push({ ...valueToKeep, culture: null });
+				}
+			}
 		}
 
-		// Variation has changed, migrate the value
-		if (newType.variesByCulture) {
-			// If it now varies by culture, set to default language
-			return { value: { ...value, culture: defaultLanguage }, changed: true };
-		} else {
-			// If it no longer varies by culture, set to invariant
-			return { value: { ...value, culture: null }, changed: true };
-		}
+		return { values: result, hasChanges };
 	}
 }
