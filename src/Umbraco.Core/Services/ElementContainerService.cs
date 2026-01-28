@@ -44,20 +44,20 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
+    public async Task<Attempt<EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc/>
-    public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
+    public async Task<Attempt<EntityContainerOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey, mustBeInRecycleBin: true);
 
-    public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
+    public async Task<Attempt<EntityContainerOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
 
         var originalPath = string.Empty;
-        Attempt<EntityContainer?, EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
+        Attempt<EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
             scope,
             key,
             Constants.System.RecycleBinElement,
@@ -97,7 +97,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return deleteResult;
     }
 
-    private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> HandleMoveAsync(
+    private async Task<Attempt<EntityContainerOperationStatus>> HandleMoveAsync(
         Guid key,
         Guid? parentKey,
         Guid userKey,
@@ -109,12 +109,12 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         EntityContainer? container = _entityContainerRepository.Get(key);
         if (container is null)
         {
-            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotFound, null);
+            return Attempt.Fail(EntityContainerOperationStatus.NotFound);
         }
 
         if (mustBeInRecycleBin && container.Trashed is false)
         {
-            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotInTrash, container);
+            return Attempt.Fail(EntityContainerOperationStatus.NotInTrash);
         }
 
         var parentId = Constants.System.Root;
@@ -125,13 +125,13 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             EntityContainer? parent = _entityContainerRepository.Get(parentKey.Value);
             if (parent is null)
             {
-                return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.ParentNotFound, null);
+                return Attempt.Fail(EntityContainerOperationStatus.ParentNotFound);
             }
 
             if (parent.Trashed)
             {
                 // cannot move to a trashed container
-                return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.InTrash, null);
+                return Attempt.Fail(EntityContainerOperationStatus.InTrash);
             }
 
             parentId = parent.Id;
@@ -139,7 +139,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             parentLevel = parent.Level;
         }
 
-        Attempt<EntityContainer?, EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
+        Attempt<EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
             scope,
             key,
             parentId,
@@ -224,7 +224,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return Attempt.Succeed(EntityContainerOperationStatus.Success);
     }
 
-    private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> MoveLockedAsync<TNotification>(
+    private async Task<Attempt<EntityContainerOperationStatus>> MoveLockedAsync<TNotification>(
         ICoreScope scope,
         Guid key,
         int parentId,
@@ -240,18 +240,18 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         EntityContainer? container = _entityContainerRepository.Get(key);
         if (container is null)
         {
-            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotFound, null);
+            return Attempt.Fail(EntityContainerOperationStatus.NotFound);
         }
 
         if (container.ParentId == parentId)
         {
-            return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
+            return Attempt.Succeed(EntityContainerOperationStatus.Success);
         }
 
         EntityContainerOperationStatus validateMoveResult = validateMove(container);
         if (validateMoveResult != EntityContainerOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(validateMoveResult, null);
+            return Attempt.Fail(validateMoveResult);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -260,7 +260,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         TNotification movingNotification = movingNotificationFactory(container, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(movingNotification))
         {
-            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
+            return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
 
         var newContainerPath = $"{parentPath.TrimEnd(Constants.CharArrays.Comma)},{container.Id}";
@@ -300,7 +300,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                     var unpublishSuccess = await ElementEditingService.UnpublishTrashedElementOnRestore(descendantElement, userKey, _elementService, _userIdKeyResolver, _logger);
                     if (unpublishSuccess is false)
                     {
-                        return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Unknown, container);
+                        return Attempt.Fail(EntityContainerOperationStatus.Unknown);
                     }
 
                     // NOTE: this cast isn't pretty, but it's the best we can do now. the content and media services do something
@@ -325,7 +325,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IStatefulNotification movedNotification = movedNotificationFactory(container, eventMessages);
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
 
-        return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
+        return Attempt.Succeed(EntityContainerOperationStatus.Success);
     }
 
     private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteLockedAsync(

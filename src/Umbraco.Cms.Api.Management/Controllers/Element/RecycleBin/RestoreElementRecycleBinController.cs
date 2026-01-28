@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -53,13 +52,13 @@ public class RestoreElementRecycleBinController : ElementRecycleBinControllerBas
             return Forbidden();
         }
 
-        Attempt<IElement?, ContentEditingOperationStatus> result = await _elementEditingService.RestoreAsync(
+        Attempt<ContentEditingOperationStatus> result = await _elementEditingService.RestoreAsync(
             id,
             moveElementRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
-            : ContentEditingOperationStatusResult(result.Status);
+            : ContentEditingOperationStatusResult(result.Result);
     }
 }

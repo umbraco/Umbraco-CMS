@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -49,11 +48,11 @@ public class MoveToRecycleBinElementFolderController : ElementFolderControllerBa
             return Forbidden();
         }
 
-        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _elementContainerService
+        Attempt<EntityContainerOperationStatus> result = await _elementContainerService
             .MoveToRecycleBinAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
-            : OperationStatusResult(result.Status);
+            : OperationStatusResult(result.Result);
     }
 }

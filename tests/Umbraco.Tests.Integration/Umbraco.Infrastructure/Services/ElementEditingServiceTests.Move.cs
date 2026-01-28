@@ -21,7 +21,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -51,7 +51,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -272,7 +272,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.InTrash, moveResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.InTrash, moveResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -296,7 +296,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.InTrash, moveResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.InTrash, moveResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
