@@ -19,6 +19,9 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _routes?: Array<UmbRoute>;
 
+	@state()
+	private _loading?: boolean = true;
+
 	constructor() {
 		super();
 
@@ -26,6 +29,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
 			this.#observeForbidden();
+			this.#observeLoading();
 		});
 	}
 
@@ -51,7 +55,23 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
+	#observeLoading() {
+		this.observe(
+			this.#workspaceContext?.loading.isOn,
+			(loading) => {
+				this._loading = loading ?? false;
+			},
+			'_observeLoading',
+		);
+	}
+
 	private async _generateRoutes() {
+		if (!this.#variants || this.#variants.length === 0) {
+			this._routes = [];
+			this.#ensureForbiddenRoute(this._routes);
+			return;
+		}
+
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
@@ -93,15 +113,25 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
+		this.#ensureForbiddenRoute(routes);
+
+		this._routes = routes;
+	}
+
+	/**
+	 * Ensure that there is a route to handle forbidden access.
+	 * This route will display a forbidden message when the user does not have permission to access certain resources.
+	 * Also handles not found routes.
+	 * @param {Array<UmbRoute>} routes - The array of routes to append the forbidden route to
+	 */
+	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
 		routes.push({
-			path: `**`,
+			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
 				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
 			},
 		});
-
-		this._routes = routes;
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
@@ -109,9 +139,9 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes && this._routes.length > 0
+		return !this._loading && this._routes && this._routes.length > 0
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
-			: '';
+			: html`<umb-view-loader></umb-view-loader>`;
 	}
 
 	static override styles = [

@@ -331,13 +331,13 @@ internal sealed class ContentEditingService
         return ContentEditingOperationStatus.Success;
     }
 
-    protected override IContent New(string? name, int parentId, Guid? parentKey, IContentType contentType)
+    protected override IContent New(string? name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
-    protected override OperationResult? Move(IContent content, int newParentId, Guid? newParentKey, int userId)
+    protected override OperationResult? Move(IContent content, int newParentId, int userId)
         => ContentService.Move(content, newParentId, userId);
 
-    protected override IContent? Copy(IContent content, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
 
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
@@ -345,7 +345,7 @@ internal sealed class ContentEditingService
     protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
 
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
     protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)
     {

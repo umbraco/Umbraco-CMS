@@ -89,4 +89,17 @@ public partial class ElementEditingServiceTests
             Assert.AreEqual($"{original.Name} (1)", copy.Name);
         });
     }
+
+    [Test]
+    public async Task Cannot_Copy_To_Non_Existing_Parent()
+    {
+        var original = await CreateInvariantElement();
+
+        var copyResult = await ElementEditingService.CopyAsync(original.Key, Guid.NewGuid(), Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(copyResult.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, copyResult.Status);
+        });
+    }
 }

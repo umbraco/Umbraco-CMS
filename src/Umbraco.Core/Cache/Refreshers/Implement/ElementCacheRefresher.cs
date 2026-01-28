@@ -29,7 +29,7 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
         _idKeyMap = idKeyMap;
         _elementCacheService = elementCacheService;
 
-        // TODO: Use IElementsCache instead of ICacheManager, see ContentCacheRefresher for more information.
+        // TODO ELEMENTS: Use IElementsCache instead of ICacheManager, see ContentCacheRefresher for more information.
         _cacheManager = cacheManager;
     }
 

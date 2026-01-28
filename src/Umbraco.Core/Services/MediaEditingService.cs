@@ -135,13 +135,13 @@ internal sealed class MediaEditingService
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
-    protected override IMedia New(string? name, int parentId, Guid? parentKey, IMediaType mediaType)
+    protected override IMedia New(string? name, int parentId, IMediaType mediaType)
         => new Models.Media(name, parentId, mediaType);
 
-    protected override OperationResult? Move(IMedia media, int newParentId, Guid? newParentKey, int userId)
+    protected override OperationResult? Move(IMedia media, int newParentId, int userId)
         => ContentService.Move(media, newParentId, userId).Result;
 
-    protected override IMedia? Copy(IMedia media, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => throw new NotSupportedException("Copy is not supported for media");
 
     protected override OperationResult? MoveToRecycleBin(IMedia media, int userId)
@@ -172,6 +172,7 @@ internal sealed class MediaEditingService
                 OperationResultType.Success => ContentEditingOperationStatus.Success,
                 OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
                 OperationResultType.FailedDuplicateKey => ContentEditingOperationStatus.DuplicateKey,
+                OperationResultType.FailedInvalidKey => ContentEditingOperationStatus.InvalidKey,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
                 _ => ContentEditingOperationStatus.Unknown

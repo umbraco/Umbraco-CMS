@@ -1,4 +1,5 @@
 import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import { UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN } from '../../../folder/workspace/constants.js';
 import type { UmbElementRecycleBinTreeItemModel } from '../../tree/types.js';
 //import { UmbElementItemDataResolver } from '../../../item/data-resolver/element-item-data-resolver.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -26,7 +27,11 @@ export class UmbTrashedElementNameTableColumnElement extends UmbLitElement imple
 			//this.#resolver.setData(value);
 			this._name = value.name;
 
-			this._editPath = UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+			const pathPattern = value.isFolder
+				? UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN
+				: UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN;
+
+			this._editPath = pathPattern.generateAbsolute({
 				unique: value.unique,
 			});
 		}

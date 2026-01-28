@@ -1,11 +1,12 @@
 ﻿using NPoco;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 // TODO ELEMENTS: split this into two interfaces - like "IEntityDto" and "IPublishedDto"?
 public interface IContentVersionDto
 {
-    internal const string IdColumnName = "id";
+    internal const string IdColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     internal const string PublishedColumnName = "published";
 

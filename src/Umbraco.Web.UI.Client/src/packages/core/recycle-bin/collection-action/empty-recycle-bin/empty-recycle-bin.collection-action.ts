@@ -3,14 +3,16 @@ import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.inter
 import type { ManifestCollectionActionEmptyRecycleBinKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Collection action for emptying the recycle bin.
  * @class UmbEmptyRecycleBinCollectionAction
- * @augments {UmbControllerBase}
- * @implements {UmbCollectionActionBase}
+ * @augments {UmbCollectionActionBase}
  */
 export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase {
 	#manifest: ManifestCollectionActionEmptyRecycleBinKind;
@@ -49,6 +51,29 @@ export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase 
 		// Refresh the collection
 		const collectionContext = await this.getContext(UMB_COLLECTION_CONTEXT);
 		collectionContext?.loadCollection();
+
+		// Refresh the tree (if any)
+		await this.#reloadChildrenOfEntity();
+	}
+
+	/**
+	 * Requests a reload of the children of the current entity in the tree.
+	 * Silently returns if the required contexts are not available.
+	 */
+	async #reloadChildrenOfEntity() {
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) return;
+
+		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) return;
+
+		const entityType = entityContext.getEntityType();
+		if (!entityType) return;
+
+		const unique = entityContext.getUnique();
+
+		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
+		eventContext.dispatchEvent(event);
 	}
 }
 

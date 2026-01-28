@@ -139,6 +139,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 					oldPassword,
 				},
 			}),
+			{ disableNotifications: true },
 		);
 	}
 }

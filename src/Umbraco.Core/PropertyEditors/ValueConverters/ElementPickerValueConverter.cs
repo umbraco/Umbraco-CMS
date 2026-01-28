@@ -61,15 +61,15 @@ public class ElementPickerValueConverter : PropertyValueConverterBase, IDelivery
         return elements.ToArray();
     }
 
-    // TODO KJA: implement Delivery API
+    // TODO ELEMENTS: implement Delivery API
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
         => GetPropertyCacheLevel(propertyType);
 
-    // TODO KJA: implement Delivery API
+    // TODO ELEMENTS: implement Delivery API
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => GetPropertyValueType(propertyType);
 
-    // TODO KJA: implement Delivery API
+    // TODO ELEMENTS: implement Delivery API
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         => null;
 }
