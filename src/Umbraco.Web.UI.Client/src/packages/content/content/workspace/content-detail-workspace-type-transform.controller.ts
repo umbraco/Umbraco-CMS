@@ -140,9 +140,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 						result.push(value);
 					} else if (value.culture === cultureToKeep) {
 						// Culture value: only migrate if no invariant value exists for the same segment
-						const existingInvariantValue = valuesOfAlias.find(
-							(v) => v.culture === null && v.segment === value.segment,
-						);
+						const existingInvariantValue = valuesOfAlias.find((v) => v.culture === null && v.segment === value.segment);
 						if (!existingInvariantValue) {
 							result.push({ ...value, culture: null });
 						}

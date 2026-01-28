@@ -779,6 +779,147 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 		expect(data?.values[0]?.value).to.equal('existing en-US value');
 	});
 
+	it('preserves existing invariant values and migrates culture values when changing to invariant', async () => {
+		// Set up initial data with culture values AND an existing invariant value
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'en-US value',
+					culture: 'en-US',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'da-DK value',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'existing invariant for segmentA',
+					culture: null,
+					segment: 'segmentA',
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'en-US segmentA value',
+					culture: 'en-US',
+					segment: 'segmentA',
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (variant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: true,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to be invariant
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: true,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		const data = mockWorkspace.getData();
+		const testPropValues = data?.values.filter((v) => v.alias === 'testProperty');
+
+		// Should have 2 values: migrated en-US (null segment) and existing invariant (segmentA)
+		expect(testPropValues?.length).to.equal(2);
+
+		// All should be invariant now
+		expect(testPropValues?.every((v) => v.culture === null)).to.be.true;
+
+		// Default segment should be migrated from en-US
+		const defaultSegment = testPropValues?.find((v) => v.segment === null);
+		expect(defaultSegment?.value).to.equal('en-US value');
+
+		// SegmentA should keep existing invariant value (not overwritten by en-US segmentA)
+		const segmentA = testPropValues?.find((v) => v.segment === 'segmentA');
+		expect(segmentA?.value).to.equal('existing invariant for segmentA');
+	});
+
+	it('does not overwrite existing invariant+segment value with culture value when changing to invariant', async () => {
+		// Set up initial data where an invariant value already exists for the same segment
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'existing invariant value',
+					culture: null,
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'en-US value',
+					culture: 'en-US',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (variant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to be invariant
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Should keep existing invariant value and NOT migrate en-US (would conflict with same segment)
+		const data = mockWorkspace.getData();
+		expect(data?.values.length).to.equal(1);
+		expect(data?.values[0]?.culture).to.be.null;
+		expect(data?.values[0]?.value).to.equal('existing invariant value');
+	});
+
 	it('preserves all segment values for fallback culture when default language has no values', async () => {
 		// Set up initial data with only non-default language values with segments
 		mockWorkspace.setData({
