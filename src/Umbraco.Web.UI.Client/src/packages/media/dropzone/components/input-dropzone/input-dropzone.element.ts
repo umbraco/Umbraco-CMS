@@ -76,10 +76,15 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	@query('#dropzone', true)
 	protected _dropzone?: UUIFileDropzoneElement;
 
+	@query('#uploader')
+	protected _uploader?: HTMLDivElement;
+
 	@state()
 	protected _progressItems: Array<UmbUploadableItem> = [];
 
 	protected _manager = new UmbDropzoneManager(this);
+
+	#autoCloseTimeout?: ReturnType<typeof setTimeout>;
 
 	/**
 	 * Determines if the dropzone should be disabled.
@@ -110,20 +115,49 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	protected _observeProgressItems() {
 		this.observe(
 			this._manager.progressItems,
-			(progressItems) => {
+			async (progressItems) => {
 				this._progressItems = [...progressItems];
-				const waiting = this._progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
-				if (this._progressItems.length && !waiting) {
-					this.value = [...this._progressItems];
-					this.dispatchEvent(new UmbDropzoneChangeEvent(this._progressItems));
+				const hasWaiting = this._progressItems.some((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
+
+				// Clear any pending auto-close when new uploads start
+				if (hasWaiting) {
+					clearTimeout(this.#autoCloseTimeout);
 				}
+
+				this.#handleUploadComplete(hasWaiting);
+				await this.#showPopover();
 			},
 			'_observeProgressItems',
 		);
 	}
 
+	#handleUploadComplete(hasWaiting: boolean): void {
+		if (!this._progressItems.length || hasWaiting) return;
+
+		this.value = [...this._progressItems];
+		this.dispatchEvent(new UmbDropzoneChangeEvent(this._progressItems));
+
+		// Only auto-close if all items completed successfully (no errors)
+		const allSuccessful = this._progressItems.every((item) => item.status === UmbFileDropzoneItemStatus.COMPLETE);
+		if (!allSuccessful) return;
+
+		this.#autoCloseTimeout = setTimeout(() => {
+			this._manager.removeAll();
+		}, 750);
+	}
+
+	async #showPopover(): Promise<void> {
+		if (!this._progressItems.length) return;
+
+		await this.updateComplete;
+		if (this._uploader && !this._uploader.matches(':popover-open')) {
+			this._uploader.showPopover();
+		}
+	}
+
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
+		clearTimeout(this.#autoCloseTimeout);
 		this._manager.destroy();
 	}
 
@@ -159,7 +193,17 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		if (!this._progressItems?.length) return nothing;
 
 		return html`
-			<div id="uploader">
+			<div id="uploader" popover="manual">
+				<div id="uploader-header">
+					<span><umb-localize key="media_uploading">Uploading</umb-localize></span>
+					<uui-button
+						id="uploader-close"
+						compact
+						@click=${this.#handleRemove}
+						label=${this.localize.term('general_close')}>
+						<uui-icon name="remove"></uui-icon>
+					</uui-button>
+				</div>
 				${repeat(
 					this._progressItems,
 					(item) => item.unique,
@@ -265,6 +309,10 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				cursor: pointer;
 			}
 
+			:host([hidden]) {
+				display: none;
+			}
+
 			:host([disabled]) #dropzone {
 				opacity: 0.5;
 				pointer-events: none;
@@ -302,6 +350,37 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				flex-wrap: wrap;
 				align-items: center;
 				gap: var(--uui-size-space-3);
+				background: var(--umb-dropzone-uploader-background, var(--uui-color-surface));
+				padding: var(--umb-dropzone-uploader-padding, var(--uui-size-space-5));
+				border-radius: var(--umb-dropzone-uploader-border-radius, var(--uui-border-radius));
+				border: var(--umb-dropzone-uploader-border, 1px solid var(--uui-color-border));
+				box-shadow: var(--umb-dropzone-uploader-box-shadow, var(--uui-shadow-depth-3));
+				max-width: var(--umb-dropzone-uploader-max-width, 350px);
+				cursor: default;
+
+				/* Popover positioning - uses inset: auto to reset default centering */
+				&:popover-open {
+					inset: auto;
+					top: var(--umb-dropzone-uploader-top, auto);
+					bottom: var(--umb-dropzone-uploader-bottom, 24px);
+					left: var(--umb-dropzone-uploader-left, auto);
+					right: var(--umb-dropzone-uploader-right, 24px);
+				}
+
+				&::backdrop {
+					background: transparent;
+				}
+
+				#uploader-header {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					width: 100%;
+					font-weight: bold;
+					padding-bottom: var(--uui-size-space-2);
+					border-bottom: 1px solid var(--uui-color-divider);
+					margin-bottom: var(--uui-size-space-2);
+				}
 
 				.placeholder {
 					display: grid;
