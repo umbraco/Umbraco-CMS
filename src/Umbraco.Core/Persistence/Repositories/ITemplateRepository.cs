@@ -6,6 +6,8 @@ public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>
 {
     ITemplate? Get(string? alias);
 
+    ITemplate? Get(Guid key) => throw new NotImplementedException();
+
     IEnumerable<ITemplate> GetAll(params string[] aliases);
 
     IEnumerable<ITemplate> GetChildren(int masterTemplateId);
