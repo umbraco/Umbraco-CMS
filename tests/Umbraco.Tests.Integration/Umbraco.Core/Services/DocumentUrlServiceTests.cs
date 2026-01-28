@@ -448,7 +448,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Act - check stored URL segments in database
         List<PublishedDocumentUrlSegment> storedSegments;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedSegments = DocumentUrlRepository.GetAll()
                 .Where(s => s.DocumentKey == Subpage.Key)
@@ -502,7 +502,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Assert - URLs should now be stored with specific languageId
         List<PublishedDocumentUrlSegment> segmentsAfter;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             segmentsAfter = DocumentUrlRepository.GetAll()
                 .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)

@@ -60,7 +60,6 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
-        builder.AddNotificationAsyncHandler<ContentTypeChangedNotification, DocumentUrlServiceContentTypeChangedNotificationHandler>();
     }
 
     [SetUp]
@@ -850,7 +849,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     {
         // Arrange - create variant content type and content
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate3");
-        FileService.SaveTemplate(template);
+        await FileService.CreateTemplateAsync(template, Constants.Security.SuperUserKey);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "variantType3");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -865,7 +864,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Act - check stored alias
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == content.Key)
@@ -942,7 +941,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify invariant aliases exist
         List<PublishedDocumentUrlAlias> invariantAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             invariantAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
