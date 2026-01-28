@@ -181,7 +181,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 		const previewSigns = this._signs.slice(0, 2);
 
-		return html`<div class="preview ${this._popoverOpen ? 'hidden' : ''}">
+		return html`<div class="preview">
 			${repeat(
 				previewSigns,
 				(c) => c.alias,
@@ -241,10 +241,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			.preview {
 				pointer-events: none;
 				transition: opacity 120ms var(--ease);
-			}
-
-			.preview.hidden {
-				opacity: 0;
 			}
 
 			.preview-icon {
