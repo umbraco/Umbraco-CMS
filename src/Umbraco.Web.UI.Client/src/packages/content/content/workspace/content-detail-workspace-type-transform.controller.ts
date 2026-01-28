@@ -94,19 +94,19 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 		const result: Array<UmbContentValueModel> = [];
 		let hasChanges = false;
 
-		for (const [alias, aliasValues] of valuesByAlias) {
+		for (const [alias, valuesOfAlias] of valuesByAlias) {
 			const oldType = oldPropertyTypes.find((p) => p.alias === alias);
 			const newType = newPropertyTypes.find((p) => p.alias === alias);
 
 			// If we can't find both types, keep values unchanged (composition may not have been loaded yet)
 			if (!oldType || !newType) {
-				result.push(...aliasValues);
+				result.push(...valuesOfAlias);
 				continue;
 			}
 
 			// No variation change - keep all values as-is
 			if (oldType.variesByCulture === newType.variesByCulture) {
-				result.push(...aliasValues);
+				result.push(...valuesOfAlias);
 				continue;
 			}
 
@@ -114,16 +114,16 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 
 			if (newType.variesByCulture) {
 				// Invariant → Variant: assign default language to the single invariant value
-				for (const value of aliasValues) {
+				for (const value of valuesOfAlias) {
 					result.push({ ...value, culture: defaultLanguage });
 				}
 			} else {
 				// Variant → Invariant: keep all segment values for the default language (or first culture if default doesn't exist)
-				const cultureToKeep = aliasValues.some((v) => v.culture === defaultLanguage)
+				const cultureToKeep = valuesOfAlias.some((v) => v.culture === defaultLanguage)
 					? defaultLanguage
-					: aliasValues[0]?.culture;
+					: valuesOfAlias[0]?.culture;
 
-				for (const value of aliasValues) {
+				for (const value of valuesOfAlias) {
 					if (value.culture === cultureToKeep) {
 						result.push({ ...value, culture: null });
 					}
