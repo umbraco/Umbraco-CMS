@@ -5,6 +5,7 @@ export interface UmbBlockRteTypeModel extends UmbBlockTypeBaseModel {
 	displayInline: boolean;
 }
 export interface UmbBlockRteLayoutModel extends UmbBlockLayoutBaseModel {
+	/** @deprecated Use `displayInline` on `UmbBlockRteTypeModel` instead. This field will be removed in Umbraco 19. [LK] */
 	displayInline?: boolean;
 }
 

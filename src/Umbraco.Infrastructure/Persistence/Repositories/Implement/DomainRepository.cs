@@ -136,7 +136,7 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
         // If the language changed, we need to resolve the ISO code
         if (entity.LanguageId.HasValue)
         {
-            ((UmbracoDomain)entity).LanguageIsoCode = Database.FirstOrDefault<string>(
+            ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>(
                 $"SELECT {QuoteColumnName("languageISOCode")} FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @langId",
                 new { langId = entity.LanguageId });
         }
@@ -186,7 +186,7 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
         // If the language changed, we need to resolve the ISO code
         if (entity.WasPropertyDirty("LanguageId"))
         {
-            ((UmbracoDomain)entity).LanguageIsoCode = Database.FirstOrDefault<string>(
+            ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>(
                 $"SELECT {QuoteColumnName("languageISOCode")} FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @langId",
                 new { langId = entity.LanguageId });
         }
