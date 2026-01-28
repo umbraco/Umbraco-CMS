@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__umbraco__create*",
+      "mcp__umbraco__get*",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_wait_for"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "umbraco-cms"
+  ]
+}
