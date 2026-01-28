@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "17.2.0-rc",
+	"version": "17.3.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
