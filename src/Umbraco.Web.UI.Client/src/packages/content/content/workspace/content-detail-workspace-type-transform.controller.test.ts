@@ -659,6 +659,126 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 		expect(segmentB?.value).to.equal('en-US segment B');
 	});
 
+	it('preserves existing culture values and migrates invariant values when changing to variant', async () => {
+		// Set up initial data with an invariant value AND an existing culture value
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'invariant value',
+					culture: null,
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'existing danish value',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (invariant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to vary by culture
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Should keep existing da-DK value AND migrate invariant value to en-US
+		const data = mockWorkspace.getData();
+		expect(data?.values.length).to.equal(2);
+
+		const enValue = data?.values.find((v) => v.culture === 'en-US');
+		expect(enValue?.value).to.equal('invariant value');
+
+		const daValue = data?.values.find((v) => v.culture === 'da-DK');
+		expect(daValue?.value).to.equal('existing danish value');
+	});
+
+	it('does not overwrite existing culture+segment value with invariant value when changing to variant', async () => {
+		// Set up initial data where a culture value already exists for the same segment as the invariant
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'invariant value',
+					culture: null,
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'existing en-US value',
+					culture: 'en-US', // Same as default language
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (invariant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to vary by culture
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: false,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Should keep existing en-US value and NOT migrate invariant (would conflict with same culture+segment)
+		const data = mockWorkspace.getData();
+		expect(data?.values.length).to.equal(1);
+		expect(data?.values[0]?.culture).to.equal('en-US');
+		expect(data?.values[0]?.value).to.equal('existing en-US value');
+	});
+
 	it('preserves all segment values for fallback culture when default language has no values', async () => {
 		// Set up initial data with only non-default language values with segments
 		mockWorkspace.setData({

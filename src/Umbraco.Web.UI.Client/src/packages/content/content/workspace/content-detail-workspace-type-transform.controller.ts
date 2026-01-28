@@ -113,20 +113,41 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			hasChanges = true;
 
 			if (newType.variesByCulture) {
-				// Invariant → Variant: assign default language to the single invariant value
+				// Invariant → Variant: keep existing culture values, only migrate invariant values if no value exists for that culture+segment
 				for (const value of valuesOfAlias) {
-					result.push({ ...value, culture: defaultLanguage });
+					if (value.culture !== null) {
+						// Keep existing culture values as-is
+						result.push(value);
+					} else {
+						// Invariant value: only migrate if no value exists for default language + same segment
+						const existingCultureValue = valuesOfAlias.find(
+							(v) => v.culture === defaultLanguage && v.segment === value.segment,
+						);
+						if (!existingCultureValue) {
+							result.push({ ...value, culture: defaultLanguage });
+						}
+					}
 				}
 			} else {
-				// Variant → Invariant: keep all segment values for the default language (or first culture if default doesn't exist)
+				// Variant → Invariant: keep existing invariant values, only migrate culture values if no invariant value exists for that segment
 				const cultureToKeep = valuesOfAlias.some((v) => v.culture === defaultLanguage)
 					? defaultLanguage
 					: valuesOfAlias[0]?.culture;
 
 				for (const value of valuesOfAlias) {
-					if (value.culture === cultureToKeep) {
-						result.push({ ...value, culture: null });
+					if (value.culture === null) {
+						// Keep existing invariant values as-is
+						result.push(value);
+					} else if (value.culture === cultureToKeep) {
+						// Culture value: only migrate if no invariant value exists for the same segment
+						const existingInvariantValue = valuesOfAlias.find(
+							(v) => v.culture === null && v.segment === value.segment,
+						);
+						if (!existingInvariantValue) {
+							result.push({ ...value, culture: null });
+						}
 					}
+					// Discard values from other cultures
 				}
 			}
 		}
