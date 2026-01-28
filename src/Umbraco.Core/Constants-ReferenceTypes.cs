@@ -16,6 +16,8 @@ public static partial class Constants
     public static class ReferenceType
     {
         public const string Document = UdiEntityType.Document;
+        public const string Element = UdiEntityType.Element;
+        public const string ElementContainer = UdiEntityType.ElementContainer;
         public const string Media = UdiEntityType.Media;
         public const string Member = UdiEntityType.Member;
         public const string DocumentTypePropertyType = "document-type-property-type";

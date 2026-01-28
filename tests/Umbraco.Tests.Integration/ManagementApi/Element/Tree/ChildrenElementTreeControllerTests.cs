@@ -52,7 +52,8 @@ public class ChildrenElementTreeControllerTests : ManagementApiUserGroupTestBase
             ParentKey = _parentKey,
             Variants = [new VariantModel { Name = $"ChildElement {Guid.NewGuid()}" }],
         };
-        await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var childElementResult = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(childElementResult.Success, $"Failed to create child element: {childElementResult.Status}");
     }
 
     protected override Expression<Func<ChildrenElementTreeController, object>> MethodSelector =>

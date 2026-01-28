@@ -420,6 +420,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
             Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
+            Services.AddUnique<IElementRecycleBinQueryService, ElementRecycleBinQueryService>();
             Services.AddUnique<IContentQueryService, ContentQueryService>();
 
             // Authorizers

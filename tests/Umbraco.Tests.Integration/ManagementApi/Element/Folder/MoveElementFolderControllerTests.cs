@@ -21,9 +21,11 @@ public class MoveElementFolderControllerTests : ManagementApiUserGroupTestBase<M
     public async Task Setup()
     {
         var folderResult = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(folderResult.Success, $"Failed to create folder: {folderResult.Status}");
         _folderKey = folderResult.Result!.Key;
 
         var targetResult = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(targetResult.Success, $"Failed to create target folder: {targetResult.Status}");
         _targetFolderKey = targetResult.Result!.Key;
     }
 

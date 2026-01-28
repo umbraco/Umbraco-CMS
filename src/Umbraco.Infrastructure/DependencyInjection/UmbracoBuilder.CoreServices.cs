@@ -352,7 +352,11 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
+            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<ElementMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<EntityContainerMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
         // add notification handlers for property editors
         builder
@@ -450,7 +454,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
-            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>();
+            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementPublishedNotification, ContentRelationsUpdate>();
 
         return builder;
     }

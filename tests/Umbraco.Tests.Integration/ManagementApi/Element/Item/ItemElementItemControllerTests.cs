@@ -35,6 +35,7 @@ public class ItemElementItemControllerTests : ManagementApiUserGroupTestBase<Ite
             Variants = [new VariantModel { Name = Guid.NewGuid().ToString() }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
     }
 
@@ -58,7 +59,4 @@ public class ItemElementItemControllerTests : ManagementApiUserGroupTestBase<Ite
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
-
-    protected override async Task<HttpResponseMessage> ClientRequest()
-        => await Client.GetAsync($"{Url}?id={_elementKey}");
 }
