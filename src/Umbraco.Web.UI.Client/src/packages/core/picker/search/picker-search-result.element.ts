@@ -5,6 +5,7 @@ import type { ManifestPickerSearchResultItem } from './result-item/picker-search
 import { UmbDefaultPickerSearchResultItemContext } from './result-item/default/default-picker-search-result-item.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
@@ -24,6 +25,12 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
 	private _isSearchable: boolean = false;
 
+	@state()
+	private _currentPage = 1;
+
+	@state()
+	private _totalPages = 1;
+
 	@property({ attribute: false })
 	pickableFilter: PickableFilterMethodType = () => true;
 
@@ -34,18 +41,30 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
 			this.#pickerContext = context;
+
 			this.observe(
 				this.#pickerContext?.search.searchable,
 				(isSearchable) => (this._isSearchable = isSearchable ?? false),
-				'obsSearchable',
+				null,
 			);
-			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query), 'obsQuery');
+
+			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query), null);
+
+			this.observe(this.#pickerContext?.search.searching, (query) => (this._searching = query ?? false), null);
+
+			this.observe(this.#pickerContext?.search.resultItems, (items) => (this._items = items ?? []), null);
+
 			this.observe(
-				this.#pickerContext?.search.searching,
-				(query) => (this._searching = query ?? false),
-				'obsSearching',
+				this.#pickerContext?.search.pagination.currentPage,
+				(currentPage) => (this._currentPage = currentPage ?? 1),
+				null,
 			);
-			this.observe(this.#pickerContext?.search.resultItems, (items) => (this._items = items ?? []), 'obsResultItems');
+
+			this.observe(
+				this.#pickerContext?.search.pagination.totalPages,
+				(totalPages) => (this._totalPages = totalPages ?? 1),
+				null,
+			);
 		});
 	}
 
@@ -67,8 +86,25 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 					(item) => item.unique,
 					(item) => this.#renderResultItem(item),
 				)}
+				${this.#renderPagination()}
 			</uui-box>
 		`;
+	}
+
+	#onPageChange(event: UUIPaginationEvent) {
+		this.#pickerContext?.search.pagination.setCurrentPageNumber(event.target.current);
+		this.#pickerContext?.search.search();
+	}
+
+	#renderPagination() {
+		if (this._totalPages <= 1) {
+			return nothing;
+		}
+
+		return html`<uui-pagination
+			.current=${this._currentPage}
+			.total=${this._totalPages}
+			@change=${this.#onPageChange}></uui-pagination>`;
 	}
 
 	#renderEmptyResult() {
@@ -111,6 +147,11 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 				&:last-of-type {
 					margin-bottom: 0;
 				}
+			}
+
+			uui-pagination {
+				display: block;
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];
