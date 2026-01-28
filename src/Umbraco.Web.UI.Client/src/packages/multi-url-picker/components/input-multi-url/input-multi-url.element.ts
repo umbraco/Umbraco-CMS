@@ -228,6 +228,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 							type: data?.type,
 							unique: data?.unique,
 							url: data?.url,
+							culture: data?.culture,
 						},
 					},
 				};
@@ -356,10 +357,10 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	}
 
 	#getResolvedItemUrl(link: UmbLinkPickerLink): string {
-		return (
-			(this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '') +
-			(link.queryString || '')
-		);
+		const baseUrl = link.culture
+			? link.url
+			: (this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? '');
+		return baseUrl + (link.queryString || '');
 	}
 
 	override render() {

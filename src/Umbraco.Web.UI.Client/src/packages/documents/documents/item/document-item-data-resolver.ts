@@ -73,6 +73,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	#variantContext?: UmbVariantContext;
 	#fallbackCulture?: string | null;
 	#displayCulture?: string | null;
+	#cultureOverride?: string | null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -81,6 +82,24 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 			this.#variantContext = context;
 			this.#observeVariantContext();
 		});
+	}
+
+	/**
+	 * Set a culture override that takes precedence over the variant context
+	 * If set, this culture will be used instead of displayCulture
+	 * @param {string | null | undefined} culture - The culture to use, or null/undefined to clear override
+	 */
+	setCultureOverride(culture: string | null | undefined) {
+		this.#cultureOverride = culture;
+		this.#setVariantAwareValues();
+	}
+
+	/**
+	 * Get the culture override if set
+	 * @returns {string | null | undefined} The culture override
+	 */
+	getCultureOverride(): string | null | undefined {
+		return this.#cultureOverride;
 	}
 
 	#observeVariantContext() {
@@ -107,11 +126,12 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 
 	/**
 	 * Get the display culture or fallback culture
-	 * @returns {string | null | undefined} The display culture or fallback culture
+	 * Priority: cultureOverride > displayCulture > fallbackCulture
+	 * @returns {string | null | undefined} The culture to use
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	getCulture(): string | null | undefined {
-		return this.#displayCulture || this.#fallbackCulture;
+		return this.#cultureOverride ?? this.#displayCulture ?? this.#fallbackCulture;
 	}
 
 	/**
@@ -321,6 +341,14 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 			return variants[0];
 		}
 
-		return findVariant(variants, this.#displayCulture!);
+		// Priority: cultureOverride > displayCulture > fallbackCulture
+		const targetCulture = this.#cultureOverride ?? this.#displayCulture;
+
+		if (!targetCulture) {
+			// Fallback to first variant if no culture available
+			return variants[0];
+		}
+
+		return findVariant(variants, targetCulture);
 	}
 }

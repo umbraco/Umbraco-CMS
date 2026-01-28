@@ -25,3 +25,20 @@ export const UMB_DOCUMENT_PICKER_MODAL = new UmbModalToken<UmbDocumentPickerModa
 		},
 	},
 );
+
+export const UMB_DOCUMENT_VARIANT_PICKER_MODAL = new UmbModalToken<
+	UmbDocumentPickerModalData,
+	UmbDocumentPickerModalValue
+>(UMB_TREE_PICKER_MODAL_ALIAS, {
+	modal: {
+		type: 'sidebar',
+		size: 'small',
+	},
+	data: {
+		treeAlias: 'Umb.Tree.Document',
+		search: {
+			providerAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
+		},
+		isVariant: true,
+	},
+});

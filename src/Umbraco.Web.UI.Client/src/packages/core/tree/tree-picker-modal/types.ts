@@ -22,7 +22,20 @@ export interface UmbTreePickerModalData<
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;
 	startNode?: UmbTreeStartNode;
 	foldersOnly?: boolean;
+	isVariant?: boolean;
+	/** Optional list of available languages. If not provided, will be fetched automatically when isVariant is true. */
+	availableLanguages?: Array<UmbTreePickerLanguageOption>;
+	/** Optional initial culture to select. If not provided, will use app language context. */
+	initialCulture?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
+export type UmbPickerVariantModalValue = UmbPickerModalValue;
+
+export interface UmbTreePickerModalValue extends UmbPickerVariantModalValue {
+	culture?: string;
+}
+
+export interface UmbTreePickerLanguageOption {
+	unique: string;
+	name: string;
+}

@@ -32,6 +32,9 @@ public class LinkDisplay
     [DataMember(Name = "url")]
     public string? Url { get; set; }
 
+    [DataMember(Name = "culture")]
+    public string? Culture { get; set; }
+
     public static class Types
     {
         public const string Document = "document";

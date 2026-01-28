@@ -39,6 +39,14 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	disabled = false;
 
+	@property({ type: String })
+	public set culture(value: string | undefined) {
+		this.#item.setCultureOverride(value);
+	}
+	public get culture(): string | undefined {
+		return this.#item.getCultureOverride() ?? undefined;
+	}
+
 	@state()
 	private _unique = '';
 
