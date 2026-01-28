@@ -137,7 +137,6 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				${!this.readonly
 					? html`
 							<uui-input-lock
-								id="alias"
 								name="alias"
 								slot="append"
 								label=${aliasLabel}
@@ -167,7 +166,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 			align-items: center;
 		}
 
-		#alias {
+		uui-input-lock {
 			transition: opacity 80ms;
 			&.muted {
 				opacity: 0.55;
@@ -181,7 +180,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		:host(:invalid:not([pristine])) > uui-input {
 			border-color: var(--uui-color-invalid);
 		}
-		:host(:not(invalid):not(:hover):not(:focus-within)) #alias {
+		:host(:not(invalid):not(:hover):not(:focus-within)) uui-input-lock {
 			--uui-button-contrast: transparent;
 			--uui-input-background-color-readonly: transparent;
 		}
