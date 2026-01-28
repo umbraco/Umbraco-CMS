@@ -304,7 +304,7 @@ public class DocumentUrlService : IDocumentUrlService
         foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
             // Group using composite key of document/language/draft.
-            (Guid DocumentKey, int? LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
+            (Guid DocumentKey, int? LanguageId, bool IsDraft) key = (model.DocumentKey, model.NullableLanguageId, model.IsDraft);
 
             if (grouped.TryGetValue(key, out (string? Primary, List<string> Alternates) segments) is false)
             {
@@ -782,7 +782,7 @@ public class DocumentUrlService : IDocumentUrlService
         yield return new PublishedDocumentUrlSegment
         {
             DocumentKey = cacheKey.DocumentKey,
-            LanguageId = cacheKey.LanguageId,
+            NullableLanguageId = cacheKey.LanguageId,
             UrlSegment = cache.PrimarySegment,
             IsDraft = cacheKey.IsDraft,
             IsPrimary = true,
@@ -796,7 +796,7 @@ public class DocumentUrlService : IDocumentUrlService
                 yield return new PublishedDocumentUrlSegment
                 {
                     DocumentKey = cacheKey.DocumentKey,
-                    LanguageId = cacheKey.LanguageId,
+                    NullableLanguageId = cacheKey.LanguageId,
                     UrlSegment = segment,
                     IsDraft = cacheKey.IsDraft,
                     IsPrimary = false,

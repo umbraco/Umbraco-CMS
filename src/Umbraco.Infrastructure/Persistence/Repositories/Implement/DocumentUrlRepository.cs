@@ -94,7 +94,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         {
             UrlSegment = dto.UrlSegment,
             DocumentKey = dto.UniqueId,
-            LanguageId = dto.LanguageId,
+            NullableLanguageId = dto.LanguageId,
             IsDraft = dto.IsDraft,
             IsPrimary = dto.IsPrimary
         };
@@ -105,7 +105,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         {
             UrlSegment = model.UrlSegment,
             UniqueId = model.DocumentKey,
-            LanguageId = model.LanguageId,
+            LanguageId = model.NullableLanguageId,
             IsDraft = model.IsDraft,
             IsPrimary = model.IsPrimary,
         };
