@@ -38,9 +38,9 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeCreated();
 
   // Assert
+  expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
   await umbracoUi.member.clickMembersSidebarButton();
   await umbracoUi.member.isMemberWithNameVisible(memberName, true);
-  expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
 test('can edit comments', async ({umbracoApi, umbracoUi}) => {

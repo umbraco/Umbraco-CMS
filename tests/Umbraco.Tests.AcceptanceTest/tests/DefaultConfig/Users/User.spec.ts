@@ -57,6 +57,9 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
+  // This wait is currently necessary as the action button is clicked before it is "ready"
+  // TODO: Remove the wait and fix the 'clickActionButton'
+  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickDeleteButton();
   await umbracoUi.user.clickConfirmToDeleteButtonAndWaitForUserToBeDeleted();
@@ -378,6 +381,9 @@ test('can change password for a user', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
+  // This wait is currently necessary as the action button is clicked before it is "ready"
+  // TODO: Remove the wait and fix the 'clickActionButton'
+  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickChangePasswordButton();
   await umbracoUi.user.updatePassword(userPassword);
@@ -422,6 +428,9 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUserWithName(newTestUser);
 
   // Act
+  // This wait is currently necessary as the action button is clicked before it is "ready"
+  // TODO: Remove the wait and fix the 'clickActionButton'
+  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickEnableButton();
   await umbracoUi.user.clickConfirmEnableButton();

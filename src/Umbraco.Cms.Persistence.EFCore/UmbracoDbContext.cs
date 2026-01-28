@@ -12,6 +12,7 @@ using Umbraco.Cms.Persistence.EFCore.Migrations;
 namespace Umbraco.Cms.Persistence.EFCore;
 
 /// <summary>
+/// The Entity Framework Core database context for Umbraco CMS.
 /// </summary>
 /// <remarks>
 /// To autogenerate migrations use the following commands
@@ -35,7 +36,7 @@ public class UmbracoDbContext : DbContext
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoDbContext"/> class.
     /// </summary>
-    /// <param name="options"></param>
+    /// <param name="options">The options to be used by the DbContext.</param>
     public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
         : base(ConfigureOptions(options))
     { }
@@ -78,6 +79,7 @@ public class UmbracoDbContext : DbContext
         return optionsBuilder.Options;
     }
 
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

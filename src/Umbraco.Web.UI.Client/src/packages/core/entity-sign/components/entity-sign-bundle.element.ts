@@ -1,7 +1,10 @@
 import { UmbLitElement } from '../../lit-element/lit-element.element.js';
 import type { ManifestEntitySign } from '../types.js';
 import { customElement, html, nothing, property, repeat, state, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbExtensionsElementAndApiInitializer,
+	createExtensionElementWithApi,
+} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
@@ -40,11 +43,14 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 	@state()
 	private _labels: Map<string, string> = new Map();
+	@state()
+	private _popoverOpen = false;
 
-	private _open = false;
 	private _hoverTimer?: number;
 
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
+	@state()
+	private _popoverSigns?: Array<HTMLElement | undefined>;
 
 	constructor() {
 		super();
@@ -63,6 +69,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		if (!this.#entityType || !this.#entityFlagAliases) {
 			this.removeUmbControllerByAlias('extensionsInitializer');
 			this._signs = [];
+			this._popoverSigns = undefined;
 			return;
 		}
 
@@ -76,6 +83,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				// Clean up old observers
 				this.#signLabelObservations.forEach((o) => this.removeUmbController(o));
 				this.#signLabelObservations = [];
+				this._popoverSigns = undefined;
 
 				// Setup label observers
 				signs.forEach((sign) => {
@@ -101,23 +109,54 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
-	#handleHoverTimer(open: boolean, delay: number) {
+	async #createPopoverSigns(): Promise<void> {
+		if (!this._signs || this._popoverSigns) return;
+
+		this._popoverSigns = await Promise.all(
+			this._signs.map(async (sign) => {
+				const { element } = await createExtensionElementWithApi(sign.manifest, [{ meta: sign.manifest.meta }]);
+				if (element) {
+					(element as any).manifest = sign.manifest;
+				}
+				return element;
+			}),
+		);
+	}
+
+	async #handleHoverTimer(open: boolean, delay: number) {
 		if (this._hoverTimer) clearTimeout(this._hoverTimer);
-		this._hoverTimer = window.setTimeout(() => {
-			this._open = open;
-			this.requestUpdate();
+		this._hoverTimer = window.setTimeout(async () => {
+			const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
+			if (popover) {
+				if (open) {
+					await this.#createPopoverSigns();
+					// 1) Get the host element's position
+					const hostRect = this.getBoundingClientRect();
+					// 2) Position the popover
+					popover.style.top = `${hostRect.bottom}px`;
+					popover.style.left = `${hostRect.right}px`;
+					// 3) Show the popover
+					popover.showPopover();
+					this._popoverOpen = true;
+				} else {
+					popover.hidePopover();
+					this._popoverOpen = false;
+				}
+			}
 			this._hoverTimer = undefined;
 		}, delay);
 	}
 
 	#openTooltip = () => {
-		if (!this._open) {
+		const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
+		if (popover && !popover.matches(':popover-open')) {
 			this.#handleHoverTimer(true, 240);
 		}
 	};
 
 	#cancelOpen = () => {
-		if (this._open) {
+		const popover = this.shadowRoot?.querySelector('#entity-sign-popover') as HTMLElement;
+		if (popover?.matches(':popover-open')) {
 			this.#handleHoverTimer(false, 360);
 		} else if (this._hoverTimer) {
 			clearTimeout(this._hoverTimer);
@@ -134,138 +173,83 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	#renderBundle() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
-		const first = this._signs?.[0];
-		if (!first) return nothing;
-		return html`<div class="infobox ${this._open ? 'is-open' : ''}" style=${`--count:${this._signs.length}`}>
-			${this.#renderOptions()}
+		return html` ${this.#renderPreview()} ${this.#renderPopover()} `;
+	}
+
+	#renderPreview() {
+		if (!this._signs || this._signs.length === 0) return nothing;
+
+		const previewSigns = this._signs.slice(0, 2);
+
+		return html`<div class="preview">
+			${repeat(
+				previewSigns,
+				(c) => c.alias,
+				(c, i) => html`<span class="preview-icon" style=${`--i:${i}`}>${c.component}</span>`,
+			)}
 		</div>`;
 	}
 
+	#renderPopover() {
+		return html`<div id="entity-sign-popover" popover="hint" class="infobox">${this.#renderOptions()}</div>`;
+	}
+
 	#renderOptions() {
-		return this._signs
-			? repeat(
-					this._signs,
-					(c) => c.alias,
-					(c, i) => {
-						return html`<div class="sign-container ${i > 1 ? 'hide-in-overview' : ''}" style=${`--i:${i}`}>
-							<span class="badge-icon">${c.component}</span
-							><span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
-						</div>`;
-					},
-				)
-			: nothing;
+		if (!this._signs || !this._popoverSigns) return nothing;
+
+		return repeat(
+			this._signs,
+			(c) => c.alias,
+			(c, index) => {
+				return html`<div class="sign-container">
+					<span class="badge-icon">${this._popoverSigns![index]}</span>
+					<span class="label">${this.localize.string(this._labels.get(c.alias) ?? '')}</span>
+				</div>`;
+			},
+		);
 	}
 
 	static override styles = [
 		css`
 			:host {
-				anchor-name: --entity-sign;
 				position: relative;
-				--offset-h: 12px; /* 22px / 16 */
-				--row-h: 1.36rem; /* 22px / 16 */
-				--icon-w: 0.75rem; /* 12px / 16 */
-				--pad-x: 0.25rem; /*  4px / 16 */
 				--ease: cubic-bezier(0.1, 0, 0.3, 1);
 				--ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 			}
 
 			.infobox {
 				position: absolute;
-				top: 0;
-				margin-top: calc(-12px + var(--offset-h));
-				left: 19px;
-				margin-left: -6px;
-				background-color: transparent;
-				padding: var(--uui-size-2);
-				padding-left: var(--uui-size-3);
-				font-size: 8px;
-				clip-path: inset(-10px calc(100% - 30px) calc(100% - 10px) -20px);
-				transition:
-					background-color 80ms 40ms linear,
-					clip-path 120ms var(--ease-bounce),
-					font-size 120ms var(--ease);
-				/*will-change: clip-path;*/
-				min-height: fit-content;
-			}
-			.infobox::before {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 100%;
-				bottom: 100%;
-				opacity: 0;
-				border-radius: 3px;
+				padding: var(--uui-size-2) var(--uui-size-3);
+				font-size: 12px;
+				color: var(--uui-color-text);
+				background-color: var(--uui-color-surface);
 				box-shadow: var(--uui-shadow-depth-2);
-				display: none;
-				transition:
-					right 120ms var(--ease-bounce),
-					bottom 120ms var(--ease-bounce),
-					opacity 120ms linear,
-					display 0 120ms;
+				border-radius: 3px;
+				border: none;
+				margin: 0;
+				--umb-sign-bundle-bg: var(--uui-color-surface);
 			}
 
 			.infobox > .sign-container {
 				display: flex;
-				align-items: start;
+				align-items: center;
 				gap: 3px;
 				position: relative;
-				transform: translate(calc((var(--i) * -5px) - 10px), calc((-1 * var(--i) * var(--row-h)) - var(--offset-h)));
-				transition:
-					transform 120ms var(--ease),
-					visibility 0ms linear 120ms opacity 120ms linear;
-				z-index: calc(var(--count) - var(--i));
-				/*will-change: transform;*/
 				pointer-events: none;
 			}
-			.infobox > .sign-container.hide-in-overview {
-				visibility: hidden;
+
+			.preview {
+				pointer-events: none;
+				transition: opacity 120ms var(--ease);
 			}
 
-			.infobox .sign-container .label {
-				opacity: 0;
-				transition: opacity 120ms;
-			}
-
-			/*OPEN STATE -- Prevent the hover state in firefox(until support of the position-anchor)*/
-			@supports (position-anchor: --any-check) {
-				.infobox {
-					position: fixed;
-					position-anchor: --entity-sign;
-					top: anchor(bottom);
-					left: anchor(right);
-					z-index: 1;
-				}
-				.infobox.is-open {
-					z-index: 10;
-					background-color: var(--uui-color-surface);
-					font-size: 12px;
-					color: var(--uui-color-text);
-					clip-path: inset(-6px);
-					--umb-sign-bundle-bg: var(--uui-color-surface);
-				}
-				.infobox.is-open::before {
-					right: 0;
-					bottom: 0;
-					opacity: 100;
-					background-color: var(--uui-color-surface);
-					display: block;
-					transition:
-						right 120ms var(--ease-bounce),
-						bottom 120ms var(--ease-bounce),
-						opacity 120ms var(--ease),
-						display 0 0;
-				}
-				.infobox.is-open > .sign-container {
-					transform: none;
-					align-items: center;
-					transition: transform 120ms var(--ease);
-					visibility: visible;
-				}
-				.infobox.is-open .sign-container .label {
-					opacity: 1;
-					pointer-events: auto;
-				}
+			.preview-icon {
+				position: absolute;
+				top: 10px;
+				left: 12px;
+				transform: translateX(calc(var(--i) * -5px));
+				font-size: 8px;
+				z-index: calc(2 - var(--i));
 			}
 		`,
 	];

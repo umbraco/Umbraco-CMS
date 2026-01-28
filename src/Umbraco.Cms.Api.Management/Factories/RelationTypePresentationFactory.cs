@@ -58,7 +58,8 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         return Task.FromResult<IEnumerable<IReferenceResponseModel>>(result);
     }
 
-    private IReferenceResponseModel? MapDocumentReference(RelationItemModel relationItemModel,
+    private IReferenceResponseModel? MapDocumentReference(
+        RelationItemModel relationItemModel,
         List<IEntitySlim> slimEntities)
     {
         DocumentReferenceResponseModel? documentReferenceResponseModel =

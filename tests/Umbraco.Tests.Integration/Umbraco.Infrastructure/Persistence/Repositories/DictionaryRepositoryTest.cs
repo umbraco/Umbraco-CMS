@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -25,17 +27,22 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache) =>
+    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false)
+    {
+        var dictionarySettingsMonitor = new Mock<IOptionsMonitor<DictionarySettings>>();
+        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch });
 
         // Create a repository with a real runtime cache.
-        new DictionaryRepository(
+        return new DictionaryRepository(
             GetRequiredService<IScopeAccessor>(),
             cache,
             GetRequiredService<ILogger<DictionaryRepository>>(),
             GetRequiredService<ILoggerFactory>(),
             GetRequiredService<ILanguageRepository>(),
             GetRequiredService<IRepositoryCacheVersionService>(),
-            GetRequiredService<ICacheSyncService>());
+            GetRequiredService<ICacheSyncService>(),
+            dictionarySettingsMonitor.Object);
+    }
 
     [Test]
     public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
@@ -536,6 +543,50 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             var dictionaryItem = repository.Get("Read More Updated");
 
             Assert.IsNotNull(dictionaryItem);
+        }
+    }
+
+    [Test]
+    public void GetDictionaryItemDescendants_WithValueSearch_Disabled_Does_Not_Return_Items_Matching_Only_Translation_Value()
+    {
+        // Arrange
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache, enableValueSearch: false);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act - Search for "Læs" which only exists in Danish translation value, not in any key
+            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+
+            // Assert - Should not find anything because value search is disabled
+            Assert.That(results, Is.Empty);
+        }
+    }
+
+    [Test]
+    public void GetDictionaryItemDescendants_WithValueSearch_Enabled_Returns_Items_Matching_Translation_Value()
+    {
+        // Arrange
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache, enableValueSearch: true);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act - Search for "Læs" which only exists in Danish translation value, not in any key
+            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+
+            // Assert - Should find "Read More" because its Danish translation contains "Læs mere"
+            Assert.That(results, Has.Length.EqualTo(1));
+            Assert.That(results[0].ItemKey, Is.EqualTo("Read More"));
+
+            // - also verify that both languages have a translation
+            var translatedIsoCodes = results[0]
+                .Translations
+                .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)
+                .Select(translation => translation.LanguageIsoCode)
+                .ToArray();
+            Assert.That(translatedIsoCodes, Does.Contain("en-US"));
+            Assert.That(translatedIsoCodes, Does.Contain("da-DK"));
         }
     }
 

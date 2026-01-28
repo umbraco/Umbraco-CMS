@@ -99,7 +99,7 @@ internal sealed partial class ColorPickerConfigurationEditor : ConfigurationEdit
             return normalizedValue;
         }
 
-        [GeneratedRegex("^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase, "en-GB")]
+        [GeneratedRegex("^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$", RegexOptions.IgnoreCase, "en-GB")]
         private static partial Regex ColorPattern();
     }
 }

@@ -6,11 +6,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 public class UserGroupDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string KeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
 
     public UserGroupDto()
     {
@@ -20,11 +22,11 @@ public class UserGroupDto
         UserGroup2GranularPermissionDtos = new List<UserGroup2GranularPermissionDto>();
     }
 
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 6)]
     public int Id { get; set; }
 
-    [Column("key")]
+    [Column(KeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupKey")]
@@ -80,11 +82,11 @@ public class UserGroupDto
     public int? StartMediaId { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    [Reference(ReferenceType.Many, ReferenceMemberName = UserGroup2AppDto.ReferenceMemberName)]
     public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    [Reference(ReferenceType.Many, ReferenceMemberName = UserGroup2LanguageDto.ReferenceMemberName)]
     public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
 
     [ResultColumn]

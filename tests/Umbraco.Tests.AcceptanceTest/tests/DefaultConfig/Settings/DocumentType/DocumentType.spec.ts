@@ -40,11 +40,12 @@ test('can create a document type with a template', {tag: '@smoke'}, async ({umbr
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentTypeWithTemplateButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  const documentTypeId = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
+  const {documentTypeId, templateId} = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeAndTemplateToBeCreated();
 
   // Assert
   // Checks if the documentType contains the template
   const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
+  expect(documentTypeData.allowedTemplates[0].id).toEqual(templateId);
   const templateData = await umbracoApi.template.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates[0].id).toEqual(templateData.id);
 

@@ -24,12 +24,13 @@ import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
+import { UmbFileDropzoneItemStatus, type UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
+import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
@@ -151,7 +152,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	// TODO: move to location manager in context
-	async #loadChildrenOfCurrentMediaItem(selectedItems?: Array<UmbUploadableItem>) {
+	async #loadChildrenOfCurrentMediaItem() {
 		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
 		let paginationManager = this.#pagingMap.get(key);
 
@@ -178,18 +179,51 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		paginationManager.setTotalItems(data?.total ?? 0);
 		this._currentPage = paginationManager.getCurrentPageNumber();
 		this._currentTotalPages = paginationManager.getTotalPages();
+	}
 
-		if (selectedItems?.length) {
-			const selectedItem = this._currentChildren.find((x) => x.unique == selectedItems[0].unique);
-			if (selectedItem) {
-				this.#onSelected(selectedItem);
-			}
+	async #onDropzoneChange(evt: UmbDropzoneChangeEvent) {
+		const target = evt.target as UmbDropzoneMediaElement;
+		const uploadedItems = target.value;
+
+		// Filter for successfully completed uploads only
+		const completedItems = uploadedItems?.filter((item) => item.status === UmbFileDropzoneItemStatus.COMPLETE) ?? [];
+
+		if (completedItems.length === 0) {
+			return;
+		}
+
+		// Navigate to the last page where new items appear (they get highest SortOrder)
+		await this.#navigateToLastPage();
+
+		// Auto-select uploaded items based on picker mode (single vs multiple)
+		const completedUniques = completedItems.map((item) => item.unique);
+
+		if (this.data?.multiple) {
+			// Multiple selection: add all uploaded items to selection, avoiding duplicates
+			const existingSelection = this.value?.selection ?? [];
+			const newSelection = [...new Set([...existingSelection, ...completedUniques])];
+			this._isSelectionMode = newSelection.length > 0;
+			this.modalContext?.setValue({ selection: newSelection });
+		} else {
+			// Single selection: select the first uploaded item
+			this._isSelectionMode = true;
+			this.modalContext?.setValue({ selection: [completedUniques[0]] });
 		}
 	}
 
-	#onDropzoneChange(evt: UmbDropzoneChangeEvent) {
-		const target = evt.target as UmbDropzoneMediaElement;
-		this.#loadChildrenOfCurrentMediaItem(target.value);
+	async #navigateToLastPage() {
+		// First reload to get fresh total from server (including newly uploaded items)
+		await this.#loadChildrenOfCurrentMediaItem();
+
+		// If we're not on the last page, navigate there
+		if (this._currentPage < this._currentTotalPages) {
+			const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
+			const paginationManager = this.#pagingMap.get(key);
+			if (paginationManager) {
+				paginationManager.setCurrentPageNumber(this._currentTotalPages);
+				await this.#loadChildrenOfCurrentMediaItem();
+			}
+		}
 	}
 
 	// TODO: move to location manager in context

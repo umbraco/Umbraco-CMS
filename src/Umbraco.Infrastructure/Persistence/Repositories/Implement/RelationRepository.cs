@@ -432,7 +432,8 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> {
+        var list = new List<string>
+        {
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE id = @id"
         };
         return list;
