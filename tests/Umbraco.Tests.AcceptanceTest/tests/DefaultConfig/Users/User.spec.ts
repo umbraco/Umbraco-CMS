@@ -610,3 +610,64 @@ test('cannot remove all user group from a user', {tag: '@release'}, async ({umbr
   // Assert
   await umbracoUi.user.isErrorNotificationVisible();
 });
+
+test('can add an element start node to a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const elementFolderName = 'TestElementFolder';
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickChooseElementStartNodeButton();
+  await umbracoUi.user.clickButtonWithName(elementFolderName);
+  await umbracoUi.user.clickChooseContainerButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainElementStartNodeIds(nameOfTheUser, [elementFolderId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+});
+
+test('can remove an element start node from a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const elementFolderName = 'TestElementFolder';
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  // Adds the element start node to the user
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  userData.elementStartNodeIds.push({id: elementFolderId});
+  await umbracoApi.user.update(userId, userData);
+  expect(await umbracoApi.user.doesUserContainElementStartNodeIds(nameOfTheUser, [elementFolderId])).toBeTruthy();
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickRemoveButtonForElementNodeWithName(elementFolderName);
+  await umbracoUi.user.clickConfirmRemoveButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainElementStartNodeIds(nameOfTheUser, [elementFolderId])).toBeFalsy();
+
+  // Clean
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+});
+
+test('can allow access to all elements for a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickAllowAccessToAllElements();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  expect(userData.hasElementRootAccess).toBeTruthy();
+});
