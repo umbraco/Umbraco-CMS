@@ -369,6 +369,22 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		return Promise.resolve();
 	}
 
+	/**
+	 * Validate this context, all the validators of this context will be validated.
+	 * Notice its a recursive check meaning sub validation contexts also validates their validators.
+	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
+	 */
+	async validate(): Promise<void> {
+		this.#validationMode = true;
+
+		const resultsStatus = await this.#executeValidators(this.#validators);
+
+		// We need to ask again for messages, as they might have been added during the validation process. [NL]
+		const hasMessages = this.messages?.getHasAnyMessages() ?? false;
+
+		return this.#performValidation(this.#validators, resultsStatus, hasMessages);
+	}
+
 	async #executeValidators(validators: UmbValidator[], variantIds?: Array<UmbVariantId>): Promise<boolean> {
 		if (validators.length === 0) {
 			return true;
@@ -385,22 +401,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			() => true,
 			() => false,
 		);
-	}
-
-	/**
-	 * Validate this context, all the validators of this context will be validated.
-	 * Notice its a recursive check meaning sub validation contexts also validates their validators.
-	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
-	 */
-	async validate(): Promise<void> {
-		this.#validationMode = true;
-
-		const resultsStatus = await this.#executeValidators(this.#validators);
-
-		// We need to ask again for messages, as they might have been added during the validation process. [NL]
-		const hasMessages = this.messages?.getHasAnyMessages() ?? false;
-
-		return this.#performValidation(this.#validators, resultsStatus, hasMessages);
 	}
 
 	/**
