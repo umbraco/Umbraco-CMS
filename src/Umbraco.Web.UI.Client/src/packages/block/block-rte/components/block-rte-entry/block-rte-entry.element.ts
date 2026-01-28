@@ -290,9 +290,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#buildEntryName(contexts: {
-		propertyDatasetContext: NonNullable<Awaited<ReturnType<typeof this.getContext<typeof UMB_PROPERTY_DATASET_CONTEXT>>>>;
-		propertyContext: NonNullable<Awaited<ReturnType<typeof this.getContext<typeof UMB_PROPERTY_CONTEXT>>>>;
-		clipboardContext: NonNullable<Awaited<ReturnType<typeof this.getContext<typeof UMB_CLIPBOARD_PROPERTY_CONTEXT>>>>;
+		propertyDatasetContext: { getName(): string };
+		propertyContext: { getLabel(): string };
+		clipboardContext: { write(data: unknown): void };
 	}) {
 		const workspaceName = this.localize.string(contexts.propertyDatasetContext.getName());
 		const propertyLabel = this.localize.string(contexts.propertyContext.getLabel());
