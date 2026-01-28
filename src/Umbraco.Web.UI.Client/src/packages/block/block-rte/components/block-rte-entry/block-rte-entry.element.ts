@@ -1,5 +1,5 @@
-import type { UmbBlockRteLayoutModel } from '../../types.js';
-import { UMB_BLOCK_RTE } from '../../constants.js';
+import type { UmbBlockRteLayoutModel, UmbBlockRteValueModel } from '../../types.js';
+import { UMB_BLOCK_RTE, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, property, state, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -10,6 +10,8 @@ import type {
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 import '../ref-rte-block/index.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -255,6 +257,44 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.#context.expose();
 	};
 
+	async #copyToClipboard() {
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
+
+		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
+		const propertyLabel = this.localize.string(propertyContext?.getLabel());
+		const blockLabel = this.#context.getName();
+
+		const entryName = workspaceName
+			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
+			: `${propertyLabel} - ${blockLabel}`;
+
+		const content = this.#context.getContent();
+		const layout = this.#context.getLayout();
+		const settings = this.#context.getSettings();
+		const expose = this.#context.getExpose();
+
+		const propertyValue: UmbBlockRteValueModel = {
+			contentData: content ? [structuredClone(content)] : [],
+			layout: {
+				[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
+			},
+			settingsData: settings ? [structuredClone(settings)] : [],
+			expose: expose ? [structuredClone(expose)] : [],
+		};
+
+		clipboardContext.write({
+			icon: this._icon,
+			name: entryName,
+			propertyValue,
+			propertyEditorUiAlias: 'Umb.PropertyEditorUi.RichText',
+		});
+	}
+
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
@@ -292,7 +332,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderActionBar() {
 		return this._showActions
-			? html`<uui-action-bar>${this.#renderEditAction()}${this.#renderEditSettingsAction()}</uui-action-bar>`
+			? html`<uui-action-bar>${this.#renderEditAction()}${this.#renderEditSettingsAction()}${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}</uui-action-bar>`
 			: nothing;
 	}
 
@@ -352,6 +392,18 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 					</uui-button>`
 				: nothing}
 		`;
+	}
+
+	#renderDeleteAction() {
+		return html`<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
+			<uui-icon name="icon-remove"></uui-icon>
+		</uui-button>`;
+	}
+
+	#renderCopyToClipboardAction() {
+		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#copyToClipboard()}>
+			<uui-icon name="icon-clipboard-copy"></uui-icon>
+		</uui-button>`;
 	}
 
 	override render() {
