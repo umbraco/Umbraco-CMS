@@ -29,7 +29,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Result);
         });
 
         var container = await ElementContainerService.GetAsync(containerKey);
@@ -72,7 +72,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Result);
         });
 
         var container = await ElementContainerService.GetAsync(containerKey);
@@ -138,7 +138,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Result);
         });
 
         var rootContainer = await ElementContainerService.GetAsync(rootContainerKey);
@@ -178,7 +178,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.NotInTrash, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.NotInTrash, restoreResult.Result);
         });
 
         var container = await ElementContainerService.GetAsync(containerKey);
@@ -215,7 +215,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InTrash, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.InTrash, restoreResult.Result);
         });
 
         var container = await ElementContainerService.GetAsync(containerKey);
@@ -235,7 +235,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.NotFound, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.NotFound, restoreResult.Result);
         });
     }
 
@@ -258,7 +258,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, restoreResult.Result);
         });
 
         var container = await ElementContainerService.GetAsync(containerKey);
@@ -286,7 +286,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, restoreResult.Result);
         });
 
         var container = await ElementContainerService.GetAsync(containerKey);
@@ -354,7 +354,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, restoreResult.Result);
         });
 
         childElement = await ElementEditingService.GetAsync(childElement.Key);

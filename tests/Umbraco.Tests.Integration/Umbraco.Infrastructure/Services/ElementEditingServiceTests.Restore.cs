@@ -29,7 +29,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, restoreResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, restoreResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -70,7 +70,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, restoreResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, restoreResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -99,7 +99,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotInTrash, restoreResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.NotInTrash, restoreResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -132,7 +132,7 @@ public partial class ElementEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.InTrash, restoreResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.InTrash, restoreResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -294,7 +294,7 @@ public partial class ElementEditingServiceTests
             Assert.IsFalse(restoreResult.Success);
             Assert.AreEqual(
                 ContentEditingOperationStatus.NotFound,
-                restoreResult.Status);
+                restoreResult.Result);
         });
     }
 
@@ -319,7 +319,7 @@ public partial class ElementEditingServiceTests
             Assert.IsFalse(restoreResult.Success);
             Assert.AreEqual(
                 ContentEditingOperationStatus.ParentNotFound,
-                restoreResult.Status);
+                restoreResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -348,7 +348,7 @@ public partial class ElementEditingServiceTests
             Assert.IsFalse(restoreResult.Success);
             Assert.AreEqual(
                 ContentEditingOperationStatus.ParentNotFound,
-                restoreResult.Status);
+                restoreResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);

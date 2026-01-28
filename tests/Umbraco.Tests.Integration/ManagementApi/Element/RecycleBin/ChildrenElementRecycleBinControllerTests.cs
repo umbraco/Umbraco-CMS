@@ -48,7 +48,7 @@ public class ChildrenElementRecycleBinControllerTests : ElementRecycleBinControl
 
         // Move folder to recycle bin (this will move the element inside it too)
         var moveResult = await ElementContainerService.MoveToRecycleBinAsync(_folderKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success, $"Failed to move folder to recycle bin: {moveResult.Status}");
+        Assert.IsTrue(moveResult.Success, $"Failed to move folder to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<ChildrenElementRecycleBinController, object>> MethodSelector =>

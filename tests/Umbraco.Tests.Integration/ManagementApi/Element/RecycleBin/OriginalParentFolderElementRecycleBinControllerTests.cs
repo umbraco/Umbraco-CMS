@@ -38,7 +38,7 @@ public class OriginalParentFolderElementRecycleBinControllerTests : ElementRecyc
         _folderKey = folderResult.Result!.Key;
 
         var moveResult = await ElementContainerService.MoveToRecycleBinAsync(_folderKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success, $"Failed to move folder to recycle bin: {moveResult.Status}");
+        Assert.IsTrue(moveResult.Success, $"Failed to move folder to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<OriginalParentElementFolderRecycleBinController, object>> MethodSelector =>

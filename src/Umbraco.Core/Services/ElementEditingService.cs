@@ -181,11 +181,11 @@ internal sealed class ElementEditingService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
+    public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
         => await HandleElementMoveAsync(key, containerKey, userKey);
 
     /// <inheritdoc/>
-    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? containerKey, Guid userKey)
+    public async Task<Attempt<ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? containerKey, Guid userKey)
         => await HandleElementMoveAsync(key, containerKey, userKey, mustBeInRecycleBin: true);
 
     public async Task<Attempt<ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
@@ -217,7 +217,7 @@ internal sealed class ElementEditingService
         return moveResult;
     }
 
-    private async Task<Attempt<IElement?, ContentEditingOperationStatus>> HandleElementMoveAsync(
+    private async Task<Attempt<ContentEditingOperationStatus>> HandleElementMoveAsync(
         Guid key,
         Guid? containerKey,
         Guid userKey,
@@ -229,12 +229,12 @@ internal sealed class ElementEditingService
         IElement? element = await GetAsync(key);
         if (element is null)
         {
-            return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotFound, null);
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
         }
 
         if (mustBeInRecycleBin && element.Trashed is false)
         {
-            return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, element);
+            return Attempt.Fail(ContentEditingOperationStatus.NotInTrash);
         }
 
         var parentId = Constants.System.Root;
@@ -243,12 +243,12 @@ internal sealed class ElementEditingService
             EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
             if (container is null)
             {
-                return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentNotFound, element);
+                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
             }
 
             if (container.Trashed)
             {
-                return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(ContentEditingOperationStatus.InTrash, element);
+                return Attempt.Fail(ContentEditingOperationStatus.InTrash);
             }
 
             parentId = container.Id;
@@ -273,11 +273,11 @@ internal sealed class ElementEditingService
 
         if (!moveResult.Success)
         {
-            return Attempt.FailWithStatus<IElement?, ContentEditingOperationStatus>(moveResult.Result, element);
+            return moveResult;
         }
 
         scope.Complete();
-        return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, await GetAsync(key));
+        return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
