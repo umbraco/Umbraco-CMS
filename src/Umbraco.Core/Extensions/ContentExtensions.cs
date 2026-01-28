@@ -228,7 +228,7 @@ public static class ContentExtensions
     /// <summary>
     ///     Gets the current status of the Content
     /// </summary>
-    public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string? culture = null)
+    public static ContentStatus GetStatus(this IPublishableContentBase content, ContentScheduleCollection contentSchedule, string? culture = null)
     {
         if (content.Trashed)
         {

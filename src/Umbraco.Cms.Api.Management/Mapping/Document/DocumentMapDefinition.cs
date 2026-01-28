@@ -133,29 +133,5 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     }
 
     private void Map(ContentScheduleCollection source, DocumentResponseModel target, MapperContext context)
-    {
-        foreach (ContentSchedule schedule in source.FullSchedule)
-        {
-            DocumentVariantResponseModel? variant = target.Variants
-                .FirstOrDefault(v =>
-                    v.Culture == schedule.Culture ||
-                    (IsInvariant(v.Culture) && IsInvariant(schedule.Culture)));
-            if (variant is null)
-            {
-                continue;
-            }
-
-            switch (schedule.Action)
-            {
-                case ContentScheduleAction.Release:
-                    variant.ScheduledPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
-                    break;
-                case ContentScheduleAction.Expire:
-                    variant.ScheduledUnpublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
-                    break;
-            }
-        }
-    }
-
-    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == Core.Constants.System.InvariantCulture;
+        => MapContentScheduleCollection<DocumentResponseModel, DocumentVariantResponseModel>(source, target, context);
 }

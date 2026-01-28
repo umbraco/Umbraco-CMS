@@ -2,7 +2,7 @@
 
 public sealed class ContentPublishingResult
 {
-    public IContent? Content { get; init; }
+    public IPublishableContentBase? Content { get; init; }
 
     public IEnumerable<string> InvalidPropertyAliases { get; set; } = [];
 }

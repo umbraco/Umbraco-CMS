@@ -211,10 +211,91 @@ internal sealed class DatabaseDataCreator
     {
         var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.AdminGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionAssignDomain.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionRights.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "7",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+            ],
+            [Constants.Security.EditorGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+            ],
+            [Constants.Security.WriterGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+            ],
+            [Constants.Security.TranslatorGroupKey] =
+            [
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+            ],
         };
 
         var i = 1;
@@ -324,6 +405,21 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
+                CreateDate = DateTime.UtcNow,
+            });
+        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+            new NodeDto
+            {
+                NodeId = Constants.System.RecycleBinElement,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 0,
+                Path = "-1,-22",
+                SortOrder = 0,
+                UniqueId = Constants.System.RecycleBinElementKey,
+                Text = "Recycle Bin",
+                NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
                 CreateDate = DateTime.UtcNow,
             });
 
@@ -1114,6 +1210,7 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ElementTree, Name = "ElementTree" });
     }
 
     private void CreateContentTypeData()
@@ -1299,6 +1396,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.AdminGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
                 Description = "Users with full access to all sections and functionality",
@@ -1317,6 +1415,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.WriterGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = WriterGroupAlias,
                 Name = "Writers",
                 Description = "Users with permission to create and update but not publish content",
@@ -1335,6 +1434,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.EditorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
                 Description = "Users with full permission to create, update and publish content",
@@ -1353,6 +1453,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.TranslatorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = TranslatorGroupAlias,
                 Name = "Translators",
                 Description = "Users with permission to manage dictionary entries",
@@ -1403,12 +1504,15 @@ internal sealed class DatabaseDataCreator
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Users });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Forms });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Translation });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Content });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Content });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Media });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Forms });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 4, AppAlias = Constants.Applications.Translation });
     }

@@ -40,6 +40,7 @@ public class EntityService : RepositoryService, IEntityService
             { typeof(IMemberType).FullName!, UmbracoObjectTypes.MemberType },
             { typeof(IMemberGroup).FullName!, UmbracoObjectTypes.MemberGroup },
             { typeof(ITemplate).FullName!, UmbracoObjectTypes.Template },
+            { typeof(IElement).FullName!, UmbracoObjectTypes.Element },
         };
     }
 
@@ -192,6 +193,17 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
+    public virtual IEnumerable<IEntitySlim> GetAll(IEnumerable<UmbracoObjectTypes> objectTypes, params int[] ids)
+    {
+        IEnumerable<Guid> objectTypeGuids = objectTypes.Select(x => x.GetGuid());
+
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _entityRepository.GetAll(objectTypeGuids, ids);
+        }
+    }
+
+    /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType)
         => GetAll(objectType, Array.Empty<int>());
 
@@ -230,6 +242,17 @@ public class EntityService : RepositoryService, IEntityService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAll(objectType.GetGuid(), keys);
+        }
+    }
+
+    /// <inheritdoc />
+    public virtual IEnumerable<IEntitySlim> GetAll(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys)
+    {
+        IEnumerable<Guid> objectTypeGuids = objectTypes.Select(x => x.GetGuid());
+
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _entityRepository.GetAll(objectTypeGuids, keys);
         }
     }
 
@@ -585,6 +608,48 @@ public class EntityService : RepositoryService, IEntityService
 
     /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedDescendants(
+        Guid? parentKey,
+        UmbracoObjectTypes parentObjectType,
+        IEnumerable<UmbracoObjectTypes> childObjectTypes,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            Guid objectTypeGuid = parentObjectType.GetGuid();
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>();
+
+            if (parentKey.HasValue)
+            {
+                // lookup the path so we can use it in the prefix query below
+                TreeEntityPath[] paths = _entityRepository.GetAllPaths(objectTypeGuid, parentKey.Value).ToArray();
+                if (paths.Length == 0)
+                {
+                    totalRecords = 0;
+                    return Enumerable.Empty<IEntitySlim>();
+                }
+
+                var path = paths[0].Path;
+                query.Where(x => x.Path.SqlStartsWith(path + ",", TextColumnType.NVarchar));
+            }
+
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+            var objectTypeGuids = childObjectTypes.Select(x => x.GetGuid()).ToHashSet();
+            if (pageSize == 0)
+            {
+                totalRecords = _entityRepository.CountByQuery(query, objectTypeGuids, filter);
+                return Enumerable.Empty<IEntitySlim>();
+            }
+
+            return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuids, pageNumber, pageSize, out totalRecords, filter, ordering);
+        }
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IEntitySlim> GetPagedDescendants(
         IEnumerable<int> ids,
         UmbracoObjectTypes objectType,
         long pageIndex,
@@ -710,9 +775,6 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[]? ids)
     {
-        Type? entityType = objectType.GetClrType();
-        GetObjectType(entityType);
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAllPaths(objectType.GetGuid(), ids);
@@ -722,9 +784,6 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys)
     {
-        Type? entityType = objectType.GetClrType();
-        GetObjectType(entityType);
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAllPaths(objectType.GetGuid(), keys);
@@ -741,7 +800,7 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     private int CountChildren(int id, UmbracoObjectTypes objectType, bool trashed = false, IQuery<IUmbracoEntity>? filter = null) =>
-        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, trashed, filter);
+        CountChildren(id, new HashSet<UmbracoObjectTypes> { objectType }, trashed, filter);
 
     private int CountChildren(
         int id,
@@ -830,7 +889,7 @@ public class EntityService : RepositoryService, IEntityService
 
             if (take == 0)
             {
-                totalRecords = CountChildren(parentId, childObjectTypes, filter: filter);
+                totalRecords = CountChildren(parentId, childObjectTypes, trashed, filter);
                 return Array.Empty<IEntitySlim>();
             }
 

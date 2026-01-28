@@ -5,6 +5,11 @@ namespace Umbraco.Cms.Core.Services;
 public interface IContentServiceBase<TItem> : IContentServiceBase
     where TItem : class, IContentBase
 {
+    /// <summary>
+    ///     Gets a content item.
+    /// </summary>
+    /// <param name="key">The identifier of the content item.</param>
+    /// <returns>The content item, or null if not found.</returns>
     TItem? GetById(Guid key);
 
     Attempt<OperationResult?> Save(IEnumerable<TItem> contents, int userId = Constants.Security.SuperUserId);

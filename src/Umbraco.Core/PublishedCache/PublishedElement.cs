@@ -45,6 +45,10 @@ public class PublishedElement : IPublishedElement
                                })
                                .ToArray()
                            ?? [];
+
+        Name = string.Empty;
+        Path = string.Empty;
+        Cultures = new Dictionary<string, PublishedCultureInfo>();
     }
 
     // initializes a new instance of the PublishedElement class
@@ -79,4 +83,20 @@ public class PublishedElement : IPublishedElement
         IPublishedProperty? property = index < 0 ? null : _propertiesArray?[index];
         return property;
     }
+
+    // TODO ELEMENTS: figure out what to do with all these
+    //                perhaps replace this whole class with PublishedElementWrapped? in that case, we also need to do the same for PublishedContent
+    public int Id { get; }
+    public string Name { get; }
+    public int SortOrder { get; }
+    public int Level { get; }
+    public string Path { get; }
+    public int CreatorId { get; }
+    public DateTime CreateDate { get; }
+    public int WriterId { get; }
+    public DateTime UpdateDate { get; }
+    public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
+    public PublishedItemType ItemType { get; }
+    public bool IsDraft(string? culture = null) => throw new NotImplementedException();
+    public bool IsPublished(string? culture = null) => throw new NotImplementedException();
 }

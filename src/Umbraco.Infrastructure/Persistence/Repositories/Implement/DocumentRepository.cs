@@ -1450,7 +1450,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     /// <inheritdoc />
-    public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
+    public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
     {
         if (content == null)
         {
@@ -1877,12 +1877,12 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     /// <inheritdoc />
-    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
+    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] contentIds)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<ContentScheduleDto>()
             .From<ContentScheduleDto>()
-            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, documentIds);
+            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, contentIds);
 
         List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
 

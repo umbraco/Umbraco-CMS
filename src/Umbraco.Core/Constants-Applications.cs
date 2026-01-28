@@ -46,6 +46,11 @@ public static partial class Constants
         ///     Application alias for the forms section.
         /// </summary>
         public const string Forms = "forms";
+
+        /// <summary>
+        ///     Application alias for the library section.
+        /// </summary>
+        public const string Library = "library";
     }
 
     /// <summary>

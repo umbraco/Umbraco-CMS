@@ -53,6 +53,10 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Media start node key not found")
                 .WithDetail("The assigned media start node does not exists.")
                 .Build()),
+            UserGroupOperationStatus.ElementStartNodeKeyNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("Element start node key not found")
+                .WithDetail("The assigned element start node does not exist.")
+                .Build()),
             UserGroupOperationStatus.DocumentPermissionKeyNotFound => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Document permission key not found")
                 .WithDetail("An assigned document permission does not reference an existing document.")

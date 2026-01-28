@@ -24,6 +24,8 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// </summary>
     int? StartMediaId { get; set; }
 
+    int? StartElementId { get; set; }
+
     /// <summary>
     ///     The icon
     /// </summary>

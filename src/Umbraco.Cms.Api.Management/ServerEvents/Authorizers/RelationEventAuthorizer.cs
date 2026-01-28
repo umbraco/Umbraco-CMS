@@ -12,5 +12,5 @@ public class RelationEventAuthorizer : EventSourcePolicyAuthorizer
 
     public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Relation];
 
-    protected override string Policy => AuthorizationPolicies.TreeAccessDocumentsOrMediaOrMembersOrContentTypes;
+    protected override string Policy => AuthorizationPolicies.TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes;
 }
