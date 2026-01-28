@@ -38,10 +38,6 @@ export class UmbBlockRteManagerContext<
 			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
 		}
 
-		if (blockType.displayInline) {
-			data.layout.displayInline = true;
-		}
-
 		return data;
 	}
 
