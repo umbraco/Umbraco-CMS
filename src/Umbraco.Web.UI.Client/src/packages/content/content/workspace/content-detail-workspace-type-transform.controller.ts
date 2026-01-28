@@ -70,6 +70,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 	/**
 	 * Transforms all values based on property variation changes.
 	 * Handles both invariant→variant and variant→invariant transitions, including cleanup of duplicate values.
+	 * When transitioning to invariant, keeps all segment values for the chosen culture (default language preferred).
 	 * @param {Array<UmbContentValueModel>} values - All content values
 	 * @param {Array<UmbPropertyTypeModel>} oldPropertyTypes - Previous property type definitions
 	 * @param {Array<UmbPropertyTypeModel>} newPropertyTypes - New property type definitions
@@ -117,11 +118,15 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 					result.push({ ...value, culture: defaultLanguage });
 				}
 			} else {
-				// Variant → Invariant: keep only the default language value (or first if default doesn't exist)
-				const defaultLanguageValue = aliasValues.find((v) => v.culture === defaultLanguage);
-				const valueToKeep = defaultLanguageValue ?? aliasValues[0];
-				if (valueToKeep) {
-					result.push({ ...valueToKeep, culture: null });
+				// Variant → Invariant: keep all segment values for the default language (or first culture if default doesn't exist)
+				const cultureToKeep = aliasValues.some((v) => v.culture === defaultLanguage)
+					? defaultLanguage
+					: aliasValues[0]?.culture;
+
+				for (const value of aliasValues) {
+					if (value.culture === cultureToKeep) {
+						result.push({ ...value, culture: null });
+					}
 				}
 			}
 		}

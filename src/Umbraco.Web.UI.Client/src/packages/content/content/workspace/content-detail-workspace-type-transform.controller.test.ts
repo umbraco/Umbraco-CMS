@@ -566,4 +566,164 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 		expect(staysVariantPropValues?.find((v) => v.culture === 'en-US')?.value).to.equal('en-US stays variant');
 		expect(staysVariantPropValues?.find((v) => v.culture === 'da-DK')?.value).to.equal('da-DK stays variant');
 	});
+
+	it('preserves all segment values for the default language when changing to invariant', async () => {
+		// Set up initial data with multiple cultures and segments
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'en-US default segment',
+					culture: 'en-US',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'en-US segment A',
+					culture: 'en-US',
+					segment: 'segmentA',
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'en-US segment B',
+					culture: 'en-US',
+					segment: 'segmentB',
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'da-DK default segment',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'da-DK segment A',
+					culture: 'da-DK',
+					segment: 'segmentA',
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (variant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: true,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to be invariant (culture only, segments still vary)
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: true,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Should keep all segment values for the default language (en-US) and discard da-DK values
+		const data = mockWorkspace.getData();
+		const testPropValues = data?.values.filter((v) => v.alias === 'testProperty');
+
+		expect(testPropValues?.length).to.equal(3);
+
+		// All values should now have culture: null
+		expect(testPropValues?.every((v) => v.culture === null)).to.be.true;
+
+		// Should have all three segments from en-US
+		const defaultSegment = testPropValues?.find((v) => v.segment === null);
+		expect(defaultSegment?.value).to.equal('en-US default segment');
+
+		const segmentA = testPropValues?.find((v) => v.segment === 'segmentA');
+		expect(segmentA?.value).to.equal('en-US segment A');
+
+		const segmentB = testPropValues?.find((v) => v.segment === 'segmentB');
+		expect(segmentB?.value).to.equal('en-US segment B');
+	});
+
+	it('preserves all segment values for fallback culture when default language has no values', async () => {
+		// Set up initial data with only non-default language values with segments
+		mockWorkspace.setData({
+			unique: 'test-doc',
+			values: [
+				{
+					alias: 'testProperty',
+					value: 'da-DK default segment',
+					culture: 'da-DK',
+					segment: null,
+					editorAlias: 'test-editor',
+				},
+				{
+					alias: 'testProperty',
+					value: 'da-DK segment A',
+					culture: 'da-DK',
+					segment: 'segmentA',
+					editorAlias: 'test-editor',
+				},
+			],
+		} as UmbContentDetailModel<UmbEntityVariantModel>);
+
+		// Set initial property types (variant)
+		const oldPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: true,
+				variesBySegment: true,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
+
+		// Create controller
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+
+		// Wait for initial observation
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Change property to be invariant
+		const newPropertyTypes: Array<UmbPropertyTypeModel> = [
+			{
+				alias: 'testProperty',
+				variesByCulture: false,
+				variesBySegment: true,
+			} as UmbPropertyTypeModel,
+		];
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
+
+		// Wait for observation to trigger
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Should keep all segment values from da-DK (fallback since en-US has no values)
+		const data = mockWorkspace.getData();
+		const testPropValues = data?.values.filter((v) => v.alias === 'testProperty');
+
+		expect(testPropValues?.length).to.equal(2);
+
+		// All values should now have culture: null
+		expect(testPropValues?.every((v) => v.culture === null)).to.be.true;
+
+		// Should have both segments from da-DK
+		const defaultSegment = testPropValues?.find((v) => v.segment === null);
+		expect(defaultSegment?.value).to.equal('da-DK default segment');
+
+		const segmentA = testPropValues?.find((v) => v.segment === 'segmentA');
+		expect(segmentA?.value).to.equal('da-DK segment A');
+	});
 });
