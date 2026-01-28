@@ -145,7 +145,8 @@ public class OptimizeInvariantUrlRecords : MigrationBase
     private void ConvertInvariantDocumentUrlRecords()
     {
         // For SQL Server: Convert existing invariant records to use NULL languageId and remove duplicates.
-        // Invariant documents are those with ContentVariation.Nothing (variations = 1) in cmsContentType.
+        // Invariant documents are those with ContentVariation.Nothing (variations = 0) in cmsContentType.
+        // Note: ContentVariation.Culture = 1, ContentVariation.Segment = 2, so 0 means no variation (invariant).
         Execute.Sql($@"
             -- Identify invariant documents
             ;WITH InvariantDocs AS (
@@ -154,7 +155,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] n ON du.uniqueId = n.uniqueId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Content}] c ON n.id = c.nodeId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.ContentType}] ct ON c.contentTypeId = ct.nodeId
-                WHERE ct.variations = 1  -- ContentVariation.Nothing (invariant)
+                WHERE ct.variations = 0  -- ContentVariation.Nothing (invariant)
             ),
             -- Select one record per unique combination to keep
             ToKeep AS (
@@ -177,7 +178,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] n ON du.uniqueId = n.uniqueId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Content}] c ON n.id = c.nodeId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.ContentType}] ct ON c.contentTypeId = ct.nodeId
-                WHERE ct.variations = 1  -- ContentVariation.Nothing (invariant)
+                WHERE ct.variations = 0  -- ContentVariation.Nothing (invariant)
             )
             UPDATE du SET du.languageId = NULL
             FROM [{Constants.DatabaseSchema.Tables.DocumentUrl}] du
@@ -188,6 +189,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
     private void ConvertInvariantDocumentUrlAliasRecords()
     {
         // For SQL Server: Convert existing invariant alias records to use NULL languageId and remove duplicates.
+        // Note: ContentVariation.Nothing = 0 (invariant), ContentVariation.Culture = 1 (variant).
         Execute.Sql($@"
             -- Identify invariant documents with aliases
             ;WITH InvariantDocs AS (
@@ -196,7 +198,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] n ON da.uniqueId = n.uniqueId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Content}] c ON n.id = c.nodeId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.ContentType}] ct ON c.contentTypeId = ct.nodeId
-                WHERE ct.variations = 1  -- ContentVariation.Nothing (invariant)
+                WHERE ct.variations = 0  -- ContentVariation.Nothing (invariant)
             ),
             -- Select one record per unique combination to keep
             ToKeep AS (
@@ -219,7 +221,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] n ON da.uniqueId = n.uniqueId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Content}] c ON n.id = c.nodeId
                 INNER JOIN [{Constants.DatabaseSchema.Tables.ContentType}] ct ON c.contentTypeId = ct.nodeId
-                WHERE ct.variations = 1  -- ContentVariation.Nothing (invariant)
+                WHERE ct.variations = 0  -- ContentVariation.Nothing (invariant)
             )
             UPDATE da SET da.languageId = NULL
             FROM [{Constants.DatabaseSchema.Tables.DocumentUrlAlias}] da

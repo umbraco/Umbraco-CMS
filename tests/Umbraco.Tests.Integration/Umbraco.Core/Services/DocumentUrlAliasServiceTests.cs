@@ -37,7 +37,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -69,7 +69,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create template
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // Create content type with umbracoUrlAlias property
         ContentType = CreateContentTypeWithUrlAlias(template.Id);
@@ -285,7 +285,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create a culture-variant content type
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id);
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -377,7 +377,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create a culture-variant content type
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate2");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasVariant2");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -475,7 +475,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify original alias exists in database
         List<PublishedDocumentUrlAlias> aliasesBefore;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             aliasesBefore = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == documentKey)
@@ -497,7 +497,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Alias should be removed from database
         List<PublishedDocumentUrlAlias> aliasesAfter;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             aliasesAfter = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == documentKey)
@@ -683,7 +683,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify in database
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
@@ -743,7 +743,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Note: The content type created in setup is invariant (no culture variance),
         // so aliases should be stored with NULL LanguageId
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll().ToList();
         }
@@ -832,7 +832,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     {
         // Verify invariant content was created in setup
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
@@ -849,7 +849,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     {
         // Arrange - create variant content type and content
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate3");
-        await FileService.CreateTemplateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "variantType3");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -888,7 +888,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify aliases are stored with NULL languageId (invariant)
         List<PublishedDocumentUrlAlias> aliasesBefore;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             aliasesBefore = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
@@ -905,7 +905,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var urlAliasProperty = ContentType.PropertyTypes.First(p => p.Alias == Constants.Conventions.Content.UrlAlias);
         urlAliasProperty.Variations = ContentVariation.Culture;
 
-        await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Reload content from database to pick up the new content type variation
         var content = ContentService.GetById(PageWithSingleAlias.Key)!;
@@ -918,7 +918,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Assert - aliases should now be stored with specific languageId (handler triggered by ContentType save)
         List<PublishedDocumentUrlAlias> aliasesAfter;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             aliasesAfter = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
@@ -958,7 +958,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var urlAliasProperty = ContentType.PropertyTypes.First(p => p.Alias == Constants.Conventions.Content.UrlAlias);
         urlAliasProperty.Variations = ContentVariation.Culture;
 
-        await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Reload content from database to pick up the new content type variation
         var content = ContentService.GetById(PageWithSingleAlias.Key)!;
@@ -971,7 +971,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify aliases are stored with specific languageId (variant) - handler triggered by ContentType save
         List<PublishedDocumentUrlAlias> variantAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             variantAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
@@ -985,7 +985,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         ContentType.Variations = ContentVariation.Nothing;
         urlAliasProperty.Variations = ContentVariation.Nothing;
 
-        await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Reload content from database to pick up the new invariant content type
         content = ContentService.GetById(PageWithSingleAlias.Key)!;
@@ -997,7 +997,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Assert - aliases should now be stored with NULL languageId (handler triggered by ContentType save)
         List<PublishedDocumentUrlAlias> aliasesAfter;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             aliasesAfter = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))

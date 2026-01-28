@@ -32,9 +32,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
     private IDocumentUrlRepository DocumentUrlRepository => GetRequiredService<IDocumentUrlRepository>();
 
-    private IDocumentUrlAliasRepository DocumentUrlAliasRepository => GetRequiredService<IDocumentUrlAliasRepository>();
-
-    private IDocumentUrlAliasService DocumentUrlAliasService => GetRequiredService<IDocumentUrlAliasService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
@@ -184,7 +182,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     public async Task<string?> GetDocumentKeyByUri_With_Domains_Returns_Expected_DocumentKey(string path, string domain, string rootUrl)
     {
         var template = TemplateBuilder.CreateTextPageTemplate("variantPageTemplate", "Variant Page Template");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantPage")
@@ -193,7 +191,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             .WithAllowAsRoot(true)
             .WithDefaultTemplateId(template.Id)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var rootPage = new ContentBuilder()
             .WithKey(Guid.Parse(VariantRootPageKey))
@@ -478,7 +476,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Verify URLs are stored with NULL languageId (invariant)
         List<PublishedDocumentUrlSegment> segmentsBefore;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             segmentsBefore = DocumentUrlRepository.GetAll()
                 .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
@@ -490,7 +488,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Act - change content type from invariant to variant
         ContentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Reload content from database to pick up the new content type variation
         var subpage = ContentService.GetById(Subpage.Key)!;
@@ -528,7 +526,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Verify invariant URLs are stored with NULL languageId
         List<PublishedDocumentUrlSegment> invariantSegments;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             invariantSegments = DocumentUrlRepository.GetAll()
                 .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
@@ -540,7 +538,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Change content type to variant
         ContentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Reload content from database to pick up the new content type variation
         var subpage = ContentService.GetById(Subpage.Key)!;
@@ -552,7 +550,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Verify URLs are stored with specific languageId (variant)
         List<PublishedDocumentUrlSegment> variantSegments;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             variantSegments = DocumentUrlRepository.GetAll()
                 .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
@@ -564,11 +562,11 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Act - change content type from variant to invariant
         ContentType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Assert - URLs should now be stored with NULL languageId
         List<PublishedDocumentUrlSegment> segmentsAfter;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             segmentsAfter = DocumentUrlRepository.GetAll()
                 .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
