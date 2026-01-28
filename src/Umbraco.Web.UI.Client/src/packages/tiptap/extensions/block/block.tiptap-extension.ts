@@ -61,9 +61,6 @@ export const umbRteBlockInline = umbRteBlock.extend({
 		return [{ tag: `umb-rte-block-inline[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}]` }];
 	},
 
-	// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-expect-error
 	renderHTML({ HTMLAttributes }) {
 		return ['umb-rte-block-inline', HTMLAttributes];
 	},
@@ -71,20 +68,14 @@ export const umbRteBlockInline = umbRteBlock.extend({
 	addCommands() {
 		return {
 			setBlockInline:
-				// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				(options) =>
-					// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					({ commands }) => {
-						const attrs = { [UMB_BLOCK_RTE_DATA_CONTENT_KEY]: options.contentKey };
-						return commands.insertContent({
-							type: this.name,
-							attrs,
-						});
-					},
+				({ commands }) => {
+					const attrs = { [UMB_BLOCK_RTE_DATA_CONTENT_KEY]: options.contentKey };
+					return commands.insertContent({
+						type: this.name,
+						attrs,
+					});
+				},
 		};
 	},
 });
