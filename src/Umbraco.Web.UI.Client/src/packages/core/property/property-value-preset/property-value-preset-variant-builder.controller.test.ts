@@ -17,7 +17,7 @@ import { UmbVariantId } from '../../variant/variant-id.class.js';
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-// Test with async APIs, espcially where the first one is slower than the last one.
+// Test with async APIs, especially where the first one is slower than the last one.
 export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePreset<string, UmbPropertyEditorConfig> {
 	async processValue(
 		value: undefined | string,
@@ -410,6 +410,41 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			expect(result[0]?.segment).to.be.null;
 			expect(result[1]?.culture).to.be.equal('cultureB');
 			expect(result[1]?.segment).to.be.null;
+		});
+
+		it('excludes invariant option when property variesByCulture', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
+			// Provide both invariant and culture variant options (simulates content-detail-workspace-base behavior)
+			ctrl.setVariantOptions([
+				new UmbVariantId('cultureA', null),
+				new UmbVariantId('cultureB', null),
+				new UmbVariantId(null, null), // invariant option - should be filtered out
+			]);
+
+			// Property varies by culture, so invariant option should be excluded
+			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
+				{
+					alias: 'test',
+					propertyEditorUiAlias: 'test-editor-ui',
+					config: [],
+					typeArgs: { variesByCulture: true, variesBySegment: false },
+				},
+			];
+
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
+
+			// Should only have 2 results (cultureA and cultureB), NOT 3
+			expect(result.length).to.be.equal(2);
+			expect(result[0]?.culture).to.be.equal('cultureA');
+			expect(result[0]?.segment).to.be.null;
+			expect(result[1]?.culture).to.be.equal('cultureB');
+			expect(result[1]?.segment).to.be.null;
+			// Verify no invariant value was created
+			expect(result.some((r) => r.culture === null)).to.be.false;
 		});
 
 		it('throws error when setVariantOptions is used after setCultures', async () => {
