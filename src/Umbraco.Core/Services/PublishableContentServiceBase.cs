@@ -534,6 +534,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(WriteLockIds);
+
             SavingNotification<TContent> savingNotification = SavingNotification(content, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -541,7 +543,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 return OperationResult.Cancel(eventMessages);
             }
 
-            scope.WriteLock(WriteLockIds);
             userId ??= Constants.Security.SuperUserId;
 
             if (content.HasIdentity == false)
@@ -599,6 +600,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(WriteLockIds);
+
             SavingNotification<TContent> savingNotification = SavingNotification(contentsA, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -606,7 +609,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 return OperationResult.Cancel(eventMessages);
             }
 
-            scope.WriteLock(WriteLockIds);
             foreach (TContent content in contentsA)
             {
                 if (content.HasIdentity == false)
@@ -1378,13 +1380,13 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(WriteLockIds);
+
             if (scope.Notifications.PublishCancelable(DeletingNotification(content, eventMessages)))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
             }
-
-            scope.WriteLock(WriteLockIds);
 
             // if it's not trashed yet, and published, we should unpublish
             // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
@@ -1423,6 +1425,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(WriteLockIds);
+
             var deletingVersionsNotification =
                 new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
@@ -1431,7 +1435,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 return;
             }
 
-            scope.WriteLock(WriteLockIds);
             _documentRepository.DeleteVersions(id, versionDate);
 
             scope.Notifications.Publish(
@@ -1457,6 +1460,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(WriteLockIds);
             var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
@@ -1470,7 +1474,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 
-            scope.WriteLock(WriteLockIds);
             TContent? c = _documentRepository.Get(id);
 
             // don't delete the current or published version

@@ -818,6 +818,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             MemberSavingNotification? savingNotification = null;
             if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving))
             {
@@ -835,8 +837,6 @@ namespace Umbraco.Cms.Core.Services
             }
 
             var previousUsername = _memberRepository.Get(member.Id)?.Username;
-
-            scope.WriteLock(Constants.Locks.MemberTree);
 
             _memberRepository.Save(member);
 
@@ -876,14 +876,14 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
-
-            scope.WriteLock(Constants.Locks.MemberTree);
 
             foreach (IMember member in membersA)
             {
@@ -958,6 +958,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
@@ -965,7 +967,6 @@ namespace Umbraco.Cms.Core.Services
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
-            scope.WriteLock(Constants.Locks.MemberTree);
             DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
 
             Audit(AuditType.Delete, userId, member.Id);
