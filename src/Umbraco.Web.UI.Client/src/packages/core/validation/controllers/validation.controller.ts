@@ -348,10 +348,10 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		// We need to ask again for messages, as they might have been added during the validation process. [NL]
 		const hasMessages = this.messages?.getHasAnyMessages() ?? false;
 
-		return this.#performValidation(this.#validators, resultsStatus, hasMessages);
+		return this.#handleValidationResult(this.#validators, resultsStatus, hasMessages);
 	}
 
-	#performValidation(validators: UmbValidator[], resultsStatus: boolean, hasMessages: boolean): Promise<void> {
+	#handleValidationResult(validators: UmbValidator[], resultsStatus: boolean, hasMessages: boolean): Promise<void> {
 		if (validators.length === 0 && resultsStatus === false) {
 			throw new Error('No validators to validate, but validation failed');
 		}
@@ -426,7 +426,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		const hasMessages =
 			messages.filter((msg) => variantIds.some((variantId) => filterMsgByVariantId(msg, variantId))).length > 0;
 
-		return this.#performValidation(matchingValidators, resultsStatus, hasMessages);
+		return this.#handleValidationResult(matchingValidators, resultsStatus, hasMessages);
 	}
 
 	/**

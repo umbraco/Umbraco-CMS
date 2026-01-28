@@ -988,7 +988,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected async _validateVariantsAndLog(variantIds?: Array<UmbVariantId>): Promise<void> {
-		await this.validateByVariantIds(variantIds).catch(async () => {
+		await this.#validateByVariantIds(variantIds).catch(async () => {
 			// TODO: Implement developer-mode logging here. [NL]
 			console.warn(
 				'Validation failed because of these validation messages still begin present: ',
@@ -1003,7 +1003,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @param {Array<UmbVariantId> | undefined} variantIds Optional array of variantIds to filter which contexts to validate.
 	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
 	 */
-	async validateByVariantIds(variantIds?: Array<UmbVariantId>): Promise<Array<void>> {
+	async #validateByVariantIds(variantIds?: Array<UmbVariantId>): Promise<Array<void>> {
 		// If variantIds are provided, we only validate the contexts matching those variantIds, or those without a variantId.
 		if (variantIds) {
 			if (variantIds.length === 0) {
