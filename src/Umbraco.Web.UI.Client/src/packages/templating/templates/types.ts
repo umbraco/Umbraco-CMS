@@ -6,5 +6,5 @@ export interface UmbTemplateDetailModel {
 	name: string;
 	alias: string;
 	content: string | null;
-	masterTemplate: { unique: string } | null;
+	layout: { unique: string } | null;
 }

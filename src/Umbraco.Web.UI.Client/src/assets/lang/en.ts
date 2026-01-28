@@ -1635,8 +1635,13 @@ export default {
 		insertPartialView: 'Partial view',
 		insertPartialViewDesc:
 			"A partial view is a separate template file which can be rendered inside another template, it's great for reusing markup or for separating complex templates into separate files.",
+		layout: 'Layout',
+		/** @deprecated Use  instead. Will be removed in Umbraco 19. */
+		/** @deprecated Use layout instead. Will be removed in Umbraco 19. */
 		mastertemplate: 'Master template',
 		quickGuide: 'Quick guide to template tags',
+		noLayout: 'No layout',
+		/** @deprecated Use noLayout instead. Will be removed in Umbraco 19. */
 		noMaster: 'No master',
 		renderBody: 'Render child template',
 		renderBodyDesc: 'Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.',

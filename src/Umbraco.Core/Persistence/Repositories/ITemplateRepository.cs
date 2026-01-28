@@ -8,7 +8,7 @@ public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>
 
     IEnumerable<ITemplate> GetAll(params string[] aliases);
 
-    IEnumerable<ITemplate> GetChildren(int masterTemplateId);
+    IEnumerable<ITemplate> GetChildren(int layoutId);
 
-    IEnumerable<ITemplate> GetDescendants(int masterTemplateId);
+    IEnumerable<ITemplate> GetDescendants(int layoutId);
 }

@@ -23,10 +23,10 @@ public class TemplateBuilder
     private string _content;
     private DateTime? _createDate;
     private int? _id;
-    private bool? _isMasterTemplate;
+    private bool? _isLayout;
     private Guid? _key;
-    private string _masterTemplateAlias;
-    private Lazy<int> _masterTemplateId;
+    private string _layoutAlias;
+    private Lazy<int> _layoutId;
     private string _name;
     private string _path;
     private DateTime? _updateDate;
@@ -89,13 +89,17 @@ public class TemplateBuilder
         return this;
     }
 
-    public TemplateBuilder AsMasterTemplate(string masterTemplateAlias, int masterTemplateId)
+    public TemplateBuilder AsLayout(string layoutAlias, int layoutId)
     {
-        _isMasterTemplate = true;
-        _masterTemplateAlias = masterTemplateAlias;
-        _masterTemplateId = new Lazy<int>(() => masterTemplateId);
+        _isLayout = true;
+        _layoutAlias = layoutAlias;
+        _layoutId = new Lazy<int>(() => layoutId);
         return this;
     }
+
+    [Obsolete("Use AsLayout instead. This will be removed in Umbraco 19.")]
+    public TemplateBuilder AsMasterTemplate(string masterTemplateAlias, int masterTemplateId)
+        => AsLayout(masterTemplateAlias, masterTemplateId);
 
     public override ITemplate Build()
     {
@@ -107,9 +111,9 @@ public class TemplateBuilder
         var updateDate = _updateDate ?? DateTime.UtcNow;
         var path = _path ?? $"-1,{id}";
         var content = _content;
-        var isMasterTemplate = _isMasterTemplate ?? false;
-        var masterTemplateAlias = _masterTemplateAlias ?? string.Empty;
-        var masterTemplateId = _masterTemplateId ?? new Lazy<int>(() => -1);
+        var isLayout = _isLayout ?? false;
+        var layoutAlias = _layoutAlias ?? string.Empty;
+        var layoutId = _layoutId ?? new Lazy<int>(() => -1);
 
         var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -121,9 +125,9 @@ public class TemplateBuilder
             UpdateDate = updateDate,
             Path = path,
             Content = content,
-            IsMasterTemplate = isMasterTemplate,
-            MasterTemplateAlias = masterTemplateAlias,
-            MasterTemplateId = masterTemplateId
+            IsLayout = isLayout,
+            LayoutAlias = layoutAlias,
+            LayoutId = layoutId
         };
 
         return template;

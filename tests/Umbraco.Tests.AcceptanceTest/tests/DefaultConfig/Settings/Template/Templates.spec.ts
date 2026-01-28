@@ -81,7 +81,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
 });
 
-test('can set a template as master template', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can set a template as layout', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childTemplateName = 'ChildTemplate';
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
@@ -90,23 +90,23 @@ test('can set a template as master template', {tag: '@release'}, async ({umbraco
 
   // Act
   await umbracoUi.template.goToTemplate(childTemplateName);
-  await umbracoUi.template.clickChangeMasterTemplateButton();
+  await umbracoUi.template.clickChangeLayoutButton();
   await umbracoUi.template.clickModalMenuItemWithName(templateName);
   await umbracoUi.template.clickChooseButton();
   await umbracoUi.template.clickSaveButtonAndWaitForTemplateToBeUpdated();
 
   // Assert
-  await umbracoUi.template.isMasterTemplateNameVisible(templateName);
-  // Checks if the childTemplate has the masterTemplate set
+  await umbracoUi.template.isLayoutNameVisible(templateName);
+  // Checks if the childTemplate has the layout set
   const childTemplateData = await umbracoApi.template.getByName(childTemplateName);
-  const masterTemplateData = await umbracoApi.template.getByName(templateName);
-  expect(childTemplateData.masterTemplate.id).toBe(masterTemplateData.id);
+  const layoutData = await umbracoApi.template.getByName(templateName);
+  expect(childTemplateData.layout.id).toBe(layoutData.id);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
 });
 
-test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
+test('can remove a layout', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childTemplateName = 'ChildTemplate';
   const templateAlias = AliasHelper.toAlias(templateName);
@@ -118,13 +118,13 @@ test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.template.goToTemplate(templateName, childTemplateName);
-  await umbracoUi.template.clickRemoveMasterTemplateButton();
+  await umbracoUi.template.clickRemoveLayoutButton();
   await umbracoUi.template.clickSaveButtonAndWaitForTemplateToBeUpdated();
 
   // Assert
-  await umbracoUi.template.isMasterTemplateNameVisible('No master');
+  await umbracoUi.template.isLayoutNameVisible('No layout');
   const childTemplate = await umbracoApi.template.getByName(childTemplateName);
-  expect(childTemplate.masterTemplate).toBe(null);
+  expect(childTemplate.layout).toBe(null);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
