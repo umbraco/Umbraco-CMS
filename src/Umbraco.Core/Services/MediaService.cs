@@ -802,6 +802,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -829,7 +831,6 @@ namespace Umbraco.Cms.Core.Services
                         new OperationResult(OperationResultType.FailedInvalidKey, eventMessages));
                 }
 
-                scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                 {
                     if (_entityRepository.Get(media.Key, UmbracoObjectTypes.Media.GetGuid()) is not null)
@@ -869,6 +870,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(mediasA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -877,8 +880,6 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 IEnumerable<TreeChange<IMedia>> treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
-
-                scope.WriteLock(Constants.Locks.MediaTree);
                 foreach (IMedia media in mediasA)
                 {
                     if (media.HasIdentity == false)
@@ -915,13 +916,13 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(media, messages)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
-
-                scope.WriteLock(Constants.Locks.MediaTree);
 
                 DeleteLocked(scope, media, messages);
 
@@ -983,15 +984,15 @@ namespace Umbraco.Cms.Core.Services
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
+            if (wlock)
+            {
+                scope.WriteLock(Constants.Locks.MediaTree);
+            }
+
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 return;
-            }
-
-            if (wlock)
-            {
-                scope.WriteLock(Constants.Locks.MediaTree);
             }
 
             _mediaRepository.DeleteVersions(id, versionDate);
@@ -1013,6 +1014,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
@@ -1025,12 +1028,8 @@ namespace Umbraco.Cms.Core.Services
                 IMedia? media = GetVersion(versionId);
                 if (media is not null)
                 {
-                    DeleteVersions(scope, true, id, media.UpdateDate, userId);
+                    DeleteVersions(scope, false, id, media.UpdateDate, userId);
                 }
-            }
-            else
-            {
-                scope.WriteLock(Constants.Locks.MediaTree);
             }
 
             _mediaRepository.DeleteVersion(versionId);
@@ -1275,6 +1274,8 @@ namespace Umbraco.Cms.Core.Services
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -1283,8 +1284,6 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 var saved = new List<IMedia>();
-
-                scope.WriteLock(Constants.Locks.MediaTree);
                 var sortOrder = 0;
 
                 foreach (IMedia media in itemsA)
@@ -1509,6 +1508,5 @@ namespace Umbraco.Cms.Core.Services
         }
 
         #endregion
-
     }
 }
