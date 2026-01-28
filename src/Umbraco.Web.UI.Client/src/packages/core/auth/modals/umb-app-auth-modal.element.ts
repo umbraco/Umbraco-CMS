@@ -185,7 +185,8 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				padding: 32px 0 32px 32px;
 				width: 100vw;
 				max-width: 1920px;
-				height: calc(100vh - 64px);
+				height: 100vh;
+				box-sizing: border-box;
 			}
 
 			#graphic {
