@@ -231,12 +231,8 @@ public class OptimizeInvariantUrlRecords : MigrationBase
 
     private void TriggerRebuild()
     {
-        // Clear the rebuild keys to trigger a full rebuild on next startup
-        // DocumentUrlService and DocumentUrlAliasService check these keys on startup
+        // Clear the rebuild keys to trigger a full rebuild on next startup.
         _keyValueService.SetValue(DocumentUrlService.RebuildKey, string.Empty);
-
-        // For DocumentUrlAliasService, we need to trigger rebuild by setting an invalid value
-        // The service uses "UmbracoUrlAliasGeneration" key with value "1"
-        _keyValueService.SetValue("UmbracoUrlAliasGeneration", string.Empty);
+        _keyValueService.SetValue(DocumentUrlAliasService.RebuildKey, string.Empty);
     }
 }

@@ -14,7 +14,10 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class DocumentUrlAliasService : IDocumentUrlAliasService
 {
-    private const string RebuildKey = "UmbracoUrlAliasGeneration";
+    /// <summary>
+    /// Represents the key used to identify the URL alias generation rebuild operation.
+    /// </summary>
+    public const string RebuildKey = "UmbracoUrlAliasGeneration";
 
     /// <summary>
     /// Represents the current rebuild version value used to track changes in alias parsing logic.
