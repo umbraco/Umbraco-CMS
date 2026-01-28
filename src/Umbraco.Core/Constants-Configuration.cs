@@ -68,6 +68,7 @@ public static partial class Constants
         public const string ConfigCache = ConfigPrefix + "Cache";
         public const string ConfigDistributedJobs = ConfigPrefix + "DistributedJobs";
         public const string ConfigBackOfficeTokenCookie = ConfigSecurity + ":BackOfficeTokenCookie";
+        public const string ConfigDictionary = ConfigPrefix + "Dictionary";
 
         public static class NamedOptions
         {

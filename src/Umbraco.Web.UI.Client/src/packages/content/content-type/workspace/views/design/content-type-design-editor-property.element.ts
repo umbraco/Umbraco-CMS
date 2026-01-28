@@ -165,8 +165,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		} else {
 			return html`
 				<div id="header">
-					<p><b>${this.property.name}</b></p>
-					<p><i>${this.property.alias}</i></p>
+					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
 					<p>${this.property.description}</p>
 				</div>
 				<div id="editor">
@@ -338,12 +337,15 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host(:not([sort-mode-active])) {
-				display: grid;
-				grid-template-columns: 300px auto;
-				column-gap: var(--uui-size-layout-2);
+			:host {
+				display: block;
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;
+			}
+			:host(:not([sort-mode-active])) {
+				display: grid;
+				grid-template-columns: 320px auto;
+				column-gap: var(--uui-size-space-5);
 				container-type: inline-size;
 			}
 
@@ -368,15 +370,13 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: relative;
 				display: flex;
 				padding: 0;
-				margin-bottom: var(--uui-size-3);
-			}
-
-			:host([sort-mode-active]:last-of-type) {
-				margin-bottom: 0;
 			}
 
 			:host([sort-mode-active]:not([_inherited])) {
 				cursor: grab;
+			}
+			:host([sort-mode-active][_inherited]) {
+				cursor: not-allowed;
 			}
 
 			:host([sort-mode-active]) .sortable {
@@ -388,9 +388,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			}
 			:host([sort-mode-active][_inherited]) .sortable {
 				color: var(--uui-color-disabled-contrast);
-			}
-			:host([sort-mode-active]:not([_inherited])) .sortable {
-				background-color: var(--uui-color-divider);
 			}
 
 			:host([sort-mode-active]) uui-input {
@@ -429,6 +426,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#header i {
 				opacity: 0.55;
+				float: right;
 			}
 
 			#header umb-input-with-alias {

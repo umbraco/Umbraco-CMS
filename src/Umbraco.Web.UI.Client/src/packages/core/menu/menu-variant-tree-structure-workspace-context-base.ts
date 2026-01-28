@@ -10,7 +10,8 @@ import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel 
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_VARIANT_WORKSPACE_CONTEXT,
-	UMB_WORKSPACE_PATH_PATTERN,
+	UMB_WORKSPACE_EDIT_PATH_PATTERN,
+	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -101,29 +102,34 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
 		const sectionName = this._sectionContext?.getPathname();
-		if (!sectionName) {
-			return undefined;
-		}
-		UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
-			sectionName,
-			entityType: structureItem.entityType,
-		});
-		const path = `section/${this._sectionContext!.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+		if (!sectionName) return undefined;
+
+		const unique = structureItem.unique;
+		if (!unique) return undefined;
 
 		// find related variant id from structure item:
-		const itemVariantFit = structureItem.variants.find((variant) => {
-			return (
+		const itemVariantFit = structureItem.variants.find(
+			(variant) =>
 				variant.culture === this.#workspaceActiveVariantId?.culture &&
-				variant.segment === this.#workspaceActiveVariantId?.segment
-			);
-		});
+				variant.segment === this.#workspaceActiveVariantId?.segment,
+		);
+
 		if (itemVariantFit) {
 			const variantId = UmbVariantId.CreateFromPartial(itemVariantFit);
-			return `${path}/${variantId.toString()}`;
+			return UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN.generateAbsolute({
+				sectionName,
+				entityType: structureItem.entityType,
+				unique,
+				variantId: variantId.toString(),
+			});
 		}
 
 		// If no related variantID, then lets the redirect go to the main-variant:
-		return path;
+		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+			sectionName,
+			entityType: structureItem.entityType,
+			unique,
+		});
 	}
 
 	async #requestStructure() {

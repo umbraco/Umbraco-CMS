@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Data;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -18,7 +19,7 @@ public class RecycleBinMediaProtectionHelperTests
     public void DeleteContainedFilesWithProtection_WithTrashedMedia_DeletesFilesWithSuffix()
     {
         // Arrange
-        var deletedFiles = new List<string>();
+        var deletedFiles = new ConcurrentBag<string>();
         var fileSystemMock = new Mock<IFileSystem>();
         fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
         fileSystemMock
@@ -38,14 +39,14 @@ public class RecycleBinMediaProtectionHelperTests
 
         // Assert
         Assert.That(deletedFiles, Has.Count.EqualTo(1));
-        Assert.That(deletedFiles[0], Is.EqualTo("media/test/image.deleted.jpg"));
+        Assert.That(deletedFiles.Single(), Is.EqualTo("media/test/image.deleted.jpg"));
     }
 
     [Test]
     public void DeleteContainedFilesWithProtection_WithNonTrashedMedia_DeletesFilesWithoutSuffix()
     {
         // Arrange
-        var deletedFiles = new List<string>();
+        var deletedFiles = new ConcurrentBag<string>();
         var fileSystemMock = new Mock<IFileSystem>();
         fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
         fileSystemMock
@@ -65,14 +66,14 @@ public class RecycleBinMediaProtectionHelperTests
 
         // Assert
         Assert.That(deletedFiles, Has.Count.EqualTo(1));
-        Assert.That(deletedFiles[0], Is.EqualTo("media/test/image.jpg"));
+        Assert.That(deletedFiles.Single(), Is.EqualTo("media/test/image.jpg"));
     }
 
     [Test]
     public void DeleteContainedFilesWithProtection_WithTrashedAndNonTrashedMedia_DeletesBothCorrectly()
     {
         // Arrange
-        var deletedFiles = new List<string>();
+        var deletedFiles = new ConcurrentBag<string>();
         var fileSystemMock = new Mock<IFileSystem>();
         fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
         fileSystemMock
@@ -130,7 +131,7 @@ public class RecycleBinMediaProtectionHelperTests
     public void DeleteContainedFilesWithProtection_WithMultipleFiles_DeletesAllWithCorrectSuffix()
     {
         // Arrange
-        var deletedFiles = new List<string>();
+        var deletedFiles = new ConcurrentBag<string>();
         var fileSystemMock = new Mock<IFileSystem>();
         fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
         fileSystemMock
