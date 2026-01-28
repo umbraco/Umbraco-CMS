@@ -450,3 +450,59 @@ test('can remove granular permission to a specific document for a user group', a
   // Clean
   await umbracoApi.document.ensureNameNotExists(documentTypeName);
 });
+
+test('can add an element start node to a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
+  const elementFolderName = 'TestElementFolder';
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickChooseElementStartNodeButton();
+  await umbracoUi.userGroup.clickLabelWithName(elementFolderName);
+  await umbracoUi.userGroup.clickChooseContainerButton();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainElementStartNodeId(userGroupName, elementFolderId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+});
+
+test('can remove an element start node from a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementFolderName = 'TestElementFolder';
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, elementFolderId);
+  expect(await umbracoApi.userGroup.doesUserGroupContainElementStartNodeId(userGroupName, elementFolderId)).toBeTruthy();
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickRemoveButtonForElementNodeWithName(elementFolderName);
+  await umbracoUi.userGroup.clickConfirmRemoveButton();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainElementStartNodeId(userGroupName, elementFolderId)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+});
+
+test('can enable access to all elements in a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickAllowAccessToAllElements();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainElementRootAccess(userGroupName)).toBeTruthy();
+});
