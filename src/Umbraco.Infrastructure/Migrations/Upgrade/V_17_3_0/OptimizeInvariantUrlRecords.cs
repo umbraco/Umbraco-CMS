@@ -39,17 +39,17 @@ public class OptimizeInvariantUrlRecords : MigrationBase
 
     private void MigrateSqlServer()
     {
-        // 1. Make languageId nullable in umbracoDocumentUrl
+        // Make languageId nullable in umbracoDocumentUrl.
         AlterDocumentUrlLanguageIdToNullable();
 
-        // 2. Make languageId nullable in umbracoDocumentUrlAlias
+        // Make languageId nullable in umbracoDocumentUrlAlias.
         AlterDocumentUrlAliasLanguageIdToNullable();
 
-        // 3. Convert existing invariant records to use NULL languageId and remove duplicates
+        // Convert existing invariant records to use NULL languageId and remove duplicates.
         ConvertInvariantDocumentUrlRecords();
         ConvertInvariantDocumentUrlAliasRecords();
 
-        // 4. Trigger rebuild to update the in-memory cache with new structure
+        // Trigger rebuild to update the in-memory cache with new structure.
         TriggerRebuild();
     }
 
@@ -58,7 +58,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
         // SQLite doesn't support ALTER TABLE to modify columns well.
         // Instead, we drop and recreate the tables, then trigger a full rebuild on startup.
 
-        // Drop existing tables
+        // Drop existing tables.
         if (TableExists(Constants.DatabaseSchema.Tables.DocumentUrl))
         {
             Delete.Table(Constants.DatabaseSchema.Tables.DocumentUrl).Do();
@@ -69,7 +69,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
             Delete.Table(Constants.DatabaseSchema.Tables.DocumentUrlAlias).Do();
         }
 
-        // Recreate tables with nullable languageId (using updated DTOs)
+        // Recreate tables with nullable languageId (using updated DTOs).
         Create.Table<DocumentUrlDto>().Do();
         Create.Table<DocumentUrlAliasDto>().Do();
 
@@ -82,7 +82,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
         var tableName = Constants.DatabaseSchema.Tables.DocumentUrl;
         var columnName = DocumentUrlDto.LanguageIdColumnName;
 
-        // Drop the existing unique clustered index that includes languageId
+        // Drop the existing unique clustered index that includes languageId.
         var existingIndexName = $"IX_{tableName}";
         if (IndexExists(existingIndexName))
         {
@@ -96,9 +96,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
             .Nullable()
             .Do();
 
-        // Recreate the unique clustered index (now works with NULL values)
-        // Note: In SQL Server, NULL values are treated as equal for uniqueness in a unique index,
-        // so we need to create filtered indexes for invariant records separately
+        // Recreate the unique clustered index (now works with NULL values for invariant content).
         Execute.Sql($@"
             CREATE UNIQUE CLUSTERED INDEX [IX_{tableName}]
             ON [{tableName}] ([{DocumentUrlDto.UniqueIdColumnName}], [{columnName}], [{DocumentUrlDto.IsDraftColumnName}], [{DocumentUrlDto.UrlSegmentColumnName}])
@@ -110,34 +108,34 @@ public class OptimizeInvariantUrlRecords : MigrationBase
         var tableName = Constants.DatabaseSchema.Tables.DocumentUrlAlias;
         var columnName = "languageId";
 
-        // Drop the existing unique index
+        // Drop the existing unique index.
         var existingUniqueIndexName = $"IX_{tableName}_Unique";
         if (IndexExists(existingUniqueIndexName))
         {
             Delete.Index(existingUniqueIndexName).OnTable(tableName).Do();
         }
 
-        // Drop the lookup index
+        // Drop the lookup index.
         var existingLookupIndexName = $"IX_{tableName}_Lookup";
         if (IndexExists(existingLookupIndexName))
         {
             Delete.Index(existingLookupIndexName).OnTable(tableName).Do();
         }
 
-        // Alter the column to be nullable
+        // Alter the column to be nullable.
         Alter.Table(tableName)
             .AlterColumn(columnName)
             .AsInt32()
             .Nullable()
             .Do();
 
-        // Recreate the unique index
+        // Recreate the unique index.
         Execute.Sql($@"
             CREATE UNIQUE NONCLUSTERED INDEX [IX_{tableName}_Unique]
             ON [{tableName}] ([uniqueId], [{columnName}], [alias])
         ").Do();
 
-        // Recreate the lookup index
+        // Recreate the lookup index.
         Execute.Sql($@"
             CREATE NONCLUSTERED INDEX [IX_{tableName}_Lookup]
             ON [{tableName}] ([alias], [{columnName}])
@@ -146,8 +144,8 @@ public class OptimizeInvariantUrlRecords : MigrationBase
 
     private void ConvertInvariantDocumentUrlRecords()
     {
-        // For SQL Server: Convert existing invariant records to use NULL languageId and remove duplicates
-        // Invariant documents are those with ContentVariation.Nothing (variations = 1) in cmsContentType
+        // For SQL Server: Convert existing invariant records to use NULL languageId and remove duplicates.
+        // Invariant documents are those with ContentVariation.Nothing (variations = 1) in cmsContentType.
         Execute.Sql($@"
             -- Identify invariant documents
             ;WITH InvariantDocs AS (
@@ -189,7 +187,7 @@ public class OptimizeInvariantUrlRecords : MigrationBase
 
     private void ConvertInvariantDocumentUrlAliasRecords()
     {
-        // For SQL Server: Convert existing invariant alias records to use NULL languageId and remove duplicates
+        // For SQL Server: Convert existing invariant alias records to use NULL languageId and remove duplicates.
         Execute.Sql($@"
             -- Identify invariant documents with aliases
             ;WITH InvariantDocs AS (
