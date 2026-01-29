@@ -152,32 +152,47 @@ export function transformUsers(): void {
 	// Transform user groups
 	const transformedGroups = groups.map((group) => {
 		const groupKey = formatGuid(group.key);
-		const groupPermissions = permissionsByGroup.get(groupKey) || [];
+		const groupPermissions = permissionsByGroup.get(groupKey.toLowerCase()) || [];
 
-		// Parse default permissions
-		const fallbackPermissions = group.userGroupDefaultPermissions
-			? group.userGroupDefaultPermissions.split('').map((p) => {
-					// Map old permission letters to new permission verbs
-					const permissionMap: Record<string, string> = {
-						F: 'Umb.Document.Read',
-						C: 'Umb.Document.Create',
-						A: 'Umb.Document.Update',
-						D: 'Umb.Document.Delete',
-						K: 'Umb.Document.CreateBlueprint',
-						N: 'Umb.Document.Notifications',
-						U: 'Umb.Document.Publish',
-						P: 'Umb.Document.Permissions',
-						Z: 'Umb.Document.Unpublish',
-						O: 'Umb.Document.Duplicate',
-						M: 'Umb.Document.Move',
-						S: 'Umb.Document.Sort',
-						H: 'Umb.Document.CultureAndHostnames',
-						I: 'Umb.Document.PublicAccess',
-						R: 'Umb.Document.Rollback',
-					};
-					return permissionMap[p] || `Umb.Document.Unknown.${p}`;
-				})
-			: [];
+		// Map old single-letter permissions to new permission verbs
+		const legacyPermissionMap: Record<string, string> = {
+			F: 'Umb.Document.Read',
+			C: 'Umb.Document.Create',
+			A: 'Umb.Document.Update',
+			D: 'Umb.Document.Delete',
+			K: 'Umb.Document.CreateBlueprint',
+			N: 'Umb.Document.Notifications',
+			U: 'Umb.Document.Publish',
+			P: 'Umb.Document.Permissions',
+			Z: 'Umb.Document.Unpublish',
+			O: 'Umb.Document.Duplicate',
+			M: 'Umb.Document.Move',
+			S: 'Umb.Document.Sort',
+			H: 'Umb.Document.CultureAndHostnames',
+			I: 'Umb.Document.PublicAccess',
+			R: 'Umb.Document.Rollback',
+		};
+
+		// Build fallbackPermissions from umbracoUserGroup2Permission table
+		// Filter out legacy single-character codes and map them to new format
+		const fallbackPermissions = [
+			...new Set(
+				groupPermissions
+					.map((p) => {
+						// If it's a new-style permission (starts with "Umb."), use it directly
+						if (p.permission.startsWith('Umb.')) {
+							return p.permission;
+						}
+						// If it's a single-letter legacy permission, map it
+						if (p.permission.length === 1 && legacyPermissionMap[p.permission]) {
+							return legacyPermissionMap[p.permission];
+						}
+						// Skip unknown permissions
+						return null;
+					})
+					.filter((p): p is string => p !== null),
+			),
+		];
 
 		// Transform granular permissions - use fallback permissions instead since nodeKey doesn't exist
 		const granularPermissions: Array<{ $type: string; document: { id: string }; verbs: string[] }> = [];

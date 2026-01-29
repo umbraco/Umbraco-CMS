@@ -7,7 +7,25 @@ export const data: Array<UmbMockUserGroupModel> = [
 		"alias": "admin",
 		"description": null,
 		"icon": "icon-medal",
-		"fallbackPermissions": [],
+		"fallbackPermissions": [
+			"Umb.Document.Read",
+			"Umb.Document.Create",
+			"Umb.Document.Update",
+			"Umb.Document.Notifications",
+			"Umb.Document.Duplicate",
+			"Umb.Document.Move",
+			"Umb.Document.PublicAccess",
+			"Umb.Document.Sort",
+			"Umb.Document.CultureAndHostnames",
+			"Umb.Document.Permissions",
+			"Umb.Document.Delete",
+			"Umb.Document.CreateBlueprint",
+			"Umb.Document.Publish",
+			"Umb.Document.Unpublish",
+			"Umb.Document.Rollback",
+			"Umb.Document.PropertyValue.Read",
+			"Umb.Document.PropertyValue.Write"
+		],
 		"permissions": [],
 		"sections": [
 			"Umb.Section.Content",
@@ -38,7 +56,13 @@ export const data: Array<UmbMockUserGroupModel> = [
 		"alias": "writer",
 		"description": null,
 		"icon": "icon-edit",
-		"fallbackPermissions": [],
+		"fallbackPermissions": [
+			"Umb.Document.Create",
+			"Umb.Document.Update",
+			"Umb.Document.CultureAndHostnames",
+			"Umb.Document.Read",
+			"Umb.Document.Notifications"
+		],
 		"permissions": [],
 		"sections": [
 			"Umb.Section.Content"
@@ -63,7 +87,21 @@ export const data: Array<UmbMockUserGroupModel> = [
 		"alias": "editor",
 		"description": null,
 		"icon": "icon-tools",
-		"fallbackPermissions": [],
+		"fallbackPermissions": [
+			"Umb.Document.Create",
+			"Umb.Document.Update",
+			"Umb.Document.Delete",
+			"Umb.Document.Move",
+			"Umb.Document.Duplicate",
+			"Umb.Document.Sort",
+			"Umb.Document.Rollback",
+			"Umb.Document.PublicAccess",
+			"Umb.Document.Publish",
+			"Umb.Document.Unpublish",
+			"Umb.Document.Read",
+			"Umb.Document.CreateBlueprint",
+			"Umb.Document.Notifications"
+		],
 		"permissions": [],
 		"sections": [
 			"Umb.Section.Content",
@@ -89,7 +127,10 @@ export const data: Array<UmbMockUserGroupModel> = [
 		"alias": "translator",
 		"description": null,
 		"icon": "icon-globe",
-		"fallbackPermissions": [],
+		"fallbackPermissions": [
+			"Umb.Document.Update",
+			"Umb.Document.Read"
+		],
 		"permissions": [],
 		"sections": [
 			"Umb.Section.Translation"
@@ -131,7 +172,11 @@ export const data: Array<UmbMockUserGroupModel> = [
 		"alias": "custom",
 		"description": null,
 		"icon": "icon-ball color-red",
-		"fallbackPermissions": [],
+		"fallbackPermissions": [
+			"Umb.Document.Read",
+			"Umb.Document.Create",
+			"Umb.Document.PropertyValue.Read"
+		],
 		"permissions": [],
 		"sections": [
 			"Umb.Section.Content"
