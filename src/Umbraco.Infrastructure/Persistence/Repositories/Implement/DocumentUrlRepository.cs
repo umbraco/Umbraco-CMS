@@ -34,10 +34,10 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
         Dictionary<(Guid UniqueId, int? LanguageId, bool isDraft, string urlSegment), DocumentUrlDto> dtoDictionary = publishedDocumentUrlSegments
             .Select(BuildDto)
-            .ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft, x.UrlSegment));
+            .ToDictionary(x => (x.UniqueId, x.NullableLanguageId, x.IsDraft, x.UrlSegment));
 
         var toDelete = new List<int>();
-        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft, x.UrlSegment));
+        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.NullableLanguageId, x.IsDraft, x.UrlSegment));
 
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
@@ -51,12 +51,12 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
             foreach (DocumentUrlDto existing in existingUrlsInBatch)
             {
-                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.IsDraft, existing.UrlSegment), out DocumentUrlDto? found))
+                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.NullableLanguageId, existing.IsDraft, existing.UrlSegment), out DocumentUrlDto? found))
                 {
                     found.NodeId = existing.NodeId;
 
                     // If we found it, we know we should not insert it as a new record.
-                    toInsert.Remove((found.UniqueId, found.LanguageId, found.IsDraft, found.UrlSegment));
+                    toInsert.Remove((found.UniqueId, found.NullableLanguageId, found.IsDraft, found.UrlSegment));
                 }
                 else
                 {
@@ -94,7 +94,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         {
             UrlSegment = dto.UrlSegment,
             DocumentKey = dto.UniqueId,
-            NullableLanguageId = dto.LanguageId,
+            NullableLanguageId = dto.NullableLanguageId,
             IsDraft = dto.IsDraft,
             IsPrimary = dto.IsPrimary
         };
@@ -105,7 +105,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         {
             UrlSegment = model.UrlSegment,
             UniqueId = model.DocumentKey,
-            LanguageId = model.NullableLanguageId,
+            NullableLanguageId = model.NullableLanguageId,
             IsDraft = model.IsDraft,
             IsPrimary = model.IsPrimary,
         };
