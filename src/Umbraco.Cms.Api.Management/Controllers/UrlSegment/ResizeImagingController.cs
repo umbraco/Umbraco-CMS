@@ -26,7 +26,8 @@ public class ResizeImagingController : ImagingControllerBase
     public Task<IActionResult> Urls([FromQuery(Name = "id")] HashSet<Guid> ids, int height = 200, int width = 200, ImageCropMode? mode = null, string? format = null)
     {
         IEnumerable<IMedia> items = _mediaService.GetByIds(ids);
+        var options = new ImageResizeOptions(height, width, mode, format);
 
-        return Task.FromResult<IActionResult>(Ok(_reziseImageUrlFactory.CreateUrlSets(items, height, width, mode, format)));
+        return Task.FromResult<IActionResult>(Ok(_reziseImageUrlFactory.CreateUrlSets(items, options)));
     }
 }

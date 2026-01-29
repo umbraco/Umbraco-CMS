@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -24,21 +24,21 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
         _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
-    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode, string? format = null)
+    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options)
     {
-        return mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, height, width, mode, format))).ToArray();
+        return mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, options))).ToArray();
     }
 
-    private IEnumerable<MediaUrlInfo> CreateUrls(IMedia media, int height, int width, ImageCropMode? mode, string? format)
+    private IEnumerable<MediaUrlInfo> CreateUrls(IMedia media, ImageResizeOptions options)
     {
         IEnumerable<string> urls = media
             .GetUrls(_contentSettings, _mediaUrlGenerators)
             .WhereNotNull();
 
-        return CreateThumbnailUrls(urls, height, width, mode, format);
+        return CreateThumbnailUrls(urls, options);
     }
 
-    private IEnumerable<MediaUrlInfo> CreateThumbnailUrls(IEnumerable<string> urls, int height, int width, ImageCropMode? mode, string? format)
+    private IEnumerable<MediaUrlInfo> CreateThumbnailUrls(IEnumerable<string> urls, ImageResizeOptions options)
     {
         foreach (var url in urls)
         {
@@ -59,15 +59,15 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                 continue;
             }
 
-            var options = new ImageUrlGenerationOptions(url)
+            var imageOptions = new ImageUrlGenerationOptions(url)
             {
-                Height = height,
-                Width = width,
-                ImageCropMode = mode,
-                FurtherOptions = string.IsNullOrWhiteSpace(format) ? null : $"format={format}",
+                Height = options.Height,
+                Width = options.Width,
+                ImageCropMode = options.Mode,
+                FurtherOptions = string.IsNullOrWhiteSpace(options.Format) ? null : $"format={options.Format}",
             };
 
-            var relativeUrl = _imageUrlGenerator.GetImageUrl(options);
+            var relativeUrl = _imageUrlGenerator.GetImageUrl(imageOptions);
             if (relativeUrl is null)
             {
                 continue;
