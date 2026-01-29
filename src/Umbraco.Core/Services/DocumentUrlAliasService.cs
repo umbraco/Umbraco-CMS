@@ -414,7 +414,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return aliases;
         }
 
-        // Handle culture-variant content with a culture-variant alias property
+        // Handle culture-variant content with a culture-variant alias property.
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         foreach (ILanguage language in languages)
         {
