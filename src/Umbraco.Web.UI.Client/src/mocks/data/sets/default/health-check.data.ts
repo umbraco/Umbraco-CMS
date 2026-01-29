@@ -4,14 +4,6 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-/**
- *
- * @param name
- */
-export function getGroupWithResultsByName(name: string) {
-	return healthGroups.find((group) => group.name.toLowerCase() === name.toLowerCase());
-}
-
 export const healthGroups: Array<HealthCheckGroupWithResultResponseModel & { name: string }> = [
 	{
 		name: 'Configuration',
