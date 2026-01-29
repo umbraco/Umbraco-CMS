@@ -171,6 +171,9 @@ public class NotificationsRepository : INotificationsRepository
             .SelectDistinct<NodeDto>(c => c.NodeObjectType)
             .From<NodeDto>()
             .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
+
+        // We must use FirstOrDefault over ExecuteScalar when retrieving a Guid, to ensure we go through the full NPoco mapping pipeline.
+        // Without that, though it will succeed on SQLite and SQLServer, it could fail on other database providers.
         Guid nodeType = AmbientScope.Database.FirstOrDefault<Guid>(sql);
 
         var dto = new User2NodeNotifyDto { Action = action, NodeId = entity.Id, UserId = user.Id };
