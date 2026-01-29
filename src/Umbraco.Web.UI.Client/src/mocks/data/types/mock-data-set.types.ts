@@ -17,6 +17,7 @@ import type {
 	DocumentBlueprintResponseModel,
 	DocumentBlueprintTreeItemResponseModel,
 	// Document Type
+	DocumentTypeConfigurationResponseModel,
 	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
 	DocumentTypeTreeItemResponseModel,
@@ -191,6 +192,7 @@ export interface UmbMockDataSet {
 	document: Array<UmbMockDocumentModel>;
 	documentBlueprint: Array<UmbMockDocumentBlueprintModel>;
 	documentType: Array<UmbMockDocumentTypeModel>;
+	documentTypeConfiguration?: DocumentTypeConfigurationResponseModel;
 	language: Array<UmbMockLanguageModel>;
 	media: Array<UmbMockMediaModel>;
 	mediaType: Array<UmbMockMediaTypeModel>;

@@ -6,16 +6,25 @@ import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js'
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type {
-	AllowedDocumentTypeModel,
-	CreateDocumentTypeRequestModel,
-	CreateFolderRequestModel,
-	DocumentTypeItemResponseModel,
-	DocumentTypeResponseModel,
-	DocumentTypeSortModel,
-	DocumentTypeTreeItemResponseModel,
-	PagedAllowedDocumentTypeModel,
+import {
+	DataTypeChangeModeModel,
+	type AllowedDocumentTypeModel,
+	type CreateDocumentTypeRequestModel,
+	type CreateFolderRequestModel,
+	type DocumentTypeConfigurationResponseModel,
+	type DocumentTypeItemResponseModel,
+	type DocumentTypeResponseModel,
+	type DocumentTypeSortModel,
+	type DocumentTypeTreeItemResponseModel,
+	type PagedAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+
+const defaultConfiguration: DocumentTypeConfigurationResponseModel = {
+	dataTypesCanBeChanged: DataTypeChangeModeModel.TRUE,
+	disableTemplates: false,
+	useSegments: false,
+	reservedFieldNames: [],
+};
 
 class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentTypeModel>(this, documentTypeTreeItemMapper);
@@ -44,6 +53,10 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
 		return { items: mappedItems, total: mappedItems.length };
+	}
+
+	getConfiguration(): DocumentTypeConfigurationResponseModel {
+		return dataSet.documentTypeConfiguration ?? defaultConfiguration;
 	}
 }
 
