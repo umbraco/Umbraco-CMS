@@ -167,7 +167,7 @@ const rawData = [
 				"id": "39ad8047-c922-4717-ad19-f8ae4a431f9a",
 				"parent": null,
 				"name": "Content",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			}
 		],
@@ -457,7 +457,7 @@ const rawData = [
 				"id": "7c07140b-4715-43ab-aa18-01e1456bf72f",
 				"parent": null,
 				"name": "Color Pickers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -646,7 +646,7 @@ const rawData = [
 				"id": "38c46685-f235-4584-b245-11553d500484",
 				"parent": null,
 				"name": "Content Pickers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -779,7 +779,7 @@ const rawData = [
 				"id": "4fe71f18-3851-4335-8875-efe72e7507db",
 				"parent": null,
 				"name": "Content",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			}
 		],
@@ -1036,42 +1036,42 @@ const rawData = [
 				"id": "d193e812-d8a7-497c-b1f4-70993cc41cc8",
 				"parent": null,
 				"name": "Content",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 10
 			},
 			{
 				"id": "d32c9908-08ca-46df-af4e-2412d405d860",
 				"parent": null,
 				"name": "A very overly long and silly billy tab name 1",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 11
 			},
 			{
 				"id": "9c986c6d-cf47-4204-99ca-35ec76dc1001",
 				"parent": null,
 				"name": "A very overly long and silly billy tab name 2",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 12
 			},
 			{
 				"id": "1e16c34c-1d1b-4a0c-8453-cd4deb1446aa",
 				"parent": null,
 				"name": "A very overly long and silly billy tab name 3",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 13
 			},
 			{
 				"id": "6adc4408-cb75-406d-9f04-5be52db38da6",
 				"parent": null,
 				"name": "A very overly long and silly billy tab name 4",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 14
 			},
 			{
 				"id": "8f876fc8-130c-40d6-bfe6-42addbc1beee",
 				"parent": null,
 				"name": "A very overly long and silly billy tab name 5",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 15
 			}
 		],
@@ -1229,14 +1229,14 @@ const rawData = [
 				"id": "587ef7a2-cb16-427d-9693-d567c73d1767",
 				"parent": null,
 				"name": "Block Grid",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 10
 			},
 			{
 				"id": "7a90eab4-6ec4-4e17-9c48-34608eb4d7c3",
 				"parent": null,
 				"name": "Block List",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 20
 			}
 		],
@@ -1369,7 +1369,7 @@ const rawData = [
 				"id": "fa9fb286-8ab3-492a-90fc-5777c0b00742",
 				"parent": null,
 				"name": "DateTime Pickers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -1502,7 +1502,7 @@ const rawData = [
 				"id": "4f13c5d7-3e86-464b-b0d1-2030f0253450",
 				"parent": null,
 				"name": "Content",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			}
 		],
@@ -1561,7 +1561,7 @@ const rawData = [
 				"id": "bdee1190-86f5-4580-9754-45a5bf203be2",
 				"parent": null,
 				"name": "Content",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			}
 		],
@@ -1646,28 +1646,28 @@ const rawData = [
 				"id": "225d30d8-4930-43f3-a71a-d059a6dd5d81",
 				"parent": null,
 				"name": "Content",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			},
 			{
 				"id": "ee8d1ded-bd44-4a10-abd1-47255343a78e",
 				"parent": null,
 				"name": "Content",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			},
 			{
 				"id": "98eb6573-8f6e-49ea-ba3a-d57223c28d74",
 				"parent": null,
 				"name": "Media",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			},
 			{
 				"id": "5e1b902f-79d9-4ec4-8371-4e5669acba3f",
 				"parent": null,
 				"name": "Media",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 1
 			}
 		],
@@ -1776,7 +1776,7 @@ const rawData = [
 				"id": "de29d746-2f04-4dc2-a5e6-979759415375",
 				"parent": null,
 				"name": "testGroup",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 10
 			}
 		],
@@ -1837,7 +1837,7 @@ const rawData = [
 				"id": "6feeb6c7-ec69-4f10-8601-3e478472dce1",
 				"parent": null,
 				"name": "Test",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			}
 		],
@@ -1929,7 +1929,7 @@ const rawData = [
 				"id": "e629b81a-6b75-4b7f-9bfa-1bfc29b6e2a2",
 				"parent": null,
 				"name": "Decimals",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -1990,14 +1990,14 @@ const rawData = [
 				"id": "00d99fa1-e029-4e2b-9fc9-dd468221ade6",
 				"parent": null,
 				"name": "Content",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 10
 			},
 			{
 				"id": "eaf5a845-bace-4a09-91cc-e5575178b2f4",
 				"parent": null,
 				"name": "Content",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 10
 			}
 		],
@@ -2065,7 +2065,7 @@ const rawData = [
 				"id": "52d4ecbe-753b-4217-9160-6e2b0b3709dc",
 				"parent": null,
 				"name": "Content",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			}
 		],
@@ -2214,7 +2214,7 @@ const rawData = [
 				"id": "de50f42a-9d88-4c92-b297-a3a61dee7dcc",
 				"parent": null,
 				"name": "Dropdowns",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -2273,7 +2273,7 @@ const rawData = [
 				"id": "44200614-20e7-44cc-a9ac-67e2e7983dc9",
 				"parent": null,
 				"name": "testGroup",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			}
 		],
@@ -2360,7 +2360,7 @@ const rawData = [
 				"id": "f8082afc-a3fd-4d32-8927-c7159290fb8c",
 				"parent": null,
 				"name": "Email Address",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -2493,7 +2493,7 @@ const rawData = [
 				"id": "3f800461-2b29-45a0-a8ad-dc06e43ce6fe",
 				"parent": null,
 				"name": "Eye Dropper Color Pickers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -2650,7 +2650,7 @@ const rawData = [
 				"id": "7a2361ed-3f5f-4db5-af90-07f8a7bb60cb",
 				"parent": null,
 				"name": "Markdown Editors",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -2927,7 +2927,7 @@ const rawData = [
 				"id": "a2114ac3-a87a-4c7d-a882-d55cefebbf2c",
 				"parent": null,
 				"name": "Media Pickers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -2988,7 +2988,7 @@ const rawData = [
 				"id": "dc0c9e8c-e488-4a29-ae72-7e5791078719",
 				"parent": null,
 				"name": "Member Group Picker",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -3049,7 +3049,7 @@ const rawData = [
 				"id": "f516f9ea-e299-4f9d-892e-46c39d93489c",
 				"parent": null,
 				"name": "Member Picker",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -3230,7 +3230,7 @@ const rawData = [
 				"id": "5a327c88-8e0f-421b-abf0-01b07533685e",
 				"parent": null,
 				"name": "Multi URL Pickers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -3531,7 +3531,7 @@ const rawData = [
 				"id": "c697eddc-c31a-4886-b14c-22cd9718a477",
 				"parent": null,
 				"name": "Multinode Treepickers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -3664,7 +3664,7 @@ const rawData = [
 				"id": "4745f3e2-a4b4-475d-884f-3a615f2e7328",
 				"parent": null,
 				"name": "Multiple Textstrings",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -3821,7 +3821,7 @@ const rawData = [
 				"id": "d1812831-2cb7-48bd-83d8-0decd916cd59",
 				"parent": null,
 				"name": "Numerics",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -3906,7 +3906,7 @@ const rawData = [
 				"id": "1c2c5bf0-b8a2-48eb-945b-1e872772c850",
 				"parent": null,
 				"name": "Radio Button List",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4069,7 +4069,7 @@ const rawData = [
 				"id": "3542f8d3-f045-4e0c-b48d-d2e3bb0d0a6b",
 				"parent": null,
 				"name": "Rich Text Editors",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4226,7 +4226,7 @@ const rawData = [
 				"id": "cb366883-9d00-4d98-8d1f-2a10337a63ff",
 				"parent": null,
 				"name": "Sliders",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4383,7 +4383,7 @@ const rawData = [
 				"id": "1f6e9b00-2294-48f0-bd40-7bc118b992ad",
 				"parent": null,
 				"name": "Textareas",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4516,7 +4516,7 @@ const rawData = [
 				"id": "5abf162a-2d2c-43da-ac2a-21d1cb4c2f04",
 				"parent": null,
 				"name": "Toggles",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4601,7 +4601,7 @@ const rawData = [
 				"id": "aa20dc91-4bb6-4ec4-980a-a1af95d5b6d8",
 				"parent": null,
 				"name": "Textboxes",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4662,7 +4662,7 @@ const rawData = [
 				"id": "4b4223ef-7957-4be6-9a44-568aa6930b4f",
 				"parent": null,
 				"name": "Checkbox List",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4747,7 +4747,7 @@ const rawData = [
 				"id": "26e56467-05e0-4e57-853c-f48e8148e8aa",
 				"parent": null,
 				"name": "Tags",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -4808,7 +4808,7 @@ const rawData = [
 				"id": "b439bb1f-215f-4dcc-9db5-d27354ad61ef",
 				"parent": null,
 				"name": "User Picker",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5020,7 +5020,7 @@ const rawData = [
 				"id": "5ab66da4-12dd-4b79-bb8a-bab68bc7a7ac",
 				"parent": null,
 				"name": "Labels",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5105,7 +5105,7 @@ const rawData = [
 				"id": "e8964451-7d12-407d-a963-cdbfee0eba35",
 				"parent": null,
 				"name": "Image Croppers",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5238,7 +5238,7 @@ const rawData = [
 				"id": "7e89bad4-a030-4878-a293-bae51cccb74e",
 				"parent": null,
 				"name": "Block Lists",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5347,7 +5347,7 @@ const rawData = [
 				"id": "b136c5af-636d-4625-a301-6a1e04ba548d",
 				"parent": null,
 				"name": "Block Grids",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5432,7 +5432,7 @@ const rawData = [
 				"id": "9849ef3a-73a1-46c4-b444-e4493f02b3c5",
 				"parent": null,
 				"name": "File Uploads",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5493,14 +5493,14 @@ const rawData = [
 				"id": "a00f85d5-fcee-4c52-aa2d-aa432a492695",
 				"parent": null,
 				"name": "Combobox",
-				"type": "Tab",
+				"type": "Group",
 				"sortOrder": 0
 			},
 			{
 				"id": "d7edf3b0-b27b-4a15-a17d-82e50cf6ff03",
 				"parent": null,
 				"name": "Combobox",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5561,7 +5561,7 @@ const rawData = [
 				"id": "31417d76-88b6-40ba-8b91-68612cab8fc6",
 				"parent": null,
 				"name": "Code Editor",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],
@@ -5628,7 +5628,7 @@ const rawData = [
 				"id": "3333fd0a-1a8e-48c7-bf4e-b4a0e8746f1c",
 				"parent": null,
 				"name": "Rich Text Editors",
-				"type": "Group",
+				"type": "Tab",
 				"sortOrder": 0
 			}
 		],

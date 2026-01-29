@@ -268,13 +268,13 @@ export function transformDocumentTypes(): void {
 		});
 
 		// Transform containers (groups/tabs)
-		// Type: 0 = Tab, 1 = Group
+		// Type: 0 = Group, 1 = Tab (from PropertyGroupType enum in Umbraco.Core)
 		const containers = ctGroups.map((g) => {
 			return {
 				id: formatGuid(g.uniqueId),
 				parent: null,
 				name: g.text || 'Unnamed',
-				type: g.type === 0 ? 'Tab' : 'Group',
+				type: g.type === 0 ? 'Group' : 'Tab',
 				sortOrder: g.sortOrder,
 			};
 		});
