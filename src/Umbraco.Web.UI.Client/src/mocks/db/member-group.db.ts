@@ -61,4 +61,4 @@ const itemResponseMapper = (item: UmbMockMemberGroupModel): MemberGroupItemRespo
 	};
 };
 
-export const umbMemberGroupMockDb = new UmbMemberGroupMockDB(dataSet.memberGroup);
+export const umbMemberGroupMockDb = new UmbMemberGroupMockDB(dataSet.memberGroup ?? []);

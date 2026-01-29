@@ -27,4 +27,4 @@ const itemResponseMapper = (item: UmbMockRelationModel): RelationResponseModel =
 	};
 };
 
-export const umbRelationMockDb = new UmbRelationMockDB(dataSet.relation);
+export const umbRelationMockDb = new UmbRelationMockDB(dataSet.relation ?? []);

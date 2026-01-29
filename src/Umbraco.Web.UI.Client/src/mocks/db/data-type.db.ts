@@ -130,4 +130,4 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 	};
 };
 
-export const umbDataTypeMockDb = new UmbDataTypeMockDB(dataSet.dataType);
+export const umbDataTypeMockDb = new UmbDataTypeMockDB(dataSet.dataType ?? []);

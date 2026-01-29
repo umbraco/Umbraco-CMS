@@ -11,8 +11,8 @@ import type {
 import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const healthGroups = dataSet.healthGroups;
-const healthGroupsWithoutResult = dataSet.healthGroupsWithoutResult;
+const healthGroups = dataSet.healthGroups ?? [];
+const healthGroupsWithoutResult = dataSet.healthGroupsWithoutResult ?? [];
 
 /**
  *

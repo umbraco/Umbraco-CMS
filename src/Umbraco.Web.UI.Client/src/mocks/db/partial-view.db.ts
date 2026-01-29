@@ -22,13 +22,13 @@ class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewMod
 	}
 
 	getSnippets(): PagedPartialViewSnippetItemResponseModel {
-		const snippetItems = dataSet.partialViewSnippets.map((item) => createSnippetItem(item));
+		const snippetItems = (dataSet.partialViewSnippets ?? []).map((item) => createSnippetItem(item));
 		const total = snippetItems.length;
 		return { items: snippetItems, total };
 	}
 
 	getSnippet(id: string): PartialViewSnippetResponseModel | undefined {
-		return dataSet.partialViewSnippets.find((item) => item.id === id);
+		return (dataSet.partialViewSnippets ?? []).find((item) => item.id === id);
 	}
 }
 
@@ -39,4 +39,4 @@ const createSnippetItem = (item: PartialViewSnippetResponseModel): PartialViewSn
 	};
 };
 
-export const umbPartialViewMockDB = new UmbPartialViewMockDB(dataSet.partialView);
+export const umbPartialViewMockDB = new UmbPartialViewMockDB(dataSet.partialView ?? []);

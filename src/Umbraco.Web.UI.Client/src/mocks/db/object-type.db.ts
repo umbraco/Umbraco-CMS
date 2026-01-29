@@ -4,7 +4,7 @@ import type { ObjectTypeResponseModel } from '@umbraco-cms/backoffice/external/b
 
 class UmbObjectTypeMockDB extends UmbMockDBBase<ObjectTypeResponseModel> {
 	constructor() {
-		super(dataSet.objectType);
+		super(dataSet.objectType ?? []);
 	}
 
 	getById(id: string) {

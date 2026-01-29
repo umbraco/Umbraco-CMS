@@ -184,63 +184,64 @@ export interface UmbMockLogLevelsModel {
 /**
  * Interface describing the complete structure of a mock data set.
  * All data sets (default, test, etc.) must implement this interface.
+ * All properties are optional - if not provided, they will fall back to empty arrays or default values.
  */
 export interface UmbMockDataSet {
-	// Core entity data arrays
-	dataType: Array<UmbMockDataTypeModel>;
-	dictionary: Array<UmbMockDictionaryModel>;
-	document: Array<UmbMockDocumentModel>;
-	documentBlueprint: Array<UmbMockDocumentBlueprintModel>;
-	documentType: Array<UmbMockDocumentTypeModel>;
+	// Core entity data arrays (all optional, defaults to empty array)
+	dataType?: Array<UmbMockDataTypeModel>;
+	dictionary?: Array<UmbMockDictionaryModel>;
+	document?: Array<UmbMockDocumentModel>;
+	documentBlueprint?: Array<UmbMockDocumentBlueprintModel>;
+	documentType?: Array<UmbMockDocumentTypeModel>;
 	documentTypeConfiguration?: DocumentTypeConfigurationResponseModel;
-	language: Array<UmbMockLanguageModel>;
-	media: Array<UmbMockMediaModel>;
-	mediaType: Array<UmbMockMediaTypeModel>;
-	member: Array<UmbMockMemberModel>;
-	memberGroup: Array<UmbMockMemberGroupModel>;
-	memberType: Array<UmbMockMemberTypeModel>;
-	partialView: Array<UmbMockPartialViewModel>;
-	partialViewSnippets: Array<PartialViewSnippetResponseModel>;
-	relation: Array<UmbMockRelationModel>;
-	relationType: Array<UmbMockRelationTypeModel>;
-	script: Array<UmbMockScriptModel>;
-	staticFile: Array<UmbMockStaticFileModel>;
-	stylesheet: Array<UmbMockStylesheetModel>;
-	template: Array<UmbMockTemplateModel>;
-	user: Array<UmbMockUserModel>;
-	userGroup: Array<UmbMockUserGroupModel>;
-	objectType: Array<ObjectTypeResponseModel>;
+	language?: Array<UmbMockLanguageModel>;
+	media?: Array<UmbMockMediaModel>;
+	mediaType?: Array<UmbMockMediaTypeModel>;
+	member?: Array<UmbMockMemberModel>;
+	memberGroup?: Array<UmbMockMemberGroupModel>;
+	memberType?: Array<UmbMockMemberTypeModel>;
+	partialView?: Array<UmbMockPartialViewModel>;
+	partialViewSnippets?: Array<PartialViewSnippetResponseModel>;
+	relation?: Array<UmbMockRelationModel>;
+	relationType?: Array<UmbMockRelationTypeModel>;
+	script?: Array<UmbMockScriptModel>;
+	staticFile?: Array<UmbMockStaticFileModel>;
+	stylesheet?: Array<UmbMockStylesheetModel>;
+	template?: Array<UmbMockTemplateModel>;
+	user?: Array<UmbMockUserModel>;
+	userGroup?: Array<UmbMockUserGroupModel>;
+	objectType?: Array<ObjectTypeResponseModel>;
 
-	// Log viewer data
-	logViewerSavedSearches: Array<SavedLogSearchResponseModel>;
-	logViewerMessageTemplates: Array<LogTemplateResponseModel>;
-	logViewerLogLevels: UmbMockLogLevelsModel;
-	logs: Array<LogMessageResponseModel>;
+	// Log viewer data (optional, defaults to empty arrays/default values)
+	logViewerSavedSearches?: Array<SavedLogSearchResponseModel>;
+	logViewerMessageTemplates?: Array<LogTemplateResponseModel>;
+	logViewerLogLevels?: UmbMockLogLevelsModel;
+	logs?: Array<LogMessageResponseModel>;
 
 	// Audit logs
-	auditLogs: Array<AuditLogResponseModel>;
+	auditLogs?: Array<AuditLogResponseModel>;
 
 	// Health check data
-	healthGroups: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;
-	healthGroupsWithoutResult: Array<HealthCheckGroupPresentationModel>;
+	healthGroups?: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;
+	healthGroupsWithoutResult?: Array<HealthCheckGroupPresentationModel>;
 
 	// Examine/search data
-	examineIndexers: Array<IndexResponseModel>;
-	examinePagedIndexers: PagedIndexResponseModel;
-	examineSearchResults: Array<SearchResultResponseModel>;
+	examineIndexers?: Array<IndexResponseModel>;
+	examinePagedIndexers?: PagedIndexResponseModel;
+	examineSearchResults?: Array<SearchResultResponseModel>;
 
 	// Tracked references
-	trackedReferenceItems: Array<UmbMockTrackedReferenceItemModel>;
+	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;
 
 	// News
-	news: Array<NewsDashboardItemResponseModel>;
+	news?: Array<NewsDashboardItemResponseModel>;
 
 	// User-specific extras
-	mfaLoginProviders: Array<UserTwoFactorProviderModel>;
+	mfaLoginProviders?: Array<UserTwoFactorProviderModel>;
 
 	// Template-specific helpers
-	templateQueryResult: TemplateQueryResultResponseModel;
-	templateQuerySettings: TemplateQuerySettingsResponseModel;
+	templateQueryResult?: TemplateQueryResultResponseModel;
+	templateQuerySettings?: TemplateQuerySettingsResponseModel;
 }
 
 // ============================================================================

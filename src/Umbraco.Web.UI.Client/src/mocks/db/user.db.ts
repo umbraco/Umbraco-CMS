@@ -137,11 +137,11 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	}
 
 	getMfaLoginProviders() {
-		return dataSet.mfaLoginProviders;
+		return dataSet.mfaLoginProviders ?? [];
 	}
 
 	enableMfaProvider(providerName: string) {
-		const provider = dataSet.mfaLoginProviders.find((x) => x.providerName === providerName);
+		const provider = (dataSet.mfaLoginProviders ?? []).find((x) => x.providerName === providerName);
 		if (provider) {
 			provider.isEnabledOnUser = true;
 			return true;
@@ -151,7 +151,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	}
 
 	disableMfaProvider(providerName: string) {
-		const provider = dataSet.mfaLoginProviders.find((x) => x.providerName === providerName);
+		const provider = (dataSet.mfaLoginProviders ?? []).find((x) => x.providerName === providerName);
 		if (provider) {
 			provider.isEnabledOnUser = false;
 			return true;
@@ -301,4 +301,4 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 	};
 };
 
-export const umbUserMockDb = new UmbUserMockDB(dataSet.user);
+export const umbUserMockDb = new UmbUserMockDB(dataSet.user ?? []);

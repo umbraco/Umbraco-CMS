@@ -40,4 +40,4 @@ const itemMapper = (item: UmbMockTemplateModel): TemplateItemResponseModel => {
 	};
 };
 
-export const umbTemplateMockDb = new UmbTemplateMockDB(dataSet.template);
+export const umbTemplateMockDb = new UmbTemplateMockDB(dataSet.template ?? []);

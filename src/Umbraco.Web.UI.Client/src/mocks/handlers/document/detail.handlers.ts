@@ -13,7 +13,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const referenceData = dataSet.trackedReferenceItems;
+const referenceData = dataSet.trackedReferenceItems ?? [];
 
 export const detailHandlers = [
 	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {

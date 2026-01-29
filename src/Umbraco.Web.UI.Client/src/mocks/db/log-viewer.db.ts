@@ -59,9 +59,14 @@ class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 	}
 }
 
+const defaultLogLevels = {
+	total: 0,
+	items: [] as Array<{ name: string; level: string }>,
+};
+
 export const umbLogViewerData = {
-	searches: new UmbLogViewerSearchesData(dataSet.logViewerSavedSearches),
-	templates: new UmbLogViewerTemplatesData(dataSet.logViewerMessageTemplates),
-	logs: new UmbLogViewerMessagesData(dataSet.logs),
-	logLevels: dataSet.logViewerLogLevels,
+	searches: new UmbLogViewerSearchesData(dataSet.logViewerSavedSearches ?? []),
+	templates: new UmbLogViewerTemplatesData(dataSet.logViewerMessageTemplates ?? []),
+	logs: new UmbLogViewerMessagesData(dataSet.logs ?? []),
+	logLevels: dataSet.logViewerLogLevels ?? defaultLogLevels,
 };

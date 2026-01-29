@@ -103,4 +103,4 @@ const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintItem
 	};
 };
 
-export const umbDocumentBlueprintMockDb = new UmbDocumentBlueprintMockDB(dataSet.documentBlueprint);
+export const umbDocumentBlueprintMockDb = new UmbDocumentBlueprintMockDB(dataSet.documentBlueprint ?? []);

@@ -79,4 +79,4 @@ const itemResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeItemRespons
 	};
 };
 
-export const umbMemberTypeMockDb = new UmbMemberTypeMockDB(dataSet.memberType);
+export const umbMemberTypeMockDb = new UmbMemberTypeMockDB(dataSet.memberType ?? []);

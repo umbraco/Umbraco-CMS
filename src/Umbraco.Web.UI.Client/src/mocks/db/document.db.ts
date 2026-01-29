@@ -178,4 +178,4 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 	};
 };
 
-export const umbDocumentMockDb = new UmbDocumentMockDB(dataSet.document);
+export const umbDocumentMockDb = new UmbDocumentMockDB(dataSet.document ?? []);

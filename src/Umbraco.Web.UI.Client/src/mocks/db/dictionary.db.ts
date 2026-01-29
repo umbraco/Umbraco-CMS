@@ -76,4 +76,4 @@ const itemMapper = (model: UmbMockDictionaryModel): DictionaryItemItemResponseMo
 	};
 };
 
-export const umbDictionaryMockDb = new UmbDictionaryMockDB(dataSet.dictionary);
+export const umbDictionaryMockDb = new UmbDictionaryMockDB(dataSet.dictionary ?? []);

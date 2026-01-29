@@ -181,4 +181,4 @@ const allowedExtensionMediaTypeMapper = (
 	};
 };
 
-export const umbMediaTypeMockDb = new UmbMediaTypeMockDB(dataSet.mediaType);
+export const umbMediaTypeMockDb = new UmbMediaTypeMockDB(dataSet.mediaType ?? []);

@@ -170,4 +170,4 @@ const allowedDocumentTypeMapper = (item: UmbMockDocumentTypeModel): AllowedDocum
 	};
 };
 
-export const umbDocumentTypeMockDb = new UmbDocumentTypeMockDB(dataSet.documentType);
+export const umbDocumentTypeMockDb = new UmbDocumentTypeMockDB(dataSet.documentType ?? []);

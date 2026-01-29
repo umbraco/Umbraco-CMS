@@ -129,4 +129,4 @@ const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseMode
 	};
 };
 
-export const umbMediaMockDb = new UmbMediaMockDB(dataSet.media);
+export const umbMediaMockDb = new UmbMediaMockDB(dataSet.media ?? []);

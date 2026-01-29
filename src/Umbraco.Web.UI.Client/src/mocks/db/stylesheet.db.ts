@@ -17,4 +17,4 @@ class UmbStylesheetMockDb extends UmbFileSystemMockDbBase<UmbMockStylesheetModel
 	}
 }
 
-export const umbStylesheetMockDb = new UmbStylesheetMockDb(dataSet.stylesheet);
+export const umbStylesheetMockDb = new UmbStylesheetMockDb(dataSet.stylesheet ?? []);

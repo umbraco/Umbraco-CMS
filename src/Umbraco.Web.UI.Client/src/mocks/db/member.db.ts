@@ -145,4 +145,4 @@ const collectionItemResponseMapper = (item: UmbMockMemberModel): any => {
 	};
 };
 
-export const umbMemberMockDb = new UmbMemberMockDB(dataSet.member);
+export const umbMemberMockDb = new UmbMemberMockDB(dataSet.member ?? []);

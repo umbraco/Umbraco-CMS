@@ -45,4 +45,4 @@ const itemResponseMapper = (item: UmbMockLanguageModel): LanguageItemResponseMod
 	};
 };
 
-export const umbLanguageMockDb = new UmbLanguageMockDB(dataSet.language);
+export const umbLanguageMockDb = new UmbLanguageMockDB(dataSet.language ?? []);

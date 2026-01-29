@@ -8,8 +8,8 @@ import type {
 	PagedSearchResultResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-const searchResultMockData = dataSet.examineSearchResults;
-const PagedIndexers = dataSet.examinePagedIndexers;
+const searchResultMockData = dataSet.examineSearchResults ?? [];
+const PagedIndexers = dataSet.examinePagedIndexers ?? { items: [], total: 0 };
 const Indexers = PagedIndexers.items;
 
 /**

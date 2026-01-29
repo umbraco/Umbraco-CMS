@@ -138,4 +138,4 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 	};
 };
 
-export const umbUserGroupMockDb = new UmbUserGroupMockDB(dataSet.userGroup);
+export const umbUserGroupMockDb = new UmbUserGroupMockDB(dataSet.userGroup ?? []);

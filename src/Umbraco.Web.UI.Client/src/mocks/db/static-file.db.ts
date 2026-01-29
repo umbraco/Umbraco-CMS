@@ -13,4 +13,4 @@ class UmbStaticFileMockDB extends UmbFileSystemMockDbBase<UmbMockStaticFileModel
 	}
 }
 
-export const umbStaticFileMockDb = new UmbStaticFileMockDB(dataSet.staticFile);
+export const umbStaticFileMockDb = new UmbStaticFileMockDB(dataSet.staticFile ?? []);

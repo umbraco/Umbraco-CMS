@@ -10,7 +10,7 @@ import type {
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
-const referenceData = dataSet.trackedReferenceItems;
+const referenceData = dataSet.trackedReferenceItems ?? [];
 
 export const detailHandlers = [
 	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {

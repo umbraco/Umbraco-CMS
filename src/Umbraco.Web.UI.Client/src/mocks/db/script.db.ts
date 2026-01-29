@@ -17,4 +17,4 @@ class UmbScriptMockDB extends UmbFileSystemMockDbBase<UmbMockScriptModel> {
 	}
 }
 
-export const umbScriptMockDb = new UmbScriptMockDB(dataSet.script);
+export const umbScriptMockDb = new UmbScriptMockDB(dataSet.script ?? []);
