@@ -126,6 +126,16 @@ public interface IContentService : IContentServiceBase<IContent>
     IContent? GetById(int id);
 
     /// <summary>
+    ///     Gets a document.
+    /// </summary>
+    /// <param name="key">The unique identifier of the document.</param>
+    /// <returns>The document, or null if not found.</returns>
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+    IContent? GetById(Guid key);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+
+    /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>
     /// <param name="contentId">The identifier of the content to load schedule for.</param>
@@ -262,7 +272,30 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
+
+    /// <summary>
+    ///     Gets child documents of a parent with optional property filtering.
+    /// </summary>
+    /// <param name="id">The parent identifier.</param>
+    /// <param name="pageIndex">The page number.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Total number of documents.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="filter">Query filter.</param>
+    /// <param name="ordering">Ordering infos.</param>
+    /// <param name="loadTemplates">
+    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
+    ///     (e.g., collection views). Default is true.
+    /// </param>
+#pragma warning disable CS0618 // Type or member is obsolete
+    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
+        => GetPagedChildren(id, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets descendant documents of a given parent.

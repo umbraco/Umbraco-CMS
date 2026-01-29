@@ -5,8 +5,12 @@ using Umbraco.Cms.Persistence.EFCore.Migrations;
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
 
+/// <summary>
+/// Composer for registering SQL Server EF Core migration services.
+/// </summary>
 public class EFCoreSqlServerComposer : IComposer
 {
+    /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IMigrationProvider, SqlServerMigrationProvider>();

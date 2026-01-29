@@ -673,6 +673,7 @@ public class ContentService : RepositoryService, IContentService
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }
@@ -705,6 +706,7 @@ public class ContentService : RepositoryService, IContentService
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }
@@ -840,7 +842,12 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
+        => GetPagedChildren(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
     {
         if (pageIndex < 0)
         {
@@ -859,7 +866,7 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
 
             IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering, loadTemplates);
         }
     }
 
@@ -918,7 +925,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(ordering));
         }
 
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
     }
 
     /// <summary>
@@ -1009,7 +1016,7 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
             IQuery<IContent>? query = Query<IContent>()?
                 .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
     }
 
@@ -1104,6 +1111,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var savingNotification = new ContentSavingNotification(content, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -1111,7 +1120,6 @@ public class ContentService : RepositoryService, IContentService
                 return OperationResult.Cancel(eventMessages);
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             userId ??= Constants.Security.SuperUserId;
 
             if (content.HasIdentity == false)
@@ -1171,6 +1179,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var savingNotification = new ContentSavingNotification(contentsA, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -1178,7 +1188,6 @@ public class ContentService : RepositoryService, IContentService
                 return OperationResult.Cancel(eventMessages);
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             foreach (IContent content in contentsA)
             {
                 if (content.HasIdentity == false)
@@ -2290,13 +2299,13 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(content, eventMessages)))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
             }
-
-            scope.WriteLock(Constants.Locks.ContentTree);
 
             // if it's not trashed yet, and published, we should unpublish
             // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
@@ -2361,6 +2370,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var deletingVersionsNotification =
                 new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
@@ -2369,7 +2380,6 @@ public class ContentService : RepositoryService, IContentService
                 return;
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             _documentRepository.DeleteVersions(id, versionDate);
 
             scope.Notifications.Publish(
@@ -2395,6 +2405,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
@@ -2408,7 +2420,6 @@ public class ContentService : RepositoryService, IContentService
                 DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             IContent? c = _documentRepository.Get(id);
 
             // don't delete the current or published version
@@ -2731,6 +2742,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             TryGetParentKey(parentId, out Guid? parentKey);
             if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
             {
@@ -2742,8 +2755,6 @@ public class ContentService : RepositoryService, IContentService
             // it's just part of the Copied event args so the RelateOnCopyHandler knows what to do
             // meaning that the event has to trigger for every copied content including descendants
             var copies = new List<Tuple<IContent, IContent>>();
-
-            scope.WriteLock(Constants.Locks.ContentTree);
 
             // a copy is not published (but not really unpublishing either)
             // update the create author and last edit author
