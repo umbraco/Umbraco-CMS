@@ -25,15 +25,13 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     }
 
     /// <inheritdoc />
-    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options)
-    {
-        return mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, options))).ToArray();
-    }
+    [Obsolete("Use the overload that accepts ImageResizeOptions instead. This method will be removed in v19.")]
+    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode)
+        => CreateUrlSets(mediaItems, new ImageResizeOptions(height, width, mode));
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that accepts ImageResizeOptions instead. This method will be removed in v19.")]
-    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode, string? format = null)
-        => CreateUrlSets(mediaItems, new ImageResizeOptions(height, width, mode, format));
+    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options)
+        => mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, options))).ToArray();
 
     private IEnumerable<MediaUrlInfo> CreateUrls(IMedia media, ImageResizeOptions options)
     {
