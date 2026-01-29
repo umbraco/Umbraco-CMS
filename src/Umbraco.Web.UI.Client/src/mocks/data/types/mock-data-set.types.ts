@@ -226,7 +226,6 @@ export interface UmbMockDataSet {
 	examineIndexers: Array<IndexResponseModel>;
 	examinePagedIndexers: PagedIndexResponseModel;
 	examineSearchResults: Array<SearchResultResponseModel>;
-	examineGetSearchResults: () => Array<SearchResultResponseModel>;
 
 	// Tracked references
 	trackedReferenceItems: Array<UmbMockTrackedReferenceItemModel>;

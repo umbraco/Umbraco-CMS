@@ -5,13 +5,6 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-/**
- *
- */
-export function getSearchResultsMockData(): SearchResultResponseModel[] {
-	return searchResultMockData;
-}
-
 export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'ExternalIndex',

@@ -33,7 +33,6 @@ export const healthGroupsWithoutResult = [];
 export const examineIndexers = [];
 export const examinePagedIndexers = { items: [], total: 0 };
 export const examineSearchResults = [];
-export const examineGetSearchResults = () => [];
 export const trackedReferenceItems = [];
 export const news = [];
 
