@@ -126,6 +126,3 @@ export const templateQuerySettings: TemplateQuerySettingsResponseModel = {
 	writeDataFile('template.data.ts', content);
 	console.log(`Transformed ${templates.length} templates`);
 }
-
-// Run if called directly
-transformTemplates();

@@ -236,6 +236,3 @@ export const data: Array<UmbMockMediaTypeModel> = ${JSON.stringify(mediaTypes, n
 	writeDataFile('media-type.data.ts', content);
 	console.log(`Transformed ${mediaTypes.length} media types`);
 }
-
-// Run if called directly
-transformMediaTypes();

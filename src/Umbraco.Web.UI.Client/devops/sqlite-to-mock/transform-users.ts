@@ -274,6 +274,3 @@ export const data: Array<UmbMockUserGroupModel> = ${JSON.stringify(transformedGr
 	writeDataFile('user-group.data.ts', groupContent);
 	console.log(`Transformed ${transformedGroups.length} user groups`);
 }
-
-// Run if called directly
-transformUsers();
