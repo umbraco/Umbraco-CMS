@@ -10,7 +10,7 @@ export const manifests: UmbExtensionManifest = {
 	weight: 1000,
 	meta: {
 		iconName: 'icon-block',
-		label: 'Protected',
+		label: '#content_protected',
 		iconColorAlias: 'red',
 	},
 };

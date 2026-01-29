@@ -163,7 +163,10 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
 
                     foreach (ISearchResult item in results)
                     {
-                        if (int.TryParse(item.Id, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                        if (int.TryParse(
+                                item.Id,
+                                NumberStyles.Integer,
+                                CultureInfo.InvariantCulture,
                                 out var contentId))
                         {
                             DeleteIndexForEntity(contentId, false);
@@ -405,7 +408,9 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             }
         }
 
-        public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id,
+        public static void Execute(
+            ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            int id,
             bool keepIfUnpublished)
         {
             foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes

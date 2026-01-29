@@ -767,7 +767,7 @@ export class UmbContentTypeStructureManager<
 			const props: UmbPropertyTypeModel[] = [];
 			docTypes.forEach((docType) => {
 				docType.properties?.forEach((property) => {
-					if (property.container?.id === containerId) {
+					if ((containerId === null && !property.container) || property.container?.id === containerId) {
 						props.push(property);
 					}
 				});

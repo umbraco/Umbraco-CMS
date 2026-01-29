@@ -139,7 +139,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
-    protected ILanguage ConvertFromDto(LanguageDto dto)
+    private ILanguage ConvertFromDto(LanguageDto dto)
     {
         lock (_codeIdMap)
         {
@@ -267,6 +267,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("tagId")} IN (SELECT id FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
         };
         return list;

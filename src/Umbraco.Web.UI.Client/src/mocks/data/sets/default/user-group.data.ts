@@ -25,6 +25,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		id: 'user-group-administrators-id',
 		name: 'Administrators',
 		alias: 'admin',
+		description: 'Administrators have full access to all settings and features within the CMS.',
 		icon: 'icon-medal',
 		fallbackPermissions: [
 			UMB_USER_PERMISSION_DOCUMENT_READ,
@@ -89,6 +90,8 @@ export const data: Array<UmbMockUserGroupModel> = [
 		id: 'user-group-editors-id',
 		name: 'Editors',
 		alias: 'editors',
+		description:
+			'The Editors group is responsible for creating, updating, and managing Content and Media within the platform. While they do not have access to system-level areas such as Settings, Users, or Packages, they play a crucial role in maintaining the website’s daily content operations. Editors start from the Media root node when handling media files, ensuring they can upload, modify, and organize assets relevant to their work.',
 		icon: 'icon-tools',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [

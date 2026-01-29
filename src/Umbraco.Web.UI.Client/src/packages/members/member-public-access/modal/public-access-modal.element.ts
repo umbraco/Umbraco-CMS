@@ -36,6 +36,12 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	@state()
 	private _errorDocumentId?: string;
 
+	@state()
+	private _isLoading = false;
+
+	@state()
+	private _loadError?: string;
+
 	// Init
 
 	override firstUpdated() {
@@ -45,38 +51,74 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	async #getDocumentName() {
 		if (!this.#unique) return;
-		// Should this be done here or in the action file?
-		const { data } = await new UmbDocumentItemRepository(this).requestItems([this.#unique]);
-		if (!data) return;
-		const item = data[0];
-		//TODO How do we ensure we get the correct variant?
-		this._documentName = item.variants[0]?.name;
 
-		if (item.isProtected) {
-			this.#getPublicAccessModel();
+		this._isLoading = true;
+		this._loadError = undefined;
+
+		try {
+			// Should this be done here or in the action file?
+			const { data, error } = await new UmbDocumentItemRepository(this).requestItems([this.#unique]);
+
+			if (error) {
+				this._loadError = 'Failed to load document information';
+				return;
+			}
+
+			if (!data) {
+				this._loadError = 'No document data returned';
+				return;
+			}
+
+			const item = data[0];
+			//TODO How do we ensure we get the correct variant?
+			this._documentName = item.variants[0]?.name;
+
+			if (item.isProtected) {
+				await this.#getPublicAccessModel();
+			}
+		} catch (err) {
+			this._loadError = 'An error occurred while loading document information';
+			console.error('Error loading document:', err);
+		} finally {
+			this._isLoading = false;
 		}
 	}
 
 	async #getPublicAccessModel() {
 		if (!this.#unique) return;
-		const { data } = await this.#publicAccessRepository.read(this.#unique);
 
-		if (!data) return;
-		this.#isNew = false;
-		this._startPage = false;
+		try {
+			const { data, error } = await this.#publicAccessRepository.read(this.#unique);
 
-		// Specific or Groups
-		this._specific = data.members.length > 0;
+			if (error) {
+				this._loadError = 'Failed to load public access settings';
+				return;
+			}
 
-		//selection
-		if (data.members.length > 0) {
-			this._selection = data.members.map((m) => m.id);
-		} else if (data.groups.length > 0) {
-			this._selection = data.groups.map((g) => g.id);
+			if (!data) {
+				this._loadError = 'No public access data returned';
+				return;
+			}
+
+			this.#isNew = false;
+			this._startPage = false;
+
+			// Specific or Groups
+			this._specific = data.members.length > 0;
+
+			//selection
+			if (data.members.length > 0) {
+				this._selection = data.members.map((m) => m.id);
+			} else if (data.groups.length > 0) {
+				this._selection = data.groups.map((g) => g.id);
+			}
+
+			this._loginDocumentId = data.loginDocument.id;
+			this._errorDocumentId = data.errorDocument.id;
+		} catch (err) {
+			this._loadError = 'An error occurred while loading public access settings';
+			console.error('Error loading public access model:', err);
 		}
-
-		this._loginDocumentId = data.loginDocument.id;
-		this._errorDocumentId = data.errorDocument.id;
 	}
 
 	// Modal events
@@ -167,9 +209,26 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_protect')}>
-				<uui-box>${this._startPage ? this.renderSelectGroup() : this.renderEditPage()}</uui-box> ${this.renderActions()}
+				<uui-box>${this.#renderContent()}</uui-box> ${this.renderActions()}
 			</umb-body-layout>
 		`;
+	}
+
+	#renderContent() {
+		if (this._isLoading) {
+			return html`<div id="loader">
+				<uui-loader></uui-loader>
+			</div>`;
+		}
+
+		if (this._loadError) {
+			return html`<div id="error">
+				<p><strong>${this.localize.term('general_error')}</strong></p>
+				<p>${this._loadError}</p>
+			</div>`;
+		}
+
+		return this._startPage ? this.renderSelectGroup() : this.renderEditPage();
 	}
 
 	// First page when no Restricting Public Access is set.
@@ -294,6 +353,22 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			}
 			small {
 				display: block;
+			}
+
+			#loader {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: var(--uui-size-12) 0;
+			}
+
+			#error {
+				color: var(--uui-color-danger);
+				padding: var(--uui-size-4);
+			}
+
+			#error p {
+				margin: var(--uui-size-2) 0;
 			}
 		`,
 	];

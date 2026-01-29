@@ -56,7 +56,19 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     public void Handle(ContentDeletedBlueprintNotification notification) => DeleteContainedFiles(notification.DeletedBlueprints);
 
     /// <inheritdoc/>
-    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    public void Handle(MediaDeletedNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection)
+        {
+            RecycleBinMediaProtectionHelper.DeleteContainedFilesWithProtection(
+                notification.DeletedEntities,
+                ContainedFilePaths,
+                MediaFileManager);
+            return;
+        }
+
+        DeleteContainedFiles(notification.DeletedEntities);
+    }
 
     /// <inheritdoc/>
     public void Handle(MediaMovedToRecycleBinNotification notification)
@@ -115,7 +127,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
     {
         IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia);
-        MediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
+        RecycleBinMediaProtectionHelper.RemoveSuffixFromContainedFiles(filePathsToRename, MediaFileManager);
     }
 
     /// <summary>

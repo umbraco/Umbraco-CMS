@@ -459,7 +459,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
     {
         // NodeId is named Id on TreeEntityPath = use an alias
-        Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, nameof(TreeEntityPath.Id)), x => x.Path)
+        Sql<ISqlContext> sql = Sql().Select<NodeDto>(
+                x => Alias(x.NodeId, nameof(TreeEntityPath.Id)),
+                x => x.Path,
+                x => Alias(x.UniqueId, nameof(TreeEntityPath.Key)))
             .From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
         filter?.Invoke(sql);
         return Database.Fetch<TreeEntityPath>(sql);
@@ -624,7 +627,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     #region Sql
 
-    protected Sql<ISqlContext> GetVariantInfos(IEnumerable<int> ids) =>
+    private Sql<ISqlContext> GetVariantInfos(IEnumerable<int> ids) =>
         Sql()
             .Select<NodeDto>(x => x.NodeId)
             .AndSelect<LanguageDto>(x => x.IsoCode)
@@ -659,7 +662,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .OrderBy<LanguageDto>(x => x.Id);
 
     // gets the full sql for a given object type and a given unique id
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         Guid uniqueId)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, uniqueId);
@@ -667,7 +674,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     // gets the full sql for a given object type and a given node id
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         int nodeId)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, nodeId);
@@ -675,14 +686,18 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     // gets the full sql for a given object type, with a given filter
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
     }
 
-    protected Sql<ISqlContext> GetFullSqlForEntityType(
+    private Sql<ISqlContext> GetFullSqlForEntityType(
         bool isContent,
         bool isMedia,
         bool isMember,
@@ -691,7 +706,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         Action<Sql<ISqlContext>>? filter)
         => GetFullSqlForEntityType(isContent, isMedia, isMember, [objectType], ordering, filter);
 
-    protected Sql<ISqlContext> GetFullSqlForEntityType(
+    private Sql<ISqlContext> GetFullSqlForEntityType(
         bool isContent,
         bool isMedia,
         bool isMember,
@@ -706,12 +721,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return sql;
     }
 
-    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, bool isCount = false)
+    private Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, bool isCount = false)
         => GetBase(isContent, isMedia, isMember, filter, [], isCount);
 
     // gets the base SELECT + FROM [+ filter] sql
     // always from the 'current' content version
-    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, Guid[] objectTypes, bool isCount = false)
+    private Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, Guid[] objectTypes, bool isCount = false)
     {
         Sql<ISqlContext> sql = Sql();
         ISqlSyntaxProvider syntax = SqlContext.SqlSyntax;
@@ -722,9 +737,18 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         else
         {
             sql
-                .Select<NodeDto>(x => x.NodeId, x => x.Trashed, x => x.ParentId, x => x.UserId, x => x.Level,
+                .Select<NodeDto>(
+                    x => x.NodeId,
+                    x => x.Trashed,
+                    x => x.ParentId,
+                    x => x.UserId,
+                    x => x.Level,
                     x => x.Path)
-                .AndSelect<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType,
+                .AndSelect<NodeDto>(
+                    x => x.SortOrder,
+                    x => x.UniqueId,
+                    x => x.Text,
+                    x => x.NodeObjectType,
                     x => x.CreateDate);
 
             if (objectTypes.Length == 0)
@@ -810,8 +834,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM [+ filter] + WHERE sql
     // for a given object type, with a given filter
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount,
-        Action<Sql<ISqlContext>>? filter, Guid[] objectTypes)
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Action<Sql<ISqlContext>>? filter,
+        Guid[] objectTypes)
     {
         Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, filter, objectTypes, isCount);
         if (objectTypes.Length > 0)
@@ -824,7 +853,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given node id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, int id)
+    private Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, int id)
     {
         Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.NodeId == id);
@@ -833,7 +862,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given unique id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid uniqueId)
+    private Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid uniqueId)
     {
         Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.UniqueId == uniqueId);
@@ -842,21 +871,35 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and node id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Guid objectType,
         int nodeId) =>
         GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.NodeId == nodeId && x.NodeObjectType == objectType);
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and unique id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Guid objectType,
         Guid uniqueId) =>
         GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.UniqueId == uniqueId && x.NodeObjectType == objectType);
 
     // gets the GROUP BY / ORDER BY sql
     // required in order to count children
-    protected Sql<ISqlContext> AddGroupBy(bool isContent, bool isMedia, bool isMember, Sql<ISqlContext> sql,
+    private Sql<ISqlContext> AddGroupBy(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Sql<ISqlContext> sql,
         bool defaultSort)
     {
         sql

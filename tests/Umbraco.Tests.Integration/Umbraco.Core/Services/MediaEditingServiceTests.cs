@@ -14,13 +14,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
 {
-    protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    protected IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
+    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
-    protected IMediaType ImageMediaType { get; set; }
+    private IMediaType ImageMediaType { get; set; }
 
-    protected IMediaType ArticleMediaType { get; set; }
+    private IMediaType ArticleMediaType { get; set; }
 
     [SetUp]
     public async Task Setup()
@@ -47,6 +47,16 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
 
         Assert.IsTrue(imageCreateAttempt.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, imageCreateAttempt.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Media_With_Guid_7_When_Default_Media_Path_Scheme_Is_Registered()
+    {
+        var imageModel = CreateMediaCreateModelWithFile("Image", Guid.CreateVersion7(), ArticleMediaType.Key);
+        var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(imageCreateAttempt.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidKey, imageCreateAttempt.Status);
     }
 
     [Test]

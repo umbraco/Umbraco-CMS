@@ -32,7 +32,10 @@ public interface IColumnOptionBuilder<out TNext, out TNextFk> : IFluentBuilder
 
     TNextFk ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName);
 
-    TNextFk ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName,
+    TNextFk ForeignKey(
+        string foreignKeyName,
+        string primaryTableSchema,
+        string primaryTableName,
         string primaryColumnName);
 
     TNextFk ForeignKey();
@@ -41,6 +44,9 @@ public interface IColumnOptionBuilder<out TNext, out TNextFk> : IFluentBuilder
 
     TNextFk ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName);
 
-    TNextFk ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName,
+    TNextFk ReferencedBy(
+        string foreignKeyName,
+        string foreignTableSchema,
+        string foreignTableName,
         string foreignColumnName);
 }

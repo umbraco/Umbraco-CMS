@@ -406,7 +406,7 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
-            return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
+            return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("LoginName"));
         }
 
         public IEnumerable<IMember> GetAll(
@@ -435,7 +435,7 @@ namespace Umbraco.Cms.Core.Services
             int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
             Guid.TryParse(filter, out Guid filterAsGuid);
             IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
-            return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
+            return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, propertyAliases: null, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 
         /// <summary>
@@ -548,7 +548,8 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query = Query<IMember>().Where(x => ids.Contains(x.Key));
+            List<Guid> idsAsList = [.. ids];
+            IQuery<IMember> query = Query<IMember>().Where(x => idsAsList.Contains(x.Key));
             return Task.FromResult(_memberRepository.Get(query));
         }
 
@@ -588,7 +589,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
             }
 
-            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Name"));
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("Name"));
         }
 
         /// <summary>
@@ -627,7 +628,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Email"));
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("Email"));
         }
 
         /// <summary>
@@ -666,7 +667,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("LoginName"));
         }
 
         /// <inheritdoc />
@@ -817,6 +818,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             MemberSavingNotification? savingNotification = null;
             if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving))
             {
@@ -834,8 +837,6 @@ namespace Umbraco.Cms.Core.Services
             }
 
             var previousUsername = _memberRepository.Get(member.Id)?.Username;
-
-            scope.WriteLock(Constants.Locks.MemberTree);
 
             _memberRepository.Save(member);
 
@@ -875,14 +876,14 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
-
-            scope.WriteLock(Constants.Locks.MemberTree);
 
             foreach (IMember member in membersA)
             {
@@ -957,6 +958,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
@@ -964,7 +967,6 @@ namespace Umbraco.Cms.Core.Services
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
-            scope.WriteLock(Constants.Locks.MemberTree);
             DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
 
             Audit(AuditType.Delete, userId, member.Id);

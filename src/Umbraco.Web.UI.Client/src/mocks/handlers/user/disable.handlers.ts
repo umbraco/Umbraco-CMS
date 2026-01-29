@@ -10,7 +10,8 @@ export const handlers = [
 		if (!data) return;
 		if (!data.userIds) return;
 
-		umbUserMockDb.disable(data.userIds);
+		const ids = data.userIds.map((ref) => ref.id);
+		umbUserMockDb.disable(ids);
 
 		return new HttpResponse(null, { status: 200 });
 	}),

@@ -10,7 +10,8 @@ export const handlers = [
 		if (!data) return;
 		if (!data.userIds) return;
 
-		umbUserMockDb.unlock(data.userIds);
+		const ids = data.userIds.map((ref) => ref.id);
+		umbUserMockDb.unlock(ids);
 
 		return new HttpResponse(null, { status: 200 });
 	}),

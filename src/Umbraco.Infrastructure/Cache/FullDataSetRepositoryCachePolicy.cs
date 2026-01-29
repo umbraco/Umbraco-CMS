@@ -25,10 +25,20 @@ namespace Umbraco.Cms.Core.Cache;
 internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
     where TEntity : class, IEntity
 {
-    protected static readonly TId[] EmptyIds = new TId[0]; // const
+    private static readonly TId[] _emptyIds = []; // const
     private readonly Func<TEntity, TId> _entityGetId;
     private readonly bool _expires;
+    private readonly Lock _getAllLock = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> class.
+    /// </summary>
+    /// <param name="cache">The cache to use for storing entities.</param>
+    /// <param name="scopeAccessor">The scope accessor for accessing the current scope.</param>
+    /// <param name="repositoryCacheVersionService">The service for managing cache version synchronization.</param>
+    /// <param name="cacheSyncService">The service for synchronizing cache changes across servers.</param>
+    /// <param name="entityGetId">A function to extract the identifier from an entity.</param>
+    /// <param name="expires">Whether cached items should expire after a timeout.</param>
     public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, IRepositoryCacheVersionService repositoryCacheVersionService, ICacheSyncService cacheSyncService, Func<TEntity, TId> entityGetId, bool expires)
         : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService)
     {
@@ -39,10 +49,7 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
     /// <inheritdoc />
     public override void Create(TEntity entity, Action<TEntity> persistNew)
     {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
+        ArgumentNullException.ThrowIfNull(entity);
 
         try
         {
@@ -54,9 +61,9 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
         }
     }
 
-    protected string GetEntityTypeCacheKey() => RepositoryCacheKeys.GetKey<TEntity>();
+    private static string GetEntityTypeCacheKey() => RepositoryCacheKeys.GetKey<TEntity>();
 
-    protected void InsertEntities(TEntity[]? entities)
+    private void InsertEntities(TEntity[]? entities)
     {
         if (entities is null)
         {
@@ -88,10 +95,7 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
     /// <inheritdoc />
     public override void Update(TEntity entity, Action<TEntity> persistUpdated)
     {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
+        ArgumentNullException.ThrowIfNull(entity);
 
         try
         {
@@ -110,10 +114,7 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
     /// <inheritdoc />
     public override void Delete(TEntity entity, Action<TEntity> persistDeleted)
     {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
+        ArgumentNullException.ThrowIfNull(entity);
 
         try
         {
@@ -190,19 +191,37 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
     /// <inheritdoc />
     public override void ClearAll() => Cache.Clear(GetEntityTypeCacheKey());
 
-    // does NOT clone anything, so be nice with the returned values
+    /// <summary>
+    /// Gets all cached entities, or retrieves them from the repository if not cached.
+    /// </summary>
+    /// <remarks>
+    /// Uses double-check locking to prevent the "thundering herd" problem where multiple
+    /// threads detecting a cache miss would all query the database simultaneously.
+    /// Does NOT clone anything, so be nice with the returned values.
+    /// </remarks>
     internal IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>?> performGetAll)
     {
-        // try the cache first
+        // Fast path - check cache without lock.
         DeepCloneableList<TEntity>? all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
         if (all != null)
         {
             return all.ToArray();
         }
 
-        // else get from repo and cache
-        TEntity[]? entities = performGetAll(EmptyIds)?.WhereNotNull().ToArray();
-        InsertEntities(entities); // may be an empty array...
-        return entities ?? Enumerable.Empty<TEntity>();
+        // Slow path - lock to prevent thundering herd on cache miss.
+        lock (_getAllLock)
+        {
+            // Double-check inside lock - another thread may have populated the cache.
+            all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
+            if (all != null)
+            {
+                return all.ToArray();
+            }
+
+            // Only one thread queries the database.
+            TEntity[]? entities = performGetAll(_emptyIds)?.WhereNotNull().ToArray();
+            InsertEntities(entities); // may be an empty array...
+            return entities ?? Enumerable.Empty<TEntity>();
+        }
     }
 }

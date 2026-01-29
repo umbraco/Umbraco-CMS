@@ -9,7 +9,7 @@ export const handlers = [
 		if (!data) return;
 		if (!data.newPassword) return;
 
-		/* we don't have to update any mock data when a password is changed
+			/* we don't have to update any mock data when a password is changed
 		so we just return a 200 */
 		return new HttpResponse(null, { status: 200 });
 	}),

@@ -2,6 +2,7 @@ const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaTypeMockDb } from '../../db/media-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { CreateFolderRequestModel, UpdateFolderResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const folderHandlers = [
 	http.post(umbracoPath(`${UMB_SLUG}/folder`), async ({ request }) => {

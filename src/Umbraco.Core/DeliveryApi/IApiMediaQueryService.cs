@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -24,6 +24,6 @@ public interface IApiMediaQueryService
     ///     Returns the media item that matches the supplied path (if any).
     /// </summary>
     /// <param name="path">The path to look up.</param>
-    /// <returns>The media item at <see cref="path"/>, or null if it does not exist.</returns>
+    /// <returns>The media item at the specified <paramref name="path"/>, or <c>null</c> if it does not exist.</returns>
     IPublishedContent? GetByPath(string path);
 }

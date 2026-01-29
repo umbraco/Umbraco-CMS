@@ -3,8 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -348,18 +346,21 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
 
                 Guid[] allowedTypes = configuration?.Filter?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(Guid.Parse).ToArray() ?? [];
 
-                // We can't validate if there is no object type, and we don't need to if there's no filter.
-                if (entityReferences is null || allowedTypes.Length == 0 || configuration?.TreeSource?.ObjectType is null)
+                // Don't need to validate if there's no filter.
+                if (entityReferences is null || allowedTypes.Length == 0)
                 {
                     return validationResults;
                 }
+
+                // If no object type is specified, it's considered as document.
+                var objectType = configuration?.TreeSource?.ObjectType ?? DocumentObjectType;
 
                 using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
                 Guid?[] uniqueContentTypeKeys = entityReferences
                     .Select(x => x.Unique)
                     .Distinct()
-                    .Select(x => GetContent(configuration.TreeSource.ObjectType, x))
+                    .Select(x => GetContent(objectType, x))
                     .Select(x => x?.ContentType.Key)
                     .Distinct()
                     .ToArray();

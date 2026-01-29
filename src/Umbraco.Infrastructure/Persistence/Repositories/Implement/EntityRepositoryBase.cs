@@ -27,8 +27,13 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     private IQuery<TEntity>? _hasIdQuery;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
+    /// Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
     /// </summary>
+    /// <param name="scopeAccessor">The scope accessor.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
     protected EntityRepositoryBase(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -43,7 +48,9 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected EntityRepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches,
+    protected EntityRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
         ILogger<EntityRepositoryBase<TId, TEntity>> logger)
         : this(
             scopeAccessor,
@@ -54,9 +61,13 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     {
     }
 
+// TODO (V18): Make these fields into read-only properties.
+
+#pragma warning disable IDE1006 // Naming Styles
     protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
 
     protected readonly ICacheSyncService CacheSyncService;
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Gets the logger
@@ -226,8 +237,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             ScopeAccessor,
             DefaultOptions,
             RepositoryCacheVersionService,
-            CacheSyncService
-            );
+            CacheSyncService);
 
     protected abstract TEntity? PerformGet(TId? id);
 

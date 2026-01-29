@@ -98,7 +98,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : this(scopeAccessor,
+        : this(
+            scopeAccessor,
             cache,
             logger,
             loggerFactory,
@@ -114,14 +115,14 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             serializer,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
     protected override MediaRepository This => this;
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public override IEnumerable<IMedia> GetPage(
         IQuery<IMedia>? query,
         long pageIndex,
@@ -129,7 +130,19 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         out long totalRecords,
         IQuery<IMedia>? filter,
         Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public override IEnumerable<IMedia> GetPage(
+        IQuery<IMedia>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IMedia>? filter,
+        Ordering? ordering)
     {
+
         Sql<ISqlContext>? filterSql = null;
 
         if (filter != null)
@@ -141,13 +154,17 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             }
         }
 
-        return GetPage<ContentDto>(query, pageIndex, pageSize, out totalRecords,
-            x => MapDtosToContent(x),
+        return GetPage<ContentDto>(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
+            x => MapDtosToContent(x, propertyAliases: propertyAliases),
             filterSql,
             ordering);
     }
 
-    private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)
+    private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false, string[]? propertyAliases = null)
     {
         var temps = new List<TempContent<Core.Models.Media>>();
         var contentTypes = new Dictionary<int, IMediaType?>();
@@ -187,7 +204,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         }
 
         // load all properties for all documents from database in 1 query - indexed by version id
-        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps);
+        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps, propertyAliases);
 
         // assign properties
         foreach (TempContent<Core.Models.Media> temp in temps)
