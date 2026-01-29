@@ -7,6 +7,7 @@ import type {
 const defaultQuerySettings: TemplateQuerySettingsResponseModel = {
 	documentTypeAliases: [],
 	properties: [],
+	operators: [],
 };
 
 const defaultQueryResult: TemplateQueryResultResponseModel = {
