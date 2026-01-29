@@ -201,6 +201,7 @@
 		"lint": "eslint src",
 		"prepack": "tsc-alias -f -p src/tsconfig.build.json && npm run generate:jsonschema:dist && npm run wc-analyze && npm run wc-analyze:vscode && node ./devops/publish/cleanse-pkg.js",
 		"preview": "vite preview --open",
+		"sqlite-to-mock": "tsx devops/sqlite-to-mock/index.ts && eslint --fix --no-warn-ignored \"src/mocks/data/sets/*/*.data.ts\"",
 		"storybook:build": "npm run wc-analyze && storybook build",
 		"storybook:preview": "npm run wc-analyze && storybook build && npx serve storybook-static",
 		"storybook": "npm run wc-analyze && storybook dev -p 6006",
@@ -228,6 +229,7 @@
 		"element-internals-polyfill": "^3.0.2"
 	},
 	"devDependencies": {
+		"@types/sql.js": "^1.4.9",
 		"@babel/core": "^7.28.4",
 		"@eslint/js": "^9.37.0",
 		"@open-wc/testing": "^4.0.0",
@@ -266,10 +268,12 @@
 		"storybook": "10.1.10",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.16",
+		"tsx": "^4.7.0",
 		"typedoc": "^0.28.13",
 		"typescript": "5.9.3",
 		"typescript-eslint": "^8.45.0",
 		"typescript-json-schema": "^0.65.1",
+		"sql.js": "^1.10.0",
 		"vite": "^7.1.11",
 		"vite-plugin-static-copy": "^3.1.3",
 		"vite-tsconfig-paths": "^5.1.4",
