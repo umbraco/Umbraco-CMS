@@ -21,7 +21,7 @@ export const script = [] as never[];
 export const staticFile = [] as never[];
 export const stylesheet = [] as never[];
 export const template = [] as never[];
-export { data as user, mfaLoginProviders } from '../default/user.data.js';
+export { data as user } from '../default/user.data.js';
 export { data as userGroup } from '../default/user-group.data.js';
 export const objectType = [] as never[];
 export const logViewerSavedSearches = [] as never[];
@@ -69,7 +69,8 @@ export const templateQuerySettings = {
 // Type assertion to ensure this module satisfies UmbMockDataSet
 // Note: This will fail at compile-time if the module doesn't satisfy the interface
 // We import user and userGroup from the default set for authentication testing
-import { data as user, mfaLoginProviders } from '../default/user.data.js';
+import { data as user } from '../default/user.data.js';
+import { data as mfaLoginProviders } from '../default/user-mfa-login-providers.data.js';
 import { data as userGroup } from '../default/user-group.data.js';
 
 const _typeCheck: UmbMockDataSet = {
