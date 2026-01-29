@@ -24,6 +24,7 @@ public class TemporaryFileConfigurationPresentationFactory : ITemporaryFileConfi
             ImageFileTypes = _imageUrlGenerator.SupportedImageFileTypes.ToArray(),
             DisallowedUploadedFilesExtensions = _contentSettings.DisallowedUploadedFileExtensions.ToArray(),
             AllowedUploadedFileExtensions = _contentSettings.AllowedUploadedFileExtensions.ToArray(),
-            MaxFileSize = _runtimeSettings.MaxRequestLength,
+            // Default to 50 MB (51200 KB) when MaxRequestLength is not set, matching ConfigureKestrelServerOptions default
+            MaxFileSize = _runtimeSettings.MaxRequestLength ?? 51200,
         };
 }
