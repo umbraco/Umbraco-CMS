@@ -37,7 +37,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -69,7 +69,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create template
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // Create content type with umbracoUrlAlias property
         ContentType = CreateContentTypeWithUrlAlias(template.Id);
@@ -200,6 +200,47 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         return (ContentType)contentType;
     }
 
+    /// <summary>
+    /// Creates a culture-variant content type where the umbracoUrlAlias property is SHARED (not varied by culture).
+    /// This tests the scenario where a variant content type has an invariant alias property.
+    /// </summary>
+    private ContentType CreateCultureVariantContentTypeWithSharedUrlAlias(int templateId, string alias = "pageWithSharedAlias")
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias(alias)
+            .WithName("Page With Shared Alias")
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithSortOrder(1)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlAlias)
+                    .WithName("URL Alias")
+                    .WithSortOrder(2)
+                    .WithDataTypeId(Constants.DataTypes.Textbox)
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                    .WithValueStorageType(ValueStorageType.Nvarchar)
+                    .WithVariations(ContentVariation.Nothing) // SHARED - not varied by culture
+                    .Done()
+                .Done()
+            .AddAllowedTemplate()
+                .WithId(templateId)
+                .WithAlias("sharedAliasTemplate")
+                .WithName("Shared Alias Template")
+                .Done()
+            .WithDefaultTemplateId(templateId)
+            .Build();
+
+        return (ContentType)contentType;
+    }
+
     #region GetDocumentKeysByAlias Tests
 
     [Test]
@@ -285,7 +326,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create a culture-variant content type
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id);
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -377,7 +418,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create a culture-variant content type
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate2");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasVariant2");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -466,6 +507,89 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Alias should no longer resolve
         Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Stores_Alias_For_Variant_ContentType_With_Variant_Alias_Property()
+    {
+        // Arrange - Create a culture-variant content type with a CULTURE-VARIED umbracoUrlAlias property.
+        var template = TemplateBuilder.CreateTextPageTemplate("variantAliasTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithVariantAlias");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        // Create content with the culture-varied alias property set
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName("en-US", "Page With Variant Alias")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-alias-value", "en-US"); // With culture - it's a variant property
+        content.ParentId = RootPage.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["en-US"]);
+
+        // Act - trigger alias creation
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Assert - the alias should be stored in the database
+        List<PublishedDocumentUrlAlias> storedAliases;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedAliases = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == content.Key)
+                .ToList();
+        }
+
+        Assert.That(storedAliases, Has.Count.GreaterThan(0), "Variant alias on variant content type should be stored in database");
+        Assert.That(storedAliases.Any(a => a.Alias == "variant-alias-value"), Is.True, "The alias value should be stored");
+
+        // Also verify it can be retrieved via the service
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-alias-value", isoCode);
+        Assert.That(result, Does.Contain(content.Key), "Variant alias should be retrievable via GetDocumentKeysByAliasAsync");
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Stores_Alias_For_Variant_ContentType_With_Shared_Alias_Property()
+    {
+        // Arrange - Create a culture-variant content type with a SHARED (non-culture-varied) umbracoUrlAlias property.
+        // This is the bug scenario: variant content type + shared alias property = no alias saved.
+        var template = TemplateBuilder.CreateTextPageTemplate("sharedAliasTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithSharedUrlAlias(template.Id);
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        // Create content with the shared alias property set
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName("en-US", "Page With Shared Alias")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "shared-alias-value"); // No culture - it's a shared property
+        content.ParentId = RootPage.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["en-US"]);
+
+        // Act - trigger alias creation
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Assert - the alias should be stored in the database
+        List<PublishedDocumentUrlAlias> storedAliases;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedAliases = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == content.Key)
+                .ToList();
+        }
+
+        Assert.That(storedAliases, Has.Count.GreaterThan(0), "Shared alias on variant content type should be stored in database");
+        Assert.That(storedAliases.Any(a => a.Alias == "shared-alias-value"), Is.True, "The alias value should be stored");
+
+        // Also verify it can be retrieved via the service
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("shared-alias-value", isoCode);
+        Assert.That(result, Does.Contain(content.Key), "Shared alias should be retrievable via GetDocumentKeysByAliasAsync");
     }
 
     [Test]
