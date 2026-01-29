@@ -2,15 +2,18 @@ import type { UmbMockDataSet, UmbMockDataKey, UmbMockDataKeyMap } from '../types
 
 export const UMB_MOCK_SET_NAME = import.meta.env.VITE_MOCK_SET || 'default';
 
+// Dynamically discover all mock data sets using Vite's glob imports
+const mockSets = import.meta.glob<UmbMockDataSet>('./**/index.ts');
+
 const loadSet = async (): Promise<UmbMockDataSet> => {
-	switch (UMB_MOCK_SET_NAME) {
-		case 'test':
-			return import('./test/index.js') as Promise<UmbMockDataSet>;
-		case 'kenn':
-			return import('./kenn/index.js') as Promise<UmbMockDataSet>;
-		default:
-			return import('./default/index.js') as Promise<UmbMockDataSet>;
+	const path = `./${UMB_MOCK_SET_NAME}/index.ts`;
+
+	if (path in mockSets) {
+		return mockSets[path]() as Promise<UmbMockDataSet>;
 	}
+
+	console.warn(`Mock set "${UMB_MOCK_SET_NAME}" not found, falling back to "default"`);
+	return mockSets['./default/index.ts']() as Promise<UmbMockDataSet>;
 };
 
 /**

@@ -21,6 +21,7 @@ import { transformUsers } from './transform-users.js';
 import { transformTemplates } from './transform-templates.js';
 import { transformLanguages } from './transform-languages.js';
 import { transformDictionary } from './transform-dictionary.js';
+import { generateSupportingFiles } from './generate-supporting-files.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,6 +107,11 @@ console.log('');
 // Close database connection
 closeDatabase();
 
+// Generate supporting files (index.ts, placeholders, static data)
+console.log('Generating supporting files...');
+generateSupportingFiles(setAlias);
+console.log('');
+
 console.log('='.repeat(60));
 console.log('Transformation complete!');
 console.log('='.repeat(60));
@@ -114,7 +120,7 @@ console.log('');
 // Run eslint to fix formatting on generated files
 console.log('Running eslint to fix formatting...');
 try {
-	execSync(`npx eslint --fix --no-warn-ignored "src/mocks/data/sets/${setAlias}/*.data.ts"`, {
+	execSync(`npx eslint --fix --no-warn-ignored "src/mocks/data/sets/${setAlias}/*.ts"`, {
 		stdio: 'inherit',
 		cwd: path.resolve(__dirname, '../..'),
 	});
@@ -125,7 +131,4 @@ try {
 
 console.log('');
 console.log('Next steps:');
-console.log('1. Copy supporting files from default set (culture, etc.)');
-console.log('2. Create index.ts for the new data set');
-console.log(`3. Update sets/index.ts to include ${setAlias} as an option`);
-console.log(`4. Test with VITE_MOCK_SET=${setAlias}`);
+console.log(`2. Test with VITE_MOCK_SET=${setAlias}`);
