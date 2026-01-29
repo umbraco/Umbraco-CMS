@@ -33,7 +33,6 @@ export {
 	Indexers as examineIndexers,
 	PagedIndexers as examinePagedIndexers,
 	searchResultMockData as examineSearchResults,
-	getIndexByName as examineGetIndexByName,
 	getSearchResultsMockData as examineGetSearchResults,
 } from './examine.data.js';
 export { items as trackedReferenceItems } from './tracked-reference.data.js';

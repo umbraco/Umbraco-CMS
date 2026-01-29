@@ -9,8 +9,19 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 const searchResultMockData = dataSet.examineSearchResults;
-const getIndexByName = dataSet.examineGetIndexByName;
 const PagedIndexers = dataSet.examinePagedIndexers;
+const Indexers = PagedIndexers.items;
+
+/**
+ *
+ * @param indexName
+ */
+function getIndexByName(indexName: string) {
+	return Indexers.find((index) => {
+		if (index.name) return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
+		else return undefined;
+	});
+}
 
 export const handlers = [
 	http.get(umbracoPath('/indexer'), () => {

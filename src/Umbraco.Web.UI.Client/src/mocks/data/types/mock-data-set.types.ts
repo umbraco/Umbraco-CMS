@@ -226,7 +226,6 @@ export interface UmbMockDataSet {
 	examineIndexers: Array<IndexResponseModel>;
 	examinePagedIndexers: PagedIndexResponseModel;
 	examineSearchResults: Array<SearchResultResponseModel>;
-	examineGetIndexByName: (indexName: string) => IndexResponseModel | undefined;
 	examineGetSearchResults: () => Array<SearchResultResponseModel>;
 
 	// Tracked references

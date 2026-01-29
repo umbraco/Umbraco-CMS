@@ -7,17 +7,6 @@ import { HealthStatusModel } from '@umbraco-cms/backoffice/external/backend-api'
 
 /**
  *
- * @param indexName
- */
-export function getIndexByName(indexName: string) {
-	return Indexers.find((index) => {
-		if (index.name) return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
-		else return undefined;
-	});
-}
-
-/**
- *
  */
 export function getSearchResultsMockData(): SearchResultResponseModel[] {
 	return searchResultMockData;
