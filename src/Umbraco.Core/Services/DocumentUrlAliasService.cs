@@ -181,14 +181,14 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return [];
         }
 
-        // Try culture-specific lookup first
+        // Try culture-specific lookup first.
         var cacheKey = new AliasCacheKey(normalizedAlias, languageId.Value);
         if (_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) && documentKeys.Count > 0)
         {
             return documentKeys;
         }
 
-        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL.
         var invariantKey = new AliasCacheKey(normalizedAlias, null);
         if (_aliasCache.TryGetValue(invariantKey, out documentKeys) && documentKeys.Count > 0)
         {
@@ -217,7 +217,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return [];
         }
 
-        // Get aliases for requested language OR invariant (NULL languageId)
+        // Get aliases for requested language OR invariant (NULL languageId).
         return aliasKeys
             .Where(key => key.LanguageId == languageId.Value || key.LanguageId == null)
             .Select(key => key.NormalizedAlias)
@@ -332,8 +332,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         foreach (DocumentUrlAliasRaw raw in rawAliases)
         {
-            // Invariant content (LanguageId = null) is stored with NULL languageId
-            // This is more memory-efficient and semantically explicit
+            // Invariant content (LanguageId = null) is stored with NULL languageId.
             if (raw.LanguageId is null)
             {
                 foreach (var alias in NormalizeAliases(raw.AliasValue))
@@ -388,8 +387,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
 
-        // Handle invariant content - store alias with NULL languageId
-        // This is more memory-efficient and semantically explicit
+        // Handle invariant content - store alias with NULL languageId.
         if (document.ContentType.VariesByCulture() is false)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
@@ -482,7 +480,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// </summary>
     private void AddToCache(PublishedDocumentUrlAlias alias)
     {
-        var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId); // LanguageId is now int?
+        var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId);
 
         _aliasCache.AddOrUpdate(
             cacheKey,

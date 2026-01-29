@@ -454,7 +454,7 @@ public class DocumentUrlService : IDocumentUrlService
             return cache.PrimarySegment;
         }
 
-        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL.
         UrlCacheKey invariantKey = CreateCacheKey(documentKey, null, isDraft);
         return _documentUrlCache.TryGetValue(invariantKey, out cache) ? cache.PrimarySegment : null;
     }
@@ -488,14 +488,14 @@ public class DocumentUrlService : IDocumentUrlService
             return Enumerable.Empty<string>();
         }
 
-        // Try culture-specific lookup first
+        // Try culture-specific lookup first.
         UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
         if (_documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache))
         {
             return cache.GetAllSegments();
         }
 
-        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL.
         UrlCacheKey invariantKey = CreateCacheKey(documentKey, null, isDraft);
         return _documentUrlCache.TryGetValue(invariantKey, out cache)
             ? cache.GetAllSegments()
@@ -1212,14 +1212,14 @@ public class DocumentUrlService : IDocumentUrlService
     {
         if (TryGetLanguageIdFromCulture(culture, out int languageId))
         {
-            // Try culture-specific lookup first
+            // Try culture-specific lookup first.
             if (_documentUrlCache.TryGetValue(CreateCacheKey(documentKey, languageId, isDraft), out UrlSegmentCache? cache))
             {
                 segment = cache.PrimarySegment;
                 return true;
             }
 
-            // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL
+            // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL.
             if (_documentUrlCache.TryGetValue(CreateCacheKey(documentKey, null, isDraft), out cache))
             {
                 segment = cache.PrimarySegment;
