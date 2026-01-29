@@ -387,8 +387,14 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
 
-        // Handle invariant content - store alias with NULL languageId.
-        if (document.ContentType.VariesByCulture() is false)
+        // Check if the alias property itself varies by culture (not just the content type).
+        // A variant content type can have a shared (invariant) alias property.
+        IProperty? aliasProperty = document.Properties.FirstOrDefault(p => p.Alias == Constants.Conventions.Content.UrlAlias);
+        var aliasPropertyVariesByCulture = aliasProperty?.PropertyType.VariesByCulture() ?? false;
+
+        // Handle invariant content OR variant content with a shared alias property.
+        // Store alias for ALL languages (like DocumentUrlService).
+        if (document.ContentType.VariesByCulture() is false || aliasPropertyVariesByCulture is false)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
 
@@ -408,7 +414,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return aliases;
         }
 
-        // Handle culture-variant content
+        // Handle culture-variant content with a culture-variant alias property
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         foreach (ILanguage language in languages)
         {
