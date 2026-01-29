@@ -1078,10 +1078,10 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // select tags to insert: tags pointed to by a relation ship, for proper property/content types,
         // and of source language, and where we cannot left join to an existing tag with same text,
         // group and languageId
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
         Sql<ISqlContext> sqlSelectTagsToInsert1 = Sql()
             .SelectDistinct<TagDto>(x => x.Text, x => x.Group)
-            .Append(", " + targetLanguageIdS)
+            .Append($", {targetLanguageIdS} ")
             .From<TagDto>();
 
         sqlSelectTagsToInsert1
@@ -1234,7 +1234,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         Database.Execute(sqlDelete);
 
         // now insert all property data into the target language that exists under the source language
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
         var cols = Sql().ColumnsForInsert<PropertyDataDto>(
             x => x.VersionId,
             x => x.PropertyTypeId,
@@ -1658,7 +1658,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     public bool HasContentNodes(int id)
     {
         var sql = new Sql(
-            $"SELECT CASE WHEN EXISTS (SELECT * FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName("contentTypeId")} = @id) THEN 1 ELSE 0 END",
+            $"SELECT CASE WHEN EXISTS (SELECT * FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName(ContentDto.ContentTypeIdColumnName)} = @id) THEN 1 ELSE 0 END",
             new { id });
         return Database.ExecuteScalar<int>(sql) == 1;
     }
@@ -1670,18 +1670,18 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // is included here just to be 100% sure since it has a FK on cmsPropertyType.
         var list = new List<string>
         {
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {QuoteColumnName("nodeId")} = @id",
-            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {QuoteColumnName("uniqueId")} IN
-                (SELECT {QuoteColumnName("uniqueId")} FROM {QuoteTableName(NodeDto.TableName)} WHERE id = @id)",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("nodeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {QuoteColumnName("Id")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {QuoteColumnName("AllowedId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {QuoteColumnName("parentContentTypeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {QuoteColumnName("childContentTypeId")} = @id",
-            $@"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName("propertyTypeId")} IN
-                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {QuoteColumnName("contentTypeId")} = @id)",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {QuoteColumnName("contentTypeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)} WHERE {QuoteColumnName("contenttypeNodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName(User2NodeNotifyDto.NodeIdColumnName)} = @id",
+            $@"DELETE FROM {QuoteTableName(UserGroup2GranularPermissionDto.TableName)} WHERE {QuoteColumnName(UserGroup2GranularPermissionDto.UniqueIdColumnName)} IN
+                (SELECT {QuoteColumnName("uniqueId")} FROM {QuoteTableName(NodeDto.TableName)} WHERE {QuoteColumnName(NodeDto.PrimaryKeyColumnName)} = @id)",
+            $"DELETE FROM {QuoteTableName(TagRelationshipDto.TableName)} WHERE {QuoteColumnName(TagRelationshipDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.AllowedIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.ChildIdColumnName)} = @id",
+            $@"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName(PropertyDataDto.PropertyTypeIdColumnName)} IN
+                (SELECT id FROM {QuoteTableName(PropertyTypeDto.TableName)} WHERE {QuoteColumnName(PropertyTypeDto.ContentTypeIdColumnName)} = @id)",
+            $"DELETE FROM {QuoteTableName(PropertyTypeDto.TableName)} WHERE {QuoteColumnName(PropertyTypeDto.ContentTypeIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(PropertyTypeGroupDto.TableName)} WHERE {QuoteColumnName(PropertyTypeGroupDto.ContentTypeNodeIdColumnName)} = @id",
         };
         return list;
     }
