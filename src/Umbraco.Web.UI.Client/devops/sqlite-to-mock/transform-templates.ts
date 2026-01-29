@@ -71,14 +71,6 @@ import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/back
 
 export const data: Array<UmbMockTemplateModel> = ${JSON.stringify(templates, null, '\t')};
 
-export const createTemplateScaffold = (masterTemplateAlias: string) => {
-	return \`@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@{
-	Layout = \${masterTemplateAlias};
-}\`;
-};
-
 export const templateQueryResult: TemplateQueryResultResponseModel = {
 	queryExpression: '',
 	sampleResults: [],
