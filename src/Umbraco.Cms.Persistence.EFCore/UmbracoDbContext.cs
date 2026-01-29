@@ -1,5 +1,3 @@
-using System.Configuration;
-using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,7 +84,11 @@ public class UmbracoDbContext : DbContext
 
         foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
+            // Prefix OpenIddict tables with "umbraco", we only want to do this for OpenIddict because our own tables are not consistent.
+            if (entity.ClrType.Assembly.FullName!.StartsWith("OpenIddict"))
+            {
+                entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
+            }
         }
     }
 }
