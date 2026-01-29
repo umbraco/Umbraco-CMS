@@ -6,6 +6,7 @@ import { publishingHandlers } from './publishing.handlers.js';
 import { detailHandlers } from './detail.handlers.js';
 import { domainHandlers } from './domain.handlers.js';
 import { collectionHandlers } from './collection.handlers.js';
+import { urlHandlers } from './url.handlers.js';
 
 export const handlers = [
 	...recycleBinHandlers,
@@ -13,6 +14,7 @@ export const handlers = [
 	...treeHandlers,
 	...itemHandlers,
 	...publishingHandlers,
+	...urlHandlers,
 	...detailHandlers,
 	...domainHandlers,
 	...collectionHandlers,

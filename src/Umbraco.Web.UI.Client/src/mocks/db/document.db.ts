@@ -3,6 +3,7 @@ import { dataSet } from '../data/sets/index.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { UmbMockEntityVariantUrlManager } from './utils/entity/entity-variant-url.manager.js';
 import { umbDocumentTypeMockDb } from './document-type.db.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbEntityRecycleBin } from './utils/entity/entity-recycle-bin.js';
@@ -28,6 +29,7 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this.data, treeItemMapper);
 	publishing = new UmbMockDocumentPublishingManager(this);
 	collection = new UmbMockDocumentCollectionManager(this, collectionMapper);
+	url = new UmbMockEntityVariantUrlManager<UmbMockDocumentModel>(this);
 
 	constructor(data: Array<UmbMockDocumentModel>) {
 		super(data);
