@@ -37,8 +37,8 @@ export const handlers = [
 		});
 	}),
 
-	http.post(umbracoPath('/package/:name/run-migration'), async ({ params }) => {
-		const name = params.name as string;
+	http.post<{ name: string }>(umbracoPath('/package/:name/run-migration'), async ({ params }) => {
+		const name = params.name;
 		if (!name) return new HttpResponse(null, { status: 404 });
 		return new HttpResponse(null, { status: 200 });
 	}),
@@ -51,35 +51,35 @@ export const handlers = [
 		});
 	}),
 
-	http.post(umbracoPath('/package/created'), async ({ request }) => {
+	http.post<object, CreatePackageRequestModel>(umbracoPath('/package/created'), async ({ request }) => {
 		//save
-		const data: CreatePackageRequestModel = await request.json();
+		const data = await request.json();
 		const newPackage: PackageDefinitionResponseModel = { ...data, id: UmbId.new(), packagePath: '' };
 		packageArray.push(newPackage);
 		return HttpResponse.json<PackageDefinitionResponseModel>(newPackage);
 	}),
 
-	http.get(umbracoPath('/package/created/:id'), ({ params }) => {
+	http.get<{ id: string }>(umbracoPath('/package/created/:id'), ({ params }) => {
 		//read 1
-		const id = params.id as string;
+		const id = params.id;
 		if (!id) return new HttpResponse(null, { status: 404 });
 		const found = packageArray.find((p) => p.id == id);
 		if (!found) return new HttpResponse(null, { status: 404 });
 		return HttpResponse.json<PackageDefinitionResponseModel>(found);
 	}),
 
-	http.put(umbracoPath('/package/created/:id'), async ({ request }) => {
+	http.put<{ id: string }, PackageDefinitionResponseModel>(umbracoPath('/package/created/:id'), async ({ request }) => {
 		//update
-		const data: PackageDefinitionResponseModel = await request.json();
+		const data = await request.json();
 		if (!data.id) return;
 		const index = packageArray.findIndex((x) => x.id === data.id);
 		packageArray[index] = data;
 		return new HttpResponse(null, { status: 200 });
 	}),
 
-	http.delete(umbracoPath('/package/created/:id'), ({ params }) => {
+	http.delete<{ id: string }>(umbracoPath('/package/created/:id'), ({ params }) => {
 		//delete
-		const id = params.id as string;
+		const id = params.id;
 		if (!id) return new HttpResponse(null, { status: 404 });
 		const index = packageArray.findIndex((p) => p.id == id);
 		if (index <= -1) return new HttpResponse(null, { status: 404 });

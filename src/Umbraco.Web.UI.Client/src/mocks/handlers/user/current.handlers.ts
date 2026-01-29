@@ -9,7 +9,7 @@ export const handlers = [
 		const loggedInUser = umbUserMockDb.getCurrentUser();
 		return HttpResponse.json(loggedInUser);
 	}),
-	http.get<GetUserCurrentLoginProvidersResponse>(umbracoPath(`${UMB_SLUG}/current/login-providers`), () => {
+	http.get(umbracoPath(`${UMB_SLUG}/current/login-providers`), () => {
 		return HttpResponse.json<GetUserCurrentLoginProvidersResponse>([
 			{
 				hasManualLinkingEnabled: true,
@@ -23,13 +23,14 @@ export const handlers = [
 		const mfaLoginProviders = umbUserMockDb.getMfaLoginProviders();
 		return HttpResponse.json(mfaLoginProviders);
 	}),
-	http.get(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), ({ params }) => {
-		if (!params.providerName) {
+	http.get<{ providerName: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), ({ params }) => {
+		const providerName = params.providerName;
+		if (!providerName) {
 			return new HttpResponse(null, { status: 400 });
 		}
 
 		const mfaProviders = umbUserMockDb.getMfaLoginProviders();
-		const mfaProvider = mfaProviders.find((p) => p.providerName === params.providerName.toString());
+		const mfaProvider = mfaProviders.find((p) => p.providerName === providerName);
 
 		if (!mfaProvider) {
 			return new HttpResponse(null, { status: 404 });
@@ -41,11 +42,12 @@ export const handlers = [
 			secret: '8b713fc7-8f17-4f5d-b2ac-b53879c75953',
 		});
 	}),
-	http.post<{ code: string; secret: string }>(
+	http.post<{ providerName: string }, { code: string; secret: string }>(
 		umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`),
 		async ({ request, params }) => {
+			const providerName = params.providerName;
 			const body = await request.json();
-			if (!params.providerName || !body.code || !body.secret) {
+			if (!providerName || !body.code || !body.secret) {
 				return new HttpResponse(null, { status: 400 });
 			}
 
@@ -53,14 +55,15 @@ export const handlers = [
 				return new HttpResponse(null, { status: 400 });
 			}
 
-			const result = umbUserMockDb.enableMfaProvider(params.providerName.toString());
+			const result = umbUserMockDb.enableMfaProvider(providerName);
 			return new HttpResponse(null, { status: result ? 200 : 404 });
 		},
 	),
-	http.delete<{ code: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), ({ request, params }) => {
+	http.delete<{ providerName: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), ({ request, params }) => {
+		const providerName = params.providerName;
 		const url = new URL(request.url);
 		const code = url.searchParams.get('code');
-		if (!params.providerName || !code) {
+		if (!providerName || !code) {
 			return new HttpResponse(null, { status: 400 });
 		}
 
@@ -68,7 +71,7 @@ export const handlers = [
 			return new HttpResponse(null, { status: 400 });
 		}
 
-		const result = umbUserMockDb.disableMfaProvider(params.providerName.toString());
+		const result = umbUserMockDb.disableMfaProvider(providerName);
 		return new HttpResponse(null, { status: result ? 200 : 404 });
 	}),
 ];

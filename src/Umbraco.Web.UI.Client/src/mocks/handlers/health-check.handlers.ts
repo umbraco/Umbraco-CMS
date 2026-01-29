@@ -35,8 +35,8 @@ export const handlers = [
 		return HttpResponse.json<PagedHealthCheckGroupResponseModel>({ total: 9999, items: healthGroupsWithoutResult });
 	}),
 
-	http.get(umbracoPath('/health-check-group/:name'), ({ params }) => {
-		const name = params.name as string;
+	http.get<{ name: string }>(umbracoPath('/health-check-group/:name'), ({ params }) => {
+		const name = params.name;
 
 		if (!name) return;
 		const group = getGroupByName(name);
@@ -48,8 +48,8 @@ export const handlers = [
 		}
 	}),
 
-	http.post(umbracoPath('/health-check-group/:name/check'), ({ params }) => {
-		const name = params.name as string;
+	http.post<{ name: string }>(umbracoPath('/health-check-group/:name/check'), ({ params }) => {
+		const name = params.name;
 		if (!name) return;
 
 		const group = getGroupWithResultsByName(name);
@@ -61,8 +61,8 @@ export const handlers = [
 		}
 	}),
 
-	http.post<HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async ({ request }) => {
-		const body = await request.json<HealthCheckActionRequestModel>();
+	http.post<object, HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async ({ request }) => {
+		const body = await request.json();
 		const healthCheckId = body.healthCheck.id;
 		// Find the health check based on the healthCheckId from the healthGroups[].checks
 		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.id === healthCheckId);

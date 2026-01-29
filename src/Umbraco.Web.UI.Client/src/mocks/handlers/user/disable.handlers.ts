@@ -5,7 +5,7 @@ import type { DisableUserRequestModel } from '@umbraco-cms/backoffice/external/b
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	http.post<DisableUserRequestModel>(umbracoPath(`${UMB_SLUG}/disable`), async ({ request }) => {
+	http.post<object, DisableUserRequestModel>(umbracoPath(`${UMB_SLUG}/disable`), async ({ request }) => {
 		const data = await request.json();
 		if (!data) return;
 		if (!data.userIds) return;

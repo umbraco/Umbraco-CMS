@@ -1,11 +1,10 @@
 import { umbDocumentMockDb } from '../db/document.db.js';
-import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const { http, HttpResponse } = window.MockServiceWorker;
 
 export const handlers = [
-	http.post<DynamicRootRequestModel>(umbracoPath('/dynamic-root/query'), async () => {
+	http.post(umbracoPath('/dynamic-root/query'), async () => {
 		const response = umbDocumentMockDb.tree
 			.getRoot()
 			.items.map((item) => item.id)

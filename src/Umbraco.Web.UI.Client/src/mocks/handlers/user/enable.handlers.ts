@@ -5,7 +5,7 @@ import type { EnableUserRequestModel } from '@umbraco-cms/backoffice/external/ba
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	http.post<EnableUserRequestModel>(umbracoPath(`${UMB_SLUG}/enable`), async ({ request }) => {
+	http.post<object, EnableUserRequestModel>(umbracoPath(`${UMB_SLUG}/enable`), async ({ request }) => {
 		const data = await request.json();
 		if (!data) return;
 		if (!data.userIds) return;

@@ -24,8 +24,9 @@ export const handlers = [
 		});
 	}),
 
-	http.post<TelemetryResponseModel>(umbracoPath('/telemetry/level'), async ({ request }) => {
-		const newLevel = (await request.json<TelemetryResponseModel>()).telemetryLevel;
+	http.post<object, TelemetryResponseModel>(umbracoPath('/telemetry/level'), async ({ request }) => {
+		const body = await request.json();
+		const newLevel = body.telemetryLevel;
 		if (newLevel) {
 			telemetryLevel = newLevel;
 			return new HttpResponse(null, { status: 200 });
