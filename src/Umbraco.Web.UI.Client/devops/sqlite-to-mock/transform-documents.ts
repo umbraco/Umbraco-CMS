@@ -1,7 +1,7 @@
 /**
  * Transform umbracoDocument records into mock data format.
  */
-import { prepare, ObjectTypes, formatGuid, writeDataFile, type UmbracoNode } from './db.js';
+import { prepare, ObjectTypes, formatGuid, writeDataFile } from './db.js';
 
 interface DocumentRow {
 	nodeId: number;
@@ -216,64 +216,67 @@ export function transformDocuments(): void {
 		const versionPropertyData = version ? propertyDataByVersion.get(version.id) || [] : [];
 
 		// Transform property values
-		const values = versionPropertyData.map((pd) => {
-			const propType = propertyTypeMap.get(pd.propertyTypeId);
-			if (!propType) return null;
+		const values = versionPropertyData
+			.map((pd) => {
+				const propType = propertyTypeMap.get(pd.propertyTypeId);
+				if (!propType) return null;
 
-			// Determine the value based on what's populated
-			let value: unknown = null;
-			if (pd.textValue !== null) {
-				// Try to parse as JSON first
-				try {
-					value = JSON.parse(pd.textValue);
-				} catch {
-					value = pd.textValue;
+				// Determine the value based on what's populated
+				let value: unknown = null;
+				if (pd.textValue !== null) {
+					// Try to parse as JSON first
+					try {
+						value = JSON.parse(pd.textValue);
+					} catch {
+						value = pd.textValue;
+					}
+				} else if (pd.varcharValue !== null) {
+					value = pd.varcharValue;
+				} else if (pd.intValue !== null) {
+					value = pd.intValue;
+				} else if (pd.decimalValue !== null) {
+					value = pd.decimalValue;
+				} else if (pd.dateValue !== null) {
+					value = pd.dateValue;
 				}
-			} else if (pd.varcharValue !== null) {
-				value = pd.varcharValue;
-			} else if (pd.intValue !== null) {
-				value = pd.intValue;
-			} else if (pd.decimalValue !== null) {
-				value = pd.decimalValue;
-			} else if (pd.dateValue !== null) {
-				value = pd.dateValue;
-			}
 
-			return {
-				editorAlias: propType.editorAlias,
-				alias: propType.alias,
-				culture: pd.languageId ? languageMap.get(pd.languageId) || null : null,
-				segment: pd.segment,
-				value,
-			};
-		}).filter((v): v is NonNullable<typeof v> => v !== null);
+				return {
+					editorAlias: propType.editorAlias,
+					alias: propType.alias,
+					culture: pd.languageId ? languageMap.get(pd.languageId) || null : null,
+					segment: pd.segment,
+					value,
+				};
+			})
+			.filter((v): v is NonNullable<typeof v> => v !== null);
 
 		// Build variants
-		const variants = nodeCultures.length > 0
-			? nodeCultures.map((c) => ({
-					state: c.published === 1 ? 'Published' : 'Draft',
-					publishDate: version?.versionDate || row.createDate,
-					culture: c.culture,
-					segment: null,
-					name: c.name || row.text || 'Unnamed',
-					createDate: row.createDate,
-					updateDate: version?.versionDate || row.createDate,
-					id: formatGuid(row.uniqueId),
-					flags: [] as string[],
-				}))
-			: [
-					{
-						state: publishState?.published ? 'Published' : 'Draft',
+		const variants =
+			nodeCultures.length > 0
+				? nodeCultures.map((c) => ({
+						state: c.published === 1 ? 'Published' : 'Draft',
 						publishDate: version?.versionDate || row.createDate,
-						culture: null,
+						culture: c.culture,
 						segment: null,
-						name: row.text || 'Unnamed',
+						name: c.name || row.text || 'Unnamed',
 						createDate: row.createDate,
 						updateDate: version?.versionDate || row.createDate,
 						id: formatGuid(row.uniqueId),
 						flags: [] as string[],
-					},
-				];
+					}))
+				: [
+						{
+							state: publishState?.published ? 'Published' : 'Draft',
+							publishDate: version?.versionDate || row.createDate,
+							culture: null,
+							segment: null,
+							name: row.text || 'Unnamed',
+							createDate: row.createDate,
+							updateDate: version?.versionDate || row.createDate,
+							id: formatGuid(row.uniqueId),
+							flags: [] as string[],
+						},
+					];
 
 		return {
 			ancestors,
@@ -326,8 +329,7 @@ export const data: Array<UmbMockDocumentModel> = rawData.map(doc => ({
 `;
 
 	writeDataFile('document.data.ts', content);
-	console.log(`Transformed ${nonTrashedDocuments.length} documents (${documents.length - nonTrashedDocuments.length} trashed excluded)`);
+	console.log(
+		`Transformed ${nonTrashedDocuments.length} documents (${documents.length - nonTrashedDocuments.length} trashed excluded)`,
+	);
 }
-
-// Run if called directly
-transformDocuments();

@@ -39,6 +39,3 @@ export const data: Array<UmbMockLanguageModel> = ${JSON.stringify(languages, nul
 	writeDataFile('language.data.ts', content);
 	console.log(`Transformed ${languages.length} languages`);
 }
-
-// Run if called directly
-transformLanguages();

@@ -1,30 +1,83 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
 /**
  * Database connection and helper functions for SQLite to mock data transformation.
  */
-import initSqlJs, { Database as SqlJsDatabase } from 'sql.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import initSqlJs from 'sql.js';
+import type { BindParams, Database as SqlJsDatabase } from 'sql.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to the SQLite database
-const DB_PATH = path.resolve(__dirname, '../../../Umbraco.Web.UI/umbraco/Data/Umbraco.sqlite.db');
+// Configuration - must be set before using database
+let _dbPath: string | null = null;
+let _setAlias: string | null = null;
+let _db: SqlJsDatabase | null = null;
 
-// Output directory for generated mock data files
-export const OUTPUT_DIR = path.resolve(__dirname, '../../src/mocks/data/sets/kenn');
+/**
+ * Configure the database module with paths.
+ * Must be called before using any database functions.
+ */
+export function configure(dbPath: string, setAlias: string): void {
+	_dbPath = dbPath;
+	_setAlias = setAlias;
+}
 
-// Initialize sql.js and load the database
-const SQL = await initSqlJs();
-const dbBuffer = fs.readFileSync(DB_PATH);
-export const db: SqlJsDatabase = new SQL.Database(dbBuffer);
+/**
+ * Get the output directory for generated mock data files.
+ * Throws if configure() has not been called.
+ */
+export function getOutputDir(): string {
+	if (!_setAlias) {
+		throw new Error('db.ts not configured. Call configure() first.');
+	}
+	return path.resolve(__dirname, `../../src/mocks/data/sets/${_setAlias}`);
+}
+
+/**
+ * Get the database instance, initializing it if needed.
+ * Throws if configure() has not been called.
+ */
+export async function getDatabase(): Promise<SqlJsDatabase> {
+	if (!_dbPath) {
+		throw new Error('db.ts not configured. Call configure() first.');
+	}
+	if (!_db) {
+		const SQL = await initSqlJs();
+		const dbBuffer = fs.readFileSync(_dbPath);
+		_db = new SQL.Database(dbBuffer);
+	}
+	return _db;
+}
+
+/**
+ * Close the database connection.
+ */
+export function closeDatabase(): void {
+	if (_db) {
+		_db.close();
+		_db = null;
+	}
+}
+
+/**
+ * Get the configured database path.
+ */
+export function getDbPath(): string | null {
+	return _dbPath;
+}
 
 /**
  * Helper class to create a consistent query interface similar to better-sqlite3
  */
 export class PreparedStatement {
-	constructor(private database: SqlJsDatabase, private sql: string) {}
+	constructor(
+		private database: SqlJsDatabase,
+		private sql: string,
+	) {}
 
 	all(...params: unknown[]): unknown[] {
 		const stmt = this.database.prepare(this.sql);
@@ -32,7 +85,7 @@ export class PreparedStatement {
 
 		// Bind parameters if provided
 		if (params.length > 0) {
-			stmt.bind(params);
+			stmt.bind(params as BindParams);
 		}
 
 		while (stmt.step()) {
@@ -51,10 +104,14 @@ export class PreparedStatement {
 }
 
 /**
- * Prepare a SQL statement
+ * Prepare a SQL statement.
+ * Requires that getDatabase() has been called first to initialize the database.
  */
 export function prepare(sql: string): PreparedStatement {
-	return new PreparedStatement(db, sql);
+	if (!_db) {
+		throw new Error('Database not initialized. Call getDatabase() first.');
+	}
+	return new PreparedStatement(_db, sql);
 }
 
 /**
@@ -296,10 +353,8 @@ export function getVariationFlags(variations: number): { variesByCulture: boolea
  * Write a TypeScript data file
  */
 export function writeDataFile(filename: string, content: string): void {
-	const outputPath = path.join(OUTPUT_DIR, filename);
+	const outputDir = getOutputDir();
+	const outputPath = path.join(outputDir, filename);
 	fs.writeFileSync(outputPath, content, 'utf-8');
 	console.log(`Written: ${filename}`);
 }
-
-console.log(`Database: ${DB_PATH}`);
-console.log(`Output: ${OUTPUT_DIR}`);

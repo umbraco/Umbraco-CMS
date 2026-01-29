@@ -151,35 +151,37 @@ export function transformMedia(): void {
 			const versionPropertyData = version ? propertyDataByVersion.get(version.id) || [] : [];
 
 			// Transform property values
-			const values = versionPropertyData.map((pd) => {
-				const propType = propertyTypeMap.get(pd.propertyTypeId);
-				if (!propType) return null;
+			const values = versionPropertyData
+				.map((pd) => {
+					const propType = propertyTypeMap.get(pd.propertyTypeId);
+					if (!propType) return null;
 
-				// Determine the value based on what's populated
-				let value: unknown = null;
-				if (pd.textValue !== null) {
-					// Try to parse as JSON first (for image cropper data, etc.)
-					try {
-						value = JSON.parse(pd.textValue);
-					} catch {
-						value = pd.textValue;
+					// Determine the value based on what's populated
+					let value: unknown = null;
+					if (pd.textValue !== null) {
+						// Try to parse as JSON first (for image cropper data, etc.)
+						try {
+							value = JSON.parse(pd.textValue);
+						} catch {
+							value = pd.textValue;
+						}
+					} else if (pd.varcharValue !== null) {
+						value = pd.varcharValue;
+					} else if (pd.intValue !== null) {
+						value = pd.intValue;
+					} else if (pd.decimalValue !== null) {
+						value = pd.decimalValue;
+					} else if (pd.dateValue !== null) {
+						value = pd.dateValue;
 					}
-				} else if (pd.varcharValue !== null) {
-					value = pd.varcharValue;
-				} else if (pd.intValue !== null) {
-					value = pd.intValue;
-				} else if (pd.decimalValue !== null) {
-					value = pd.decimalValue;
-				} else if (pd.dateValue !== null) {
-					value = pd.dateValue;
-				}
 
-				return {
-					editorAlias: propType.editorAlias,
-					alias: propType.alias,
-					value,
-				};
-			}).filter((v): v is NonNullable<typeof v> => v !== null);
+					return {
+						editorAlias: propType.editorAlias,
+						alias: propType.alias,
+						value,
+					};
+				})
+				.filter((v): v is NonNullable<typeof v> => v !== null);
 
 			// Build media type info
 			const mediaTypeInfo: Record<string, unknown> = {
@@ -224,6 +226,3 @@ export const data: Array<UmbMockMediaModel> = ${JSON.stringify(media, null, '\t'
 	writeDataFile('media.data.ts', content);
 	console.log(`Transformed ${media.length} media items`);
 }
-
-// Run if called directly
-transformMedia();

@@ -394,6 +394,3 @@ export const data: Array<UmbMockDocumentTypeModel> = rawData.map(dt => ({
 	writeDataFile('document-type.data.ts', content);
 	console.log(`Transformed ${documentTypes.length} document types and ${folders.length} folders`);
 }
-
-// Run if called directly
-transformDocumentTypes();

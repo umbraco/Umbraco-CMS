@@ -1,7 +1,7 @@
 /**
  * Transform cmsDictionary and cmsLanguageText records into mock data format.
  */
-import { prepare, formatGuid, writeDataFile, type UmbracoNode, type Language } from './db.js';
+import { prepare, formatGuid, writeDataFile } from './db.js';
 
 interface DictionaryItem {
 	pk: number;
@@ -102,6 +102,3 @@ export const data: Array<UmbMockDictionaryModel> = ${JSON.stringify(dictionary, 
 	writeDataFile('dictionary.data.ts', content);
 	console.log(`Transformed ${dictionary.length} dictionary items`);
 }
-
-// Run if called directly
-transformDictionary();

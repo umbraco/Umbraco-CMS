@@ -201,7 +201,7 @@
 		"lint": "eslint src",
 		"prepack": "tsc-alias -f -p src/tsconfig.build.json && npm run generate:jsonschema:dist && npm run wc-analyze && npm run wc-analyze:vscode && node ./devops/publish/cleanse-pkg.js",
 		"preview": "vite preview --open",
-		"sqlite-to-mock": "tsx devops/sqlite-to-mock/index.ts && eslint --fix --no-warn-ignored \"src/mocks/data/sets/*/*.data.ts\"",
+		"sqlite-to-mock": "tsx devops/sqlite-to-mock/index.ts",
 		"storybook:build": "npm run wc-analyze && storybook build",
 		"storybook:preview": "npm run wc-analyze && storybook build && npx serve storybook-static",
 		"storybook": "npm run wc-analyze && storybook dev -p 6006",

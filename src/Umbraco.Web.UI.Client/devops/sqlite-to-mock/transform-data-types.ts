@@ -102,6 +102,3 @@ export const data: Array<UmbMockDataTypeModel> = ${JSON.stringify(allDataTypes, 
 	writeDataFile('data-type.data.ts', content);
 	console.log(`Transformed ${dataTypes.length} data types and ${folders.length} folders`);
 }
-
-// Run if called directly
-transformDataTypes();
