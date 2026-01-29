@@ -24,21 +24,21 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
         _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
-    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode)
+    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode, string? format = null)
     {
-        return mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, height, width, mode))).ToArray();
+        return mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, height, width, mode, format))).ToArray();
     }
 
-    private IEnumerable<MediaUrlInfo> CreateUrls(IMedia media, int height, int width, ImageCropMode? mode)
+    private IEnumerable<MediaUrlInfo> CreateUrls(IMedia media, int height, int width, ImageCropMode? mode, string? format)
     {
         IEnumerable<string> urls = media
             .GetUrls(_contentSettings, _mediaUrlGenerators)
             .WhereNotNull();
 
-        return CreateThumbnailUrls(urls, height, width, mode);
+        return CreateThumbnailUrls(urls, height, width, mode, format);
     }
 
-    private IEnumerable<MediaUrlInfo> CreateThumbnailUrls(IEnumerable<string> urls, int height, int width, ImageCropMode? mode)
+    private IEnumerable<MediaUrlInfo> CreateThumbnailUrls(IEnumerable<string> urls, int height, int width, ImageCropMode? mode, string? format)
     {
         foreach (var url in urls)
         {
@@ -64,6 +64,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                 Height = height,
                 Width = width,
                 ImageCropMode = mode,
+                FurtherOptions = string.IsNullOrWhiteSpace(format) ? null : $"format={format}",
             };
 
             var relativeUrl = _imageUrlGenerator.GetImageUrl(options);
