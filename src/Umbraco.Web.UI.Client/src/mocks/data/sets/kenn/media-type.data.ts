@@ -1,0 +1,942 @@
+import type { UmbMockMediaTypeModel } from '../../types/mock-data-set.types.js';
+
+export const data: Array<UmbMockMediaTypeModel> = [
+	{
+		"name": "Test Media Type",
+		"id": "12c07232-f127-4f63-b0cf-f96b1cfd9168",
+		"parent": null,
+		"description": null,
+		"alias": "testMediaType",
+		"icon": "icon-picture color-red",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-228",
+				"container": {
+					"id": "806d712b-40f3-4a32-b52f-1d44e47caf36"
+				},
+				"alias": "image",
+				"name": "Image",
+				"description": "",
+				"dataType": {
+					"id": "1df9f033-e6d4-451f-b8d2-e0cbc50a836f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 0,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-788",
+				"container": {
+					"id": "806d712b-40f3-4a32-b52f-1d44e47caf36"
+				},
+				"alias": "colorPicker",
+				"name": "Color Picker",
+				"description": "",
+				"dataType": {
+					"id": "a62e05d6-f7f8-4929-b35b-2e3068692eb6"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "806d712b-40f3-4a32-b52f-1d44e47caf36",
+				"parent": null,
+				"name": "Media",
+				"type": "Tab",
+				"sortOrder": 0
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": true,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Nested Media Type",
+		"id": "aec7b681-fc7f-43ae-aff3-dc37bde558ec",
+		"parent": {
+			"id": "12c07232-f127-4f63-b0cf-f96b1cfd9168"
+		},
+		"description": null,
+		"alias": "nestedMediaType",
+		"icon": "icon-picture",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-229",
+				"container": {
+					"id": "05176628-e222-477b-a506-07058077e208"
+				},
+				"alias": "altText",
+				"name": "Alternative Text",
+				"description": "",
+				"dataType": {
+					"id": "0cc0eba1-9960-42c9-bf9b-60e150b429ae"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "05176628-e222-477b-a506-07058077e208",
+				"parent": null,
+				"name": "Media",
+				"type": "Tab",
+				"sortOrder": 0
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": true,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Deeply Nested Media Type",
+		"id": "116313e3-dad9-46d6-bcc8-6be325264851",
+		"parent": {
+			"id": "aec7b681-fc7f-43ae-aff3-dc37bde558ec"
+		},
+		"description": null,
+		"alias": "deeplyNestedMediaType",
+		"icon": "icon-picture",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-230",
+				"container": {
+					"id": "4da5b477-14d4-4987-b442-3e954e7c5a00"
+				},
+				"alias": "tags",
+				"name": "Tags",
+				"description": "",
+				"dataType": {
+					"id": "b6b73142-b9c1-4bf8-a16d-e1c23320b549"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 2,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "4da5b477-14d4-4987-b442-3e954e7c5a00",
+				"parent": null,
+				"name": "Media",
+				"type": "Tab",
+				"sortOrder": 0
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Folder",
+		"id": "f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d",
+		"parent": null,
+		"description": null,
+		"alias": "Folder",
+		"icon": "icon-folder",
+		"flags": [],
+		"properties": [],
+		"containers": [],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [
+			{
+				"mediaType": {
+					"id": "f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d"
+				},
+				"sortOrder": 0
+			},
+			{
+				"mediaType": {
+					"id": "cc07b313-0843-4aa8-bbda-871c8da728c8"
+				},
+				"sortOrder": 1
+			},
+			{
+				"mediaType": {
+					"id": "4c52d8ab-54e6-40cd-999c-7a5f24903e4d"
+				},
+				"sortOrder": 2
+			},
+			{
+				"mediaType": {
+					"id": "f6c515bb-653c-4bdc-821c-987729ebe327"
+				},
+				"sortOrder": 3
+			},
+			{
+				"mediaType": {
+					"id": "a5ddeee0-8fd8-4cee-a658-6f1fcdb00de3"
+				},
+				"sortOrder": 4
+			},
+			{
+				"mediaType": {
+					"id": "a43e3414-9599-4230-a7d3-943a21b20122"
+				},
+				"sortOrder": 5
+			},
+			{
+				"mediaType": {
+					"id": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c"
+				},
+				"sortOrder": 6
+			}
+		],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"collection": {
+			"id": "3a0156c4-3b8c-4803-bdc1-6871faa83fff"
+		},
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Image",
+		"id": "cc07b313-0843-4aa8-bbda-871c8da728c8",
+		"parent": null,
+		"description": null,
+		"alias": "Image",
+		"icon": "icon-picture",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-6",
+				"container": {
+					"id": "79ed4d07-254a-42cf-8fa9-ebe1c116a596"
+				},
+				"alias": "umbracoFile",
+				"name": "Image",
+				"description": null,
+				"dataType": {
+					"id": "1df9f033-e6d4-451f-b8d2-e0cbc50a836f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 0,
+				"validation": {
+					"mandatory": true,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-7",
+				"container": {
+					"id": "79ed4d07-254a-42cf-8fa9-ebe1c116a596"
+				},
+				"alias": "umbracoWidth",
+				"name": "Width",
+				"description": null,
+				"dataType": {
+					"id": "5eb57825-e15e-4fc7-8e37-fca65cdafbde"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-8",
+				"container": {
+					"id": "79ed4d07-254a-42cf-8fa9-ebe1c116a596"
+				},
+				"alias": "umbracoHeight",
+				"name": "Height",
+				"description": null,
+				"dataType": {
+					"id": "5eb57825-e15e-4fc7-8e37-fca65cdafbde"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 2,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-9",
+				"container": {
+					"id": "79ed4d07-254a-42cf-8fa9-ebe1c116a596"
+				},
+				"alias": "umbracoBytes",
+				"name": "File size",
+				"description": null,
+				"dataType": {
+					"id": "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 3,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-10",
+				"container": {
+					"id": "79ed4d07-254a-42cf-8fa9-ebe1c116a596"
+				},
+				"alias": "umbracoExtension",
+				"name": "File extension",
+				"description": null,
+				"dataType": {
+					"id": "f0bc4bfb-b499-40d6-ba86-058885a5178c"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 4,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "79ed4d07-254a-42cf-8fa9-ebe1c116a596",
+				"parent": null,
+				"name": "Image",
+				"type": "Tab",
+				"sortOrder": 1
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "File",
+		"id": "4c52d8ab-54e6-40cd-999c-7a5f24903e4d",
+		"parent": null,
+		"description": null,
+		"alias": "File",
+		"icon": "icon-document",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-24",
+				"container": {
+					"id": "50899f9c-023a-4466-b623-aba9049885fe"
+				},
+				"alias": "umbracoFile",
+				"name": "File",
+				"description": null,
+				"dataType": {
+					"id": "84c6b441-31df-4ffe-b67e-67d5bc3ae65a"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 0,
+				"validation": {
+					"mandatory": true,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-25",
+				"container": {
+					"id": "50899f9c-023a-4466-b623-aba9049885fe"
+				},
+				"alias": "umbracoExtension",
+				"name": "File extension",
+				"description": null,
+				"dataType": {
+					"id": "f0bc4bfb-b499-40d6-ba86-058885a5178c"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-26",
+				"container": {
+					"id": "50899f9c-023a-4466-b623-aba9049885fe"
+				},
+				"alias": "umbracoBytes",
+				"name": "File size",
+				"description": null,
+				"dataType": {
+					"id": "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 2,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "50899f9c-023a-4466-b623-aba9049885fe",
+				"parent": null,
+				"name": "File",
+				"type": "Tab",
+				"sortOrder": 1
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Audio",
+		"id": "a5ddeee0-8fd8-4cee-a658-6f1fcdb00de3",
+		"parent": null,
+		"description": null,
+		"alias": "umbracoMediaAudio",
+		"icon": "icon-sound-waves",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-43",
+				"container": {
+					"id": "335fb495-0a87-4e82-b902-30eb367b767c"
+				},
+				"alias": "umbracoFile",
+				"name": "Audio",
+				"description": null,
+				"dataType": {
+					"id": "8f430dd6-4e96-447e-9dc0-cb552c8cd1f3"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 0,
+				"validation": {
+					"mandatory": true,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-44",
+				"container": {
+					"id": "335fb495-0a87-4e82-b902-30eb367b767c"
+				},
+				"alias": "umbracoExtension",
+				"name": "File extension",
+				"description": null,
+				"dataType": {
+					"id": "f0bc4bfb-b499-40d6-ba86-058885a5178c"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-45",
+				"container": {
+					"id": "335fb495-0a87-4e82-b902-30eb367b767c"
+				},
+				"alias": "umbracoBytes",
+				"name": "File size",
+				"description": null,
+				"dataType": {
+					"id": "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 2,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "335fb495-0a87-4e82-b902-30eb367b767c",
+				"parent": null,
+				"name": "Audio",
+				"type": "Tab",
+				"sortOrder": 1
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Article",
+		"id": "a43e3414-9599-4230-a7d3-943a21b20122",
+		"parent": null,
+		"description": "This is an article media type.",
+		"alias": "umbracoMediaArticle",
+		"icon": "icon-article",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-46",
+				"container": {
+					"id": "9af3bd65-f687-4453-9518-5f180d1898ec"
+				},
+				"alias": "umbracoFile",
+				"name": "Article",
+				"description": null,
+				"dataType": {
+					"id": "bc1e266c-dac4-4164-bf08-8a1ec6a7143d"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 0,
+				"validation": {
+					"mandatory": true,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-47",
+				"container": {
+					"id": "9af3bd65-f687-4453-9518-5f180d1898ec"
+				},
+				"alias": "umbracoExtension",
+				"name": "File extension",
+				"description": null,
+				"dataType": {
+					"id": "f0bc4bfb-b499-40d6-ba86-058885a5178c"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-48",
+				"container": {
+					"id": "9af3bd65-f687-4453-9518-5f180d1898ec"
+				},
+				"alias": "umbracoBytes",
+				"name": "File size",
+				"description": null,
+				"dataType": {
+					"id": "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 2,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "9af3bd65-f687-4453-9518-5f180d1898ec",
+				"parent": null,
+				"name": "Article",
+				"type": "Tab",
+				"sortOrder": 1
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Vector Graphics (SVG)",
+		"id": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c",
+		"parent": null,
+		"description": null,
+		"alias": "umbracoMediaVectorGraphics",
+		"icon": "icon-picture",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-49",
+				"container": {
+					"id": "f199b4d7-9e84-439f-8531-f87d9af37711"
+				},
+				"alias": "umbracoFile",
+				"name": "Vector Graphics",
+				"description": null,
+				"dataType": {
+					"id": "215cb418-2153-4429-9aef-8c0f0041191b"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 0,
+				"validation": {
+					"mandatory": true,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-50",
+				"container": {
+					"id": "f199b4d7-9e84-439f-8531-f87d9af37711"
+				},
+				"alias": "umbracoExtension",
+				"name": "File extension",
+				"description": null,
+				"dataType": {
+					"id": "f0bc4bfb-b499-40d6-ba86-058885a5178c"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-51",
+				"container": {
+					"id": "f199b4d7-9e84-439f-8531-f87d9af37711"
+				},
+				"alias": "umbracoBytes",
+				"name": "File size",
+				"description": null,
+				"dataType": {
+					"id": "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 2,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "f199b4d7-9e84-439f-8531-f87d9af37711",
+				"parent": null,
+				"name": "Vector Graphics",
+				"type": "Tab",
+				"sortOrder": 1
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "Video",
+		"id": "f6c515bb-653c-4bdc-821c-987729ebe327",
+		"parent": null,
+		"description": null,
+		"alias": "umbracoMediaVideo",
+		"icon": "icon-video",
+		"flags": [],
+		"properties": [
+			{
+				"id": "pt-40",
+				"container": {
+					"id": "2f0a61b6-cf92-4ff4-b437-751ab35eb254"
+				},
+				"alias": "umbracoFile",
+				"name": "Video",
+				"description": null,
+				"dataType": {
+					"id": "70575fe7-9812-4396-bbe1-c81a76db71b5"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 0,
+				"validation": {
+					"mandatory": true,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-41",
+				"container": {
+					"id": "2f0a61b6-cf92-4ff4-b437-751ab35eb254"
+				},
+				"alias": "umbracoExtension",
+				"name": "File extension",
+				"description": null,
+				"dataType": {
+					"id": "f0bc4bfb-b499-40d6-ba86-058885a5178c"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 1,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			},
+			{
+				"id": "pt-42",
+				"container": {
+					"id": "2f0a61b6-cf92-4ff4-b437-751ab35eb254"
+				},
+				"alias": "umbracoBytes",
+				"name": "File size",
+				"description": null,
+				"dataType": {
+					"id": "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f"
+				},
+				"variesByCulture": false,
+				"variesBySegment": false,
+				"sortOrder": 2,
+				"validation": {
+					"mandatory": false,
+					"mandatoryMessage": null,
+					"regEx": null,
+					"regExMessage": null
+				},
+				"appearance": {
+					"labelOnTop": false
+				}
+			}
+		],
+		"containers": [
+			{
+				"id": "2f0a61b6-cf92-4ff4-b437-751ab35eb254",
+				"parent": null,
+				"name": "Video",
+				"type": "Tab",
+				"sortOrder": 1
+			}
+		],
+		"allowedAsRoot": true,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	},
+	{
+		"name": "MediaChildNode",
+		"id": "8faa36cb-75e7-4bd0-bd64-639c1fcbcab8",
+		"parent": null,
+		"description": null,
+		"alias": "mediachildnode",
+		"icon": "icon-document",
+		"flags": [],
+		"properties": [],
+		"containers": [],
+		"allowedAsRoot": false,
+		"variesByCulture": false,
+		"variesBySegment": false,
+		"isElement": false,
+		"allowedMediaTypes": [],
+		"compositions": [],
+		"isFolder": false,
+		"hasChildren": false,
+		"isDeletable": false,
+		"aliasCanBeChanged": false
+	}
+];

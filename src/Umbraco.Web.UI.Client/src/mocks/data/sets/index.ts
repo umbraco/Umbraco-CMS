@@ -6,6 +6,8 @@ const loadSet = async (): Promise<UmbMockDataSet> => {
 	switch (UMB_MOCK_SET_NAME) {
 		case 'test':
 			return import('./test/index.js') as Promise<UmbMockDataSet>;
+		case 'kenn':
+			return import('./kenn/index.js') as Promise<UmbMockDataSet>;
 		default:
 			return import('./default/index.js') as Promise<UmbMockDataSet>;
 	}
