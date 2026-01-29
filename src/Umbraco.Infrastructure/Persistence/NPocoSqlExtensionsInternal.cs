@@ -64,26 +64,41 @@ namespace Umbraco.Extensions
                 queryColumns.Sort((a, b) => names.IndexOf(a.Key).CompareTo(names.IndexOf(b.Key)));
             }
 
-            string? GetAlias(PocoColumn column)
-            {
-                if (aliases != null && aliases.TryGetValue(column.ColumnName, out var alias))
-                {
-                    return alias;
-                }
 
-                if ((column.MemberInfoKey.InvariantEquals("uniqueid") && !column.MemberInfoKey.Equals("uniqueId"))
-                    || (column.MemberInfoKey.InvariantEquals("languageid") && !column.MemberInfoKey.Equals("languageId")))
-                {
-                    return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.ColumnName
-                    : column.ColumnAlias) : null;
-                }
-
-                return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
-            }
 
             return queryColumns
-                .Select(x => sql.SqlContext.SqlSyntax.GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value)!, referenceName, forInsert: forInsert))
+                .Select(x => sql.SqlContext.SqlSyntax.GetColumn(
+                    sql.SqlContext.DatabaseType,
+                    tableName,
+                    x.Value.ColumnName,
+                    GetAlias(x.Value, withAlias, aliases)!,
+                    referenceName,
+                    forInsert: forInsert))
                 .ToArray();
+        }
+
+        private static string? GetAlias(PocoColumn column, bool withAlias = true, Dictionary<string, string>? aliases = null)
+        {
+            if (aliases != null && aliases.TryGetValue(column.ColumnName, out var alias))
+            {
+                return alias;
+            }
+
+            var columnMemberInfoKeyIsUniqueId = column.MemberInfoKey.InvariantEquals("uniqueid") && !column.MemberInfoKey.Equals("uniqueId");
+            var columnMemberInfoKeyIsLanguageId = column.MemberInfoKey.InvariantEquals("languageid") && !column.MemberInfoKey.Equals("languageId");
+
+            if (columnMemberInfoKeyIsUniqueId || columnMemberInfoKeyIsLanguageId)
+            {
+                var fallbackAlias = string.IsNullOrEmpty(column.ColumnAlias)
+                        ? column.ColumnName
+                        : column.ColumnAlias;
+
+                return withAlias
+                    ? fallbackAlias
+                    : null;
+            }
+
+            return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
         }
     }
 }
