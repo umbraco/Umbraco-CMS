@@ -241,7 +241,6 @@ export interface UmbMockDataSet {
 	mfaLoginProviders: Array<UserTwoFactorProviderModel>;
 
 	// Template-specific helpers
-	createTemplateScaffold: (masterTemplateAlias: string) => string;
 	templateQueryResult: TemplateQueryResultResponseModel;
 	templateQuerySettings: TemplateQuerySettingsResponseModel;
 }

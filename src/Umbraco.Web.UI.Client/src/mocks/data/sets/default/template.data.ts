@@ -70,14 +70,6 @@ export const data: Array<UmbMockTemplateModel> = [
 	},
 ];
 
-export const createTemplateScaffold = (masterTemplateAlias: string) => {
-	return `@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@{
-	Layout = ${masterTemplateAlias};
-}`;
-};
-
 //prettier-ignore
 const templateQueryExpressions = [
 `Umbraco.ContentAtRoot().FirstOrDefault()

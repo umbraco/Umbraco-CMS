@@ -1,4 +1,4 @@
-import { dataSet, type UmbMockTemplateModel } from '../data/sets/index.js';
+import type { UmbMockTemplateModel } from '../data/sets/index.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import type { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type { CreateTemplateRequestModel, TemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -9,8 +9,12 @@ export class UmbMockTemplateDetailManager extends UmbMockEntityDetailManager<Umb
 		super(db, createDetailMockMapper, detailResponseMapper);
 	}
 
-	createScaffold() {
-		return dataSet.createTemplateScaffold('master');
+	createScaffold(masterTemplateAlias: string = 'master') {
+		return `@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+		Layout = ${masterTemplateAlias};
+}`;
 	}
 }
 

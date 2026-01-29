@@ -41,13 +41,6 @@ export const trackedReferenceItems = [];
 export const news = [];
 
 // Template-specific exports
-export const createTemplateScaffold = (masterTemplateAlias: string) => {
-	return `@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@{
-	Layout = ${masterTemplateAlias};
-}`;
-};
 
 export const templateQueryResult = {
 	queryExpression: '',

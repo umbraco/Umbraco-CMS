@@ -16,12 +16,7 @@ export { data as relationType } from './relationType.data.js';
 export { data as script } from './script.data.js';
 export { data as staticFile } from './static-file.data.js';
 export { data as stylesheet } from './stylesheet.data.js';
-export {
-	data as template,
-	createTemplateScaffold,
-	templateQueryResult,
-	templateQuerySettings,
-} from './template.data.js';
+export { data as template, templateQueryResult, templateQuerySettings } from './template.data.js';
 export { data as user } from './user.data.js';
 export { data as mfaLoginProviders } from './user-mfa-login-providers.data.js';
 export { data as userGroup } from './user-group.data.js';
