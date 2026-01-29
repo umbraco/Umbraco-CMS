@@ -29,21 +29,23 @@ public class FetchDocumentTypesController : DocumentTypeControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpPost("fetch")]
+    [HttpGet("fetch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FetchResponseModel<DocumentTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Fetch(CancellationToken cancellationToken, FetchRequestModel requestModel)
+    public async Task<IActionResult> Fetch(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] Guid[] ids)
     {
-        Guid[] ids = [.. requestModel.Ids.Select(x => x.Id).Distinct()];
+        Guid[] requestedIds = [.. ids.Distinct()];
 
-        if (ids.Length == 0)
+        if (requestedIds.Length == 0)
         {
             return Ok(new FetchResponseModel<DocumentTypeResponseModel>());
         }
 
-        IEnumerable<IContentType> contentTypes = _contentTypeService.GetMany(ids);
+        IEnumerable<IContentType> contentTypes = _contentTypeService.GetMany(requestedIds);
 
-        List<IContentType> ordered = OrderByRequestedIds(contentTypes, ids);
+        List<IContentType> ordered = OrderByRequestedIds(contentTypes, requestedIds);
 
         var responseModels = ordered.Select(ct => _umbracoMapper.Map<DocumentTypeResponseModel>(ct)!).ToList();
 

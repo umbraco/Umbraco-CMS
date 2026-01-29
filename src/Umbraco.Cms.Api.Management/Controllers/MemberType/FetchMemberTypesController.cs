@@ -29,21 +29,23 @@ public class FetchMemberTypesController : MemberTypeControllerBase
         _memberTypePresentationFactory = memberTypePresentationFactory;
     }
 
-    [HttpPost("fetch")]
+    [HttpGet("fetch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FetchResponseModel<MemberTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Fetch(CancellationToken cancellationToken, FetchRequestModel requestModel)
+    public async Task<IActionResult> Fetch(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] Guid[] ids)
     {
-        Guid[] ids = [.. requestModel.Ids.Select(x => x.Id).Distinct()];
+        Guid[] requestedIds = [.. ids.Distinct()];
 
-        if (ids.Length == 0)
+        if (requestedIds.Length == 0)
         {
             return Ok(new FetchResponseModel<MemberTypeResponseModel>());
         }
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(ids);
+        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(requestedIds);
 
-        List<IMemberType> ordered = OrderByRequestedIds(memberTypes, ids);
+        List<IMemberType> ordered = OrderByRequestedIds(memberTypes, requestedIds);
 
         // Member type mapping is async via factory.
         IEnumerable<Task<MemberTypeResponseModel>> mappingTasks = ordered.Select(mt => _memberTypePresentationFactory.CreateResponseModelAsync(mt));

@@ -1,9 +1,7 @@
 using System.Linq.Expressions;
 using System.Net;
-using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.MediaType;
-using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
@@ -27,16 +25,10 @@ public class FetchMediaTypesControllerTests : ManagementApiUserGroupTestBase<Fet
     }
 
     protected override Expression<Func<FetchMediaTypesController, object>> MethodSelector =>
-        x => x.Fetch(CancellationToken.None, new FetchRequestModel());
+        x => x.Fetch(CancellationToken.None, Array.Empty<Guid>());
 
     protected override async Task<HttpResponseMessage> ClientRequest()
-    {
-        var requestModel = new FetchRequestModel
-        {
-            Ids = [new(_key1), new(_key2)]
-        };
-        return await Client.PostAsync(Url, JsonContent.Create(requestModel));
-    }
+        => await Client.GetAsync($"{Url}?id={_key1}&id={_key2}");
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

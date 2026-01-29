@@ -29,21 +29,23 @@ public class FetchMediaTypesController : MediaTypeControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpPost("fetch")]
+    [HttpGet("fetch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FetchResponseModel<MediaTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Fetch(CancellationToken cancellationToken, FetchRequestModel requestModel)
+    public async Task<IActionResult> Fetch(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] Guid[] ids)
     {
-        Guid[] ids = [.. requestModel.Ids.Select(x => x.Id).Distinct()];
+        Guid[] requestedIds = [.. ids.Distinct()];
 
-        if (ids.Length == 0)
+        if (requestedIds.Length == 0)
         {
             return Ok(new FetchResponseModel<MediaTypeResponseModel>());
         }
 
-        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(ids);
+        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(requestedIds);
 
-        List<IMediaType> ordered = OrderByRequestedIds(mediaTypes, ids);
+        List<IMediaType> ordered = OrderByRequestedIds(mediaTypes, requestedIds);
 
         var responseModels = ordered.Select(mt => _umbracoMapper.Map<MediaTypeResponseModel>(mt)!).ToList();
 

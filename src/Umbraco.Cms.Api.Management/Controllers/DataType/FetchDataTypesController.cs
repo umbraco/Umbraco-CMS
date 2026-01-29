@@ -29,21 +29,23 @@ public class FetchDataTypesController : DataTypeControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpPost("fetch")]
+    [HttpGet("fetch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FetchResponseModel<DataTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Fetch(CancellationToken cancellationToken, FetchRequestModel requestModel)
+    public async Task<IActionResult> Fetch(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] Guid[] ids)
     {
-        Guid[] ids = [.. requestModel.Ids.Select(x => x.Id).Distinct()];
+        Guid[] requestedIds = [.. ids.Distinct()];
 
-        if (ids.Length == 0)
+        if (requestedIds.Length == 0)
         {
             return Ok(new FetchResponseModel<DataTypeResponseModel>());
         }
 
-        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetAllAsync(ids);
+        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetAllAsync(requestedIds);
 
-        List<IDataType> ordered = OrderByRequestedIds(dataTypes, ids);
+        List<IDataType> ordered = OrderByRequestedIds(dataTypes, requestedIds);
 
         var responseModels = ordered.Select(dt => _umbracoMapper.Map<DataTypeResponseModel>(dt)!).ToList();
 
