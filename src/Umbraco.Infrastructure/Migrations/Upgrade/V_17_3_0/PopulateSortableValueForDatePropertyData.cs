@@ -6,7 +6,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_2_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 
 /// <summary>
 /// Populates the sortableValue column for existing property data that uses date/time property editors
