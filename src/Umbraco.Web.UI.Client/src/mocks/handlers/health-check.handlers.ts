@@ -11,10 +11,17 @@ import type {
 import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const getGroupByName = dataSet.getGroupByName;
 const getGroupWithResultsByName = dataSet.getGroupWithResultsByName;
 const healthGroups = dataSet.healthGroups;
 const healthGroupsWithoutResult = dataSet.healthGroupsWithoutResult;
+
+/**
+ *
+ * @param name
+ */
+function getGroupByName(name: string) {
+	return healthGroupsWithoutResult.find((group) => group.name?.toLowerCase() == name.toLowerCase());
+}
 
 export const handlers = [
 	http.get(umbracoPath('/health-check-group'), () => {

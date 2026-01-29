@@ -30,7 +30,6 @@ export const logs = [];
 export const auditLogs = [];
 export const healthGroups = [];
 export const healthGroupsWithoutResult = [];
-export const getGroupByName = (_name: string) => undefined;
 export const getGroupWithResultsByName = (_name: string) => undefined;
 export const examineIndexers = [];
 export const examinePagedIndexers = { items: [], total: 0 };

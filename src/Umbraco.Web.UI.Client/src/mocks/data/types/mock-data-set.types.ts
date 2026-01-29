@@ -221,7 +221,6 @@ export interface UmbMockDataSet {
 	// Health check data
 	healthGroups: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;
 	healthGroupsWithoutResult: Array<HealthCheckGroupPresentationModel>;
-	getGroupByName: (name: string) => HealthCheckGroupPresentationModel | undefined;
 	getGroupWithResultsByName: (name: string) => (HealthCheckGroupWithResultResponseModel & { name: string }) | undefined;
 
 	// Examine/search data

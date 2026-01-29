@@ -28,12 +28,7 @@ export {
 } from './log-viewer.data.js';
 export { data as logs } from './logs.data.js';
 export { data as auditLogs } from './audit-log.data.js';
-export {
-	healthGroups,
-	healthGroupsWithoutResult,
-	getGroupByName,
-	getGroupWithResultsByName,
-} from './health-check.data.js';
+export { healthGroups, healthGroupsWithoutResult, getGroupWithResultsByName } from './health-check.data.js';
 export {
 	Indexers as examineIndexers,
 	PagedIndexers as examinePagedIndexers,
