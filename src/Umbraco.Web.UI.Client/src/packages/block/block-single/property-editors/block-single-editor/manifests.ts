@@ -6,10 +6,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.BlockSingle',
-		name: 'Block Single Property Editor UI',
+		name: 'Single Block Property Editor UI',
 		element: () => import('./property-editor-ui-block-single.element.js'),
 		meta: {
-			label: 'Block Single',
+			label: 'Single Block',
 			propertyEditorSchemaAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-shape-square',
 			group: 'richContent',

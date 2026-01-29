@@ -652,7 +652,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Arrange
         var root = await CreateRootContentWithFiveChildrenAsListViewItems();
 
-        var allChildren = ContentService.GetPagedChildren(root.Id, 0, 10, out _).ToArray();
+        var allChildren = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null).ToArray();
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
