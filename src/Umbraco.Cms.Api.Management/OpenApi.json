@@ -38700,6 +38700,10 @@
           "alias": {
             "type": "string"
           },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "icon": {
             "type": "string",
             "nullable": true
@@ -46936,6 +46940,7 @@
         "required": [
           "allowLocalLogin",
           "allowPasswordReset",
+          "umbracoCssPath",
           "versionCheckPeriod"
         ],
         "type": "object",
@@ -46949,6 +46954,9 @@
           },
           "allowLocalLogin": {
             "type": "boolean"
+          },
+          "umbracoCssPath": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -49177,6 +49185,10 @@
           "alias": {
             "type": "string"
           },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "icon": {
             "type": "string",
             "nullable": true
@@ -49613,6 +49625,10 @@
           },
           "alias": {
             "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "icon": {
             "type": "string",
