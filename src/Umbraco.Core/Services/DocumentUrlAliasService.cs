@@ -413,7 +413,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return aliases;
         }
 
-        // Handle culture-variant content with a culture-variant alias property
+        // Handle culture-variant content with a culture-variant alias property.
         foreach (ILanguage language in languages)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode);

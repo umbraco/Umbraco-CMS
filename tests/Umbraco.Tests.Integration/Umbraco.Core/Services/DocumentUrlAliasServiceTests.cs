@@ -534,7 +534,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Assert - the alias should be stored in the database
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == content.Key)
@@ -576,7 +576,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Assert - the alias should be stored in the database
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == content.Key)
