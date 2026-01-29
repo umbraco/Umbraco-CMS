@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 
 namespace Umbraco.Cms.Persistence.EFCore;
@@ -90,5 +91,7 @@ public class UmbracoDbContext : DbContext
                 entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
             }
         }
+
+        modelBuilder.Entity<WebhookDto>();
     }
 }
