@@ -64,6 +64,15 @@ namespace Umbraco.Extensions
                 queryColumns.Sort((a, b) => names.IndexOf(a.Key).CompareTo(names.IndexOf(b.Key)));
             }
 
+            string? GetAliasOld(PocoColumn column)
+            {
+                if (aliases != null && aliases.TryGetValue(column.ColumnName, out var alias))
+                {
+                    return alias;
+                }
+
+                return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
+            }
 
 
             return queryColumns
@@ -71,7 +80,7 @@ namespace Umbraco.Extensions
                     sql.SqlContext.DatabaseType,
                     tableName,
                     x.Value.ColumnName,
-                    GetAlias(x.Value, withAlias, aliases)!,
+                    GetAlias(x.Value, withAlias, aliases)!, // GetAliasOld(x.Value),
                     referenceName,
                     forInsert: forInsert))
                 .ToArray();
@@ -83,6 +92,8 @@ namespace Umbraco.Extensions
             {
                 return alias;
             }
+
+            // MyTODOs: why does PostgreSQL have issues with these aliases?
 
             var columnMemberInfoKeyIsUniqueId = column.MemberInfoKey.InvariantEquals("uniqueid") && !column.MemberInfoKey.Equals("uniqueId");
             var columnMemberInfoKeyIsLanguageId = column.MemberInfoKey.InvariantEquals("languageid") && !column.MemberInfoKey.Equals("languageId");
@@ -99,6 +110,6 @@ namespace Umbraco.Extensions
             }
 
             return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
-        }
+        }        
     }
 }
