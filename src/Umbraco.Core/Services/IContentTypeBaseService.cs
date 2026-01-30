@@ -179,4 +179,5 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, Guid? parentContentKey, int skip, int take)
         => GetAllowedChildrenAsync(key, skip, take);
 
+    Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key, UmbracoObjectTypes objectType);
 }

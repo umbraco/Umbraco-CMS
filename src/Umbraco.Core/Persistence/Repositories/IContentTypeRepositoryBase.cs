@@ -39,4 +39,12 @@ public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<i
     ///     Returns true or false depending on whether content nodes have been created based on the provided content type id.
     /// </summary>
     bool HasContentNodes(int id);
+
+    /// <summary>
+    ///     Gets the allowed parent keys for a child content type.
+    /// </summary>
+    /// <param name="key">The child content type.</param>
+    /// <param name="umbracoObjectType">The object type.</param>
+    /// <returns>An IEnumerable of the allowed parent keys.</returns>
+    IEnumerable<Guid> GetAllowedParentKeys(Guid key, UmbracoObjectTypes umbracoObjectType);
 }

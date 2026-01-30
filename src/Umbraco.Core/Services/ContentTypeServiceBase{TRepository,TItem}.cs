@@ -1201,6 +1201,21 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result);
     }
 
+    public async Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key, UmbracoObjectTypes objectType)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        if (objectType == UmbracoObjectTypes.Member || objectType == UmbracoObjectTypes.MemberType)
+        {
+            // Return an empty array if it's a member or member type.
+            return Attempt.SucceedWithStatus<IEnumerable<Guid>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, []);
+        }
+
+        IEnumerable<Guid> allowedParentKeys = Repository.GetAllowedParentKeys(key, objectType);
+
+        return Attempt.SucceedWithStatus<IEnumerable<Guid>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, allowedParentKeys);
+    }
+
     #endregion
 
     #region Containers
