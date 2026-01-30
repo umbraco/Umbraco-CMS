@@ -97,7 +97,7 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
 
     #endregion
 
-    private DbProviderFactory? DbProviderFactory
+    protected DbProviderFactory? DbProviderFactory
     {
         get
         {
@@ -281,7 +281,7 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         => new UmbracoPocoDataBuilder(type, _pocoMappers, _upgrading).Init();
 
     // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
-    private UmbracoDatabase? CreateDatabaseInstance()
+    protected virtual UmbracoDatabase? CreateDatabaseInstance()
     {
         if (ConnectionString is null || SqlContext is null || DbProviderFactory is null)
         {
