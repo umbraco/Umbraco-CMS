@@ -179,5 +179,13 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, Guid? parentContentKey, int skip, int take)
         => GetAllowedChildrenAsync(key, skip, take);
 
-    Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key, UmbracoObjectTypes objectType);
+    /// <summary>
+    /// Returns all content types that allow the inputted key as a child. E.g all parents of the inputted key.
+    /// </summary>
+    /// <param name="key">The key of the child content type.</param>
+    /// <param name="objectType">The object type of the child content type.</param>
+    /// <returns>A guid list of all parents.</returns>
+    /// <exception cref="NotImplementedException">Default implementation due to breaking changes.</exception>
+    Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key,
+        UmbracoObjectTypes objectType) => throw new NotImplementedException();
 }

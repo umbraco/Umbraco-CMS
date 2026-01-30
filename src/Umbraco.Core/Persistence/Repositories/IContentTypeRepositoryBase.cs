@@ -46,5 +46,5 @@ public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<i
     /// <param name="key">The child content type.</param>
     /// <param name="umbracoObjectType">The object type.</param>
     /// <returns>An IEnumerable of the allowed parent keys.</returns>
-    IEnumerable<Guid> GetAllowedParentKeys(Guid key, UmbracoObjectTypes umbracoObjectType);
+    IEnumerable<Guid> GetAllowedParentKeys(Guid key, UmbracoObjectTypes umbracoObjectType) => throw new NotImplementedException();
 }
