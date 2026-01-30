@@ -1,5 +1,4 @@
-import type { UmbMockMemberTypeModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockMemberTypeModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
@@ -17,7 +16,7 @@ class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
 	detail = new UmbMockEntityDetailManager<UmbMockMemberTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockMemberTypeModel>) {
-		super(data);
+		super('memberType', data);
 	}
 }
 
@@ -79,4 +78,4 @@ const itemResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeItemRespons
 	};
 };
 
-export const umbMemberTypeMockDb = new UmbMemberTypeMockDB(dataSet.memberType ?? []);
+export const umbMemberTypeMockDb = new UmbMemberTypeMockDB([]);

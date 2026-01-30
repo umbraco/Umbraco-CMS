@@ -1,6 +1,5 @@
 import { objectArrayFilter, queryFilter } from '../utils.js';
-import type { UmbMockMemberModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockMemberModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
@@ -39,7 +38,7 @@ class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
 	collection = new UmbMockContentCollectionManager(this, collectionItemResponseMapper);
 
 	constructor(data: Array<UmbMockMemberModel>) {
-		super(data);
+		super('member', data);
 	}
 
 	filter(options: MemberFilterOptions): PagedMemberResponseModel {
@@ -145,4 +144,4 @@ const collectionItemResponseMapper = (item: UmbMockMemberModel): any => {
 	};
 };
 
-export const umbMemberMockDb = new UmbMemberMockDB(dataSet.member ?? []);
+export const umbMemberMockDb = new UmbMemberMockDB([]);

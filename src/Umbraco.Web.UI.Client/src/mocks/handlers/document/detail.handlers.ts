@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import type { UmbMockDocumentModel } from '../../data/sets/index.js';
-import { dataSet } from '../../data/sets/index.js';
+import type { UmbMockDocumentModel } from '../../data/types/mock-data-set.types.js';
+import { umbMockManager } from '../../mock-manager.js';
 import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
@@ -13,7 +13,9 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const referenceData = dataSet.trackedReferenceItems ?? [];
+function getReferenceData() {
+	return umbMockManager.getDataSet().trackedReferenceItems ?? [];
+}
 
 export const detailHandlers = [
 	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {
@@ -51,7 +53,7 @@ export const detailHandlers = [
 		let data: Array<DefaultReferenceResponseModel> = [];
 
 		if (id === 'all-property-editors-document-id') {
-			data = referenceData;
+			data = getReferenceData();
 		}
 
 		const PagedTrackedReference: PagedIReferenceResponseModel = {

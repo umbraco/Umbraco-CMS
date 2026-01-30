@@ -1,5 +1,4 @@
-import type { UmbMockMediaModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockMediaModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
@@ -27,7 +26,13 @@ export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 	url = new UmbMockEntityVariantUrlManager<UmbMockMediaModel>(this);
 
 	constructor(data: Array<UmbMockMediaModel>) {
-		super(data);
+		super('media', data);
+	}
+
+	override setData(data: Array<UmbMockMediaModel>) {
+		super.setData(data);
+		// Update recycleBin's data to match - it has its own data array
+		this.recycleBin.setData(data);
 	}
 }
 
@@ -129,4 +134,4 @@ const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseMode
 	};
 };
 
-export const umbMediaMockDb = new UmbMediaMockDB(dataSet.media ?? []);
+export const umbMediaMockDb = new UmbMediaMockDB([]);

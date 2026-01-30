@@ -1,5 +1,4 @@
-import type { UmbMockDictionaryModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockDictionaryModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
@@ -20,7 +19,7 @@ export class UmbDictionaryMockDB extends UmbEntityMockDbBase<UmbMockDictionaryMo
 	detail = new UmbMockEntityDetailManager<UmbMockDictionaryModel>(this, createMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockDictionaryModel>) {
-		super(data);
+		super('dictionary', data);
 	}
 
 	getOverview(): PagedDictionaryOverviewResponseModel {
@@ -76,4 +75,4 @@ const itemMapper = (model: UmbMockDictionaryModel): DictionaryItemItemResponseMo
 	};
 };
 
-export const umbDictionaryMockDb = new UmbDictionaryMockDB(dataSet.dictionary ?? []);
+export const umbDictionaryMockDb = new UmbDictionaryMockDB([]);

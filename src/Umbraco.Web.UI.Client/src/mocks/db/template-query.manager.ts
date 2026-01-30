@@ -1,4 +1,4 @@
-import { dataSet } from '../data/sets/index.js';
+import { umbMockManager } from '../mock-manager.js';
 import type {
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
@@ -20,7 +20,7 @@ const defaultQueryResult: TemplateQueryResultResponseModel = {
 export class UmbMockTemplateQueryManager {
 	constructor() {}
 
-	getQuerySettings = () => dataSet.templateQuerySettings ?? defaultQuerySettings;
+	getQuerySettings = () => umbMockManager.getDataSet().templateQuerySettings ?? defaultQuerySettings;
 
-	getQueryResult = () => dataSet.templateQueryResult ?? defaultQueryResult;
+	getQueryResult = () => umbMockManager.getDataSet().templateQueryResult ?? defaultQueryResult;
 }

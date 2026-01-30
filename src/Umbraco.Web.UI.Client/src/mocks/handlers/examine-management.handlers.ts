@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { dataSet } from '../data/sets/index.js';
+import { umbMockManager } from '../mock-manager.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type {
 	IndexResponseModel,
@@ -8,16 +8,27 @@ import type {
 	PagedSearchResultResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-const searchResultMockData = dataSet.examineSearchResults ?? [];
-const PagedIndexers = dataSet.examinePagedIndexers ?? { items: [], total: 0 };
-const Indexers = PagedIndexers.items;
+/**
+ *
+ */
+function getSearchResultMockData() {
+	return umbMockManager.getDataSet().examineSearchResults ?? [];
+}
+
+/**
+ *
+ */
+function getPagedIndexers() {
+	return umbMockManager.getDataSet().examinePagedIndexers ?? { items: [], total: 0 };
+}
 
 /**
  *
  * @param indexName
  */
 function getIndexByName(indexName: string) {
-	return Indexers.find((index) => {
+	const indexers = getPagedIndexers().items;
+	return indexers.find((index) => {
 		if (index.name) return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
 		else return undefined;
 	});
@@ -25,7 +36,7 @@ function getIndexByName(indexName: string) {
 
 export const handlers = [
 	http.get(umbracoPath('/indexer'), () => {
-		return HttpResponse.json<PagedIndexResponseModel>(PagedIndexers);
+		return HttpResponse.json<PagedIndexResponseModel>(getPagedIndexers());
 	}),
 
 	http.get(umbracoPath('/indexer/:indexName'), ({ params }) => {
@@ -72,7 +83,7 @@ export const handlers = [
 		if (searcherName) {
 			return HttpResponse.json<PagedSearchResultResponseModel>({
 				total: 0,
-				items: searchResultMockData,
+				items: getSearchResultMockData(),
 			});
 		} else {
 			return new HttpResponse(null, { status: 404 });

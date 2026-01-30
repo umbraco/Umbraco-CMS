@@ -1,4 +1,4 @@
-import { dataSet } from '../data/sets/index.js';
+import { umbMockManager } from '../mock-manager.js';
 import { UmbMockDBBase } from './utils/mock-db-base.js';
 import type {
 	LogMessageResponseModel,
@@ -8,7 +8,7 @@ import type {
 
 class UmbLogViewerSearchesData extends UmbMockDBBase<SavedLogSearchResponseModel> {
 	constructor(data: SavedLogSearchResponseModel[]) {
-		super(data);
+		super('logViewerSavedSearches', data);
 	}
 
 	getSavedSearches(skip = 0, take = this.data.length): Array<SavedLogSearchResponseModel> {
@@ -22,7 +22,7 @@ class UmbLogViewerSearchesData extends UmbMockDBBase<SavedLogSearchResponseModel
 
 class UmbLogViewerTemplatesData extends UmbMockDBBase<LogTemplateResponseModel> {
 	constructor(data: LogTemplateResponseModel[]) {
-		super(data);
+		super('logViewerMessageTemplates', data);
 	}
 
 	getTemplates(skip = 0, take = this.data.length): Array<LogTemplateResponseModel> {
@@ -32,7 +32,7 @@ class UmbLogViewerTemplatesData extends UmbMockDBBase<LogTemplateResponseModel> 
 
 class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 	constructor(data: LogMessageResponseModel[]) {
-		super(data);
+		super('logs', data);
 	}
 
 	getLogs(skip = 0, take = this.data.length): Array<LogMessageResponseModel> {
@@ -65,8 +65,10 @@ const defaultLogLevels = {
 };
 
 export const umbLogViewerData = {
-	searches: new UmbLogViewerSearchesData(dataSet.logViewerSavedSearches ?? []),
-	templates: new UmbLogViewerTemplatesData(dataSet.logViewerMessageTemplates ?? []),
-	logs: new UmbLogViewerMessagesData(dataSet.logs ?? []),
-	logLevels: dataSet.logViewerLogLevels ?? defaultLogLevels,
+	searches: new UmbLogViewerSearchesData([]),
+	templates: new UmbLogViewerTemplatesData([]),
+	logs: new UmbLogViewerMessagesData([]),
+	get logLevels() {
+		return umbMockManager.getDataSet().logViewerLogLevels ?? defaultLogLevels;
+	},
 };

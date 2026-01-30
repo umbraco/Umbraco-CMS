@@ -1,5 +1,4 @@
-import type { UmbMockStylesheetModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockStylesheetModel } from '../data/types/mock-data-set.types.js';
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemDetailManager } from './utils/file-system/file-system-detail.manager.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';
@@ -13,8 +12,8 @@ class UmbStylesheetMockDb extends UmbFileSystemMockDbBase<UmbMockStylesheetModel
 	file = new UmbMockFileSystemDetailManager<UmbMockStylesheetModel>(this);
 
 	constructor(data: Array<UmbMockStylesheetModel>) {
-		super(data);
+		super('stylesheet', data);
 	}
 }
 
-export const umbStylesheetMockDb = new UmbStylesheetMockDb(dataSet.stylesheet ?? []);
+export const umbStylesheetMockDb = new UmbStylesheetMockDb([]);

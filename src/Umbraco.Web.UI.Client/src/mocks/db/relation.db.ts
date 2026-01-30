@@ -1,5 +1,4 @@
-import type { UmbMockRelationModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockRelationModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type { RelationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -8,7 +7,7 @@ class UmbRelationMockDB extends UmbEntityMockDbBase<UmbMockRelationModel> {
 	item = new UmbMockEntityDetailManager<UmbMockRelationModel>(this, itemResponseMapper, createDetailMockMapper);
 
 	constructor(data: Array<UmbMockRelationModel>) {
-		super(data);
+		super('relation', data);
 	}
 }
 
@@ -27,4 +26,4 @@ const itemResponseMapper = (item: UmbMockRelationModel): RelationResponseModel =
 	};
 };
 
-export const umbRelationMockDb = new UmbRelationMockDB(dataSet.relation ?? []);
+export const umbRelationMockDb = new UmbRelationMockDB([]);

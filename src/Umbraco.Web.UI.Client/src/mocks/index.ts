@@ -1,5 +1,6 @@
 const { setupWorker, isCommonAssetRequest } = window.MockServiceWorker;
 import { handlers } from './browser-handlers.js';
+import { umbMockManager } from './mock-manager.js';
 import type { setupWorker as setupWorkerType, StartOptions } from 'msw/browser';
 import type {
 	http as httpType,
@@ -26,18 +27,51 @@ export const onUnhandledRequest = (request: Request) => {
 	}
 };
 
-export const startMockServiceWorker = (config?: StartOptions) =>
-	worker.start({
+/**
+ * Options for starting the mock service worker.
+ */
+export interface UmbMockServiceWorkerOptions extends StartOptions {
+	/**
+	 * The name of the mock data set to use.
+	 * @default 'default'
+	 */
+	mockSet?: string;
+
+	/**
+	 * Whether to use the custom service worker that bypasses static assets.
+	 * Set to true for Vite development (faster startup).
+	 * Tests should use false since they serve files from a different location.
+	 * @default false
+	 */
+	useCustomServiceWorker?: boolean;
+}
+
+/**
+ * Starts the mock service worker with the specified options.
+ * @param config - Configuration options including the mock set to use.
+ */
+export const startMockServiceWorker = async (config?: UmbMockServiceWorkerOptions) => {
+	const { mockSet = 'default', useCustomServiceWorker = false, ...mswConfig } = config ?? {};
+
+	// Initialize mock data with the specified set
+	await umbMockManager.initialize(mockSet);
+
+	return worker.start({
 		onUnhandledRequest,
-		// Use our custom service worker wrapper that bypasses static assets
-		// at the service worker level, before they reach MSW's fetch handler.
-		// This avoids the expensive round-trip to the main thread for every
-		// JS/CSS/image request, significantly improving startup performance.
-		serviceWorker: {
-			url: '/umbServiceWorker.js',
-		},
-		...config,
+		// Use custom service worker wrapper that bypasses static assets at the
+		// service worker level, avoiding expensive round-trips to main thread.
+		// This significantly improves startup performance in Vite development.
+		...(useCustomServiceWorker && {
+			serviceWorker: {
+				url: '/umbServiceWorker.js',
+			},
+		}),
+		...mswConfig,
 	});
+};
+
+// Re-export convenience functions for tests
+export { useMockSet, clearMockData } from './mock-manager.js';
 
 declare global {
 	interface Window {

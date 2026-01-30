@@ -12,7 +12,10 @@ async function bootstrap() {
 	//#region Vite Mock Setup
 	if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
 		appElement.bypassAuth = true;
-		await startMockServiceWorker();
+		await startMockServiceWorker({
+			mockSet: import.meta.env.VITE_MOCK_SET || 'default',
+			useCustomServiceWorker: true,
+		});
 	} else {
 		appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;
 	}

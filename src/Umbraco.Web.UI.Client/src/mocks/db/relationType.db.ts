@@ -1,5 +1,4 @@
-import type { UmbMockRelationTypeModel, UmbMockRelationTypeItemModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockRelationTypeModel, UmbMockRelationTypeItemModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type {
@@ -12,7 +11,7 @@ class UmbRelationTypeMockDB extends UmbEntityMockDbBase<UmbMockRelationTypeModel
 	detail = new UmbMockEntityDetailManager<UmbMockRelationTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockRelationTypeModel>) {
-		super(data);
+		super('relationType', data);
 	}
 }
 
@@ -41,4 +40,4 @@ const itemResponseMapper = (item: UmbMockRelationTypeItemModel): RelationTypeIte
 	};
 };
 
-export const umbRelationTypeMockDb = new UmbRelationTypeMockDB(dataSet.relationType ?? []);
+export const umbRelationTypeMockDb = new UmbRelationTypeMockDB([]);

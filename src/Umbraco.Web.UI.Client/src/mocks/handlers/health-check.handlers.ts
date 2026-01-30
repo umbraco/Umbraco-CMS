@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 
-import { dataSet } from '../data/sets/index.js';
+import { umbMockManager } from '../mock-manager.js';
 import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupResponseModel,
@@ -11,15 +11,26 @@ import type {
 import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const healthGroups = dataSet.healthGroups ?? [];
-const healthGroupsWithoutResult = dataSet.healthGroupsWithoutResult ?? [];
+/**
+ *
+ */
+function getHealthGroups() {
+	return umbMockManager.getDataSet().healthGroups ?? [];
+}
+
+/**
+ *
+ */
+function getHealthGroupsWithoutResult() {
+	return umbMockManager.getDataSet().healthGroupsWithoutResult ?? [];
+}
 
 /**
  *
  * @param name
  */
 function getGroupByName(name: string) {
-	return healthGroupsWithoutResult.find((group) => group.name?.toLowerCase() == name.toLowerCase());
+	return getHealthGroupsWithoutResult().find((group) => group.name?.toLowerCase() == name.toLowerCase());
 }
 
 /**
@@ -27,12 +38,15 @@ function getGroupByName(name: string) {
  * @param name
  */
 export function getGroupWithResultsByName(name: string) {
-	return healthGroups.find((group) => group.name.toLowerCase() === name.toLowerCase());
+	return getHealthGroups().find((group) => group.name.toLowerCase() === name.toLowerCase());
 }
 
 export const handlers = [
 	http.get(umbracoPath('/health-check-group'), () => {
-		return HttpResponse.json<PagedHealthCheckGroupResponseModel>({ total: 9999, items: healthGroupsWithoutResult });
+		return HttpResponse.json<PagedHealthCheckGroupResponseModel>({
+			total: 9999,
+			items: getHealthGroupsWithoutResult(),
+		});
 	}),
 
 	http.get<{ name: string }>(umbracoPath('/health-check-group/:name'), ({ params }) => {
@@ -65,7 +79,9 @@ export const handlers = [
 		const body = await request.json();
 		const healthCheckId = body.healthCheck.id;
 		// Find the health check based on the healthCheckId from the healthGroups[].checks
-		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.id === healthCheckId);
+		const healthCheck = getHealthGroups()
+			.flatMap((group) => group.checks)
+			.find((check) => check?.id === healthCheckId);
 
 		if (!healthCheck) {
 			return new HttpResponse(null, { status: 404 });

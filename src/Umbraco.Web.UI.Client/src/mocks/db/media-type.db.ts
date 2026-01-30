@@ -1,5 +1,4 @@
-import type { UmbMockMediaTypeModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockMediaTypeModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
@@ -30,7 +29,7 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 	);
 
 	constructor(data: Array<UmbMockMediaTypeModel>) {
-		super(data);
+		super('mediaType', data);
 	}
 
 	getAllowedChildren(id: string): PagedAllowedMediaTypeModel {
@@ -181,4 +180,4 @@ const allowedExtensionMediaTypeMapper = (
 	};
 };
 
-export const umbMediaTypeMockDb = new UmbMediaTypeMockDB(dataSet.mediaType ?? []);
+export const umbMediaTypeMockDb = new UmbMediaTypeMockDB([]);

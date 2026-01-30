@@ -1,5 +1,4 @@
-import type { UmbMockTemplateModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockTemplateModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
@@ -17,7 +16,7 @@ class UmbTemplateMockDB extends UmbEntityMockDbBase<UmbMockTemplateModel> {
 	query = new UmbMockTemplateQueryManager();
 
 	constructor(data: Array<UmbMockTemplateModel>) {
-		super(data);
+		super('template', data);
 	}
 }
 
@@ -40,4 +39,4 @@ const itemMapper = (item: UmbMockTemplateModel): TemplateItemResponseModel => {
 	};
 };
 
-export const umbTemplateMockDb = new UmbTemplateMockDB(dataSet.template ?? []);
+export const umbTemplateMockDb = new UmbTemplateMockDB([]);

@@ -1,5 +1,5 @@
-import type { UmbMockDocumentTypeModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockDocumentTypeModel } from '../data/types/mock-data-set.types.js';
+import { umbMockManager } from '../mock-manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
@@ -37,7 +37,7 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 	);
 
 	constructor(data: Array<UmbMockDocumentTypeModel>) {
-		super(data);
+		super('documentType', data);
 	}
 
 	getAllowedChildren(id: string): PagedAllowedDocumentTypeModel {
@@ -56,7 +56,7 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 	}
 
 	getConfiguration(): DocumentTypeConfigurationResponseModel {
-		return dataSet.documentTypeConfiguration ?? defaultConfiguration;
+		return umbMockManager.getDataSet().documentTypeConfiguration ?? defaultConfiguration;
 	}
 }
 
@@ -170,4 +170,4 @@ const allowedDocumentTypeMapper = (item: UmbMockDocumentTypeModel): AllowedDocum
 	};
 };
 
-export const umbDocumentTypeMockDb = new UmbDocumentTypeMockDB(dataSet.documentType ?? []);
+export const umbDocumentTypeMockDb = new UmbDocumentTypeMockDB([]);

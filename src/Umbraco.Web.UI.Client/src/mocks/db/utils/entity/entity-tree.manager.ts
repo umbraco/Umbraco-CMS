@@ -1,12 +1,22 @@
 import { pagedResult } from '../paged-result.js';
-import type { UmbEntityMockDbBase } from './entity-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
+/**
+ * Interface for DB classes that can be used with the tree manager.
+ * Both UmbEntityMockDbBase and UmbEntityRecycleBin implement this.
+ */
+export interface UmbMockEntityTreeSource<T> {
+	getAll(): Array<T>;
+	read(id: string): T | undefined;
+	update?(id: string, item: T): void;
+	create?(item: T): string | void;
+}
+
 export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: string } | null; hasChildren: boolean }> {
-	#db: UmbEntityMockDbBase<T>;
+	#db: UmbMockEntityTreeSource<T>;
 	#treeItemMapper: (item: T) => any;
 
-	constructor(mockDb: UmbEntityMockDbBase<T>, treeItemMapper: (item: T) => any) {
+	constructor(mockDb: UmbMockEntityTreeSource<T>, treeItemMapper: (item: T) => any) {
 		this.#db = mockDb;
 		this.#treeItemMapper = treeItemMapper;
 	}
@@ -47,6 +57,8 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 	}
 
 	move(ids: Array<string>, destinationId: string) {
+		if (!this.#db.update) throw new Error('move() requires a DB with update() method');
+
 		const destinationItem = this.#db.read(destinationId);
 		if (!destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
 
@@ -65,12 +77,15 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 			};
 		});
 
-		movedItems.forEach((movedItem: any) => this.#db.update(movedItem.id, movedItem));
+		movedItems.forEach((movedItem: any) => this.#db.update!(movedItem.id, movedItem));
 		destinationItem.hasChildren = true;
 		this.#db.update(destinationItem.id, destinationItem);
 	}
 
 	copy(ids: Array<string>, destinationId: string) {
+		if (!this.#db.update || !this.#db.create)
+			throw new Error('copy() requires a DB with update() and create() methods');
+
 		const destinationItem = this.#db.read(destinationId);
 		if (!destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
 
@@ -92,7 +107,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 			};
 		});
 
-		copyItems.forEach((copyItem) => this.#db.create(copyItem));
+		copyItems.forEach((copyItem) => this.#db.create!(copyItem));
 		const newIds = copyItems.map((item) => item.id);
 
 		destinationItem.hasChildren = true;

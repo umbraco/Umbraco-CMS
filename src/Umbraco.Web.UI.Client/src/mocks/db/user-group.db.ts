@@ -1,6 +1,5 @@
 import { queryFilter } from '../utils.js';
-import type { UmbMockUserGroupModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockUserGroupModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
@@ -28,7 +27,7 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	detail = new UmbMockEntityDetailManager<UmbMockUserGroupModel>(this, createMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockUserGroupModel>) {
-		super(data);
+		super('userGroup', data);
 	}
 
 	/**
@@ -138,4 +137,4 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 	};
 };
 
-export const umbUserGroupMockDb = new UmbUserGroupMockDB(dataSet.userGroup ?? []);
+export const umbUserGroupMockDb = new UmbUserGroupMockDB([]);

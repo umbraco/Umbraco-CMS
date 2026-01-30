@@ -1,5 +1,4 @@
-import type { UmbMockDocumentBlueprintModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockDocumentBlueprintModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
@@ -23,6 +22,10 @@ export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocum
 		createMockDocumentBlueprintMapper,
 		detailResponseMapper,
 	);
+
+	constructor(data: Array<UmbMockDocumentBlueprintModel>) {
+		super('documentBlueprint', data);
+	}
 }
 
 const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintTreeItemResponseModel => {
@@ -103,4 +106,4 @@ const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintItem
 	};
 };
 
-export const umbDocumentBlueprintMockDb = new UmbDocumentBlueprintMockDB(dataSet.documentBlueprint ?? []);
+export const umbDocumentBlueprintMockDb = new UmbDocumentBlueprintMockDB([]);

@@ -1,5 +1,5 @@
-import type { UmbMockPartialViewModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockPartialViewModel } from '../data/types/mock-data-set.types.js';
+import { umbMockManager } from '../mock-manager.js';
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';
 import { UmbMockFileSystemItemManager } from './utils/file-system/file-system-item.manager.js';
@@ -18,17 +18,19 @@ class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewMod
 	file = new UmbMockFileSystemDetailManager<UmbMockPartialViewModel>(this);
 
 	constructor(data: Array<UmbMockPartialViewModel>) {
-		super(data);
+		super('partialView', data);
 	}
 
 	getSnippets(): PagedPartialViewSnippetItemResponseModel {
-		const snippetItems = (dataSet.partialViewSnippets ?? []).map((item) => createSnippetItem(item));
+		const snippets = umbMockManager.getDataSet().partialViewSnippets ?? [];
+		const snippetItems = snippets.map((item) => createSnippetItem(item));
 		const total = snippetItems.length;
 		return { items: snippetItems, total };
 	}
 
 	getSnippet(id: string): PartialViewSnippetResponseModel | undefined {
-		return (dataSet.partialViewSnippets ?? []).find((item) => item.id === id);
+		const snippets = umbMockManager.getDataSet().partialViewSnippets ?? [];
+		return snippets.find((item) => item.id === id);
 	}
 }
 
@@ -39,4 +41,4 @@ const createSnippetItem = (item: PartialViewSnippetResponseModel): PartialViewSn
 	};
 };
 
-export const umbPartialViewMockDB = new UmbPartialViewMockDB(dataSet.partialView ?? []);
+export const umbPartialViewMockDB = new UmbPartialViewMockDB([]);

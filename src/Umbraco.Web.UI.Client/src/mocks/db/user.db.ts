@@ -1,6 +1,6 @@
 import { stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
-import type { UmbMockUserModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockUserModel } from '../data/types/mock-data-set.types.js';
+import { umbMockManager } from '../mock-manager.js';
 import { umbUserGroupMockDb } from './user-group.db.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
@@ -42,7 +42,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	detail = new UmbMockEntityDetailManager<UmbMockUserModel>(this, createMockMapper, detailResponseMapper);
 
 	constructor(data: UmbMockUserModel[]) {
-		super(data);
+		super('user', data);
 	}
 
 	calculateStartNodes(id: string): CalculatedUserStartNodesResponseModel {
@@ -137,11 +137,12 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	}
 
 	getMfaLoginProviders() {
-		return dataSet.mfaLoginProviders ?? [];
+		return umbMockManager.getDataSet().mfaLoginProviders ?? [];
 	}
 
 	enableMfaProvider(providerName: string) {
-		const provider = (dataSet.mfaLoginProviders ?? []).find((x) => x.providerName === providerName);
+		const providers = umbMockManager.getDataSet().mfaLoginProviders ?? [];
+		const provider = providers.find((x) => x.providerName === providerName);
 		if (provider) {
 			provider.isEnabledOnUser = true;
 			return true;
@@ -151,7 +152,8 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	}
 
 	disableMfaProvider(providerName: string) {
-		const provider = (dataSet.mfaLoginProviders ?? []).find((x) => x.providerName === providerName);
+		const providers = umbMockManager.getDataSet().mfaLoginProviders ?? [];
+		const provider = providers.find((x) => x.providerName === providerName);
 		if (provider) {
 			provider.isEnabledOnUser = false;
 			return true;
@@ -301,4 +303,4 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 	};
 };
 
-export const umbUserMockDb = new UmbUserMockDB(dataSet.user ?? []);
+export const umbUserMockDb = new UmbUserMockDB([]);

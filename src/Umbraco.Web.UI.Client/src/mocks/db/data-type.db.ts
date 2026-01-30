@@ -1,6 +1,5 @@
 import { queryFilter } from '../utils.js';
-import type { UmbMockDataTypeModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockDataTypeModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
@@ -38,7 +37,7 @@ class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 	detail = new UmbMockEntityDetailManager<UmbMockDataTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockDataTypeModel>) {
-		super(data);
+		super('dataType', data);
 	}
 
 	filter(options: UmbDataTypeFilterOptions): PagedDataTypeItemResponseModel {
@@ -130,4 +129,4 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 	};
 };
 
-export const umbDataTypeMockDb = new UmbDataTypeMockDB(dataSet.dataType ?? []);
+export const umbDataTypeMockDb = new UmbDataTypeMockDB([]);

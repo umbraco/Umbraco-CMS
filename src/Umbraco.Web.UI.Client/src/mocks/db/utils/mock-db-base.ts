@@ -1,8 +1,32 @@
+import type { UmbMockDataSet } from '../../data/types/mock-data-set.types.js';
+import { umbMockDbRegistry } from '../mock-db-registry.js';
+
 export abstract class UmbMockDBBase<T> {
 	protected data: Array<T> = [];
 
-	constructor(data: Array<T>) {
-		this.data = data;
+	/**
+	 * @param dataKey - The key in UmbMockDataSet this DB corresponds to (used for auto-registration)
+	 * @param data - Initial data array
+	 */
+	constructor(dataKey: keyof UmbMockDataSet, data: Array<T>) {
+		this.data = structuredClone(data);
+		// Auto-register with the registry
+		umbMockDbRegistry.register(dataKey, this);
+	}
+
+	/**
+	 * Replaces DB data with new data (used when switching mock sets).
+	 * @param data
+	 */
+	setData(data: Array<T>) {
+		this.data = structuredClone(data);
+	}
+
+	/**
+	 * Empties the DB completely.
+	 */
+	clear() {
+		this.data = [];
 	}
 
 	getAll() {

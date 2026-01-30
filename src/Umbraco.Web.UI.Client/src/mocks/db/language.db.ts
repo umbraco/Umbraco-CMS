@@ -1,5 +1,4 @@
-import type { UmbMockLanguageModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockLanguageModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockCultureItemManager } from './utils/culture/culture-item.manager.js';
 import { UmbCultureMockDbBase } from './utils/culture/culture-base.js';
 import { UmbMockCultureDetailManager } from './utils/culture/culture-detail.manager.js';
@@ -14,7 +13,7 @@ class UmbLanguageMockDB extends UmbCultureMockDbBase<UmbMockLanguageModel> {
 	detail = new UmbMockCultureDetailManager<UmbMockLanguageModel>(this, createDetailMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockLanguageModel>) {
-		super(data);
+		super('language', data);
 	}
 }
 
@@ -45,4 +44,4 @@ const itemResponseMapper = (item: UmbMockLanguageModel): LanguageItemResponseMod
 	};
 };
 
-export const umbLanguageMockDb = new UmbLanguageMockDB(dataSet.language ?? []);
+export const umbLanguageMockDb = new UmbLanguageMockDB([]);

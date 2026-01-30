@@ -1,10 +1,11 @@
+import type { UmbMockDataSet } from '../../../data/types/mock-data-set.types.js';
 import { UmbMockDBBase } from '../mock-db-base.js';
 
 export abstract class UmbCultureMockDbBase<
 	MockItemType extends { isoCode: string },
 > extends UmbMockDBBase<MockItemType> {
-	constructor(data: Array<MockItemType>) {
-		super(data);
+	constructor(dataKey: keyof UmbMockDataSet, data: Array<MockItemType>) {
+		super(dataKey, data);
 	}
 
 	create(item: MockItemType) {

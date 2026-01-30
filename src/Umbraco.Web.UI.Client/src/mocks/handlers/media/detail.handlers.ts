@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaMockDb } from '../../db/media.db.js';
-import { dataSet } from '../../data/sets/index.js';
+import { umbMockManager } from '../../mock-manager.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateMediaRequestModel,
@@ -10,7 +10,12 @@ import type {
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
-const referenceData = dataSet.trackedReferenceItems ?? [];
+/**
+ *
+ */
+function getReferenceData() {
+	return umbMockManager.getDataSet().trackedReferenceItems ?? [];
+}
 
 export const detailHandlers = [
 	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {
@@ -36,6 +41,7 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 
+		const referenceData = getReferenceData();
 		const PagedTrackedReference = {
 			total: referenceData.length,
 			items: referenceData,

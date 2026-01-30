@@ -1,4 +1,4 @@
-import type { UmbMockMediaModel } from '../data/sets/index.js';
+import type { UmbMockMediaModel } from '../data/types/mock-data-set.types.js';
 import type { UmbMediaMockDB } from './media.db.js';
 import type { DirectionModel, MediaCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 

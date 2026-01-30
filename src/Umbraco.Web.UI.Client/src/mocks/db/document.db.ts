@@ -1,5 +1,4 @@
-import type { UmbMockDocumentModel } from '../data/sets/index.js';
-import { dataSet } from '../data/sets/index.js';
+import type { UmbMockDocumentModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
@@ -32,7 +31,13 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	url = new UmbMockEntityVariantUrlManager<UmbMockDocumentModel>(this);
 
 	constructor(data: Array<UmbMockDocumentModel>) {
-		super(data);
+		super('document', data);
+	}
+
+	override setData(data: Array<UmbMockDocumentModel>) {
+		super.setData(data);
+		// Update recycleBin's data to match - it has its own data array
+		this.recycleBin.setData(data);
 	}
 
 	// permissions
@@ -178,4 +183,4 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 	};
 };
 
-export const umbDocumentMockDb = new UmbDocumentMockDB(dataSet.document ?? []);
+export const umbDocumentMockDb = new UmbDocumentMockDB([]);
