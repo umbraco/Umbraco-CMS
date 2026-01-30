@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Controllers.MediaType;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -12,26 +13,24 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
-public class AllowedParentsDocumentTypeController : DocumentTypeControllerBase
+public class AllowedParentsMediaTypeController : MediaTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
-    private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllowedParentsDocumentTypeController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
+    public AllowedParentsMediaTypeController(IContentTypeService contentTypeService)
     {
         _contentTypeService = contentTypeService;
-        _umbracoMapper = umbracoMapper;
     }
 
     [HttpGet("{id:guid}/allowed-parents")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DocumentTypeAllowedParentsResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MediaTypeAllowedParentsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AllowedParentsByKey(
         CancellationToken cancellationToken,
         Guid id)
     {
-        Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedParentsAsync(id, UmbracoObjectTypes.DocumentType);
+        Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedParentsAsync(id, UmbracoObjectTypes.MediaType);
         if (attempt.Success is false)
         {
             return OperationStatusResult(attempt.Status);
@@ -39,13 +38,13 @@ public class AllowedParentsDocumentTypeController : DocumentTypeControllerBase
 
         if (attempt.Result == null || attempt.Result.ToArray().IsCollectionEmpty())
         {
-            return Ok(new DocumentTypeAllowedParentsResponseModel
+            return Ok(new MediaTypeAllowedParentsResponseModel
             {
                 AllowedParentsKeys = [],
             });
         }
 
-        var model = new DocumentTypeAllowedParentsResponseModel
+        var model = new MediaTypeAllowedParentsResponseModel
         {
             AllowedParentsKeys = attempt.Result,
         };
