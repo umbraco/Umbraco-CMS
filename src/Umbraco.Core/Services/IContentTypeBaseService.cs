@@ -186,6 +186,7 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="objectType">The object type of the child content type.</param>
     /// <returns>A guid list of all parents.</returns>
     /// <exception cref="NotImplementedException">Default implementation due to breaking changes.</exception>
+    /// TODO (V18): Remove the default implementation
     Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key,
         UmbracoObjectTypes objectType) => throw new NotImplementedException();
 }

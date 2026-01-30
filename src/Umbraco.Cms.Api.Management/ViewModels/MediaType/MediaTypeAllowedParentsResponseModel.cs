@@ -2,5 +2,5 @@
 
 public class MediaTypeAllowedParentsResponseModel
 {
-    public required IEnumerable<Guid> AllowedParentsKeys { get; set; }
+    public required ISet<ReferenceByIdModel> AllowedParentIds { get; set; }
 }

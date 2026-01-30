@@ -1201,7 +1201,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result);
     }
 
-    public async Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key, UmbracoObjectTypes objectType)
+    public virtual async Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key, UmbracoObjectTypes objectType)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 

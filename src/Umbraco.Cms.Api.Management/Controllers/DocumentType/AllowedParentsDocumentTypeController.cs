@@ -1,12 +1,12 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
@@ -34,17 +34,9 @@ public class AllowedParentsDocumentTypeController : DocumentTypeControllerBase
             return OperationStatusResult(attempt.Status);
         }
 
-        if (attempt.Result == null || !attempt.Result.Any())
-        {
-            return Ok(new DocumentTypeAllowedParentsResponseModel
-            {
-                AllowedParentsKeys = [],
-            });
-        }
-
         var model = new DocumentTypeAllowedParentsResponseModel
         {
-            AllowedParentsKeys = attempt.Result,
+            AllowedParentIds = (attempt.Result ?? []).Select(x => new ReferenceByIdModel(x)).ToHashSet(),
         };
 
         return Ok(model);

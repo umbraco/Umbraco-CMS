@@ -1716,19 +1716,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
 
         Sql<ISqlContext> sql = Sql()
-            .Select<ContentTypeAllowedContentTypeDto>(x => x.Id)
+            .Select<NodeDto>(x => x.UniqueId)
             .From<ContentTypeAllowedContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeAllowedContentTypeDto, NodeDto>((allowed, node) => allowed.Id == node.NodeId)
             .Where<ContentTypeAllowedContentTypeDto>(x => x.AllowedId == childNodeIdAttempt.Result);
 
-        IEnumerable<int> allowedIds = Database.Fetch<int>(sql);
-
-        List<Guid> allowedKeys = [];
-        allowedKeys
-            .AddRange(
-                from id in allowedIds select _idKeyMap.GetKeyForId(id, objectType)
-                into keyAttempt where keyAttempt.Success select keyAttempt.Result);
-
-        return allowedKeys;
+        return Database.Fetch<Guid>(sql);
     }
 
     private sealed class NameCompareDto
