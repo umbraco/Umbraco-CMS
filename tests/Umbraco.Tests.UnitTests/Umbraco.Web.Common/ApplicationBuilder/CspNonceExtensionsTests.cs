@@ -80,7 +80,7 @@ public class CspNonceExtensionsTests
     public void InjectNonceIntoDirective_HandlesEmptyCsp()
     {
         // Arrange
-        var csp = "";
+        var csp = string.Empty;
 
         // Act
         var result = CspNonceExtensions.InjectNonceIntoDirective(csp, "script-src", TestNonce);
