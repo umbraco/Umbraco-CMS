@@ -43,7 +43,7 @@ namespace Umbraco.Extensions
             return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
-        // moved to NPocoSqlExtensionsV17
+        // moved to NPocoSqlWhereExtensions.cs
         // can be removed after code review of PR #21577 or when in main branch
         //public static Sql<ISqlContext> WhereParam<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string param)
         //{
@@ -93,7 +93,7 @@ namespace Umbraco.Extensions
         /// <param name="field">An expression specifying the field.</param>
         /// <param name="values">The values.</param>
         /// <returns>The Sql statement.</returns>
-        // updated and moved to NPocoSqlExtensionsV17
+        // updated and moved to NPocoSqlWhereExtensions.cs
         // can be removed after code review of PR #21577 or when in main branch
         //public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
         //{
@@ -828,7 +828,7 @@ namespace Umbraco.Extensions
         /// <param name="coalesceValue">COALESCE string value.</param>
         /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
         /// field or the coalesceValue.</returns>
-        // moved to NPocoSqlExtensionsV17
+        // moved to NPocoSqlSelectExtensions.cs
         // can be removed after code review of PR #21577 or when in main branch
         //public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string coalesceValue)
         //{
@@ -1625,7 +1625,7 @@ namespace Umbraco.Extensions
             return string.IsNullOrWhiteSpace(attr?.Value) ? string.Empty : attr.Value;
         }
 
-        // moved to NPocoSqlExtensionsInternal.cs
+        // moved to SqlSyntaxExtensions.cs
         // can be removed after code review of PR #21577 or when in main branch
         //private static string GetColumnName(this PropertyInfo column)
         //{
