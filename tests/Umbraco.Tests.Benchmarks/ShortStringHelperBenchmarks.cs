@@ -15,7 +15,7 @@ public class ShortStringHelperBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        _shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        _shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig(), Utf8ToAsciiConverterStatic.Instance);
         _input = "This is a 🎈 balloon";
     }
 
