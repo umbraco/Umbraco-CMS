@@ -2403,6 +2403,80 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(updatedContentType.DefaultTemplate!.Key, Is.EqualTo(result.Result));
     }
 
+    [Test]
+    public async Task GetAllowedParentsAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
+    {
+        // Arrange
+        var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        ContentTypeService.Save(childContentType);
+
+        var parentContentType = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
+
+        // Parent does not allow child as a child type
+        ContentTypeService.Save(parentContentType);
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key, UmbracoObjectTypes.DocumentType);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAllowedParentsAsync_ReturnsParentKeys_WhenParentsAllowChildType()
+    {
+        // Arrange
+        var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        ContentTypeService.Save(childContentType);
+
+        var parentContentType1 = ContentTypeBuilder.CreateBasicContentType("parent1", "Parent1");
+        parentContentType1.AllowedContentTypes =
+        [
+            new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
+        ];
+        ContentTypeService.Save(parentContentType1);
+
+        var parentContentType2 = ContentTypeBuilder.CreateBasicContentType("parent2", "Parent2");
+        parentContentType2.AllowedContentTypes =
+        [
+            new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
+        ];
+        ContentTypeService.Save(parentContentType2);
+
+        // A parent that does NOT allow the child type
+        var unrelatedParentContentType = ContentTypeBuilder.CreateBasicContentType("unrelated", "Unrelated");
+        ContentTypeService.Save(unrelatedParentContentType);
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key, UmbracoObjectTypes.DocumentType);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        var parentKeys = result.Result!.ToList();
+        Assert.That(parentKeys.Count, Is.EqualTo(2));
+        Assert.That(parentKeys, Does.Contain(parentContentType1.Key));
+        Assert.That(parentKeys, Does.Contain(parentContentType2.Key));
+        Assert.That(parentKeys, Does.Not.Contain(unrelatedParentContentType.Key));
+    }
+
+    [Test]
+    public async Task GetAllowedParentsAsync_ReturnsEmptyCollection_WhenContentTypeDoesNotExist()
+    {
+        // Arrange
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentsAsync(nonExistentKey, UmbracoObjectTypes.DocumentType);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result, Is.Empty);
+    }
+
     private ContentType CreateComponent()
     {
         var component = new ContentType(ShortStringHelper, -1)

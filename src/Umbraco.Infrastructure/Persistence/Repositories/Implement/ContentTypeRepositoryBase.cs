@@ -1706,6 +1706,25 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             ?? Array.Empty<(TEntity, int)>();
     }
 
+    public IEnumerable<Guid> GetAllowedParentKeys(Guid key, UmbracoObjectTypes objectType)
+    {
+        Attempt<int> childNodeIdAttempt = _idKeyMap.GetIdForKey(key, objectType);
+
+        if (childNodeIdAttempt.Success is false)
+        {
+            return [];
+        }
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<ContentTypeAllowedContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeAllowedContentTypeDto, NodeDto>((allowed, node) => allowed.Id == node.NodeId)
+            .Where<ContentTypeAllowedContentTypeDto>(x => x.AllowedId == childNodeIdAttempt.Result);
+
+        return Database.Fetch<Guid>(sql);
+    }
+
     private sealed class NameCompareDto
     {
         public int NodeId { get; set; }
