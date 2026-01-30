@@ -1358,74 +1358,71 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     /// <param name="filterSql">The SQL filter to which the user state conditions are appended. If null, no conditions are added.</param>
     private void FilterByUserState(UserState[]? userState, Sql<ISqlContext> filterSql)
     {
-        if (userState != null && userState.Length > 0)
+        // the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
+        if (userState != null && userState.Length > 0
+            && userState.Contains(UserState.All) == false)
         {
-            // the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
-            if (userState.Contains(UserState.All) == false)
+            var sb = new StringBuilder("(");
+            var appended = false;
+            var userDisabled = QuoteColumnName("userDisabled");
+            var userNoConsole = QuoteColumnName("userNoConsole");
+            var lastLoginDate = QuoteColumnName("lastLoginDate");
+            var invitedDate = QuoteColumnName("invitedDate");
+
+            var falseValue = SqlSyntax.ConvertIntegerToBoolean(0);
+            var trueValue = SqlSyntax.ConvertIntegerToBoolean(1);
+            if (userState.Contains(UserState.Active))
             {
-                var sb = new StringBuilder("(");
-                var appended = false;
-                var userDisabled = QuoteColumnName("userDisabled");
-                var userNoConsole = QuoteColumnName("userNoConsole");
-                var lastLoginDate = QuoteColumnName("lastLoginDate");
-                var invitedDate = QuoteColumnName("invitedDate");
-
-                var falseValue = SqlSyntax.ConvertIntegerToBoolean(0);
-                var trueValue = SqlSyntax.ConvertIntegerToBoolean(1);
-                if (userState.Contains(UserState.Active))
-                {
-                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NOT NULL)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Inactive))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NULL)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Disabled))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append($"({userDisabled} = {trueValue})");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.LockedOut))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append($"({userNoConsole} = {trueValue})");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Invited))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append($"({lastLoginDate} IS NULL AND {userDisabled} = {trueValue} AND {invitedDate} IS NOT NULL)");
-                    appended = true;
-                }
-
-                sb.Append(")");
-
-                filterSql.Append("AND " + sb);
+                sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NOT NULL)");
+                appended = true;
             }
+
+            if (userState.Contains(UserState.Inactive))
+            {
+                if (appended)
+                {
+                    sb.Append(" OR ");
+                }
+
+                sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NULL)");
+                appended = true;
+            }
+
+            if (userState.Contains(UserState.Disabled))
+            {
+                if (appended)
+                {
+                    sb.Append(" OR ");
+                }
+
+                sb.Append($"({userDisabled} = {trueValue})");
+                appended = true;
+            }
+
+            if (userState.Contains(UserState.LockedOut))
+            {
+                if (appended)
+                {
+                    sb.Append(" OR ");
+                }
+
+                sb.Append($"({userNoConsole} = {trueValue})");
+                appended = true;
+            }
+
+            if (userState.Contains(UserState.Invited))
+            {
+                if (appended)
+                {
+                    sb.Append(" OR ");
+                }
+
+                sb.Append($"({lastLoginDate} IS NULL AND {userDisabled} = {trueValue} AND {invitedDate} IS NOT NULL)");
+            }
+
+            sb.Append(")");
+
+            filterSql.Append("AND " + sb);
         }
     }
 
