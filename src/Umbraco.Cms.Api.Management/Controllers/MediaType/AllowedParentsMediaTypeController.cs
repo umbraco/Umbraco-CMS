@@ -1,25 +1,23 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Controllers.MediaType;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
+namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
 [ApiVersion("1.0")]
 public class AllowedParentsMediaTypeController : MediaTypeControllerBase
 {
-    private readonly IContentTypeService _contentTypeService;
+    private readonly IMediaTypeService _mediaTypeService;
 
-    public AllowedParentsMediaTypeController(IContentTypeService contentTypeService)
+    public AllowedParentsMediaTypeController(IMediaTypeService mediaTypeService)
     {
-        _contentTypeService = contentTypeService;
+        _mediaTypeService = mediaTypeService;
     }
 
     [HttpGet("{id:guid}/allowed-parents")]
@@ -30,13 +28,13 @@ public class AllowedParentsMediaTypeController : MediaTypeControllerBase
         CancellationToken cancellationToken,
         Guid id)
     {
-        Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedParentsAsync(id, UmbracoObjectTypes.MediaType);
+        Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedParentsAsync(id, UmbracoObjectTypes.MediaType);
         if (attempt.Success is false)
         {
             return OperationStatusResult(attempt.Status);
         }
 
-        if (attempt.Result == null || attempt.Result.ToArray().IsCollectionEmpty())
+        if (attempt.Result == null || !attempt.Result.Any())
         {
             return Ok(new MediaTypeAllowedParentsResponseModel
             {

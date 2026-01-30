@@ -1,9 +1,8 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -15,12 +14,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 public class AllowedParentsDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
-    private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllowedParentsDocumentTypeController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
+    public AllowedParentsDocumentTypeController(IContentTypeService contentTypeService)
     {
         _contentTypeService = contentTypeService;
-        _umbracoMapper = umbracoMapper;
     }
 
     [HttpGet("{id:guid}/allowed-parents")]
@@ -37,7 +34,7 @@ public class AllowedParentsDocumentTypeController : DocumentTypeControllerBase
             return OperationStatusResult(attempt.Status);
         }
 
-        if (attempt.Result == null || attempt.Result.ToArray().IsCollectionEmpty())
+        if (attempt.Result == null || !attempt.Result.Any())
         {
             return Ok(new DocumentTypeAllowedParentsResponseModel
             {
