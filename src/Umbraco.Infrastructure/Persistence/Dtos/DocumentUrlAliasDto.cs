@@ -22,8 +22,9 @@ internal class DocumentUrlAliasDto
     public Guid UniqueId { get; set; }
 
     [Column("languageId")]
+    [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(LanguageDto))]
-    public int LanguageId { get; set; }
+    public int? LanguageId { get; set; }
 
     // Lookup index on (alias, languageId) for fast retrieval
     [Index(IndexTypes.NonClustered, ForColumns = "alias, languageId", Name = "IX_" + TableName + "_Lookup")]
