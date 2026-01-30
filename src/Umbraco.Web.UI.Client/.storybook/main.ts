@@ -37,6 +37,10 @@ const config: StorybookConfig = {
 			from: '../src/packages/core/icon-registry/icons',
 			to: 'assets/icons',
 		},
+		{
+			from: '../node_modules/lucide-static',
+			to: 'lucide-static',
+		},
 	],
 
 	typescript: {
