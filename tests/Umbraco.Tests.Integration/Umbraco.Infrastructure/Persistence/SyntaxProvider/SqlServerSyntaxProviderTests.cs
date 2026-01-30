@@ -71,7 +71,7 @@ internal sealed class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             return SqlContext.SqlSyntax.GetQuotedName(x);
         }
 
-        var expectedSql = @$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT {t("cmsContentNu")}.{c("nodeId")} AS {n("nodeId")} FROM {t("cmsContentNu")} INNER JOIN {t("umbracoNode")} ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")} WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ")
+        var expectedSql = @$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT {t("cmsContentNu")}.{c("nodeId")} AS {n("NodeId")} FROM {t("cmsContentNu")} INNER JOIN {t("umbracoNode")} ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")} WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ")
                 .Replace("\n", " ").Replace("\r", " ");
         var sqlOutputSql = sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " ");
 
