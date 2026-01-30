@@ -97,7 +97,17 @@ public static class CspNonceExtensions
         }
     }
 
-    private static string InjectNonceIntoDirective(string csp, string directive, string nonce)
+    /// <summary>
+    /// Injects a nonce value into the specified CSP directive.
+    /// </summary>
+    /// <param name="csp">The existing CSP header value.</param>
+    /// <param name="directive">The directive to inject the nonce into (e.g., "script-src").</param>
+    /// <param name="nonce">The nonce value to inject.</param>
+    /// <returns>The modified CSP header value with the nonce injected.</returns>
+    /// <remarks>
+    /// This method is internal to support unit testing.
+    /// </remarks>
+    internal static string InjectNonceIntoDirective(string csp, string directive, string nonce)
     {
         var nonceValue = $"'nonce-{nonce}'";
         var directivePrefix = $"{directive} ";
