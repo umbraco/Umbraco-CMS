@@ -23,29 +23,29 @@ export class UmbContentTypeMoveRootGroupsIntoFirstTabHelper<T extends UmbContent
 		await this.observe(
 			this.#structure.ownerContainersOf('Tab', null),
 			async (tabContainers) => {
+				if (!tabContainers) return;
 				// If the amount of containers now became 1, we should move all root containers into this tab:
 				if (tabContainers?.length === 1) {
 					const firstTabId = tabContainers[0].id;
-
-					// Move root Groups into the first Tab:
-					const rootContainers = this.#structure?.getOwnerContainers('Group', null);
-					rootContainers?.forEach((groupContainer) => {
-						this.#structure?.updateContainer(null, groupContainer.id, { parent: { id: firstTabId } });
-					});
+					const structure = this.#structure; // This may be destroyed before the async operations are done, so lets keep a copy reference.
+					if (!structure) return;
 
 					// Move root Properties into the first Tab:
-					const rootProperties = await this.#structure?.getOwnerPropertiesOf(null);
+					const rootProperties = await structure.getOwnerPropertiesOf(null);
 					rootProperties?.forEach((property) => {
-						this.#structure?.updateProperty(null, property.unique, { container: { id: firstTabId } });
+						structure.updateProperty(null, property.unique, { container: { id: firstTabId } });
 					});
 
-					this.destroy();
+					// Move root Groups into the first Tab:
+					const rootContainers = structure.getOwnerContainers('Group', null);
+					rootContainers?.forEach((groupContainer) => {
+						structure.updateContainer(null, groupContainer.id, { parent: { id: firstTabId } });
+					});
 				}
+				this.destroy();
 			},
 			'_observeMainContainer',
 		).asPromise();
-
-		this.destroy();
 	}
 
 	override destroy() {
