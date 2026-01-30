@@ -26,7 +26,7 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 		return this.#focalPoint;
 	}
 
-	#focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+	#focalPoint: UmbImageCropperFocalPoint | null = null;
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -127,9 +127,10 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 			containerWidth = container.width;
 			containerHeight = container.height;
 		}
-		// position image so that its center is at the focal point
-		let imageLeft = containerWidth / 2 - imageWidth * this.#focalPoint.left;
-		let imageTop = containerHeight / 2 - imageHeight * this.#focalPoint.top;
+		// position image so that its center is at the focal point (default to center if null)
+		const focalPoint = this.#focalPoint ?? { left: 0.5, top: 0.5 };
+		let imageLeft = containerWidth / 2 - imageWidth * focalPoint.left;
+		let imageTop = containerHeight / 2 - imageHeight * focalPoint.top;
 		// clamp
 		imageLeft = clamp(imageLeft, containerWidth - imageWidth, 0);
 		imageTop = clamp(imageTop, containerHeight - imageHeight, 0);
