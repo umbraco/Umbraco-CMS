@@ -30,11 +30,9 @@ public static class SqlSyntaxExtensions
         return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
     }
 
-    // moved to NPocoSqlExtensionsInternal.cs
-    // can be removed after code review of PR #21577 or when in main branch
-    // private static string GetColumnName(this PropertyInfo column)
-    // {
-    //    ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
-    //    return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
-    // }
+    internal static string GetColumnName(this PropertyInfo column)
+    {
+        ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
+        return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
+    }
 }

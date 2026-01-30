@@ -43,7 +43,7 @@ namespace Umbraco.Extensions
             return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
-        // moved to NPocoSqlExtensionsV17
+        // moved to NPocoSqlWhereExtensions.cs
         // can be removed after code review of PR #21577 or when in main branch
         //public static Sql<ISqlContext> WhereParam<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string param)
         //{
@@ -93,32 +93,30 @@ namespace Umbraco.Extensions
         /// <param name="field">An expression specifying the field.</param>
         /// <param name="values">The values.</param>
         /// <returns>The Sql statement.</returns>
-        // updated and moved to NPocoSqlExtensionsV17
-        // can be removed after code review of PR #21577 or when in main branch
-        //public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
-        //{
-        //    if (values == null)
-        //    {
-        //        return sql;
-        //    }
+        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
+        {
+            if (values == null)
+            {
+                return sql;
+            }
 
-        //    var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
 
-        //    string[] stringValues = [.. values.OfType<string>()]; // This is necessary to avoid failing attempting to convert to string[] when values contains non-string types
-        //    if (stringValues.Length > 0)
-        //    {
-        //        Attempt<string[]> attempt = values.TryConvertTo<string[]>();
-        //        if (attempt.Success)
-        //        {
-        //            values = attempt.Result?.Select(v => v?.ToLower());
-        //            sql.Where($"LOWER({fieldName}) IN (@values)", new { values });
-        //            return sql;
-        //        }
-        //    }
+            string[] stringValues = [.. values.OfType<string>()]; // This is necessary to avoid failing attempting to convert to string[] when values contains non-string types
+            if (stringValues.Length > 0)
+            {
+                Attempt<string[]> attempt = values.TryConvertTo<string[]>();
+                if (attempt.Success)
+                {
+                    values = attempt.Result?.Select(v => v?.ToLower());
+                    sql.Where($"LOWER({fieldName}) IN (@values)", new { values });
+                    return sql;
+                }
+            }
 
-        //    sql.Where($"{fieldName} IN (@values)", new { values });
-        //    return sql;
-        //}
+            sql.Where($"{fieldName} IN (@values)", new { values });
+            return sql;
+        }
 
         /// <summary>
         /// Appends a OR IN clause to the Sql statement.
@@ -828,7 +826,7 @@ namespace Umbraco.Extensions
         /// <param name="coalesceValue">COALESCE string value.</param>
         /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
         /// field or the coalesceValue.</returns>
-        // moved to NPocoSqlExtensionsV17
+        // moved to NPocoSqlSelectExtensions.cs
         // can be removed after code review of PR #21577 or when in main branch
         //public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string coalesceValue)
         //{
@@ -1625,7 +1623,7 @@ namespace Umbraco.Extensions
             return string.IsNullOrWhiteSpace(attr?.Value) ? string.Empty : attr.Value;
         }
 
-        // moved to NPocoSqlExtensionsInternal.cs
+        // moved to SqlSyntaxExtensions.cs
         // can be removed after code review of PR #21577 or when in main branch
         //private static string GetColumnName(this PropertyInfo column)
         //{
