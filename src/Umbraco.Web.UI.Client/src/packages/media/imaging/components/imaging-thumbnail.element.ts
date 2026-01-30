@@ -38,6 +38,14 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	mode: UmbImagingCropMode = UmbImagingCropMode.MIN;
 
 	/**
+	 * The output format of the thumbnail.
+	 * @description The format to convert the image to. Defaults to 'webp' for optimal browser support and file size.
+	 * @default 'webp'
+	 */
+	@property({ type: String })
+	format: string = 'webp';
+
+	/**
 	 * The alt text for the thumbnail.
 	 */
 	@property({ type: String })
@@ -139,6 +147,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			height: this.height,
 			width: this.width,
 			mode: this.mode,
+			format: this.format,
 		});
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';

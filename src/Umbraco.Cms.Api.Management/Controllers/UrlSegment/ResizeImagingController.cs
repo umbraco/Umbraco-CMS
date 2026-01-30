@@ -23,10 +23,11 @@ public class ResizeImagingController : ImagingControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("resize/urls")]
     [ProducesResponseType(typeof(IEnumerable<MediaUrlInfoResponseModel>), StatusCodes.Status200OK)]
-    public Task<IActionResult> Urls([FromQuery(Name = "id")] HashSet<Guid> ids, int height = 200, int width = 200, ImageCropMode? mode = null)
+    public Task<IActionResult> Urls([FromQuery(Name = "id")] HashSet<Guid> ids, int height = 200, int width = 200, ImageCropMode? mode = null, string? format = null)
     {
         IEnumerable<IMedia> items = _mediaService.GetByIds(ids);
+        var options = new ImageResizeOptions(height, width, mode, format);
 
-        return Task.FromResult<IActionResult>(Ok(_reziseImageUrlFactory.CreateUrlSets(items, height, width, mode)));
+        return Task.FromResult<IActionResult>(Ok(_reziseImageUrlFactory.CreateUrlSets(items, options)));
     }
 }

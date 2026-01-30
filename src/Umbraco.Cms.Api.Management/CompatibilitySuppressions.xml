@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!-- Adding optional 'format' parameter to resize endpoint - HTTP API remains backward compatible -->
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Api.Management.Controllers.UrlSegment.ResizeImagingController.Urls(System.Collections.Generic.HashSet{System.Guid},System.Int32,System.Int32,System.Nullable{Umbraco.Cms.Core.Models.ImageCropMode})</Target>
+  </Suppression>
+</Suppressions>
