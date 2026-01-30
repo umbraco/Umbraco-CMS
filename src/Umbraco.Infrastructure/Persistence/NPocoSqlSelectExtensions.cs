@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Extensions
 {
-    public static class NPocoSqlSelectExtensions
+    public static partial class NPocoSqlExtensions
     {
         /// <summary>
         /// Adds a SQL SELECT statement to retrieve the maximum value of the specified field from the table associated

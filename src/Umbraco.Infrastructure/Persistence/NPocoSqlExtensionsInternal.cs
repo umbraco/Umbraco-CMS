@@ -7,7 +7,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Extensions
 {
-    public static class NPocoSqlExtensionsInternal
+    public static partial class NPocoSqlExtensions
     {
         internal static string GetAliasedField(this Sql<ISqlContext> sql, string field)
         {
