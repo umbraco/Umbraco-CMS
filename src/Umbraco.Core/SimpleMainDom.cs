@@ -16,6 +16,7 @@ public class SimpleMainDom : IMainDom, IDisposable
     /// <inheritdoc />
     public bool IsMainDom { get; private set; } = true;
 
+    /// <inheritdoc />
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -23,6 +24,11 @@ public class SimpleMainDom : IMainDom, IDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    ///     Acquires the main domain status.
+    /// </summary>
+    /// <param name="hostingEnvironment">The application shutdown registry.</param>
+    /// <returns>Always returns <c>true</c> as this is a simple implementation.</returns>
     // always acquire
     public bool Acquire(IApplicationShutdownRegistry hostingEnvironment) => true;
 
@@ -46,6 +52,9 @@ public class SimpleMainDom : IMainDom, IDisposable
         }
     }
 
+    /// <summary>
+    ///     Stops the main domain and executes all registered release callbacks.
+    /// </summary>
     public void Stop()
     {
         lock (_locko)
@@ -77,6 +86,10 @@ public class SimpleMainDom : IMainDom, IDisposable
         }
     }
 
+    /// <summary>
+    ///     Releases the unmanaged resources used by the <see cref="SimpleMainDom" /> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)

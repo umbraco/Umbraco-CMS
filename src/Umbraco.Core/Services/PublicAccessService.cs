@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Implements <see cref="IPublicAccessService" /> providing operations for managing public access entries and rules.
+/// </summary>
 internal sealed class PublicAccessService : RepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
@@ -17,6 +20,16 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     private readonly IContentService _contentService;
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublicAccessService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider for database operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="publicAccessRepository">The repository for public access entry operations.</param>
+    /// <param name="entityService">The entity service for entity-related operations.</param>
+    /// <param name="contentService">The content service for content-related operations.</param>
+    /// <param name="idKeyMap">The ID-key map for converting between IDs and keys.</param>
     public PublicAccessService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -227,6 +240,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry)
     {
         Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> validationAttempt = ValidatePublicAccessEntrySlim(entry);
@@ -247,6 +261,11 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
                 : Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(attempt.Status, null);
     }
 
+    /// <summary>
+    ///     Saves a public access entry asynchronously.
+    /// </summary>
+    /// <param name="entry">The <see cref="PublicAccessEntry" /> to save.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{TResult,TStatus}" /> with the saved entry and operation status.</returns>
     private async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> SaveAsync(PublicAccessEntry entry)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -270,6 +289,11 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry);
     }
 
+    /// <summary>
+    ///     Validates a <see cref="PublicAccessEntrySlim" /> and resolves its referenced content nodes.
+    /// </summary>
+    /// <param name="entry">The entry to validate.</param>
+    /// <returns>An <see cref="Attempt{TResult,TStatus}" /> containing the validation result with resolved nodes.</returns>
     private Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> ValidatePublicAccessEntrySlim(PublicAccessEntrySlim entry)
     {
         var result = new PublicAccessNodesValidationResult();
@@ -308,6 +332,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         return Attempt.SucceedWithStatus(PublicAccessOperationStatus.Success, result);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntrySlim entry)
     {
         Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> validationAttempt = ValidatePublicAccessEntrySlim(entry);
@@ -360,6 +385,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
+    /// <inheritdoc />
     public Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key)
     {
         IEntitySlim? entity = _entityService.Get(key, UmbracoObjectTypes.Document);
@@ -378,6 +404,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyWithoutAncestorsAsync(Guid key)
     {
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> result = await GetEntryByContentKeyAsync(key);
@@ -395,6 +422,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         return result;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -432,6 +460,12 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         return Attempt.Succeed(PublicAccessOperationStatus.Success);
     }
 
+    /// <summary>
+    ///     Creates a collection of public access rules from the specified rule values and type.
+    /// </summary>
+    /// <param name="ruleValues">The values for the rules.</param>
+    /// <param name="ruleType">The type of the rules.</param>
+    /// <returns>An enumerable collection of <see cref="PublicAccessRule" /> objects.</returns>
     private IEnumerable<PublicAccessRule> CreateAccessRuleList(string[] ruleValues, string ruleType) =>
         ruleValues.Select(ruleValue => new PublicAccessRule
         {
@@ -439,6 +473,12 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
             RuleType = ruleType,
         });
 
+    /// <summary>
+    ///     Maps updates from a <see cref="PublicAccessEntrySlim" /> to an existing <see cref="PublicAccessEntry" />.
+    /// </summary>
+    /// <param name="updatesModel">The model containing the updates.</param>
+    /// <param name="entryToUpdate">The existing entry to update.</param>
+    /// <returns>The updated <see cref="PublicAccessEntry" />.</returns>
     private PublicAccessEntry MapToUpdatedEntry(PublicAccessEntrySlim updatesModel, PublicAccessEntry entryToUpdate)
     {
         entryToUpdate.LoginNodeId = _entityService.GetId(updatesModel.LoginPageId, UmbracoObjectTypes.Document).Result;

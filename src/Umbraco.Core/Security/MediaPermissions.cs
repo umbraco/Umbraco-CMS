@@ -13,16 +13,36 @@ public class MediaPermissions
 {
     private readonly AppCaches _appCaches;
 
+    /// <summary>
+    ///     Represents the result of a media access check.
+    /// </summary>
     public enum MediaAccess
     {
+        /// <summary>
+        ///     Access to the media is granted.
+        /// </summary>
         Granted,
+
+        /// <summary>
+        ///     Access to the media is denied.
+        /// </summary>
         Denied,
+
+        /// <summary>
+        ///     The media was not found.
+        /// </summary>
         NotFound,
     }
 
     private readonly IEntityService _entityService;
     private readonly IMediaService _mediaService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaPermissions" /> class.
+    /// </summary>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
     public MediaPermissions(IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
     {
         _mediaService = mediaService;
@@ -66,6 +86,12 @@ public class MediaPermissions
         return hasPathAccess ? MediaAccess.Granted : MediaAccess.Denied;
     }
 
+    /// <summary>
+    ///     Performs a permissions check for the user to check if it has access to the media item.
+    /// </summary>
+    /// <param name="media">The media item to check.</param>
+    /// <param name="user">The user to check permissions for.</param>
+    /// <returns>The result of the media access check.</returns>
     public MediaAccess CheckPermissions(IMedia? media, IUser? user)
     {
         if (user == null)

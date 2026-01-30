@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IRuntimeState"/>.
+/// </summary>
 public static class RuntimeStateExtensions
 {
     /// <summary>

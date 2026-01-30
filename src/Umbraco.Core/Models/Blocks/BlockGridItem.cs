@@ -33,6 +33,14 @@ namespace Umbraco.Cms.Core.Models.Blocks
         {
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="BlockGridItem" /> class.
+        /// </summary>
+        /// <param name="contentKey">The content key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="settingsKey">The settings key.</param>
+        /// <param name="settings">The settings.</param>
+        /// <exception cref="ArgumentNullException">Thrown when content is null.</exception>
         public BlockGridItem(Guid contentKey, IPublishedElement content, Guid? settingsKey, IPublishedElement? settings)
         {
             ContentKey = contentKey;
@@ -136,6 +144,13 @@ namespace Umbraco.Cms.Core.Models.Blocks
             Content = content;
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="BlockGridItem{T}" /> class.
+        /// </summary>
+        /// <param name="contentKey">The content key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="settingsKey">The settings key.</param>
+        /// <param name="settings">The settings.</param>
         public BlockGridItem(Guid contentKey, T content, Guid? settingsKey, IPublishedElement? settings)
             : base(contentKey, content, settingsKey, settings)
         {
@@ -174,6 +189,13 @@ namespace Umbraco.Cms.Core.Models.Blocks
             Settings = settings;
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="BlockGridItem{TContent, TSettings}" /> class.
+        /// </summary>
+        /// <param name="contentKey">The content key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="settingsKey">The settings key.</param>
+        /// <param name="settings">The settings.</param>
         public BlockGridItem(Guid contentKey, TContent content, Guid? settingsKey, TSettings? settings)
             : base(contentKey, content, settingsKey, settings)
         {

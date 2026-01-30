@@ -40,8 +40,13 @@ public class UmbracoContextReference : IDisposable
     /// </summary>
     public bool IsRoot { get; }
 
+    /// <inheritdoc />
     public void Dispose() => Dispose(true);
 
+    /// <summary>
+    ///     Releases the unmanaged resources used by the <see cref="UmbracoContextReference" /> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
