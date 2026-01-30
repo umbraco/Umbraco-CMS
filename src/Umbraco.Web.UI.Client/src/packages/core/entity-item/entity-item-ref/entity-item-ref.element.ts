@@ -121,6 +121,19 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		}
 	}
 
+	#culture?: string;
+	@property({ type: String })
+	public get culture() {
+		return this.#culture;
+	}
+	public set culture(value: string | undefined) {
+		this.#culture = value;
+
+		if (this._component) {
+			this._component.culture = this.#culture;
+		}
+	}
+
 	@property({ type: Boolean })
 	error?: boolean;
 
@@ -177,6 +190,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				component.selectable = this.selectable;
 				component.selected = this.selected;
 				component.disabled = this.disabled;
+				component.culture = this.culture;
 
 				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
 				component.addEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);

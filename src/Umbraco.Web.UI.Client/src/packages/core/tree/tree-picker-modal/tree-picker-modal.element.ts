@@ -1,15 +1,25 @@
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreeElement } from '../tree.element.js';
 import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
-import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
-import { customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTreePickerLanguageOption, UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
+import {
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	state,
+	repeat,
+	query,
+	css,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
-
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
 	TreeItemType,
@@ -38,7 +48,21 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _treeExpansion: UmbEntityExpansionModel = [];
 
+	@state()
+	private _selectedLanguage?: string;
+
+	@state()
+	private _availableLanguages: Array<UmbTreePickerLanguageOption> = [];
+
+	@state()
+	private _isLanguageDropdownOpen = false;
+
+	@query('#language-dropdown-popover')
+	private _languagePopoverElement?: UUIPopoverContainerElement;
+
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
+
+	#variantContext?: UmbVariantContext;
 
 	constructor() {
 		super();
@@ -54,6 +78,35 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#initCreateAction();
+		this.#initLanguages();
+	}
+
+	async #initLanguages() {
+		// Only init languages if availableLanguages is provided in modal data
+		if (!this.data?.availableLanguages || this.data.availableLanguages.length === 0) {
+			return;
+		}
+
+		this._availableLanguages = this.data.availableLanguages;
+
+		// Create variant context only when we have languages
+		// This prevents overriding parent context when not needed
+		if (!this.#variantContext) {
+			this.#variantContext = new UmbVariantContext(this);
+		}
+
+		// Set default/fallback language (first language in the list)
+		const defaultLanguage = this._availableLanguages[0];
+		await this.#variantContext.setFallbackCulture(defaultLanguage.unique);
+
+		// Use initial culture from modal data, or fallback to first language
+		if (this.data?.initialCulture) {
+			this._selectedLanguage = this.data.initialCulture;
+			await this.#variantContext.setCulture(this.data.initialCulture);
+		} else {
+			this._selectedLanguage = defaultLanguage.unique;
+			await this.#variantContext.setCulture(defaultLanguage.unique);
+		}
 	}
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
@@ -91,7 +144,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.observe(
 			this._pickerContext.selection.selection,
 			(selection) => {
-				this.updateValue({ selection });
+				this.updateValue({
+					selection,
+					culture: this._selectedLanguage,
+				});
 				this.requestUpdate();
 			},
 			'umbPickerSelectionObserver',
@@ -151,7 +207,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				})
 				.onSubmit((value) => {
 					if (value) {
-						this.value = { selection: [value.unique] };
+						this.value = { selection: [value.unique], culture: this._selectedLanguage };
 						this._submitModal();
 					} else {
 						this._rejectModal();
@@ -186,9 +242,96 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
+			${this.#renderLanguageSelector()}
 			<umb-picker-search-field></umb-picker-search-field>
 			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
+	}
+
+	#renderLanguageSelector() {
+		if (!this.data?.isVariant || this._availableLanguages.length <= 1) {
+			return nothing;
+		}
+
+		const selectedLanguage = this._availableLanguages.find((lang) => lang.unique === this._selectedLanguage);
+
+		return html`
+			<div style="border-bottom: 1px solid var(--uui-color-border);">
+				<div id="language-toggle" popovertarget="language-dropdown-popover" @click=${this.#onLanguageTriggerClick}>
+					<span>${selectedLanguage?.name || 'Select Language'}</span>
+					<uui-symbol-expand .open=${this._isLanguageDropdownOpen}></uui-symbol-expand>
+				</div>
+				${this.#renderLanguageContent()}
+			</div>
+		`;
+	}
+
+	#renderLanguageContent() {
+		return html`
+			<uui-popover-container
+				id="language-dropdown-popover"
+				@beforetoggle=${this.#onLanguageBeforePopoverToggle}
+				@toggle=${this.#onLanguagePopoverToggle}>
+				<div id="dropdown">
+					<uui-scroll-container> ${this.#renderLanguageOptions()} </uui-scroll-container>
+				</div>
+			</uui-popover-container>
+		`;
+	}
+
+	#renderLanguageOptions() {
+		if (!this._isLanguageDropdownOpen) return nothing;
+
+		return html`
+			<uui-combobox-list
+				aria-label="Tree Picker Language"
+				.value=${this._selectedLanguage || ''}
+				@change=${this.#onLanguageSelectionChange}>
+				${repeat(
+					this._availableLanguages,
+					(language) => language.unique,
+					(language) => html`
+						<uui-combobox-list-option value=${language.unique}> ${language.name} </uui-combobox-list-option>
+					`,
+				)}
+			</uui-combobox-list>
+		`;
+	}
+
+	#onLanguageTriggerClick() {
+		if (this._isLanguageDropdownOpen) {
+			this._languagePopoverElement?.hidePopover();
+		} else {
+			this._languagePopoverElement?.showPopover();
+		}
+		this.requestUpdate();
+	}
+
+	#onLanguageBeforePopoverToggle(event: ToggleEvent) {
+		if (event.newState === 'open' && this._languagePopoverElement) {
+			const host = this.getBoundingClientRect();
+			this._languagePopoverElement.style.width = `${host.width - 80}px`;
+		}
+	}
+
+	#onLanguagePopoverToggle(event: ToggleEvent) {
+		this._isLanguageDropdownOpen = event.newState === 'open';
+	}
+
+	async #onLanguageSelectionChange(event: Event) {
+		const target = event.target as any;
+		const value = target?.value as string;
+		if (value) {
+			this._selectedLanguage = value;
+
+			// Update variant context - this will trigger tree items to re-render
+			if (this.#variantContext) {
+				await this.#variantContext.setCulture(value);
+			}
+
+			this.requestUpdate();
+			this._languagePopoverElement?.hidePopover();
+		}
 	}
 
 	#renderTree() {
@@ -237,6 +380,55 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			</div>
 		`;
 	}
+
+	static override styles = [
+		css`
+			#language-toggle {
+				color: var(--uui-color-text);
+				text-align: left;
+				background: none;
+				border: none;
+				height: 40px;
+				padding: 0 var(--uui-size-8);
+				border-bottom: 1px solid var(--uui-color-border);
+				font-size: 14px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				cursor: pointer;
+				font-family: inherit;
+				box-sizing: border-box;
+				width: 100%;
+			}
+
+			#language-toggle:hover {
+				background-color: var(--uui-color-surface-emphasis);
+			}
+
+			#language-dropdown-popover uui-scroll-container {
+				max-height: 200px;
+			}
+
+			uui-combobox-list-option {
+				padding: var(--uui-size-2) var(--uui-size-4);
+				display: flex;
+				align-items: center;
+				font-size: 14px;
+			}
+
+			#dropdown {
+				overflow: hidden;
+				z-index: -1;
+				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: auto;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+			}
+		`,
+	];
 }
 
 export default UmbTreePickerModalElement;

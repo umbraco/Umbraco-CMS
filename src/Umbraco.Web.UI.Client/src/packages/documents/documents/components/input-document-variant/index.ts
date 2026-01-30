@@ -1,0 +1,1 @@
+export * from './input-document-variant.element.js';

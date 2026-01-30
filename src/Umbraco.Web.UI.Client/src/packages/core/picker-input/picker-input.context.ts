@@ -150,8 +150,11 @@ export class UmbPickerInputContext<
 			value: this.#getPickerModalValueArgs(),
 		}).catch(() => undefined);
 
+		this.onModalValueReceived(modalValue);
 		this.#applyModalValue(modalValue);
 	}
+
+	protected onModalValueReceived(_modalValue: PickerModalValueType | undefined) {}
 
 	protected async _requestItemName(unique: string) {
 		return this.getSelectedItemByUnique(unique)?.name ?? '#general_notFound';

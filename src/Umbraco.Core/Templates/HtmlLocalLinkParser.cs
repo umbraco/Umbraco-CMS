@@ -6,32 +6,54 @@ using Umbraco.Cms.Core.Routing;
 namespace Umbraco.Cms.Core.Templates;
 
 /// <summary>
-///     Utility class used to parse internal links
+///     Utility class used to parse internal links.
 /// </summary>
-public sealed class HtmlLocalLinkParser
+/// <remarks>
+/// Needs to support media and document links, order of attributes should not matter nor should other attributes mess with things:
+/// <![CDATA[
+/// <a type = "media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
+/// <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
+/// ]]>
+/// </remarks>
+public sealed partial class HtmlLocalLinkParser
 {
-    // needs to support media and document links, order of attributes should not matter nor should other attributes mess with things
-    // <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
-    // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
-    internal static readonly Regex LocalLinkTagPattern = new(
-        @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+    [GeneratedRegex(@"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex GetLocalLinkTagPattern();
 
-    internal static readonly Regex TypePattern = new(
-        """type=['"](?<type>(?:media|document))['"]""",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+    [GeneratedRegex("""type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex GetTypePattern();
 
-    internal static readonly Regex LocalLinkPattern = new(
-        @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+    [GeneratedRegex("""culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
+    private static partial Regex GetCulturePattern();
 
+    [GeneratedRegex(@"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex GetLocalLinkPattern();
+
+    [GeneratedRegex(@"(<a\b(?=[^>]*data-culture=['""](?<culture>[a-zA-Z0-9-_]+)['""])(?=[^>]*href=['""])[^>]*href=['""])[^""']*[""']", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
+    private static partial Regex GetLinkPattern();
+
+    private static readonly Regex _localLinkTagPattern = GetLocalLinkTagPattern();
+
+    private static readonly Regex _typePattern = GetTypePattern();
+
+    private static readonly Regex _localLinkPattern = GetLocalLinkPattern();
+
+    private static readonly Regex _culturePattern = GetCulturePattern();
+
+    private static readonly Regex _linkPattern = GetLinkPattern();
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-    public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider)
-    {
-        _publishedUrlProvider = publishedUrlProvider;
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HtmlLocalLinkParser"/> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider) => _publishedUrlProvider = publishedUrlProvider;
 
+    /// <summary>
+    /// Retrieves a collection of unique document identifiers (UDIs) from local link tags found within the specified
+    /// text.
+    /// </summary>
+    /// <param name="text">The input string containing local link tags from which UDIs will be extracted. This parameter must not be null.</param>
     public IEnumerable<Udi?> FindUdisFromLocalLinks(string text)
     {
         foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
@@ -65,13 +87,13 @@ public sealed class HtmlLocalLinkParser
             {
                 var newLink = tagData.Udi?.EntityType switch
                 {
-                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid, urlMode),
+                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid, urlMode, tagData.Culture),
                     Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid, urlMode),
                     _ => string.Empty,
                 };
 
                 text = StripTypeAttributeFromTag(text, tagData.Udi!.EntityType);
-                text = text.Replace(tagData.TagHref, newLink);
+                text = ReplaceLink(text, tagData.TagHref, newLink, tagData.Culture);
             }
             else if (tagData.IntId.HasValue)
             {
@@ -83,6 +105,25 @@ public sealed class HtmlLocalLinkParser
         return text;
     }
 
+    private string ReplaceLink(string text, string tagHref, string newLink, string? culture = null)
+    {
+        if (string.IsNullOrEmpty(culture))
+        {
+            return text.Replace(tagHref, newLink);
+        }
+        else
+        {
+            return _linkPattern.Replace(text, match =>
+            {
+                if (match.Groups["culture"].Value.Equals(culture, StringComparison.OrdinalIgnoreCase))
+                {
+                    return match.Groups[1].Value + newLink + "\"";
+                }
+                return match.Value;
+            });
+        }
+    }
+
     // under normal circumstances, the type attribute is preceded by a space
     // to cover the rare occasion where it isn't, we first replace with a space and then without.
     private static string StripTypeAttributeFromTag(string tag, string type) =>
@@ -91,7 +132,7 @@ public sealed class HtmlLocalLinkParser
 
     private IEnumerable<LocalLinkTag> FindLocalLinkIds(string text)
     {
-        MatchCollection localLinkTagMatches = LocalLinkTagPattern.Matches(text);
+        MatchCollection localLinkTagMatches = _localLinkTagPattern.Matches(text);
         foreach (Match linkTag in localLinkTagMatches)
         {
             if (Guid.TryParse(linkTag.Groups["guid"].Value, out Guid guid) is false)
@@ -100,16 +141,21 @@ public sealed class HtmlLocalLinkParser
             }
 
             // Find the type attribute
-            Match typeMatch = TypePattern.Match(linkTag.Value);
+            Match typeMatch = _typePattern.Match(linkTag.Value);
             if (typeMatch.Success is false)
             {
                 continue;
             }
 
+            // Find the culture attribute if it exists
+            Match cultureMatch = _culturePattern.Match(linkTag.Value);
+
             yield return new LocalLinkTag(
                 null,
                 new GuidUdi(typeMatch.Groups["type"].Value, guid),
-                linkTag.Groups["locallink"].Value);
+                linkTag.Groups["locallink"].Value,
+                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null
+            );
         }
 
         // also return legacy results for values that have not been migrated
@@ -123,7 +169,7 @@ public sealed class HtmlLocalLinkParser
     public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
-        MatchCollection tags = LocalLinkPattern.Matches(text);
+        MatchCollection tags = _localLinkPattern.Matches(text);
         foreach (Match tag in tags)
         {
             if (tag.Groups.Count <= 0)
@@ -153,10 +199,16 @@ public sealed class HtmlLocalLinkParser
     public class LocalLinkTag
     {
         public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
+        : this(intId, udi, tagHref, culture: null)
+        {
+        }
+
+        public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref, string? culture = null)
         {
             IntId = intId;
             Udi = udi;
             TagHref = tagHref;
+            Culture = culture;
         }
 
         public int? IntId { get; }
@@ -164,5 +216,7 @@ public sealed class HtmlLocalLinkParser
         public GuidUdi? Udi { get; }
 
         public string TagHref { get; }
+
+        public string? Culture { get; }
     }
 }

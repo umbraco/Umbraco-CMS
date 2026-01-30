@@ -457,4 +457,141 @@ public class HtmlLocalLinkParserTests
             navigationQueryService.Object,
             new Mock<IPublishedContentStatusFilteringService>().Object);
     }
+
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"en-US\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" data-culture=\"en-US\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"da-DK\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" data-culture=\"da-DK\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"en_US\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" data-culture=\"en_US\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" type=\"media\" data-culture=\"no-NO\" title=\"world\">world</a>",
+        "<a href=\"/media/1001/my-image.jpg\" data-culture=\"no-NO\" title=\"world\">world</a>")]
+    public void EnsureInternalLinks_WithCultureAttribute_ReplacesLinkPreservingCulture(string input, string expected)
+    {
+        // Arrange
+        var contentUrlProvider = new Mock<IUrlProvider>();
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<UrlMode>(),
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.AsUrl("/my-test-url", "Test Provider"));
+
+        var contentType = new PublishedContentType(
+            Guid.NewGuid(),
+            666,
+            "alias",
+            PublishedItemType.Content,
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<PublishedPropertyType>(),
+            ContentVariation.Nothing);
+        var publishedContent = new Mock<IPublishedContent>();
+        publishedContent.Setup(x => x.Id).Returns(1234);
+        publishedContent.Setup(x => x.ContentType).Returns(contentType);
+
+        var mediaType = new PublishedContentType(
+            Guid.NewGuid(),
+            777,
+            "image",
+            PublishedItemType.Media,
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<PublishedPropertyType>(),
+            ContentVariation.Nothing);
+        var media = new Mock<IPublishedContent>();
+        media.Setup(x => x.ContentType).Returns(mediaType);
+
+        var mediaUrlProvider = new Mock<IMediaUrlProvider>();
+        mediaUrlProvider.Setup(x => x.GetMediaUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<string>(),
+                It.IsAny<UrlMode>(),
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.AsUrl("/media/1001/my-image.jpg", "Test Provider"));
+
+        var umbracoContextAccessor = new TestUmbracoContextAccessor();
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(
+            umbracoContextAccessor: umbracoContextAccessor);
+
+        using (var reference = umbracoContextFactory.EnsureUmbracoContext())
+        {
+            var contentCache = Mock.Get(reference.UmbracoContext.Content);
+            contentCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(publishedContent.Object);
+
+            var mediaCache = Mock.Get(reference.UmbracoContext.Media);
+            mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
+
+            var publishedUrlProvider = CreatePublishedUrlProvider(
+                contentUrlProvider,
+                mediaUrlProvider,
+                umbracoContextAccessor);
+
+            var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
+
+            // Act
+            var output = linkParser.EnsureInternalLinks(input);
+
+            // Assert
+            Assert.AreEqual(expected, output);
+        }
+    }
+
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-other=\"value\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" data-other=\"value\" title=\"world\">world</a>")]
+    public void EnsureInternalLinks_WithoutCultureAttribute_ReplacesLinkNormally(string input, string expected)
+    {
+        // Arrange
+        var contentUrlProvider = new Mock<IUrlProvider>();
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<UrlMode>(),
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.AsUrl("/my-test-url", "Test Provider"));
+
+        var contentType = new PublishedContentType(
+            Guid.NewGuid(),
+            666,
+            "alias",
+            PublishedItemType.Content,
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<PublishedPropertyType>(),
+            ContentVariation.Nothing);
+        var publishedContent = new Mock<IPublishedContent>();
+        publishedContent.Setup(x => x.Id).Returns(1234);
+        publishedContent.Setup(x => x.ContentType).Returns(contentType);
+
+        var umbracoContextAccessor = new TestUmbracoContextAccessor();
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(
+            umbracoContextAccessor: umbracoContextAccessor);
+
+        using (var reference = umbracoContextFactory.EnsureUmbracoContext())
+        {
+            var contentCache = Mock.Get(reference.UmbracoContext.Content);
+            contentCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(publishedContent.Object);
+
+            var publishedUrlProvider = CreatePublishedUrlProvider(
+                contentUrlProvider,
+                new Mock<IMediaUrlProvider>(),
+                umbracoContextAccessor);
+
+            var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
+
+            // Act
+            var output = linkParser.EnsureInternalLinks(input);
+
+            // Assert
+            Assert.AreEqual(expected, output);
+        }
+    }
 }

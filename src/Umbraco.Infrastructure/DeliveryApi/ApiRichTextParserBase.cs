@@ -21,21 +21,21 @@ internal abstract partial class ApiRichTextParserBase
         _apiMediaUrlProvider = apiMediaUrlProvider;
     }
 
-    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl, Action handleInvalidLink)
+    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl, Action handleInvalidLink, string? culture = null)
     {
-        ReplaceStatus replaceAttempt = ReplaceLocalLink(contentCache, mediaCache, href, type, handleContentRoute, handleMediaUrl);
+        ReplaceStatus replaceAttempt = ReplaceLocalLink(contentCache, mediaCache, href, type, handleContentRoute, handleMediaUrl, culture);
         if (replaceAttempt == ReplaceStatus.Success)
         {
             return;
         }
 
-        if (replaceAttempt == ReplaceStatus.InvalidEntityType || ReplaceLegacyLocalLink(contentCache, mediaCache, href, handleContentRoute, handleMediaUrl) == ReplaceStatus.InvalidEntityType)
+        if (replaceAttempt == ReplaceStatus.InvalidEntityType || ReplaceLegacyLocalLink(contentCache, mediaCache, href, handleContentRoute, handleMediaUrl, culture) == ReplaceStatus.InvalidEntityType)
         {
             handleInvalidLink();
         }
     }
 
-    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl)
+    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl, string? culture = null)
     {
         Match match = LocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -55,7 +55,7 @@ internal abstract partial class ApiRichTextParserBase
             case Constants.UdiEntityType.Document:
                 IPublishedContent? content = contentCache.GetById(guid);
                 IApiContentRoute? route = content != null
-                    ? _apiContentRouteBuilder.Build(content)
+                    ? _apiContentRouteBuilder.Build(content, culture)
                     : null;
                 if (route != null)
                 {
@@ -79,7 +79,7 @@ internal abstract partial class ApiRichTextParserBase
         return ReplaceStatus.InvalidEntityType;
     }
 
-    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl)
+    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl, string? culture = null)
     {
         Match match = LegacyLocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -103,7 +103,7 @@ internal abstract partial class ApiRichTextParserBase
             case Constants.UdiEntityType.Document:
                 IPublishedContent? content = contentCache.GetById(guidUdi.Guid);
                 IApiContentRoute? route = content != null
-                    ? _apiContentRouteBuilder.Build(content)
+                    ? _apiContentRouteBuilder.Build(content, culture)
                     : null;
                 if (route != null)
                 {
