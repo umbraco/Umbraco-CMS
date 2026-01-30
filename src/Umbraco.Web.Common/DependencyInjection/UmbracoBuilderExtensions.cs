@@ -247,6 +247,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
         builder.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
+        builder.Services.AddUnique<ICspNonceService, AspNetCoreCspNonceService>();
         builder.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
         builder.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 

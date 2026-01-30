@@ -1,0 +1,205 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Core.Security;
+
+namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
+
+/// <summary>
+/// Extension methods for integrating CSP nonces with third-party CSP middleware.
+/// </summary>
+public static class CspNonceExtensions
+{
+    /// <summary>
+    /// Adds middleware that injects Umbraco's CSP nonce into an existing Content-Security-Policy header.
+    /// Use this AFTER your CSP middleware (e.g., NWebsec) to add the nonce to the script-src directive.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This middleware modifies the CSP header set by other middleware (like NWebsec) to include
+    /// Umbraco's nonce value. Place this middleware AFTER your CSP middleware in the pipeline.
+    /// </para>
+    /// <para>
+    /// Example usage with NWebsec:
+    /// <code>
+    /// app.UseCsp(options => options
+    ///     .DefaultSources(s => s.Self())
+    ///     .ScriptSources(s => s.Self())
+    ///     .StyleSources(s => s.Self().UnsafeInline()));
+    ///
+    /// app.UseUmbracoCspNonceInjection(); // Add nonce to NWebsec's CSP header
+    ///
+    /// app.UseUmbraco()...
+    /// </code>
+    /// </para>
+    /// </remarks>
+    /// <param name="app">The application builder.</param>
+    /// <returns>The application builder for chaining.</returns>
+    public static IApplicationBuilder UseUmbracoCspNonceInjection(this IApplicationBuilder app)
+        => app.UseUmbracoCspNonceInjection(_ => { });
+
+    /// <summary>
+    /// Adds middleware that injects Umbraco's CSP nonce into an existing Content-Security-Policy header.
+    /// Use this AFTER your CSP middleware (e.g., NWebsec) to add the nonce to the script-src directive.
+    /// </summary>
+    /// <param name="app">The application builder.</param>
+    /// <param name="configure">Action to configure the nonce injection options.</param>
+    /// <returns>The application builder for chaining.</returns>
+    public static IApplicationBuilder UseUmbracoCspNonceInjection(
+        this IApplicationBuilder app,
+        Action<CspNonceInjectionOptions> configure)
+    {
+        var options = new CspNonceInjectionOptions();
+        configure(options);
+
+        return app.Use(async (context, next) =>
+        {
+            context.Response.OnStarting(() =>
+            {
+                InjectNonceIntoHeader(context, options);
+                return Task.CompletedTask;
+            });
+
+            await next();
+        });
+    }
+
+    private static void InjectNonceIntoHeader(HttpContext context, CspNonceInjectionOptions options)
+    {
+        // Skip if the request path doesn't match.
+        if (!options.ShouldApplyToRequest(context))
+        {
+            return;
+        }
+
+        ICspNonceService? cspNonceService = context.RequestServices.GetService<ICspNonceService>();
+        if (cspNonceService is null)
+        {
+            return;
+        }
+
+        // Get the nonce that was already generated for this request.
+        var nonce = cspNonceService.GetNonce();
+        if (string.IsNullOrEmpty(nonce))
+        {
+            return;
+        }
+
+        foreach (var headerName in options.HeaderNames)
+        {
+            if (context.Response.Headers.TryGetValue(headerName, out StringValues headerValue))
+            {
+                var csp = headerValue.ToString();
+                var modifiedCsp = InjectNonceIntoDirective(csp, options.Directive, nonce);
+                context.Response.Headers[headerName] = modifiedCsp;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Injects a nonce value into the specified CSP directive.
+    /// </summary>
+    /// <param name="csp">The existing CSP header value.</param>
+    /// <param name="directive">The directive to inject the nonce into (e.g., "script-src").</param>
+    /// <param name="nonce">The nonce value to inject.</param>
+    /// <returns>The modified CSP header value with the nonce injected.</returns>
+    /// <remarks>
+    /// This method is internal to support unit testing.
+    /// </remarks>
+    internal static string InjectNonceIntoDirective(string csp, string directive, string nonce)
+    {
+        var nonceValue = $"'nonce-{nonce}'";
+        var directivePrefix = $"{directive} ";
+
+        // Find the directive, ensuring it's at the start of the CSP or after a semicolon.
+        // This prevents matching partial directive names (e.g., "script-src" within "noscript-src").
+        var directiveIndex = FindDirectiveIndex(csp, directivePrefix);
+        if (directiveIndex == -1)
+        {
+            // Directive not found - append it with the nonce.
+            var trimmedCsp = csp.TrimEnd(';', ' ');
+            if (string.IsNullOrEmpty(trimmedCsp))
+            {
+                return $"{directive} {nonceValue}";
+            }
+
+            return trimmedCsp + $"; {directive} {nonceValue}";
+        }
+
+        // Insert nonce after the directive name.
+        var insertPosition = directiveIndex + directivePrefix.Length;
+        return csp.Insert(insertPosition, nonceValue + " ");
+    }
+
+    private static int FindDirectiveIndex(string csp, string directivePrefix)
+    {
+        var searchStart = 0;
+
+        while (searchStart < csp.Length)
+        {
+            var index = csp.IndexOf(directivePrefix, searchStart, StringComparison.OrdinalIgnoreCase);
+            if (index == -1)
+            {
+                return -1;
+            }
+
+            // Valid directive start: at beginning of string, or preceded by semicolon (with optional whitespace).
+            if (index == 0 || IsPrecededBySemicolon(csp, index))
+            {
+                return index;
+            }
+
+            searchStart = index + 1;
+        }
+
+        return -1;
+    }
+
+    private static bool IsPrecededBySemicolon(string csp, int index)
+    {
+        // Look backwards from index, skipping whitespace, expecting semicolon.
+        for (var i = index - 1; i >= 0; i--)
+        {
+            if (csp[i] == ';')
+            {
+                return true;
+            }
+
+            if (!char.IsWhiteSpace(csp[i]))
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+}
+
+/// <summary>
+/// Options for CSP nonce injection middleware.
+/// </summary>
+public class CspNonceInjectionOptions
+{
+    /// <summary>
+    /// Gets or sets the CSP header names to modify.
+    /// Defaults to both "Content-Security-Policy" and "Content-Security-Policy-Report-Only".
+    /// </summary>
+    public string[] HeaderNames { get; set; } =
+    [
+        "Content-Security-Policy",
+        "Content-Security-Policy-Report-Only"
+    ];
+
+    /// <summary>
+    /// Gets or sets the CSP directive to inject the nonce into.
+    /// Defaults to "script-src".
+    /// </summary>
+    public string Directive { get; set; } = "script-src";
+
+    /// <summary>
+    /// Gets or sets a function that determines whether the nonce should be injected for a given request.
+    /// Defaults to injecting for all requests.
+    /// </summary>
+    public Func<HttpContext, bool> ShouldApplyToRequest { get; set; } = _ => true;
+}
