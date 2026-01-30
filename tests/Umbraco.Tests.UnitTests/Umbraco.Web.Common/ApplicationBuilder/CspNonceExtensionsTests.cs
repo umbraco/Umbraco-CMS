@@ -86,7 +86,7 @@ public class CspNonceExtensionsTests
         var result = CspNonceExtensions.InjectNonceIntoDirective(csp, "script-src", TestNonce);
 
         // Assert
-        Assert.That(result, Is.EqualTo("; script-src 'nonce-abc123XYZ'"));
+        Assert.That(result, Is.EqualTo("script-src 'nonce-abc123XYZ'"));
     }
 
     [Test]
@@ -153,5 +153,31 @@ public class CspNonceExtensionsTests
         // Assert - Both nonces should be present
         Assert.That(result, Does.Contain("'nonce-abc123XYZ'"));
         Assert.That(result, Does.Contain("'nonce-existingNonce'"));
+    }
+
+    [Test]
+    public void InjectNonceIntoDirective_DoesNotMatchPartialDirectiveName()
+    {
+        // Arrange - hypothetical directive containing "script-src" as a substring
+        var csp = "noscript-src 'self'; style-src 'self'";
+
+        // Act
+        var result = CspNonceExtensions.InjectNonceIntoDirective(csp, "script-src", TestNonce);
+
+        // Assert - should append script-src as new directive, not modify noscript-src
+        Assert.That(result, Is.EqualTo("noscript-src 'self'; style-src 'self'; script-src 'nonce-abc123XYZ'"));
+    }
+
+    [Test]
+    public void InjectNonceIntoDirective_MatchesCorrectDirectiveAfterPartialMatch()
+    {
+        // Arrange - CSP with both a partial match and the actual directive
+        var csp = "noscript-src 'none'; script-src 'self'";
+
+        // Act
+        var result = CspNonceExtensions.InjectNonceIntoDirective(csp, "script-src", TestNonce);
+
+        // Assert - should inject into the actual script-src, not noscript-src
+        Assert.That(result, Is.EqualTo("noscript-src 'none'; script-src 'nonce-abc123XYZ' 'self'"));
     }
 }

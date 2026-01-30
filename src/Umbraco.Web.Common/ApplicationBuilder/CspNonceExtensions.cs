@@ -67,7 +67,7 @@ public static class CspNonceExtensions
 
     private static void InjectNonceIntoHeader(HttpContext context, CspNonceInjectionOptions options)
     {
-        // Skip if the request path doesn't match
+        // Skip if the request path doesn't match.
         if (!options.ShouldApplyToRequest(context))
         {
             return;
@@ -112,17 +112,67 @@ public static class CspNonceExtensions
         var nonceValue = $"'nonce-{nonce}'";
         var directivePrefix = $"{directive} ";
 
-        // Check if directive exists in the CSP
-        var directiveIndex = csp.IndexOf(directivePrefix, StringComparison.OrdinalIgnoreCase);
+        // Find the directive, ensuring it's at the start of the CSP or after a semicolon.
+        // This prevents matching partial directive names (e.g., "script-src" within "noscript-src").
+        var directiveIndex = FindDirectiveIndex(csp, directivePrefix);
         if (directiveIndex == -1)
         {
-            // Directive not found - append it with the nonce
-            return csp.TrimEnd(';', ' ') + $"; {directive} {nonceValue}";
+            // Directive not found - append it with the nonce.
+            var trimmedCsp = csp.TrimEnd(';', ' ');
+            if (string.IsNullOrEmpty(trimmedCsp))
+            {
+                return $"{directive} {nonceValue}";
+            }
+
+            return trimmedCsp + $"; {directive} {nonceValue}";
         }
 
-        // Insert nonce after the directive name
+        // Insert nonce after the directive name.
         var insertPosition = directiveIndex + directivePrefix.Length;
         return csp.Insert(insertPosition, nonceValue + " ");
+    }
+
+    private static int FindDirectiveIndex(string csp, string directivePrefix)
+    {
+        var searchStart = 0;
+
+        while (searchStart < csp.Length)
+        {
+            var index = csp.IndexOf(directivePrefix, searchStart, StringComparison.OrdinalIgnoreCase);
+            if (index == -1)
+            {
+                return -1;
+            }
+
+            // Valid directive start: at beginning of string, or preceded by semicolon (with optional whitespace).
+            if (index == 0 || IsPrecededBySemicolon(csp, index))
+            {
+                return index;
+            }
+
+            searchStart = index + 1;
+        }
+
+        return -1;
+    }
+
+    private static bool IsPrecededBySemicolon(string csp, int index)
+    {
+        // Look backwards from index, skipping whitespace, expecting semicolon.
+        for (var i = index - 1; i >= 0; i--)
+        {
+            if (csp[i] == ';')
+            {
+                return true;
+            }
+
+            if (!char.IsWhiteSpace(csp[i]))
+            {
+                return false;
+            }
+        }
+
+        return false;
     }
 }
 
