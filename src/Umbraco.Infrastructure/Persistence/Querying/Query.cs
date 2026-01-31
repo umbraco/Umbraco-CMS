@@ -40,6 +40,29 @@ public class Query<T> : IQuery<T>
     /// </summary>
     public virtual IQuery<T> WhereIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values)
     {
+        return WhereInOrNotIn(fieldSelector, values, true);
+    }
+
+    /// <summary>
+    ///     Adds a where-not-in clause to the query.
+    /// </summary>
+    public virtual IQuery<T> WhereNotIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values)
+    {
+        return WhereInOrNotIn(fieldSelector, values, false);
+    }
+
+    /// <summary>
+    /// Adds a WHERE IN or WHERE NOT IN clause to the query based on the specified field and values.
+    /// </summary>
+    /// <param name="fieldSelector">An expression that selects the field to apply the IN or NOT IN filter to. If null, no filter is applied.</param>
+    /// <param name="values">A collection of values to compare against the selected field. Only records with field values matching (or not
+    /// matching, if <paramref name="isIn"/> is false) these values are included.</param>
+    /// <param name="isIn">If <see langword="true"/>, applies an IN filter; if <see langword="false"/>, applies a NOT IN filter. The
+    /// default is <see langword="true"/>.</param>
+    /// <returns>The current query instance with the IN or NOT IN filter applied. If <paramref name="fieldSelector"/> is null,
+    /// returns the original query instance without modification.</returns>
+    public virtual IQuery<T> WhereInOrNotIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values, bool isIn = true)
+    {
         if (fieldSelector is null)
         {
             return this;
@@ -50,7 +73,8 @@ public class Query<T> : IQuery<T>
 
         FixCompareCasing(ref values, ref whereExpression);
 
-        _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { values } }));
+        var inNot = isIn ? string.Empty : " NOT";
+        _wheres.Add(new Tuple<string, object[]>($"{whereExpression}{inNot} IN (@values)", new object[] { new { values } }));
         return this;
     }
 
@@ -65,24 +89,6 @@ public class Query<T> : IQuery<T>
         }
     }
 
-    /// <summary>
-    ///     Adds a where-not-in clause to the query.
-    /// </summary>
-    public virtual IQuery<T> WhereNotIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values)
-    {
-        if (fieldSelector is null)
-        {
-            return this;
-        }
-
-        var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
-        var whereExpression = expressionHelper.Visit(fieldSelector);
-
-        FixCompareCasing(ref values, ref whereExpression);
-
-        _wheres.Add(new Tuple<string, object[]>(whereExpression + " NOT IN (@values)", new object[] { new { values } }));
-        return this;
-    }
 
     /// <summary>
     ///     Adds a set of OR-ed where clauses to the query.
