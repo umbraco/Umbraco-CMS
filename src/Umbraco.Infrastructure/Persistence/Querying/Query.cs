@@ -51,16 +51,7 @@ public class Query<T> : IQuery<T>
         return WhereInOrNotIn(fieldSelector, values, false);
     }
 
-    /// <summary>
-    /// Adds a WHERE IN or WHERE NOT IN clause to the query based on the specified field and values.
-    /// </summary>
-    /// <param name="fieldSelector">An expression that selects the field to apply the IN or NOT IN filter to. If null, no filter is applied.</param>
-    /// <param name="values">A collection of values to compare against the selected field. Only records with field values matching (or not
-    /// matching, if <paramref name="isIn"/> is false) these values are included.</param>
-    /// <param name="isIn">If <see langword="true"/>, applies an IN filter; if <see langword="false"/>, applies a NOT IN filter. The
-    /// default is <see langword="true"/>.</param>
-    /// <returns>The current query instance with the IN or NOT IN filter applied. If <paramref name="fieldSelector"/> is null,
-    /// returns the original query instance without modification.</returns>
+    /// <inheritdoc/>
     public virtual IQuery<T> WhereInOrNotIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values, bool isIn = true)
     {
         if (fieldSelector is null)
