@@ -21,19 +21,22 @@ public class PatchDocumentController : PatchDocumentControllerBase
     private readonly DocumentPatcher _documentPatcher;
     private readonly IDocumentEditingPresentationFactory _presentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
 
     public PatchDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
         DocumentPatcher documentPatcher,
         IDocumentEditingPresentationFactory presentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IDocumentEditingPresentationFactory documentEditingPresentationFactory)
         : base(authorizationService)
     {
         _contentEditingService = contentEditingService;
         _documentPatcher = documentPatcher;
         _presentationFactory = presentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _documentEditingPresentationFactory = documentEditingPresentationFactory;
     }
 
     [HttpPatch("{id:guid}")]
@@ -50,10 +53,11 @@ public class PatchDocumentController : PatchDocumentControllerBase
         => await HandleRequest(id, requestModel, async () =>
         {
             // Map request model to domain model
+            // todo: dont use intermitent model as patching happens in the api layer => make patcher work with PatchDocumentRequestModel directly
             ContentPatchModel patchModel = _presentationFactory.MapPatchModel(requestModel);
 
-            // Apply PATCH operations to create an update model
-            Attempt<ContentUpdateModel, ContentPatchingOperationStatus> patchResult =
+            // Apply PATCH operations to create an update request model
+            Attempt<UpdateDocumentRequestModel, ContentPatchingOperationStatus> patchResult =
                 await _documentPatcher.ApplyPatchAsync(id, patchModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
             if (!patchResult.Success)
@@ -61,9 +65,11 @@ public class PatchDocumentController : PatchDocumentControllerBase
                 return ContentPatchingOperationStatusResult(patchResult.Status);
             }
 
+            ContentUpdateModel contentUpdateModel = _documentEditingPresentationFactory.MapUpdateModel(patchResult.Result);
+
             // Use the standard update method to save the patched content
             Attempt<ContentUpdateResult, ContentEditingOperationStatus> updateResult =
-                await _contentEditingService.UpdateAsync(id, patchResult.Result!, CurrentUserKey(_backOfficeSecurityAccessor));
+                await _contentEditingService.UpdateAsync(id, contentUpdateModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
             return updateResult.Success
                 ? Ok()

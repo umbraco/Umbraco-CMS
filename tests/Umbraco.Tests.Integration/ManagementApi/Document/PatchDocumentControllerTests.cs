@@ -6,11 +6,15 @@ using Umbraco.Cms.Api.Management.Controllers.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using UmbracoDataType = Umbraco.Cms.Core.Models.DataType;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
@@ -562,7 +566,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
     }
 
     [Test]
-    public async Task PatchDocument_InvalidPropertyAlias_ReturnsUnprocessableEntity()
+    public async Task PatchDocument_InvalidPropertyAlias_ReturnsBadRequest()
     {
         // Arrange - Authenticate as admin
         await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
@@ -598,6 +602,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var documentKey = createResponse.Result.Content.Key;
 
         // Try to patch non-existent property
+        // When JSONPath matches no elements, it returns BadRequest (400) not UnprocessableEntity (422)
         var patchModel = new PatchDocumentRequestModel
         {
             Operations = new[]
@@ -616,8 +621,8 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
 
-        // Assert
-        Assert.AreEqual(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        // Assert - Returns BadRequest (400) because JSONPath expression matches no elements
+        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Test]
@@ -773,5 +778,215 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         // Assert
         Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Test]
+    public async Task PatchDocument_BlockList_SingleBlock_UpdatesSingleProperty()
+    {
+        // Arrange - Authenticate as admin
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+
+        // Create element type for blocks
+        var elementType = new ContentTypeBuilder()
+            .WithAlias("heroBlock")
+            .WithName("Hero Block")
+            .AddPropertyType()
+            .WithAlias("headline")
+            .WithName("Headline")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("description")
+            .WithName("Description")
+            .WithDataTypeId(Constants.DataTypes.Textarea)
+            .Done()
+            .Build();
+        elementType.IsElement = true;
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        // Create Block List data type
+        var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();
+        var configurationEditorJsonSerializer = GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+        var blockListDataType = new UmbracoDataType(
+            propertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList],
+            configurationEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                {
+                    "blocks",
+                    new[]
+                    {
+                        new { contentElementTypeKey = elementType.Key }
+                    }
+                }
+            },
+            Name = "My Block List",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+
+        var dataTypeService = GetRequiredService<IDataTypeService>();
+        await dataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+
+        // Create content type with Block List property
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("blockListPage")
+            .WithName("Block List Page")
+            .AddPropertyType()
+            .WithAlias("contentBlocks")
+            .WithName("Content Blocks")
+            .WithDataTypeId(blockListDataType.Id)
+            .Done()
+            .Build();
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // Create three blocks
+        var block1Key = Guid.NewGuid();
+        var block2Key = Guid.NewGuid();
+        var block3Key = Guid.NewGuid();
+
+        var jsonSerializer = GetRequiredService<IJsonSerializer>();
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[]
+                    {
+                        new BlockListLayoutItem { ContentKey = block1Key },
+                        new BlockListLayoutItem { ContentKey = block2Key },
+                        new BlockListLayoutItem { ContentKey = block3Key }
+                    }
+                }
+            },
+            ContentData = new List<BlockItemData>
+            {
+                new BlockItemData
+                {
+                    Key = block1Key,
+                    ContentTypeKey = elementType.Key,
+                    ContentTypeAlias = elementType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "headline", Value = "Block 1 Headline" },
+                        new BlockPropertyValue { Alias = "description", Value = "Block 1 Description" }
+                    }
+                },
+                new BlockItemData
+                {
+                    Key = block2Key,
+                    ContentTypeKey = elementType.Key,
+                    ContentTypeAlias = elementType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "headline", Value = "Block 2 Headline" },
+                        new BlockPropertyValue { Alias = "description", Value = "Block 2 Description" }
+                    }
+                },
+                new BlockItemData
+                {
+                    Key = block3Key,
+                    ContentTypeKey = elementType.Key,
+                    ContentTypeAlias = elementType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "headline", Value = "Block 3 Headline" },
+                        new BlockPropertyValue { Alias = "description", Value = "Block 3 Description" }
+                    }
+                }
+            },
+            SettingsData = new List<BlockItemData>(),
+            Expose = new List<BlockItemVariation>()
+        };
+
+        var blockListJson = jsonSerializer.Serialize(blockListValue);
+
+        // Create document with Block List
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("My Blocks Document")
+            .WithCreatorId(Constants.Security.SuperUserId)
+            .Build();
+
+        content.SetValue("contentBlocks", blockListJson);
+        ContentService.Save(content);
+        var documentKey = content.Key;
+
+        // Act - Patch only the headline of block 2 using nested JSONPath
+        // This demonstrates the TARGET API contract for Phase 8 implementation
+        // The JSONPath expression navigates through the nested structure:
+        //   1. Find the property with alias 'contentBlocks'
+        //   2. Navigate into its .value (the BlockListValue object)
+        //   3. Navigate into .contentData array
+        //   4. Find the block with the specific key (block2Key)
+        //   5. Navigate into its .values array
+        //   6. Find the property with alias 'headline'
+        //   7. Update its .value
+        // This enables minimal payload updates (~100 bytes) vs full replacement (~2KB)
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "replace",
+                    Path = $"$.values[?(@.alias == 'contentBlocks' && @.culture == null && @.segment == null)].value.contentData[?(@.key == '{block2Key}')].values[?(@.alias == 'headline')].value",
+                    Value = "Updated Block 2 Headline"
+                }
+            }
+        };
+
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+
+        // Assert
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error response: {response.StatusCode}");
+            Console.WriteLine($"Error body: {errorContent}");
+        }
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        // Verify only block 2's headline was updated
+        var updatedContent = ContentService.GetById(documentKey);
+        Assert.IsNotNull(updatedContent);
+
+        var updatedBlockListJson = updatedContent.GetValue<string>("contentBlocks");
+        Assert.IsNotNull(updatedBlockListJson);
+
+        var updatedBlockListValue = jsonSerializer.Deserialize<BlockListValue>(updatedBlockListJson);
+        Assert.IsNotNull(updatedBlockListValue);
+
+        // Find block 2 in the content data
+        var block2Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block2Key);
+        Assert.IsNotNull(block2Data);
+
+        // Verify block 2 headline was updated
+        var headlineValue = block2Data.Values.FirstOrDefault(v => v.Alias == "headline");
+        Assert.IsNotNull(headlineValue);
+        Assert.AreEqual("Updated Block 2 Headline", headlineValue.Value?.ToString());
+
+        // Verify block 2 description was NOT updated
+        var descriptionValue = block2Data.Values.FirstOrDefault(v => v.Alias == "description");
+        Assert.IsNotNull(descriptionValue);
+        Assert.AreEqual("Block 2 Description", descriptionValue.Value?.ToString());
+
+        // Verify block 1 and block 3 were NOT updated
+        var block1Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block1Key);
+        Assert.IsNotNull(block1Data);
+        Assert.AreEqual("Block 1 Headline", block1Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
+        Assert.AreEqual("Block 1 Description", block1Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+
+        var block3Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block3Key);
+        Assert.IsNotNull(block3Data);
+        Assert.AreEqual("Block 3 Headline", block3Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
+        Assert.AreEqual("Block 3 Description", block3Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
     }
 }
