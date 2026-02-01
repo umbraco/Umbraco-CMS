@@ -39,7 +39,7 @@ public class PatchDocumentController : PatchDocumentControllerBase
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
     }
 
-    [HttpPatch("{id:guid}")]
+    [HttpPatch("{id:guid}/patch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
