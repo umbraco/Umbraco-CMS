@@ -4,6 +4,7 @@ import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A manager for searching items in a picker.
@@ -37,6 +38,11 @@ export class UmbPickerSearchManager<
 
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+		this.#pagination.setPageSize(100);
+	}
 
 	/**
 	 * Set the configuration for the search manager.
