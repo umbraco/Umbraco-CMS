@@ -183,8 +183,10 @@ export class UmbPickerSearchManager<
 			searchFrom: this.#config?.searchFrom,
 			// TODO: Move this implementation to another place. The generic picker search manager shouldn't be aware of data types.
 			dataTypeUnique: this.#config?.dataTypeUnique,
-			skip: this.#pagination.getSkip(),
-			take: this.#pagination.getPageSize(),
+			paging: {
+				skip: this.#pagination.getSkip(),
+				take: this.#pagination.getPageSize(),
+			},
 		};
 
 		const { data } = await this.#searchProvider.search(args);
