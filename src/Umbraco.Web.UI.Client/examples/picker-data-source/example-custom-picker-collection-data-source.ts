@@ -19,7 +19,7 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource
 
 	async requestCollection(args: UmbCollectionFilterModel) {
 		const skip = args.skip ?? 0;
-		const take = args.take ?? 50;
+		const take = args.take ?? 100;
 
 		const paginatedItems = customItems.slice(skip, skip + take);
 
@@ -36,9 +36,9 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource
 		return { data: items };
 	}
 
-	async search(args: UmbSearchRequestArgs & { skip?: number; take?: number }) {
-		const skip = args.skip ?? 0;
-		const take = args.take ?? 50;
+	async search(args: UmbSearchRequestArgs) {
+		const skip = args.paging?.skip ?? 0;
+		const take = args.paging?.take ?? 100;
 
 		const filteredItems = customItems.filter((item) => item.name?.toLowerCase().includes(args.query.toLowerCase()));
 		const paginatedItems = filteredItems.slice(skip, skip + take);
