@@ -31,6 +31,9 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
+	@state()
+	private _totalItems = 0;
+
 	@property({ attribute: false })
 	pickableFilter: PickableFilterMethodType = () => true;
 
@@ -65,6 +68,12 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 				(totalPages) => (this._totalPages = totalPages ?? 1),
 				null,
 			);
+
+			this.observe(
+				this.#pickerContext?.search.resultTotalItems,
+				(totalItems) => (this._totalItems = totalItems ?? 0),
+				null,
+			);
 		});
 	}
 
@@ -97,7 +106,8 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	}
 
 	#renderPagination() {
-		if (this._totalPages <= 1) {
+		// Don't show pagination if all items are loaded or there's only one page
+		if (this._items.length === this._totalItems || this._totalPages <= 1) {
 			return nothing;
 		}
 
