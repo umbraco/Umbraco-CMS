@@ -124,7 +124,7 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             .Select("*")
             .From<NodeDto>()
             .WhereIn<NodeDto>(x => x.Text, new[] { "a", "b", "c" });
-        Assert.AreEqual("SELECT *\nFROM [umbracoNode]\nWHERE (LOWER([umbracoNode].[text]) IN (@0,@1,@2))", sql.SQL);
+        Assert.AreEqual("SELECT *\nFROM [umbracoNode]\nWHERE ([umbracoNode].[text] IN (@0,@1,@2))", sql.SQL);
     }
 
     [Test]
