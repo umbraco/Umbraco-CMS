@@ -265,7 +265,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         MediaTypeService.Save(parentMediaType);
 
         // Act
-        var result = await MediaTypeService.GetAllowedParentsAsync(childMediaType.Key, UmbracoObjectTypes.MediaType);
+        var result = await MediaTypeService.GetAllowedParentsAsync(childMediaType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -299,7 +299,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         MediaTypeService.Save(unrelatedParentMediaType);
 
         // Act
-        var result = await MediaTypeService.GetAllowedParentsAsync(childMediaType.Key, UmbracoObjectTypes.MediaType);
+        var result = await MediaTypeService.GetAllowedParentsAsync(childMediaType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -312,18 +312,16 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetAllowedParentsAsync_ReturnsEmptyCollection_WhenMediaTypeDoesNotExist()
+    public async Task GetAllowedParentsAsync_ReturnsSuccessFalse_WhenMediaTypeDoesNotExist()
     {
         // Arrange
         var nonExistentKey = Guid.NewGuid();
 
         // Act
-        var result = await MediaTypeService.GetAllowedParentsAsync(nonExistentKey, UmbracoObjectTypes.MediaType);
+        var result = await MediaTypeService.GetAllowedParentsAsync(nonExistentKey);
 
         // Assert
-        Assert.That(result.Success, Is.True);
-        Assert.That(result.Result, Is.Not.Null);
-        Assert.That(result.Result, Is.Empty);
+        Assert.That(result.Success, Is.False);
     }
 
     internal sealed class ContentNotificationHandler :

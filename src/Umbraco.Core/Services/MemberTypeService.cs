@@ -144,11 +144,10 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     }
 
     /// <inheritdoc />
-    public override async Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(
-        Guid key,
-        UmbracoObjectTypes objectType) =>
-        Attempt.SucceedWithStatus<IEnumerable<Guid>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, []);
-
+    /// Unlike document and media types, allowed children (and therefore parents) are not defined for media types.
+    public override async Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentsAsync(
+        Guid key) =>
+        await Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, []));
 
     #region Notifications
 

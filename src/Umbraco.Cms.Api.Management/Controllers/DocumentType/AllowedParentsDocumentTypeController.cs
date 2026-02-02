@@ -28,7 +28,7 @@ public class AllowedParentsDocumentTypeController : DocumentTypeControllerBase
         CancellationToken cancellationToken,
         Guid id)
     {
-        Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedParentsAsync(id, UmbracoObjectTypes.DocumentType);
+        Attempt<IEnumerable<Guid>, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedParentsAsync(id);
         if (attempt.Success is false)
         {
             return OperationStatusResult(attempt.Status);

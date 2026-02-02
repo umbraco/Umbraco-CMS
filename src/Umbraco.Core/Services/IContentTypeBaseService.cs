@@ -180,13 +180,11 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
         => GetAllowedChildrenAsync(key, skip, take);
 
     /// <summary>
-    /// Returns all content types that allow the inputted key as a child. E.g all parents of the inputted key.
+    /// Gets the keys of all content types that allow the provided content type key as a child (i.e. all potential parents of the provided key).
     /// </summary>
     /// <param name="key">The key of the child content type.</param>
-    /// <param name="objectType">The object type of the child content type.</param>
-    /// <returns>A guid list of all parents.</returns>
+    /// <returns>A collection of the keys of all potential parents.</returns>
     /// <exception cref="NotImplementedException">Default implementation due to breaking changes.</exception>
     /// TODO (V18): Remove the default implementation
-    Task<Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key,
-        UmbracoObjectTypes objectType) => throw new NotImplementedException();
+    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key) => Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, []));
 }

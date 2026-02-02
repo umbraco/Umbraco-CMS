@@ -28,7 +28,7 @@ public class AllowedParentsMediaTypeController : MediaTypeControllerBase
         CancellationToken cancellationToken,
         Guid id)
     {
-        Attempt<IEnumerable<Guid>?, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedParentsAsync(id, UmbracoObjectTypes.MediaType);
+        Attempt<IEnumerable<Guid>, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedParentsAsync(id);
         if (attempt.Success is false)
         {
             return OperationStatusResult(attempt.Status);

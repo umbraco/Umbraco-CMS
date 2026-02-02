@@ -44,8 +44,7 @@ public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<i
     ///     Gets the allowed parent keys for a child content type.
     /// </summary>
     /// <param name="key">The child content type.</param>
-    /// <param name="umbracoObjectType">The object type.</param>
     /// <returns>An IEnumerable of the allowed parent keys.</returns>
     /// TODO (V18): Remove default implementation.
-    IEnumerable<Guid> GetAllowedParentKeys(Guid key, UmbracoObjectTypes umbracoObjectType) => [];
+    IEnumerable<Guid> GetAllowedParentKeys(Guid key) => [];
 }

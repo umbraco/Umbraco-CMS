@@ -1706,21 +1706,19 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             ?? Array.Empty<(TEntity, int)>();
     }
 
-    public IEnumerable<Guid> GetAllowedParentKeys(Guid key, UmbracoObjectTypes objectType)
+    public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
     {
-        Attempt<int> childNodeIdAttempt = _idKeyMap.GetIdForKey(key, objectType);
-
-        if (childNodeIdAttempt.Success is false)
-        {
-            return [];
-        }
+        Sql<ISqlContext> childNodeIdQuery = Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key);
 
         Sql<ISqlContext> sql = Sql()
             .Select<NodeDto>(x => x.UniqueId)
             .From<ContentTypeAllowedContentTypeDto>()
             .InnerJoin<NodeDto>()
             .On<ContentTypeAllowedContentTypeDto, NodeDto>((allowed, node) => allowed.Id == node.NodeId)
-            .Where<ContentTypeAllowedContentTypeDto>(x => x.AllowedId == childNodeIdAttempt.Result);
+            .WhereIn<ContentTypeAllowedContentTypeDto>(x => x.AllowedId, childNodeIdQuery);
 
         return Database.Fetch<Guid>(sql);
     }

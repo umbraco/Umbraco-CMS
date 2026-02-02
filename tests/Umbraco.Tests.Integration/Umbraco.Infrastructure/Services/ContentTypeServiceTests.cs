@@ -2416,7 +2416,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(parentContentType);
 
         // Act
-        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key, UmbracoObjectTypes.DocumentType);
+        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -2450,7 +2450,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(unrelatedParentContentType);
 
         // Act
-        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key, UmbracoObjectTypes.DocumentType);
+        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -2463,18 +2463,16 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetAllowedParentsAsync_ReturnsEmptyCollection_WhenContentTypeDoesNotExist()
+    public async Task GetAllowedParentsAsync_ReturnsSuccessFalse_WhenContentTypeDoesNotExist()
     {
         // Arrange
         var nonExistentKey = Guid.NewGuid();
 
         // Act
-        var result = await ContentTypeService.GetAllowedParentsAsync(nonExistentKey, UmbracoObjectTypes.DocumentType);
+        var result = await ContentTypeService.GetAllowedParentsAsync(nonExistentKey);
 
         // Assert
-        Assert.That(result.Success, Is.True);
-        Assert.That(result.Result, Is.Not.Null);
-        Assert.That(result.Result, Is.Empty);
+        Assert.That(result.Success, Is.False);
     }
 
     private ContentType CreateComponent()
