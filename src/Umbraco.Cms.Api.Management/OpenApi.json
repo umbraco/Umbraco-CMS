@@ -916,57 +916,27 @@
       }
     },
     "/umbraco/management/api/v1/data-type/fetch": {
-      "post": {
+      "get": {
         "tags": [
           "Data Type"
         ],
-        "operationId": "PostDataTypeFetch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
+        "operationId": "GetDataTypeFetch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
               }
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -983,19 +953,7 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -6002,57 +5960,27 @@
       }
     },
     "/umbraco/management/api/v1/document-type/fetch": {
-      "post": {
+      "get": {
         "tags": [
           "Document Type"
         ],
-        "operationId": "PostDocumentTypeFetch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
+        "operationId": "GetDocumentTypeFetch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
               }
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -6069,19 +5997,7 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -15755,57 +15671,27 @@
       }
     },
     "/umbraco/management/api/v1/media-type/fetch": {
-      "post": {
+      "get": {
         "tags": [
           "Media Type"
         ],
-        "operationId": "PostMediaTypeFetch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
+        "operationId": "GetMediaTypeFetch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
               }
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -15822,19 +15708,7 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -21156,57 +21030,27 @@
       }
     },
     "/umbraco/management/api/v1/member-type/fetch": {
-      "post": {
+      "get": {
         "tags": [
           "Member Type"
         ],
-        "operationId": "PostMemberTypeFetch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/FetchRequestModel"
-                  }
-                ]
+        "operationId": "GetMemberTypeFetch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
               }
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -21223,19 +21067,7 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -41771,26 +41603,6 @@
           "Warning"
         ],
         "type": "string"
-      },
-      "FetchRequestModel": {
-        "required": [
-          "ids"
-        ],
-        "type": "object",
-        "properties": {
-          "ids": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ReferenceByIdModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
       },
       "FetchResponseModelDataTypeResponseModel": {
         "required": [

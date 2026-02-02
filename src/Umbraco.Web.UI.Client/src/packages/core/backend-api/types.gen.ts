@@ -414,6 +414,7 @@ export type CreateUserDataRequestModel = {
 export type CreateUserGroupRequestModel = {
     name: string;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -425,7 +426,6 @@ export type CreateUserGroupRequestModel = {
     fallbackPermissions: Array<string>;
     permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
-    description?: string | null;
 };
 
 export type CreateUserRequestModel = {
@@ -1003,6 +1003,26 @@ export enum EventMessageTypeModel {
     SUCCESS = 'Success',
     WARNING = 'Warning'
 }
+
+export type FetchResponseModelDataTypeResponseModel = {
+    total: number;
+    items: Array<DataTypeResponseModel>;
+};
+
+export type FetchResponseModelDocumentTypeResponseModel = {
+    total: number;
+    items: Array<DocumentTypeResponseModel>;
+};
+
+export type FetchResponseModelMediaTypeResponseModel = {
+    total: number;
+    items: Array<MediaTypeResponseModel>;
+};
+
+export type FetchResponseModelMemberTypeResponseModel = {
+    total: number;
+    items: Array<MemberTypeResponseModel>;
+};
 
 export type FieldPresentationModel = {
     name: string;
@@ -2818,8 +2838,8 @@ export type UpdateUserDataRequestModel = {
 
 export type UpdateUserGroupRequestModel = {
     name: string;
-    description?: string | null;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -2921,6 +2941,7 @@ export type UserGroupItemResponseModel = {
 export type UserGroupResponseModel = {
     name: string;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -2934,7 +2955,6 @@ export type UserGroupResponseModel = {
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
-    description?: string | null;
 };
 
 export type UserInstallRequestModel = {
@@ -3505,6 +3525,35 @@ export type GetDataTypeConfigurationResponses = {
 };
 
 export type GetDataTypeConfigurationResponse = GetDataTypeConfigurationResponses[keyof GetDataTypeConfigurationResponses];
+
+export type GetDataTypeFetchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/data-type/fetch';
+};
+
+export type GetDataTypeFetchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDataTypeFetchResponses = {
+    /**
+     * OK
+     */
+    200: FetchResponseModelDataTypeResponseModel;
+};
+
+export type GetDataTypeFetchResponse = GetDataTypeFetchResponses[keyof GetDataTypeFetchResponses];
 
 export type PostDataTypeFolderData = {
     body?: CreateFolderRequestModel;
@@ -5317,6 +5366,35 @@ export type GetDocumentTypeConfigurationResponses = {
 
 export type GetDocumentTypeConfigurationResponse = GetDocumentTypeConfigurationResponses[keyof GetDocumentTypeConfigurationResponses];
 
+export type GetDocumentTypeFetchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/document-type/fetch';
+};
+
+export type GetDocumentTypeFetchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentTypeFetchResponses = {
+    /**
+     * OK
+     */
+    200: FetchResponseModelDocumentTypeResponseModel;
+};
+
+export type GetDocumentTypeFetchResponse = GetDocumentTypeFetchResponses[keyof GetDocumentTypeFetchResponses];
+
 export type PostDocumentTypeFolderData = {
     body?: CreateFolderRequestModel;
     path?: never;
@@ -6691,7 +6769,13 @@ export type GetDocumentByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetDocumentByIdReferencedByError = GetDocumentByIdReferencedByErrors[keyof GetDocumentByIdReferencedByErrors];
 
 export type GetDocumentByIdReferencedByResponses = {
     /**
@@ -6723,7 +6807,13 @@ export type GetDocumentByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetDocumentByIdReferencedDescendantsError = GetDocumentByIdReferencedDescendantsErrors[keyof GetDocumentByIdReferencedDescendantsErrors];
 
 export type GetDocumentByIdReferencedDescendantsResponses = {
     /**
@@ -9006,6 +9096,35 @@ export type GetMediaTypeConfigurationResponses = {
 
 export type GetMediaTypeConfigurationResponse = GetMediaTypeConfigurationResponses[keyof GetMediaTypeConfigurationResponses];
 
+export type GetMediaTypeFetchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/media-type/fetch';
+};
+
+export type GetMediaTypeFetchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetMediaTypeFetchResponses = {
+    /**
+     * OK
+     */
+    200: FetchResponseModelMediaTypeResponseModel;
+};
+
+export type GetMediaTypeFetchResponse = GetMediaTypeFetchResponses[keyof GetMediaTypeFetchResponses];
+
 export type PostMediaTypeFolderData = {
     body?: CreateFolderRequestModel;
     path?: never;
@@ -9680,7 +9799,13 @@ export type GetMediaByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMediaByIdReferencedByError = GetMediaByIdReferencedByErrors[keyof GetMediaByIdReferencedByErrors];
 
 export type GetMediaByIdReferencedByResponses = {
     /**
@@ -9712,7 +9837,13 @@ export type GetMediaByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMediaByIdReferencedDescendantsError = GetMediaByIdReferencedDescendantsErrors[keyof GetMediaByIdReferencedDescendantsErrors];
 
 export type GetMediaByIdReferencedDescendantsResponses = {
     /**
@@ -10962,6 +11093,35 @@ export type GetMemberTypeConfigurationResponses = {
 
 export type GetMemberTypeConfigurationResponse = GetMemberTypeConfigurationResponses[keyof GetMemberTypeConfigurationResponses];
 
+export type GetMemberTypeFetchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/member-type/fetch';
+};
+
+export type GetMemberTypeFetchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetMemberTypeFetchResponses = {
+    /**
+     * OK
+     */
+    200: FetchResponseModelMemberTypeResponseModel;
+};
+
+export type GetMemberTypeFetchResponse = GetMemberTypeFetchResponses[keyof GetMemberTypeFetchResponses];
+
 export type PostMemberTypeFolderData = {
     body?: CreateFolderRequestModel;
     path?: never;
@@ -11526,7 +11686,13 @@ export type GetMemberByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMemberByIdReferencedByError = GetMemberByIdReferencedByErrors[keyof GetMemberByIdReferencedByErrors];
 
 export type GetMemberByIdReferencedByResponses = {
     /**
@@ -11558,7 +11724,13 @@ export type GetMemberByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMemberByIdReferencedDescendantsError = GetMemberByIdReferencedDescendantsErrors[keyof GetMemberByIdReferencedDescendantsErrors];
 
 export type GetMemberByIdReferencedDescendantsResponses = {
     /**
