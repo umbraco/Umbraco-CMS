@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services;
 [TestFixture]
 public class PropertyValidationServiceTests
 {
-    private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+    private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig(), Utf8ToAsciiConverterStatic.Instance);
 
     private void MockObjects(out PropertyValidationService validationService, out IDataType dt)
     {

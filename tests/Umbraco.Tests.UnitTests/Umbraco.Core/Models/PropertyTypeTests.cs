@@ -28,7 +28,7 @@ public class PropertyTypeTests
     [Test]
     public void Can_Create_From_DataType()
     {
-        var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig(), Utf8ToAsciiConverterStatic.Instance);
         var dt = BuildDataType();
         var pt = new PropertyType(shortStringHelper, dt);
 

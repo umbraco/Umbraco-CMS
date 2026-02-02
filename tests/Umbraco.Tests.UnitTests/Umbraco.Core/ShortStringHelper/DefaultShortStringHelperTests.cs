@@ -70,7 +70,7 @@ public class DefaultShortStringHelperTests
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
                 StringType = CleanStringType.Ascii,
                 BreakTermsOnUpper = true,
-            }));
+            }), Utf8ToAsciiConverterStatic.Instance);
 
     private IShortStringHelper ShortStringHelper { get; set; }
 

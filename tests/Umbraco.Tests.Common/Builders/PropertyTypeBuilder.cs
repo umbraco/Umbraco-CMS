@@ -193,7 +193,9 @@ public class PropertyTypeBuilder<TParent>
         var labelOnTop = _labelOnTop ?? false;
         var variations = _variations ?? ContentVariation.Nothing;
 
-        var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        var shortStringHelper = new DefaultShortStringHelper(
+            new DefaultShortStringHelperConfig(),
+            Utf8ToAsciiConverterStatic.Instance);
 
         var propertyType = new PropertyType(shortStringHelper, propertyEditorAlias, valueStorageType)
         {

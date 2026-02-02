@@ -56,7 +56,9 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
     }
 
     protected IShortStringHelper ShortStringHelper =>
-        new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        new DefaultShortStringHelper(
+            new DefaultShortStringHelperConfig(),
+            Utf8ToAsciiConverterStatic.Instance);
 
     string IWithAliasBuilder.Alias
     {

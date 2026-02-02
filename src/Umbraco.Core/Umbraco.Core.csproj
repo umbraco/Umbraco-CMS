@@ -90,4 +90,8 @@
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\**\*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Strings\CharacterMappings\*.json" />
+  </ItemGroup>
 </Project>

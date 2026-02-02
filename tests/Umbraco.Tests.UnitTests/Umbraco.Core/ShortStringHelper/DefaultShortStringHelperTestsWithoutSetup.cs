@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 [TestFixture]
 public class DefaultShortStringHelperTestsWithoutSetup
 {
+    private static readonly IUtf8ToAsciiConverter AsciiConverter = Utf8ToAsciiConverterStatic.Instance;
+
     [Test]
     public void U4_4056()
     {
@@ -25,7 +27,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
         var helper =
             new DefaultShortStringHelper(
-                new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)); // unicode
+                new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings), AsciiConverter); // unicode
         var output = helper.CleanStringForUrlSegment(input);
         Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", output);
 
@@ -35,7 +37,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                 StringType = CleanStringType.LowerCase | CleanStringType.Ascii, // ascii
                 Separator = '-',
-            }));
+            }), AsciiConverter);
         output = helper.CleanStringForUrlSegment(input);
         Assert.AreEqual("aeoa-and-aeoa-and-and-and-grosser-bbddzhzh-page", output);
     }
@@ -54,7 +56,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
         var helper =
             new DefaultShortStringHelper(
-                new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)); // unicode
+                new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings), AsciiConverter); // unicode
         Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
         Assert.AreEqual("æøå-and-æøå-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input2));
 
@@ -64,7 +66,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                 StringType = CleanStringType.LowerCase | CleanStringType.TryAscii, // try ascii
                 Separator = '-',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
         Assert.AreEqual("aeoa-and-aeoa-and-grosser-bbddzhzh-page", helper.CleanStringForUrlSegment(input2));
     }
@@ -80,7 +82,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("foo_bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
@@ -91,7 +93,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c),
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("foo*bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
     }
 
@@ -106,7 +108,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c),
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("0123foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
@@ -117,12 +119,12 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
         Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123 foo_bar 543 nil 321", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(
-            new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings()));
+            new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings()), AsciiConverter);
         Assert.AreEqual("child2", helper.CleanStringForSafeAlias("1child2"));
     }
 
@@ -138,7 +140,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // uppercase letter means new term
                 BreakTermsOnUpper = true,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("foo*Bar", helper.CleanString("fooBar", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
@@ -150,7 +152,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // uppercase letter is part of term
                 BreakTermsOnUpper = false,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("fooBar", helper.CleanString("fooBar", CleanStringType.Alias));
     }
 
@@ -166,7 +168,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // non-uppercase letter means cut acronym
                 CutAcronymOnNonUpper = true,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
@@ -181,7 +183,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // non-uppercase letter means word
                 CutAcronymOnNonUpper = false,
                 Separator = '*',
-            }));
+            }), AsciiConverter);
         Assert.AreEqual("foo*BARRnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BARnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
@@ -201,7 +203,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                     CutAcronymOnNonUpper = true,
                     GreedyAcronyms = true,
                     Separator = '*',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("foo*BARR*nil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BAR*nil", helper.CleanString("foo BARnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BA*nil", helper.CleanString("foo BAnil", CleanStringType.Alias));
@@ -217,7 +219,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                     CutAcronymOnNonUpper = true,
                     GreedyAcronyms = false,
                     Separator = '*',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
@@ -235,7 +237,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("foo", helper.CleanString("   foo   ", CleanStringType.Alias));
         Assert.AreEqual("foo*bar", helper.CleanString("   foo   bar   ", CleanStringType.Alias));
     }
@@ -251,7 +253,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("foo*bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
@@ -262,7 +264,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = ' ',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("foo bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
@@ -272,7 +274,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("foobar", helper.CleanString("foo bar", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
@@ -283,7 +285,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '文',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("foo文bar", helper.CleanString("foo bar", CleanStringType.Alias));
     }
 
@@ -298,7 +300,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
 
         // TODO: but for a filename we want to keep them!
@@ -343,7 +345,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     public void Utf8ToAsciiConverter()
     {
         const string str = "a\U00010F00z\uA74Ftéô";
-        var output = global::Umbraco.Cms.Core.Strings.Utf8ToAsciiConverter.ToAsciiString(str);
+        var output = global::Umbraco.Cms.Core.Strings.Utf8ToAsciiConverterStatic.ToAsciiString(str);
         Assert.AreEqual("a?zooteo", output);
     }
 
@@ -358,7 +360,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual("中文测试", helper.CleanString("中文测试", CleanStringType.Alias));
         Assert.AreEqual("léger*中文测试*ZÔRG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
 
@@ -370,7 +372,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
                     Separator = '*',
-                }));
+                }), AsciiConverter);
         Assert.AreEqual(string.Empty, helper.CleanString("中文测试", CleanStringType.Alias));
         Assert.AreEqual("leger*ZORG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
     }
@@ -385,7 +387,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
         };
 
         var helper =
-            new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings));
+            new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings), AsciiConverter);
 
         const string input = "0123 中文测试 中文测试 léger ZÔRG (2) a?? *x";
 
@@ -414,7 +416,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = ' ',
-                }));
+                }), AsciiConverter);
 
         // BBB is an acronym
         // E is a word (too short to be an acronym)
@@ -505,7 +507,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     // #endregion
     // public void CleanStringWithUnderscore(string input, string expected, bool allowUnderscoreInTerm)
     // {
-    //     var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
+    //     var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault(), AsciiConverter)
     //         .WithConfig(allowUnderscoreInTerm: allowUnderscoreInTerm);
     //     var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
     //     Assert.AreEqual(expected, output);

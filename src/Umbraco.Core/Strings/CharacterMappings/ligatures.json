@@ -1,0 +1,21 @@
+{
+  "name": "Ligatures",
+  "description": "Ligature characters expanded to component letters",
+  "priority": 0,
+  "mappings": {
+    "Æ": "AE",
+    "æ": "ae",
+    "Œ": "OE",
+    "œ": "oe",
+    "Ĳ": "IJ",
+    "ĳ": "ij",
+    "ß": "ss",
+    "ﬀ": "ff",
+    "ﬁ": "fi",
+    "ﬂ": "fl",
+    "ﬃ": "ffi",
+    "ﬄ": "ffl",
+    "ﬅ": "st",
+    "ﬆ": "st"
+  }
+}
