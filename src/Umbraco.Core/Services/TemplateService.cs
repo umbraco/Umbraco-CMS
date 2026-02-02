@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -20,7 +22,35 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditService _auditService;
     private readonly ITemplateContentParserService _templateContentParserService;
+    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
 
+    // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
+    // Also update UmbracoBuilder where this service is registered using:
+    //   Services.AddUnique<ITemplateService>(sp => ActivatorUtilities.CreateInstance<TemplateService>(sp));
+    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddUnique).
+    // Revert it to:
+    //   Services.AddUnique<ITemplateService, TemplateService>();
+
+    [ActivatorUtilitiesConstructor]
+    public TemplateService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IShortStringHelper shortStringHelper,
+        ITemplateRepository templateRepository,
+        IAuditService auditService,
+        ITemplateContentParserService templateContentParserService,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _shortStringHelper = shortStringHelper;
+        _templateRepository = templateRepository;
+        _auditService = auditService;
+        _templateContentParserService = templateContentParserService;
+        _runtimeSettings = runtimeSettings;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public TemplateService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -29,12 +59,16 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateRepository templateRepository,
         IAuditService auditService,
         ITemplateContentParserService templateContentParserService)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            shortStringHelper,
+            templateRepository,
+            auditService,
+            templateContentParserService,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
     {
-        _shortStringHelper = shortStringHelper;
-        _templateRepository = templateRepository;
-        _auditService = auditService;
-        _templateContentParserService = templateContentParserService;
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -81,6 +115,8 @@ public class TemplateService : RepositoryService, ITemplateService
             templateContentParserService)
     {
     }
+
+    private bool IsProductionMode => _runtimeSettings.CurrentValue.Mode == RuntimeMode.Production;
 
     /// <inheritdoc />
     [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
@@ -252,9 +288,9 @@ public class TemplateService : RepositoryService, ITemplateService
             AuditType.Save,
             userKey,
             // fail the attempt if the template does not exist within the scope
-            () => ValidateUpdate(template));
+            () => ValidateUpdate(template, checkContentChangeInProductionMode: true));
 
-    private TemplateOperationStatus ValidateUpdate(ITemplate templateToUpdate)
+    private TemplateOperationStatus ValidateUpdate(ITemplate templateToUpdate, bool checkContentChangeInProductionMode = false)
     {
         ITemplate? existingTemplate = GetAsync(templateToUpdate.Alias).GetAwaiter().GetResult();
         if (existingTemplate is not null && existingTemplate.Key != templateToUpdate.Key)
@@ -265,6 +301,17 @@ public class TemplateService : RepositoryService, ITemplateService
         if (_templateRepository.Exists(templateToUpdate.Id) is false)
         {
             return TemplateOperationStatus.TemplateNotFound;
+        }
+
+        // In production mode, block updates if the content is being changed
+        if (checkContentChangeInProductionMode && IsProductionMode)
+        {
+            // Get the existing template by key to compare content
+            ITemplate? existingByKey = GetAsync(templateToUpdate.Key).GetAwaiter().GetResult();
+            if (existingByKey is not null && existingByKey.Content != templateToUpdate.Content)
+            {
+                return TemplateOperationStatus.ContentChangeNotAllowedInProductionMode;
+            }
         }
 
         return TemplateOperationStatus.Success;
@@ -453,6 +500,11 @@ public class TemplateService : RepositoryService, ITemplateService
 
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey, string? contentTypeAlias)
     {
+        if (IsProductionMode)
+        {
+            return Attempt.FailWithStatus(TemplateOperationStatus.NotAllowedInProductionMode, template);
+        }
+
         if (IsValidAlias(template.Alias) is false)
         {
             return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
@@ -473,6 +525,11 @@ public class TemplateService : RepositoryService, ITemplateService
 
     private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, Guid userKey)
     {
+        if (IsProductionMode)
+        {
+            return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.NotAllowedInProductionMode, null);
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             ITemplate? template = await getTemplate();
