@@ -232,7 +232,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         Sql<ISqlContext> sql = GetBaseQuery(false)
             // TODO: An inner join would be better, though I've read that the query optimizer will always turn a
             // subquery with an IN clause into an inner join anyways.
-            .Append($"WHERE {QuoteTableName("umbracoNode")}.id IN (" + subQuery.SQL + ")", subQuery.Arguments)
+            .Append($"WHERE {QuoteTableName("umbracoNode")}.id IN ({subQuery.SQL})", subQuery.Arguments)
             .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
             .OrderBy<NodeDto>(x => x.SortOrder);
 
