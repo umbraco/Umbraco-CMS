@@ -55,6 +55,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	@state()
 	private _diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
 
+	@state()
+	private _showDiff = false;
+
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
 
@@ -197,7 +200,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				}),
 		};
 
-		await this.#setDiffs();
+		if (this._showDiff) {
+			await this.#setDiffs();
+		}
 	}
 
 	async #onRollback() {
@@ -259,8 +264,26 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		this.#requestVersions();
 	}
 
+	#onToggleDiff(event: Event) {
+		const checkbox = event.target as HTMLInputElement;
+		this._showDiff = checkbox.checked;
+
+		// If we have toggled on and have a selected version, immediately show the diff.
+		if (this._showDiff && this._selectedVersion) {
+			this.#setDiffs();
+		}
+	}
+
 	#trimQuotes(str: string): string {
 		return str.replace(/^['"]|['"]$/g, '');
+	}
+
+	#getPlainValue(alias: string): string {
+		if (alias === 'name') {
+			return this._selectedVersion?.name ?? '';
+		}
+		const prop = this._selectedVersion?.properties.find((x) => x.alias === alias);
+		return prop ? this.#trimQuotes(JSON.stringify(prop.value)) : '';
 	}
 
 	#renderCultureSelect() {
@@ -352,9 +375,16 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				>
 			`;
 
+		// Build list of property aliases to display (name + all properties)
+		const propertyAliases = ['name', ...this._selectedVersion.properties.map((p) => p.alias)];
+
 		return html`
 			<uui-box headline=${this.currentVersionHeader} id="box-right">
-				${unsafeHTML(this.localize.term('rollback_diffHelp'))}
+				<uui-toggle
+					label=${this.localize.term('rollback_showDiff')}
+					@change=${this.#onToggleDiff}
+					.checked=${this._showDiff}></uui-toggle>
+				${this._showDiff ? html`<p>${unsafeHTML(this.localize.term('rollback_diffHelp'))}</p>` : nothing}
 				<uui-table>
 					<uui-table-column style="width: 0"></uui-table-column>
 					<uui-table-column></uui-table-column>
@@ -364,15 +394,15 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 						<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
 					</uui-table-head>
 					${repeat(
-						this._diffs,
-						(item) => item.alias,
-						(item) => {
-							const diff = this._diffs.find((x) => x?.alias === item.alias);
+						propertyAliases,
+						(alias) => alias,
+						(alias) => {
+							const diff = this._diffs.find((x) => x?.alias === alias);
 							return html`
 								<uui-table-row>
-									<uui-table-cell>${item.alias}</uui-table-cell>
+									<uui-table-cell>${alias}</uui-table-cell>
 									<uui-table-cell>
-										${diff
+										${this._showDiff && diff
 											? diff.diff.map((part) =>
 													part.added
 														? html`<span class="diff-added">${part.value}</span>`
@@ -380,7 +410,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 															? html`<span class="diff-removed">${part.value}</span>`
 															: part.value,
 												)
-											: nothing}
+											: this.#getPlainValue(alias)}
 									</uui-table-cell>
 								</uui-table-row>
 							`;

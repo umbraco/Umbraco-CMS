@@ -18,13 +18,12 @@
       [SA1405] debug message text
       [IDE0060] remove parameter
       [CS0114] inherited member
-      [CS0661]/[CS0659] adjust overrides
       [CS0414] unassigned field
       [CS0252] confirm reference comparison
       [CS0612] obsolete
       [IDE1006] fix naming rule violation
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0013,CS0618,CS1998,SA1117,CS0067,CA1822,CA1416,IDE0028,SA1401,SA1405,IDE0060,CS0114,CS0661,CS0659,CS0414,CS0252,CS0612,IDE1006</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0013,CS0618,CS1998,SA1117,CS0067,CA1822,CA1416,IDE0028,SA1401,SA1405,IDE0060,CS0114,CS0414,CS0252,CS0612,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,6 +36,18 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Culture.cs">
+      <DependentUpon>StringExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Encoding.cs">
+      <DependentUpon>StringExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Manipulation.cs">
+      <DependentUpon>StringExtensionsTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

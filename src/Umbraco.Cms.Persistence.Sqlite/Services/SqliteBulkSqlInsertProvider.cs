@@ -8,8 +8,10 @@ namespace Umbraco.Cms.Persistence.Sqlite.Services;
 /// </summary>
 public class SqliteBulkSqlInsertProvider : IBulkSqlInsertProvider
 {
+    /// <inheritdoc />
     public string ProviderName => Constants.ProviderName;
 
+    /// <inheritdoc />
     public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
     {
         T[] recordsA = records.ToArray();
