@@ -17,7 +17,7 @@ export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind =
 			icon: 'icon-trash',
 			label: '#actions_clear',
 		},
-		conditions: [{ alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS }, { alias: UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS }],
+		conditions: [{ alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS }],
 	},
 };
 
