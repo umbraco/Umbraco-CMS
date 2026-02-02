@@ -115,6 +115,8 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
 
     protected override string[] AllowedFileExtensions { get; } = { ".cshtml" };
 
+    private bool IsProductionMode => _runtimeSettings.Value.Mode == RuntimeMode.Production;
+
     protected override PartialViewOperationStatus Success => PartialViewOperationStatus.Success;
 
     protected override PartialViewOperationStatus NotFound => PartialViewOperationStatus.NotFound;
@@ -173,7 +175,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid userKey)
     {
-        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
+        if (IsProductionMode)
         {
             return PartialViewOperationStatus.NotAllowedInProductionMode;
         }
@@ -184,7 +186,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid userKey)
     {
-        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
+        if (IsProductionMode)
         {
             return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
         }
@@ -195,7 +197,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(string path, PartialViewUpdateModel updateModel, Guid userKey)
     {
-        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
+        if (IsProductionMode)
         {
             return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
         }
@@ -206,7 +208,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> RenameAsync(string path, PartialViewRenameModel renameModel, Guid userKey)
     {
-        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
+        if (IsProductionMode)
         {
             return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
         }
