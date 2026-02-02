@@ -62,14 +62,14 @@ public class Query<T> : IQuery<T>
         var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
         var whereExpression = expressionHelper.Visit(fieldSelector);
 
-        FixCompareCasing(ref values, ref whereExpression);
+        LowerCaseCompare(ref values, ref whereExpression);
 
         var inNot = isIn ? string.Empty : " NOT";
         _wheres.Add(new Tuple<string, object[]>($"{whereExpression}{inNot} IN (@values)", new object[] { new { values } }));
         return this;
     }
 
-    private static void FixCompareCasing(ref IEnumerable? values, ref string whereExpression)
+    private static void LowerCaseCompare(ref IEnumerable? values, ref string whereExpression)
     {
         Attempt<string[]> attempt = values.TryConvertTo<string[]>();
         if (attempt.Success)
