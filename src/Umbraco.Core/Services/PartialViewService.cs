@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services;
 public class PartialViewService : FileServiceOperationBase<IPartialViewRepository, IPartialView, PartialViewOperationStatus>, IPartialViewService
 {
     private readonly PartialViewSnippetCollection _snippetCollection;
-    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
     // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
     // Also update UmbracoBuilder where this service is registered using:
@@ -36,7 +36,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         IUserIdKeyResolver userIdKeyResolver,
         IAuditService auditService,
         PartialViewSnippetCollection snippetCollection,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        IOptions<RuntimeSettings> runtimeSettings)
         : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
     {
         _snippetCollection = snippetCollection;
@@ -62,7 +62,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
             userIdKeyResolver,
             StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
             snippetCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
     {
     }
 
@@ -86,7 +86,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
             userIdKeyResolver,
             auditService,
             snippetCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
     {
     }
 
@@ -109,7 +109,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
             userIdKeyResolver,
             auditService,
             snippetCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
     {
     }
 
@@ -173,7 +173,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid userKey)
     {
-        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
         {
             return PartialViewOperationStatus.NotAllowedInProductionMode;
         }
@@ -184,7 +184,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid userKey)
     {
-        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
         {
             return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
         }
@@ -195,7 +195,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(string path, PartialViewUpdateModel updateModel, Guid userKey)
     {
-        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
         {
             return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
         }
@@ -206,7 +206,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> RenameAsync(string path, PartialViewRenameModel renameModel, Guid userKey)
     {
-        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
         {
             return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
         }

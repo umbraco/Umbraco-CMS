@@ -22,7 +22,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditService _auditService;
     private readonly ITemplateContentParserService _templateContentParserService;
-    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
     // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
     // Also update UmbracoBuilder where this service is registered using:
@@ -40,7 +40,7 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateRepository templateRepository,
         IAuditService auditService,
         ITemplateContentParserService templateContentParserService,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        IOptions<RuntimeSettings> runtimeSettings)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
@@ -67,7 +67,7 @@ public class TemplateService : RepositoryService, ITemplateService
             templateRepository,
             auditService,
             templateContentParserService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
     {
     }
 
@@ -116,7 +116,7 @@ public class TemplateService : RepositoryService, ITemplateService
     {
     }
 
-    private bool IsProductionMode => _runtimeSettings.CurrentValue.Mode == RuntimeMode.Production;
+    private bool IsProductionMode => _runtimeSettings.Value.Mode == RuntimeMode.Production;
 
     /// <inheritdoc />
     [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
