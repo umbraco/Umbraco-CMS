@@ -3,6 +3,7 @@ import {
 	UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
 	UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST } from '../default/index.js';
 
 export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -10,6 +11,7 @@ export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind =
 	matchType: 'propertyAction',
 	matchKind: 'clear',
 	manifest: {
+		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		api: () => import('../../common/clear/property-action-clear.controller.js'),
 		meta: {
 			icon: 'icon-trash',
