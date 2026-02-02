@@ -1,5 +1,6 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import { umbRteBlock, umbRteBlockInline } from './block.tiptap-extension.js';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
@@ -13,18 +14,18 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		super(host);
 
 		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
-			if (!context) return;
 			this.observe(
-				context.blockTypes,
+				context?.blockTypes,
 				(blockTypes) => {
 					this.#blockTypes = new Map(
-						blockTypes.map((x) => [x.contentElementTypeKey, x] as [string, UmbBlockRteTypeModel]),
+						blockTypes?.map((x) => [x.contentElementTypeKey, x] as [string, UmbBlockRteTypeModel]),
 					);
 				},
 				'_observeBlockTypes',
 			);
+
 			this.observe(
-				context.contents,
+				context?.contents.pipe(debounceTime(20)),
 				(contents) => {
 					this.#updateBlocks(contents);
 				},
@@ -37,11 +38,11 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		return [umbRteBlock, umbRteBlockInline];
 	}
 
-	#updateBlocks(contents: Array<UmbBlockDataModel>) {
+	#updateBlocks(contents?: Array<UmbBlockDataModel>) {
+		if (!contents?.length) return;
+
 		const editor = this._editor;
 		if (!editor) return;
-
-		if (!contents?.length) return;
 
 		const existingBlocks = Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map(
 			(x) => x.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY),
