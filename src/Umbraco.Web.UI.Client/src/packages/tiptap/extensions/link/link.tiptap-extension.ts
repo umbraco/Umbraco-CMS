@@ -10,6 +10,7 @@ export const UmbLink = Link.extend({
 		return {
 			...this.parent?.(),
 			'data-anchor': { default: null },
+			target: { default: null },
 			title: { default: null },
 			type: { default: 'external' },
 		};
