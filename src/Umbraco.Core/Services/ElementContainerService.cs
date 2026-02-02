@@ -354,11 +354,11 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         while (true)
         {
-            // Build filter: trashed items with path less than the last processed path (if any)
+            // Build filter: path less than the last processed path (if any) for cursor-based pagination
             var pathCursor = lastProcessedPath;
-            IQuery<IUmbracoEntity> filter = pathCursor is null
-                ? Query<IUmbracoEntity>().Where(d => d.Trashed)
-                : Query<IUmbracoEntity>().Where(d => d.Trashed && d.Path.SqlLessThan(pathCursor));
+            IQuery<IUmbracoEntity>? filter = pathCursor is null
+                ? null
+                : Query<IUmbracoEntity>().Where(d => d.Path.SqlLessThan(pathCursor));
 
             IEntitySlim[] descendants = _entityService.GetPagedDescendants(
                 key,
