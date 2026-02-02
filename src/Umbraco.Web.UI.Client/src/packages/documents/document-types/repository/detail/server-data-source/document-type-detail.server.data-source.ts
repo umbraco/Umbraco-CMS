@@ -60,7 +60,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	}
 
 	/**
-	 * Fetches a Media Type with the given id from the server
+	 * Fetches a Document Type with the given id from the server
 	 * @param {string} unique
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
@@ -74,15 +74,34 @@ export class UmbDocumentTypeDetailServerDataSource
 	}
 
 	/**
-	 * Inserts a new Media Type on the server
+	 * Fetches multiple Document Types by their unique IDs from the server
+	 * @param {Array<string>} uniques - The unique IDs of the document types to fetch
+	 * @returns {*}
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async readMany(uniques: Array<string>) {
+		if (!uniques || uniques.length === 0) {
+			return { data: [] };
+		}
+
+		const { data, error } = await this.#detailRequestManager.readMany(uniques);
+
+		return {
+			data: data?.map((item) => this.#mapServerResponseModelToEntityDetailModel(item)),
+			error,
+		};
+	}
+
+	/**
+	 * Inserts a new Document Type on the server
 	 * @param {UmbDocumentTypeDetailModel} model
 	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async create(model: UmbDocumentTypeDetailModel, parentUnique: string | null = null) {
-		if (!model) throw new Error('Media Type is missing');
-		if (!model.unique) throw new Error('Media Type unique is missing');
+		if (!model) throw new Error('Document Type is missing');
+		if (!model.unique) throw new Error('Document Type unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const body: CreateDocumentTypeRequestModel = {
@@ -203,7 +222,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	}
 
 	/**
-	 * Deletes a Media Type on the server
+	 * Deletes a Document Type on the server
 	 * @param {string} unique
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
