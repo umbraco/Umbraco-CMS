@@ -1419,6 +1419,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                     }
 
                     sb.Append($"({lastLoginDate} IS NULL AND {userDisabled} = {trueValue} AND {invitedDate} IS NOT NULL)");
+                    appended = true;
                 }
 
                 sb.Append(")");
