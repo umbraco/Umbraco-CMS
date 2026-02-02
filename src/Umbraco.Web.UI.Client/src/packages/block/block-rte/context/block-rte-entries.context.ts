@@ -1,20 +1,30 @@
-import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel, UmbBlockRteValueModel } from '../types.js';
-import {
-	UMB_BLOCK_RTE_WORKSPACE_MODAL,
-	type UmbBlockRteWorkspaceOriginData,
-} from '../workspace/block-rte-workspace.modal-token.js';
+import { UMB_BLOCK_RTE_WORKSPACE_MODAL } from '../workspace/block-rte-workspace.modal-token.js';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
+import type { UmbBlockRteWorkspaceOriginData } from '../workspace/block-rte-workspace.modal-token.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import {
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+} from '@umbraco-cms/backoffice/clipboard';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '@umbraco-cms/backoffice/block';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbPropertyEditorRteValueType } from '@umbraco-cms/backoffice/rte';
 
 /**
  * Copied from the 'rte' package to avoid a circular dependency.
  * @internal
  */
 const UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS = 'Umbraco.RichText';
+
+/**
+ * Copied from the 'tiptap' package to avoid a circular dependency.
+ * @internal
+ */
+const UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS = 'Umb.PropertyEditorUi.Tiptap';
 
 export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -33,12 +43,58 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addAdditionalPath('_catalogue/:view')
-			.onSetup((routingInfo) => {
+			.onSetup(async (routingInfo) => {
+				await this._retrieveManager;
+				if (!this._manager) return false;
+
+				const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+				if (!clipboardContext) {
+					throw new Error('Clipboard context not found');
+				}
+
+				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
+					UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS,
+				);
+
+				// TODO: consider moving some of this logic to the clipboard property context
+				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				if (!propertyContext) {
+					throw new Error('Property context not found');
+				}
+
+				const config = propertyContext.getConfig();
+				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
+
 				return {
 					data: {
 						blocks: this._manager?.getBlockTypes() ?? [],
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
+						clipboardFilter: async (clipboardEntryDetail) => {
+							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
+								pasteTranslatorManifests,
+								clipboardEntryDetail.values,
+							);
+
+							if (!hasSupportedPasteTranslator) {
+								return false;
+							}
+
+							const pasteTranslator = await valueResolver.getPasteTranslator(
+								clipboardEntryDetail.values,
+								UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS,
+							);
+
+							if (pasteTranslator.isCompatibleValue) {
+								const value = await valueResolver.resolve(
+									clipboardEntryDetail.values,
+									UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS,
+								);
+								return pasteTranslator.isCompatibleValue(value, config);
+							}
+
+							return true;
+						},
 						originData: {},
 						createBlockInWorkspace: true,
 					},
@@ -48,8 +104,8 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				if (value?.create && data) {
 					const created = await this.create(
 						value.create.contentElementTypeKey,
-						// We can parse an empty object, cause the rest will be filled in by others.
-						{} as any,
+						{},
+						data.originData as UmbBlockRteWorkspaceOriginData,
 					);
 					if (created) {
 						this.insert(
@@ -61,6 +117,18 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
+				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+					if (!clipboardContext) {
+						throw new Error('Clipboard context not found');
+					}
+
+					const propertyValues = await clipboardContext.readMultiple<UmbPropertyEditorRteValueType>(
+						value.clipboard.selection,
+						UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS,
+					);
+
+					this.#insertFromRtePropertyValues(propertyValues, data.originData as UmbBlockRteWorkspaceOriginData);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -137,8 +205,24 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.deleteLayoutElement(contentKey);
 	}
 
-	protected async _insertFromPropertyValue(value: UmbBlockRteValueModel, originData: UmbBlockRteWorkspaceOriginData) {
-		const layoutEntries = value.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS];
+	async #insertFromRtePropertyValues(
+		values: Array<UmbPropertyEditorRteValueType>,
+		originData: UmbBlockRteWorkspaceOriginData,
+	) {
+		for (const value of values) {
+			originData = await this.#insertFromRtePropertyValue(value, originData);
+		}
+	}
+
+	async #insertFromRtePropertyValue(
+		value: UmbPropertyEditorRteValueType,
+		originData: UmbBlockRteWorkspaceOriginData,
+	): Promise<UmbBlockRteWorkspaceOriginData> {
+		if (!value.blocks) {
+			throw new Error('No blocks found in property value');
+		}
+
+		const layoutEntries = value.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS];
 
 		if (!layoutEntries) {
 			throw new Error('No layout entries found');
@@ -146,11 +230,21 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 		await Promise.all(
 			layoutEntries.map(async (layoutEntry) => {
-				this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				this._insertBlockFromPropertyValue(layoutEntry, value.blocks!, originData);
 				// TODO: Missing some way to insert a Block HTML Element into the RTE at the current cursor point. (hopefully the responsibility can be avoided here, but there is some connection missing at this point) [NL]
 			}),
 		);
 
 		return originData;
+	}
+
+	// This method is required by the base class but is not used for RTE blocks.
+	// RTE blocks use `#insertFromRtePropertyValue` instead because they expect
+	// `UmbPropertyEditorRteValueType` (with markup and blocks) rather than `UmbBlockValueType`.
+	protected override _insertFromPropertyValue(
+		_value: unknown,
+		_originData: UmbBlockRteWorkspaceOriginData,
+	): Promise<UmbBlockRteWorkspaceOriginData> {
+		throw new Error('Use #insertFromRtePropertyValue for RTE blocks');
 	}
 }
