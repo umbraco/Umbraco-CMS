@@ -16,10 +16,12 @@ export class UmbServerContext extends UmbContextBase {
 	#serverInformation = new UmbObjectState<ServerInformationResponseModel | undefined>(undefined);
 
 	/**
-	 * Observable that emits true when the server is running in Production mode.
+	 * Observable that emits true when the server is running in Production mode,
+	 * false when not in Production mode, or undefined until server information is loaded.
+	 * UI consumers should treat undefined as restricted (safe default).
 	 */
 	public readonly isProductionMode = this.#serverInformation.asObservablePart(
-		(info) => info?.runtimeMode === RuntimeModeModel.PRODUCTION,
+		(info) => (info ? info.runtimeMode === RuntimeModeModel.PRODUCTION : undefined),
 	);
 
 	/**

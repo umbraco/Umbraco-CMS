@@ -32,11 +32,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     public void SetUp() => DeleteAllTemplateViewFiles();
 
     [TearDown]
-    public new void TearDown()
-    {
-        base.TearDown();
-        DeleteAllTemplateViewFiles();
-    }
+    public void TearDownTemplateFiles() => DeleteAllTemplateViewFiles();
 
     [Test]
     public async Task Can_Create_Template_Then_Assign_Child()

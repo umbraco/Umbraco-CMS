@@ -198,9 +198,9 @@ public class TemplateService : RepositoryService, ITemplateService
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey)
         => await CreateAsync(template, userKey, null);
 
-    private TemplateOperationStatus ValidateCreate(ITemplate templateToCreate)
+    private async Task<TemplateOperationStatus> ValidateCreateAsync(ITemplate templateToCreate)
     {
-        ITemplate? existingTemplate = GetAsync(templateToCreate.Alias).GetAwaiter().GetResult();
+        ITemplate? existingTemplate = await GetAsync(templateToCreate.Alias);
         if (existingTemplate is not null)
         {
             return TemplateOperationStatus.DuplicateAlias;
@@ -287,12 +287,11 @@ public class TemplateService : RepositoryService, ITemplateService
             template,
             AuditType.Save,
             userKey,
-            // fail the attempt if the template does not exist within the scope
-            () => ValidateUpdate(template, checkContentChangeInProductionMode: true));
+            () => ValidateUpdateAsync(template));
 
-    private TemplateOperationStatus ValidateUpdate(ITemplate templateToUpdate, bool checkContentChangeInProductionMode = false)
+    private async Task<TemplateOperationStatus> ValidateUpdateAsync(ITemplate templateToUpdate)
     {
-        ITemplate? existingTemplate = GetAsync(templateToUpdate.Alias).GetAwaiter().GetResult();
+        ITemplate? existingTemplate = await GetAsync(templateToUpdate.Alias);
         if (existingTemplate is not null && existingTemplate.Key != templateToUpdate.Key)
         {
             return TemplateOperationStatus.DuplicateAlias;
@@ -303,11 +302,13 @@ public class TemplateService : RepositoryService, ITemplateService
             return TemplateOperationStatus.TemplateNotFound;
         }
 
-        // In production mode, block updates if the content is being changed
-        if (checkContentChangeInProductionMode && IsProductionMode)
+        // In production mode, block updates if the content is being changed.
+        if (IsProductionMode)
         {
-            // Get the existing template by key to compare content
-            ITemplate? existingByKey = GetAsync(templateToUpdate.Key).GetAwaiter().GetResult();
+            // Reuse existingTemplate if keys match (same template), otherwise fetch by key.
+            ITemplate? existingByKey = existingTemplate?.Key == templateToUpdate.Key
+                ? existingTemplate
+                : await GetAsync(templateToUpdate.Key);
             if (existingByKey is not null && existingByKey.Content != templateToUpdate.Content)
             {
                 return TemplateOperationStatus.ContentChangeNotAllowedInProductionMode;
@@ -318,11 +319,11 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(
-            ITemplate template,
-            AuditType auditType,
-            Guid userKey,
-            Func<TemplateOperationStatus>? scopeValidator = null,
-            string? contentTypeAlias = null)
+        ITemplate template,
+        AuditType auditType,
+        Guid userKey,
+        Func<Task<TemplateOperationStatus>>? scopeValidatorAsync = null,
+        string? contentTypeAlias = null)
     {
         if (IsValidAlias(template.Alias) == false)
         {
@@ -331,7 +332,9 @@ public class TemplateService : RepositoryService, ITemplateService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            TemplateOperationStatus scopeValidatorStatus = scopeValidator?.Invoke() ?? TemplateOperationStatus.Success;
+            TemplateOperationStatus scopeValidatorStatus = scopeValidatorAsync is not null
+                ? await scopeValidatorAsync()
+                : TemplateOperationStatus.Success;
             if (scopeValidatorStatus != TemplateOperationStatus.Success)
             {
                 return Attempt.FailWithStatus(scopeValidatorStatus, template);
@@ -514,7 +517,7 @@ public class TemplateService : RepositoryService, ITemplateService
         {
             // file might already be on disk, if so grab the content to avoid overwriting
             template.Content = GetViewContent(template.Alias) ?? template.Content;
-            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreate(template), contentTypeAlias);
+            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreateAsync(template), contentTypeAlias);
         }
         catch (PathTooLongException ex)
         {

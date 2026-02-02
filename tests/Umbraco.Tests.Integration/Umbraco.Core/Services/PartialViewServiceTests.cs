@@ -32,11 +32,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
     public void SetUp() => DeleteAllPartialViewFiles();
 
     [TearDown]
-    public new void TearDown()
-    {
-        base.TearDown();
-        DeleteAllPartialViewFiles();
-    }
+    public void TearDownPartialViewFiles() => DeleteAllPartialViewFiles();
 
     [Test]
     public async Task Can_Create_PartialView()

@@ -42,8 +42,19 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _masterTemplateName?: string | null = null;
 
+	/**
+	 * Whether editing is restricted. True when in production mode OR when runtime mode is still unknown.
+	 * This ensures a safe default (restricted) until we confirm the runtime mode.
+	 */
 	@state()
-	private _isProductionMode = false;
+	private _isRestricted = true;
+
+	/**
+	 * Whether we have confirmed the server is running in production mode.
+	 * Used to show the warning message only after confirmation.
+	 */
+	@state()
+	private _isConfirmedProductionMode = false;
 
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
@@ -62,7 +73,10 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this.observe(context?.isProductionMode, (isProductionMode) => {
-				this._isProductionMode = isProductionMode ?? false;
+				// Restricted until we confirm it's NOT production mode (safe default).
+				this._isRestricted = isProductionMode !== false;
+				// Only show the warning when we've confirmed production mode.
+				this._isConfirmedProductionMode = isProductionMode === true;
 			});
 		});
 
@@ -166,7 +180,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					@click=${this.#openMasterTemplatePicker}
 					look="secondary"
 					id="master-template-button"
-					?disabled=${this._isProductionMode}
+					?disabled=${this._isRestricted}
 					label="${this.localize.term('template_mastertemplate')}: ${this._masterTemplateName
 						? this._masterTemplateName
 						: this.localize.term('template_noMaster')}"></uui-button>
@@ -174,9 +188,10 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					? html`<uui-button
 							look="secondary"
 							label=${this.localize.term('actions_remove')}
-							?disabled=${this._isProductionMode}
+							?disabled=${this._isRestricted}
+							@click=${this.#resetMasterTemplate}
 							compact>
-							<uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon>
+							<uui-icon name="icon-delete"></uui-icon>
 						</uui-button>`
 					: nothing}
 			</uui-button-group>
@@ -184,7 +199,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderProductionModeWarning() {
-		if (!this._isProductionMode) return nothing;
+		if (!this._isConfirmedProductionMode) return nothing;
 		return html`
 			<div id="production-mode-warning">
 				<uui-icon name="icon-alert"></uui-icon>
@@ -208,7 +223,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					.alias=${this._alias}
 					alias-pattern=${UMB_TEMPLATE_ALIAS_PATTERN}
 					?auto-generate-alias=${this.#isNew}
-					?readonly=${this._isProductionMode}
+					?readonly=${this._isRestricted}
 					@change=${this.#onNameAndAliasChange}
 					required
 					${umbBindToValidation(this)}
@@ -221,12 +236,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					<div slot="header-actions">
 						<umb-templating-insert-menu
 							@insert=${this.#insertSnippet}
-							?disabled=${this._isProductionMode}></umb-templating-insert-menu>
+							?disabled=${this._isRestricted}></umb-templating-insert-menu>
 						<uui-button
 							look="secondary"
 							id="query-builder-button"
 							label=${this.localize.term('template_queryBuilder')}
-							?disabled=${this._isProductionMode}
+							?disabled=${this._isRestricted}
 							@click=${this.#openQueryBuilder}>
 							<uui-icon name="icon-wand"></uui-icon> ${this.localize.term('template_queryBuilder')}
 						</uui-button>
@@ -234,7 +249,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 							look="secondary"
 							id="sections-button"
 							label=${this.localize.term('template_insertSections')}
-							?disabled=${this._isProductionMode}
+							?disabled=${this._isRestricted}
 							@click=${this.#openInsertSectionModal}>
 							<uui-icon name="icon-indent"></uui-icon> ${this.localize.term('template_insertSections')}
 						</uui-button>
@@ -252,7 +267,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				id="content"
 				language="razor"
 				.code=${this._content ?? ''}
-				?readonly=${this._isProductionMode}
+				?readonly=${this._isRestricted}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}

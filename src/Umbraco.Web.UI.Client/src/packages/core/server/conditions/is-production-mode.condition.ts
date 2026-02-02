@@ -13,6 +13,9 @@ export class UmbIsProductionModeCondition
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbIsProductionModeConditionConfig>) {
 		super(host, args);
 
+		// Default to not permitted until we know the server's runtime mode (safe default).
+		this.permitted = false;
+
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this.observe(
 				context?.isProductionMode,

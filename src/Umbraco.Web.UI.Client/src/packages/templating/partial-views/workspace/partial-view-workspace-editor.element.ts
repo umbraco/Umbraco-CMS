@@ -23,8 +23,19 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
+	/**
+	 * Whether editing is restricted. True when in production mode OR when runtime mode is still unknown.
+	 * This ensures a safe default (restricted) until we confirm the runtime mode.
+	 */
 	@state()
-	private _isProductionMode = false;
+	private _isRestricted = true;
+
+	/**
+	 * Whether we have confirmed the server is running in production mode.
+	 * Used to show the warning message only after confirmation.
+	 */
+	@state()
+	private _isConfirmedProductionMode = false;
 
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
@@ -36,7 +47,10 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this.observe(context?.isProductionMode, (isProductionMode) => {
-				this._isProductionMode = isProductionMode ?? false;
+				// Restricted until we confirm it's NOT production mode (safe default).
+				this._isRestricted = isProductionMode !== false;
+				// Only show the warning when we've confirmed production mode.
+				this._isConfirmedProductionMode = isProductionMode === true;
 			});
 		});
 
@@ -74,7 +88,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderProductionModeWarning() {
-		if (!this._isProductionMode) return nothing;
+		if (!this._isConfirmedProductionMode) return nothing;
 		return html`
 			<div id="production-mode-warning">
 				<uui-icon name="icon-alert"></uui-icon>
@@ -90,19 +104,19 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			<umb-entity-detail-workspace-editor>
 				<umb-workspace-header-name-editable
 					slot="header"
-					?readonly=${this._isNew === false || this._isProductionMode}></umb-workspace-header-name-editable>
+					?readonly=${this._isNew === false || this._isRestricted}></umb-workspace-header-name-editable>
 				${this.#renderProductionModeWarning()}
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu
 							@insert=${this.#insertSnippet}
-							?disabled=${this._isProductionMode}
+							?disabled=${this._isRestricted}
 							hidePartialViews></umb-templating-insert-menu>
 						<uui-button
 							look="secondary"
 							id="query-builder-button"
 							label=${this.localize.term('template_queryBuilder')}
-							?disabled=${this._isProductionMode}
+							?disabled=${this._isRestricted}
 							@click=${this.#openQueryBuilder}>
 							<uui-icon name="icon-wand"></uui-icon>
 							<umb-localize key="template_queryBuilder">Query builder</umb-localize>
@@ -124,7 +138,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				id="content"
 				language="razor"
 				.code=${this._content ?? ''}
-				?readonly=${this._isProductionMode}
+				?readonly=${this._isRestricted}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}
