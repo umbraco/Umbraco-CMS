@@ -6,6 +6,8 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -160,7 +162,11 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)
+    public Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)
+        => EmptyRecycleBinAsync(userKey, DescendantsIteratorPageSize);
+
+    // internal so tests can use a smaller page size
+    internal async Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey, int pageSize)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
@@ -174,7 +180,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
 
-        DeleteDescendantsLocked(Constants.System.RecycleBinElementKey, scope, eventMessages);
+        DeleteDescendantsLocked(Constants.System.RecycleBinElementKey, UmbracoObjectTypes.ElementRecycleBin, scope, eventMessages, pageSize);
 
         await AuditAsync(AuditType.Delete, userKey, Constants.System.RecycleBinElement, "Recycle bin emptied");
 
@@ -321,7 +327,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 
-        DeleteDescendantsLocked(container.Key, scope, eventMessages);
+        DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages);
 
         _entityContainerRepository.Delete(container);
 
@@ -333,42 +339,65 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
     }
 
-    private void DeleteDescendantsLocked(Guid key, ICoreScope scope, EventMessages eventMessages)
+    private void DeleteDescendantsLocked(Guid key, UmbracoObjectTypes objectType, ICoreScope scope, EventMessages eventMessages, int pageSize = DescendantsIteratorPageSize)
     {
-        long total;
-        var skip = 0;
-
         // Order by path descending to ensure children are deleted before parents
         var pathDescendingOrdering = Ordering.By("Path", Direction.Descending);
 
-        do
-        {
-            IEnumerable<IEntitySlim> descendants = _entityService.GetPagedDescendants(
-                key,
-                UmbracoObjectTypes.ElementContainer,
-                [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
-                skip,
-                DescendantsIteratorPageSize,
-                out total,
-                ordering: pathDescendingOrdering);
+        // Use path as a cursor to track progress - this avoids skip/take pagination issues
+        // when some items are skipped due to being referenced
+        string? lastProcessedPath = null;
 
-            var skippedThisIteration = 0;
+        // Track paths of items that couldn't be deleted (referenced items)
+        // so we can skip deleting containers that are ancestors of these items
+        var protectedPaths = new List<string>();
+
+        while (true)
+        {
+            // Build filter: trashed items with path less than the last processed path (if any)
+            var pathCursor = lastProcessedPath;
+            IQuery<IUmbracoEntity> filter = pathCursor is null
+                ? Query<IUmbracoEntity>().Where(d => d.Trashed)
+                : Query<IUmbracoEntity>().Where(d => d.Trashed && d.Path.SqlLessThan(pathCursor));
+
+            IEntitySlim[] descendants = _entityService.GetPagedDescendants(
+                key,
+                objectType,
+                [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
+                0,
+                pageSize,
+                out _,
+                filter: filter,
+                ordering: pathDescendingOrdering).ToArray();
+
+            if (descendants.Length == 0)
+            {
+                break;
+            }
+
             foreach (IEntitySlim descendant in descendants)
             {
+                // Skip deleting containers that are ancestors of protected (referenced) items
+                if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer
+                    && protectedPaths.Any(p => p.StartsWith(descendant.Path + ",")))
+                {
+                    continue;
+                }
+
                 // Check if referenced before fetching the full entity
                 if (_contentSettingsOptions.CurrentValue.DisableDeleteWhenReferenced
                     && _relationService.IsRelated(descendant.Id, RelationDirectionFilter.Child, null))
                 {
-                    skippedThisIteration++;
+                    protectedPaths.Add(descendant.Path);
                     continue;
                 }
 
                 DeleteItem(scope, descendant, eventMessages);
             }
 
-            skip += skippedThisIteration;
+            // Track the smallest path we've seen (last in descending order) as cursor for next iteration
+            lastProcessedPath = descendants[^1].Path;
         }
-        while (total > skip + DescendantsIteratorPageSize);
     }
 
     private void DeleteItem(ICoreScope scope, IEntitySlim descendant, EventMessages eventMessages)
