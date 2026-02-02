@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -15,7 +17,16 @@ namespace Umbraco.Cms.Core.Services;
 public class PartialViewService : FileServiceOperationBase<IPartialViewRepository, IPartialView, PartialViewOperationStatus>, IPartialViewService
 {
     private readonly PartialViewSnippetCollection _snippetCollection;
+    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
 
+    // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
+    // Also update UmbracoBuilder where this service is registered using:
+    //   Services.AddUnique<IPartialViewService>(sp => ActivatorUtilities.CreateInstance<PartialViewService>(sp));
+    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddUnique).
+    // Revert it to:
+    //   Services.AddUnique<IPartialViewService, PartialViewService>();
+
+    [ActivatorUtilitiesConstructor]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -24,11 +35,15 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         ILogger<StylesheetService> logger,
         IUserIdKeyResolver userIdKeyResolver,
         IAuditService auditService,
-        PartialViewSnippetCollection snippetCollection)
+        PartialViewSnippetCollection snippetCollection,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings)
         : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
-        => _snippetCollection = snippetCollection;
+    {
+        _snippetCollection = snippetCollection;
+        _runtimeSettings = runtimeSettings;
+    }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in v19.")]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -46,11 +61,12 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
             logger,
             userIdKeyResolver,
             StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            snippetCollection)
+            snippetCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in v19.")]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -69,7 +85,8 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
             logger,
             userIdKeyResolver,
             auditService,
-            snippetCollection)
+            snippetCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
     {
     }
 
@@ -132,17 +149,45 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
 
     /// <inheritdoc />
     public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid userKey)
-        => await HandleDeleteAsync(path, userKey);
+    {
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return PartialViewOperationStatus.NotAllowedInProductionMode;
+        }
+
+        return await HandleDeleteAsync(path, userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid userKey)
-        => await HandleCreateAsync(createModel.Name, createModel.ParentPath, createModel.Content, userKey);
+    {
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
+        }
+
+        return await HandleCreateAsync(createModel.Name, createModel.ParentPath, createModel.Content, userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(string path, PartialViewUpdateModel updateModel, Guid userKey)
-        => await HandleUpdateAsync(path, updateModel.Content, userKey);
+    {
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
+        }
+
+        return await HandleUpdateAsync(path, updateModel.Content, userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> RenameAsync(string path, PartialViewRenameModel renameModel, Guid userKey)
-        => await HandleRenameAsync(path, renameModel.Name, userKey);
+    {
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
+        }
+
+        return await HandleRenameAsync(path, renameModel.Name, userKey);
+    }
 }
