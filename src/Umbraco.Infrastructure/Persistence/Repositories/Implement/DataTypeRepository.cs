@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -66,6 +67,10 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
     private Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
     public IDataType? Get(Guid key) => _dataTypeByGuidReadRepository.Get(key);
+
+    IEnumerable<IDataType> IReadRepository<Guid, IDataType>.GetMany(params Guid[]? keys) => _dataTypeByGuidReadRepository.GetMany(keys);
+
+    public bool Exists(Guid id) => _dataTypeByGuidReadRepository.Exists(id);
 
     public override void Save(IDataType entity)
     {

@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
@@ -87,6 +88,10 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     public ITemplate? Get(Guid key) => _templateByGuidReadRepository.Get(key);
+
+    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys) => _templateByGuidReadRepository.GetMany(keys);
+
+    public bool Exists(Guid id) => _templateByGuidReadRepository.Exists(id);
 
     public override void Save(ITemplate entity)
     {
