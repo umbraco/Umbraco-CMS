@@ -152,13 +152,15 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	addEntry(data: DetailType): void {
 		const unique = data.unique;
 		this.#entries.appendOne(data);
-		this.#uniques.appendOne(unique);
+		// Add status BEFORE unique to prevent #requestNewDetails from trying to fetch
+		// (the observation callback on #uniques checks #statuses to skip already-loaded entries)
 		this.#statuses.appendOne({
 			state: {
 				type: 'success',
 			},
 			unique,
 		});
+		this.#uniques.appendOne(unique);
 		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
 	}
 
