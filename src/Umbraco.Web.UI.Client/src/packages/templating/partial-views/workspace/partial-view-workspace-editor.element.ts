@@ -1,6 +1,10 @@
 import { getQuerySnippet } from '../../utils/index.js';
 import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
+import {
+	UMB_TEMPLATING_WORKSPACE_EDITOR_STYLES,
+	UMB_PRODUCTION_MODE_WARNING_STYLES,
+} from '../../workspace-editor-styles.js';
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -126,42 +130,9 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static override styles = [
+		UMB_TEMPLATING_WORKSPACE_EDITOR_STYLES,
+		UMB_PRODUCTION_MODE_WARNING_STYLES,
 		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			umb-code-editor {
-				--editor-height: calc(100dvh - 300px);
-			}
-
-			uui-box {
-				min-height: calc(100dvh - 300px);
-				margin: var(--uui-size-layout-1);
-				--uui-box-default-padding: 0;
-				/* remove header border bottom as code editor looks better in this box */
-				--uui-color-divider-standalone: transparent;
-			}
-
-			#production-mode-warning {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-2);
-				margin: var(--uui-size-layout-1);
-				margin-bottom: 0;
-				padding: var(--uui-size-space-3) var(--uui-size-space-4);
-				background-color: var(--uui-color-warning);
-				color: var(--uui-color-warning-contrast);
-				border-radius: var(--uui-border-radius);
-				font-size: var(--uui-type-small-size);
-			}
-
-			#code-editor-menu-container uui-icon:not([name='icon-delete']) {
-				margin-right: var(--uui-size-space-3);
-			}
-
 			#insert-menu {
 				margin: 0;
 				padding: 0;
@@ -183,9 +154,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#code-editor-menu-container {
-				display: flex;
 				justify-content: flex-end;
-				gap: var(--uui-size-space-3);
 				width: 100%;
 			}
 		`,
