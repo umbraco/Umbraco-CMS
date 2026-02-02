@@ -38,7 +38,7 @@ export class UmbTiptapBlockToBlockRteClipboardPastePropertyValueTranslator
 		const allowedBlockContentTypes =
 			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
 		const blockContentTypes = propertyValue.blocks?.contentData.map((c) => c.contentTypeKey) ?? [];
-		return blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
+		return blockContentTypes.every((b) => allowedBlockContentTypes.includes(b));
 	}
 }
 

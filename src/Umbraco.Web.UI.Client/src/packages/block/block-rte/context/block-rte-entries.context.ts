@@ -108,7 +108,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						data.originData as UmbBlockRteWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
+						await this.insert(
 							created.layout,
 							created.content,
 							created.settings,
@@ -128,7 +128,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
-					this.#insertFromRtePropertyValues(propertyValues, data.originData as UmbBlockRteWorkspaceOriginData);
+					await this.#insertFromRtePropertyValues(propertyValues, data.originData as UmbBlockRteWorkspaceOriginData);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
