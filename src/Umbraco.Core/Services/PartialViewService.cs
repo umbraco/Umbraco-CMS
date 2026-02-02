@@ -43,7 +43,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         _runtimeSettings = runtimeSettings;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -66,7 +66,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -76,6 +76,29 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         IUserIdKeyResolver userIdKeyResolver,
         IAuditService auditService,
         IAuditRepository auditRepository,
+        PartialViewSnippetCollection snippetCollection)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            auditService,
+            snippetCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
+    public PartialViewService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IPartialViewRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService,
         PartialViewSnippetCollection snippetCollection)
         : this(
             provider,
