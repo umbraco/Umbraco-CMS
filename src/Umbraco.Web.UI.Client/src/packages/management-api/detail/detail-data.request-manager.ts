@@ -7,9 +7,11 @@ import {
 	type UmbCancelError,
 	type UmbApiResponse,
 	type UmbApiWithErrorResponse,
+	type UmbDataApiResponse,
 } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 export interface UmbManagementApiDetailDataRequestManagerArgs<
 	DetailResponseModelType,
@@ -20,12 +22,13 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	read: (id: string) => Promise<UmbApiResponse<{ data: DetailResponseModelType }>>;
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
+	readMany?: (ids: Array<string>) => Promise<UmbDataApiResponse<{ data: { items: Array<DetailResponseModelType> } }>>;
 	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
 	inflightRequestCache: UmbManagementApiInFlightRequestCache<DetailResponseModelType>;
 }
 
 export class UmbManagementApiDetailDataRequestManager<
-	DetailResponseModelType,
+	DetailResponseModelType extends { id: string },
 	CreateRequestModelType,
 	UpdateRequestModelType,
 > extends UmbControllerBase {
@@ -36,6 +39,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	#read;
 	#update;
 	#delete;
+	#readMany;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 	#isConnectedToServerEvents = false;
 
@@ -53,6 +57,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		this.#read = args.read;
 		this.#update = args.update;
 		this.#delete = args.delete;
+		this.#readMany = args.readMany;
 
 		this.#dataCache = args.dataCache;
 		this.#inflightRequestCache = args.inflightRequestCache;
@@ -112,6 +117,53 @@ export class UmbManagementApiDetailDataRequestManager<
 		}
 
 		return { data, error };
+	}
+
+	/**
+	 * Reads multiple items by their IDs.
+	 * Only available if a readMany function was provided in the constructor args.
+	 * @param {Array<string>} ids - The IDs of the items to read
+	 * @returns {Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>>}
+	 */
+	async readMany(ids: Array<string>): Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>> {
+		if (!this.#readMany) {
+			throw new Error('readMany is not available. No readMany function was provided in the constructor args.');
+		}
+
+		let error: UmbApiError | UmbCancelError | undefined;
+		let idsToRequest: Array<string> = [...ids];
+		let cacheItems: Array<DetailResponseModelType> = [];
+		let serverItems: Array<DetailResponseModelType> | undefined;
+
+		// Only read from the cache when we are connected to the server events
+		if (this.#isConnectedToServerEvents) {
+			const cachedIds = ids.filter((id) => this.#dataCache.has(id));
+			cacheItems = cachedIds
+				.map((id) => this.#dataCache.get(id))
+				.filter((x) => x !== undefined) as Array<DetailResponseModelType>;
+			idsToRequest = ids.filter((id) => !this.#dataCache.has(id));
+		}
+
+		if (idsToRequest.length > 0) {
+			const getItemsController = new UmbItemDataApiGetRequestController(this, {
+				api: (args) => this.#readMany!(args.uniques),
+				uniques: idsToRequest,
+			});
+
+			const { data: serverData, error: serverError } = await getItemsController.request();
+
+			serverItems = serverData.items ?? [];
+			error = serverError;
+
+			if (this.#isConnectedToServerEvents) {
+				// If we are connected to server events, we can cache the server data
+				serverItems?.forEach((item) => this.#dataCache.set(item.id, item));
+			}
+		}
+
+		const items: Array<DetailResponseModelType> = [...cacheItems, ...(serverItems ?? [])];
+
+		return { data: { items }, error };
 	}
 
 	async update(id: string, data: UpdateRequestModelType): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {

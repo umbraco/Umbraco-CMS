@@ -87,7 +87,7 @@ export class UmbDocumentTypeDetailServerDataSource
 		const { data, error } = await this.#detailRequestManager.readMany(uniques);
 
 		return {
-			data: data?.map((item) => this.#mapServerResponseModelToEntityDetailModel(item)),
+			data: data?.items?.map((item) => this.#mapServerResponseModelToEntityDetailModel(item)),
 			error,
 		};
 	}
