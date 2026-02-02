@@ -1,4 +1,5 @@
 import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_IS_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const UMB_PARTIAL_VIEW_WORKSPACE_ALIAS = 'Umb.Workspace.PartialView';
 
@@ -28,6 +29,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_IS_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
 			},
 		],
 	},

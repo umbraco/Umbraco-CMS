@@ -11,6 +11,7 @@ import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
@@ -37,6 +38,9 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _masterTemplateName?: string | null = null;
 
+	@state()
+	private _isProductionMode = false;
+
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
@@ -50,6 +54,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
+		});
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(context?.isProductionMode, (isProductionMode) => {
+				this._isProductionMode = isProductionMode ?? false;
+			});
 		});
 
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
@@ -152,15 +162,32 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					@click=${this.#openMasterTemplatePicker}
 					look="secondary"
 					id="master-template-button"
+					?disabled=${this._isProductionMode}
 					label="${this.localize.term('template_mastertemplate')}: ${this._masterTemplateName
 						? this._masterTemplateName
 						: this.localize.term('template_noMaster')}"></uui-button>
 				${this._masterTemplateName
-					? html`<uui-button look="secondary" label=${this.localize.term('actions_remove')} compact>
+					? html`<uui-button
+							look="secondary"
+							label=${this.localize.term('actions_remove')}
+							?disabled=${this._isProductionMode}
+							compact>
 							<uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon>
 						</uui-button>`
 					: nothing}
 			</uui-button-group>
+		`;
+	}
+
+	#renderProductionModeWarning() {
+		if (!this._isProductionMode) return nothing;
+		return html`
+			<div id="production-mode-warning">
+				<uui-icon name="icon-alert"></uui-icon>
+				<umb-localize key="speechBubbles_runtimeModeNotEditable">
+					Content is not editable when using Production runtime mode.
+				</umb-localize>
+			</div>
 		`;
 	}
 
@@ -177,20 +204,25 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					.alias=${this._alias}
 					alias-pattern=${UMB_TEMPLATE_ALIAS_PATTERN}
 					?auto-generate-alias=${this.#isNew}
+					?readonly=${this._isProductionMode}
 					@change=${this.#onNameAndAliasChange}
 					required
 					${umbBindToValidation(this)}
 					${umbFocus()}>
 				</umb-input-with-alias>
 
+				${this.#renderProductionModeWarning()}
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
 					<div slot="header-actions">
-						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
+						<umb-templating-insert-menu
+							@insert=${this.#insertSnippet}
+							?disabled=${this._isProductionMode}></umb-templating-insert-menu>
 						<uui-button
 							look="secondary"
 							id="query-builder-button"
 							label=${this.localize.term('template_queryBuilder')}
+							?disabled=${this._isProductionMode}
 							@click=${this.#openQueryBuilder}>
 							<uui-icon name="icon-wand"></uui-icon> ${this.localize.term('template_queryBuilder')}
 						</uui-button>
@@ -198,6 +230,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 							look="secondary"
 							id="sections-button"
 							label=${this.localize.term('template_insertSections')}
+							?disabled=${this._isProductionMode}
 							@click=${this.#openInsertSectionModal}>
 							<uui-icon name="icon-indent"></uui-icon> ${this.localize.term('template_insertSections')}
 						</uui-button>
@@ -215,6 +248,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				id="content"
 				language="razor"
 				.code=${this._content ?? ''}
+				?readonly=${this._isProductionMode}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}
@@ -243,6 +277,19 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */
 				--uui-color-divider-standalone: transparent;
+			}
+
+			#production-mode-warning {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+				margin: var(--uui-size-layout-1);
+				margin-bottom: 0;
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				background-color: var(--uui-color-warning);
+				color: var(--uui-color-warning-contrast);
+				border-radius: var(--uui-border-radius);
+				font-size: var(--uui-type-small-size);
 			}
 
 			umb-input-with-alias {

@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
@@ -18,6 +19,9 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
+	@state()
+	private _isProductionMode = false;
+
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
@@ -25,6 +29,12 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(context?.isProductionMode, (isProductionMode) => {
+				this._isProductionMode = isProductionMode ?? false;
+			});
+		});
 
 		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
@@ -59,19 +69,36 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
+	#renderProductionModeWarning() {
+		if (!this._isProductionMode) return nothing;
+		return html`
+			<div id="production-mode-warning">
+				<uui-icon name="icon-alert"></uui-icon>
+				<umb-localize key="speechBubbles_runtimeModeNotEditable">
+					Content is not editable when using Production runtime mode.
+				</umb-localize>
+			</div>
+		`;
+	}
+
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor>
 				<umb-workspace-header-name-editable
 					slot="header"
-					?readonly=${this._isNew === false}></umb-workspace-header-name-editable>
+					?readonly=${this._isNew === false || this._isProductionMode}></umb-workspace-header-name-editable>
+				${this.#renderProductionModeWarning()}
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
-						<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
+						<umb-templating-insert-menu
+							@insert=${this.#insertSnippet}
+							?disabled=${this._isProductionMode}
+							hidePartialViews></umb-templating-insert-menu>
 						<uui-button
 							look="secondary"
 							id="query-builder-button"
 							label=${this.localize.term('template_queryBuilder')}
+							?disabled=${this._isProductionMode}
 							@click=${this.#openQueryBuilder}>
 							<uui-icon name="icon-wand"></uui-icon>
 							<umb-localize key="template_queryBuilder">Query builder</umb-localize>
@@ -93,6 +120,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				id="content"
 				language="razor"
 				.code=${this._content ?? ''}
+				?readonly=${this._isProductionMode}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}
@@ -115,6 +143,19 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */
 				--uui-color-divider-standalone: transparent;
+			}
+
+			#production-mode-warning {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+				margin: var(--uui-size-layout-1);
+				margin-bottom: 0;
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				background-color: var(--uui-color-warning);
+				color: var(--uui-color-warning-contrast);
+				border-radius: var(--uui-border-radius);
+				font-size: var(--uui-type-small-size);
 			}
 
 			#code-editor-menu-container uui-icon:not([name='icon-delete']) {
