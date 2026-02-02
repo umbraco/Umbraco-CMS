@@ -181,10 +181,22 @@ namespace Umbraco.Extensions
                 .Append($") {sql.SqlContext.SqlSyntax.GetQuotedName(alias)}"));
         }
 
+        /// <summary>
+        /// Adds a WHERE clause to the SQL query that filters results based on a LIKE comparison for the specified
+        /// field.
+        /// </summary>
+        /// <remarks>Use this method to perform pattern matching queries, such as searching for records
+        /// where a field contains, starts with, or ends with a specified substring. The method does not automatically
+        /// add wildcard characters; include them in the likeValue parameter as needed.</remarks>
+        /// <typeparam name="TDto">The type of the data transfer object representing the table or entity being queried.</typeparam>
+        /// <param name="sql">The SQL builder instance to which the WHERE clause will be appended.</param>
+        /// <param name="fieldSelector">An expression that selects the field of the entity to apply the LIKE filter to.</param>
+        /// <param name="likeValue">The value to use in the LIKE comparison. This can include SQL wildcard characters such as '%' or '_'.</param>
+        /// <returns>The updated SQL builder instance with the appended WHERE LIKE clause.</returns>
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, string likeValue)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
-            sql.Where($"{fieldName} LIKE ('{likeValue}')");
+            sql.Where($"{fieldName} LIKE @0", likeValue);
             return sql;
         }
 
