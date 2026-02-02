@@ -6,3 +6,9 @@ export class UmbImageCropChangeEvent extends Event {
 		super(UmbImageCropChangeEvent.TYPE, { bubbles: false, composed: false, cancelable: false, ...args });
 	}
 }
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbImageCropChangeEvent.TYPE]: UmbImageCropChangeEvent;
+	}
+}

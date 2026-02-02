@@ -13,6 +13,8 @@ import {
 	type UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
+import { UmbModalRouteRegistrationController, type UmbModalRouteSetupReturn } from '@umbraco-cms/backoffice/router';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbPickerInputContext<
 	PickedItemType extends UmbItemModel = UmbItemModel,
@@ -29,6 +31,11 @@ export class UmbPickerInputContext<
 	public readonly selectedItems;
 	public readonly statuses;
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
+
+	#modalRoute = new UmbStringState<string | undefined>(undefined);
+	public readonly modalRoute = this.#modalRoute.asObservable();
+
+	#modalData?: Partial<PickerModalConfigType>;
 
 	/**
 	 * Define a maximum amount of selected items in this input, for this input to be valid.
@@ -69,7 +76,7 @@ export class UmbPickerInputContext<
 		super(host, UMB_PICKER_INPUT_CONTEXT);
 
 		if (modalAlias) {
-			this.modalAlias = modalAlias;
+			this.setModalAlias(modalAlias);
 		}
 
 		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias);
@@ -94,6 +101,43 @@ export class UmbPickerInputContext<
 		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
 	}
 
+	/**
+	 * Sets the modal alias/token to use for the picker modal.
+	 * @param {string | UmbModalToken} modalAlias The modal alias or token.
+	 * @memberof UmbPickerInputContext
+	 */
+	setModalAlias(modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>) {
+		this.modalAlias = modalAlias;
+		this.#createPickerModalRoute();
+	}
+
+	/**
+	 * Gets the modal alias/token used for the picker modal.
+	 * @returns {string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>} The modal alias or token.
+	 * @memberof UmbPickerInputContext
+	 */
+	getModalAlias(): string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType> | undefined {
+		return this.modalAlias;
+	}
+
+	/**
+	 * Sets modal data that will be used as base configuration for both direct openPicker() calls and modal route setup.
+	 * @param {Partial<PickerModalConfigType>} modalData The modal data to store.
+	 * @memberof UmbPickerInputContext
+	 */
+	setModalData(modalData?: Partial<PickerModalConfigType>) {
+		this.#modalData = modalData;
+	}
+
+	/**
+	 * Gets the stored modal data.
+	 * @returns {Partial<PickerModalConfigType> | undefined} The stored modal data.
+	 * @memberof UmbPickerInputContext
+	 */
+	getModalData(): Partial<PickerModalConfigType> | undefined {
+		return this.#modalData;
+	}
+
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
 
@@ -102,19 +146,11 @@ export class UmbPickerInputContext<
 		}
 
 		const modalValue = await umbOpenModal(this, this.modalAlias, {
-			data: {
-				multiple: this._max === 1 ? false : true,
-				...pickerData,
-			},
-			value: {
-				selection: this.getSelection(),
-			} as PickerModalValueType,
+			data: this.#getPickerModalDataArgs(pickerData),
+			value: this.#getPickerModalValueArgs(),
 		}).catch(() => undefined);
 
-		if (!modalValue) return;
-
-		this.setSelection(modalValue.selection);
-		this.getHostElement().dispatchEvent(new UmbChangeEvent());
+		this.#applyModalValue(modalValue);
 	}
 
 	protected async _requestItemName(unique: string) {
@@ -136,6 +172,54 @@ export class UmbPickerInputContext<
 	protected _removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+		this.getHostElement().dispatchEvent(new UmbChangeEvent());
+	}
+
+	#pickerModalRouteRegistration?: UmbModalRouteRegistrationController<
+		UmbPickerModalData<PickerItemType>,
+		PickerModalValueType
+	>;
+
+	#createPickerModalRoute() {
+		if (!this.modalAlias) {
+			this.#pickerModalRouteRegistration?.destroy();
+			return;
+		}
+
+		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias)
+			.addUniquePaths(['picker'])
+			.onSetup(() => {
+				return {
+					data: this.#getPickerModalDataArgs(),
+					value: this.#getPickerModalValueArgs(),
+				} as UmbModalRouteSetupReturn<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
+			})
+			.onSubmit((value) => {
+				this.#applyModalValue(value);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const path = routeBuilder({});
+				this.#modalRoute.setValue(path);
+			});
+	}
+
+	#getPickerModalDataArgs(modalData?: Partial<PickerModalConfigType>) {
+		return {
+			multiple: this._max === 1 ? false : true,
+			...this.#modalData,
+			...modalData,
+		};
+	}
+
+	#getPickerModalValueArgs(): PickerModalValueType {
+		return {
+			selection: this.getSelection(),
+		} as PickerModalValueType;
+	}
+
+	#applyModalValue(value: PickerModalValueType | undefined) {
+		if (!value) return;
+		this.setSelection(value.selection);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 }

@@ -26,7 +26,7 @@ import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-single-entry/index.js';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
 	extractJsonQueryProps,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -36,6 +36,7 @@ import {
 import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -244,8 +245,14 @@ export class UmbPropertyEditorUIBlockSingleElement
 			null,
 		);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
-			this.#managerContext.setVariantId(context?.getVariantId());
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeContextualVariantId',
+			);
 		});
 
 		this.addValidator(
@@ -257,7 +264,11 @@ export class UmbPropertyEditorUIBlockSingleElement
 		this.addValidator(
 			'valueMissing',
 			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => !!this.mandatory && this.#entriesContext.getLength() === 0,
+			() => {
+				if (!this.mandatory || this.readonly) return false;
+				const count = this.value?.layout?.[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.length ?? 0;
+				return count === 0;
+			},
 		);
 
 		this.observe(

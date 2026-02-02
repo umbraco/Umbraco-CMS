@@ -36,10 +36,9 @@ test('can create content with an empty block grid', async ({umbracoApi, umbracoU
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -59,10 +58,9 @@ test('can publish content with an empty block grid', async ({umbracoApi, umbraco
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -84,10 +82,9 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
@@ -107,10 +104,9 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickEditBlockGridBlockButton();
   await umbracoUi.content.enterTextstring(updatedText);
   await umbracoUi.content.clickUpdateButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
 });
@@ -125,10 +121,9 @@ test('can delete block element in the content', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickDeleteBlockGridBlockButton();
   await umbracoUi.content.clickConfirmToDeleteButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   const blockGridValue = contentData.values.find(item => item.value);
   expect(blockGridValue).toBeFalsy();
@@ -197,10 +192,9 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.doesBlockElementHaveName(blockLabel);
 });
 
@@ -218,10 +212,9 @@ test('can set the number of columns for the layout in the content', async ({umbr
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   const layoutValue = contentData.values[0]?.value.layout["Umbraco.BlockGrid"];
   expect(layoutValue[0].columnSpan).toBe(gridColumns);
@@ -249,10 +242,9 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   await umbracoUi.content.clickAddBlockSettingsTabButton();
   await umbracoUi.content.enterTextArea(settingBlockInputText);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(contentBlockInputText);
@@ -278,7 +270,7 @@ test('can create content with a block grid with the inline editing mode enabled'
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
@@ -300,10 +292,9 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
@@ -332,9 +323,9 @@ test('can add an invariant block element with an invariant RTE Tiptap in the con
   await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
@@ -364,12 +355,11 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
-  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
@@ -400,12 +390,11 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
-  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;

@@ -24,8 +24,9 @@ public class DetailsIndexerController : IndexerControllerBase
     /// <summary>
     ///     Check if the index has been rebuilt
     /// </summary>
-    /// <param name="indexName"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="indexName">The name of the index.</param>
+    /// <returns>The index details.</returns>
     /// <remarks>
     ///     This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
     ///     have a listener for the index op complete so we'll just check if that id is no longer there in the runtime cache

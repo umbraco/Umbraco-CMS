@@ -31,6 +31,7 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Creates a package.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="createPackageRequestModel">The model containing the data for a new package.</param>
     /// <returns>The created package.</returns>
     [HttpPost]

@@ -50,7 +50,7 @@ export class UmbMediaSearchServerDataSource
 				return {
 					entityType: UMB_MEDIA_ENTITY_TYPE,
 					hasChildren: item.hasChildren,
-					href: '/section/media/workspace/media/edit/' + item.id,
+					href: 'section/media/workspace/media/edit/' + item.id,
 					isTrashed: item.isTrashed,
 					unique: item.id,
 					mediaType: {

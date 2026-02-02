@@ -17,7 +17,9 @@ public class DeleteColumnExpression : MigrationExpressionBase
         var stmts = new StringBuilder();
         foreach (var columnName in ColumnNames)
         {
-            stmts.AppendFormat(SqlSyntax.DropColumn, SqlSyntax.GetQuotedTableName(TableName),
+            stmts.AppendFormat(
+                SqlSyntax.DropColumn,
+                SqlSyntax.GetQuotedTableName(TableName),
                 SqlSyntax.GetQuotedColumnName(columnName));
             AppendStatementSeparator(stmts);
         }

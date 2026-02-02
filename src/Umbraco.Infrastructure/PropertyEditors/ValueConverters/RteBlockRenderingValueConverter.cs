@@ -45,11 +45,21 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
     private DeliveryApiSettings _deliveryApiSettings;
     private readonly IDisposable? _deliveryApiSettingsChangeSubscription;
 
-    public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
-        IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
-        IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
-        IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
-        IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+    public RteBlockRenderingValueConverter(
+        HtmlLocalLinkParser linkParser,
+        HtmlUrlParser urlParser,
+        HtmlImageSourceParser imageSourceParser,
+        IApiRichTextElementParser apiRichTextElementParser,
+        IApiRichTextMarkupParser apiRichTextMarkupParser,
+        IPartialViewBlockEngine partialViewBlockEngine,
+        BlockEditorConverter blockEditorConverter,
+        IJsonSerializer jsonSerializer,
+        IApiElementBuilder apiElementBuilder,
+        RichTextBlockPropertyValueConstructorCache constructorCache,
+        ILogger<RteBlockRenderingValueConverter> logger,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _linkParser = linkParser;
         _urlParser = urlParser;
@@ -108,8 +118,12 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         };
     }
 
-    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object ConvertIntermediateToObject(
+        IPublishedElement owner,
+        IPublishedPropertyType propertyType,
+        PropertyCacheLevel referenceCacheLevel,
+        object? inter,
+        bool preview)
     {
         var converted = Convert(inter, preview);
 

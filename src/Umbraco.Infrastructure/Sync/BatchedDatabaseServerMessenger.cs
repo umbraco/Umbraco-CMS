@@ -123,8 +123,11 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     }
 
     /// <inheritdoc />
-    protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType,
-        IEnumerable<object>? ids = null, string? json = null)
+    protected override void DeliverRemote(
+        ICacheRefresher refresher,
+        MessageType messageType,
+        IEnumerable<object>? ids = null,
+        string? json = null)
     {
         var idsA = ids?.ToArray();
 

@@ -9,6 +9,7 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
+import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
@@ -154,6 +155,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
+	getLanguages(): Array<UmbLanguageDetailModel> {
+		return this.#languages.getValue();
+	}
 
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
@@ -221,6 +225,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.validationContext,
 			this.view.hints,
 		);
+
+		new UmbContentDetailWorkspaceTypeTransformController(this as any);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
@@ -425,14 +431,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this._segments.setValue([]);
 		}
 
-		// Set culture and segment for all values:
-		const cultures = this.#languages.getValue().map((x) => x.unique);
-
-		let segments: Array<string> | undefined;
-		if (this.#variesBySegment) {
-			segments = this._segments.getValue().map((s) => s.alias);
-		}
-
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
@@ -464,10 +462,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cultures);
-		if (segments) {
-			controller.setSegments(segments);
+
+		const variantOptions = (await firstValueFrom(this.variantOptions)).map(
+			(o) => new UmbVariantId(o.culture, o.segment),
+		);
+		if (contentTypeVariesByCulture) {
+			variantOptions.push(UmbVariantId.CreateInvariant()); // Ensure invariant is included, when the contentType varies by culture, because we do not have a invariant-variant in our variant-options. [NL]
 		}
+		controller.setVariantOptions(variantOptions);
 
 		controller.setValues(data.values);
 
@@ -502,7 +504,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Get the name of a variant
-	 * @param {UmbVariantId } [variantId] - The variant id
+	 * @param {UmbVariantId } [variantId] - The variant id. If not provided, returns the name of the first active variant.
 	 * @returns { string | undefined} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
@@ -511,9 +513,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
-		} else {
-			return variants[0]?.name;
 		}
+		// Get the first active variant's name
+		const activeVariant = this.splitView.getActiveVariants()[0];
+		if (activeVariant) {
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name;
+		}
+		// Fallback to first variant if no active variant is set
+		return variants[0]?.name;
 	}
 
 	/**
@@ -528,14 +536,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Get an observable for the name of a variant
-	 * @param {UmbVariantId} [variantId] - The variant id
+	 * @param {UmbVariantId} [variantId] - The variant id. If not provided, observes the name of the first active variant.
 	 * @returns {Observable<string>} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public name(variantId?: UmbVariantId): Observable<string> {
-		return this._data.createObservablePartOfCurrent(
-			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
-		);
+		if (variantId) {
+			// Explicit variant requested
+			return this._data.createObservablePartOfCurrent(
+				(data) => data?.variants?.find((x) => variantId.compare(x))?.name ?? '',
+			);
+		}
+		// No variant specified - observe first active variant's name
+		return mergeObservables([this.splitView.activeVariantByIndex(0), this.variants], ([activeVariant, variants]) => {
+			if (!activeVariant || !variants) return '';
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name ?? '';
+		});
 	}
 
 	/* Variants */

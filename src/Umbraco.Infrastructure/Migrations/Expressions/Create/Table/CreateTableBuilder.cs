@@ -160,7 +160,9 @@ public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, I
         string primaryColumnName) => ForeignKey(null, null, primaryTableName, primaryColumnName);
 
     /// <inheritdoc />
-    public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableName,
+    public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(
+        string foreignKeyName,
+        string primaryTableName,
         string primaryColumnName) =>
         ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
 
@@ -168,7 +170,8 @@ public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, I
     public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(
         string? foreignKeyName,
         string? primaryTableSchema,
-        string primaryTableName, string primaryColumnName)
+        string primaryTableName,
+        string primaryColumnName)
     {
         CurrentColumn.IsForeignKey = true;
 
@@ -204,7 +207,9 @@ public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, I
         string foreignColumnName) => ReferencedBy(null, null, foreignTableName, foreignColumnName);
 
     /// <inheritdoc />
-    public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableName,
+    public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(
+        string foreignKeyName,
+        string foreignTableName,
         string foreignColumnName) =>
         ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
 
@@ -212,7 +217,8 @@ public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, I
     public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(
         string? foreignKeyName,
         string? foreignTableSchema,
-        string foreignTableName, string foreignColumnName)
+        string foreignTableName,
+        string foreignColumnName)
     {
         var fk = new CreateForeignKeyExpression(
             _context,

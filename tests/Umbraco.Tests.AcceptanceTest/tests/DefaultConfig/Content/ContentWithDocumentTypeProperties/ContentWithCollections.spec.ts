@@ -31,11 +31,10 @@ test('can create content configured as a collection', async ({umbracoApi, umbrac
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
-  await umbracoUi.content.isTabNameVisible('Collection');
+  await umbracoUi.content.isTabNameVisible('Child items');
   await umbracoUi.content.doesContentListHaveNoItemsInList();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
@@ -54,10 +53,9 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   await umbracoUi.content.enterContentName(firstChildContentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
@@ -87,10 +85,9 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   await umbracoUi.content.enterContentName(secondChildContentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -351,11 +351,11 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_With_AllowEditInvariantFromNonDefault()
-        => Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(true);
+        => await Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(true);
 
     [Test]
     public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_Without_AllowEditInvariantFromNonDefault()
-        => Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(false);
+        => await Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(false);
 
     private async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(bool expectedInvariantValidationErrors)
     {

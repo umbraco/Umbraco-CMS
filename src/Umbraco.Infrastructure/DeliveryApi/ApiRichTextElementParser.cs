@@ -1,6 +1,7 @@
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
@@ -143,12 +144,21 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             mediaCache,
             href,
             type,
-            route =>
+            (route, content) =>
             {
+                attributes["destinationId"] = content.Key.ToString("D");
+                attributes["destinationType"] = content.ContentType.Alias;
+                attributes["linkType"] = nameof(LinkType.Content);
                 attributes["route"] = route;
                 attributes.Remove("href");
             },
-            url => attributes["href"] = url,
+            (url, media) =>
+            {
+                attributes["destinationId"] = media.Key.ToString("D");
+                attributes["destinationType"] = media.ContentType.Alias;
+                attributes["linkType"] = nameof(LinkType.Media);
+                attributes["href"] = url;
+            },
             () => attributes.Remove("href"));
     }
 

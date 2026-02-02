@@ -1,13 +1,14 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbUserGroupMockDb } from '../../data/user-group/user-group.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.get(umbracoPath(`/filter${UMB_SLUG}`), (req, res, ctx) => {
-		const skip = Number(req.url.searchParams.get('skip'));
-		const take = Number(req.url.searchParams.get('take'));
-		const filter = req.url.searchParams.get('filter');
+	http.get(umbracoPath(`/filter${UMB_SLUG}`), ({ request }) => {
+		const searchParams = new URL(request.url).searchParams;
+		const skip = Number(searchParams.get('skip'));
+		const take = Number(searchParams.get('take'));
+		const filter = searchParams.get('filter');
 
 		const options: any = {
 			skip: skip || undefined,
@@ -16,6 +17,6 @@ export const handlers = [
 		};
 
 		const response = umbUserGroupMockDb.filter(options);
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 ];

@@ -188,7 +188,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					manager.hasExposeOf(contentKey, variantId),
 					(exposed) => {
-						this.#exposed.setValue(exposed);
+						this.#exposed.setValue(exposed ?? false);
 					},
 					'observeHasExpose',
 				);
@@ -273,7 +273,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		const label = this.#labelRender.toString();
 		const title = `${prefix} ${label}`;
 		this.#name.setValue(title);
-		this.view.setTitle(title);
+
+		if (this.#modalContext) {
+			this.view.setTitle(title);
+		}
 	}
 
 	#allowNavigateAway = false;

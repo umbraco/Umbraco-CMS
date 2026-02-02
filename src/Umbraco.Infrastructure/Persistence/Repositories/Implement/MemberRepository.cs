@@ -153,7 +153,9 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     public override int RecycleBinId => throw new NotSupportedException();
 
-    public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch,
+    public IEnumerable<IMember> FindMembersInRole(
+        string roleName,
+        string usernameToMatch,
         StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         //get the group id
@@ -355,6 +357,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     /// <summary>
     ///     Gets paged member results.
     /// </summary>
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public override IEnumerable<IMember> GetPage(
         IQuery<IMember>? query,
         long pageIndex,
@@ -362,7 +365,21 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         out long totalRecords,
         IQuery<IMember>? filter,
         Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <summary>
+    ///     Gets paged member results.
+    /// </summary>
+    public override IEnumerable<IMember> GetPage(
+        IQuery<IMember>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IMember>? filter,
+        Ordering? ordering)
     {
+
         Sql<ISqlContext>? filterSql = null;
 
         if (filter != null)
@@ -374,8 +391,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             }
         }
 
-        return GetPage<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-            x => MapDtosToContent(x),
+        return GetPage<MemberDto>(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
+            x => MapDtosToContent(x, propertyAliases: propertyAliases),
             filterSql,
             ordering);
     }
@@ -466,7 +487,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         return base.ApplySystemOrdering(ref sql, ordering);
     }
 
-    private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false)
+    private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false, string[]? propertyAliases = null)
     {
         var temps = new List<TempContent<Member>>();
         var contentTypes = new Dictionary<int, IMemberType?>();
@@ -506,7 +527,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         }
 
         // load all properties for all documents from database in 1 query - indexed by version id
-        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps);
+        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps, propertyAliases);
 
         // assign properties
         foreach (TempContent<Member> temp in temps)

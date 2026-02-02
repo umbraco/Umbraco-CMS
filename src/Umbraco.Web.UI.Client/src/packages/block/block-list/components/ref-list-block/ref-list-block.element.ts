@@ -40,10 +40,11 @@ export class UmbRefListBlockElement extends UmbLitElement {
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				${when(
 					this.unpublished,
-					() =>
-						html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-							><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-						></uui-tag>`,
+					() => html`
+						<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
+							<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+						</uui-tag>
+					`,
 				)}
 			</uui-ref-node>
 		`;
@@ -54,6 +55,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 			uui-ref-node {
 				min-height: var(--uui-size-16);
 			}
+
 			uui-tag {
 				margin-left: 0.5em;
 				margin-bottom: -0.3em;
@@ -68,6 +70,22 @@ export class UmbRefListBlockElement extends UmbLitElement {
 			:host([unpublished]) umb-icon,
 			:host([unpublished]) umb-ufm-render {
 				opacity: 0.6;
+			}
+
+			@keyframes umb-icon-jiggle {
+				0%,
+				100% {
+					transform: rotate(6deg);
+				}
+				50% {
+					transform: rotate(-6deg);
+				}
+			}
+
+			:host(.sortable) {
+				umb-icon {
+					animation: umb-icon-jiggle 500ms infinite ease-in-out;
+				}
 			}
 		`,
 	];

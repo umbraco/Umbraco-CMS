@@ -24,6 +24,7 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Deletes a package with a given id.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <returns>The result of the deletion.</returns>
     [HttpDelete("{id:guid}")]

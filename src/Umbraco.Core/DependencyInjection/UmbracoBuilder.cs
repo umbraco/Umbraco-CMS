@@ -284,6 +284,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
             Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
             Services.AddUnique<IContentTypeContainerService, ContentTypeContainerService>();
+            Services.AddUnique<IContentTypeSchemaService, ContentTypeSchemaService>();
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
@@ -438,6 +439,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Routing
             Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
+            Services.AddUnique<IDocumentUrlAliasService, DocumentUrlAliasService>();
+            Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
         }
     }
 }

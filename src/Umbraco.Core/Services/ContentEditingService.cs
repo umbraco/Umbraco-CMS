@@ -292,7 +292,9 @@ internal sealed class ContentEditingService
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => await HandleCopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey);
 
-    public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels,
+    public async Task<ContentEditingOperationStatus> SortAsync(
+        Guid? parentKey,
+        IEnumerable<SortingModel> sortingModels,
         Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
@@ -343,7 +345,7 @@ internal sealed class ContentEditingService
     protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
 
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
     protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)
     {
