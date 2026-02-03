@@ -244,7 +244,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             // Act
-            var dataTypeDefinitions = DataTypeRepository.GetMany().ToArray();
+            var dataTypeDefinitions = DataTypeRepository.GetMany((int[]?)null).ToArray();
 
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);
