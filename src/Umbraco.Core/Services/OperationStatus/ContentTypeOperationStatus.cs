@@ -26,4 +26,5 @@ public enum ContentTypeOperationStatus
     InvalidElementFlagComparedToParent,
     Unknown,
     InvalidTemplateAlias,
+    NotImplemented,
 }
