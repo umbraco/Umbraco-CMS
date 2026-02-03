@@ -150,7 +150,14 @@ test('can publish single culture variant only', async ({umbracoApi, umbracoUi}) 
     true,
     true
   );
-  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(variantElementTypeId, elementNameEnglish, elementNameDanish, variantPropertyName, englishText, danishText);
+  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
+    variantElementTypeId, 
+    elementNameEnglish, 
+    elementNameDanish, 
+    variantPropertyName, 
+    englishText, 
+    danishText
+  );
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
@@ -178,7 +185,14 @@ test('can publish all cultures at once', async ({umbracoApi, umbracoUi}) => {
     true,
     true
   );
-  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(variantElementTypeId, elementNameEnglish, elementNameDanish, variantPropertyName, englishText, danishText);
+  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
+    variantElementTypeId, 
+    elementNameEnglish, 
+    elementNameDanish, 
+    variantPropertyName, 
+    englishText, 
+    danishText
+  );
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
@@ -207,7 +221,14 @@ test('can edit variant property for specific culture only', async ({umbracoApi, 
     true,
     true
   );
-  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(variantElementTypeId, elementNameEnglish, elementNameDanish, variantPropertyName, englishText, danishText);
+  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
+    variantElementTypeId, 
+    elementNameEnglish, 
+    elementNameDanish, 
+    variantPropertyName, 
+    englishText, 
+    danishText
+  );
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
@@ -235,7 +256,14 @@ test('can edit element name for specific culture only', async ({umbracoApi, umbr
     true,
     true
   );
-  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(variantElementTypeId, elementNameEnglish, elementNameDanish, variantPropertyName, englishText, danishText);
+  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
+    variantElementTypeId, 
+    elementNameEnglish, 
+    elementNameDanish, 
+    variantPropertyName, 
+    englishText, 
+    danishText
+  );
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
