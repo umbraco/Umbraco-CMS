@@ -118,10 +118,10 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 		return html`<uui-pagination
 			.current=${this._currentPage}
 			.total=${this._totalPages}
-			.first-label=${this.localize.term('pagination_first')}
-			.previous-label=${this.localize.term('pagination_previous')}
-			.next-label=${this.localize.term('pagination_next')}
-			.last-label=${this.localize.term('pagination_last')}
+			firstlabel=${this.localize.term('general_first')}
+			previouslabel=${this.localize.term('general_previous')}
+			nextlabel=${this.localize.term('general_next')}
+			lastlabel=${this.localize.term('general_last')}
 			@change=${this.#onPageChange}></uui-pagination>`;
 	}
 
