@@ -19,8 +19,6 @@ internal sealed class ContentEditingService
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
-    private readonly IUserService _userService;
-    private readonly ILocalizationService _localizationService;
     private readonly ILanguageService _languageService;
 
     public ContentEditingService(
@@ -60,8 +58,6 @@ internal sealed class ContentEditingService
         _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
         _logger = logger;
-        _userService = userService;
-        _localizationService = localizationService;
         _languageService = languageService;
     }
 
