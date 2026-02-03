@@ -1,31 +1,29 @@
 import { Link } from '../../externals.js';
 
+// TODO: [LK] Look to use a NodeView to render the link, so that we remove the `data-router-slot` attribute from the HTML value.
+// https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/javascript
+
 export const UmbLink = Link.extend({
 	name: 'umbLink',
 
 	addAttributes() {
 		return {
-			// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			...this.parent?.(),
 			'data-anchor': { default: null },
+			target: { default: null },
 			title: { default: null },
 			type: { default: 'external' },
 		};
 	},
 
-	// TODO: [LK] Look to use a NodeView to render the link
-	// https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/javascript
-
+	// TODO: [LK] Review why `addOptions()` is not typed correctly here.
+	// ref: https://github.com/ueberdosis/tiptap/issues/6670
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-expect-error
 	addOptions() {
 		return {
-			// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			...this.parent?.(),
 			HTMLAttributes: {
-				target: '',
 				'data-router-slot': 'disabled',
 			},
 		};
@@ -33,13 +31,7 @@ export const UmbLink = Link.extend({
 
 	addCommands() {
 		return {
-			// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			ensureUmbLink: (attributes) => {
-				// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				return ({ editor, chain }) => {
 					if (editor.isActive(this.name)) {
 						return true;
@@ -47,21 +39,12 @@ export const UmbLink = Link.extend({
 					return chain().setMark(this.name, attributes).setMeta('preventAutolink', true).run();
 				};
 			},
-			// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			setUmbLink: (attributes) => {
-				// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				return ({ chain }) => {
 					return chain().setMark(this.name, attributes).setMeta('preventAutolink', true).run();
 				};
 			},
 			unsetUmbLink: () => {
-				// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				return ({ chain }) => {
 					return chain().unsetMark(this.name, { extendEmptyMarkRange: true }).setMeta('preventAutolink', true).run();
 				};
