@@ -30,7 +30,7 @@ public static class SqlSyntaxExtensions
         return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
     }
 
-    internal static string GetColumnName(this PropertyInfo column)
+    private static string GetColumnName(this PropertyInfo column)
     {
         ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
         return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
