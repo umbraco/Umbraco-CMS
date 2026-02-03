@@ -68,6 +68,11 @@ export class UmbManagementApiDetailDataRequestManager<
 		});
 	}
 
+	/**
+	 * Creates a new item and returns the created item data.
+	 * @param {CreateRequestModelType} data - The data to create the item with.
+	 * @returns {Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>} The API response containing the created item or an error.
+	 */
 	async create(data: CreateRequestModelType): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
 		const { data: createdId, error } = await tryExecute(this, this.#create(data));
 
@@ -78,6 +83,13 @@ export class UmbManagementApiDetailDataRequestManager<
 		return { error };
 	}
 
+	/**
+	 * Reads a single item by its ID.
+	 * Uses the cache if connected to server events and the item is cached, otherwise fetches from the server.
+	 * Deduplicates concurrent requests for the same ID using an in-flight request cache.
+	 * @param {string} id - The ID of the item to read.
+	 * @returns {Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>} The API response containing the item or an error.
+	 */
 	async read(id: string): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
 		let data: DetailResponseModelType | undefined;
 		let error: UmbApiError | UmbCancelError | undefined;
@@ -123,7 +135,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	 * Reads multiple items by their IDs.
 	 * Only available if a readMany function was provided in the constructor args.
 	 * @param {Array<string>} ids - The IDs of the items to read
-	 * @returns {Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>>}
+	 * @returns {Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>>} - The API response containing the items or an error
 	 */
 	async readMany(ids: Array<string>): Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>> {
 		if (!this.#readMany) {
@@ -166,6 +178,12 @@ export class UmbManagementApiDetailDataRequestManager<
 		return { data: { items }, error };
 	}
 
+	/**
+	 * Updates an existing item and returns the updated item data.
+	 * @param {string} id - The ID of the item to update.
+	 * @param {UpdateRequestModelType} data - The data to update the item with.
+	 * @returns {Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>} The API response containing the updated item or an error.
+	 */
 	async update(id: string, data: UpdateRequestModelType): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
 		const { error } = await tryExecute(this, this.#update(id, data));
 
@@ -176,6 +194,12 @@ export class UmbManagementApiDetailDataRequestManager<
 		return { error };
 	}
 
+	/**
+	 * Deletes an item by its ID.
+	 * If connected to server events, the item is also removed from the cache.
+	 * @param {string} id - The ID of the item to delete.
+	 * @returns {Promise<UmbApiWithErrorResponse>} The API response containing an error if the deletion failed.
+	 */
 	async delete(id: string): Promise<UmbApiWithErrorResponse> {
 		const { error } = await tryExecute(this, this.#delete(id));
 
