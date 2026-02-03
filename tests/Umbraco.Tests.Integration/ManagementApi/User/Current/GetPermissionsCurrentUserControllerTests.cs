@@ -3,37 +3,40 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.User.Current;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.User.Current;
 
 public class GetPermissionsCurrentUserControllerTests : ManagementApiUserGroupTestBase<GetPermissionsCurrentUserController>
 {
-    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
-    private IUserService UserService => GetRequiredService<IUserService>();
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private Guid _userKey;
+    private Guid _documentKey;
 
     [SetUp]
     public async Task SetUp()
     {
-        var adminUserGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        // Content Type
+        var contentType = ContentTypeBuilder.CreateBasicContentType(
+            name: Guid.NewGuid().ToString(),
+            alias: Guid.NewGuid().ToString());
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var stringKey = Guid.NewGuid();
-        var model = new UserCreateModel()
-        {
-            Email = stringKey + "@test.com",
-            UserName = stringKey + "@test.com",
-            Name = stringKey.ToString(),
-            UserGroupKeys = new HashSet<Guid> { adminUserGroup.Key },
-        };
-        var response = await UserService.CreateAsync(Constants.Security.SuperUserKey, model);
-        _userKey = response.Result.CreatedUser.Key;
+        // Content
+        var response = await ContentEditingService.CreateAsync(
+            ContentEditingBuilder.CreateBasicContent(contentType.Key, null),
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create content with status {response.Status}.");
+        _documentKey = response.Result.Content!.Key;
     }
 
-    protected override Expression<Func<GetPermissionsCurrentUserController, object>> MethodSelector => x => x.GetPermissions(CancellationToken.None, new HashSet<Guid> { _userKey });
+    protected override Expression<Func<GetPermissionsCurrentUserController, object>> MethodSelector
+        => x => x.GetPermissions(CancellationToken.None, null!);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -64,4 +67,7 @@ public class GetPermissionsCurrentUserControllerTests : ManagementApiUserGroupTe
     {
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
+
+    protected override async Task<HttpResponseMessage> ClientRequest()
+        => await Client.GetAsync($"{Url}?id={_documentKey}");
 }
