@@ -179,4 +179,12 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, Guid? parentContentKey, int skip, int take)
         => GetAllowedChildrenAsync(key, skip, take);
 
+    /// <summary>
+    /// Gets the keys of all content types that allow the provided content type key as a child (i.e. all potential parents of the provided key).
+    /// </summary>
+    /// <param name="key">The key of the child content type.</param>
+    /// <returns>A collection of the keys of all potential parents.</returns>
+    /// <exception cref="NotImplementedException">Default implementation due to breaking changes.</exception>
+    /// TODO (V18): Remove the default implementation.
+    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key) => Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotImplemented, []));
 }
