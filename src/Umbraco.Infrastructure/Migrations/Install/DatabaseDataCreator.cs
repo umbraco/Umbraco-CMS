@@ -894,10 +894,9 @@ internal sealed class DatabaseDataCreator
 
     private void CreateNodeDataForMediaTypes()
     {
-        var folderUniqueId = new Guid("f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            folderUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Folder,
             new NodeDto
             {
                 NodeId = 1031,
@@ -907,7 +906,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1031",
                 SortOrder = 2,
-                UniqueId = folderUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.FolderGuid,
                 Text = Constants.Conventions.MediaTypes.Folder,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
