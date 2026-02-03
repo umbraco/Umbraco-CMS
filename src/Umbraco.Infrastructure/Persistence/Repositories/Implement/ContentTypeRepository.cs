@@ -101,7 +101,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     {
         if (aliases.Length == 0)
         {
-            return [];
+            return Enumerable.Empty<int>();
         }
 
         Sql<ISqlContext> sql = Sql()
