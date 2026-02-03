@@ -9,6 +9,11 @@ import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backo
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
+const observeDefaultLanguageSymbol = Symbol();
+const observeCurrentLanguageSymbol = Symbol();
+const observeWorkspaceActiveVariantSymbol = Symbol();
+const observeWorkspaceNameSymbol = Symbol();
+
 @customElement('umb-workspace-variant-menu-breadcrumb')
 export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
@@ -35,12 +40,20 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguageContext = instance;
-			this.observe(this.#appLanguageContext?.appDefaultLanguage, (value) => {
-				this._appDefaultCulture = value?.unique;
-			});
-			this.observe(this.#appLanguageContext?.appLanguageCulture, (value) => {
-				this._appCurrentCulture = value;
-			});
+			this.observe(
+				this.#appLanguageContext?.appDefaultLanguage,
+				(value) => {
+					this._appDefaultCulture = value?.unique;
+				},
+				observeDefaultLanguageSymbol,
+			);
+			this.observe(
+				this.#appLanguageContext?.appLanguageCulture,
+				(value) => {
+					this._appCurrentCulture = value;
+				},
+				observeCurrentLanguageSymbol,
+			);
 		});
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
@@ -70,14 +83,13 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	#observeWorkspaceActiveVariant() {
 		this.observe(
-			this.#workspaceContext?.splitView.activeVariantsInfo,
-			(value) => {
-				if (!value) return;
-				this._workspaceActiveVariantId = UmbVariantId.Create(value[0]);
+			this.#workspaceContext?.splitView.firstActiveVariantInfo,
+			(variantInfo) => {
+				if (!variantInfo) return;
+				this._workspaceActiveVariantId = UmbVariantId.Create(variantInfo);
 				this.#observeActiveVariantName();
 			},
-
-			'breadcrumbWorkspaceActiveVariantObserver',
+			observeWorkspaceActiveVariantSymbol,
 		);
 	}
 
@@ -85,7 +97,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext?.name(this._workspaceActiveVariantId),
 			(value) => (this._name = value || ''),
-			'breadcrumbWorkspaceNameObserver',
+			observeWorkspaceNameSymbol,
 		);
 	}
 
