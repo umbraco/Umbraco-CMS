@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>, IFileRepository
+public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>, IFileRepository, IReadRepository<Guid, ITemplate>
 {
     ITemplate? Get(string? alias);
 

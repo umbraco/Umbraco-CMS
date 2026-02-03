@@ -122,6 +122,10 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			if (!variesByCulture && variantId.culture !== null) {
 				return false;
 			}
+			// If property does vary by culture, exclude culture-invariant options
+			if (variesByCulture && variantId.culture === null) {
+				return false;
+			}
 			// If property doesn't vary by segment, only use segment-invariant options
 			if (!variesBySegment && variantId.segment !== null) {
 				return false;
