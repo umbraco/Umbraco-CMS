@@ -277,7 +277,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				--uui-tab-background: var(--uui-color-surface);
 			}
 			umb-badge {
-				--uui-badge-inset: 0 -8px auto auto;
+				--uui-badge-inset: 0 0 auto auto;
 			}
 		`,
 	];
