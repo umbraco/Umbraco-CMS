@@ -42,4 +42,17 @@ public class IssuuEmbedProviderTests : OEmbedProviderTestBase
 
         Assert.That(result, Is.False, $"Expected URL to NOT match: {url}");
     }
+
+    /// <summary>
+    /// Tests that URLs with extra path segments before /docs/ are not matched.
+    /// The publisher name should be a single path segment.
+    /// </summary>
+    [TestCase("https://issuu.com/publisher/extra/docs/document")]
+    [TestCase("https://issuu.com/publisher/nested/path/docs/document")]
+    public void UrlSchemeRegex_DoesNotMatchUrlsWithExtraPathSegments(string url)
+    {
+        var result = MatchesUrlScheme(url);
+
+        Assert.That(result, Is.False, $"Expected URL to NOT match (extra path segments): {url}");
+    }
 }

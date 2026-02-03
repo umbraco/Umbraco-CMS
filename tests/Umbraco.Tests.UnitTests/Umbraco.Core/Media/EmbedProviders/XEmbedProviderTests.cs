@@ -45,4 +45,18 @@ public class XEmbedProviderTests : OEmbedProviderTestBase
 
         Assert.That(result, Is.False, $"Expected URL to NOT match: {url}");
     }
+
+    /// <summary>
+    /// Tests that URLs with extra path segments before /status/ are not matched.
+    /// The username should be a single path segment.
+    /// </summary>
+    [TestCase("https://x.com/user/extra/status/1234567890")]
+    [TestCase("https://twitter.com/user/extra/path/status/1234567890")]
+    [TestCase("https://x.com/user/nested/deep/status/1234567890")]
+    public void UrlSchemeRegex_DoesNotMatchUrlsWithExtraPathSegments(string url)
+    {
+        var result = MatchesUrlScheme(url);
+
+        Assert.That(result, Is.False, $"Expected URL to NOT match (extra path segments): {url}");
+    }
 }
