@@ -40,6 +40,8 @@ public class UmbracoDbContext : DbContext
         : base(ConfigureOptions(options))
     { }
 
+    public required DbSet<WebhookDto> Webhooks { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var extensions = options.Extensions.FirstOrDefault() as Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension;
@@ -91,7 +93,5 @@ public class UmbracoDbContext : DbContext
                 entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
             }
         }
-
-        modelBuilder.Entity<WebhookDto>();
     }
 }
