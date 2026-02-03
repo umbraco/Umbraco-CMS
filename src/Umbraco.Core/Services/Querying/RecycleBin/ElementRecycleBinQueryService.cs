@@ -82,7 +82,7 @@ public class ElementRecycleBinQueryService : IElementRecycleBinQueryService
 
         if (parent.Trashed)
         {
-            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentNotFound, parent));
+            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentIsTrashed, parent));
         }
 
         return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.Success, parent));
