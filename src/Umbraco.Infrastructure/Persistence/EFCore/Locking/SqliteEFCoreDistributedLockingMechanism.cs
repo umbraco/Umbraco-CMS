@@ -8,10 +8,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Persistence.EFCore.Locking;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;
 
 /// <summary>
 /// Implements distributed locking for SQLite databases using EF Core.

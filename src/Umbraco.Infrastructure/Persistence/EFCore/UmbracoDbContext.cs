@@ -6,9 +6,9 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
-using Umbraco.Cms.Persistence.EFCore.Migrations;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 
-namespace Umbraco.Cms.Persistence.EFCore;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
 /// <summary>
 /// The Entity Framework Core database context for Umbraco CMS.

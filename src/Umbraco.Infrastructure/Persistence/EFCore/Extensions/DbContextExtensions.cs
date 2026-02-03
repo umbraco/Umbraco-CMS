@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
+using Umbraco.Extensions;
 
-namespace Umbraco.Extensions;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extension methods for Entity Framework Core DbContext operations.

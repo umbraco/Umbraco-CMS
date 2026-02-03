@@ -12,7 +12,7 @@ using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 using CoreEFCoreScopeProvider = Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider;
 
-namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 /// <summary>
 /// Provides functionality to create and manage EF Core scopes.

@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
-namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 /// <summary>
 /// Represents an EF Core scope that provides database context access and transaction management.

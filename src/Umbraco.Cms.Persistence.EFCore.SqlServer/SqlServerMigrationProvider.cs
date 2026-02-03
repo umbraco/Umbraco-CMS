@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Extensions;
 

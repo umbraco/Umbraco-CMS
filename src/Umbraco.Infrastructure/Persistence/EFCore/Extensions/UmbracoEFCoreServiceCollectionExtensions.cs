@@ -2,13 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
-using Umbraco.Cms.Persistence.EFCore.Locking;
-using Umbraco.Cms.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Extensions;
 
-namespace Umbraco.Extensions;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extension methods for registering EF Core services with Umbraco.
@@ -97,10 +97,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
 
         // Replace data directory
-        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
+        string? dataDirectory = AppDomain.CurrentDomain.GetData(Core.Constants.System.DataDirectoryName)?.ToString();
         if (string.IsNullOrEmpty(dataDirectory) is false)
         {
-            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
+            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Core.Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
         if (string.IsNullOrEmpty(connectionStrings.ProviderName))
@@ -130,10 +130,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
 
         // Replace data directory
-        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
+        string? dataDirectory = AppDomain.CurrentDomain.GetData(Core.Constants.System.DataDirectoryName)?.ToString();
         if (string.IsNullOrEmpty(dataDirectory) is false)
         {
-            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
+            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Core.Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
         return connectionStrings;

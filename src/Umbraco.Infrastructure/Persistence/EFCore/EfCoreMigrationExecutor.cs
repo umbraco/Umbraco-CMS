@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 
-namespace Umbraco.Cms.Persistence.EFCore;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
 /// <summary>
 /// Executes Entity Framework Core migrations for Umbraco.

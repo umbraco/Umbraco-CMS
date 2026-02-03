@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Persistence.EFCore;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
 /// <summary>
 /// Contains constants used throughout the EF Core persistence layer.

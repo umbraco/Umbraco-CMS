@@ -1,7 +1,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 /// <summary>
 /// Represents an EF Core scope that provides database context access and transaction management.

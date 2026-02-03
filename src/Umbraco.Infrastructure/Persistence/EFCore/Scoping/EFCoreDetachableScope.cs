@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 /// <summary>
 /// Represents a detachable EF Core scope that can be detached and reattached to the ambient scope stack.

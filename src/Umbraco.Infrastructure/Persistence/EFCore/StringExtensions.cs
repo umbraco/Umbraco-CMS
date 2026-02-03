@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Persistence.EFCore;
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
 /// <summary>
 /// Provides extension methods for string operations related to EF Core persistence.

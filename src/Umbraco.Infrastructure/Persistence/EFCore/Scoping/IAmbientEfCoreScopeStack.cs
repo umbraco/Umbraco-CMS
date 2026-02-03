@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 /// <summary>
 /// Manages a stack of ambient EF Core scopes for thread-safe scope tracking.

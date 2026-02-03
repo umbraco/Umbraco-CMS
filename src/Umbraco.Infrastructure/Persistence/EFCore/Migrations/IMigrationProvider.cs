@@ -1,4 +1,6 @@
-namespace Umbraco.Cms.Persistence.EFCore.Migrations;
+using Umbraco.Cms.Persistence.EFCore.Migrations;
+
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 
 /// <summary>
 /// Provides database migration capabilities for a specific database provider.

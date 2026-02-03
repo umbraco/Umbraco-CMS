@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Umbraco.Cms.Persistence.EFCore.Migrations;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 
 /// <summary>
 /// Provides setup configuration for a database provider's DbContext options.

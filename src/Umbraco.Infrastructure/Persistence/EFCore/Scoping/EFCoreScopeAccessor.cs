@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core.Scoping;
 using CoreEFCoreScopeAccessor = Umbraco.Cms.Core.Scoping.EFCore.IScopeAccessor;
 
-namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 /// <summary>
 /// Provides access to the current ambient EF Core scope.

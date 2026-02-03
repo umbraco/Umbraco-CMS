@@ -6,10 +6,11 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 
-namespace Umbraco.Cms.Persistence.EFCore.Composition;
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Composition;
 
+// TODO: Move out of composer
 /// <summary>
 /// Composer that registers Entity Framework Core services and configurations for Umbraco.
 /// </summary>
