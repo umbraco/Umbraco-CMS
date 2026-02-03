@@ -42,6 +42,6 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	 * @memberof UmbDetailStoreBase
 	 */
 	byUniques(uniques: Array<string>) {
-		return this._data.asObservablePart((x) => x.filter((y) => uniques.includes(y.unique)));
+		return this._data.asObservablePart((x) => x.filter((y) => y.unique !== null && uniques.includes(y.unique)));
 	}
 }

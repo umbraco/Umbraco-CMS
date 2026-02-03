@@ -58,7 +58,11 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 
 		// Set up mock server event context
 		mockServerEventContext = new MockServerEventContext();
-		new UmbContextProviderController(hostElement, UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, mockServerEventContext);
+		new UmbContextProviderController(
+			hostElement,
+			UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT,
+			mockServerEventContext as unknown as typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE,
+		);
 
 		// Set up caches
 		dataCache = new UmbManagementApiDetailDataCache<TestDetailModel>();
