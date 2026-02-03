@@ -23,6 +23,8 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
     [TestCase("http://flickr.com/photos/example/12345678901")]
     [TestCase("https://www.flickr.com/photos/example/12345678901/in/photolist-abc123")]
     [TestCase("https://flickr.com/photos/someuser/albums/72157634123456789")]
+    [TestCase("https://flic.kr/p/abc123")]
+    [TestCase("http://flic.kr/p/xyz789")]
     public void UrlSchemeRegex_MatchesValidFlickrUrls(string url)
     {
         var result = MatchesUrlScheme(url);
@@ -38,6 +40,8 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
     [TestCase("http://example.com/flickr.com/photos/example/123")]
     [TestCase("http://example.com/redirect?url=https://flickr.com/photos/example/123")]
     [TestCase("http://example.com//www.flickr.com/photos/example/123")]
+    [TestCase("http://127.0.0.1/flic.kr/p/abc123")]
+    [TestCase("http://example.com/flic.kr/p/abc123")]
     public void UrlSchemeRegex_DoesNotMatchMaliciousUrls(string url)
     {
         var result = MatchesUrlScheme(url);

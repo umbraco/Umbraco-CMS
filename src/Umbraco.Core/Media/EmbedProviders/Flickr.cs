@@ -22,7 +22,11 @@ public class Flickr : OEmbedProviderBase
     public override string ApiEndpoint => "https://www.flickr.com/services/oembed/";
 
     /// <inheritdoc/>
-    public override string[] UrlSchemeRegex => [@"^https?:\/\/(www\.)?flickr\.com\/photos\/"];
+    public override string[] UrlSchemeRegex =>
+    [
+        @"^https?:\/\/(www\.)?flickr\.com\/photos\/",
+        @"^https?:\/\/flic\.kr\/p\/",
+    ];
 
     /// <inheritdoc/>
     public override Dictionary<string, string> RequestParams => [];
