@@ -63,6 +63,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
+    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Media;
 
     protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 

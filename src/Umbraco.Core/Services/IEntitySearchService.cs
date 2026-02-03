@@ -9,4 +9,8 @@ namespace Umbraco.Cms.Core.Services;
 public interface IEntitySearchService
 {
     PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100);
+
+    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectType, string query, int skip = 0, int take = 100);
+
+    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectType, int skip = 0, int take = 100);
 }

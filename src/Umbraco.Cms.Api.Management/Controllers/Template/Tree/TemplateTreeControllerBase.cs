@@ -28,4 +28,5 @@ public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEnt
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Template;
+    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Unknown;
 }

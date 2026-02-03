@@ -28,4 +28,5 @@ public class MemberGroupTreeControllerBase : NamedEntityTreeControllerBase<Named
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MemberGroup;
+    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Unknown;
 }

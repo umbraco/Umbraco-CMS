@@ -96,6 +96,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
+    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Document;
 
     protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 

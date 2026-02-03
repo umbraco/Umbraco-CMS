@@ -666,6 +666,27 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    public IEnumerable<IEntitySlim> GetPagedDescendants(
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null,
+        bool includeTrashed = true)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>();
+            if (includeTrashed == false)
+            {
+                query.Where(x => x.Trashed == false);
+            }
+
+            return _entityRepository.GetPagedResultsByQuery(query, objectTypes.Select(ot => ot.GetGuid()).ToHashSet(), pageIndex, pageSize, out totalRecords, filter, ordering);
+        }
+    }
+
     /// <inheritdoc />
     public virtual UmbracoObjectTypes GetObjectType(int id)
     {

@@ -43,7 +43,6 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         : base(entityService, flagProviders) =>
         _folderObjectTypeId = FolderObjectType.GetGuid();
 
-    protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
     /// <inheritdoc/>
     protected override Guid? GetParentKey(IEntitySlim? entity)

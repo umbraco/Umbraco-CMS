@@ -36,6 +36,7 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
 
     // dictionary items do not currently have a known UmbracoObjectType, so we'll settle with Unknown for now
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Unknown;
+    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Unknown;
 
     protected IDictionaryItemService DictionaryItemService { get; }
 

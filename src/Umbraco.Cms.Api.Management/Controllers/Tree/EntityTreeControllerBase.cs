@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
@@ -21,8 +22,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected EntityTreeControllerBase(IEntityService entityService)
         : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+            entityService,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
@@ -35,6 +36,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected IEntityService EntityService { get; }
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
+    protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
     protected virtual Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.TextColumnName);
 
@@ -44,7 +46,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         (rootEntities, totalItems) = await FilterTreeEntities(rootEntities, totalItems);
 
-        TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
+        TItem[] treeItemViewModels = MapTreeItemViewModels((Guid?)null, rootEntities);
 
         await PopulateFlags(treeItemViewModels);
 
@@ -90,6 +92,37 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return Ok(result);
     }
 
+    // todo remove service injection
+    protected async Task<ActionResult<PagedViewModel<TItem>>> SearchTreeEntities(
+        IEntitySearchService _entitySearchService,
+        IIdKeyMap _idKeyMap,
+        string? query,
+        int skip,
+        int take,
+        bool includeFolders = true)
+    {
+        PagedModel<IEntitySlim> itemSearchResult =
+            query.IsNullOrWhiteSpace()
+            ? _entitySearchService.Search(FolderAndItemObjectTypes(includeFolders), skip, take)
+            : _entitySearchService.Search(FolderAndItemObjectTypes(includeFolders), query, skip, take);
+
+        (IEntitySlim[] rootEntities, long totalItems) =
+            await FilterTreeEntities(itemSearchResult.Items.ToArray(), itemSearchResult.Total);
+
+        TItem[] treeItemViewModels =
+            MapTreeItemViewModels(
+                slim => UmbracoObjectTypes.DataTypeContainer == UmbracoObjectTypes.Unknown
+                    ? null
+                    : _idKeyMap.GetKeyForId(slim.ParentId, FolderObjectType).Result,
+                rootEntities);
+
+        await PopulateFlags(treeItemViewModels);
+
+        PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
+
+        return Ok(result);
+    }
+
     /// <summary>
     /// Filters the specified collection of tree entities and returns the filtered results asynchronously.
     /// </summary>
@@ -100,7 +133,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// Override this method to implement custom filtering logic for tree entities. The default
     /// implementation returns the input array and total items unchanged.
     /// </remarks>
-    protected virtual Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities, long totalItems)
+    protected virtual Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities,
+        long totalItems)
         => Task.FromResult((entities, totalItems));
 
     /// <summary>
@@ -115,7 +149,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// Override this method to implement custom filtering logic for sibling tree entities. The default
     /// implementation returns the input array and totals unchanged.
     /// </remarks>
-    protected virtual Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(Guid targetKey, IEntitySlim[] entities, long totalBefore, long totalAfter)
+    protected virtual Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(
+        Guid targetKey, IEntitySlim[] entities, long totalBefore, long totalAfter)
         => Task.FromResult((entities, totalBefore, totalAfter));
 
     /// <summary>
@@ -126,7 +161,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
             : Constants.System.RootKey;
 
-    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
+    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey,
+        bool includeSelf = true)
     {
         IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);
 
@@ -187,7 +223,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 ordering: ItemOrdering)
             .ToArray();
 
-    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter) =>
+    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore,
+        out long totalAfter) =>
         EntityService
             .GetSiblings(
                 target,
@@ -197,10 +234,14 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 out totalBefore,
                 out totalAfter,
                 ordering: ItemOrdering)
-        .ToArray();
+            .ToArray();
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
+
+    // todo use the service directly instead of func
+    protected virtual TItem[] MapTreeItemViewModels(Func<IEntitySlim, Guid?> parentKeyLocator, IEntitySlim[] entities)
+        => entities.Select(entity => MapTreeItemViewModel(parentKeyLocator(entity), entity)).ToArray();
 
     protected virtual async Task PopulateFlags(TItem[] treeItemViewModels)
     {
@@ -216,11 +257,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         {
             Id = entity.Key,
             HasChildren = entity.HasChildren,
-            Parent = parentKey.HasValue
-                ? new ReferenceByIdModel
-                {
-                    Id = parentKey.Value,
-                }
+            Parent = parentKey.HasValue && parentKey.Value != Guid.Empty
+                ? new ReferenceByIdModel { Id = parentKey.Value, }
                 : null,
         };
 
@@ -230,6 +268,12 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };
 
-    protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore, long totalAfter)
+    protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore,
+        long totalAfter)
         => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
+
+    private IEnumerable<UmbracoObjectTypes> FolderAndItemObjectTypes(bool includeFolders) =>
+        includeFolders is false || FolderObjectType == UmbracoObjectTypes.Unknown || FolderObjectType == ItemObjectType
+            ? new[] { ItemObjectType }
+            : new[] { ItemObjectType, FolderObjectType };
 }

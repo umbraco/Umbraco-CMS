@@ -43,4 +43,50 @@ internal sealed class EntitySearchService : IEntitySearchService
             Total = totalRecords
         };
     }
+
+    public PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, string query, int skip = 0, int take = 100)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
+
+        // if the query is a GUID, search for that explicitly
+        Guid.TryParse(query, out Guid guidQuery);
+
+        IEntitySlim[] entities = _entityService
+            .GetPagedDescendants(
+                objectTypes,
+                pageNumber,
+                pageSize,
+                out long totalRecords,
+                _sqlContext.Query<IUmbracoEntity>()
+                    .Where(x => x.Name!.Contains(query) || x.Key == guidQuery),
+                Ordering.By(nameof(NodeDto.Text).ToFirstLowerInvariant()))
+            .ToArray();
+
+        return new PagedModel<IEntitySlim>
+        {
+            Items = entities,
+            Total = totalRecords
+        };
+    }
+
+    public PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, int skip = 0, int take = 100)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
+
+        IEntitySlim[] entities = _entityService
+            .GetPagedDescendants(
+                objectTypes,
+                pageNumber,
+                pageSize,
+                out long totalRecords,
+                _sqlContext.Query<IUmbracoEntity>(),
+                Ordering.By(nameof(NodeDto.Text).ToFirstLowerInvariant()))
+            .ToArray();
+
+        return new PagedModel<IEntitySlim>
+        {
+            Items = entities,
+            Total = totalRecords
+        };
+    }
 }
