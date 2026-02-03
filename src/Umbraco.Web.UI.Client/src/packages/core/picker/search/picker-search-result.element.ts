@@ -89,7 +89,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 		}
 
 		return html`
-			<uui-box id="result-container">
+			<uui-box id="result-container" class=${this._searching ? 'loading' : ''}>
 				${repeat(
 					this._items,
 					(item) => item.unique,
@@ -152,6 +152,10 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+			}
+
+			#result-container.loading {
+				opacity: 0.5;
 			}
 
 			umb-extension-with-api-slot {
