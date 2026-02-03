@@ -1,4 +1,3 @@
-using System.Xml;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
@@ -8,17 +7,25 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// </summary>
 public class Slideshare : OEmbedProviderBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Slideshare"/> class.
+    /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer.</param>
     public Slideshare(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
     {
     }
 
+    /// <inheritdoc/>
     public override string ApiEndpoint => "http://www.slideshare.net/api/oembed/2";
 
-    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?slideshare\.net\/" };
+    /// <inheritdoc/>
+    public override string[] UrlSchemeRegex => [@"^https?:\/\/(www\.)?slideshare\.net\/"];
 
-    public override Dictionary<string, string> RequestParams => new();
+    /// <inheritdoc/>
+    public override Dictionary<string, string> RequestParams => [];
 
+    /// <inheritdoc/>
     public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
         => await GetXmlBasedMarkupAsync(url, maxWidth, maxHeight, cancellationToken);
 }
