@@ -25,6 +25,11 @@ public static partial class Constants
             public const string File = "4c52d8ab-54e6-40cd-999c-7a5f24903e4d";
 
             /// <summary>
+            /// The GUID for the Folder media type as a string.
+            /// </summary>
+            public const string Folder = "f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d";
+
+            /// <summary>
             /// The GUID for the Image media type as a string.
             /// </summary>
             public const string Image = "cc07b313-0843-4aa8-bbda-871c8da728c8";
@@ -53,6 +58,11 @@ public static partial class Constants
             /// The GUID for the File media type.
             /// </summary>
             public static readonly Guid FileGuid = new(File);
+
+            /// <summary>
+            /// The GUID for the Folder media type.
+            /// </summary>
+            public static readonly Guid FolderGuid = new(Folder);
 
             /// <summary>
             /// The GUID for the Image media type.
