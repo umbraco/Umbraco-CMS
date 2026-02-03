@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core.Scoping;
+using CoreEFCoreScopeAccessor = Umbraco.Cms.Core.Scoping.EFCore.IScopeAccessor;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -23,4 +25,7 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
 
     /// <inheritdoc />
     IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => _ambientEfCoreScopeStack.AmbientScope;
+
+    /// <inheritdoc />
+    ICoreScope? CoreEFCoreScopeAccessor.AmbientScope => _ambientEfCoreScopeStack.AmbientScope;
 }

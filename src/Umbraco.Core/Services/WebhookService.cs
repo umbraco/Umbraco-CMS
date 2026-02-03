@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -12,12 +13,18 @@ public class WebhookService : IWebhookService
     private readonly ICoreScopeProvider _provider;
     private readonly IWebhookRepository _webhookRepository;
     private readonly IEventMessagesFactory _eventMessagesFactory;
+    private readonly IScopeProvider _scopeProvider;
 
-    public WebhookService(ICoreScopeProvider provider, IWebhookRepository webhookRepository, IEventMessagesFactory eventMessagesFactory)
+    public WebhookService(
+        ICoreScopeProvider provider,
+        IWebhookRepository webhookRepository,
+        IEventMessagesFactory eventMessagesFactory,
+        IScopeProvider scopeProvider)
     {
         _provider = provider;
         _webhookRepository = webhookRepository;
         _eventMessagesFactory = eventMessagesFactory;
+        _scopeProvider = scopeProvider;
     }
 
     private WebhookOperationStatus ValidateWebhook(IWebhook webhook)
@@ -131,7 +138,7 @@ public class WebhookService : IWebhookService
     /// <inheritdoc />
     public async Task<IWebhook?> GetAsync(Guid key)
     {
-        using ICoreScope scope = _provider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         IWebhook? webhook = await _webhookRepository.GetAsync(key);
         scope.Complete();
         return webhook;

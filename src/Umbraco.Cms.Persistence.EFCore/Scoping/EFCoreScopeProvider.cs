@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Scoping;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using CoreEFCoreScopeProvider = Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -239,4 +240,27 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// Removes the current scope context from the ambient scope context stack.
     /// </summary>
     public void PopAmbientScopeContext() => _ambientEfCoreScopeContextStack.Pop();
+
+    /// <inheritdoc />
+    ICoreScope CoreEFCoreScopeProvider.CreateScope(RepositoryCacheMode repositoryCacheMode, bool? scopeFileSystems)
+        => CreateScope(repositoryCacheMode, scopeFileSystems);
+
+    /// <inheritdoc />
+    ICoreScope CoreEFCoreScopeProvider.CreateDetachedScope(RepositoryCacheMode repositoryCacheMode, bool? scopeFileSystems)
+        => CreateDetachedScope(repositoryCacheMode, scopeFileSystems);
+
+    /// <inheritdoc />
+    void CoreEFCoreScopeProvider.AttachScope(ICoreScope other)
+    {
+        if (other is not IEfCoreScope<TDbContext> efCoreScope)
+        {
+            throw new ArgumentException($"Scope must be an IEfCoreScope<{typeof(TDbContext).Name}>.", nameof(other));
+        }
+
+        AttachScope(efCoreScope);
+    }
+
+    /// <inheritdoc />
+    ICoreScope CoreEFCoreScopeProvider.DetachScope() => DetachScope();
+
 }

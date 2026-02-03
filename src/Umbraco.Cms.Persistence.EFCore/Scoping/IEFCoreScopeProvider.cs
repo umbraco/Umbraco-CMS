@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Scoping;
+using CoreEFCoreScopeProvider = Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -6,7 +7,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 /// Provides functionality to create and manage EF Core scopes.
 /// </summary>
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
-public interface IEFCoreScopeProvider<TDbContext>
+public interface IEFCoreScopeProvider<TDbContext> : CoreEFCoreScopeProvider
 {
     /// <summary>
     /// Creates a new EF Core scope.
@@ -14,7 +15,7 @@ public interface IEFCoreScopeProvider<TDbContext>
     /// <param name="repositoryCacheMode">The repository cache mode.</param>
     /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     /// <returns>The created scope.</returns>
-    IEfCoreScope<TDbContext> CreateScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
+    new IEfCoreScope<TDbContext> CreateScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
 
     /// <summary>
     /// Creates a new detached EF Core scope that can be attached later.
@@ -22,7 +23,7 @@ public interface IEFCoreScopeProvider<TDbContext>
     /// <param name="repositoryCacheMode">The repository cache mode.</param>
     /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     /// <returns>The created detached scope.</returns>
-    IEfCoreScope<TDbContext> CreateDetachedScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
+    new IEfCoreScope<TDbContext> CreateDetachedScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
 
     /// <summary>
     /// Attaches a detached scope to the current ambient scope stack.
@@ -34,10 +35,10 @@ public interface IEFCoreScopeProvider<TDbContext>
     /// Detaches the current ambient scope from the stack.
     /// </summary>
     /// <returns>The detached scope.</returns>
-    IEfCoreScope<TDbContext> DetachScope();
+    new IEfCoreScope<TDbContext> DetachScope();
 
     /// <summary>
     /// Gets the ambient scope context.
     /// </summary>
-    IScopeContext? AmbientScopeContext { get; }
+    new IScopeContext? AmbientScopeContext { get; }
 }

@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core.Scoping;
+using CoreEFCoreScopeAccessor = Umbraco.Cms.Core.Scoping.EFCore.IScopeAccessor;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -28,6 +30,9 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
             }
         }
     }
+
+    /// <inheritdoc />
+    ICoreScope? CoreEFCoreScopeAccessor.AmbientScope => AmbientScope;
 
     /// <inheritdoc />
     public IEfCoreScope<TDbContext> Pop()
