@@ -14,7 +14,7 @@ public class X : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://publish.x.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"(https?:\/\/(www\.)?)(twitter|x)\.com\/.*\/status\/.*" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?(twitter|x)\.com\/.+\/status\/" };
 
     public override Dictionary<string, string> RequestParams => new();
 

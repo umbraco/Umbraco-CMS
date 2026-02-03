@@ -15,7 +15,7 @@ public class LottieFiles : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://embed.lottiefiles.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"lottiefiles\.com/*" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?lottiefiles\.com\/" };
 
     public override Dictionary<string, string> RequestParams => new();
 

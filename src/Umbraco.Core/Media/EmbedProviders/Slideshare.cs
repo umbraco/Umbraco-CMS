@@ -15,7 +15,7 @@ public class Slideshare : OEmbedProviderBase
 
     public override string ApiEndpoint => "http://www.slideshare.net/api/oembed/2";
 
-    public override string[] UrlSchemeRegex => new[] { @"slideshare\.net/" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?slideshare\.net\/" };
 
     public override Dictionary<string, string> RequestParams => new();
 

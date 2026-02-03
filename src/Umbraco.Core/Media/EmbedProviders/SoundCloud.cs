@@ -15,7 +15,7 @@ public class Soundcloud : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://soundcloud.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"soundcloud.com\/*" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?soundcloud\.com\/" };
 
     public override Dictionary<string, string> RequestParams => new();
 

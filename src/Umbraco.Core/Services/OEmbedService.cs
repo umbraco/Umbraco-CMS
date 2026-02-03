@@ -28,8 +28,7 @@ public class OEmbedService : IOEmbedService
     {
         // Find the first provider that supports the URL
         IEmbedProvider? matchedProvider = _embedProvidersCollection
-            .FirstOrDefault(provider => provider.UrlSchemeRegex
-                .Any(regex => new Regex(regex, RegexOptions.IgnoreCase).IsMatch(url.OriginalString)));
+            .FirstOrDefault(provider => MatchesUrlScheme(url.OriginalString, provider.UrlSchemeRegex));
 
         if (matchedProvider is null)
         {
@@ -53,4 +52,13 @@ public class OEmbedService : IOEmbedService
 
         return Attempt.FailWithStatus(OEmbedOperationStatus.ProviderReturnedInvalidResult, string.Empty);
     }
+
+    /// <summary>
+    /// Determines whether a URL matches any of the provider's URL scheme regex patterns.
+    /// </summary>
+    /// <param name="url">The URL to test.</param>
+    /// <param name="urlSchemeRegexPatterns">The regex patterns to match against.</param>
+    /// <returns><c>true</c> if the URL matches any pattern; otherwise, <c>false</c>.</returns>
+    internal static bool MatchesUrlScheme(string url, string[] urlSchemeRegexPatterns)
+        => urlSchemeRegexPatterns.Any(pattern => new Regex(pattern, RegexOptions.IgnoreCase).IsMatch(url));
 }

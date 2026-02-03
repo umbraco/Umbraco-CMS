@@ -15,7 +15,7 @@ public class DailyMotion : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://www.dailymotion.com/services/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"dailymotion.com/video/.*" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?dailymotion\.com\/video\/" };
 
     public override Dictionary<string, string> RequestParams => new()
     {

@@ -16,7 +16,11 @@ public class GettyImages : OEmbedProviderBase
 
     // http://gty.im/74917285
     // http://www.gettyimages.com/detail/74917285
-    public override string[] UrlSchemeRegex => new[] { @"gty\.im/*", @"gettyimages.com\/detail\/*" };
+    public override string[] UrlSchemeRegex => new[]
+    {
+        @"^https?:\/\/(www\.)?gty\.im\/",
+        @"^https?:\/\/(www\.)?gettyimages\.com\/detail\/",
+    };
 
     public override Dictionary<string, string> RequestParams => new();
 

@@ -15,7 +15,7 @@ public class Ted : OEmbedProviderBase
 
     public override string ApiEndpoint => "http://www.ted.com/talks/oembed.xml";
 
-    public override string[] UrlSchemeRegex => new[] { @"ted.com\/talks\/*" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?ted\.com\/talks\/" };
 
     public override Dictionary<string, string> RequestParams => new();
 

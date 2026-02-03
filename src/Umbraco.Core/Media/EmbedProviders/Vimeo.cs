@@ -15,7 +15,7 @@ public class Vimeo : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://vimeo.com/api/oembed.xml";
 
-    public override string[] UrlSchemeRegex => new[] { @"vimeo\.com/" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?vimeo\.com\/" };
 
     public override Dictionary<string, string> RequestParams => new();
 

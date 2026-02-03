@@ -14,7 +14,7 @@ public class Kickstarter : OEmbedProviderBase
 
     public override string ApiEndpoint => "http://www.kickstarter.com/services/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"kickstarter\.com/projects/*" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?kickstarter\.com\/projects\/" };
 
     public override Dictionary<string, string> RequestParams => new();
 

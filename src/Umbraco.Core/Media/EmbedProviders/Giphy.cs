@@ -14,7 +14,11 @@ public class Giphy : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://giphy.com/services/oembed?url=";
 
-    public override string[] UrlSchemeRegex => new[] { @"giphy\.com/*", @"gph\.is/*" };
+    public override string[] UrlSchemeRegex => new[]
+    {
+        @"^https?:\/\/(www\.)?giphy\.com\/",
+        @"^https?:\/\/(www\.)?gph\.is\/",
+    };
 
     public override Dictionary<string, string> RequestParams => new();
 

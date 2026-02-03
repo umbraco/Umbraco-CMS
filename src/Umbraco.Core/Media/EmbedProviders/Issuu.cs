@@ -15,7 +15,7 @@ public class Issuu : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://issuu.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"issuu.com/.*/docs/.*" };
+    public override string[] UrlSchemeRegex => new[] { @"^https?:\/\/(www\.)?issuu\.com\/.+\/docs\/" };
 
     public override Dictionary<string, string> RequestParams => new()
     {
