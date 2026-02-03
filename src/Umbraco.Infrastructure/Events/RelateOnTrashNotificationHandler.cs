@@ -16,10 +16,8 @@ namespace Umbraco.Cms.Core.Events;
 
 public sealed class RelateOnTrashNotificationHandler :
     INotificationHandler<ContentMovedNotification>,
-    INotificationHandler<ContentMovedToRecycleBinNotification>,
     INotificationAsyncHandler<ContentMovedToRecycleBinNotification>,
     INotificationHandler<MediaMovedNotification>,
-    INotificationHandler<MediaMovedToRecycleBinNotification>,
     INotificationAsyncHandler<MediaMovedToRecycleBinNotification>,
     INotificationHandler<ElementMovedNotification>,
     INotificationAsyncHandler<ElementMovedToRecycleBinNotification>,
@@ -88,11 +86,6 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.ObjectTypes.Document);
 
     /// <inheritdoc />
-    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
-    public void Handle(ContentMovedToRecycleBinNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public void Handle(MediaMovedNotification notification)
         => DeleteOriginalParentRelationsOnRestore(
             notification.MoveInfoCollection,
@@ -107,11 +100,6 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
             Constants.ObjectTypes.Media,
             Constants.ObjectTypes.Media);
-
-    /// <inheritdoc />
-    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
-    public void Handle(MediaMovedToRecycleBinNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public void Handle(ElementMovedNotification notification)
