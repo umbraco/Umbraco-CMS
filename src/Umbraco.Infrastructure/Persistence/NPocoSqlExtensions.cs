@@ -835,13 +835,15 @@ namespace Umbraco.Extensions
         /// <param name="coalesceValue">COALESCE string value.</param>
         /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
         /// field or the coalesceValue.</returns>
-        public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string coalesceValue)
-        {
-            ArgumentNullException.ThrowIfNull(sql);
-            ArgumentNullException.ThrowIfNull(field);
+        // moved to NPocoSqlSelectExtensions.cs
+        // can be removed after code review of PR #21577 or when in main branch
+        //public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string coalesceValue)
+        //{
+        //    ArgumentNullException.ThrowIfNull(sql);
+        //    ArgumentNullException.ThrowIfNull(field);
 
-            return sql.Select($"COALESCE(MAX {sql.SqlContext.SqlSyntax.GetFieldName(field)}), '{coalesceValue}')");
-        }
+        //    return sql.Select($"COALESCE(MAX {sql.SqlContext.SqlSyntax.GetFieldName(field)}), '{coalesceValue}')");
+        //}
 
         /// <summary>
         /// Adds a SQL SELECT statement to retrieve the sum of the values of the specified field from the table associated
@@ -1563,8 +1565,6 @@ namespace Umbraco.Extensions
             sql.Append("(").Append(subQuery.SQL, subQuery.Arguments).Append($") AS {sql.SqlContext.SqlSyntax.GetQuotedName(alias)}");
 
             return sql;
-        }
-
         private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object?>>[]? columnExpressions = null, bool withAlias = true, bool forInsert = false)
         {
             PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof(TDto));
@@ -1572,6 +1572,8 @@ namespace Umbraco.Extensions
             var queryColumns = pd.QueryColumns.ToList();
 
             Dictionary<string, string>? aliases = null;
+        //            return fieldName;
+        //        }).ToArray();
 
             if (columnExpressions != null && columnExpressions.Length > 0)
             {
