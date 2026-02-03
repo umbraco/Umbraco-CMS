@@ -128,6 +128,22 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
     }
 
     [Test]
+    public void WhereLike_Uses_Parameterized_Query()
+    {
+        var sql = new Sql<ISqlContext>(SqlContext)
+            .Select("*")
+            .From<NodeDto>()
+            .WhereLike<NodeDto>(x => x.Text, "%test%");
+
+        // Verify SQL uses parameterized query (LIKE @0) instead of inline value.
+        Assert.AreEqual("SELECT *\nFROM [umbracoNode]\nWHERE ([umbracoNode].[text] LIKE @0)", sql.SQL);
+
+        // Verify the argument is passed correctly.
+        Assert.AreEqual(1, sql.Arguments.Length);
+        Assert.AreEqual("%test%", sql.Arguments[0]);
+    }
+
+    [Test]
     public void SelectTests()
     {
         // select the whole DTO
