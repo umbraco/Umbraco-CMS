@@ -43,14 +43,6 @@ namespace Umbraco.Extensions
             return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
-        // moved to NPocoSqlWhereExtensions.cs
-        // can be removed after code review of PR #21577 or when in main branch
-        //public static Sql<ISqlContext> WhereParam<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string param)
-        //{
-        //    string s = $"{sql.GetColumns(columnExpressions: [field], withAlias: false).FirstOrDefault()} = {param}";
-        //    return sql.Where(s, []);
-        //}
-
         /// <summary>
         /// Appends a WHERE clause to the Sql statement.
         /// </summary>
@@ -95,25 +87,7 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
         {
-            if (values == null)
-            {
-                return sql;
-            }
-
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
-
-            string[] stringValues = [.. values.OfType<string>()]; // This is necessary to avoid failing attempting to convert to string[] when values contains non-string types
-            if (stringValues.Length > 0)
-            {
-                Attempt<string[]> attempt = values.TryConvertTo<string[]>();
-                if (attempt.Success)
-                {
-                    values = attempt.Result?.Select(v => v?.ToLower());
-                    sql.Where($"LOWER({fieldName}) IN (@values)", new { values });
-                    return sql;
-                }
-            }
-
             sql.Where($"{fieldName} IN (@values)", new { values });
             return sql;
         }
@@ -827,28 +801,6 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Adds a SQL SELECT statement to retrieve the maximum value of the specified field from the table associated
-        /// with the specified DTO type.
-        /// </summary>
-        /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
-        /// selected.</typeparam>
-        /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
-        /// <param name="field">An expression specifying the field for which the maximum value will be calculated. Cannot be <see
-        /// langword="null"/>.</param>
-        /// <param name="coalesceValue">COALESCE string value.</param>
-        /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
-        /// field or the coalesceValue.</returns>
-        // moved to NPocoSqlSelectExtensions.cs
-        // can be removed after code review of PR #21577 or when in main branch
-        //public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string coalesceValue)
-        //{
-        //    ArgumentNullException.ThrowIfNull(sql);
-        //    ArgumentNullException.ThrowIfNull(field);
-
-        //    return sql.Select($"COALESCE(MAX {sql.SqlContext.SqlSyntax.GetFieldName(field)}), '{coalesceValue}')");
-        //}
-
-        /// <summary>
         /// Adds a SQL SELECT statement to retrieve the sum of the values of the specified field from the table associated
         /// with the specified DTO type.
         /// </summary>
@@ -1543,22 +1495,20 @@ namespace Umbraco.Extensions
 
         #region Aliasing
 
-        // moved to NPocoSqlExtensionsInternal.cs
-        // can be removed after code review of PR #21577 or when in main branch
-        //internal static string GetAliasedField(this Sql<ISqlContext> sql, string field)
-        //{
-        //    // get alias, if aliased
-        //    //
-        //    // regex looks for pattern "([\w+].[\w+]) AS ([\w+])" ie "(field) AS (alias)"
-        //    // and, if found & a group's field matches the field name, returns the alias
-        //    //
-        //    // so... if query contains "[umbracoNode].[nodeId] AS [umbracoNode__nodeId]"
-        //    // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
+        internal static string GetAliasedField(this Sql<ISqlContext> sql, string field)
+        {
+            // get alias, if aliased
+            //
+            // regex looks for pattern "([\w+].[\w+]) AS ([\w+])" ie "(field) AS (alias)"
+            // and, if found & a group's field matches the field name, returns the alias
+            //
+            // so... if query contains "[umbracoNode].[nodeId] AS [umbracoNode__nodeId]"
+            // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
 
-        //    MatchCollection matches = sql.SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-        //    Match? match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
-        //    return match == null ? field : match.Groups[2].Value;
-        //}
+            MatchCollection matches = sql.SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
+            Match? match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            return match == null ? field : match.Groups[2].Value;
+        }
 
         #endregion
 
@@ -1572,59 +1522,50 @@ namespace Umbraco.Extensions
             return sql;
         }
 
-        // moved to NPocoSqlExtensionsInternal.cs
-        // can be removed after code review of PR #21577 or when in main branch
-        //private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object?>>[]? columnExpressions = null, bool withAlias = true, bool forInsert = false)
-        //{
-        //    PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof(TDto));
-        //    var tableName = tableAlias ?? pd.TableInfo.TableName;
-        //    var queryColumns = pd.QueryColumns.ToList();
+        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object?>>[]? columnExpressions = null, bool withAlias = true, bool forInsert = false)
+        {
+            PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof(TDto));
+            var tableName = tableAlias ?? pd.TableInfo.TableName;
+            var queryColumns = pd.QueryColumns.ToList();
 
-        //    Dictionary<string, string>? aliases = null;
+            Dictionary<string, string>? aliases = null;
 
-        //    if (columnExpressions != null && columnExpressions.Length > 0)
-        //    {
-        //        var names = columnExpressions.Select(x =>
-        //        {
-        //            (MemberInfo member, var alias) = ExpressionHelper.FindProperty(x);
-        //            var field = member as PropertyInfo;
-        //            var fieldName = field?.GetColumnName();
-        //            if (alias != null && fieldName is not null)
-        //            {
-        //                aliases ??= new Dictionary<string, string>();
-        //                aliases[fieldName] = alias;
-        //            }
-        //            return fieldName;
-        //        }).ToArray();
+            if (columnExpressions != null && columnExpressions.Length > 0)
+            {
+                var names = columnExpressions.Select(x =>
+                {
+                    (MemberInfo member, var alias) = ExpressionHelper.FindProperty(x);
+                    var field = member as PropertyInfo;
+                    var fieldName = field?.GetColumnName();
+                    if (alias != null && fieldName is not null)
+                    {
+                        aliases ??= new Dictionary<string, string>();
+                        aliases[fieldName] = alias;
+                    }
+                    return fieldName;
+                }).ToArray();
 
-        //        //only get the columns that exist in the selected names
-        //        queryColumns = queryColumns.Where(x => names.Contains(x.Key)).ToList();
+                //only get the columns that exist in the selected names
+                queryColumns = queryColumns.Where(x => names.Contains(x.Key)).ToList();
 
-        //        //ensure the order of the columns in the expressions is the order in the result
-        //        queryColumns.Sort((a, b) => names.IndexOf(a.Key).CompareTo(names.IndexOf(b.Key)));
-        //    }
+                //ensure the order of the columns in the expressions is the order in the result
+                queryColumns.Sort((a, b) => names.IndexOf(a.Key).CompareTo(names.IndexOf(b.Key)));
+            }
 
-        //    string? GetAlias(PocoColumn column)
-        //    {
-        //        if (aliases != null && aliases.TryGetValue(column.ColumnName, out var alias))
-        //        {
-        //            return alias;
-        //        }
+            string? GetAlias(PocoColumn column)
+            {
+                if (aliases != null && aliases.TryGetValue(column.ColumnName, out var alias))
+                {
+                    return alias;
+                }
 
-        //        if ((column.MemberInfoKey.InvariantEquals("uniqueid") && !column.MemberInfoKey.Equals("uniqueId"))
-        //            || (column.MemberInfoKey.InvariantEquals("languageid") && !column.MemberInfoKey.Equals("languageId")))
-        //        {
-        //            return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.ColumnName
-        //            : column.ColumnAlias) : null;
-        //        }
+                return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
+            }
 
-        //        return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
-        //    }
-
-        //    return queryColumns
-        //        .Select(x => sql.SqlContext.SqlSyntax.GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value)!, referenceName, forInsert: forInsert))
-        //        .ToArray();
-        //}
+            return queryColumns
+                .Select(x => sql.SqlContext.SqlSyntax.GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value)!, referenceName, forInsert: forInsert))
+                .ToArray();
+        }
 
         public static string GetTableName(this Type type)
         {
@@ -1635,13 +1576,11 @@ namespace Umbraco.Extensions
             return string.IsNullOrWhiteSpace(attr?.Value) ? string.Empty : attr.Value;
         }
 
-        // moved to SqlSyntaxExtensions.cs
-        // can be removed after code review of PR #21577 or when in main branch
-        //private static string GetColumnName(this PropertyInfo column)
-        //{
-        //    ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
-        //    return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
-        //}
+        private static string GetColumnName(this PropertyInfo column)
+        {
+            ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
+            return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
+        }
 
         public static string ToText(this Sql sql)
         {
