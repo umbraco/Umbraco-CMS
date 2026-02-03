@@ -25,6 +25,7 @@ export class UmbManagementApiDataTypeDetailDataRequestManager extends UmbManagem
 			read: (id: string) => DataTypeService.getDataTypeById({ path: { id } }),
 			update: (id: string, body: UpdateDataTypeRequestModel) => DataTypeService.putDataTypeById({ path: { id }, body }),
 			delete: (id: string) => DataTypeService.deleteDataTypeById({ path: { id } }),
+			readMany: (ids: Array<string>) => DataTypeService.getDataTypeFetch({ query: { id: ids } }),
 			dataCache: dataTypeDetailCache,
 			inflightRequestCache: UmbManagementApiDataTypeDetailDataRequestManager.#inflightRequestCache,
 		});

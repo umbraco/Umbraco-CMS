@@ -26,6 +26,7 @@ export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbMan
 			update: (id: string, body: UpdateDocumentTypeRequestModel) =>
 				DocumentTypeService.putDocumentTypeById({ path: { id }, body }),
 			delete: (id: string) => DocumentTypeService.deleteDocumentTypeById({ path: { id } }),
+			readMany: (ids: Array<string>) => DocumentTypeService.getDocumentTypeFetch({ query: { id: ids } }),
 			dataCache: documentTypeDetailCache,
 			inflightRequestCache: UmbManagementApiDocumentTypeDetailDataRequestManager.#inflightRequestCache,
 		});

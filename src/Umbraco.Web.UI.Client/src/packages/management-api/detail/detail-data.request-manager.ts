@@ -7,9 +7,11 @@ import {
 	type UmbCancelError,
 	type UmbApiResponse,
 	type UmbApiWithErrorResponse,
+	type UmbDataApiResponse,
 } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 export interface UmbManagementApiDetailDataRequestManagerArgs<
 	DetailResponseModelType,
@@ -20,12 +22,13 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	read: (id: string) => Promise<UmbApiResponse<{ data: DetailResponseModelType }>>;
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
+	readMany?: (ids: Array<string>) => Promise<UmbDataApiResponse<{ data: { items: Array<DetailResponseModelType> } }>>;
 	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
 	inflightRequestCache: UmbManagementApiInFlightRequestCache<DetailResponseModelType>;
 }
 
 export class UmbManagementApiDetailDataRequestManager<
-	DetailResponseModelType,
+	DetailResponseModelType extends { id: string },
 	CreateRequestModelType,
 	UpdateRequestModelType,
 > extends UmbControllerBase {
@@ -36,6 +39,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	#read;
 	#update;
 	#delete;
+	#readMany;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 	#isConnectedToServerEvents = false;
 
@@ -53,6 +57,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		this.#read = args.read;
 		this.#update = args.update;
 		this.#delete = args.delete;
+		this.#readMany = args.readMany;
 
 		this.#dataCache = args.dataCache;
 		this.#inflightRequestCache = args.inflightRequestCache;
@@ -63,6 +68,11 @@ export class UmbManagementApiDetailDataRequestManager<
 		});
 	}
 
+	/**
+	 * Creates a new item and returns the created item data.
+	 * @param {CreateRequestModelType} data - The data to create the item with.
+	 * @returns {Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>} The API response containing the created item or an error.
+	 */
 	async create(data: CreateRequestModelType): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
 		const { data: createdId, error } = await tryExecute(this, this.#create(data));
 
@@ -73,6 +83,13 @@ export class UmbManagementApiDetailDataRequestManager<
 		return { error };
 	}
 
+	/**
+	 * Reads a single item by its ID.
+	 * Uses the cache if connected to server events and the item is cached, otherwise fetches from the server.
+	 * Deduplicates concurrent requests for the same ID using an in-flight request cache.
+	 * @param {string} id - The ID of the item to read.
+	 * @returns {Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>} The API response containing the item or an error.
+	 */
 	async read(id: string): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
 		let data: DetailResponseModelType | undefined;
 		let error: UmbApiError | UmbCancelError | undefined;
@@ -114,6 +131,59 @@ export class UmbManagementApiDetailDataRequestManager<
 		return { data, error };
 	}
 
+	/**
+	 * Reads multiple items by their IDs.
+	 * Only available if a readMany function was provided in the constructor args.
+	 * @param {Array<string>} ids - The IDs of the items to read
+	 * @returns {Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>>} - The API response containing the items or an error
+	 */
+	async readMany(ids: Array<string>): Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>> {
+		if (!this.#readMany) {
+			throw new Error('readMany is not available. No readMany function was provided in the constructor args.');
+		}
+
+		let error: UmbApiError | UmbCancelError | undefined;
+		let idsToRequest: Array<string> = [...ids];
+		let cacheItems: Array<DetailResponseModelType> = [];
+		let serverItems: Array<DetailResponseModelType> | undefined;
+
+		// Only read from the cache when we are connected to the server events
+		if (this.#isConnectedToServerEvents) {
+			const cachedIds = ids.filter((id) => this.#dataCache.has(id));
+			cacheItems = cachedIds
+				.map((id) => this.#dataCache.get(id))
+				.filter((x) => x !== undefined) as Array<DetailResponseModelType>;
+			idsToRequest = ids.filter((id) => !this.#dataCache.has(id));
+		}
+
+		if (idsToRequest.length > 0) {
+			const getItemsController = new UmbItemDataApiGetRequestController(this, {
+				api: (args) => this.#readMany!(args.uniques),
+				uniques: idsToRequest,
+			});
+
+			const { data: serverData, error: serverError } = await getItemsController.request();
+
+			serverItems = serverData.items ?? [];
+			error = serverError;
+
+			if (this.#isConnectedToServerEvents) {
+				// If we are connected to server events, we can cache the server data
+				serverItems?.forEach((item) => this.#dataCache.set(item.id, item));
+			}
+		}
+
+		const items: Array<DetailResponseModelType> = [...cacheItems, ...(serverItems ?? [])];
+
+		return { data: { items }, error };
+	}
+
+	/**
+	 * Updates an existing item and returns the updated item data.
+	 * @param {string} id - The ID of the item to update.
+	 * @param {UpdateRequestModelType} data - The data to update the item with.
+	 * @returns {Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>} The API response containing the updated item or an error.
+	 */
 	async update(id: string, data: UpdateRequestModelType): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
 		const { error } = await tryExecute(this, this.#update(id, data));
 
@@ -124,6 +194,12 @@ export class UmbManagementApiDetailDataRequestManager<
 		return { error };
 	}
 
+	/**
+	 * Deletes an item by its ID.
+	 * If connected to server events, the item is also removed from the cache.
+	 * @param {string} id - The ID of the item to delete.
+	 * @returns {Promise<UmbApiWithErrorResponse>} The API response containing an error if the deletion failed.
+	 */
 	async delete(id: string): Promise<UmbApiWithErrorResponse> {
 		const { error } = await tryExecute(this, this.#delete(id));
 

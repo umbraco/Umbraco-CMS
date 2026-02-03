@@ -188,50 +188,82 @@ export class UmbContentTypeStructureManager<
 	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique: string): Promise<UmbRepositoryResponseWithAsObservable<T | undefined>> {
-		if (this.#ownerContentTypeUnique === unique) {
-			// Its the same, but we do not know if its done loading jet, so we will wait for the load promise to finish. [NL]
+		// Check if already loaded (unique matches AND data exists)
+		if (this.#ownerContentTypeUnique === unique && this.getOwnerContentType()) {
 			await this.#init;
 			return { data: this.getOwnerContentType(), asObservable: () => this.ownerContentType };
 		}
 		await this.#initRepository;
-		this.clear();
-		this.#ownerContentTypeUnique = unique;
+
 		if (!unique) {
-			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
-			this.#initResolver = undefined;
-			this.#initRejection = undefined;
 			return Promise.reject(
 				new Error('The unique identifier is missing. A valid unique identifier is required to load the content type.'),
 			);
 		}
-		this.#repoManager!.setUniques([unique]);
-		const observable = this.#repoManager!.entryByUnique(unique);
-		const result = await this.observe(observable).asPromise();
-		if (!result) {
-			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
-			this.#initResolver = undefined;
-			this.#initRejection = undefined;
+
+		// Fetch the content type from the repository
+		const { data, error } = await this.#repository!.requestByUnique(unique);
+		if (error || !data) {
 			return {
-				error: new UmbError(`Content Type structure manager could not load: ${unique}`),
-				asObservable: () => observable,
+				error: error ?? new UmbError(`Content Type structure manager could not load: ${unique}`),
+				asObservable: () => this.ownerContentType,
 			};
 		}
 
-		// Awaits that everything is loaded:
+		// Delegate to setType to handle the rest
+		return this.setType(data);
+	}
+
+	/**
+	 * setType will set the ContentType from already-fetched data and load all inherited and composed ContentTypes.
+	 * This is useful when the content type has already been fetched (e.g., via bulk fetch) and you want to avoid re-fetching.
+	 * @param {T} contentType - The ContentType to set.
+	 * @returns {Promise} - Promise resolved when the content type and all compositions are loaded.
+	 */
+	public async setType(contentType: T): Promise<UmbRepositoryResponseWithAsObservable<T | undefined>> {
+		const unique = contentType.unique;
+		// Check if already loaded (unique matches AND data exists)
+		if (this.#ownerContentTypeUnique === unique && this.getOwnerContentType()) {
+			await this.#init;
+			return { data: this.getOwnerContentType(), asObservable: () => this.ownerContentType };
+		}
+		await this.#initRepository;
+		// Only clear if this is a different content type (unique might be pre-set via setOwnerContentTypeUnique)
+		if (this.#ownerContentTypeUnique !== unique) {
+			this.clear();
+		}
+		this.#ownerContentTypeUnique = unique;
+		if (!unique) {
+			this.#initRejection?.(`Content Type structure manager could not set type: ${unique}`);
+			this.#initResolver = undefined;
+			this.#initRejection = undefined;
+			return Promise.reject(
+				new Error('The unique identifier is missing. A valid unique identifier is required to set the content type.'),
+			);
+		}
+
+		// Add entry to repo manager FIRST so it has the status before any observations trigger
+		// (when #contentTypes is updated, it triggers contentTypeCompositions observer which calls setUniques on repoManager)
+		this.#repoManager!.addEntry(contentType);
+
+		// Now add the content type to the state
+		this.#contentTypes.appendOne(contentType);
+
+		// Awaits that everything is loaded (compositions):
 		await observationAsPromise(this.contentTypeLoaded, async (loaded) => {
 			return loaded === true;
 		}).catch(() => {
-			const msg = `Content Type structure manager could not load: ${unique}. Not all Content Types loaded successfully.`;
+			const msg = `Content Type structure manager could not set type: ${unique}. Not all Content Types loaded successfully.`;
 			this.#initRejection?.(msg);
 			this.#initResolver = undefined;
 			this.#initRejection = undefined;
 			return Promise.reject(new UmbError(msg));
 		});
 
-		this.#initResolver?.(result);
+		this.#initResolver?.(contentType);
 		this.#initResolver = undefined;
 		this.#initRejection = undefined;
-		return { data: result, asObservable: () => this.ownerContentType };
+		return { data: contentType, asObservable: () => this.ownerContentType };
 	}
 
 	public async createScaffold(preset?: Partial<T>): Promise<UmbRepositoryResponse<T>> {
@@ -332,6 +364,9 @@ export class UmbContentTypeStructureManager<
 		await Promise.resolve();
 		const ownerUnique = this.getOwnerContentTypeUnique();
 		if (!ownerUnique) return;
+		// Only proceed if the owner content type is actually loaded in #contentTypes
+		// This prevents triggering fetches when only the unique is set (via setOwnerContentTypeUnique) but data isn't loaded yet
+		if (!this.getOwnerContentType()) return;
 		const compositionUniques = contentTypeCompositions?.map((x) => x.contentType.unique) ?? [];
 		const newUniques = [ownerUnique, ...compositionUniques];
 		this.#contentTypes.filter((x) => newUniques.includes(x.unique));
@@ -354,6 +389,15 @@ export class UmbContentTypeStructureManager<
 
 	getOwnerContentTypeUnique() {
 		return this.#ownerContentTypeUnique;
+	}
+
+	/**
+	 * Sets the owner content type unique identifier without loading data.
+	 * This is useful when you need to register the structure synchronously before async initialization.
+	 * @param {string} unique - The unique identifier to set.
+	 */
+	setOwnerContentTypeUnique(unique: string) {
+		this.#ownerContentTypeUnique = unique;
 	}
 
 	getVariesByCulture() {
