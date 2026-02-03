@@ -24,14 +24,35 @@ public sealed class RelateOnTrashNotificationHandler :
     INotificationHandler<EntityContainerMovedNotification>,
     INotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification>
 {
-    private readonly IAuditService _auditService;
     private readonly IEntityService _entityService;
     private readonly IRelationService _relationService;
     private readonly ICoreScopeProvider _scopeProvider;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly ILocalizedTextService _textService;
 
+    public RelateOnTrashNotificationHandler(
+        IRelationService relationService,
+        IEntityService entityService,
+        ICoreScopeProvider scopeProvider)
+    {
+        _relationService = relationService;
+        _entityService = entityService;
+        _scopeProvider = scopeProvider;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    public RelateOnTrashNotificationHandler(
+        IRelationService relationService,
+        IEntityService entityService,
+        ICoreScopeProvider coreScopeProvider,
+        ILocalizedTextService textService,
+        IAuditService auditService,
+        IScopeProvider scopeProvider,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(relationService, entityService, coreScopeProvider)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,
         IEntityService entityService,
@@ -40,14 +61,16 @@ public sealed class RelateOnTrashNotificationHandler :
         IScopeProvider scopeProvider,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            relationService,
+            entityService,
+            scopeProvider,
+            textService,
+            auditService,
+            scopeProvider,
+            backOfficeSecurityAccessor,
+            userIdKeyResolver)
     {
-        _relationService = relationService;
-        _entityService = entityService;
-        _textService = textService;
-        _auditService = auditService;
-        _scopeProvider = scopeProvider;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _userIdKeyResolver = userIdKeyResolver;
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
@@ -169,7 +192,7 @@ public sealed class RelateOnTrashNotificationHandler :
         }
     }
 
-    private async Task CreateOriginalParentRelationOnTrashAsync<T>(
+    private Task CreateOriginalParentRelationOnTrashAsync<T>(
         IEnumerable<MoveToRecycleBinEventInfo<T>> moveInfoCollection,
         string originalParentRelationTypeAlias,
         string originalParentRelationTypeName,
@@ -187,9 +210,6 @@ public sealed class RelateOnTrashNotificationHandler :
             relationType = new RelationType(originalParentRelationTypeName, originalParentRelationTypeAlias, false, parentObjectType, childObjectType, false);
             _relationService.Save(relationType);
         }
-
-        UmbracoObjectTypes entityObjectType = ObjectTypes.GetUmbracoObjectType(childObjectType);
-        var localizationKey = GetLocalizationKey(entityObjectType);
 
         foreach (MoveToRecycleBinEventInfo<T> item in moveInfoCollection)
         {
@@ -210,31 +230,9 @@ public sealed class RelateOnTrashNotificationHandler :
                 _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
                 new Relation(originalParentId, item.Entity.Id, relationType);
             _relationService.Save(relation);
-
-            Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser switch
-            {
-                { } user => user.Key,
-                null when item.Entity is IContentBase contentBase => await _userIdKeyResolver.GetAsync(contentBase.WriterId),
-                _ => Constants.Security.SuperUserKey, // TODO: Not sure what to default to here (when deleting a container)? Shouldn't these audits be in the service itself where we have better user context?
-            };
-            await _auditService.AddAsync(
-                AuditType.Delete,
-                userKey,
-                item.Entity.Id,
-                entityObjectType.GetName(),
-                string.Format(_textService.Localize("recycleBin", localizationKey), item.Entity.Id, originalParentId));
         }
 
         scope.Complete();
+        return Task.CompletedTask;
     }
-
-    private static string GetLocalizationKey(UmbracoObjectTypes entityObjectType)
-        => entityObjectType switch
-        {
-            UmbracoObjectTypes.Document => "contentTrashed",
-            UmbracoObjectTypes.Media => "mediaTrashed",
-            UmbracoObjectTypes.Element => "elementTrashed",
-            UmbracoObjectTypes.ElementContainer => "elementContainerTrashed",
-            _ => throw new ArgumentOutOfRangeException(nameof(entityObjectType), entityObjectType, "Unsupported entity object type for recycle bin localization."),
-        };
 }

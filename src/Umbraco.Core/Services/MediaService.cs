@@ -1077,7 +1077,8 @@ namespace Umbraco.Cms.Core.Services
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
                 MoveToRecycleBinEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2)).ToArray();
                 scope.Notifications.Publish(new MediaMovedToRecycleBinNotification(moveInfo, messages).WithStateFrom(movingToRecycleBinNotification));
-                Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
+
+                AuditMoveToRecycleBin(userId, media.Id, originalPath);
                 scope.Complete();
             }
 
@@ -1352,6 +1353,15 @@ namespace Umbraco.Cms.Core.Services
                 UmbracoObjectTypes.Media.GetName(),
                 message,
                 parameters);
+        }
+
+        private void AuditMoveToRecycleBin(int userId, int mediaId, string originalPath)
+        {
+            IList<string> pathSegments = originalPath.ToDelimitedList();
+            var originalParentId = pathSegments.Count > 2
+                ? int.Parse(pathSegments[^2], CultureInfo.InvariantCulture)
+                : Constants.System.Root;
+            Audit(AuditType.Move, userId, mediaId, $"Moved to recycle bin from parent {originalParentId}");
         }
 
         #endregion

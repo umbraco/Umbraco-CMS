@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -1081,7 +1082,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.Notifications.Publish(
                 new ContentMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
                     movingToRecycleBinNotification));
-            Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
+
+            AuditMoveToRecycleBin(userId, content.Id, originalPath);
 
             scope.Complete();
         }
@@ -1707,6 +1709,15 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     // TODO ELEMENTS: not used? clean up!
     private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
         langs.Any(x => x.IsMandatory && x.IsoCode.InvariantEquals(culture));
+
+    private void AuditMoveToRecycleBin(int userId, int contentId, string originalPath)
+    {
+        IList<string> pathSegments = originalPath.ToDelimitedList();
+        var originalParentId = pathSegments.Count > 2
+            ? int.Parse(pathSegments[^2], CultureInfo.InvariantCulture)
+            : Constants.System.Root;
+        Audit(AuditType.Move, userId, contentId, $"Moved to recycle bin from parent {originalParentId}");
+    }
 
     #endregion
 

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -227,6 +229,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotFound, null);
         }
 
+        // Capture original path before any modifications (needed for audit message when trashing)
+        var originalPath = container.Path;
+
         if (container.ParentId == parentId)
         {
             return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
@@ -303,7 +308,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         _entityContainerRepository.Save(container);
 
-        await AuditAsync(AuditType.Move, userKey, container.Id);
+        await AuditMoveAsync(userKey, container.Id, trash, originalPath);
 
         // fire the moved notification
         IStatefulNotification movedNotification = movedNotificationFactory(container, eventMessages);
@@ -381,6 +386,21 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             }
         }
         while (total > DescendantsIteratorPageSize);
+    }
+
+    private async Task AuditMoveAsync(Guid userKey, int containerId, bool trash, string originalPath)
+    {
+        string? message = null;
+        if (trash)
+        {
+            IList<string> pathSegments = originalPath.ToDelimitedList();
+            var originalParentId = pathSegments.Count > 2
+                ? int.Parse(pathSegments[^2], CultureInfo.InvariantCulture)
+                : Constants.System.Root;
+            message = $"Moved to recycle bin from parent {originalParentId}";
+        }
+
+        await AuditAsync(AuditType.Move, userKey, containerId, message);
     }
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.Element;
