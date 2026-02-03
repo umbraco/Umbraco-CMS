@@ -16,6 +16,10 @@ public class CurrentUserResponseModel : UserPresentationBase
 
     public required bool HasMediaRootAccess { get; init; }
 
+    public required ISet<ReferenceByIdModel> ElementStartNodeIds { get; init; } = new HashSet<ReferenceByIdModel>();
+
+    public required bool HasElementRootAccess { get; init; }
+
     public required IEnumerable<string> AvatarUrls { get; init; } = Enumerable.Empty<string>();
 
     public required IEnumerable<string> Languages { get; init; } = Enumerable.Empty<string>();

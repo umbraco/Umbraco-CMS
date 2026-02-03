@@ -42,4 +42,5 @@ public enum UserOperationStatus
     DuplicateId,
     InvalidUserType,
     InvalidUserName,
+    ElementNodeNotFound,
 }

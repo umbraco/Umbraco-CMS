@@ -116,7 +116,7 @@ public class PropertyValidationService : IPropertyValidationService
     }
 
     /// <inheritdoc />
-    public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
+    public bool IsPropertyDataValid(IPublishableContentBase content, out IProperty[] invalidProperties, CultureImpact? impact)
     {
         // select invalid properties
         invalidProperties = content.Properties.Where(x =>

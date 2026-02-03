@@ -24,6 +24,8 @@ public interface IReadOnlyUserGroup
 
     int? StartMediaId { get; }
 
+    int? StartElementId { get; }
+
     // This is set to return true as default to avoid breaking changes.
     bool HasAccessToAllLanguages => true;
 

@@ -227,6 +227,18 @@ public static class DistributedCacheExtensions
 
     #endregion
 
+    #region ElementCacheRefresher
+
+    public static void RefreshAllElementCache(this DistributedCache dc)
+        // note: refresh all element cache does refresh content types too
+        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, new ElementCacheRefresher.JsonPayload(0, Guid.Empty, TreeChangeTypes.RefreshAll).Yield());
+
+
+    public static void RefreshElementCache(this DistributedCache dc, IEnumerable<TreeChange<IElement>> changes)
+        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new ElementCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)));
+
+    #endregion
+
     #region Published Snapshot
 
     public static void RefreshAllPublishedSnapshot(this DistributedCache dc)
@@ -234,6 +246,7 @@ public static class DistributedCacheExtensions
         // note: refresh all content & media caches does refresh content types too
         dc.RefreshAllContentCache();
         dc.RefreshAllMediaCache();
+        dc.RefreshAllElementCache();
         dc.RefreshAllDomainCache();
     }
 

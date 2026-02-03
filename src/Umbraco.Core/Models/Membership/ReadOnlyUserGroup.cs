@@ -26,6 +26,40 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
             icon,
             startContentId,
             startMediaId,
+            null,
+            alias,
+            allowedLanguages,
+            allowedSections,
+            permissions,
+            granularPermissions,
+            hasAccessToAllLanguages)
+    {
+    }
+
+    [Obsolete("Please use the constructor that includes all parameters. Scheduled for removal in Umbraco 19.")]
+    public ReadOnlyUserGroup(
+        int id,
+        Guid key,
+        string? name,
+        string? description,
+        string? icon,
+        int? startContentId,
+        int? startMediaId,
+        string? alias,
+        IEnumerable<int> allowedLanguages,
+        IEnumerable<string> allowedSections,
+        ISet<string> permissions,
+        ISet<IGranularPermission> granularPermissions,
+        bool hasAccessToAllLanguages)
+        : this(
+            id,
+            key,
+            name,
+            description,
+            icon,
+            startContentId,
+            startMediaId,
+            null,
             alias,
             allowedLanguages,
             allowedSections,
@@ -43,6 +77,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         string? icon,
         int? startContentId,
         int? startMediaId,
+        int? startElementId,
         string? alias,
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
@@ -62,6 +97,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         // Zero is invalid and will be treated as Null
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
+        StartElementId = startElementId == 0 ? null : startElementId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
         Permissions = permissions;
         GranularPermissions = granularPermissions;
@@ -80,6 +116,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public int? StartContentId { get; }
 
     public int? StartMediaId { get; }
+
+    public int? StartElementId { get; }
 
     public string Alias { get; }
 

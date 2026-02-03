@@ -19,7 +19,7 @@ public class CultureImpactFactory : ICultureImpactFactory
     }
 
     /// <inheritdoc/>
-    public CultureImpact? Create(string? culture, bool isDefault, IContent content)
+    public CultureImpact? Create(string? culture, bool isDefault, IContentBase content)
     {
         TryCreate(culture, isDefault, content.ContentType.Variations, true, _contentSettings.AllowEditInvariantFromNonDefault, out CultureImpact? impact);
 

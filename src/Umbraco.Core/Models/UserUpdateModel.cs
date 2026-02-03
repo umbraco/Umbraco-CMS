@@ -20,5 +20,9 @@ public class UserUpdateModel
 
     public bool HasMediaRootAccess { get; set; }
 
+    public ISet<Guid> ElementStartNodeKeys { get; set; } = new HashSet<Guid>();
+
+    public bool HasElementRootAccess { get; set; }
+
     public ISet<Guid> UserGroupKeys { get; set; } = new HashSet<Guid>();
 }

@@ -11,4 +11,8 @@ public class CalculatedUserStartNodesResponseModel
     public ISet<ReferenceByIdModel> MediaStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasMediaRootAccess { get; set; }
+
+    public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
+
+    public bool HasElementRootAccess { get; set; }
 }

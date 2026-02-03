@@ -38,6 +38,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private List<int> _languageCollection;
     private int? _startContentId;
     private int? _startMediaId;
+    private int? _startElementId;
 
     /// <summary>
     ///     Constructor to create a new user group
@@ -80,6 +81,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _startMediaId;
         set => SetPropertyValueAndDetectChanges(value, ref _startMediaId, nameof(StartMediaId));
+    }
+
+    [DataMember]
+    public int? StartElementId
+    {
+        get => _startElementId;
+        set => SetPropertyValueAndDetectChanges(value, ref _startElementId, nameof(StartElementId));
     }
 
     [DataMember]

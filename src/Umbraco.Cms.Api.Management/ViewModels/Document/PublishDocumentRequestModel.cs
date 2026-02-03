@@ -5,7 +5,7 @@ public class PublishDocumentRequestModel
     public required IEnumerable<CultureAndScheduleRequestModel> PublishSchedules { get; set; }
 }
 
-
+// TODO ELEMENTS: move the following classes to ViewModels.Content
 public class CultureAndScheduleRequestModel
 {
     /// <summary>
@@ -18,7 +18,6 @@ public class CultureAndScheduleRequestModel
     /// </summary>
     public ScheduleRequestModel? Schedule { get; set; }
 }
-
 
 public class ScheduleRequestModel
 {

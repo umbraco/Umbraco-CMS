@@ -18,6 +18,8 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
 
     int[]? StartMediaIds { get; set; }
 
+    int[]? StartElementIds { get; set; }
+
     string? Language { get; set; }
 
     DateTime? InvitedDate { get; set; }
