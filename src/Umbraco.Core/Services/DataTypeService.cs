@@ -311,19 +311,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-            IQuery<IDataType> query = Query<IDataType>();
-            if (keys.Length > 0)
-            {
-                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
-                // See ExpressionTests.Sql_In().
-                List<Guid> keysAsList = [.. keys];
-                query = query.Where(x => keysAsList.Contains(x.Key));
-            }
-
-            IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
-
-            return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany(keys);
+            return Task.FromResult(dataTypes);
         }
 
         /// <inheritdoc />
@@ -373,7 +362,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Task<IDataType?> GetAsync(Guid id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IDataType? dataType = GetDataTypeFromRepository(id);
+            IDataType? dataType = _dataTypeRepository.Get(id);
 
             return Task.FromResult(dataType);
         }
@@ -675,7 +664,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             EventMessages eventMessages = EventMessagesFactory.Get();
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-            IDataType? dataType = GetDataTypeFromRepository(id);
+            IDataType? dataType = _dataTypeRepository.Get(id);
             if (dataType == null)
             {
                 return Attempt.FailWithStatus(DataTypeOperationStatus.NotFound, dataType);
@@ -740,7 +729,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-            IDataType? dataType = GetDataTypeFromRepository(key);
+            IDataType? dataType = _dataTypeRepository.Get(key);
             if (dataType == null)
             {
                 // Is an unexpected response, but returning an empty collection aligns with how we handle retrieval of concrete Umbraco
@@ -908,13 +897,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, dataType);
         }
-
-        private IDataType? GetDataTypeFromRepository(Guid id)
-        => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.DataType) switch
-        {
-            { Success: false } => null,
-            { Result: var intId } => _dataTypeRepository.Get(intId),
-        };
 
         private void Audit(AuditType type, int userId, int objectId) =>
             AuditAsync(type, userId, objectId).GetAwaiter().GetResult();

@@ -114,6 +114,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	 * If all states are the same, returns that state.
 	 * If states differ, returns DRAFT (displays as "Unpublished") since mixed states can't be meaningfully represented
 	 * and DRAFT is more accurate than showing "Not created" (which shouldn't appear since those variants are filtered out).
+	 * @param states
 	 */
 	static #determineRepresentativeState(states: Array<UmbDocumentVariantState | null>): UmbDocumentVariantState | null {
 		if (states.length === 0) return null;
