@@ -14,7 +14,7 @@ type PickableFilterMethodType<T extends UmbSearchResultItemModel = UmbSearchResu
 @customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
-	private _query?: UmbSearchRequestArgs;
+	private _executedQuery?: UmbSearchRequestArgs;
 
 	@state()
 	private _searching: boolean = false;
@@ -51,9 +51,13 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 				null,
 			);
 
-			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query), null);
+			this.observe(
+				this.#pickerContext?.search.executedQuery,
+				(executedQuery) => (this._executedQuery = executedQuery),
+				null,
+			);
 
-			this.observe(this.#pickerContext?.search.searching, (query) => (this._searching = query ?? false), null);
+			this.observe(this.#pickerContext?.search.searching, (searching) => (this._searching = searching ?? false), null);
 
 			this.observe(this.#pickerContext?.search.resultItems, (items) => (this._items = items ?? []), null);
 
@@ -80,7 +84,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	override render() {
 		if (!this._isSearchable) return nothing;
 
-		if (this._query?.query && this._searching === false && this._items.length === 0) {
+		if (this._executedQuery?.query && this._searching === false && this._items.length === 0) {
 			return this.#renderEmptyResult();
 		}
 
@@ -123,7 +127,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 
 	#renderEmptyResult() {
 		return html`<uui-box>
-			<small>No result for <strong>"${this._query?.query}"</strong>.</small>
+			<small>No result for <strong>"${this._executedQuery?.query}"</strong>.</small>
 		</uui-box>`;
 	}
 

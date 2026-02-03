@@ -24,6 +24,9 @@ export class UmbPickerSearchManager<
 	#query = new UmbObjectState<SearchRequestArgsType | undefined>(undefined);
 	public readonly query = this.#query.asObservable();
 
+	#executedQuery = new UmbObjectState<SearchRequestArgsType | undefined>(undefined);
+	public readonly executedQuery = this.#executedQuery.asObservable();
+
 	#searching = new UmbBooleanState(false);
 	public readonly searching = this.#searching.asObservable();
 
@@ -114,6 +117,7 @@ export class UmbPickerSearchManager<
 	 */
 	public clear() {
 		this.#query.setValue(undefined);
+		this.#executedQuery.setValue(undefined);
 		this.#resultItems.setValue([]);
 		this.#searching.setValue(false);
 		this.#resultTotalItems.setValue(0);
@@ -202,6 +206,7 @@ export class UmbPickerSearchManager<
 		const total = data?.total ?? 0;
 		this.#resultTotalItems.setValue(total);
 		this.#pagination.setTotalItems(total);
+		this.#executedQuery.setValue(query);
 		this.#searching.setValue(false);
 	}
 }
