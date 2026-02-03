@@ -133,6 +133,11 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             .Distinct()
             .ToArray();
 
+        if (keys.Length == 0)
+        {
+            return [];
+        }
+
         return _entityRepository.GetAll(objectType, keys).ToList();
     }
 }
