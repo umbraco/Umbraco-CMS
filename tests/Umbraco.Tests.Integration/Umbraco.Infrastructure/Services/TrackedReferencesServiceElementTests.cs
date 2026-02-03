@@ -202,12 +202,9 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
             var itemKeys = actual.Result.Items.Select(x => x.NodeKey).ToList();
 
-            // Should not return the folder itself
-            Assert.IsFalse(itemKeys.Contains(Folder1.Key));
-
-            // Should return the element inside the folder that is referenced
+            // Should *only* return the element inside the folder that is referenced
             Assert.AreEqual(1, itemKeys.Count);
-            Assert.IsTrue(itemKeys.Contains(ElementInFolder.Key));
+            Assert.AreEqual(ElementInFolder.Key, itemKeys[0]);
         });
     }
 
@@ -272,13 +269,6 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         ElementService.Save(Element2);
         ElementService.Publish(Element2, ["*"]);
 
-        // Create Element3 that references Element1 and Element2
-        Element3 = ElementService.Create("Element 3", ElementType.Alias);
-        Element3.SetValue("elementPicker", $"[\"{Element1.Key}\"]");
-        Element3.SetValue("elementPicker2", $"[\"{Element2.Key}\"]");
-        ElementService.Save(Element3);
-        ElementService.Publish(Element3, ["*"]);
-
         // Create a folder with an element inside it
         var folderResult = await ElementContainerService.CreateAsync(
             null,
@@ -299,9 +289,10 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         ElementInFolder = createResult.Result.Content!;
         ElementService.Publish(ElementInFolder, ["*"]);
 
-        // Update Element3 to also reference the element in the folder
-        Element3 = ElementService.GetById(Element3.Key)!;
+        // Create Element3 that references Element1, Element2 and the element in the folder
+        Element3 = ElementService.Create("Element 3", ElementType.Alias);
         Element3.SetValue("elementPicker", $"[\"{Element1.Key}\", \"{ElementInFolder.Key}\"]");
+        Element3.SetValue("elementPicker2", $"[\"{Element2.Key}\"]");
         ElementService.Save(Element3);
         ElementService.Publish(Element3, ["*"]);
     }
