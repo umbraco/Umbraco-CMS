@@ -1544,6 +1544,7 @@ namespace Umbraco.Extensions
 
             return sql;
         }
+
         private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object?>>[]? columnExpressions = null, bool withAlias = true, bool forInsert = false)
         {
             PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof(TDto));
