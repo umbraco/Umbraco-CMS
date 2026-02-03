@@ -217,9 +217,12 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		}
 		return html`
 			<umb-body-layout header-fit-height>
-				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && (this._hasRootGroups || this._hasRootProperties)))
+				${this._routerPath &&
+				(this._tabs.length > 1 || (this._tabs.length === 1 && (this._hasRootGroups || this._hasRootProperties)))
 					? html` <uui-tab-group slot="header">
-							${(this._hasRootGroups || this._hasRootProperties) && this._tabs.length > 0 ? this.#renderTab(null, '#general_generic') : nothing}
+							${(this._hasRootGroups || this._hasRootProperties) && this._tabs.length > 0
+								? this.#renderTab(null, '#general_generic')
+								: nothing}
 							${repeat(
 								this._tabs,
 								(tab) => tab.name,
@@ -258,7 +261,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			href=${fullPath}
 			data-mark="content-tab:${path ?? 'root'}"
 			>${hint && !active
-				? html`<umb-badge slot="extra" inline-mode .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+				? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 						>${hint.text}</umb-badge
 					>`
 				: nothing}</uui-tab
@@ -272,6 +275,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				display: block;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
+			}
+			umb-badge {
+				--uui-badge-inset: 0 -8px auto auto;
 			}
 		`,
 	];
