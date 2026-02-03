@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <inheritdoc cref="ILastSyncedRepository"/>
 public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
 {
-    private readonly IMachineInfoFactory  _machineInfoFactory;
+    private readonly IMachineInfoFactory _machineInfoFactory;
 
     public LastSyncedRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, IMachineInfoFactory machineInfoFactory)
         : base(scopeAccessor, appCaches)
@@ -91,7 +91,10 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
     /// <inheritdoc />
     public async Task DeleteEntriesOlderThanAsync(DateTime pruneDate)
     {
-        var maxId = Database.ExecuteScalar<int>($"SELECT MAX(Id) FROM {QuoteTableName("umbracoCacheInstruction")};");
+        Sql<ISqlContext> maxIdSql = Database.SqlContext.Sql()
+                .SelectMax<CacheInstructionDto>(x => x.Id)
+                .From<CacheInstructionDto>();
+        var maxId = await Database.ExecuteScalarAsync<int>(maxIdSql);
 
         Sql sql =
             new Sql().Append(
