@@ -81,9 +81,21 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add(ResizeWebProcessor.Height, options.Height?.ToString(CultureInfo.InvariantCulture));
         }
 
-        if (furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
+        // Determine format: explicit > furtherOptions > default for non-images
+        string? formatValue = options.Format;
+        if (string.IsNullOrWhiteSpace(formatValue) && furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
         {
-            queryString.Add(FormatWebProcessor.Format, format[0]);
+            formatValue = format[0];
+        }
+
+        if (string.IsNullOrWhiteSpace(formatValue) && RequiresFormatConversion(options.ImageUrl))
+        {
+            formatValue = "webp"; // Default for processable non-image files (PDF, etc.)
+        }
+
+        if (!string.IsNullOrWhiteSpace(formatValue))
+        {
+            queryString.Add(FormatWebProcessor.Format, formatValue);
         }
 
         if (options.Quality is not null)
@@ -102,5 +114,32 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
         }
 
         return QueryHelpers.AddQueryString(options.ImageUrl, queryString);
+    }
+
+    /// <summary>
+    /// Determines if the source file requires format conversion because it's not a true image format.
+    /// </summary>
+    /// <param name="imageUrl">The source image URL.</param>
+    /// <returns>True if the file needs conversion to an image format; otherwise, false.</returns>
+    private static bool RequiresFormatConversion(string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return false;
+        }
+
+        // Extract extension from URL (handle query strings)
+        var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
+        var path = uri.IsAbsoluteUri ? uri.LocalPath : imageUrl.Split('?')[0];
+        var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
+
+        if (string.IsNullOrEmpty(extension))
+        {
+            return false;
+        }
+
+        // True image formats that don't require conversion
+        string[] trueImageFormats = { "jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff" };
+        return !trueImageFormats.Contains(extension);
     }
 }

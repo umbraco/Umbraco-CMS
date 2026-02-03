@@ -39,11 +39,10 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 	/**
 	 * The output format of the thumbnail.
-	 * @description The format to convert the image to. Defaults to 'webp' for optimal browser support and file size.
-	 * @default 'webp'
+	 * @description The format to convert the image to. If not specified, the backend automatically determines the best format based on the source file type.
 	 */
 	@property({ type: String })
-	format: string = 'webp';
+	format?: string;
 
 	/**
 	 * The alt text for the thumbnail.

@@ -68,7 +68,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                 Height = options.Height,
                 Width = options.Width,
                 ImageCropMode = options.Mode,
-                FurtherOptions = string.IsNullOrWhiteSpace(options.Format) ? null : $"format={options.Format}",
+                Format = options.Format,
             };
 
             var relativeUrl = _imageUrlGenerator.GetImageUrl(imageOptions);

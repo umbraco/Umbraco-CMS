@@ -17,6 +17,8 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
 
     public int? Quality { get; set; }
 
+    public string? Format { get; set; }
+
     public ImageCropMode? ImageCropMode { get; set; }
 
     public ImageCropAnchor? ImageCropAnchor { get; set; }
@@ -35,6 +37,7 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
            Width == other.Width &&
            Height == other.Height &&
            Quality == other.Quality &&
+           Format == other.Format &&
            ImageCropMode == other.ImageCropMode &&
            ImageCropAnchor == other.ImageCropAnchor &&
            EqualityComparer<FocalPointPosition>.Default.Equals(FocalPoint, other.FocalPoint) &&
@@ -52,6 +55,7 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
         hash.Add(Width);
         hash.Add(Height);
         hash.Add(Quality);
+        hash.Add(Format);
         hash.Add(ImageCropMode);
         hash.Add(ImageCropAnchor);
         hash.Add(FocalPoint);
