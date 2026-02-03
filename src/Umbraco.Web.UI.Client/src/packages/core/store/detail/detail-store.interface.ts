@@ -5,4 +5,5 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export interface UmbDetailStore<T extends UmbEntityModel> extends UmbStore<T>, UmbApi {
 	byUnique: (unique: string) => Observable<T | undefined>;
+	byUniques: (uniques: Array<string>) => Observable<Array<T>>;
 }

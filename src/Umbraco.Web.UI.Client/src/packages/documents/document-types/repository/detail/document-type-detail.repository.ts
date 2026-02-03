@@ -2,7 +2,10 @@ import type { UmbDocumentTypeDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from './document-type-detail.store.context-token.js';
 import { UmbDocumentTypeDetailServerDataSource } from './server-data-source/document-type-detail.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbDetailRepositoryBase,
+	type UmbRepositoryResponseWithAsObservable,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 
 export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<
@@ -25,12 +28,12 @@ export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<
 	/**
 	 * Requests multiple document type details by their unique IDs
 	 * @param {Array<string>} uniques - The unique IDs of the document types to fetch
-	 * @returns {Promise<UmbRepositoryResponse<Array<UmbDocumentTypeDetailModel>>>}
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDocumentTypeDetailModel>>>}
 	 * @memberof UmbDocumentTypeDetailRepository
 	 */
 	async requestByUniques(
 		uniques: Array<string>,
-	): Promise<UmbRepositoryResponse<Array<UmbDocumentTypeDetailModel> | undefined>> {
+	): Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDocumentTypeDetailModel> | undefined>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -43,7 +46,11 @@ export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<
 			data.forEach((item) => this.#detailStore?.append(item));
 		}
 
-		return { data, error };
+		return {
+			data,
+			error,
+			asObservable: () => this.#detailStore?.byUniques(uniques),
+		};
 	}
 }
 
