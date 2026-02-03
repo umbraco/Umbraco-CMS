@@ -46,6 +46,5 @@ public class ValidateCreateElementController : CreateElementControllerBase
             return result.Success
                 ? Ok()
                 : ElementEditingOperationStatusResult(result.Status, requestModel, result.Result);
-                : ContentEditingOperationStatusResult(result.Status);
         });
 }

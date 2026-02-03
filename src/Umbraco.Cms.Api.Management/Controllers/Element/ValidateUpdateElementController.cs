@@ -46,6 +46,5 @@ public class ValidateUpdateElementController : UpdateElementControllerBase
             return result.Success
                 ? Ok()
                 : ElementEditingOperationStatusResult(result.Status, requestModel, result.Result);
-                : ContentEditingOperationStatusResult(result.Status);
         });
 }
