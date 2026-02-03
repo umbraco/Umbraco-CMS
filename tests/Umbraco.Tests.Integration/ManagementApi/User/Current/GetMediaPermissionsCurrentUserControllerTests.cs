@@ -3,38 +3,37 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.User.Current;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.ContentTypeEditing;
-using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.User.Current;
 
 public class GetMediaPermissionsCurrentUserControllerTests : ManagementApiUserGroupTestBase<GetMediaPermissionsCurrentUserController>
 {
-    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
-    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
+    private IUserService UserService => GetRequiredService<IUserService>();
 
-    private Guid _mediaKey;
+    private Guid _userKey;
 
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypeCreateAttempt = await MediaTypeEditingService.CreateAsync(
-            MediaTypeEditingBuilder.CreateBasicMediaType(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()),
-            Constants.Security.SuperUserKey);
-        Assert.IsTrue(mediaTypeCreateAttempt.Success);
+        var adminUserGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
 
-        var response = await MediaEditingService.CreateAsync(
-            MediaEditingBuilder.CreateBasicMedia(mediaTypeCreateAttempt.Result.Key, null),
-            Constants.Security.SuperUserKey);
-        Assert.IsTrue(response.Success);
-        _mediaKey = response.Result.Content!.Key;
+        var stringKey = Guid.NewGuid();
+        var model = new UserCreateModel()
+        {
+            Email = stringKey + "@test.com",
+            UserName = stringKey + "@test.com",
+            Name = stringKey.ToString(),
+            UserGroupKeys = new HashSet<Guid> { adminUserGroup.Key },
+        };
+        var response = await UserService.CreateAsync(Constants.Security.SuperUserKey, model);
+        _userKey = response.Result.CreatedUser.Key;
     }
 
-    protected override Expression<Func<GetMediaPermissionsCurrentUserController, object>> MethodSelector
-        => x => x.GetPermissions(CancellationToken.None, new HashSet<Guid> { _mediaKey });
+    protected override Expression<Func<GetMediaPermissionsCurrentUserController, object>> MethodSelector => x => x.GetPermissions(CancellationToken.None, new HashSet<Guid> { _userKey });
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
