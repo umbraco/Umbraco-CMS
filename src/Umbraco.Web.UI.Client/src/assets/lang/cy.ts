@@ -1277,7 +1277,8 @@ export default {
 	rollback: {
 		headline: 'Dewis fersiwn i gymharu efo fersiwn bresennol',
 		changes: 'Newidiadau',
-		diffHelp: "Bydd <del>testun coch</del> yn cael ei dynnu yn y fersiwn a ddewiswyd, bydd <ins>testun gwyrdd</ins> yn cael ei ychwanegu.",
+		diffHelp:
+			'Bydd <del>testun coch</del> yn cael ei dynnu yn y fersiwn a ddewiswyd, bydd <ins>testun gwyrdd</ins> yn cael ei ychwanegu.',
 		showDiff: "Dangos gwahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd.",
 		documentRolledBack: "Dogfen wedi'i rolio yn ôl",
 		htmlHelp:
