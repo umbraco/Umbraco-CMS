@@ -92,7 +92,6 @@ internal sealed class ElementEditingService
             createModel.Variants.Select(variant => variant.Culture),
             userKey);
 
-
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)

@@ -1,5 +1,6 @@
 import './user-avatar/user-avatar.element.js';
 import './user-document-start-node/user-document-start-node.element.js';
+import './user-element-start-node/user-element-start-node.element.js';
 import './user-input/user-input.element.js';
 import './user-media-start-node/user-media-start-node.element.js';
 

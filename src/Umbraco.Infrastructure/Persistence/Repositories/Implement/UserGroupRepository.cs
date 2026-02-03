@@ -493,7 +493,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     {
         var userGroupId = QuoteColumnName("userGroupId");
         var userGroupKey = QuoteColumnName("userGroupKey");
-        var key = QuoteColumnName("Key");
+        var key = QuoteColumnName(UserGroupDto.KeyColumnName);
         var umbracoUserGroup = QuoteTableName(UserGroupDto.TableName);
         var list = new List<string>
         {

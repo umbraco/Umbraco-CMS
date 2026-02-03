@@ -30,6 +30,12 @@ export class UmbUserWorkspaceContext
 	readonly hasDocumentRootAccess = this._data.createObservablePartOfCurrent(
 		(data) => data?.hasDocumentRootAccess || false,
 	);
+	readonly elementStartNodeUniques = this._data.createObservablePartOfCurrent(
+		(data) => data?.elementStartNodeUniques || [],
+	);
+	readonly hasElementRootAccess = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasElementRootAccess || false,
+	);
 	readonly mediaStartNodeUniques = this._data.createObservablePartOfCurrent(
 		(data) => data?.mediaStartNodeUniques || [],
 	);
