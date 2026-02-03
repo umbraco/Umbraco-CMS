@@ -1201,7 +1201,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result);
     }
 
-    public virtual async Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key)
+    /// <inheritdoc/>
+    public async Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -1211,10 +1212,16 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, []);
         }
 
-        IEnumerable<Guid> allowedParentKeys = Repository.GetAllowedParentKeys(key);
+        IEnumerable<Guid> allowedParentKeys = await PerformGetAllowedParentKeysAsync(key);
 
-        return await Task.FromResult(Attempt.SucceedWithStatus(ContentTypeOperationStatus.Success, allowedParentKeys));
+        return Attempt.SucceedWithStatus(ContentTypeOperationStatus.Success, allowedParentKeys);
     }
+
+    /// <summary>
+    /// Retrieves a collection of allowed parent keys for the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the key for which to retrieve allowed parent keys.</param>
+    protected virtual Task<IEnumerable<Guid>> PerformGetAllowedParentKeysAsync(Guid key) => Task.FromResult(Repository.GetAllowedParentKeys(key));
 
     #endregion
 

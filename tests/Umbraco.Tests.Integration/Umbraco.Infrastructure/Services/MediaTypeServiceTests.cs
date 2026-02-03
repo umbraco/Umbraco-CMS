@@ -265,7 +265,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         MediaTypeService.Save(parentMediaType);
 
         // Act
-        var result = await MediaTypeService.GetAllowedParentsAsync(childMediaType.Key);
+        var result = await MediaTypeService.GetAllowedParentKeysAsync(childMediaType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -299,7 +299,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         MediaTypeService.Save(unrelatedParentMediaType);
 
         // Act
-        var result = await MediaTypeService.GetAllowedParentsAsync(childMediaType.Key);
+        var result = await MediaTypeService.GetAllowedParentKeysAsync(childMediaType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -318,7 +318,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         var nonExistentKey = Guid.NewGuid();
 
         // Act
-        var result = await MediaTypeService.GetAllowedParentsAsync(nonExistentKey);
+        var result = await MediaTypeService.GetAllowedParentKeysAsync(nonExistentKey);
 
         // Assert
         Assert.That(result.Success, Is.False);

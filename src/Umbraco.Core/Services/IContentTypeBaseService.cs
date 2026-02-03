@@ -185,6 +185,6 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="key">The key of the child content type.</param>
     /// <returns>A collection of the keys of all potential parents.</returns>
     /// <exception cref="NotImplementedException">Default implementation due to breaking changes.</exception>
-    /// TODO (V18): Remove the default implementation
-    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentsAsync(Guid key) => Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, []));
+    /// TODO (V18): Remove the default implementation.
+    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key) => Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotImplemented, []));
 }

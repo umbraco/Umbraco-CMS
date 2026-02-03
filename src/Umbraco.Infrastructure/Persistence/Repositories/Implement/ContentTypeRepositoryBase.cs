@@ -1706,6 +1706,12 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             ?? Array.Empty<(TEntity, int)>();
     }
 
+
+    /// <summary>
+    /// Retrieves a collection of allowed parent keys for the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the key for which to retrieve allowed parent keys.</param>
+    /// <returns>An enumerable collection of GUIDs representing the allowed parent keys.</returns>
     public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
     {
         Sql<ISqlContext> childNodeIdQuery = Sql()

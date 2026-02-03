@@ -1,10 +1,9 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -28,7 +27,7 @@ public class AllowedParentsMediaTypeController : MediaTypeControllerBase
         CancellationToken cancellationToken,
         Guid id)
     {
-        Attempt<IEnumerable<Guid>, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedParentsAsync(id);
+        Attempt<IEnumerable<Guid>, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedParentKeysAsync(id);
         if (attempt.Success is false)
         {
             return OperationStatusResult(attempt.Status);

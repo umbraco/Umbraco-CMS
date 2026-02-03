@@ -2404,7 +2404,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetAllowedParentsAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
+    public async Task GetAllowedParentKeysAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
     {
         // Arrange
         var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
@@ -2416,7 +2416,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(parentContentType);
 
         // Act
-        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key);
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -2425,7 +2425,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetAllowedParentsAsync_ReturnsParentKeys_WhenParentsAllowChildType()
+    public async Task GetAllowedParentKeysAsync_ReturnsParentKeys_WhenParentsAllowChildType()
     {
         // Arrange
         var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
@@ -2450,7 +2450,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(unrelatedParentContentType);
 
         // Act
-        var result = await ContentTypeService.GetAllowedParentsAsync(childContentType.Key);
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -2463,13 +2463,13 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetAllowedParentsAsync_ReturnsSuccessFalse_WhenContentTypeDoesNotExist()
+    public async Task GetAllowedParentKeysAsync_ReturnsSuccessFalse_WhenContentTypeDoesNotExist()
     {
         // Arrange
         var nonExistentKey = Guid.NewGuid();
 
         // Act
-        var result = await ContentTypeService.GetAllowedParentsAsync(nonExistentKey);
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(nonExistentKey);
 
         // Assert
         Assert.That(result.Success, Is.False);

@@ -144,10 +144,10 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     }
 
     /// <inheritdoc />
-    /// Unlike document and media types, allowed children (and therefore parents) are not defined for media types.
-    public override async Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentsAsync(
-        Guid key) =>
-        await Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, []));
+    /// <remarks>
+    /// Unlike document and media types, allowed children (and therefore parents) are not defined for member types.
+    /// </remarks>
+    protected override Task<IEnumerable<Guid>> PerformGetAllowedParentKeysAsync(Guid key) => Task.FromResult(Enumerable.Empty<Guid>());
 
     #region Notifications
 
