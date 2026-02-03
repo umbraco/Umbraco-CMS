@@ -149,6 +149,7 @@ export class UmbPickerSearchManager<
 	 * @memberof UmbPickerSearchManager
 	 */
 	public updateQuery(query: Partial<SearchRequestArgsType>) {
+		this.#pagination.setCurrentPageNumber(1);
 		const mergedQuery = { ...this.getQuery(), ...query } as SearchRequestArgsType;
 		this.#query.setValue(mergedQuery);
 	}
