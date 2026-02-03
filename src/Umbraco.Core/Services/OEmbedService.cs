@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Media;
@@ -11,6 +12,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class OEmbedService : IOEmbedService
 {
+    private static readonly ConcurrentDictionary<string, Regex> RegexCache = new();
+
     private readonly EmbedProvidersCollection _embedProvidersCollection;
     private readonly ILogger<OEmbedService> _logger;
 
@@ -60,5 +63,8 @@ public class OEmbedService : IOEmbedService
     /// <param name="urlSchemeRegexPatterns">The regex patterns to match against.</param>
     /// <returns><c>true</c> if the URL matches any pattern; otherwise, <c>false</c>.</returns>
     internal static bool MatchesUrlScheme(string url, string[] urlSchemeRegexPatterns)
-        => urlSchemeRegexPatterns.Any(pattern => new Regex(pattern, RegexOptions.IgnoreCase).IsMatch(url));
+        => urlSchemeRegexPatterns.Any(pattern => GetOrCreateRegex(pattern).IsMatch(url));
+
+    private static Regex GetOrCreateRegex(string pattern)
+        => RegexCache.GetOrAdd(pattern, p => new Regex(p, RegexOptions.IgnoreCase | RegexOptions.Compiled));
 }
