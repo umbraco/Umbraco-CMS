@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return [];
             }
 
-            ISqlSyntaxProvider? sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
+            ISqlSyntaxProvider sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
             string[] columns = [
                     sx.ColumnWithAlias("x", "otherId", "nodeId"),
                     sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),

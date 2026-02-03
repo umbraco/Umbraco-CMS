@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +16,13 @@ public sealed class EmptyCreatedAtActionResult : ActionResult
     private readonly object _routeValues;
     private readonly string _resourceIdentifier;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EmptyCreatedAtActionResult"/> class.
+    /// </summary>
+    /// <param name="actionName">The name of the action to generate the URL for.</param>
+    /// <param name="controllerName">The name of the controller to generate the URL for.</param>
+    /// <param name="routeValues">The route values to use for URL generation.</param>
+    /// <param name="resourceIdentifier">The identifier of the created resource.</param>
     public EmptyCreatedAtActionResult(string actionName, string controllerName, object routeValues, string resourceIdentifier)
     {
         _actionName = actionName;
@@ -24,6 +31,7 @@ public sealed class EmptyCreatedAtActionResult : ActionResult
         _resourceIdentifier = resourceIdentifier;
     }
 
+    /// <inheritdoc/>
     public override void ExecuteResult(ActionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
