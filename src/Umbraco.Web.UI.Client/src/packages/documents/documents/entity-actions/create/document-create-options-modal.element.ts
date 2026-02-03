@@ -43,15 +43,20 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _availableBlueprints: Array<UmbDocumentBlueprintItemBaseModel> = [];
 
+	@state()
+	private _isLoading = false;
+
 	override async firstUpdated() {
+		this._isLoading = true;
 		const parentUnique = this.data?.parent.unique;
 		const documentTypeUnique = this.data?.documentType?.unique || null;
 
-		this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
+		await this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
 
 		if (parentUnique) {
-			this.#retrieveHeadline(parentUnique);
+			await this.#retrieveHeadline(parentUnique);
 		}
+		this._isLoading = false;
 	}
 
 	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
@@ -166,6 +171,9 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderDocumentTypes() {
+		if (this._isLoading) {
+			return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		}
 		return when(
 			this._allowedDocumentTypes.length === 0,
 			() => this.#renderNoDocumentTypes(),
@@ -218,6 +226,12 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 
 			#edit-permissions {
 				margin-top: var(--uui-size-6);
+			}
+
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];
