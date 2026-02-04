@@ -70,7 +70,8 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     {
         foreach (var url in urls)
         {
-            var extension = Path.GetExtension(url).TrimStart('.');
+            var path = url.Split('?')[0];
+            var extension = Path.GetExtension(path).TrimStart('.');
             if (_imageUrlGenerator.SupportedImageFileTypes.InvariantContains(extension) is false)
             {
                 // It's okay to return just the image URL for SVGs, as they are always scalable.

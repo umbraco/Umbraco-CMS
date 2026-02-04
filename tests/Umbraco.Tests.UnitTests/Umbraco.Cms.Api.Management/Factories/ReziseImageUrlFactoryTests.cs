@@ -255,11 +255,10 @@ public class ReziseImageUrlFactoryTests
         // Arrange
         var factory = CreateFactory();
         var media = CreateMediaWithUrl("/media/document.pdf");
+        var options = new ImageResizeOptions(Height: 200, Width: 200, Mode: ImageCropMode.Crop);
 
         // Act
-#pragma warning disable CS0618 // Type or member is obsolete
-        var result = factory.CreateUrlSets([media], height: 200, width: 200, mode: ImageCropMode.Crop).ToList();
-#pragma warning restore CS0618
+        var result = factory.CreateUrlSets([media], options).ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(1));

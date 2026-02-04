@@ -62,22 +62,7 @@ public class ContentImagingSettingsTests
     }
 
     [Test]
-    public void ImageFileTypes_IsSubsetOf_ImageFileTypes_ByDefault()
-    {
-        // Arrange
-        var settings = new ContentImagingSettings();
 
-        // Assert - All ImageFileTypes should be in ImageFileTypes
-        foreach (var format in settings.ImageFileTypes)
-        {
-            Assert.That(
-                settings.ImageFileTypes,
-                Does.Contain(format),
-                $"ImageFileTypes should contain all formats from ImageFileTypes, but '{format}' was missing");
-        }
-    }
-
-    [Test]
     public void ImageFileTypes_AllowsCaseInsensitiveComparison()
     {
         // Arrange
