@@ -4,6 +4,8 @@ import { UMB_MOVE_MEDIA_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
+export const UMB_MEDIA_MOVE_SELECTABLE_FILTER_PROVIDER_ALIAS = 'Umb.MoveSelectableFilterProvider.Media';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
@@ -15,6 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			treeRepositoryAlias: UMB_MEDIA_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_MEDIA_REPOSITORY_ALIAS,
 			treeAlias: UMB_MEDIA_TREE_ALIAS,
+			selectableFilterProviderAlias: UMB_MEDIA_MOVE_SELECTABLE_FILTER_PROVIDER_ALIAS,
 		},
 		conditions: [
 			{
@@ -22,5 +25,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'moveSelectableFilterProvider',
+		alias: UMB_MEDIA_MOVE_SELECTABLE_FILTER_PROVIDER_ALIAS,
+		name: 'Media Move Selectable Filter Provider',
+		api: () => import('./media-move-selectable-filter.provider.js'),
+	},
+
 	...repositoryManifests,
 ];
