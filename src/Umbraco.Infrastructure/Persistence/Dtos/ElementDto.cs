@@ -7,16 +7,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("nodeId", AutoIncrement = false)]
 [ExplicitColumns]
-public sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
+internal sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.Element;
 
-    [Column("nodeId")]
+    [Column(INodeDto.NodeIdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
 
-    [Column("published")]
+    [Column(IPublishableContentDto<ElementVersionDto>.PublishedColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 

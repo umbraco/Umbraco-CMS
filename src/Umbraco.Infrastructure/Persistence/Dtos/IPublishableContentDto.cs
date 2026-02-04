@@ -2,9 +2,14 @@ using NPoco;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-public interface IPublishableContentDto<TContentVersionDto> : INodeDto
+internal interface IPublishableContentDto<TContentVersionDto> : INodeDto
     where TContentVersionDto : class, IContentVersionDto
 {
+    internal const string PublishedColumnName = "published";
+
+    [Column(PublishedColumnName)]
+    bool Published { get; }
+
     [ResultColumn]
     ContentDto ContentDto { get; }
 

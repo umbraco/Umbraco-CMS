@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -28,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IContent" />.
 /// </summary>
-public class DocumentRepository : PublishableContentRepositoryBase<int, IContent, DocumentRepository, DocumentDto, DocumentVersionDto>, IDocumentRepository
+internal class DocumentRepository : PublishableContentRepositoryBase<int, IContent, DocumentRepository, DocumentDto, DocumentVersionDto, DocumentCultureVariationDto>, IDocumentRepository
 {
     private readonly AppCaches _appCaches;
     private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
@@ -146,103 +145,6 @@ public class DocumentRepository : PublishableContentRepositoryBase<int, IContent
                                                                            _loggerFactory.CreateLogger<PermissionRepository<IContent>>(),
                                                                            _repositoryCacheVersionService,
                                                                            _cacheSyncService);
-
-    /// <inheritdoc />
-    public ContentScheduleCollection GetContentSchedule(int contentId)
-    {
-        var result = new ContentScheduleCollection();
-
-        List<ContentScheduleDto>? scheduleDtos = Database.Fetch<ContentScheduleDto>(Sql()
-            .Select<ContentScheduleDto>()
-            .From<ContentScheduleDto>()
-            .Where<ContentScheduleDto>(x => x.NodeId == contentId));
-
-        foreach (ContentScheduleDto? scheduleDto in scheduleDtos)
-        {
-            result.Add(new ContentSchedule(
-                scheduleDto.Id,
-                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
-                scheduleDto.Date,
-                scheduleDto.Action == ContentScheduleAction.Release.ToString()
-                    ? ContentScheduleAction.Release
-                    : ContentScheduleAction.Expire));
-        }
-
-        return result;
-    }
-
-    protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
-    {
-        // note: 'updater' is the user who created the latest draft version,
-        //       we don't have an 'updater' per culture (should we?)
-        if (ordering.OrderBy.InvariantEquals("updater"))
-        {
-            Sql<ISqlContext> joins = Sql()
-                .InnerJoin<UserDto>("updaterUser")
-                .On<ContentVersionDto, UserDto>(
-                (version, user) => version.UserId == user.Id,
-                    aliasRight: "updaterUser");
-
-            // see notes in ApplyOrdering: the field MUST be selected + aliased
-            sql = Sql(
-                InsertBefore(
-                    sql,
-                    "FROM",
-                    ", " + SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "updaterUser") + " AS ordering "),
-                sql.Arguments);
-
-            sql = InsertJoins(sql, joins);
-
-            return "ordering";
-        }
-
-        if (ordering.OrderBy.InvariantEquals("published"))
-        {
-            // no culture, assume invariant and simply order by published.
-            if (ordering.Culture.IsNullOrWhiteSpace())
-            {
-                return SqlSyntax.GetFieldName<DocumentDto>(x => x.Published);
-            }
-
-            // invariant: left join will yield NULL and we must use pcv to determine published
-            // variant: left join may yield NULL or something, and that determines published
-
-            Sql<ISqlContext> joins = Sql()
-                .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>(
-                    (content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype")
-                // left join on optional culture variation
-                //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
-                .LeftJoin<ContentVersionCultureVariationDto>(
-                    nested => nested.InnerJoin<LanguageDto>("langp")
-                    .On<ContentVersionCultureVariationDto, LanguageDto>(
-                            (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]",
-                            "ccvp",
-                            "langp"),
-                    "ccvp")
-                .On<ContentVersionDto, ContentVersionCultureVariationDto>(
-                (version, ccv) => version.Id == ccv.VersionId,
-                    "pcv",
-                    "ccvp");
-
-            sql = InsertJoins(sql, joins);
-
-            // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
-            // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
-            var sqlText = InsertBefore(
-                sql.SQL,
-                "FROM",
-
-                // when invariant, ie 'variations' does not have the culture flag (value 1), it should be safe to simply use the published flag on umbracoDocument,
-                // otherwise check if there's a version culture variation for the lang, via ccv.id
-                $", (CASE WHEN (ctype.variations & 1) = 0 THEN ({SqlSyntax.GetFieldName<DocumentDto>(x => x.Published)}) ELSE (CASE WHEN ccvp.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
-
-            sql = Sql(sqlText, sql.Arguments);
-
-            return "ordering";
-        }
-
-        return base.ApplySystemOrdering(ref sql, ordering);
-    }
 
     private IEnumerable<IContent> MapDtosToContent(
         List<DocumentDto> dtos,
@@ -383,7 +285,7 @@ public class DocumentRepository : PublishableContentRepositoryBase<int, IContent
             {
                 // load all variations for all documents from database, in one query
                 IDictionary<int, List<ContentVariation>> contentVariations = GetContentVariations(temps);
-                IDictionary<int, List<DocumentVariation>> documentVariations = GetDocumentVariations(temps);
+                IDictionary<int, List<EntityVariation>> documentVariations = GetEntityVariations(temps);
                 foreach (TempContent<Content> temp in temps)
                 {
                     SetVariations(temp.Content, contentVariations, documentVariations);
@@ -431,7 +333,7 @@ public class DocumentRepository : PublishableContentRepositoryBase<int, IContent
             if (contentType?.VariesByCulture() ?? false)
             {
                 IDictionary<int, List<ContentVariation>> contentVariations = GetContentVariations(ltemp);
-                IDictionary<int, List<DocumentVariation>> documentVariations = GetDocumentVariations(ltemp);
+                IDictionary<int, List<EntityVariation>> documentVariations = GetEntityVariations(ltemp);
                 SetVariations(content, contentVariations, documentVariations);
             }
 
@@ -443,118 +345,6 @@ public class DocumentRepository : PublishableContentRepositoryBase<int, IContent
         {
             content.EnableChangeTracking();
         }
-    }
-
-    private void SetVariations(
-        Content? content,
-        IDictionary<int, List<ContentVariation>> contentVariations,
-        IDictionary<int, List<DocumentVariation>> documentVariations)
-    {
-        if (content is null)
-        {
-            return;
-        }
-
-        if (contentVariations.TryGetValue(content.VersionId, out List<ContentVariation>? contentVariation))
-        {
-            foreach (ContentVariation v in contentVariation)
-            {
-                content.SetCultureInfo(v.Culture, v.Name, v.Date.EnsureUtc());
-            }
-        }
-
-        if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
-        {
-            foreach (ContentVariation v in contentVariation)
-            {
-                content.SetPublishInfo(v.Culture, v.Name, v.Date.EnsureUtc());
-            }
-        }
-
-        if (documentVariations.TryGetValue(content.Id, out List<DocumentVariation>? documentVariation))
-        {
-            content.SetCultureEdited(documentVariation.Where(x => x.Edited).Select(x => x.Culture));
-        }
-    }
-
-    private IDictionary<int, List<ContentVariation>> GetContentVariations<T>(List<TempContent<T>> temps)
-        where T : class, IContentBase
-    {
-        var versions = new List<int>();
-        foreach (TempContent<T> temp in temps)
-        {
-            versions.Add(temp.VersionId);
-            if (temp.PublishedVersionId > 0)
-            {
-                versions.Add(temp.PublishedVersionId);
-            }
-        }
-
-        if (versions.Count == 0)
-        {
-            return new Dictionary<int, List<ContentVariation>>();
-        }
-
-        IEnumerable<ContentVersionCultureVariationDto> dtos =
-            Database.FetchByGroups<ContentVersionCultureVariationDto, int>(
-                versions,
-                Constants.Sql.MaxParameterCount,
-                batch
-                    => Sql()
-                        .Select<ContentVersionCultureVariationDto>()
-                        .From<ContentVersionCultureVariationDto>()
-                        .WhereIn<ContentVersionCultureVariationDto>(x => x.VersionId, batch));
-
-        var variations = new Dictionary<int, List<ContentVariation>>();
-
-        foreach (ContentVersionCultureVariationDto dto in dtos)
-        {
-            if (!variations.TryGetValue(dto.VersionId, out List<ContentVariation>? variation))
-            {
-                variations[dto.VersionId] = variation = new List<ContentVariation>();
-            }
-
-            variation.Add(new ContentVariation
-            {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
-                Name = dto.Name,
-                Date = dto.UpdateDate
-            });
-        }
-
-        return variations;
-    }
-
-    private IDictionary<int, List<DocumentVariation>> GetDocumentVariations<T>(List<TempContent<T>> temps)
-        where T : class, IContentBase
-    {
-        IEnumerable<int> ids = temps.Select(x => x.Id);
-
-        IEnumerable<DocumentCultureVariationDto> dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(
-            ids,
-            Constants.Sql.MaxParameterCount,
-            batch => Sql()
-                        .Select<DocumentCultureVariationDto>()
-                        .From<DocumentCultureVariationDto>()
-                        .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, batch));
-
-        var variations = new Dictionary<int, List<DocumentVariation>>();
-
-        foreach (DocumentCultureVariationDto dto in dtos)
-        {
-            if (!variations.TryGetValue(dto.NodeId, out List<DocumentVariation>? variation))
-            {
-                variations[dto.NodeId] = variation = new List<DocumentVariation>();
-            }
-
-            variation.Add(new DocumentVariation
-            {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
-                Edited = dto.Edited
-            });
-        }
-
-        return variations;
     }
 
     private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
@@ -633,19 +423,6 @@ public class DocumentRepository : PublishableContentRepositoryBase<int, IContent
 
             yield return dto;
         }
-    }
-
-    private sealed class ContentVariation
-    {
-        public string? Culture { get; set; }
-        public string? Name { get; set; }
-        public DateTime Date { get; set; }
-    }
-
-    private sealed class DocumentVariation
-    {
-        public string? Culture { get; set; }
-        public bool Edited { get; set; }
     }
 
     #region Repository Base

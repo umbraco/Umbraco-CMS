@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-public interface INodeDto
+internal interface INodeDto
 {
     internal const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 

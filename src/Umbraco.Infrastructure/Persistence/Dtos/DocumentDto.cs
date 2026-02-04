@@ -11,16 +11,12 @@ public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
 
-
-    // Public constants to bind properties between DTOs
-    public const string PublishedColumnName = "published";
-
     [Column(INodeDto.NodeIdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
 
-    [Column(PublishedColumnName)]
+    [Column(IPublishableContentDto<DocumentVersionDto>.PublishedColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 

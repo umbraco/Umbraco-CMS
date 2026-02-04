@@ -35,7 +35,7 @@ public class PublishStatusRepository : IPublishStatusRepository
                 $"n.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)}",
                 $"l.{syntax.GetQuotedColumnName(LanguageDto.IsoCodeColumnName)}",
                 $"ct.{syntax.GetQuotedColumnName(ContentTypeDto.VariationsColumnName)}",
-                $"d.{syntax.GetQuotedColumnName(DocumentDto.PublishedColumnName)}",
+                $"d.{syntax.GetQuotedColumnName(IPublishableContentDto<DocumentVersionDto>.PublishedColumnName)}",
                 $"dcv.{syntax.GetQuotedColumnName(DocumentCultureVariationDto.PublishedColumnName)} as {syntax.GetQuotedColumnName(PublishStatusDto.DocumentVariantPublishStatusColumnName)}") // COALESCE is not necessary as the column is not nullable
             .From<DocumentDto>("d")
             .InnerJoin<ContentDto>("c").On<DocumentDto, ContentDto>((d, c) => d.NodeId == c.NodeId, "c", "d")
@@ -129,7 +129,7 @@ public class PublishStatusRepository : IPublishStatusRepository
         [Column(ContentTypeDto.VariationsColumnName)]
         public byte ContentTypeVariation { get; set; }
 
-        [Column(DocumentDto.PublishedColumnName)]
+        [Column(IPublishableContentDto<DocumentVersionDto>.PublishedColumnName)]
         public bool DocumentInvariantPublished { get; set; }
 
         [Column(DocumentVariantPublishStatusColumnName)]

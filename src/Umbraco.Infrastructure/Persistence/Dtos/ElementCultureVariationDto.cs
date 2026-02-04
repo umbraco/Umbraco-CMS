@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal sealed class ElementCultureVariationDto
+internal sealed class ElementCultureVariationDto : ICultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ElementCultureVariation;
 
@@ -15,12 +15,12 @@ internal sealed class ElementCultureVariationDto
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("nodeId")]
+    [Column(INodeDto.NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,languageId")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{INodeDto.NodeIdColumnName},{ICultureVariationDto.LanguageIdColumnName}")]
     public int NodeId { get; set; }
 
-    [Column("languageId")]
+    [Column(ICultureVariationDto.LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }
@@ -30,7 +30,7 @@ internal sealed class ElementCultureVariationDto
     public string? Culture { get; set; }
 
     // authority on whether a culture has been edited
-    [Column("edited")]
+    [Column(ICultureVariationDto.EditedColumnName)]
     public bool Edited { get; set; }
 
     // de-normalized for perfs
