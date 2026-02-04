@@ -41,14 +41,15 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
     /// </summary>
     public int? Quality { get; set; }
 
-<<<<<<< claude/webp-thumbnail-default-TYFpe
+
+    /// <summary>
+    ///     Gets or sets the image format to use (for example "webp").
+    /// </summary>
     public string? Format { get; set; }
 
-=======
     /// <summary>
     ///     Gets or sets the image crop mode to use.
     /// </summary>
->>>>>>> main
     public ImageCropMode? ImageCropMode { get; set; }
 
     /// <summary>
