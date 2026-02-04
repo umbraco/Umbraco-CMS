@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -60,6 +61,7 @@ using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
+using Umbraco.Cms.Web.Common.Authorization;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions;
@@ -93,6 +95,21 @@ public static partial class UmbracoBuilderExtensions
         }
 
         builder.Services.AddSingleton<AddCoreMarker>();
+
+        // Register the feature authorization handler and policy.
+        // This enables the UmbracoFeatureEnabled policy used by Delivery API and other controllers.
+        builder.Services.TryAddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
+        builder.Services.AddAuthorization(options =>
+        {
+            // Only add the policy if it doesn't already exist
+            if (options.GetPolicy(AuthorizationPolicies.UmbracoFeatureEnabled) is null)
+            {
+                options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy =>
+                {
+                    policy.Requirements.Add(new FeatureAuthorizeRequirement());
+                });
+            }
+        });
 
         return builder
             .AddConfiguration()

@@ -40,6 +40,9 @@ public static class UmbracoBuilderExtensions
     /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddDeliveryApi(this IUmbracoBuilder builder)
     {
+        // Delivery API supports member authentication for protected content
+        builder.AddMembersIdentity();
+
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategy>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategyV2>();
