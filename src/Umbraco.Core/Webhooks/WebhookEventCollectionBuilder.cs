@@ -7,10 +7,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
+/// <summary>
+/// Builder for the <see cref="WebhookEventCollection"/> that handles registration of webhook events
+/// and their corresponding notification handlers with the dependency injection container.
+/// </summary>
 public class WebhookEventCollectionBuilder : SetCollectionBuilderBase<WebhookEventCollectionBuilder, WebhookEventCollection, IWebhookEvent>
 {
+    /// <inheritdoc />
     protected override WebhookEventCollectionBuilder This => this;
 
+    /// <inheritdoc />
     public override void RegisterWith(IServiceCollection services)
     {
         // register the collection
@@ -21,6 +27,10 @@ public class WebhookEventCollectionBuilder : SetCollectionBuilderBase<WebhookEve
         base.RegisterWith(services);
     }
 
+    /// <summary>
+    /// Registers webhook event types and their notification handlers with the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to register with.</param>
     private void RegisterTypes(IServiceCollection services)
     {
         Type[] types = GetRegisteringTypes(GetTypes()).ToArray();
@@ -49,6 +59,11 @@ public class WebhookEventCollectionBuilder : SetCollectionBuilderBase<WebhookEve
         }
     }
 
+    /// <summary>
+    /// Gets the notification type that a webhook event handler handles.
+    /// </summary>
+    /// <param name="handlerType">The webhook event handler type.</param>
+    /// <returns>The notification type, or <c>null</c> if not found.</returns>
     private Type? GetNotificationType(Type handlerType)
         => handlerType.TryGetGenericArguments(typeof(INotificationAsyncHandler<>), out Type[]? genericArguments)
         ? genericArguments.FirstOrDefault(arg => typeof(INotification).IsAssignableFrom(arg))

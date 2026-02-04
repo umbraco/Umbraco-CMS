@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 
 /// <summary>
-///     Provides a base class for health checks of http header values.
+///     Provides a base class for health checks of HTTP header values.
 /// </summary>
 public abstract class BaseHttpHeaderCheck : HealthCheck
 {
@@ -20,6 +20,15 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     private readonly bool _metaTagOptionAvailable;
     private readonly bool _shouldNotExist;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BaseHttpHeaderCheck" /> class.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <param name="textService">The localized text service.</param>
+    /// <param name="header">The name of the HTTP header to check for.</param>
+    /// <param name="localizedTextPrefix">The prefix for localized text keys.</param>
+    /// <param name="metaTagOptionAvailable">A value indicating whether the header can also be set via a meta tag.</param>
+    /// <param name="shouldNotExist">A value indicating whether the header should not exist (when <c>true</c>, the check passes if the header is absent).</param>
     protected BaseHttpHeaderCheck(
         IHostingEnvironment hostingEnvironment,
         ILocalizedTextService textService,
@@ -36,6 +45,9 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         _shouldNotExist = shouldNotExist;
     }
 
+    /// <summary>
+    ///     Gets the localized text service.
+    /// </summary>
     [Obsolete("Save ILocalizedTextService in a field on the super class instead of using this")]
     protected ILocalizedTextService LocalizedTextService { get; }
 
@@ -46,21 +58,18 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
 
     private static HttpClient HttpClient => _httpClient ??= new HttpClient();
 
-    /// <summary>
-    ///     Get the status for this health check
-    /// </summary>
+    /// <inheritdoc />
     public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
         => [await CheckForHeader()];
 
-    /// <summary>
-    ///     Executes the action and returns it's status
-    /// </summary>
+    /// <inheritdoc />
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         => throw new InvalidOperationException("HTTP Header action requested is either not executable or does not exist");
 
     /// <summary>
-    ///     The actual health check method.
+    ///     Performs the actual health check by checking for the specified HTTP header.
     /// </summary>
+    /// <returns>A task that represents the asynchronous operation containing the health check status.</returns>
     protected async Task<HealthCheckStatus> CheckForHeader()
     {
         string message;

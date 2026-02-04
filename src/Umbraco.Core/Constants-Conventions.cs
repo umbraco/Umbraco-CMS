@@ -7,31 +7,87 @@ public static partial class Constants
     /// </summary>
     public static class Conventions
     {
+        /// <summary>
+        ///     Contains constants related to database migrations.
+        /// </summary>
         public static class Migrations
         {
+            /// <summary>
+            ///     The name of the Umbraco core upgrade plan.
+            /// </summary>
             public const string UmbracoUpgradePlanName = "Umbraco.Core";
+
+            /// <summary>
+            ///     The name of the Umbraco core pre-migrations upgrade plan.
+            /// </summary>
             public const string UmbracoUpgradePlanPremigrationsName = "Umbraco.Core.Premigrations";
+
+            /// <summary>
+            ///     The prefix used for key-value storage of upgrade state.
+            /// </summary>
             public const string KeyValuePrefix = "Umbraco.Core.Upgrader.State+";
+
+            /// <summary>
+            ///     The key used to store the Umbraco upgrade plan state.
+            /// </summary>
             public const string UmbracoUpgradePlanKey = KeyValuePrefix + UmbracoUpgradePlanName;
+
+            /// <summary>
+            ///     The key used to store the Umbraco pre-migrations upgrade plan state.
+            /// </summary>
             public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
         }
 
+        /// <summary>
+        ///     Contains constants for permission category identifiers.
+        /// </summary>
         public static class PermissionCategories
         {
+            /// <summary>
+            ///     The content permission category.
+            /// </summary>
             public const string ContentCategory = "content";
+
+            /// <summary>
+            ///     The administration permission category.
+            /// </summary>
             public const string AdministrationCategory = "administration";
+
+            /// <summary>
+            ///     The structure permission category.
+            /// </summary>
             public const string StructureCategory = "structure";
+
+            /// <summary>
+            ///     The other permission category.
+            /// </summary>
             public const string OtherCategory = "other";
         }
 
+        /// <summary>
+        ///     Contains constants for public access rule types.
+        /// </summary>
         public static class PublicAccess
         {
+            /// <summary>
+            ///     The rule type for member username-based access.
+            /// </summary>
             public const string MemberUsernameRuleType = "MemberUsername";
+
+            /// <summary>
+            ///     The rule type for member role-based access.
+            /// </summary>
             public const string MemberRoleRuleType = "MemberRole";
         }
 
+        /// <summary>
+        ///     Contains constants for data type naming conventions.
+        /// </summary>
         public static class DataTypes
         {
+            /// <summary>
+            ///     The prefix used for list view data type names.
+            /// </summary>
             public const string ListViewPrefix = "List View - ";
         }
 
@@ -183,6 +239,9 @@ public static partial class Constants
             /// </summary>
             public const string Comments = "umbracoMemberComments";
 
+            /// <summary>
+            ///     The label for the Comments property.
+            /// </summary>
             public const string CommentsLabel = "Comments";
 
             /// <summary>
@@ -211,8 +270,14 @@ public static partial class Constants
             /// </summary>
             public const string DefaultAlias = "Member";
 
+            /// <summary>
+            ///     The system default protect type alias.
+            /// </summary>
             public const string SystemDefaultProtectType = "_umbracoSystemDefaultProtectType";
 
+            /// <summary>
+            ///     The identifier for the all members list.
+            /// </summary>
             public const string AllMembersListId = "all-members";
         }
 
@@ -334,8 +399,14 @@ public static partial class Constants
             // TODO: return a list of built in types so we can use that to prevent deletion in the UI
         }
 
+        /// <summary>
+        ///     Contains constants for UDI (Umbraco Data Identifier) conventions.
+        /// </summary>
         public static class Udi
         {
+            /// <summary>
+            ///     The prefix for all Umbraco Data Identifiers.
+            /// </summary>
             public const string Prefix = "umb://";
         }
 

@@ -43,6 +43,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     /// <summary>
     ///     Constructor to create a new user group
     /// </summary>
+    /// <param name="shortStringHelper">The short string helper for alias processing.</param>
     public UserGroup(IShortStringHelper shortStringHelper)
     {
         _alias = string.Empty;
@@ -76,6 +77,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         _icon = icon;
     }
 
+    /// <inheritdoc />
     [DataMember]
     public int? StartMediaId
     {
@@ -83,6 +85,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _startMediaId, nameof(StartMediaId));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public int? StartElementId
     {
@@ -97,6 +100,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _startContentId, nameof(StartContentId));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string? Icon
     {
@@ -104,6 +108,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string Alias
     {
@@ -114,6 +119,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
             nameof(Alias));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string? Name
     {
@@ -121,6 +127,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string? Description
     {
@@ -128,6 +135,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _description!, nameof(Description));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public bool HasAccessToAllLanguages
     {
@@ -142,6 +150,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _permissions!, nameof(Permissions), _stringEnumerableComparer);
     }
 
+    /// <inheritdoc />
     public ISet<IGranularPermission> GranularPermissions
     {
         get => _granularPermissions;
@@ -149,10 +158,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     }
 
 
+    /// <inheritdoc />
     public IEnumerable<string> AllowedSections => _sectionCollection;
 
+    /// <inheritdoc />
     public int UserCount { get; }
 
+    /// <inheritdoc />
     public void RemoveAllowedSection(string sectionAlias)
     {
         if (_sectionCollection.Contains(sectionAlias))
@@ -161,6 +173,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         }
     }
 
+    /// <inheritdoc />
     public void AddAllowedSection(string sectionAlias)
     {
         if (_sectionCollection.Contains(sectionAlias) == false)
@@ -169,11 +182,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         }
     }
 
+    /// <inheritdoc />
     public IEnumerable<int> AllowedLanguages
     {
         get => _languageCollection;
     }
 
+    /// <inheritdoc />
     public void RemoveAllowedLanguage(int languageId)
     {
         if (_languageCollection.Contains(languageId))
@@ -182,6 +197,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         }
     }
 
+    /// <inheritdoc />
     public void AddAllowedLanguage(int languageId)
     {
         if (_languageCollection.Contains(languageId) == false)
@@ -190,10 +206,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         }
     }
 
+    /// <inheritdoc />
     public void ClearAllowedLanguages() => _languageCollection.Clear();
 
+    /// <inheritdoc />
     public void ClearAllowedSections() => _sectionCollection.Clear();
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);

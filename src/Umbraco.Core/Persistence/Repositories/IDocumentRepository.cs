@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="IContent" /> document entities.
+/// </summary>
 public interface IDocumentRepository : IPublishableContentRepository<IContent>
 {
     /// <summary>
@@ -35,6 +38,30 @@ public interface IDocumentRepository : IPublishableContentRepository<IContent>
         IQuery<IContent>? filter,
         Ordering? ordering,
         bool loadTemplates);
+    /// <summary>
+    ///     Clears the publishing schedule for all entries having a date before (lower than, or equal to) a specified date.
+    /// </summary>
+    /// <param name="date">The cutoff date.</param>
+    /// <summary>
+    ///     Clears the publishing schedule for entries matching the specified action and having a date before the specified date.
+    /// </summary>
+    /// <param name="date">The cutoff date.</param>
+    /// <param name="action">The schedule action to clear.</param>
+    /// <summary>
+    ///     Checks whether there is content scheduled for expiration before the specified date.
+    /// </summary>
+    /// <param name="date">The date to check.</param>
+    /// <returns><c>true</c> if there is content scheduled for expiration; otherwise, <c>false</c>.</returns>
+    /// <summary>
+    ///     Checks whether there is content scheduled for release before the specified date.
+    /// </summary>
+    /// <param name="date">The date to check.</param>
+    /// <returns><c>true</c> if there is content scheduled for release; otherwise, <c>false</c>.</returns>
+    /// <summary>
+    ///     Checks whether the path to a content item is published.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <returns><c>true</c> if the path is published; otherwise, <c>false</c>.</returns>
 
     /// <summary>
     ///     Used to bulk update the permissions set for a content item. This will replace all permissions

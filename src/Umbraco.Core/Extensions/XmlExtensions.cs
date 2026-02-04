@@ -13,6 +13,12 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class XmlExtensions
 {
+    /// <summary>
+    /// Determines whether the attribute collection contains an attribute with the specified name.
+    /// </summary>
+    /// <param name="attributes">The XML attribute collection.</param>
+    /// <param name="attributeName">The name of the attribute to check for.</param>
+    /// <returns><c>true</c> if the collection contains the attribute; otherwise, <c>false</c>.</returns>
     public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName) =>
         attributes.Cast<XmlAttribute>().Any(x => x.Name == attributeName);
 
@@ -46,11 +52,11 @@ public static class XmlExtensions
         }
     }
 
-    ///// <summary>
-    ///// Converts from an XElement to an XmlElement
-    ///// </summary>
-    ///// <param name="xElement"></param>
-    ///// <returns></returns>
+    /// <summary>
+    ///     Converts from an <see cref="XContainer"/> to an <see cref="XmlNode"/>.
+    /// </summary>
+    /// <param name="xElement">The XContainer to convert.</param>
+    /// <returns>The document element as an XmlNode, or null if the document has no root element.</returns>
     public static XmlNode? ToXmlElement(this XContainer xElement)
     {
         var xmlDocument = new XmlDocument();
@@ -76,6 +82,15 @@ public static class XmlExtensions
         }
     }
 
+    /// <summary>
+    /// Gets the required attribute value from an XML element, converted to the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type to convert the attribute value to.</typeparam>
+    /// <param name="xml">The XML element.</param>
+    /// <param name="attributeName">The name of the attribute.</param>
+    /// <returns>The attribute value converted to the specified type.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the xml parameter is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the attribute is not found or cannot be converted.</exception>
     public static T? RequiredAttributeValue<T>(this XElement xml, string attributeName)
     {
         if (xml == null)
@@ -103,6 +118,14 @@ public static class XmlExtensions
         throw new InvalidOperationException($"{attribute.Value} attribute value cannot be converted to {typeof(T)}");
     }
 
+    /// <summary>
+    /// Gets an attribute value from an XML element, converted to the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type to convert the attribute value to.</typeparam>
+    /// <param name="xml">The XML element.</param>
+    /// <param name="attributeName">The name of the attribute.</param>
+    /// <returns>The attribute value converted to the specified type, or the default value if not found or conversion fails.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the xml parameter is null.</exception>
     public static T? AttributeValue<T>(this XElement xml, string attributeName)
     {
         if (xml == null)
@@ -125,6 +148,14 @@ public static class XmlExtensions
         return default;
     }
 
+    /// <summary>
+    /// Gets an attribute value from an XML node, converted to the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type to convert the attribute value to.</typeparam>
+    /// <param name="xml">The XML node.</param>
+    /// <param name="attributeName">The name of the attribute.</param>
+    /// <returns>The attribute value converted to the specified type, or the default value if not found or conversion fails.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the xml parameter is null.</exception>
     public static T? AttributeValue<T>(this XmlNode xml, string attributeName)
     {
         if (xml == null)
@@ -152,6 +183,11 @@ public static class XmlExtensions
         return default;
     }
 
+    /// <summary>
+    /// Converts an <see cref="XmlNode"/> to an <see cref="XElement"/>.
+    /// </summary>
+    /// <param name="node">The XML node to convert.</param>
+    /// <returns>The converted XElement, or null if the node has no root element.</returns>
     public static XElement? GetXElement(this XmlNode node)
     {
         var xDoc = new XDocument();
@@ -163,6 +199,11 @@ public static class XmlExtensions
         return xDoc.Root;
     }
 
+    /// <summary>
+    /// Converts an <see cref="XContainer"/> to an <see cref="XmlNode"/>.
+    /// </summary>
+    /// <param name="element">The XContainer to convert.</param>
+    /// <returns>The converted XmlNode, or null if conversion fails.</returns>
     public static XmlNode? GetXmlNode(this XContainer element)
     {
         using (XmlReader xmlReader = element.CreateReader())
@@ -173,6 +214,12 @@ public static class XmlExtensions
         }
     }
 
+    /// <summary>
+    /// Converts an <see cref="XContainer"/> to an <see cref="XmlNode"/> and imports it into the specified document.
+    /// </summary>
+    /// <param name="element">The XContainer to convert.</param>
+    /// <param name="xmlDoc">The XML document to import the node into.</param>
+    /// <returns>The imported XmlNode, or null if conversion fails.</returns>
     public static XmlNode? GetXmlNode(this XContainer element, XmlDocument xmlDoc)
     {
         XmlNode? node = element.GetXmlNode();
@@ -184,11 +231,15 @@ public static class XmlExtensions
         return null;
     }
 
-    // this exists because
-    // new XElement("root", "a\nb").Value is "a\nb" but
-    // .ToString(SaveOptions.*) is "a\r\nb" and cannot figure out how to get rid of "\r"
-    // and when saving data we want nothing to change
-    // this method will produce a string that respects the \r and \n in the data value
+    /// <summary>
+    ///     Converts an <see cref="XElement"/> to a string while preserving the exact line endings in text values.
+    /// </summary>
+    /// <param name="xml">The XML element to convert.</param>
+    /// <returns>A string representation of the XML element with preserved line endings.</returns>
+    /// <remarks>
+    ///     This method exists because <see cref="XElement.ToString()"/> with SaveOptions changes line endings.
+    ///     When saving data, we want the exact characters to be preserved.
+    /// </remarks>
     public static string ToDataString(this XElement xml)
     {
         var settings = new XmlWriterSettings

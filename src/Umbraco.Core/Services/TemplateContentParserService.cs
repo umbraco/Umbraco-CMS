@@ -1,10 +1,14 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for parsing template content to extract metadata such as the master template alias.
+/// </summary>
 public partial class TemplateContentParserService : ITemplateContentParserService
 {
+    /// <inheritdoc />
     public string? MasterTemplateAlias(string? viewContent)
     {
         if (viewContent.IsNullOrWhiteSpace())

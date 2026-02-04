@@ -50,7 +50,14 @@ public enum SecureSocketOptions
 /// </summary>
 public class SmtpSettings : ValidatableEntryBase
 {
+    /// <summary>
+    ///     The default secure socket options for SMTP.
+    /// </summary>
     internal const string StaticSecureSocketOptions = "Auto";
+
+    /// <summary>
+    ///     The default SMTP delivery method.
+    /// </summary>
     internal const string StaticDeliveryMethod = "Network";
 
     /// <summary>

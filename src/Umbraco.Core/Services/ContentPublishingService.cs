@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for publishing and unpublishing content, including scheduled publishing and branch publishing.
+/// </summary>
 internal sealed class ContentPublishingService : ContentPublishingServiceBase<IContent, IContentService>, IContentPublishingService
 {
     private const string PublishBranchOperationType = "ContentPublishBranch";
@@ -23,6 +26,20 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
 
     protected override int WriteLockId => Constants.Locks.ContentTree;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentPublishingService"/> class.
+    /// </summary>
+    /// <param name="coreScopeProvider">The core scope provider.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="contentValidationService">The content validation service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="longRunningOperationService">The long running operation service.</param>
+    /// <param name="umbracoContextFactory">The Umbraco context factory.</param>
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
         IContentService contentService,

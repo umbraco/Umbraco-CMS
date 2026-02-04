@@ -1,8 +1,11 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Defines the Script Service, which provides operations for managing <see cref="IScript" /> files.
+/// </summary>
 public interface IScriptService : IBasicFileService<IScript>
 {
     /// <summary>

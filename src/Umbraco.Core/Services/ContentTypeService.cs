@@ -23,6 +23,21 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     private readonly IContentService _contentService;
     private readonly IElementService _elementService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="repository">The content type repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="entityContainerRepository">The document type container repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="templateService">The template service.</param>
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -85,6 +100,20 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="repository">The content type repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="entityContainerRepository">The document type container repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
     [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
@@ -114,6 +143,20 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="repository">The content type repository.</param>
+    /// <param name="auditRepository">The audit repository (obsolete).</param>
+    /// <param name="entityContainerRepository">The document type container repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
@@ -143,6 +186,21 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="repository">The content type repository.</param>
+    /// <param name="auditRepository">The audit repository (obsolete).</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="entityContainerRepository">The document type container repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
@@ -173,6 +231,22 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="repository">The content type repository.</param>
+    /// <param name="auditRepository">The audit repository (obsolete).</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="entityContainerRepository">The document type container repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="templateService">The template service.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
@@ -237,12 +311,18 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     {
     }
 
+    /// <inheritdoc />
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 
+    /// <inheritdoc />
     protected override int[] WriteLockIds => ContentTypeLocks.WriteLockIds;
 
+    /// <inheritdoc />
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 
+    /// <summary>
+    ///     Gets the content service.
+    /// </summary>
     /// <summary>
     ///     Gets all property type aliases across content, media and member types.
     /// </summary>
@@ -290,6 +370,12 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         }
     }
 
+    /// <summary>
+    ///     Gets content types by query.
+    /// </summary>
+    /// <param name="query">The query to filter content types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A collection of content types matching the query.</returns>
     public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -342,6 +428,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             : Attempt<Guid?, ContentTypeOperationStatus>.Fail(updateContentTypeResult.Result);
     }
 
+    /// <inheritdoc />
     protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -356,46 +443,57 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
 
     #region Notifications
 
+    /// <inheritdoc />
     protected override SavingNotification<IContentType> GetSavingNotification(
         IContentType item,
         EventMessages eventMessages) => new ContentTypeSavingNotification(item, eventMessages);
 
+    /// <inheritdoc />
     protected override SavingNotification<IContentType> GetSavingNotification(
         IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeSavingNotification(items, eventMessages);
 
+    /// <inheritdoc />
     protected override SavedNotification<IContentType> GetSavedNotification(
         IContentType item,
         EventMessages eventMessages) => new ContentTypeSavedNotification(item, eventMessages);
 
+    /// <inheritdoc />
     protected override SavedNotification<IContentType> GetSavedNotification(
         IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeSavedNotification(items, eventMessages);
 
+    /// <inheritdoc />
     protected override DeletingNotification<IContentType> GetDeletingNotification(
         IContentType item,
         EventMessages eventMessages) => new ContentTypeDeletingNotification(item, eventMessages);
 
+    /// <inheritdoc />
     protected override DeletingNotification<IContentType> GetDeletingNotification(
         IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeDeletingNotification(items, eventMessages);
 
+    /// <inheritdoc />
     protected override DeletedNotification<IContentType> GetDeletedNotification(
         IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeDeletedNotification(items, eventMessages);
 
+    /// <inheritdoc />
     protected override MovingNotification<IContentType> GetMovingNotification(
         MoveEventInfo<IContentType> moveInfo,
         EventMessages eventMessages) => new ContentTypeMovingNotification(moveInfo, eventMessages);
 
+    /// <inheritdoc />
     protected override MovedNotification<IContentType> GetMovedNotification(
         IEnumerable<MoveEventInfo<IContentType>> moveInfo, EventMessages eventMessages) =>
         new ContentTypeMovedNotification(moveInfo, eventMessages);
 
+    /// <inheritdoc />
     protected override ContentTypeChangeNotification<IContentType> GetContentTypeChangedNotification(
         IEnumerable<ContentTypeChange<IContentType>> changes, EventMessages eventMessages) =>
         new ContentTypeChangedNotification(changes, eventMessages);
 
+    /// <inheritdoc />
     protected override ContentTypeRefreshNotification<IContentType> GetContentTypeRefreshedNotification(
         IEnumerable<ContentTypeChange<IContentType>> changes, EventMessages eventMessages) =>
         new ContentTypeRefreshedNotification(changes, eventMessages);

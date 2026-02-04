@@ -14,6 +14,9 @@ public interface IContent : IPublishableContentBase
     int? TemplateId { get; set; }
 
     /// <summary>
+    /// <summary>
+    ///     Gets or sets the published state of the content.
+    /// </summary>
     ///     Gets a value indicating whether the content item is a blueprint.
     /// </summary>
     bool Blueprint { get; set; }

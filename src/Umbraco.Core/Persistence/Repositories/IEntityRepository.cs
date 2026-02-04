@@ -5,16 +5,47 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for lightweight entity operations.
+/// </summary>
 public interface IEntityRepository : IRepository
 {
+    /// <summary>
+    ///     Gets an entity by its identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns>The entity if found; otherwise, <c>null</c>.</returns>
     IEntitySlim? Get(int id);
 
+    /// <summary>
+    ///     Gets an entity by its unique key.
+    /// </summary>
+    /// <param name="key">The unique key of the entity.</param>
+    /// <returns>The entity if found; otherwise, <c>null</c>.</returns>
     IEntitySlim? Get(Guid key);
 
+    /// <summary>
+    ///     Gets an entity by its identifier and object type.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <param name="objectTypeId">The object type identifier.</param>
+    /// <returns>The entity if found; otherwise, <c>null</c>.</returns>
     IEntitySlim? Get(int id, Guid objectTypeId);
 
+    /// <summary>
+    ///     Gets an entity by its unique key and object type.
+    /// </summary>
+    /// <param name="key">The unique key of the entity.</param>
+    /// <param name="objectTypeId">The object type identifier.</param>
+    /// <returns>The entity if found; otherwise, <c>null</c>.</returns>
     IEntitySlim? Get(Guid key, Guid objectTypeId);
 
+    /// <summary>
+    ///     Gets all entities of a specific object type by their identifiers.
+    /// </summary>
+    /// <param name="objectType">The object type identifier.</param>
+    /// <param name="ids">The identifiers of the entities.</param>
+    /// <returns>A collection of entities.</returns>
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids);
 
     /// <summary>
@@ -26,6 +57,12 @@ public interface IEntityRepository : IRepository
     IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params int[] ids)
         => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
+    /// <summary>
+    ///     Gets all entities of a specific object type by their unique keys.
+    /// </summary>
+    /// <param name="objectType">The object type identifier.</param>
+    /// <param name="keys">The unique keys of the entities.</param>
+    /// <returns>A collection of entities.</returns>
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
 
     /// <summary>
@@ -92,34 +129,76 @@ public interface IEntityRepository : IRepository
     }
 
     /// <summary>
-    ///     Gets entities for a query
+    ///     Gets entities for a query.
     /// </summary>
-    /// <param name="query"></param>
-    /// <returns></returns>
+    /// <param name="query">The query to apply.</param>
+    /// <returns>A collection of entities matching the query.</returns>
     IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query);
 
     /// <summary>
-    ///     Gets entities for a query and a specific object type allowing the query to be slightly more optimized
+    ///     Gets entities for a query and a specific object type, allowing the query to be slightly more optimized.
     /// </summary>
-    /// <param name="query"></param>
-    /// <param name="objectType"></param>
-    /// <returns></returns>
+    /// <param name="query">The query to apply.</param>
+    /// <param name="objectType">The object type identifier.</param>
+    /// <returns>A collection of entities matching the query.</returns>
     IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType);
 
+    /// <summary>
+    ///     Gets the object type for an entity by its identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns>The object type of the entity.</returns>
     UmbracoObjectTypes GetObjectType(int id);
 
+    /// <summary>
+    ///     Gets the object type for an entity by its unique key.
+    /// </summary>
+    /// <param name="key">The unique key of the entity.</param>
+    /// <returns>The object type of the entity.</returns>
     UmbracoObjectTypes GetObjectType(Guid key);
 
+    /// <summary>
+    ///     Reserves an identifier for a given unique key.
+    /// </summary>
+    /// <param name="key">The unique key to reserve an identifier for.</param>
+    /// <returns>The reserved identifier.</returns>
     int ReserveId(Guid key);
 
+    /// <summary>
+    ///     Gets all entity paths for a specific object type.
+    /// </summary>
+    /// <param name="objectType">The object type identifier.</param>
+    /// <param name="ids">Optional identifiers to filter the results.</param>
+    /// <returns>A collection of entity paths.</returns>
     IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[]? ids);
 
+    /// <summary>
+    ///     Gets all entity paths for a specific object type.
+    /// </summary>
+    /// <param name="objectType">The object type identifier.</param>
+    /// <param name="keys">The unique keys to filter the results.</param>
+    /// <returns>A collection of entity paths.</returns>
     IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys);
 
+    /// <summary>
+    ///     Checks whether an entity with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns><c>true</c> if the entity exists; otherwise, <c>false</c>.</returns>
     bool Exists(int id);
 
+    /// <summary>
+    ///     Checks whether an entity with the specified unique key exists.
+    /// </summary>
+    /// <param name="key">The unique key of the entity.</param>
+    /// <returns><c>true</c> if the entity exists; otherwise, <c>false</c>.</returns>
     bool Exists(Guid key);
 
+    /// <summary>
+    ///     Checks whether entities with the specified unique keys exist.
+    /// </summary>
+    /// <param name="keys">The unique keys of the entities.</param>
+    /// <returns><c>true</c> if all entities exist; otherwise, <c>false</c>.</returns>
     bool Exists(IEnumerable<Guid> keys);
 
     /// <summary>
@@ -139,16 +218,16 @@ public interface IEntityRepository : IRepository
     bool Exists(int id, Guid objectType) => throw new NotImplementedException();
 
     /// <summary>
-    ///     Gets paged entities for a query and a specific object type
+    ///     Gets paged entities for a query and a specific object type.
     /// </summary>
-    /// <param name="query"></param>
-    /// <param name="objectType"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="filter"></param>
-    /// <param name="ordering"></param>
-    /// <returns></returns>
+    /// <param name="query">The query to apply.</param>
+    /// <param name="objectType">The object type identifier.</param>
+    /// <param name="pageIndex">The page index.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Returns the total number of records.</param>
+    /// <param name="filter">An optional filter query.</param>
+    /// <param name="ordering">The ordering to apply, or <c>null</c> for default ordering.</param>
+    /// <returns>A collection of entities for the specified page.</returns>
     IEnumerable<IEntitySlim> GetPagedResultsByQuery(
         IQuery<IUmbracoEntity> query,
         Guid objectType,
@@ -159,6 +238,17 @@ public interface IEntityRepository : IRepository
         Ordering? ordering) =>
         GetPagedResultsByQuery(query, new HashSet<Guid>(){objectType}, pageIndex, pageSize, out totalRecords, filter, ordering);
 
+    /// <summary>
+    ///     Gets paged entities for a query and multiple object types.
+    /// </summary>
+    /// <param name="query">The query to apply.</param>
+    /// <param name="objectTypes">The object type identifiers.</param>
+    /// <param name="pageIndex">The page index.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Returns the total number of records.</param>
+    /// <param name="filter">An optional filter query.</param>
+    /// <param name="ordering">The ordering to apply, or <c>null</c> for default ordering.</param>
+    /// <returns>A collection of entities for the specified page.</returns>
     IEnumerable<IEntitySlim> GetPagedResultsByQuery(
         IQuery<IUmbracoEntity> query,
         ISet<Guid> objectTypes,
@@ -168,7 +258,22 @@ public interface IEntityRepository : IRepository
         IQuery<IUmbracoEntity>? filter,
         Ordering? ordering);
 
+    /// <summary>
+    ///     Counts entities matching a query for a specific object type.
+    /// </summary>
+    /// <param name="query">The query to apply.</param>
+    /// <param name="objectType">The object type identifier.</param>
+    /// <param name="filter">An optional filter query.</param>
+    /// <returns>The count of entities matching the query.</returns>
     int CountByQuery(IQuery<IUmbracoEntity> query, Guid objectType, IQuery<IUmbracoEntity>? filter) =>
         CountByQuery(query, new HashSet<Guid>() { objectType }, filter);
+
+    /// <summary>
+    ///     Counts entities matching a query for multiple object types.
+    /// </summary>
+    /// <param name="query">The query to apply.</param>
+    /// <param name="objectTypes">The object type identifiers.</param>
+    /// <param name="filter">An optional filter query.</param>
+    /// <returns>The count of entities matching the query.</returns>
     int CountByQuery(IQuery<IUmbracoEntity> query, IEnumerable<Guid> objectTypes, IQuery<IUmbracoEntity>? filter);
 }
