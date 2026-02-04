@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Filters;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -209,6 +210,12 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             MemberService.DeleteMembersOfType(typeId);
         }
     }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// Unlike document and media types, allowed children (and therefore parents) are not defined for member types.
+    /// </remarks>
+    protected override Task<IEnumerable<Guid>> PerformGetAllowedParentKeysAsync(Guid key) => Task.FromResult(Enumerable.Empty<Guid>());
 
     #region Notifications
 

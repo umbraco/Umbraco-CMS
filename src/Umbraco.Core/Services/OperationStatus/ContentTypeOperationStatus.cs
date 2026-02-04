@@ -124,4 +124,5 @@ public enum ContentTypeOperationStatus
     ///     The specified template alias is invalid.
     /// </summary>
     InvalidTemplateAlias,
+    NotImplemented,
 }

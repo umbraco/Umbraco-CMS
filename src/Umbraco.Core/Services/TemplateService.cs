@@ -229,16 +229,7 @@ public class TemplateService : RepositoryService, ITemplateService
     public Task<IEnumerable<ITemplate>> GetAllAsync(params Guid[] keys)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        IQuery<ITemplate> query = Query<ITemplate>();
-        if (keys.Any())
-        {
-            var keysList = keys.ToList();
-            query = query.Where(x => keysList.Contains(x.Key));
-        }
-
-        IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);
-
+        IEnumerable<ITemplate> templates = _templateRepository.GetMany(keys);
         return Task.FromResult(templates);
     }
 
@@ -272,11 +263,9 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <inheritdoc />
     public Task<ITemplate?> GetAsync(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
-            return Task.FromResult(_templateRepository.Get(query)?.SingleOrDefault());
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        ITemplate? template = _templateRepository.Get(id);
+        return Task.FromResult(template);
     }
 
     /// <inheritdoc />

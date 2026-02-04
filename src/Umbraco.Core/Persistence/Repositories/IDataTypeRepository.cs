@@ -6,15 +6,8 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="IDataType" /> entities.
 /// </summary>
-public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>
+public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>, IReadRepository<Guid, IDataType>
 {
-    /// <summary>
-    ///     Gets a data type by its unique key.
-    /// </summary>
-    /// <param name="key">The unique key of the data type.</param>
-    /// <returns>The data type if found; otherwise, <c>null</c>.</returns>
-    IDataType? Get(Guid key);
-
     /// <summary>
     ///     Moves a data type to a container.
     /// </summary>
