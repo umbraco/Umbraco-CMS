@@ -3,7 +3,7 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.User.Current;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.ContentEditing;
+
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 
