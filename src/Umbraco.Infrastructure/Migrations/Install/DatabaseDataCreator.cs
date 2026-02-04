@@ -2448,18 +2448,28 @@ internal sealed class DatabaseDataCreator
         ArgumentNullException.ThrowIfNull(_pocoDataFactory);
 
         PocoData pocoData = _pocoDataFactory.ForType(poco.GetType());
-        var autoIncrement = UseAutoIncrement();
+        var autoIncrement = UseAutoIncrement(pocoData);
 
         _database.Insert<T>(
             pocoData.TableInfo.TableName,
-            null,
+            null, // NPoco handles retrievs the PrimaryKeyName from pocoData when this parameter is null and combined with autoIncrement == true an `INSERT` for PostgreSQL is handled correctly. It is abit hacky, but the NPoco project is not well maintained.
             autoIncrement,
             poco);
     }
 
-    private bool UseAutoIncrement()
+    private bool UseAutoIncrement(PocoData pocoData)
     {
-        return ((IUmbracoDatabase)_database).SqlContext.DatabaseType is PostgreSQLDatabaseType;
+        if (_database is not IUmbracoDatabase umbracoDatabase)
+        {
+            throw new InvalidOperationException("Database must implement IUmbracoDatabase to determine database type.");
+        }
+
+        if (pocoData.TableInfo.AutoIncrement)
+        {
+            return umbracoDatabase.SqlContext.SqlSyntax.InsertWithSpecialAutoInkrement();
+        }
+
+        return false;
     }
 
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.

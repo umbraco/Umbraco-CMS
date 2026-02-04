@@ -181,6 +181,16 @@ public interface ISqlSyntaxProvider
     bool SupportsSequences() => false;
 
     /// <summary>
+    /// This is an additional setting for databases that use auto-increment columns but require special handling during insert operations.
+    /// </summary>
+    /// <returns>true if the provider requires special handling for auto-increment inserts; otherwise, false.</returns>
+    /// <remarks>
+    /// Use case PostgreSQL which uses sequences for auto-incrementing columns but may require specific insert logic.
+    /// After inserting a dedicated value the sequence needs to be updated to avoid conflicts.
+    /// </remarks>
+    bool InsertWithSpecialAutoInkrement() => false;
+
+    /// <summary>
     /// Alters the database sequences to match the current schema requirements.
     /// </summary>
     /// <remarks>
