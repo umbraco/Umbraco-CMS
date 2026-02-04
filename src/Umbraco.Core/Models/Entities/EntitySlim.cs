@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Entities;
@@ -96,27 +95,6 @@ public class EntitySlim : IEntitySlim
     /// <inheritdoc />
     [DataMember]
     public virtual bool IsContainer { get; set; }
-
-    /// <summary>
-    ///     Occurs when a property value changes.
-    /// </summary>
-    /// <remarks>
-    ///     This event is declared to satisfy the <see cref="ICanBeDirty" /> interface but is never raised
-    ///     since <see cref="EntitySlim" /> does not track changes.
-    /// </remarks>
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    /// <summary>
-    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
-    public void DisableChangeTracking() => throw new InvalidOperationException("This method won't be implemented.");
-
-    /// <summary>
-    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
-    public void EnableChangeTracking() => throw new InvalidOperationException("This method won't be implemented.");
 
     #region IDeepCloneable
 

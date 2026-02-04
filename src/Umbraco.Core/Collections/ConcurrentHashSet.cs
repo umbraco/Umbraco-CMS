@@ -15,13 +15,6 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
     private readonly ReaderWriterLockSlim _instanceLocker = new(LockRecursionPolicy.NoRecursion);
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ConcurrentHashSet{T}" /> class.
-    /// </summary>
-    public ConcurrentHashSet()
-    {
-    }
-
-    /// <summary>
     ///     Gets the number of elements contained in the <see cref="T:System.Collections.ICollection" />.
     /// </summary>
     /// <returns>
