@@ -647,6 +647,43 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Delete_Member_With_2_External_Logins()
+    {
+        // Arrange
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        MemberTypeService.Save(memberType);
+        IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+        MemberService.Save(member);
+
+        // Inserting 2 external logins into the database.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            ScopeAccessor.AmbientScope.Database.Insert(new ExternalLoginDto
+            {
+                UserOrMemberKey = member.Key,
+                LoginProvider = "Test1",
+                ProviderKey = "test-1",
+                CreateDate = DateTime.UtcNow
+            });
+            ScopeAccessor.AmbientScope.Database.Insert(new ExternalLoginDto
+            {
+                UserOrMemberKey = member.Key,
+                LoginProvider = "Test2",
+                ProviderKey = "test-2",
+                CreateDate = DateTime.UtcNow
+            });
+            scope.Complete();
+        }
+
+        // Act
+        MemberService.Delete(member);
+
+        // Assert
+        var deleted = MemberService.GetById(member.Id);
+        Assert.That(deleted, Is.Null);
+    }
+
+    [Test]
     public void Exists_By_Username()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
