@@ -10,10 +10,15 @@ internal interface IPublishableContentDto<TContentVersionDto> : INodeDto
         internal const string NodeId = INodeDto.Columns.NodeId;
 
         internal const string Published = IContentVersionDto.Columns.Published;
+
+        internal const string Edited = ICultureVariationDto.Columns.Edited;
     }
 
     [Column(Columns.Published)]
-    bool Published { get; }
+    bool Published { get; set;  }
+
+    [Column(Columns.Edited)]
+    bool Edited { get; set; }
 
     [ResultColumn]
     ContentDto ContentDto { get; }

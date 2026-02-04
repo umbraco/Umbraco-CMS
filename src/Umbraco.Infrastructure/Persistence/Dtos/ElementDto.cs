@@ -20,7 +20,7 @@ internal sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 
-    [Column("edited")]
+    [Column(IPublishableContentDto<ElementVersionDto>.Columns.Edited)]
     public bool Edited { get; set; }
 
     [ResultColumn]

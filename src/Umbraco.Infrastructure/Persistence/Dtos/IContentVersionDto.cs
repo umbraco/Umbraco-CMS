@@ -14,10 +14,10 @@ internal interface IContentVersionDto
     }
 
     [Column(Columns.Id)]
-    int Id { get; }
+    int Id { get; set; }
 
     [Column(Columns.Published)]
-    bool Published { get; }
+    bool Published { get; set; }
 
     [ResultColumn]
     ContentVersionDto ContentVersionDto { get; }

@@ -20,7 +20,7 @@ public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 
-    [Column("edited")]
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Edited)]
     public bool Edited { get; set; }
 
     // [Column("publishDate")]
