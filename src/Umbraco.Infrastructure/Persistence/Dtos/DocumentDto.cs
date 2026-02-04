@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey(INodeDto.NodeIdColumnName, AutoIncrement = false)]
 [ExplicitColumns]
-public class DocumentDto : INodeDto
+public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
 
@@ -51,7 +51,7 @@ public class DocumentDto : INodeDto
     // so this here is a OneToOne reference
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]
-    public DocumentVersionDto DocumentVersionDto { get; set; } = null!;
+    public DocumentVersionDto ContentVersionDto { get; set; } = null!;
 
     // same
     [ResultColumn]

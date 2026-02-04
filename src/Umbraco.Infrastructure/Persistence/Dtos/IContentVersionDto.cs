@@ -15,4 +15,7 @@ public interface IContentVersionDto
 
     [Column(PublishedColumnName)]
     bool Published { get; }
+
+    [ResultColumn]
+    ContentVersionDto ContentVersionDto { get; }
 }

@@ -16,7 +16,7 @@ internal sealed class ContentBaseFactory
     {
         ContentDto contentDto = dto.ContentDto;
         NodeDto nodeDto = contentDto.NodeDto;
-        DocumentVersionDto documentVersionDto = dto.DocumentVersionDto;
+        DocumentVersionDto documentVersionDto = dto.ContentVersionDto;
         ContentVersionDto contentVersionDto = documentVersionDto.ContentVersionDto;
         DocumentVersionDto? publishedVersionDto = dto.PublishedVersionDto;
 
@@ -82,7 +82,7 @@ internal sealed class ContentBaseFactory
 
         ContentDto contentDto = dto.ContentDto;
         NodeDto nodeDto = contentDto.NodeDto;
-        ElementVersionDto elementVersionDto = dto.ElementVersionDto;
+        ElementVersionDto elementVersionDto = dto.ContentVersionDto;
         ContentVersionDto contentVersionDto = elementVersionDto.ContentVersionDto;
         ElementVersionDto? publishedVersionDto = dto.PublishedVersionDto;
 
@@ -248,7 +248,7 @@ internal sealed class ContentBaseFactory
             NodeId = entity.Id,
             Published = entity.Published,
             ContentDto = contentDto,
-            DocumentVersionDto = BuildDocumentVersionDto(entity, contentDto),
+            ContentVersionDto = BuildDocumentVersionDto(entity, contentDto),
         };
 
         return dto;
@@ -266,7 +266,7 @@ internal sealed class ContentBaseFactory
             NodeId = entity.Id,
             Published = entity.Published,
             ContentDto = contentDto,
-            ElementVersionDto = BuildElementVersionDto(entity, contentDto),
+            ContentVersionDto = BuildElementVersionDto(entity, contentDto),
         };
 
         return dto;

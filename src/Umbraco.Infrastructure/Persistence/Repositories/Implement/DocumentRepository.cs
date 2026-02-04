@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IContent" />.
 /// </summary>
-public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentRepository>, IDocumentRepository
+public class DocumentRepository : PublishableContentRepositoryBase<int, IContent, DocumentRepository, DocumentDto, DocumentVersionDto>, IDocumentRepository
 {
     private readonly AppCaches _appCaches;
     private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
@@ -266,7 +266,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 // if the cache contains the (proper version of the) item, use it
                 IContent? cached =
                     IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
-                if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
+                if (cached != null && cached.VersionId == dto.ContentVersionDto.ContentVersionDto.Id)
                 {
                     content[i] = (Content)cached;
                     continue;
@@ -288,7 +288,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             if (loadTemplates)
             {
                 // need templates
-                var templateId = dto.DocumentVersionDto.TemplateId;
+                var templateId = dto.ContentVersionDto.TemplateId;
                 if (templateId.HasValue)
                 {
                     templateIds.Add(templateId.Value);
@@ -305,11 +305,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
 
             // need temps, for properties, templates and variations
-            var versionId = dto.DocumentVersionDto.Id;
+            var versionId = dto.ContentVersionDto.Id;
             var publishedVersionId = dto.Published ? dto.PublishedVersionDto!.Id : 0;
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
             {
-                Template1Id = dto.DocumentVersionDto.TemplateId
+                Template1Id = dto.ContentVersionDto.TemplateId
             };
             if (dto.Published)
             {
@@ -410,13 +410,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             content.DisableChangeTracking();
 
             // get template
-            if (dto.DocumentVersionDto.TemplateId.HasValue)
+            if (dto.ContentVersionDto.TemplateId.HasValue)
             {
-                content.TemplateId = dto.DocumentVersionDto.TemplateId;
+                content.TemplateId = dto.ContentVersionDto.TemplateId;
             }
 
             // get properties - indexed by version id
-            var versionId = dto.DocumentVersionDto.Id;
+            var versionId = dto.ContentVersionDto.Id;
 
             // TODO: shall we get published properties or not?
             //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
@@ -425,7 +425,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
             var ltemp = new List<TempContent<Content>> { temp };
             IDictionary<int, PropertyCollection> properties = GetPropertyCollections(ltemp);
-            content.Properties = properties[dto.DocumentVersionDto.Id];
+            content.Properties = properties[dto.ContentVersionDto.Id];
 
             // set variations, if varying
             if (contentType?.VariesByCulture() ?? false)
@@ -715,101 +715,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             .OrderBy<NodeDto>(x => x.Level)
             .OrderBy<NodeDto>(x => x.SortOrder);
 
-    protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType) => GetBaseQuery(queryType, true);
-
+    // TODO ELEMENTS: if this cannot be removed, make the one in the base protected
     // gets the COALESCE expression for variant/invariant name
     private string VariantNameSqlExpression
         => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv")
             .Sql;
-
-    protected Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
-    {
-        Sql<ISqlContext> sql = SqlContext.Sql();
-
-        switch (queryType)
-        {
-            case QueryType.Count:
-                sql = sql.SelectCount();
-                break;
-            case QueryType.Ids:
-                sql = sql.Select<DocumentDto>(x => x.NodeId);
-                break;
-            case QueryType.Single:
-            case QueryType.Many:
-                // R# may flag this ambiguous and red-squiggle it, but it is not
-                sql = sql.Select<DocumentDto>(r =>
-                        r.Select(documentDto => documentDto.ContentDto, r1 =>
-                                r1.Select(contentDto => contentDto.NodeDto))
-                            .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
-                                r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
-                            .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
-                                r1.Select(documentVersionDto => documentVersionDto!.ContentVersionDto, "pcv")))
-
-                    // select the variant name, coalesce to the invariant name, as "variantName"
-                    .AndSelect(VariantNameSqlExpression + " AS variantName");
-                break;
-        }
-
-        sql
-            .From<DocumentDto>()
-            .InnerJoin<ContentDto>().On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-            .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-
-            // inner join on mandatory edited version
-            .InnerJoin<ContentVersionDto>()
-            .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<DocumentVersionDto>()
-            .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
-
-            // left join on optional published version
-            .LeftJoin<ContentVersionDto>(
-                nested => nested.InnerJoin<DocumentVersionDto>("pdv")
-                    .On<ContentVersionDto, DocumentVersionDto>(
-                        (left, right) => left.Id == right.Id && right.Published,
-                            "pcv",
-                            "pdv"),
-                        "pcv")
-            .On<DocumentDto, ContentVersionDto>(
-                (left, right) => left.NodeId == right.NodeId,
-                aliasRight: "pcv")
-
-            // TODO: should we be joining this when the query type is not single/many?
-            // left join on optional culture variation
-            //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
-            .LeftJoin<ContentVersionCultureVariationDto>(
-                nested => nested.InnerJoin<LanguageDto>("lang")
-                .On<ContentVersionCultureVariationDto, LanguageDto>(
-                        (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]",
-                        "ccv",
-                        "lang"),
-                "ccv")
-                .On<ContentVersionDto, ContentVersionCultureVariationDto>(
-                        (version, ccv) => version.Id == ccv.VersionId,
-                    aliasRight: "ccv");
-
-        sql
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-
-        // this would ensure we don't get the published version - keep for reference
-        //sql
-        //    .WhereAny(
-        //        x => x.Where<ContentVersionDto, ContentVersionDto>((x1, x2) => x1.Id != x2.Id, alias2: "pcv"),
-        //        x => x.WhereNull<ContentVersionDto>(x1 => x1.Id, "pcv")
-        //    );
-
-        if (current)
-        {
-            sql.Where<ContentVersionDto>(x => x.Current); // always get the current version
-        }
-
-        return sql;
-    }
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
-        GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
-
-    // ah maybe not, that what's used for eg Exists in base repo
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(NodeDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
@@ -1056,14 +966,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         Database.Insert(contentDto);
 
         // persist the content version dto
-        ContentVersionDto contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
+        ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
         contentVersionDto.NodeId = nodeDto.NodeId;
         contentVersionDto.Current = !publishing;
         Database.Insert(contentVersionDto);
         entity.VersionId = contentVersionDto.Id;
 
         // persist the document version dto
-        DocumentVersionDto documentVersionDto = dto.DocumentVersionDto;
+        DocumentVersionDto documentVersionDto = dto.ContentVersionDto;
         documentVersionDto.Id = entity.VersionId;
         if (publishing)
         {
@@ -1263,8 +1173,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             Database.Update(dto.ContentDto);
 
             // update the content & document version dtos
-            ContentVersionDto contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
-            DocumentVersionDto documentVersionDto = dto.DocumentVersionDto;
+            ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
+            DocumentVersionDto documentVersionDto = dto.ContentVersionDto;
             if (publishing)
             {
                 documentVersionDto.Published = true; // now published

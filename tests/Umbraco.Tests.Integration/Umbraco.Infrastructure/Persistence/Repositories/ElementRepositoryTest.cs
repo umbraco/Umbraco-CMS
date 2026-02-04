@@ -101,7 +101,9 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             dataValueReferences,
             DataTypeService,
             ConfigurationEditorJsonSerializer,
-            Mock.Of<IEventAggregator>());
+            Mock.Of<IEventAggregator>(),
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
         return repository;
     }
 
