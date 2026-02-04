@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a property value with support for culture and segment variations.
+/// </summary>
 public interface IPropertyValue
 {
     /// <summary>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -10,11 +10,16 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LabelConfigurationEditor"/> class.
+    /// </summary>
+    /// <param name="ioHelper">The IO helper.</param>
     public LabelConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {
     }
 
+    /// <inheritdoc />
     public override IDictionary<string, object> FromConfigurationEditor(IDictionary<string, object> configuration)
     {
         // default value

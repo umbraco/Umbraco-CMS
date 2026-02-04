@@ -12,8 +12,14 @@ public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem
 {
     private readonly Dictionary<Type, int> _customWeights = new();
 
+    /// <summary>
+    /// Gets or sets the default weight for items that don't have a <see cref="WeightAttribute" />.
+    /// </summary>
     public virtual int DefaultWeight { get; set; } = 100;
 
+    /// <summary>
+    /// Gets the current builder instance.
+    /// </summary>
     protected abstract TBuilder This { get; }
 
     /// <summary>
@@ -135,6 +141,7 @@ public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem
         return This;
     }
 
+    /// <inheritdoc />
     protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
     {
         var list = types.ToList();
@@ -142,6 +149,11 @@ public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem
         return list;
     }
 
+    /// <summary>
+    /// Gets the weight of a type.
+    /// </summary>
+    /// <param name="type">The type to get the weight for.</param>
+    /// <returns>The weight from a custom weight, <see cref="WeightAttribute" />, or <see cref="DefaultWeight" />.</returns>
     protected virtual int GetWeight(Type type)
     {
         if (_customWeights.TryGetValue(type, out int weight))

@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a content template (blueprint) is deleted.
+/// </summary>
 [WebhookEvent("Content Template [Blueprint] Deleted", Constants.WebhookEvents.Types.Content)]
 public class ContentDeletedBlueprintWebhookEvent : WebhookEventContentBase<ContentDeletedBlueprintNotification, IContent>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentDeletedBlueprintWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public ContentDeletedBlueprintWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -23,10 +33,13 @@ public class ContentDeletedBlueprintWebhookEvent : WebhookEventContentBase<Conte
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.ContentDeletedBlueprint;
 
+    /// <inheritdoc />
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentDeletedBlueprintNotification notification) =>
         notification.DeletedBlueprints;
 
+    /// <inheritdoc />
     protected override object ConvertEntityToRequestPayload(IContent entity) => new DefaultPayloadModel { Id = entity.Key };
 }

@@ -3,6 +3,9 @@
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
+/// <summary>
+///     Specifies the Lucene directory factory type for Examine indexes.
+/// </summary>
 public enum LuceneDirectoryFactory
 {
     /// <summary>
