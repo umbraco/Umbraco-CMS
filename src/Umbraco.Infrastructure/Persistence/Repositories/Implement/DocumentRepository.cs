@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -331,12 +330,6 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Document;
 
-    // TODO ELEMENTS: if this cannot be removed, make the one in the base protected
-    // gets the COALESCE expression for variant/invariant name
-    private string VariantNameSqlExpression
-        => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv")
-            .Sql;
-
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var nodeId = QuoteColumnName("nodeId");
@@ -387,36 +380,6 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     #region Content Repository
 
-    public int CountPublished(string? contentTypeAlias = null)
-    {
-        Sql<ISqlContext> sql = SqlContext.Sql();
-        if (contentTypeAlias.IsNullOrWhiteSpace())
-        {
-            sql.SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<DocumentDto>()
-                .On<NodeDto, DocumentDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Trashed == false)
-                .Where<DocumentDto>(x => x.Published);
-        }
-        else
-        {
-            sql.SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>()
-                .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<DocumentDto>()
-                .On<NodeDto, DocumentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>()
-                .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Trashed == false)
-                .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias)
-                .Where<DocumentDto>(x => x.Published);
-        }
-
-        return Database.ExecuteScalar<int>(sql);
-    }
-
     public void ReplaceContentPermissions(EntityPermissionSet permissionSet) =>
         PermissionRepository.ReplaceEntityPermissions(permissionSet);
 
@@ -437,75 +400,6 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     /// </summary>
     /// <param name="permission"></param>
     public void AddOrUpdatePermissions(ContentPermissionSet permission) => PermissionRepository.Save(permission);
-
-    /// <inheritdoc />
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    public override IEnumerable<IContent> GetPage(
-        IQuery<IContent>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<IContent>? filter,
-        Ordering? ordering)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering, loadTemplates: true);
-
-    /// <inheritdoc />
-    public override IEnumerable<IContent> GetPage(
-        IQuery<IContent>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        string[]? propertyAliases,
-        IQuery<IContent>? filter,
-        Ordering? ordering)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering, loadTemplates: true);
-
-    /// <inheritdoc />
-    public IEnumerable<IContent> GetPage(
-        IQuery<IContent>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        string[]? propertyAliases,
-        IQuery<IContent>? filter,
-        Ordering? ordering,
-        bool loadTemplates)
-    {
-        Sql<ISqlContext>? filterSql = null;
-
-        // if we have a filter, map its clauses to an Sql statement
-        if (filter != null)
-        {
-            // if the clause works on "name", we need to swap the field and use the variantName instead,
-            // so that querying also works on variant content (for instance when searching a listview).
-
-            // figure out how the "name" field is going to look like - so we can look for it
-            var nameField = SqlContext.VisitModelField<IContent>(x => x.Name);
-
-            filterSql = Sql();
-            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
-            {
-                var clauseSql = filterClause.Item1;
-                var clauseArgs = filterClause.Item2;
-
-                // replace the name field
-                // we cannot reference an aliased field in a WHERE clause, so have to repeat the expression here
-                clauseSql = clauseSql.Replace(nameField, VariantNameSqlExpression);
-
-                // append the clause
-                filterSql.Append($"AND ({clauseSql})", clauseArgs);
-            }
-        }
-
-        return GetPage<DocumentDto>(
-            query,
-            pageIndex,
-            pageSize,
-            out totalRecords,
-            x => MapDtosToContent(x, propertyAliases: propertyAliases, loadTemplates: loadTemplates),
-            filterSql,
-            ordering);
-    }
 
     public bool IsPathPublished(IContent? content)
     {
@@ -540,14 +434,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     public override int RecycleBinId => Constants.System.RecycleBinContent;
 
-    public bool RecycleBinSmells()
-    {
-        IAppPolicyCache cache = _appCaches.RuntimeCache;
-        var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
-
-        // always cache either true or false
-        return cache.GetCacheItem(cacheKey, () => CountChildren(RecycleBinId) > 0);
-    }
+    protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
 
     #endregion
 

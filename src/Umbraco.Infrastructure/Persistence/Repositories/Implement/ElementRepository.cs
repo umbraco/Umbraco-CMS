@@ -4,7 +4,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -239,12 +238,6 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Element;
 
-    // TODO ELEMENTS: if this cannot be removed, make the one in the base protected
-    // gets the COALESCE expression for variant/invariant name
-    private string VariantNameSqlExpression
-        => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv")
-            .Sql;
-
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string>
@@ -279,73 +272,6 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
 
     #region Content Repository
 
-    public int CountPublished(string? contentTypeAlias = null)
-    {
-        Sql<ISqlContext> sql = SqlContext.Sql();
-        if (contentTypeAlias.IsNullOrWhiteSpace())
-        {
-            sql.SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ElementDto>()
-                .On<NodeDto, ElementDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Trashed == false)
-                .Where<ElementDto>(x => x.Published);
-        }
-        else
-        {
-            sql.SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>()
-                .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ElementDto>()
-                .On<NodeDto, ElementDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>()
-                .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Trashed == false)
-                .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias)
-                .Where<ElementDto>(x => x.Published);
-        }
-
-        return Database.ExecuteScalar<int>(sql);
-    }
-
-    /// <inheritdoc />
-    public override IEnumerable<IElement> GetPage(IQuery<IElement>? query,
-        long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IElement>? filter, Ordering? ordering)
-    {
-        Sql<ISqlContext>? filterSql = null;
-
-        // if we have a filter, map its clauses to an Sql statement
-        if (filter != null)
-        {
-            // if the clause works on "name", we need to swap the field and use the variantName instead,
-            // so that querying also works on variant content (for instance when searching a listview).
-
-            // figure out how the "name" field is going to look like - so we can look for it
-            var nameField = SqlContext.VisitModelField<IElement>(x => x.Name);
-
-            filterSql = Sql();
-            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
-            {
-                var clauseSql = filterClause.Item1;
-                var clauseArgs = filterClause.Item2;
-
-                // replace the name field
-                // we cannot reference an aliased field in a WHERE clause, so have to repeat the expression here
-                clauseSql = clauseSql.Replace(nameField, VariantNameSqlExpression);
-
-                // append the clause
-                filterSql.Append($"AND ({clauseSql})", clauseArgs);
-            }
-        }
-
-        return GetPage<ElementDto>(query, pageIndex, pageSize, out totalRecords,
-            x => MapDtosToContent(x),
-            filterSql,
-            ordering);
-    }
-
     // NOTE: Elements cannot have unpublished parents
     public bool IsPathPublished(IElement? content)
         => content is { Trashed: false, Published: true };
@@ -354,16 +280,10 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
 
     #region Recycle Bin
 
-    public override int RecycleBinId => Constants.System.RecycleBinContent;
 
-    public bool RecycleBinSmells()
-    {
-        IAppPolicyCache cache = _appCaches.RuntimeCache;
-        var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
+    public override int RecycleBinId => Constants.System.RecycleBinElement;
 
-        // always cache either true or false
-        return cache.GetCacheItem(cacheKey, () => CountChildren(RecycleBinId) > 0);
-    }
+    protected override string RecycleBinCacheKey => CacheKeys.ElementRecycleBinCacheKey;
 
     #endregion
 

@@ -60,6 +60,7 @@ public static class CacheKeys
     ///     Cache key for media recycle bin.
     /// </summary>
     public const string MediaRecycleBinCacheKey = "recycleBin_media";
+    public const string ElementRecycleBinCacheKey = "recycleBin_element";
 
     /// <summary>
     ///     Cache key prefix for preview (draft) property cache values.
