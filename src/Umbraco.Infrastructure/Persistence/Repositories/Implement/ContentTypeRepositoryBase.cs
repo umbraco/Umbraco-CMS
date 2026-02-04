@@ -131,14 +131,35 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         {
             [moving.Id] = moving.Path,
         };
+        var entityKeys = new Dictionary<int, Guid?>
+        {
+            [moving.Id] = moving.Key,
+        };
 
         foreach (TEntity descendant in descendants.OrderBy(x => x.Level))
         {
-            //FIXME: Use MoveEventInfo constructor that takes a parentKey when this method is refactored
-            moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
+            // Get parent key: use moving.Key for direct children, otherwise look up from entityKeys or idKeyMap
+            Guid? descendantParentKey = null;
+            if (descendant.ParentId == moving.Id)
+            {
+                descendantParentKey = moving.Key;
+            }
+            else if (entityKeys.TryGetValue(descendant.ParentId, out Guid? existingKey))
+            {
+                descendantParentKey = existingKey;
+            }
+            else
+            {
+                // Look up parent key using idKeyMap
+                Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(descendant.ParentId, UmbracoObjectTypes.Unknown);
+                descendantParentKey = keyAttempt.Success ? keyAttempt.Result : null;
+            }
+
+            moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId, descendantParentKey));
 
             descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
             descendant.Level += levelDelta;
+            entityKeys[descendant.Id] = descendant.Key;
 
             Save(descendant);
         }
