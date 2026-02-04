@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
@@ -238,34 +237,18 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Element;
 
-    protected override IEnumerable<string> GetDeleteClauses()
+    protected override IEnumerable<string> GetEntityDeleteClauses()
     {
-        var list = new List<string>
-        {
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            // TODO ELEMENTS: include these if applicable, or clean up if not
-            // "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
-            // "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
-            // "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
-            // " SET startContentId = NULL WHERE startContentId = @id",
-            // "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
-            // "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Element + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ElementCultureVariation + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ElementVersion + " WHERE id IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation +
-            " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion +
-            " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id",
-        };
-        return list;
+        var nodeId = QuoteColumnName("nodeId");
+        return [
+            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup)}
+              SET {QuoteColumnName("startElementId")} = NULL
+              WHERE {QuoteColumnName("startElementId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Element)} WHERE {nodeId} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ElementCultureVariation)} WHERE {nodeId} = @id",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ElementVersion)} WHERE id IN
+              (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+        ];
     }
 
     #endregion
