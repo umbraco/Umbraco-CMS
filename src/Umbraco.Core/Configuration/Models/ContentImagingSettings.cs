@@ -11,15 +11,9 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class ContentImagingSettings
 {
     /// <summary>
-    ///     The default set of accepted image file extensions.
+    ///     The default set of native image file extensions that don't require format conversion.
     /// </summary>
     internal const string StaticImageFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
-
-    /// <summary>
-    ///     The default set of native image formats that don't require conversion.
-    ///     These are formats that image processors can handle directly without needing to convert to another format.
-    /// </summary>
-    internal const string StaticTrueImageFormats = "jpg,jpeg,png,gif,webp,bmp,tif,tiff";
 
     private static readonly ISet<ImagingAutoFillUploadField> _defaultImagingAutoFillUploadField = new HashSet<ImagingAutoFillUploadField>
     {
@@ -34,30 +28,57 @@ public class ContentImagingSettings
     };
 
     /// <summary>
-    ///     Gets or sets a value for the collection of accepted image file extensions.
-    ///     This defines which file extensions are considered processable by the imaging system (includes formats like PDF that can be converted to images).
+    ///     Gets or sets a value for the collection of native image format extensions that don't require format conversion.
+    ///     These are true image formats (JPG, PNG, GIF, WebP, etc.) that can be processed directly without conversion.
     ///     For configuration, see appsettings.json under Umbraco:CMS:Content:Imaging:ImageFileTypes.
     /// </summary>
     /// <remarks>
-    ///     This setting determines which files can be processed by image manipulation middleware.
-    ///     It includes both native image formats (JPG, PNG, etc.) and non-image formats that can be converted (PDF, EPS, etc.).
-    ///     Compare with <see cref="TrueImageFormats"/> which defines only native image formats that don't require conversion.
+    ///     <para>
+    ///     This setting is used in multiple ways throughout Umbraco:
+    ///     </para>
+    ///     <list type="number">
+    ///         <item>
+    ///             <term>Thumbnail Format Determination (Factory Layer)</term>
+    ///             <description>
+    ///             When generating image thumbnails via the Management API, the resize factory checks if the source file extension
+    ///             is in this list. If the extension is NOT found (e.g., PDF, EPS), the system automatically converts the output to
+    ///             WebP format for browser compatibility. Native image formats keep their original format unless explicitly overridden.
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <term>Backoffice UI Configuration (Temporary File API)</term>
+    ///             <description>
+    ///             This list is exposed to the Umbraco backoffice via the temporary file configuration endpoint
+    ///             (/umbraco/management/api/v1/temporary-file/configuration). The frontend uses this to understand which file extensions
+    ///             represent native images vs. other processable file types. This helps the UI make informed decisions about how to
+    ///             handle different media file types.
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    ///     <para>
+    ///     Configuration example (appsettings.json):
+    ///     </para>
+    ///     <code>
+    ///     {
+    ///       "Umbraco": {
+    ///         "CMS": {
+    ///           "Content": {
+    ///             "Imaging": {
+    ///               "ImageFileTypes": ["jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif", "webp"]
+    ///             }
+    ///           }
+    ///         }
+    ///       }
+    ///     }
+    ///     </code>
+    ///     <para>
+    ///     <strong>Note:</strong> This setting defines which formats are "native images" and is separate from what ImageSharp can process.
+    ///     ImageSharp may support additional formats through plugins (e.g., PDF via community packages), but those would not be in this
+    ///     list since they require conversion to a standard image format.
+    ///     </para>
     /// </remarks>
     [DefaultValue(StaticImageFileTypes)]
     public ISet<string> ImageFileTypes { get; set; } = new HashSet<string>(StaticImageFileTypes.Split(Constants.CharArrays.Comma));
-
-    /// <summary>
-    ///     Gets or sets a value for the collection of native image format extensions that don't require format conversion.
-    ///     These are true image formats (JPG, PNG, GIF, WebP, etc.) that can be processed directly.
-    ///     For configuration, see appsettings.json under Umbraco:CMS:Content:Imaging:TrueImageFormats.
-    /// </summary>
-    /// <remarks>
-    ///     This setting determines which formats are considered "native" images that don't need conversion to another format.
-    ///     Files with extensions NOT in this list (like PDF, EPS) will be automatically converted to a web-friendly format (typically WebP) when thumbnails are generated.
-    ///     Compare with <see cref="ImageFileTypes"/> which includes all processable formats including those that require conversion.
-    /// </remarks>
-    [DefaultValue(StaticTrueImageFormats)]
-    public ISet<string> TrueImageFormats { get; set; } = new HashSet<string>(StaticTrueImageFormats.Split(Constants.CharArrays.Comma));
 
     /// <summary>
     ///     Gets or sets the collection of media property mappings that are automatically populated with image metadata after a media file is uploaded.

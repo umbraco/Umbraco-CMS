@@ -147,7 +147,7 @@ public class ReziseImageUrlFactoryTests
     }
 
     [Test]
-    public void CreateUrlSets_CustomTrueImageFormats_RespectsConfiguration()
+    public void CreateUrlSets_CustomImageFileTypes_RespectsConfiguration()
     {
         // Arrange
         var customFormats = new HashSet<string> { "jpg", "png" }; // Only JPG and PNG, not GIF
@@ -162,11 +162,11 @@ public class ReziseImageUrlFactoryTests
         var jpgResult = factory.CreateUrlSets([jpgMedia], options).ToList();
 
         // Assert
-        // GIF should get format=webp since it's not in custom TrueImageFormats
+        // GIF should get format=webp since it's not in custom ImageFileTypes
         var gifUrl = gifResult[0].UrlInfos.First().Url;
         Assert.That(gifUrl, Does.Contain("format=webp"));
 
-        // JPG should not get format parameter since it's in custom TrueImageFormats
+        // JPG should not get format parameter since it's in custom ImageFileTypes
         var jpgUrl = jpgResult[0].UrlInfos.First().Url;
         Assert.That(jpgUrl, Does.Not.Contain("format="));
     }
@@ -304,8 +304,8 @@ public class ReziseImageUrlFactoryTests
     {
         return new ContentImagingSettings
         {
-            TrueImageFormats = trueImageFormats ?? new HashSet<string>(
-                ContentImagingSettings.StaticTrueImageFormats.Split(Constants.CharArrays.Comma)),
+            ImageFileTypes = trueImageFormats ?? new HashSet<string>(
+                ContentImagingSettings.StaticImageFileTypes.Split(Constants.CharArrays.Comma)),
         };
     }
 

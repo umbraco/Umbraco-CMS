@@ -117,7 +117,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     /// <remarks>
     /// Format determination logic:
     /// 1. If a format is explicitly requested, use it
-    /// 2. If the source file is not a true image format (e.g., PDF), convert to WebP
+    /// 2. If the source file is not a native image format (e.g., PDF), convert to WebP
     /// 3. For native image formats (JPG, PNG, etc.), keep original format (null = no conversion)
     /// </remarks>
     private string? DetermineOutputFormat(string imageUrl, string? requestedFormat)
@@ -140,17 +140,17 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                 return null;
             }
 
-            // Check if this is a true image format
-            var isTrueImageFormat = _imagingSettings.TrueImageFormats
+            // Check if this is a native image format
+            var isNativeImageFormat = _imagingSettings.ImageFileTypes
                 .Any(format => format.Equals(extension, StringComparison.OrdinalIgnoreCase));
 
-            // If not a true image format (e.g., PDF), convert to WebP
-            // For true image formats, return null to keep original
-            return isTrueImageFormat ? null : "webp";
+            // If not a native image format (e.g., PDF), convert to WebP
+            // For native image formats, return null to keep original
+            return isNativeImageFormat ? null : "webp";
         }
         catch (UriFormatException)
         {
-            // If URL parsing fails, treat as a true image and don't convert
+            // If URL parsing fails, treat as a native image and don't convert
             return null;
         }
     }

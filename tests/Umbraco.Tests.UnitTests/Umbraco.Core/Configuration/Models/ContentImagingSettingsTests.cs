@@ -8,38 +8,38 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models;
 public class ContentImagingSettingsTests
 {
     [Test]
-    public void TrueImageFormats_DefaultValue_ContainsExpectedFormats()
+    public void ImageFileTypes_DefaultValue_ContainsExpectedFormats()
     {
         // Arrange
         var settings = new ContentImagingSettings();
 
         // Assert
-        Assert.That(settings.TrueImageFormats, Is.Not.Null);
-        Assert.That(settings.TrueImageFormats, Is.Not.Empty);
+        Assert.That(settings.ImageFileTypes, Is.Not.Null);
+        Assert.That(settings.ImageFileTypes, Is.Not.Empty);
 
         // Check that default formats are present
         var expectedFormats = new[] { "jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff" };
         foreach (var format in expectedFormats)
         {
             Assert.That(
-                settings.TrueImageFormats,
+                settings.ImageFileTypes,
                 Does.Contain(format),
-                $"Expected TrueImageFormats to contain '{format}'");
+                $"Expected ImageFileTypes to contain '{format}'");
         }
     }
 
     [Test]
-    public void TrueImageFormats_DefaultValue_MatchesStaticConstant()
+    public void ImageFileTypes_DefaultValue_MatchesStaticConstant()
     {
         // Arrange
         var settings = new ContentImagingSettings();
-        var expectedFormats = ContentImagingSettings.StaticTrueImageFormats.Split(Constants.CharArrays.Comma);
+        var expectedFormats = ContentImagingSettings.StaticImageFileTypes.Split(Constants.CharArrays.Comma);
 
         // Assert
-        Assert.That(settings.TrueImageFormats.Count, Is.EqualTo(expectedFormats.Length));
+        Assert.That(settings.ImageFileTypes.Count, Is.EqualTo(expectedFormats.Length));
         foreach (var format in expectedFormats)
         {
-            Assert.That(settings.TrueImageFormats, Does.Contain(format));
+            Assert.That(settings.ImageFileTypes, Does.Contain(format));
         }
     }
 
@@ -80,21 +80,21 @@ public class ContentImagingSettingsTests
     }
 
     [Test]
-    public void TrueImageFormats_CanBeConfigured_WithCustomFormats()
+    public void ImageFileTypes_CanBeConfigured_WithCustomFormats()
     {
         // Arrange
         var customFormats = new HashSet<string> { "jpg", "png", "webp" };
         var settings = new ContentImagingSettings
         {
-            TrueImageFormats = customFormats,
+            ImageFileTypes = customFormats,
         };
 
         // Assert
-        Assert.That(settings.TrueImageFormats, Is.EqualTo(customFormats));
-        Assert.That(settings.TrueImageFormats.Count, Is.EqualTo(3));
-        Assert.That(settings.TrueImageFormats, Does.Contain("jpg"));
-        Assert.That(settings.TrueImageFormats, Does.Contain("png"));
-        Assert.That(settings.TrueImageFormats, Does.Contain("webp"));
+        Assert.That(settings.ImageFileTypes, Is.EqualTo(customFormats));
+        Assert.That(settings.ImageFileTypes.Count, Is.EqualTo(3));
+        Assert.That(settings.ImageFileTypes, Does.Contain("jpg"));
+        Assert.That(settings.ImageFileTypes, Does.Contain("png"));
+        Assert.That(settings.ImageFileTypes, Does.Contain("webp"));
     }
 
     [Test]
@@ -117,30 +117,30 @@ public class ContentImagingSettingsTests
     }
 
     [Test]
-    public void TrueImageFormats_IsSubsetOf_ImageFileTypes_ByDefault()
+    public void ImageFileTypes_IsSubsetOf_ImageFileTypes_ByDefault()
     {
         // Arrange
         var settings = new ContentImagingSettings();
 
-        // Assert - All TrueImageFormats should be in ImageFileTypes
-        foreach (var format in settings.TrueImageFormats)
+        // Assert - All ImageFileTypes should be in ImageFileTypes
+        foreach (var format in settings.ImageFileTypes)
         {
             Assert.That(
                 settings.ImageFileTypes,
                 Does.Contain(format),
-                $"ImageFileTypes should contain all formats from TrueImageFormats, but '{format}' was missing");
+                $"ImageFileTypes should contain all formats from ImageFileTypes, but '{format}' was missing");
         }
     }
 
     [Test]
-    public void TrueImageFormats_AllowsCaseInsensitiveComparison()
+    public void ImageFileTypes_AllowsCaseInsensitiveComparison()
     {
         // Arrange
         var settings = new ContentImagingSettings();
 
         // Act & Assert - Test that the collection can be used for case-insensitive matching
         // (Actual case-insensitive comparison logic is in the factory, but the data should support it)
-        var lowercaseFormats = settings.TrueImageFormats.Select(f => f.ToLowerInvariant()).ToList();
+        var lowercaseFormats = settings.ImageFileTypes.Select(f => f.ToLowerInvariant()).ToList();
         var uppercaseCheck = lowercaseFormats.Any(f => f.Equals("JPG", StringComparison.OrdinalIgnoreCase));
 
         Assert.That(uppercaseCheck, Is.True, "Should support case-insensitive matching");
@@ -199,17 +199,17 @@ public class ContentImagingSettingsTests
     }
 
     [Test]
-    public void TrueImageFormats_EmptySet_IsAllowed()
+    public void ImageFileTypes_EmptySet_IsAllowed()
     {
         // Arrange & Act
         var settings = new ContentImagingSettings
         {
-            TrueImageFormats = new HashSet<string>(),
+            ImageFileTypes = new HashSet<string>(),
         };
 
         // Assert
-        Assert.That(settings.TrueImageFormats, Is.Not.Null);
-        Assert.That(settings.TrueImageFormats, Is.Empty);
+        Assert.That(settings.ImageFileTypes, Is.Not.Null);
+        Assert.That(settings.ImageFileTypes, Is.Empty);
     }
 
     [Test]
@@ -217,7 +217,7 @@ public class ContentImagingSettingsTests
     {
         // Assert
         Assert.That(ContentImagingSettings.StaticImageFileTypes, Is.EqualTo("jpeg,jpg,gif,bmp,png,tiff,tif,webp"));
-        Assert.That(ContentImagingSettings.StaticTrueImageFormats, Is.EqualTo("jpg,jpeg,png,gif,webp,bmp,tif,tiff"));
+        Assert.That(ContentImagingSettings.StaticImageFileTypes, Is.EqualTo("jpg,jpeg,png,gif,webp,bmp,tif,tiff"));
     }
 
     [TestCase("jpg", true)]
@@ -232,7 +232,7 @@ public class ContentImagingSettingsTests
     [TestCase("eps", false)]
     [TestCase("svg", false)]
     [TestCase("txt", false)]
-    public void TrueImageFormats_ContainsExpectedFormat(string format, bool shouldContain)
+    public void ImageFileTypes_ContainsExpectedFormat(string format, bool shouldContain)
     {
         // Arrange
         var settings = new ContentImagingSettings();
@@ -241,16 +241,16 @@ public class ContentImagingSettingsTests
         if (shouldContain)
         {
             Assert.That(
-                settings.TrueImageFormats,
+                settings.ImageFileTypes,
                 Does.Contain(format),
-                $"Expected TrueImageFormats to contain '{format}'");
+                $"Expected ImageFileTypes to contain '{format}'");
         }
         else
         {
             Assert.That(
-                settings.TrueImageFormats,
+                settings.ImageFileTypes,
                 Does.Not.Contain(format),
-                $"Expected TrueImageFormats to NOT contain '{format}'");
+                $"Expected ImageFileTypes to NOT contain '{format}'");
         }
     }
 }
