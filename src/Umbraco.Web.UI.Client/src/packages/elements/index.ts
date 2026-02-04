@@ -1,3 +1,4 @@
+export * from './audit-log/index.js';
 export * from './collection/index.js';
 export * from './folder/index.js';
 export * from './item/index.js';
