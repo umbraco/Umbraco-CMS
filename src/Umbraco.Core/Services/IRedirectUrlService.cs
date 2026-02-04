@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
+///     Provides operations for managing URL redirects for content items.
 /// </summary>
 public interface IRedirectUrlService : IService
 {

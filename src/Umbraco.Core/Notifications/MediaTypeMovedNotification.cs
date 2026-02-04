@@ -7,6 +7,12 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class MediaTypeMovedNotification : MovedNotification<IMediaType>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaTypeMovedNotification"/> class
+    ///     with a single media type move operation.
+    /// </summary>
+    /// <param name="target">The move event information for the media type that was moved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public MediaTypeMovedNotification(MoveEventInfo<IMediaType> target, EventMessages messages)
         : base(target, messages)
     {

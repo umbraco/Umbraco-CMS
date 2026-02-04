@@ -14,18 +14,59 @@ public static partial class Constants
         /// </summary>
         public const string InternalGenericPropertiesPrefix = "_umb_";
 
+        /// <summary>
+        ///     Contains legacy property editor aliases from previous Umbraco versions.
+        /// </summary>
         public static class Legacy
         {
+            /// <summary>
+            ///     Defines legacy property editor aliases.
+            /// </summary>
             public static class Aliases
             {
+                /// <summary>
+                ///     Legacy alias for the Textbox property editor.
+                /// </summary>
                 public const string Textbox = "Umbraco.Textbox";
+
+                /// <summary>
+                ///     Legacy alias for the Date property editor.
+                /// </summary>
                 public const string Date = "Umbraco.Date";
+
+                /// <summary>
+                ///     Legacy alias for the Content Picker 2 property editor.
+                /// </summary>
                 public const string ContentPicker2 = "Umbraco.ContentPicker2";
+
+                /// <summary>
+                ///     Legacy alias for the Media Picker 2 property editor.
+                /// </summary>
                 public const string MediaPicker2 = "Umbraco.MediaPicker2";
+
+                /// <summary>
+                ///     Legacy alias for the Member Picker 2 property editor.
+                /// </summary>
                 public const string MemberPicker2 = "Umbraco.MemberPicker2";
+
+                /// <summary>
+                ///     Legacy alias for the Multi Node Tree Picker 2 property editor.
+                /// </summary>
                 public const string MultiNodeTreePicker2 = "Umbraco.MultiNodeTreePicker2";
+
+                /// <summary>
+                ///     Legacy alias for the Textbox Multiple property editor.
+                /// </summary>
                 public const string TextboxMultiple = "Umbraco.TextboxMultiple";
+
+                /// <summary>
+                ///     Legacy alias for the Related Links 2 property editor.
+                /// </summary>
                 public const string RelatedLinks2 = "Umbraco.RelatedLinks2";
+
+                /// <summary>
+                ///     Legacy alias for the Related Links property editor.
+                /// </summary>
                 public const string RelatedLinks = "Umbraco.RelatedLinks";
             }
         }
@@ -288,16 +329,34 @@ public static partial class Constants
         /// </summary>
         public static class Groups
         {
+            /// <summary>
+            ///     The Common property editor group.
+            /// </summary>
             public const string Common = "Common";
 
+            /// <summary>
+            ///     The Lists property editor group.
+            /// </summary>
             public const string Lists = "Lists";
 
+            /// <summary>
+            ///     The Media property editor group.
+            /// </summary>
             public const string Media = "Media";
 
+            /// <summary>
+            ///     The People property editor group.
+            /// </summary>
             public const string People = "People";
 
+            /// <summary>
+            ///     The Pickers property editor group.
+            /// </summary>
             public const string Pickers = "Pickers";
 
+            /// <summary>
+            ///     The Rich Content property editor group.
+            /// </summary>
             public const string RichContent = "Rich Content";
         }
     }

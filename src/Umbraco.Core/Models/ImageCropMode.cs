@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Defines the mode used for image cropping and resizing operations.
+/// </summary>
 public enum ImageCropMode
 {
     /// <summary>

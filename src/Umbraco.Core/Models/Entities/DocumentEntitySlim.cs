@@ -5,4 +5,5 @@ namespace Umbraco.Cms.Core.Models.Entities;
 /// </summary>
 public class DocumentEntitySlim : PublishableContentEntitySlim, IDocumentEntitySlim
 {
+    /// <inheritdoc />
 }

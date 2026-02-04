@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.ImportExport;
 
+/// <summary>
+///     Service implementation for importing member types from XML files.
+/// </summary>
 public class MemberTypeImportService : IMemberTypeImportService
 {
     private readonly IPackageDataInstallation _packageDataInstallation;
@@ -14,6 +17,14 @@ public class MemberTypeImportService : IMemberTypeImportService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberTypeImportService"/> class.
+    /// </summary>
+    /// <param name="packageDataInstallation">The package data installation service for importing member types.</param>
+    /// <param name="entityService">The entity service for checking existence of entities.</param>
+    /// <param name="temporaryFileToXmlImportService">The service for loading XML from temporary files.</param>
+    /// <param name="coreScopeProvider">The core scope provider for creating database scopes.</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user keys to user IDs.</param>
     public MemberTypeImportService(
         IPackageDataInstallation packageDataInstallation,
         IEntityService entityService,
@@ -28,6 +39,7 @@ public class MemberTypeImportService : IMemberTypeImportService
         _userIdKeyResolver = userIdKeyResolver;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IMemberType?, MemberTypeImportOperationStatus>> Import(
         Guid temporaryFileId,
         Guid userKey,
