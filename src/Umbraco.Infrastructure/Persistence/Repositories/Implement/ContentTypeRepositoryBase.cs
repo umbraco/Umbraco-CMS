@@ -138,23 +138,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         foreach (TEntity descendant in descendants.OrderBy(x => x.Level))
         {
-            // Get parent key: use moving.Key for direct children, otherwise look up from entityKeys or idKeyMap
-            Guid? descendantParentKey = null;
-            if (descendant.ParentId == moving.Id)
-            {
-                descendantParentKey = moving.Key;
-            }
-            else if (entityKeys.TryGetValue(descendant.ParentId, out Guid? existingKey))
-            {
-                descendantParentKey = existingKey;
-            }
-            else
-            {
-                // Look up parent key using idKeyMap
-                Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(descendant.ParentId, UmbracoObjectTypes.Unknown);
-                descendantParentKey = keyAttempt.Success ? keyAttempt.Result : null;
-            }
-
+            Guid? descendantParentKey = GetParentKey(descendant, moving, entityKeys);
             moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId, descendantParentKey));
 
             descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
@@ -165,6 +149,29 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
 
         return moveInfo;
+    }
+
+    /// <summary>
+    ///     Gets the parent key for a descendant entity during a move operation.
+    /// </summary>
+    /// <param name="descendant">The descendant entity.</param>
+    /// <param name="moving">The entity being moved.</param>
+    /// <param name="entityKeys">Dictionary of already processed entity keys.</param>
+    /// <returns>The parent key, or null if not found.</returns>
+    private Guid? GetParentKey(TEntity descendant, TEntity moving, Dictionary<int, Guid?> entityKeys)
+    {
+        if (descendant.ParentId == moving.Id)
+        {
+            return moving.Key;
+        }
+
+        if (entityKeys.TryGetValue(descendant.ParentId, out Guid? existingKey))
+        {
+            return existingKey;
+        }
+
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(descendant.ParentId, UmbracoObjectTypes.Unknown);
+        return keyAttempt.Success ? keyAttempt.Result : null;
     }
 
     /// <summary>
