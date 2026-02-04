@@ -3,25 +3,27 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/constants.js';
 import type { UmbElementDetailRepository } from '../repository/index.js';
 import type { UmbElementDetailModel, UmbElementVariantModel } from '../types.js';
-import { UmbElementWorkspacePropertyDatasetContext } from './property-dataset-context/element-workspace-property-dataset-context.js';
+import { UMB_ELEMENT_COLLECTION_ALIAS } from '../collection/constants.js';
+import { UmbElementValidationRepository } from '../repository/validation/element-validation.repository.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from './constants.js';
+import { UmbElementWorkspacePropertyDatasetContext } from './property-dataset-context/element-workspace-property-dataset-context.js';
+import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import {
+	UmbEntityRestoredFromRecycleBinEvent,
+	UmbEntityTrashedEvent,
+	UmbIsTrashedEntityContext,
+} from '@umbraco-cms/backoffice/recycle-bin';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD } from '@umbraco-cms/backoffice/document';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import {
-	UmbEntityRestoredFromRecycleBinEvent,
-	UmbEntityTrashedEvent,
-	UmbIsTrashedEntityContext,
-} from '@umbraco-cms/backoffice/recycle-bin';
 import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -49,11 +51,15 @@ export class UmbElementWorkspaceContext
 		super(host, {
 			entityType: UMB_ELEMENT_ENTITY_TYPE,
 			workspaceAlias: UMB_ELEMENT_WORKSPACE_ALIAS,
+			collectionAlias: UMB_ELEMENT_COLLECTION_ALIAS,
 			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
+			contentValidationRepository: UmbElementValidationRepository,
+			skipValidationOnSubmit: false,
+			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
-			ignoreValidationResultOnSubmit: true,
+			//saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
