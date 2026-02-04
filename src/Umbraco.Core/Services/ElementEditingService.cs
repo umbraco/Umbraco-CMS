@@ -310,27 +310,15 @@ internal sealed class ElementEditingService
             return Attempt.Fail(saveResult);
         }
 
-        await AuditMoveAsync(userKey, toMove.Id, trash, originalPath);
+        string? auditMessage = trash
+            ? $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}"
+            : null;
+        await _auditService.AddAsync(AuditType.Move, userKey, toMove.Id, UmbracoObjectTypes.Element.GetName(), auditMessage);
 
         IStatefulNotification movedNotification = movedNotificationFactory(toMove, eventMessages);
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
 
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
-    }
-
-    private async Task AuditMoveAsync(Guid userKey, int elementId, bool trash, string originalPath)
-    {
-        string? message = null;
-        if (trash)
-        {
-            IList<string> pathSegments = originalPath.ToDelimitedList();
-            var originalParentId = pathSegments.Count > 2
-                ? int.Parse(pathSegments[^2], CultureInfo.InvariantCulture)
-                : Constants.System.Root;
-            message = $"Moved to recycle bin from parent {originalParentId}";
-        }
-
-        await _auditService.AddAsync(AuditType.Move, userKey, elementId, UmbracoObjectTypes.Element.GetName(), message);
     }
 
     protected override IElement? Copy(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)

@@ -1083,7 +1083,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 new ContentMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
                     movingToRecycleBinNotification));
 
-            AuditMoveToRecycleBin(userId, content.Id, originalPath);
+            Audit(AuditType.Move, userId, content.Id, $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}");
 
             scope.Complete();
         }
@@ -1709,15 +1709,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     // TODO ELEMENTS: not used? clean up!
     private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
         langs.Any(x => x.IsMandatory && x.IsoCode.InvariantEquals(culture));
-
-    private void AuditMoveToRecycleBin(int userId, int contentId, string originalPath)
-    {
-        IList<string> pathSegments = originalPath.ToDelimitedList();
-        var originalParentId = pathSegments.Count > 2
-            ? int.Parse(pathSegments[^2], CultureInfo.InvariantCulture)
-            : Constants.System.Root;
-        Audit(AuditType.Move, userId, contentId, $"Moved to recycle bin from parent {originalParentId}");
-    }
 
     #endregion
 

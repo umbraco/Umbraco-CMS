@@ -308,7 +308,10 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         _entityContainerRepository.Save(container);
 
-        await AuditMoveAsync(userKey, container.Id, trash, originalPath);
+        string? auditMessage = trash
+            ? $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}"
+            : null;
+        await AuditAsync(AuditType.Move, userKey, container.Id, auditMessage);
 
         // fire the moved notification
         IStatefulNotification movedNotification = movedNotificationFactory(container, eventMessages);
@@ -386,21 +389,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             }
         }
         while (total > DescendantsIteratorPageSize);
-    }
-
-    private async Task AuditMoveAsync(Guid userKey, int containerId, bool trash, string originalPath)
-    {
-        string? message = null;
-        if (trash)
-        {
-            IList<string> pathSegments = originalPath.ToDelimitedList();
-            var originalParentId = pathSegments.Count > 2
-                ? int.Parse(pathSegments[^2], CultureInfo.InvariantCulture)
-                : Constants.System.Root;
-            message = $"Moved to recycle bin from parent {originalParentId}";
-        }
-
-        await AuditAsync(AuditType.Move, userKey, containerId, message);
     }
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.Element;

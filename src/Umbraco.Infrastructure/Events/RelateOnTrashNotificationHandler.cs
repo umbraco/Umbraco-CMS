@@ -213,10 +213,7 @@ public sealed class RelateOnTrashNotificationHandler :
 
         foreach (MoveToRecycleBinEventInfo<T> item in moveInfoCollection)
         {
-            IList<string> originalPath = item.OriginalPath.ToDelimitedList();
-            var originalParentId = originalPath.Count > 2
-                ? int.Parse(originalPath[^2], CultureInfo.InvariantCulture)
-                : Constants.System.Root;
+            var originalParentId = item.OriginalPath.GetParentIdFromPath();
 
             // Before we can create this relation, we need to ensure that the original parent still exists which
             // may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
