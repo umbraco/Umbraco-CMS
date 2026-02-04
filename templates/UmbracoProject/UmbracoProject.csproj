@@ -8,11 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--#if (UmbracoVersion != "null")
-    <PackageReference Include="Umbraco.Cms" Version="CUSTOM_VERSION" />
-    #else
     <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-    #endif-->
     <!--#if (ModelsBuilderMode == "InMemoryAuto" || (DevelopmentMode == "BackofficeDevelopment" && ModelsBuilderMode == "Default")) -->
     <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <!--#endif -->
