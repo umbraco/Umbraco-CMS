@@ -98,16 +98,12 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add(ResizeWebProcessor.Height, height.ToString(CultureInfo.InvariantCulture));
         }
 
-        // Determine format: explicit > furtherOptions > default for non-images
+        // Determine format: explicit > furtherOptions
+        // Note: Format determination (e.g., converting PDFs to WebP) is handled by the factory layer
         string? formatValue = options.Format;
         if (string.IsNullOrWhiteSpace(formatValue) && furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
         {
             formatValue = format.ToString();
-        }
-
-        if (string.IsNullOrWhiteSpace(formatValue) && RequiresFormatConversion(options.ImageUrl))
-        {
-            formatValue = "webp"; // Default for processable non-image files (PDF, etc.)
         }
 
         if (!string.IsNullOrWhiteSpace(formatValue))
@@ -143,41 +139,5 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
         }
 
         return QueryHelpers.AddQueryString(options.ImageUrl, queryString);
-    }
-
-    private static readonly string[] TrueImageFormats = { "jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff" };
-
-    /// <summary>
-    /// Determines if the source file requires format conversion because it's not a true image format.
-    /// </summary>
-    /// <param name="imageUrl">The source image URL.</param>
-    /// <returns>True if the file needs conversion to an image format; otherwise, false.</returns>
-    private static bool RequiresFormatConversion(string? imageUrl)
-    {
-        if (string.IsNullOrWhiteSpace(imageUrl))
-        {
-            return false;
-        }
-
-        try
-        {
-            // Extract extension from URL (handle query strings)
-            var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
-            var path = uri.IsAbsoluteUri ? uri.LocalPath : imageUrl.Split('?')[0];
-            var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
-
-            if (string.IsNullOrEmpty(extension))
-            {
-                return false;
-            }
-
-            // True image formats that don't require conversion
-            return !TrueImageFormats.Contains(extension);
-        }
-        catch (UriFormatException)
-        {
-            // If URL parsing fails, treat as non-image requiring conversion
-            return false;
-        }
     }
 }

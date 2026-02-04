@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -13,13 +15,35 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly ContentSettings _contentSettings;
+    private readonly ContentImagingSettings _imagingSettings;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
-    public ReziseImageUrlFactory(IImageUrlGenerator imageUrlGenerator, IOptions<ContentSettings> contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators, IAbsoluteUrlBuilder absoluteUrlBuilder)
+    [Obsolete("Use the constructor with IOptions<ContentImagingSettings> parameter. This constructor will be removed in v19.")]
+    public ReziseImageUrlFactory(
+        IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IAbsoluteUrlBuilder absoluteUrlBuilder)
+        : this(
+            imageUrlGenerator,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentImagingSettings>>(),
+            mediaUrlGenerators,
+            absoluteUrlBuilder)
+    {
+    }
+
+    public ReziseImageUrlFactory(
+        IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings,
+        IOptions<ContentImagingSettings> imagingSettings,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IAbsoluteUrlBuilder absoluteUrlBuilder)
     {
         _imageUrlGenerator = imageUrlGenerator;
         _contentSettings = contentSettings.Value;
+        _imagingSettings = imagingSettings.Value;
         _mediaUrlGenerators = mediaUrlGenerators;
         _absoluteUrlBuilder = absoluteUrlBuilder;
     }
@@ -46,8 +70,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     {
         foreach (var url in urls)
         {
-            // Have to remove first char here, as it always contains the "."
-            var extension = Path.GetExtension(url).Remove(0, 1);
+            var extension = Path.GetExtension(url).TrimStart('.');
             if (_imageUrlGenerator.SupportedImageFileTypes.InvariantContains(extension) is false)
             {
                 // It's okay to return just the image URL for SVGs, as they are always scalable.
@@ -68,7 +91,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                 Height = options.Height,
                 Width = options.Width,
                 ImageCropMode = options.Mode,
-                Format = options.Format,
+                Format = DetermineOutputFormat(url, options.Format),
             };
 
             var relativeUrl = _imageUrlGenerator.GetImageUrl(imageOptions);
@@ -82,6 +105,53 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                 Culture = null,
                 Url = _absoluteUrlBuilder.ToAbsoluteUrl(relativeUrl).ToString(),
             };
+        }
+    }
+
+    /// <summary>
+    /// Determines the appropriate output format for an image based on the source URL and requested format.
+    /// </summary>
+    /// <param name="imageUrl">The source image URL.</param>
+    /// <param name="requestedFormat">The explicitly requested format (from API request), or null to use automatic determination.</param>
+    /// <returns>The format to use for the output image, or null to keep the original format.</returns>
+    /// <remarks>
+    /// Format determination logic:
+    /// 1. If a format is explicitly requested, use it
+    /// 2. If the source file is not a true image format (e.g., PDF), convert to WebP
+    /// 3. For native image formats (JPG, PNG, etc.), keep original format (null = no conversion)
+    /// </remarks>
+    private string? DetermineOutputFormat(string imageUrl, string? requestedFormat)
+    {
+        // If user explicitly requested a format, honor it
+        if (!string.IsNullOrWhiteSpace(requestedFormat))
+        {
+            return requestedFormat;
+        }
+
+        // Extract extension from URL
+        try
+        {
+            var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
+            var path = uri.IsAbsoluteUri ? uri.LocalPath : imageUrl.Split('?')[0];
+            var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
+
+            if (string.IsNullOrEmpty(extension))
+            {
+                return null;
+            }
+
+            // Check if this is a true image format
+            var isTrueImageFormat = _imagingSettings.TrueImageFormats
+                .Any(format => format.Equals(extension, StringComparison.OrdinalIgnoreCase));
+
+            // If not a true image format (e.g., PDF), convert to WebP
+            // For true image formats, return null to keep original
+            return isTrueImageFormat ? null : "webp";
+        }
+        catch (UriFormatException)
+        {
+            // If URL parsing fails, treat as a true image and don't convert
+            return null;
         }
     }
 }
