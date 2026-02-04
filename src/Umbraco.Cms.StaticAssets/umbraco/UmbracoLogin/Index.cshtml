@@ -7,7 +7,6 @@
 @using Umbraco.Cms.Core.Logging
 @using Umbraco.Cms.Core.Mail
 @using Umbraco.Cms.Core.Manifest
-@using Umbraco.Cms.Core.Security
 @using Umbraco.Cms.Core.Serialization
 @using Umbraco.Cms.Web.Common.Hosting
 @using Umbraco.Extensions
@@ -20,7 +19,9 @@
 @inject IBackOfficePathGenerator BackOfficePathGenerator
 @inject IPackageManifestService PackageManifestService
 @inject IJsonSerializer JsonSerializer
-@inject ICspNonceService CspNonceService
+@inject Umbraco.Cms.Core.Security.ICspNonceService CspNonceService
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper Umbraco.Cms.Web.Common.TagHelpers.CspNonceTagHelper, Umbraco.Cms.Web.Common
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = HostingEnvironment.GetBackOfficePath();
@@ -31,9 +32,7 @@
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
-    var nonce = CspNonceService.GetNonce();
 }
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
 <html lang="@GlobalSettings.Value.DefaultUILanguage">
@@ -57,14 +56,7 @@
     </style>
 
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService, CspNonceService)
-    @if (string.IsNullOrEmpty(nonce))
-    {
-        <script type="module" src="~/umbraco/login/login.js" asp-append-version="true"></script>
-    }
-    else
-    {
-        <script type="module" src="~/umbraco/login/login.js" asp-append-version="true" nonce="@nonce"></script>
-    }
+    <script type="module" src="~/umbraco/login/login.js" asp-append-version="true" asp-csp-nonce></script>
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">

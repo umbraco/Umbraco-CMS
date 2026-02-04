@@ -4,7 +4,6 @@
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Logging
 @using Umbraco.Cms.Core.Manifest
-@using Umbraco.Cms.Core.Security
 @using Umbraco.Cms.Core.Serialization
 @using Umbraco.Cms.Web.Common.Hosting
 @using Umbraco.Extensions
@@ -13,14 +12,13 @@
 @inject IJsonSerializer JsonSerializer
 @inject IProfilerHtml ProfilerHtml
 @inject IOptions<GlobalSettings> GlobalSettings
-@inject ICspNonceService CspNonceService
+@inject Umbraco.Cms.Core.Security.ICspNonceService CspNonceService
+@addTagHelper Umbraco.Cms.Web.Common.TagHelpers.CspNonceTagHelper, Umbraco.Cms.Web.Common
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = BackOfficePathGenerator.BackOfficePath;
     var backOfficeAssetsPath = BackOfficePathGenerator.BackOfficeAssetsPath;
     var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
-    var nonce = CspNonceService.GetNonce();
-    var nonceAttribute = string.IsNullOrEmpty(nonce) ? "" : $"nonce=\"{nonce}\"";
 }<!doctype html>
 <html lang="@GlobalSettings.Value.DefaultUILanguage">
 
@@ -37,7 +35,7 @@
     <link rel="stylesheet" href="@backOfficeAssetsPath/css/umb-css.css" />
     <link rel="stylesheet" href="@backOfficeAssetsPath/css/uui-css.css" />
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService, CspNonceService)
-    <script type="module" src="@backOfficeAssetsPath/apps/app/app.element.js" @Html.Raw(nonceAttribute)></script>
+    <script type="module" src="@backOfficeAssetsPath/apps/app/app.element.js" asp-csp-nonce></script>
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
