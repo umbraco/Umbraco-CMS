@@ -5,18 +5,18 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[PrimaryKey(IPublishableContentDto<ElementVersionDto>.Columns.NodeId, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.Element;
 
-    [Column(INodeDto.NodeIdColumnName)]
+    [Column(IPublishableContentDto<ElementVersionDto>.Columns.NodeId)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
 
-    [Column(IPublishableContentDto<ElementVersionDto>.PublishedColumnName)]
+    [Column(IPublishableContentDto<ElementVersionDto>.Columns.Published)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 

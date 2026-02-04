@@ -233,83 +233,6 @@ internal class ElementRepository : PublishableContentRepositoryBase<int, IElemen
         }
     }
 
-    private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IElement element, bool publishing)
-    {
-        if (element.CultureInfos is not null)
-        {
-            // create dtos for the 'current' (non-published) version, all cultures
-            // ReSharper disable once UseDeconstruction
-            foreach (ContentCultureInfos cultureInfo in element.CultureInfos)
-            {
-                yield return new ContentVersionCultureVariationDto
-                {
-                    VersionId = element.VersionId,
-                    LanguageId =
-                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
-                        throw new InvalidOperationException("Not a valid culture."),
-                    Culture = cultureInfo.Culture,
-                    Name = cultureInfo.Name,
-                    UpdateDate =
-                        element.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
-                };
-            }
-        }
-
-        // if not publishing, we're just updating the 'current' (non-published) version,
-        // so there are no DTOs to create for the 'published' version which remains unchanged
-        if (!publishing)
-        {
-            yield break;
-        }
-
-        if (element.PublishCultureInfos is not null)
-        {
-            // create dtos for the 'published' version, for published cultures (those having a name)
-            // ReSharper disable once UseDeconstruction
-            foreach (ContentCultureInfos cultureInfo in element.PublishCultureInfos)
-            {
-                yield return new ContentVersionCultureVariationDto
-                {
-                    VersionId = element.PublishedVersionId,
-                    LanguageId =
-                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
-                        throw new InvalidOperationException("Not a valid culture."),
-                    Culture = cultureInfo.Culture,
-                    Name = cultureInfo.Name,
-                    UpdateDate =
-                        element.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
-                };
-            }
-        }
-    }
-
-    private IEnumerable<ElementCultureVariationDto> GetElementVariationDtos(IElement element,
-        HashSet<string> editedCultures)
-    {
-        IEnumerable<string>
-            allCultures = element.AvailableCultures.Union(element.PublishedCultures); // union = distinct
-        foreach (var culture in allCultures)
-        {
-            var dto = new ElementCultureVariationDto
-            {
-                NodeId = element.Id,
-                LanguageId =
-                    LanguageRepository.GetIdByIsoCode(culture) ??
-                    throw new InvalidOperationException("Not a valid culture."),
-                Culture = culture,
-                Name = element.GetCultureName(culture) ?? element.GetPublishName(culture),
-                Available = element.IsCultureAvailable(culture),
-                Published = element.IsCulturePublished(culture),
-                // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
-                Edited = element.IsCultureAvailable(culture) &&
-                         (!element.IsCulturePublished(culture) ||
-                          (editedCultures != null && editedCultures.Contains(culture)))
-            };
-
-            yield return dto;
-        }
-    }
-
     #region Repository Base
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Element;
@@ -656,7 +579,7 @@ internal class ElementRepository : PublishableContentRepositoryBase<int, IElemen
             Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
             // insert element variations
-            Database.BulkInsertRecords(GetElementVariationDtos(entity, editedCultures!));
+            Database.BulkInsertRecords(GetEntityVariationDtos(entity, editedCultures!));
         }
 
         // trigger here, before we reset Published etc
@@ -882,7 +805,7 @@ internal class ElementRepository : PublishableContentRepositoryBase<int, IElemen
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert element variations
-                Database.BulkInsertRecords(GetElementVariationDtos(entity, editedCultures!));
+                Database.BulkInsertRecords(GetEntityVariationDtos(entity, editedCultures!));
             }
 
             // update the element dto

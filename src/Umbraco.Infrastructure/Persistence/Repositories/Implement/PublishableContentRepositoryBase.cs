@@ -24,7 +24,7 @@ internal abstract class PublishableContentRepositoryBase<TId, TEntity, TReposito
     where TRepository : class, IRepository
     where TEntityDto : class, IPublishableContentDto<TContentVersionDto>
     where TContentVersionDto : class, IContentVersionDto
-    where TContentCultureVariationDto : class, ICultureVariationDto
+    where TContentCultureVariationDto : class, ICultureVariationDto, new()
 {
     protected PublishableContentRepositoryBase(
         IScopeAccessor scopeAccessor,
@@ -264,6 +264,84 @@ internal abstract class PublishableContentRepositoryBase<TId, TEntity, TReposito
         return variations;
     }
 
+    protected IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(TEntity content, bool publishing)
+    {
+        if (content.CultureInfos is not null)
+        {
+            // create dtos for the 'current' (non-published) version, all cultures
+            // ReSharper disable once UseDeconstruction
+            foreach (ContentCultureInfos cultureInfo in content.CultureInfos)
+            {
+                yield return new ContentVersionCultureVariationDto
+                {
+                    VersionId = content.VersionId,
+                    LanguageId =
+                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
+                        throw new InvalidOperationException("Not a valid culture."),
+                    Culture = cultureInfo.Culture,
+                    Name = cultureInfo.Name,
+                    UpdateDate =
+                        content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
+                };
+            }
+        }
+
+        // if not publishing, we're just updating the 'current' (non-published) version,
+        // so there are no DTOs to create for the 'published' version which remains unchanged
+        if (!publishing)
+        {
+            yield break;
+        }
+
+        if (content.PublishCultureInfos is not null)
+        {
+            // create dtos for the 'published' version, for published cultures (those having a name)
+            // ReSharper disable once UseDeconstruction
+            foreach (ContentCultureInfos cultureInfo in content.PublishCultureInfos)
+            {
+                yield return new ContentVersionCultureVariationDto
+                {
+                    VersionId = content.PublishedVersionId,
+                    LanguageId =
+                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
+                        throw new InvalidOperationException("Not a valid culture."),
+                    Culture = cultureInfo.Culture,
+                    Name = cultureInfo.Name,
+                    UpdateDate =
+                        content.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
+                };
+            }
+        }
+    }
+
+    protected IEnumerable<TContentCultureVariationDto> GetEntityVariationDtos(
+        TEntity content,
+        HashSet<string> editedCultures)
+    {
+        IEnumerable<string>
+            allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
+        foreach (var culture in allCultures)
+        {
+            var dto = new TContentCultureVariationDto
+            {
+                NodeId = content.Id,
+                LanguageId =
+                    LanguageRepository.GetIdByIsoCode(culture) ??
+                    throw new InvalidOperationException("Not a valid culture."),
+                Culture = culture,
+                Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
+                Available = content.IsCultureAvailable(culture),
+                Published = content.IsCulturePublished(culture),
+                // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
+                Edited = content.IsCultureAvailable(culture) &&
+                         (!content.IsCulturePublished(culture) ||
+                          (editedCultures != null && editedCultures.Contains(culture)))
+            };
+
+            yield return dto;
+        }
+    }
+
     protected sealed class ContentVariation
     {
         public string? Culture { get; set; }
@@ -276,7 +354,6 @@ internal abstract class PublishableContentRepositoryBase<TId, TEntity, TReposito
         public string? Culture { get; set; }
         public bool Edited { get; set; }
     }
-
 
     #region Repository Base
 

@@ -347,84 +347,6 @@ internal class DocumentRepository : PublishableContentRepositoryBase<int, IConte
         }
     }
 
-    private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
-    {
-        if (content.CultureInfos is not null)
-        {
-            // create dtos for the 'current' (non-published) version, all cultures
-            // ReSharper disable once UseDeconstruction
-            foreach (ContentCultureInfos cultureInfo in content.CultureInfos)
-            {
-                yield return new ContentVersionCultureVariationDto
-                {
-                    VersionId = content.VersionId,
-                    LanguageId =
-                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
-                        throw new InvalidOperationException("Not a valid culture."),
-                    Culture = cultureInfo.Culture,
-                    Name = cultureInfo.Name,
-                    UpdateDate =
-                        content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
-                };
-            }
-        }
-
-        // if not publishing, we're just updating the 'current' (non-published) version,
-        // so there are no DTOs to create for the 'published' version which remains unchanged
-        if (!publishing)
-        {
-            yield break;
-        }
-
-        if (content.PublishCultureInfos is not null)
-        {
-            // create dtos for the 'published' version, for published cultures (those having a name)
-            // ReSharper disable once UseDeconstruction
-            foreach (ContentCultureInfos cultureInfo in content.PublishCultureInfos)
-            {
-                yield return new ContentVersionCultureVariationDto
-                {
-                    VersionId = content.PublishedVersionId,
-                    LanguageId =
-                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
-                        throw new InvalidOperationException("Not a valid culture."),
-                    Culture = cultureInfo.Culture,
-                    Name = cultureInfo.Name,
-                    UpdateDate =
-                        content.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
-                };
-            }
-        }
-    }
-
-    private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(
-        IContent content,
-        HashSet<string> editedCultures)
-    {
-        IEnumerable<string>
-            allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
-        foreach (var culture in allCultures)
-        {
-            var dto = new DocumentCultureVariationDto
-            {
-                NodeId = content.Id,
-                LanguageId =
-                    LanguageRepository.GetIdByIsoCode(culture) ??
-                    throw new InvalidOperationException("Not a valid culture."),
-                Culture = culture,
-                Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
-                Available = content.IsCultureAvailable(culture),
-                Published = content.IsCulturePublished(culture),
-                // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
-                Edited = content.IsCultureAvailable(culture) &&
-                         (!content.IsCulturePublished(culture) ||
-                          (editedCultures != null && editedCultures.Contains(culture)))
-            };
-
-            yield return dto;
-        }
-    }
-
     #region Repository Base
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Document;
@@ -830,7 +752,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<int, IConte
             Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
             // insert document variations
-            Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
+            Database.BulkInsertRecords(GetEntityVariationDtos(entity, editedCultures!));
         }
 
         // trigger here, before we reset Published etc
@@ -1059,7 +981,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<int, IConte
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
+                Database.BulkInsertRecords(GetEntityVariationDtos(entity, editedCultures!));
             }
 
             // update the document dto

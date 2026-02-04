@@ -5,9 +5,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal interface IPublishableContentDto<TContentVersionDto> : INodeDto
     where TContentVersionDto : class, IContentVersionDto
 {
-    internal const string PublishedColumnName = "published";
+    internal static class Columns
+    {
+        internal const string NodeId = INodeDto.Columns.NodeId;
 
-    [Column(PublishedColumnName)]
+        internal const string Published = IContentVersionDto.Columns.Published;
+    }
+
+    [Column(Columns.Published)]
     bool Published { get; }
 
     [ResultColumn]
