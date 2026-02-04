@@ -17,6 +17,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class TextOnlyValueEditor : DataValueEditor
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TextOnlyValueEditor" /> class.
+    /// </summary>
+    /// <param name="attribute">The data editor attribute.</param>
+    /// <param name="localizedTextService">The localized text service.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="jsonSerializer">The JSON serializer.</param>
+    /// <param name="ioHelper">The IO helper.</param>
     public TextOnlyValueEditor(
         DataEditorAttribute attribute,
         ILocalizedTextService localizedTextService,
@@ -61,18 +69,26 @@ public class TextOnlyValueEditor : DataValueEditor
     }
 
     /// <summary>
-    /// A common length validator for both textbox and text area.
+    ///     A common length validator for both textbox and text area.
     /// </summary>
     internal sealed class LengthValidator : IValueValidator
     {
         private readonly ILocalizedTextService _localizedTextService;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LengthValidator" /> class.
+        /// </summary>
+        /// <param name="localizedTextService">The localized text service.</param>
         public LengthValidator(ILocalizedTextService localizedTextService)
         {
             _localizedTextService = localizedTextService;
         }
 
-        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration,
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(
+            object? value,
+            string? valueType,
+            object? dataTypeConfiguration,
             PropertyValidationContext validationContext)
         {
             int? maxCharacters = dataTypeConfiguration switch

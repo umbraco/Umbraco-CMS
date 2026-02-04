@@ -4,9 +4,10 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
+// TODO ELEMENTS: rename this to VariantStateHelper or ContentVariantStateHelper (depending on the new name for DocumentVariantState)
 internal static class DocumentVariantStateHelper
 {
-    internal static DocumentVariantState GetState(IContent content, string? culture)
+    internal static DocumentVariantState GetState(IPublishableContentBase content, string? culture)
         => GetState(
             content,
             culture,
@@ -27,6 +28,17 @@ internal static class DocumentVariantStateHelper
             content.CultureNames.Keys,
             content.EditedCultures,
             content.PublishedCultures);
+
+    internal static DocumentVariantState GetState(IElementEntitySlim element, string? culture)
+        => GetState(
+            element,
+            culture,
+            element.Edited,
+            element.Published,
+            element.Trashed,
+            element.CultureNames.Keys,
+            element.EditedCultures,
+            element.PublishedCultures);
 
     private static DocumentVariantState GetState(IEntity entity, string? culture, bool edited, bool published, bool trashed, IEnumerable<string> availableCultures, IEnumerable<string> editedCultures, IEnumerable<string> publishedCultures)
     {

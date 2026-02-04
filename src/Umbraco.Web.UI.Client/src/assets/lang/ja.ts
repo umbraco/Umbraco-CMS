@@ -672,8 +672,8 @@ export default {
 		reset: 'リセット',
 	},
 	rollback: {
-		diffHelp:
-			'現在の版と選択した以前の版との比較を表示します。<br /><del>赤</del> の文字列は以前の版にはない部分で、<ins>緑の文字列は以前の版にのみある部分です。</ins>',
+		diffHelp: '<del>赤いテキスト</del>は選択したバージョンで削除され、<ins>緑のテキスト</ins>が追加されます。',
+		showDiff: '現在の（下書き）バージョンと選択したバージョンの違いを表示。',
 		documentRolledBack: 'ドキュメントは以前の版に戻りました',
 		htmlHelp: '選択した版をhtmlで表示します。２つの版の比較を表示したいときは、Diff を選択してください。',
 		rollbackTo: '以前の版に戻る',

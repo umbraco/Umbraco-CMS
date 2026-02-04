@@ -33,6 +33,28 @@ public abstract class PublishedElementWrapped : IPublishedElement
     /// <inheritdoc />
     public IPublishedProperty? GetProperty(string alias) => _content.GetProperty(alias);
 
+    public int Id => _content.Id;
+
+    public string Name => _content.Name;
+
+    public int SortOrder => _content.SortOrder;
+
+    public int CreatorId => _content.CreatorId;
+
+    public DateTime CreateDate => _content.CreateDate;
+
+    public int WriterId => _content.WriterId;
+
+    public DateTime UpdateDate => _content.UpdateDate;
+
+    public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
+
+    public PublishedItemType ItemType => _content.ItemType;
+
+    public bool IsDraft(string? culture = null) => _content.IsDraft(culture);
+
+    public bool IsPublished(string? culture = null) => _content.IsPublished(culture);
+
     /// <summary>
     ///     Gets the wrapped content.
     /// </summary>

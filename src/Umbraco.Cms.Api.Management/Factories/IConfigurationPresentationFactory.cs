@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
@@ -24,4 +25,6 @@ public interface IConfigurationPresentationFactory
 
     MediaTypeConfigurationResponseModel CreateMediaTypeConfigurationResponseModel()
         => throw new NotImplementedException();
+
+    ElementConfigurationResponseModel CreateElementConfigurationResponseModel();
 }

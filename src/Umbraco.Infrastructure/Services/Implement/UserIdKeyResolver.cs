@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
@@ -9,8 +9,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
-// It's okay that we never clear this, since you can never change a user's key/id
-// and it'll be caught by the services if it doesn't exist.
+/// <summary>
+/// Implements <see cref="IUserIdKeyResolver"/> for resolving user keys to user IDs and vice versa without retrieving full user details.
+/// </summary>
+/// <remarks>
+/// It's okay that we never clear this, since you can never change a user's key/id
+/// and it'll be caught by the services if it doesn't exist.
+/// </remarks>
 internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 {
     private readonly IScopeProvider _scopeProvider;
@@ -19,6 +24,9 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
     private readonly SemaphoreSlim _keytToIdLock = new(1, 1);
     private readonly SemaphoreSlim _idToKeyLock = new(1, 1);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserIdKeyResolver"/> class.
+    /// </summary>
     public UserIdKeyResolver(IScopeProvider scopeProvider) => _scopeProvider = scopeProvider;
 
     /// <inheritdoc/>
@@ -28,6 +36,14 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
     /// <inheritdoc/>
     public async Task<Attempt<int>> TryGetAsync(Guid key)
     {
+        // The super-user Id and key is known, so we don't need a look-up here.
+        if (key == Constants.Security.SuperUserKey)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return Attempt.Succeed(Constants.Security.SuperUserId);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
         if (_keyToId.TryGetValue(key, out int id))
         {
             return Attempt.Succeed(id);
@@ -59,7 +75,6 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 return Attempt.Fail<int>();
             }
 
-
             _keyToId[key] = fetchedId.Value;
             return Attempt.Succeed(fetchedId.Value);
         }
@@ -76,6 +91,14 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
     /// <inheritdoc/>
     public async Task<Attempt<Guid>> TryGetAsync(int id)
     {
+        // The super-user Id and key is known, so we don't need a look-up here.
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (id is Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+        {
+            return Attempt.Succeed(Constants.Security.SuperUserKey);
+        }
+
         if (_idToKey.TryGetValue(id, out Guid key))
         {
             return Attempt.Succeed(key);
@@ -97,7 +120,9 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id == id);
 
-            Guid? fetchedKey = scope.Database.ExecuteScalar<Guid?>(query);
+            // We must use FirstOrDefault over ExecuteScalar when retrieving a nullable Guid, to ensure we go through the full NPoco mapping pipeline.
+            // Without that, though it will succeed on SQLite and SQLServer, it could fail on other database providers.
+            Guid? fetchedKey = scope.Database.FirstOrDefault<Guid?>(query);
             if (fetchedKey is null)
             {
                 return Attempt<Guid>.Fail();

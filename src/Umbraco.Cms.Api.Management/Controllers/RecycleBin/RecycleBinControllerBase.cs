@@ -124,7 +124,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
                 .Build()),
         });
 
-    private IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
+    protected virtual IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
     {
         IEntitySlim[] rootEntities = _entityService
             .GetPagedTrashedChildren(RecycleBinRootKey, ItemObjectType, skip, take, out totalItems)
@@ -133,7 +133,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
         return rootEntities;
     }
 
-    private IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems)
+    protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems)
     {
         IEntitySlim? parent = _entityService.Get(parentKey, ItemObjectType);
         if (parent == null || parent.Trashed == false)
@@ -168,7 +168,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
                 after,
                 out totalBefore,
                 out totalAfter,
-                ordering: Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text)))
+                ordering: Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.TextColumnName))
             .ToArray();
 
     /// <summary>

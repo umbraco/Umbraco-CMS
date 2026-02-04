@@ -42,6 +42,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         var contentRootAccess = contentStartNodeKey is null && userGroup.StartContentId == Constants.System.Root;
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
         var mediaRootAccess = mediaStartNodeKey is null && userGroup.StartMediaId == Constants.System.Root;
+        Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.ElementContainer);
+        var elementRootAccess = elementStartNodeKey is null && userGroup.StartElementId == Constants.System.Root;
 
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
@@ -54,11 +56,14 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Id = userGroup.Key,
             Name = userGroup.Name ?? string.Empty,
+            Description = userGroup.Description ?? string.Empty,
             Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             DocumentRootAccess = contentRootAccess,
             MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
             MediaRootAccess = mediaRootAccess,
+            ElementStartNode = ReferenceByIdModel.ReferenceOrNull(elementStartNodeKey),
+            ElementRootAccess = elementRootAccess,
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
@@ -76,6 +81,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         // TODO figure out how to reuse code from Task<UserGroupResponseModel> CreateAsync(IUserGroup userGroup) instead of copying
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
+        Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.ElementContainer);
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
         if (languageIsoCodesMappingAttempt.Success is false)
@@ -87,9 +93,11 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Id = userGroup.Key,
             Name = userGroup.Name ?? string.Empty,
+            Description = userGroup.Description ?? string.Empty,
             Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
+            ElementStartNode = ReferenceByIdModel.ReferenceOrNull(elementStartNodeKey),
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
@@ -132,6 +140,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Name = CleanUserGroupNameOrAliasForXss(requestModel.Name),
             Alias = CleanUserGroupNameOrAliasForXss(requestModel.Alias),
+            Description = requestModel.Description,
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
             Permissions = requestModel.FallbackPermissions,
@@ -197,6 +206,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         current.Name = CleanUserGroupNameOrAliasForXss(request.Name);
         current.Alias = CleanUserGroupNameOrAliasForXss(request.Alias);
+        current.Description = request.Description;
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
 
@@ -272,6 +282,26 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         else
         {
             target.StartMediaId = null;
+        }
+
+        if (source.ElementStartNode is not null)
+        {
+            var elementId = GetIdFromKey(source.ElementStartNode.Id, UmbracoObjectTypes.ElementContainer);
+
+            if (elementId is null)
+            {
+                return Attempt.Fail(UserGroupOperationStatus.ElementStartNodeKeyNotFound);
+            }
+
+            target.StartElementId = elementId;
+        }
+        else if (source.ElementRootAccess)
+        {
+            target.StartElementId = Constants.System.Root;
+        }
+        else
+        {
+            target.StartElementId = null;
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);

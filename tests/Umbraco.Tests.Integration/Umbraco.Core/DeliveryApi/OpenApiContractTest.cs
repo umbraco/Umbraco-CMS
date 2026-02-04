@@ -24,7 +24,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
     {
         var backOfficePath = HostingEnvironment.GetBackOfficePath();
 
-        var swaggerPath = $"{backOfficePath}/swagger/delivery/swagger.json";
+        var swaggerPath = $"{backOfficePath}/openapi/delivery.json";
 
         var generatedOpenApiContract = await Client.GetStringAsync(swaggerPath);
         var generatedOpenApiJson = JsonNode.Parse(generatedOpenApiContract);
@@ -61,7 +61,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Select all": {},
+                  "Select all": {
+                    "value": ""
+                  },
                   "Select all ancestors of a node by id": {
                     "value": "ancestors:id"
                   },
@@ -93,7 +95,11 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   }
                 },
                 "examples": {
-                  "Default filter": {},
+                  "Default filter": {
+                    "value": [
+                      ""
+                    ]
+                  },
                   "Filter by content type (equals)": {
                     "value": [
                       "contentType:alias1"
@@ -127,7 +133,11 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   }
                 },
                 "examples": {
-                  "Default sort": {},
+                  "Default sort": {
+                    "value": [
+                      ""
+                    ]
+                  },
                   "Sort by create date": {
                     "value": [
                       "createDate:asc",
@@ -188,7 +198,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -301,7 +313,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -330,7 +342,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -439,7 +453,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -468,7 +482,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -577,7 +593,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -608,7 +624,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -717,7 +735,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -759,7 +777,11 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   }
                 },
                 "examples": {
-                  "Default filter": {},
+                  "Default filter": {
+                    "value": [
+                      ""
+                    ]
+                  },
                   "Filter by media type": {
                     "value": [
                       "mediaType:alias1"
@@ -783,7 +805,11 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   }
                 },
                 "examples": {
-                  "Default sort": {},
+                  "Default sort": {
+                    "value": [
+                      ""
+                    ]
+                  },
                   "Sort by create date": {
                     "value": [
                       "createDate:asc",
@@ -838,7 +864,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -900,7 +928,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -929,7 +957,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -984,7 +1014,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -1012,7 +1042,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -1067,7 +1099,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -1098,7 +1130,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
                   "type": "string"
                 },
                 "examples": {
-                  "Expand none": {},
+                  "Expand none": {
+                    "value": ""
+                  },
                   "Expand all properties": {
                     "value": "properties[$all]"
                   },
@@ -1153,7 +1187,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             },
             "security": [
               {
-                "ApiKeyAuth": []
+                "ApiKeyAuth": [ ]
               }
             ]
           }
@@ -1513,7 +1547,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
       },
       "security": [
         {
-          "ApiKeyAuth": []
+          "ApiKeyAuth": [ ]
         }
       ],
       "tags": [

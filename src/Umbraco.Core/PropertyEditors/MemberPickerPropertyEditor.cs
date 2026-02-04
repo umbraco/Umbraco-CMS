@@ -8,19 +8,30 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+///     Represents a property editor for selecting members.
+/// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MemberPicker,
     ValueType = ValueTypes.String,
     ValueEditorIsReusable = true)]
 public class MemberPickerPropertyEditor : DataEditor
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
     public MemberPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
 
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MemberPickerPropertyValueEditor>(Attribute!);
 
+    /// <summary>
+    ///     Provides the value editor for the member picker property editor.
+    /// </summary>
     private sealed class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IMemberService _memberService;

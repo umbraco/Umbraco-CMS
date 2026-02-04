@@ -33,6 +33,8 @@ export class UmbUserGroupServerDataSource
 			aliasCanBeChanged: true,
 			documentRootAccess: false,
 			documentStartNode: null,
+			elementRootAccess: false,
+			elementStartNode: null,
 			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			fallbackPermissions: [],
 			hasAccessToAllLanguages: false,
@@ -45,6 +47,7 @@ export class UmbUserGroupServerDataSource
 			permissions: [],
 			sections: [],
 			unique: UmbId.new(),
+			description: '',
 		};
 
 		return { data };
@@ -85,6 +88,8 @@ export class UmbUserGroupServerDataSource
 			alias: data.alias,
 			documentRootAccess: data.documentRootAccess,
 			documentStartNode: data.documentStartNode ? { unique: data.documentStartNode.id } : null,
+			elementRootAccess: data.elementRootAccess,
+			elementStartNode: data.elementStartNode ? { unique: data.elementStartNode.id } : null,
 			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			fallbackPermissions: data.fallbackPermissions,
 			hasAccessToAllLanguages: data.hasAccessToAllLanguages,
@@ -98,6 +103,7 @@ export class UmbUserGroupServerDataSource
 			permissions,
 			sections: data.sections,
 			unique: data.id,
+			description: data.description ?? null,
 		};
 
 		return { data: userGroup };
@@ -127,6 +133,8 @@ export class UmbUserGroupServerDataSource
 			alias: model.alias,
 			documentRootAccess: model.documentRootAccess,
 			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
+			elementRootAccess: model.elementRootAccess,
+			elementStartNode: model.elementStartNode ? { id: model.elementStartNode.unique } : null,
 			fallbackPermissions: model.fallbackPermissions,
 			hasAccessToAllLanguages: model.hasAccessToAllLanguages,
 			icon: model.icon,
@@ -136,6 +144,7 @@ export class UmbUserGroupServerDataSource
 			name: model.name,
 			permissions,
 			sections: model.sections,
+			description: model.description,
 		};
 
 		const { data, error } = await tryExecute(
@@ -177,6 +186,8 @@ export class UmbUserGroupServerDataSource
 			alias: model.alias,
 			documentRootAccess: model.documentRootAccess,
 			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
+			elementRootAccess: model.elementRootAccess,
+			elementStartNode: model.elementStartNode ? { id: model.elementStartNode.unique } : null,
 			fallbackPermissions: model.fallbackPermissions,
 			hasAccessToAllLanguages: model.hasAccessToAllLanguages,
 			icon: model.icon,
@@ -186,6 +197,7 @@ export class UmbUserGroupServerDataSource
 			name: model.name,
 			permissions,
 			sections: model.sections,
+			description: model.description,
 		};
 
 		const { error } = await tryExecute(

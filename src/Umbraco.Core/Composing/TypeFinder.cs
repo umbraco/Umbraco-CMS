@@ -29,7 +29,7 @@ public class TypeFinder : ITypeFinder
         "DataAnnotationsExtensions,", "DataAnnotationsExtensions.", "Dynamic,", "Examine,", "Examine.",
         "HtmlAgilityPack,", "HtmlAgilityPack.", "HtmlDiff,", "ICSharpCode.", "Iesi.Collections,", // used by NHibernate
         "JetBrains.Annotations,", "LightInject.", // DI
-        "LightInject,", "Lucene.", "Markdown,", "Microsoft.", "MiniProfiler,", "Moq,", "MySql.", "NHibernate,",
+        "LightInject,", "Lucene.", "Markdig,", "Markdown,", "Microsoft.", "MiniProfiler,", "Moq,", "MySql.", "NHibernate,",
         "NHibernate.", "Newtonsoft.", "NPoco,", "NuGet.", "RouteDebugger,", "Semver.", "Serilog.", "Serilog,",
         "ServiceStack.", "SqlCE4Umbraco,", "Superpower,", // used by Serilog
         "System.", "TidyNet,", "TidyNet.", "WebDriver,", "itextsharp,", "mscorlib,", "NUnit,", "NUnit.", "NUnit3.",
@@ -49,6 +49,14 @@ public class TypeFinder : ITypeFinder
     private string[]? _assembliesAcceptingLoadExceptions;
     private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TypeFinder" /> class.
+    /// </summary>
+    /// <param name="logger">The logger instance.</param>
+    /// <param name="assemblyProvider">The assembly provider for discovering assemblies.</param>
+    /// <param name="additionalExlusionAssemblies">Optional additional assembly name prefixes to exclude from scanning.</param>
+    /// <param name="typeFinderConfig">Optional type finder configuration.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="logger" /> is null.</exception>
     public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, string[]? additionalExlusionAssemblies, ITypeFinderConfig? typeFinderConfig = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -79,7 +87,10 @@ public class TypeFinder : ITypeFinder
         }
     }
 
-    // used for benchmark tests
+    /// <summary>
+    /// Gets or sets a value indicating whether to query with referencing assemblies.
+    /// </summary>
+    /// <remarks>Used for benchmark tests.</remarks>
     internal bool QueryWithReferencingAssemblies { get; set; } = true;
 
     private string[] AssembliesAcceptingLoadExceptions
@@ -99,14 +110,7 @@ public class TypeFinder : ITypeFinder
         }
     }
 
-    /// <summary>
-    ///     Finds any classes derived from the assignTypeFrom Type that contain the attribute TAttribute
-    /// </summary>
-    /// <param name="assignTypeFrom"></param>
-    /// <param name="attributeType"></param>
-    /// <param name="assemblies"></param>
-    /// <param name="onlyConcreteClasses"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public IEnumerable<Type> FindClassesOfTypeWithAttribute(
         Type assignTypeFrom,
         Type attributeType,
@@ -115,19 +119,16 @@ public class TypeFinder : ITypeFinder
     {
         IEnumerable<Assembly> assemblyList = assemblies ?? AssembliesToScan;
 
-        return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses,
+        return GetClassesWithBaseType(
+            assignTypeFrom,
+            assemblyList,
+            onlyConcreteClasses,
 
             // the additional filter will ensure that any found types also have the attribute applied.
             t => t.GetCustomAttributes(attributeType, false).Any());
     }
 
-    /// <summary>
-    ///     Returns all types found of in the assemblies specified of type T
-    /// </summary>
-    /// <param name="assignTypeFrom"></param>
-    /// <param name="assemblies"></param>
-    /// <param name="onlyConcreteClasses"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly>? assemblies = null, bool onlyConcreteClasses = true)
     {
         IEnumerable<Assembly> assemblyList = assemblies ?? AssembliesToScan;
@@ -135,13 +136,7 @@ public class TypeFinder : ITypeFinder
         return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses);
     }
 
-    /// <summary>
-    ///     Finds any classes with the attribute.
-    /// </summary>
-    /// <param name="attributeType">The attribute type </param>
-    /// <param name="assemblies">The assemblies.</param>
-    /// <param name="onlyConcreteClasses">if set to <c>true</c> only concrete classes.</param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public IEnumerable<Type> FindClassesWithAttribute(
         Type attributeType,
         IEnumerable<Assembly>? assemblies = null,
@@ -152,11 +147,7 @@ public class TypeFinder : ITypeFinder
         return GetClassesWithAttribute(attributeType, assemblyList, onlyConcreteClasses);
     }
 
-    /// <summary>
-    ///     Returns a Type for the string type name
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public virtual Type? GetTypeByName(string name)
     {
         // NOTE: This will not find types in dynamic assemblies unless those assemblies are already loaded

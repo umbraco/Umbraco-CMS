@@ -15,12 +15,24 @@ using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCo
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
+/// <summary>
+///     Implements <see cref="IMainDomLock"/> using SQL database for distributed lock coordination.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This implementation uses a database row in the KeyValue table to coordinate MainDom
+///         acquisition across multiple application instances in a load-balanced environment.
+///     </para>
+///     <para>
+///         The lock is acquired by inserting or updating a row with a unique identifier. Other
+///         instances poll the database to detect when the current MainDom releases the lock.
+///     </para>
+/// </remarks>
 public class SqlMainDomLock : IMainDomLock
 {
     private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
     private const string UpdatedSuffix = "_updated";
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly IUmbracoDatabase? _db;
     private readonly UmbracoDatabaseFactory _dbFactory;
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly Lock _locker = new();
@@ -31,6 +43,16 @@ public class SqlMainDomLock : IMainDomLock
     private bool _hasTable;
     private bool _mainDomChanging;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SqlMainDomLock"/> class.
+    /// </summary>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="connectionStrings">The connection strings configuration.</param>
+    /// <param name="dbProviderFactoryCreator">The database provider factory creator.</param>
+    /// <param name="mainDomKeyGenerator">The MainDom key generator.</param>
+    /// <param name="databaseSchemaCreatorFactory">The database schema creator factory.</param>
+    /// <param name="npocoMappers">The NPoco mapper collection.</param>
     public SqlMainDomLock(
         ILoggerFactory loggerFactory,
         IOptions<GlobalSettings> globalSettings,
@@ -70,6 +92,7 @@ public class SqlMainDomLock : IMainDomLock
     /// </remarks>
     private string MainDomKey { get; }
 
+    /// <inheritdoc />
     public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
     {
         if (!_dbFactory.Configured)
@@ -133,6 +156,7 @@ public class SqlMainDomLock : IMainDomLock
         return await WaitForExistingAsync(tempId, millisecondsTimeout);
     }
 
+    /// <inheritdoc />
     public Task ListenAsync()
     {
         if (_errorDuringAcquiring)
@@ -396,7 +420,13 @@ public class SqlMainDomLock : IMainDomLock
 
     private bool _disposedValue; // To detect redundant calls
 
-
+    /// <summary>
+    ///     Releases unmanaged and - optionally - managed resources.
+    /// </summary>
+    /// <param name="disposing">
+    ///     <c>true</c> to release both managed and unmanaged resources;
+    ///     <c>false</c> to release only unmanaged resources.
+    /// </param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
@@ -464,7 +494,7 @@ public class SqlMainDomLock : IMainDomLock
         }
     }
 
-    // This code added to correctly implement the disposable pattern.
+    /// <inheritdoc />
     public void Dispose() =>
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);

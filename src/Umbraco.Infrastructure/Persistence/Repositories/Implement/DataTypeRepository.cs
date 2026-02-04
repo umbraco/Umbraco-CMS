@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -30,6 +31,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
     private readonly PropertyEditorCollection _editors;
     private readonly IConfigurationEditorJsonSerializer _serializer;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
+    private readonly DataTypeByGuidReadRepository _dataTypeByGuidReadRepository;
 
     public DataTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -53,11 +55,38 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         _serializer = serializer;
         _dataValueEditorFactory = dataValueEditorFactory;
         _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
+        _dataTypeByGuidReadRepository = new DataTypeByGuidReadRepository(
+            this,
+            scopeAccessor,
+            cache,
+            loggerFactory.CreateLogger<DataTypeByGuidReadRepository>(),
+            repositoryCacheVersionService,
+            cacheSyncService);
     }
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
+    private Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
-    public IDataType? Get(Guid key) => GetMany().FirstOrDefault(x => x.Key == key);
+    public IDataType? Get(Guid key) => _dataTypeByGuidReadRepository.Get(key);
+
+    IEnumerable<IDataType> IReadRepository<Guid, IDataType>.GetMany(params Guid[]? keys) => _dataTypeByGuidReadRepository.GetMany(keys);
+
+    public bool Exists(Guid id) => _dataTypeByGuidReadRepository.Exists(id);
+
+    public override void Save(IDataType entity)
+    {
+        base.Save(entity);
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+        _dataTypeByGuidReadRepository.PopulateCacheByKey(entity);
+    }
+
+    public override void Delete(IDataType entity)
+    {
+        base.Delete(entity);
+
+        // Also clear the GUID cache so subsequent lookups by GUID don't return stale data.
+        _dataTypeByGuidReadRepository.ClearCacheByKey(entity.Key);
+    }
 
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
@@ -224,7 +253,18 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
 
     #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
-    protected override IDataType? PerformGet(int id) => GetMany(id).FirstOrDefault();
+    protected override IDataType? PerformGet(int id)
+    {
+        IDataType? dataType = GetMany(id).FirstOrDefault();
+
+        if (dataType != null)
+        {
+            // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+            _dataTypeByGuidReadRepository.PopulateCacheByKey(dataType);
+        }
+
+        return dataType;
+    }
 
     private string? EnsureUniqueNodeName(string? nodeName, int id = 0)
     {
@@ -273,12 +313,17 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         }
 
         List<DataTypeDto>? dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-        return dtos.Select(x => DataTypeFactory.BuildEntity(
+        IDataType[] dataTypes = dtos.Select(x => DataTypeFactory.BuildEntity(
             x,
             _editors,
             _dataTypeLogger,
             _serializer,
             _dataValueEditorFactory)).ToArray();
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+        _dataTypeByGuidReadRepository.PopulateCacheByKey(dataTypes);
+
+        return dataTypes;
     }
 
     protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -473,6 +518,164 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         Database.Execute(sql);
 
         entity.DeleteDate = DateTime.UtcNow;
+    }
+
+    #endregion
+
+    #region Read Repository implementation for Guid keys
+
+    /// <summary>
+    /// Populates the int-keyed cache with the given entity.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IDataType entity)
+    {
+        if (entity.HasIdentity)
+        {
+            var cacheKey = GetCacheKey(entity.Id);
+            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+        }
+    }
+
+    /// <summary>
+    /// Populates the int-keyed cache with the given entities.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IEnumerable<IDataType> entities)
+    {
+        foreach (IDataType entity in entities)
+        {
+            PopulateCacheById(entity);
+        }
+    }
+
+    private static string GetCacheKey(int id) => RepositoryCacheKeys.GetKey<IDataType>() + id;
+
+    // reading repository purely for looking up by GUID
+    private sealed class DataTypeByGuidReadRepository : EntityRepositoryBase<Guid, IDataType>
+    {
+        private readonly DataTypeRepository _outerRepo;
+
+        public DataTypeByGuidReadRepository(
+            DataTypeRepository outerRepo,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<DataTypeByGuidReadRepository> logger,
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService,
+                cacheSyncService) =>
+            _outerRepo = outerRepo;
+
+        protected override IDataType? PerformGet(Guid id)
+        {
+            Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(false)
+                .Where<NodeDto>(x => x.UniqueId == id);
+
+            DataTypeDto? dto = Database.FirstOrDefault<DataTypeDto>(sql);
+
+            if (dto == null)
+            {
+                return null;
+            }
+
+            IDataType dataType = DataTypeFactory.BuildEntity(
+                dto,
+                _outerRepo._editors,
+                _outerRepo._dataTypeLogger,
+                _outerRepo._serializer,
+                _outerRepo._dataValueEditorFactory);
+
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(dataType);
+
+            return dataType;
+        }
+
+        protected override IEnumerable<IDataType> PerformGetAll(params Guid[]? ids)
+        {
+            Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(false);
+            if (ids?.Length > 0)
+            {
+                sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
+            }
+            else
+            {
+                sql.Where<NodeDto>(x => x.NodeObjectType == _outerRepo.NodeObjectTypeId);
+            }
+
+            List<DataTypeDto>? dtos = Database.Fetch<DataTypeDto>(sql);
+            IDataType[] dataTypes = dtos.Select(x => DataTypeFactory.BuildEntity(
+                x,
+                _outerRepo._editors,
+                _outerRepo._dataTypeLogger,
+                _outerRepo._serializer,
+                _outerRepo._dataValueEditorFactory)).ToArray();
+
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(dataTypes);
+
+            return dataTypes;
+        }
+
+        protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override IEnumerable<string> GetDeleteClauses() =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override void PersistNewItem(IDataType entity) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override void PersistUpdatedItem(IDataType entity) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override string GetBaseWhereClause() =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entity.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(IDataType entity)
+        {
+            if (entity.HasIdentity)
+            {
+                var cacheKey = GetCacheKey(entity.Key);
+                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            }
+        }
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entities.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(IEnumerable<IDataType> entities)
+        {
+            foreach (IDataType entity in entities)
+            {
+                PopulateCacheByKey(entity);
+            }
+        }
+
+        /// <summary>
+        /// Clears the GUID-keyed cache entry for the given key.
+        /// This ensures deleted entities are not returned from the cache.
+        /// </summary>
+        public void ClearCacheByKey(Guid key)
+        {
+            var cacheKey = GetCacheKey(key);
+            IsolatedCache.Clear(cacheKey);
+        }
+
+        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IDataType>() + key;
     }
 
     #endregion

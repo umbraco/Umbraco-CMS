@@ -13,10 +13,15 @@ public class QueuingEventDispatcher : QueuingEventDispatcherBase
 {
     private readonly MediaFileManager _mediaFileManager;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="QueuingEventDispatcher" /> class.
+    /// </summary>
+    /// <param name="mediaFileManager">The media file manager.</param>
     public QueuingEventDispatcher(MediaFileManager mediaFileManager)
         : base(true) =>
         _mediaFileManager = mediaFileManager;
 
+    /// <inheritdoc />
     protected override void ScopeExitCompleted()
     {
         // processing only the last instance of each event...

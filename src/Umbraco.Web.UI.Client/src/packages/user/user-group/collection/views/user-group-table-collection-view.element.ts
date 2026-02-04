@@ -1,6 +1,4 @@
-import { UMB_USER_GROUP_COLLECTION_CONTEXT } from '../user-group-collection.context-token.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
-import type { UmbUserGroupCollectionContext } from '../user-group-collection.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -14,10 +12,12 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 
 import '../components/user-group-table-name-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-group-collection-table-view')
 export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
@@ -32,6 +32,10 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			name: this.localize.term('general_name'),
 			alias: 'userGroupName',
 			elementName: 'umb-user-group-table-name-column-layout',
+		},
+		{
+			name: this.localize.term('general_description'),
+			alias: 'description',
 		},
 		{
 			name: this.localize.term('main_sections'),
@@ -59,7 +63,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	#collectionContext?: UmbUserGroupCollectionContext;
+	#collectionContext?: UmbDefaultCollectionContext;
 
 	// TODO: hardcoded dependencies on document and media modules. We should figure out how these dependencies can be added through extensions.
 	#documentItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
@@ -71,7 +75,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_USER_GROUP_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext?.selection.selection,
@@ -132,6 +136,10 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 						value: {
 							name: userGroup.name,
 						},
+					},
+					{
+						columnAlias: 'description',
+						value: userGroup.description ?? '',
 					},
 					{
 						columnAlias: 'userGroupSections',

@@ -11,6 +11,13 @@ internal sealed class UserTwoFactorLoginService : TwoFactorLoginServiceBase, IUs
 {
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserTwoFactorLoginService" /> class.
+    /// </summary>
+    /// <param name="twoFactorLoginService">The two-factor login service.</param>
+    /// <param name="twoFactorSetupGenerators">The two-factor setup generators.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
     public UserTwoFactorLoginService(
         ITwoFactorLoginService twoFactorLoginService,
         IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,

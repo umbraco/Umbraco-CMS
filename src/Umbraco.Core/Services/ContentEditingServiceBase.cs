@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
@@ -12,6 +14,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Base class for content editing services that provides common functionality for creating, updating,
+/// and managing content entities (documents, media, members).
+/// </summary>
+/// <typeparam name="TContent">The type of content entity.</typeparam>
+/// <typeparam name="TContentType">The type of content type.</typeparam>
+/// <typeparam name="TContentService">The type of content service.</typeparam>
+/// <typeparam name="TContentTypeService">The type of content type service.</typeparam>
 internal abstract class ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
@@ -25,7 +35,24 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly IContentValidationServiceBase<TContentType> _validationService;
     private readonly IRelationService _relationService;
     private readonly ContentTypeFilterCollection _contentTypeFilters;
+    private readonly ILanguageService _languageService;
+    private readonly IUserService _userService;
+    private readonly ILocalizationService _localizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="validationService">The validation service.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
     protected ContentEditingServiceBase(
         TContentService contentService,
         TContentTypeService contentTypeService,
@@ -37,7 +64,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         IContentValidationServiceBase<TContentType> validationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService,
+        ILocalizationService localizationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
@@ -55,24 +85,74 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         ContentService = contentService;
         ContentTypeService = contentTypeService;
         _contentTypeFilters = contentTypeFilters;
+        _languageService = languageService;
+        _userService = userService;
+        _localizationService = localizationService;
     }
 
+    /// <summary>
+    /// Creates a new content entity.
+    /// </summary>
+    /// <param name="name">The name of the content.</param>
+    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="contentType">The content type.</param>
+    /// <returns>A new content entity.</returns>
     protected abstract TContent New(string? name, int parentId, TContentType contentType);
 
+    /// <summary>
+    /// Moves content to a new parent.
+    /// </summary>
+    /// <param name="content">The content to move.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
     protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
 
+    /// <summary>
+    /// Copies content to a new parent.
+    /// </summary>
+    /// <param name="content">The content to copy.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
+    /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The copied content, or null if the operation failed.</returns>
     protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId);
 
+    /// <summary>
+    /// Moves content to the recycle bin.
+    /// </summary>
+    /// <param name="content">The content to move to recycle bin.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
     protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
 
+    /// <summary>
+    /// Deletes content.
+    /// </summary>
+    /// <param name="content">The content to delete.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
     protected abstract OperationResult? Delete(TContent content, int userId);
 
+    /// <summary>
+    /// Gets the current content settings.
+    /// </summary>
     protected ContentSettings ContentSettings { get; private set; }
 
+    /// <summary>
+    /// Gets the core scope provider.
+    /// </summary>
     protected ICoreScopeProvider CoreScopeProvider { get; }
 
+    /// <summary>
+    /// Gets the content service.
+    /// </summary>
     protected TContentService ContentService { get; }
 
+    /// <summary>
+    /// Gets the content type service.
+    /// </summary>
     protected TContentTypeService ContentTypeService { get; }
 
     /// <summary>
@@ -80,6 +160,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// </summary>
     protected virtual string? RelateParentOnDeleteAlias => null;
 
+    /// <summary>
+    /// Maps a content creation model to a new content entity.
+    /// </summary>
+    /// <typeparam name="TContentCreateResult">The type of the creation result.</typeparam>
+    /// <param name="contentCreationModelBase">The content creation model.</param>
+    /// <returns>An attempt containing the creation result and operation status.</returns>
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
@@ -111,6 +197,13 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return Attempt.SucceedWithStatus(validationResult.Status, new TContentCreateResult { Content = content, ValidationResult = validationResult.Result });
     }
 
+    /// <summary>
+    /// Maps a content editing model to an existing content entity for update.
+    /// </summary>
+    /// <typeparam name="TContentUpdateResult">The type of the update result.</typeparam>
+    /// <param name="content">The existing content entity to update.</param>
+    /// <param name="contentEditingModelBase">The content editing model.</param>
+    /// <returns>An attempt containing the update result and operation status.</returns>
     protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
         where TContentUpdateResult : ContentUpdateResultBase<TContent>, new()
     {
@@ -131,9 +224,36 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationResult = validationResult.Result });
     }
 
+    /// <summary>
+    /// Validates the cultures in the content editing model.
+    /// </summary>
+    /// <param name="contentEditingModelBase">The content editing model to validate.</param>
+    /// <returns><c>true</c> if all cultures are valid; otherwise, <c>false</c>.</returns>
     protected async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
         => await _validationService.ValidateCulturesAsync(contentEditingModelBase);
 
+    protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey,
+        IEnumerable<string?>? cultures,
+        Guid userKey)
+    {
+        if (await ValidateCulturesAsync(contentEditingModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult());
+        }
+
+        IEnumerable<string?>? culturesToValidate = await GetCulturesToValidate(cultures, userKey);
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
+    }
+
+    /// <summary>
+    /// Validates the properties in the content editing model against the content type.
+    /// </summary>
+    /// <param name="contentEditingModelBase">The content editing model to validate.</param>
+    /// <param name="contentTypeKey">The content type key.</param>
+    /// <param name="culturesToValidate">Optional cultures to restrict validation to.</param>
+    /// <returns>An attempt containing the validation result and operation status.</returns>
     protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
         Guid contentTypeKey,
@@ -159,16 +279,49 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
     }
 
+    protected async Task<IEnumerable<string?>?> GetCulturesToValidate(IEnumerable<string?>? cultures, Guid userKey)
+    {
+        // Cultures to validate can be provided by the calling code, but if the editor is restricted to only have
+        // access to certain languages, we don't want to validate by any they aren't allowed to edit.
+        HashSet<string> allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        if (cultures == null)
+        {
+            // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
+            // should only validate the ones they do.
+            IEnumerable<string> allCultures = await _languageService.GetAllIsoCodesAsync();
+            return allowedCultures.Count == allCultures.Count() ? null : allowedCultures;
+        }
+
+        // If explicit cultures are provided, we should only validate the ones the user has access to.
+        return cultures.Where(x => !string.IsNullOrEmpty(x) && allowedCultures.Contains(x)).ToList();
+    }
+
+    /// <summary>
+    /// Handles moving content to the recycle bin.
+    /// </summary>
+    /// <param name="key">The content key.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <returns>An attempt containing the content and operation status.</returns>
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key,
+        => await HandleDeletionAsync(
+                key,
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
                 MoveToRecycleBin,
                 ContentSettings.DisableUnpublishWhenReferenced,
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
+    /// <summary>
+    /// Handles deleting content.
+    /// </summary>
+    /// <param name="key">The content key.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <param name="mustBeTrashed">Whether the content must be in the recycle bin to be deleted.</param>
+    /// <returns>An attempt containing the content and operation status.</returns>
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
-        => await HandleDeletionAsync(key,
+        => await HandleDeletionAsync(
+                key,
                 userKey,
                 mustBeTrashed
                     ? ContentTrashStatusRequirement.MustBeTrashed
@@ -238,6 +391,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return OperationResultToAttempt(content, deleteResult);
     }
 
+    /// <summary>
+    /// Handles moving content to a new parent.
+    /// </summary>
+    /// <param name="key">The content key.</param>
+    /// <param name="parentKey">The new parent key, or null for root.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <param name="mustBeInRecycleBin">Whether the content must be in the recycle bin (for restore operations).</param>
+    /// <returns>An attempt containing the content and operation status.</returns>
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
@@ -286,6 +447,15 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return OperationResultToAttempt(content, moveResult);
     }
 
+    /// <summary>
+    /// Handles copying content to a new parent.
+    /// </summary>
+    /// <param name="key">The content key to copy.</param>
+    /// <param name="parentKey">The new parent key, or null for root.</param>
+    /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
+    /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <returns>An attempt containing the copied content and operation status.</returns>
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
@@ -322,6 +492,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             : Attempt.FailWithStatus(operationStatus, content);
     }
 
+    /// <summary>
+    /// Converts an operation result to a content editing operation status.
+    /// </summary>
+    /// <param name="operationResult">The operation result to convert.</param>
+    /// <returns>The corresponding content editing operation status.</returns>
     protected ContentEditingOperationStatus OperationResultToOperationStatus(OperationResult? operationResult)
         => operationResult?.Result switch
         {
@@ -334,6 +509,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             _ => ContentEditingOperationStatus.Unknown
         };
 
+    /// <summary>
+    /// Gets the user ID from the user key.
+    /// </summary>
+    /// <param name="userKey">The user key.</param>
+    /// <returns>The user ID.</returns>
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
     private TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
@@ -400,6 +580,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return contentType;
     }
 
+    /// <summary>
+    /// Attempts to get and validate the parent ID for content creation or move operations.
+    /// </summary>
+    /// <param name="parentKey">The parent key, or null for root.</param>
+    /// <param name="contentType">The content type being created or moved.</param>
+    /// <returns>A tuple containing the parent ID (if valid) and the operation status.</returns>
     protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
@@ -577,6 +763,16 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     private static Dictionary<string, IPropertyType> GetPropertyTypesByAlias(TContentType contentType)
         => contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
+
+    protected async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
+    {
+        IUser user = await _userService.GetAsync(userKey)
+                      ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
+
+        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
+
+        return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+    }
 
     /// <summary>
     /// Should never be made public, serves the purpose of a nullable bool but more readable.

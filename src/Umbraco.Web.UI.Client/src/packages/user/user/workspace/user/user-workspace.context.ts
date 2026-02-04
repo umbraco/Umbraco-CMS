@@ -30,6 +30,12 @@ export class UmbUserWorkspaceContext
 	readonly hasDocumentRootAccess = this._data.createObservablePartOfCurrent(
 		(data) => data?.hasDocumentRootAccess || false,
 	);
+	readonly elementStartNodeUniques = this._data.createObservablePartOfCurrent(
+		(data) => data?.elementStartNodeUniques || [],
+	);
+	readonly hasElementRootAccess = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasElementRootAccess || false,
+	);
 	readonly mediaStartNodeUniques = this._data.createObservablePartOfCurrent(
 		(data) => data?.mediaStartNodeUniques || [],
 	);
@@ -109,10 +115,10 @@ export class UmbUserWorkspaceContext
 		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
-	deleteAvatar() {
+	async deleteAvatar() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
-		return this.avatarRepository.deleteAvatar(unique);
+		await this.avatarRepository.deleteAvatar(unique);
 	}
 
 	override destroy(): void {

@@ -2,42 +2,148 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains constants for built-in Umbraco data types.
+    /// </summary>
     public static class DataTypes
     {
         // NOTE: unfortunately due to backwards compat we can't move/rename these, with the addition of the GUID
         // constants, it would make more sense to have these suffixed with "ID" or in a Subclass called "INT", for
         // now all we can do is make a subclass called Guids to put the GUID IDs.
+
+        /// <summary>
+        ///     The integer ID for the Label (string) data type.
+        /// </summary>
         public const int LabelString = System.DefaultLabelDataTypeId;
+
+        /// <summary>
+        ///     The integer ID for the Label (integer) data type.
+        /// </summary>
         public const int LabelInt = -91;
+
+        /// <summary>
+        ///     The integer ID for the Label (big integer) data type.
+        /// </summary>
         public const int LabelBigint = -93;
+
+        /// <summary>
+        ///     The integer ID for the Label (date/time) data type.
+        /// </summary>
         public const int LabelDateTime = -94;
+
+        /// <summary>
+        ///     The integer ID for the Label (time) data type.
+        /// </summary>
         public const int LabelTime = -98;
+
+        /// <summary>
+        ///     The integer ID for the Label (decimal) data type.
+        /// </summary>
         public const int LabelDecimal = -99;
+
+        /// <summary>
+        ///     The integer ID for the Label (bytes) data type.
+        /// </summary>
         public const int LabelBytes = -104;
+
+        /// <summary>
+        ///     The integer ID for the Label (pixels) data type.
+        /// </summary>
         public const int LabelPixels = -105;
 
+        /// <summary>
+        ///     The integer ID for the Textarea data type.
+        /// </summary>
         public const int Textarea = -89;
+
+        /// <summary>
+        ///     The integer ID for the Textbox data type.
+        /// </summary>
         public const int Textbox = -88;
+
+        /// <summary>
+        ///     The integer ID for the Rich Text Editor data type.
+        /// </summary>
         public const int RichtextEditor = -87;
+
+        /// <summary>
+        ///     The integer ID for the Boolean (True/False) data type.
+        /// </summary>
         public const int Boolean = -49;
+
+        /// <summary>
+        ///     The integer ID for the Date/Time data type.
+        /// </summary>
         public const int DateTime = -36;
+
+        /// <summary>
+        ///     The integer ID for the Dropdown (single select) data type.
+        /// </summary>
         public const int DropDownSingle = -39;
+
+        /// <summary>
+        ///     The integer ID for the Dropdown (multiple select) data type.
+        /// </summary>
         public const int DropDownMultiple = -42;
+
+        /// <summary>
+        ///     The integer ID for the Upload (file) data type.
+        /// </summary>
         public const int Upload = -90;
+
+        /// <summary>
+        ///     The integer ID for the Upload (video) data type.
+        /// </summary>
         public const int UploadVideo = -100;
+
+        /// <summary>
+        ///     The integer ID for the Upload (audio) data type.
+        /// </summary>
         public const int UploadAudio = -101;
+
+        /// <summary>
+        ///     The integer ID for the Upload (article) data type.
+        /// </summary>
         public const int UploadArticle = -102;
+
+        /// <summary>
+        ///     The integer ID for the Upload (vector graphics) data type.
+        /// </summary>
         public const int UploadVectorGraphics = -103;
 
+        /// <summary>
+        ///     The integer ID for the default content list view data type.
+        /// </summary>
         public const int DefaultContentListView = -95;
+
+        /// <summary>
+        ///     The integer ID for the default media list view data type.
+        /// </summary>
         public const int DefaultMediaListView = -96;
+
+        /// <summary>
+        ///     The integer ID for the default members list view data type.
+        /// </summary>
         public const int DefaultMembersListView = -97;
 
+        /// <summary>
+        ///     The integer ID for the Image Cropper data type.
+        /// </summary>
         public const int ImageCropper = 1043;
+
+        /// <summary>
+        ///     The integer ID for the Tags data type.
+        /// </summary>
         public const int Tags = 1041;
 
+        /// <summary>
+        ///     Contains reserved pre-value keys used by data types.
+        /// </summary>
         public static class ReservedPreValueKeys
         {
+            /// <summary>
+            ///     The pre-value key for ignoring user start nodes.
+            /// </summary>
             public const string IgnoreUserStartNodes = "ignoreUserStartNodes";
         }
 
@@ -84,7 +190,8 @@ public static partial class Constants
             /// <summary>
             ///     Guid for Member as string
             /// </summary>
-            public const string Member = "d59be02f-1df9-4228-aa1e-01917d806cda";
+            [Obsolete("Use the constant defined in Umbraco.Core.Constants.MemberTypes.Guids.Member. Scheduled for removal in Umbraco 19.")]
+            public const string Member = MemberTypes.Guids.Member;
 
             /// <summary>
             ///     Guid for Image Cropper as string
@@ -274,6 +381,7 @@ public static partial class Constants
             /// <summary>
             ///     Guid for Member
             /// </summary>
+            [Obsolete("Use the constant defined in Umbraco.Core.Constants.MemberTypes.Guids.MemberGuid. Scheduled for removal in Umbraco 19.")]
             public static readonly Guid MemberGuid = new(Member);
 
             /// <summary>

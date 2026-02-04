@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.DeliveryApi;
+namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Defines a service that handles routing for Delivery API requests.
+/// </summary>
 public interface IRequestRoutingService
 {
     /// <summary>

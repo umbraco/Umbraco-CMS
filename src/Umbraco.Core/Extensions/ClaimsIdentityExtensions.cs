@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="ClaimsIdentity"/> and <see cref="IIdentity"/>.
+/// </summary>
 public static class ClaimsIdentityExtensions
 {
     private static string? _authenticationType;
@@ -37,6 +40,12 @@ public static class ClaimsIdentityExtensions
         ClaimTypes.Locality, Constants.Security.SecurityStampClaimType,
     };
 
+    /// <summary>
+    /// Gets the user ID from the identity, converted to the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type to convert the user ID to.</typeparam>
+    /// <param name="identity">The identity.</param>
+    /// <returns>The user ID converted to the specified type, or the default value if not found or conversion fails.</returns>
     public static T? GetUserId<T>(this IIdentity identity)
     {
         var strId = identity.GetUserId();
@@ -119,6 +128,12 @@ public static class ClaimsIdentityExtensions
         return username;
     }
 
+    /// <summary>
+    /// Gets the email address from the identity.
+    /// </summary>
+    /// <param name="identity">The identity.</param>
+    /// <returns>The email address if found; otherwise, null.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when identity is null.</exception>
     public static string? GetEmail(this IIdentity identity)
     {
         if (identity == null)
@@ -248,38 +263,6 @@ public static class ClaimsIdentityExtensions
                 identity));
         }
 
-        // NOTE: this can be removed when the obsolete claim type has been deleted
-        if (identity.HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false &&
-            startContentNodes != null)
-        {
-            foreach (var startContentNode in startContentNodes)
-            {
-                identity.AddClaim(new Claim(
-                    Constants.Security.StartContentNodeIdClaimType,
-                    startContentNode.ToInvariantString(),
-                    ClaimValueTypes.Integer32,
-                    AuthenticationType,
-                    AuthenticationType,
-                    identity));
-            }
-        }
-
-        // NOTE: this can be removed when the obsolete claim type has been deleted
-        if (identity.HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false &&
-            startMediaNodes != null)
-        {
-            foreach (var startMediaNode in startMediaNodes)
-            {
-                identity.AddClaim(new Claim(
-                    Constants.Security.StartMediaNodeIdClaimType,
-                    startMediaNode.ToInvariantString(),
-                    ClaimValueTypes.Integer32,
-                    AuthenticationType,
-                    AuthenticationType,
-                    identity));
-            }
-        }
-
         if (identity.HasClaim(x => x.Type == ClaimTypes.Locality) == false)
         {
             identity.AddClaim(new Claim(
@@ -303,22 +286,6 @@ public static class ClaimsIdentityExtensions
                 identity));
         }
 
-        // Add each app as a separate claim
-        // NOTE: this can be removed when the obsolete claim type has been deleted
-        if (identity.HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
-        {
-            foreach (var application in allowedApps)
-            {
-                identity.AddClaim(new Claim(
-                    Constants.Security.AllowedApplicationsClaimType,
-                    application,
-                    ClaimValueTypes.String,
-                    AuthenticationType,
-                    AuthenticationType,
-                    identity));
-            }
-        }
-
         // Claims are added by the ClaimsIdentityFactory because our UserStore supports roles, however this identity might
         // not be made with that factory if it was created with a different ticket so perform the check
         if (identity.HasClaim(x => x.Type == ClaimsIdentity.DefaultRoleClaimType) == false && roles != null)
@@ -336,43 +303,6 @@ public static class ClaimsIdentityExtensions
             }
         }
     }
-
-
-
-    /// <summary>
-    ///     Get the start content nodes from a ClaimsIdentity
-    /// </summary>
-    /// <param name="identity"></param>
-    /// <returns>Array of start content nodes</returns>
-    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
-    public static int[] GetStartContentNodes(this ClaimsIdentity identity) =>
-        identity.FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType)
-            .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
-                ? i
-                : default)
-            .Where(x => x != default).ToArray();
-
-    /// <summary>
-    ///     Get the start media nodes from a ClaimsIdentity
-    /// </summary>
-    /// <param name="identity"></param>
-    /// <returns>Array of start media nodes</returns>
-    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
-    public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
-        identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
-            .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
-                ? i
-                : default)
-            .Where(x => x != default).ToArray();
-
-    /// <summary>
-    ///     Get the allowed applications from a ClaimsIdentity
-    /// </summary>
-    /// <param name="identity"></param>
-    /// <returns></returns>
-    [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
-    public static string[] GetAllowedApplications(this ClaimsIdentity identity) => identity
-        .FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray();
 
     /// <summary>
     ///     Get the user ID from a ClaimsIdentity

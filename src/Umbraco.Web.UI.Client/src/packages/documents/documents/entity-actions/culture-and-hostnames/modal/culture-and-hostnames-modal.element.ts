@@ -103,7 +103,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	}
 
 	async #requestLanguages() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({});
+		const { data } = await this.#languageCollectionRepository.requestCollection({ take: 999 });
 		// Set to empty array if no data, to indicate loading is complete
 		this._languageModel = data?.items ?? [];
 	}

@@ -10,11 +10,30 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Implements the <see cref="IMediaEditingService"/> for creating, updating, deleting,
+///     and managing <see cref="IMedia"/> items through the editing API.
+/// </summary>
 internal sealed class MediaEditingService
     : ContentEditingServiceWithSortingBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
     private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaEditingService"/> class.
+    /// </summary>
+    /// <param name="contentService">The <see cref="IMediaService"/> for media operations.</param>
+    /// <param name="contentTypeService">The <see cref="IMediaTypeService"/> for media type operations.</param>
+    /// <param name="propertyEditorCollection">The collection of property editors.</param>
+    /// <param name="dataTypeService">The <see cref="IDataTypeService"/> for data type operations.</param>
+    /// <param name="logger">The logger for this service.</param>
+    /// <param name="scopeProvider">The <see cref="ICoreScopeProvider"/> for database scope management.</param>
+    /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
+    /// <param name="treeEntitySortingService">The <see cref="ITreeEntitySortingService"/> for sorting operations.</param>
+    /// <param name="mediaValidationService">The <see cref="IMediaValidationService"/> for media validation.</param>
+    /// <param name="optionsMonitor">The options monitor for <see cref="ContentSettings"/>.</param>
+    /// <param name="relationService">The <see cref="IRelationService"/> for relation operations.</param>
+    /// <param name="contentTypeFilters">The collection of content type filters.</param>
     public MediaEditingService(
         IMediaService contentService,
         IMediaTypeService contentTypeService,
@@ -27,7 +46,10 @@ internal sealed class MediaEditingService
         IMediaValidationService mediaValidationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService,
+        ILocalizationService localizationService)
         : base(
             contentService,
             contentTypeService,
@@ -40,18 +62,23 @@ internal sealed class MediaEditingService
             treeEntitySortingService,
             optionsMonitor,
             relationService,
-            contentTypeFilters)
+            contentTypeFilters,
+            languageService,
+            userService,
+            localizationService)
         => _logger = logger;
 
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
 
+    /// <inheritdoc />
     public Task<IMedia?> GetAsync(Guid key)
     {
         IMedia? media = ContentService.GetById(key);
         return Task.FromResult(media);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MediaUpdateModel updateModel)
     {
         IMedia? media = ContentService.GetById(key);
@@ -60,9 +87,11 @@ internal sealed class MediaEditingService
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MediaCreateModel createModel)
         => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
 
+    /// <inheritdoc />
     public async Task<Attempt<MediaCreateResult, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
     {
         Attempt<MediaCreateResult, ContentEditingOperationStatus> result = await MapCreate<MediaCreateResult>(createModel);
@@ -91,6 +120,7 @@ internal sealed class MediaEditingService
             : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<MediaUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, MediaUpdateModel updateModel, Guid userKey)
     {
         IMedia? media = ContentService.GetById(key);
@@ -117,42 +147,56 @@ internal sealed class MediaEditingService
             : Attempt.FailWithStatus(operationStatus, new MediaUpdateResult { Content = media });
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
         => await HandleMoveToRecycleBinAsync(key, userKey);
 
+    /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey,false);
 
+    /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, true);
 
+    /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
 
+    /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey, true);
 
+    /// <inheritdoc />
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
+    /// <inheritdoc />
     protected override IMedia New(string? name, int parentId, IMediaType mediaType)
         => new Models.Media(name, parentId, mediaType);
 
+    /// <inheritdoc />
     protected override OperationResult? Move(IMedia media, int newParentId, int userId)
         => ContentService.Move(media, newParentId, userId).Result;
 
+    /// <inheritdoc />
+    /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>
     protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => throw new NotSupportedException("Copy is not supported for media");
 
+    /// <inheritdoc />
     protected override OperationResult? MoveToRecycleBin(IMedia media, int userId)
         => ContentService.MoveToRecycleBin(media, userId).Result;
 
+    /// <inheritdoc />
     protected override OperationResult? Delete(IMedia media, int userId)
         => ContentService.Delete(media, userId).Result;
 
+    /// <inheritdoc />
     protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
         => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
 
+    /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IMedia> items, int userId)
     {
         bool result = ContentService.Sort(items, userId);
@@ -161,6 +205,12 @@ internal sealed class MediaEditingService
             : ContentEditingOperationStatus.CancelledByNotification;
     }
 
+    /// <summary>
+    ///     Saves a media item to the repository.
+    /// </summary>
+    /// <param name="media">The <see cref="IMedia"/> item to save.</param>
+    /// <param name="userId">The identifier of the user performing the save operation.</param>
+    /// <returns>A <see cref="ContentEditingOperationStatus"/> indicating the outcome of the save operation.</returns>
     private ContentEditingOperationStatus Save(IMedia media, int userId)
     {
         try
@@ -172,6 +222,7 @@ internal sealed class MediaEditingService
                 OperationResultType.Success => ContentEditingOperationStatus.Success,
                 OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
                 OperationResultType.FailedDuplicateKey => ContentEditingOperationStatus.DuplicateKey,
+                OperationResultType.FailedInvalidKey => ContentEditingOperationStatus.InvalidKey,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
                 _ => ContentEditingOperationStatus.Unknown

@@ -15,6 +15,10 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IPublishedContent"/> to navigate content trees,
+/// access properties, and retrieve related content such as ancestors, descendants, siblings, and children.
+/// </summary>
 public static class PublishedContentExtensions
 {
     #region Name
@@ -28,7 +32,7 @@ public static class PublishedContentExtensions
     ///     The specific culture to get the name for. If null is used the current culture is used (Default is
     ///     null).
     /// </param>
-    public static string Name(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
+    public static string Name(this IPublishedElement content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
         if (content == null)
         {
@@ -267,9 +271,26 @@ public static class PublishedContentExtensions
         return template?.Alias ?? string.Empty;
     }
 
+    /// <summary>
+    /// Determines whether a specific template is allowed for the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="webRoutingSettings">The web routing settings.</param>
+    /// <param name="templateId">The template identifier.</param>
+    /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
     public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, WebRoutingSettings webRoutingSettings, int templateId) =>
         content.IsAllowedTemplate(contentTypeService, webRoutingSettings.DisableAlternativeTemplates, webRoutingSettings.ValidateAlternativeTemplates, templateId);
 
+    /// <summary>
+    /// Determines whether a specific template is allowed for the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="disableAlternativeTemplates">Whether alternative templates are disabled.</param>
+    /// <param name="validateAlternativeTemplates">Whether to validate alternative templates against allowed templates.</param>
+    /// <param name="templateId">The template identifier.</param>
+    /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
     public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, int templateId)
     {
         if (disableAlternativeTemplates)
@@ -292,6 +313,16 @@ public static class PublishedContentExtensions
         return publishedContentContentType.IsAllowedTemplate(templateId);
     }
 
+    /// <summary>
+    /// Determines whether a specific template is allowed for the content item by template alias.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="fileService">The file service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="disableAlternativeTemplates">Whether alternative templates are disabled.</param>
+    /// <param name="validateAlternativeTemplates">Whether to validate alternative templates against allowed templates.</param>
+    /// <param name="templateAlias">The template alias.</param>
+    /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
     public static bool IsAllowedTemplate(this IPublishedContent content, IFileService fileService, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, string templateAlias)
     {
         ITemplate? template = fileService.GetTemplate(templateAlias);
@@ -443,8 +474,20 @@ public static class PublishedContentExtensions
 
     #region IsSomething: equality
 
+    /// <summary>
+    /// Determines whether this content item is equal to another content item by comparing their IDs.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The other content item to compare.</param>
+    /// <returns><c>true</c> if both content items have the same ID; otherwise, <c>false</c>.</returns>
     public static bool IsEqual(this IPublishedContent content, IPublishedContent other) => content.Id == other.Id;
 
+    /// <summary>
+    /// Determines whether this content item is not equal to another content item by comparing their IDs.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The other content item to compare.</param>
+    /// <returns><c>true</c> if the content items have different IDs; otherwise, <c>false</c>.</returns>
     public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other) =>
         content.IsEqual(other) == false;
 
@@ -452,15 +495,39 @@ public static class PublishedContentExtensions
 
     #region IsSomething: ancestors and descendants
 
+    /// <summary>
+    /// Determines whether this content item is a descendant of another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential ancestor content item.</param>
+    /// <returns><c>true</c> if this content is a descendant of the other; otherwise, <c>false</c>.</returns>
     public static bool IsDescendant(this IPublishedContent content, IPublishedContent other) =>
         other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
 
+    /// <summary>
+    /// Determines whether this content item is a descendant of or the same as another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential ancestor or same content item.</param>
+    /// <returns><c>true</c> if this content is a descendant of or equal to the other; otherwise, <c>false</c>.</returns>
     public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other) =>
         content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
 
+    /// <summary>
+    /// Determines whether this content item is an ancestor of another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential descendant content item.</param>
+    /// <returns><c>true</c> if this content is an ancestor of the other; otherwise, <c>false</c>.</returns>
     public static bool IsAncestor(this IPublishedContent content, IPublishedContent other) =>
         content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
 
+    /// <summary>
+    /// Determines whether this content item is an ancestor of or the same as another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential descendant or same content item.</param>
+    /// <returns><c>true</c> if this content is an ancestor of or equal to the other; otherwise, <c>false</c>.</returns>
     public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other) =>
         other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
 
@@ -571,7 +638,8 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="publishedStatusFilteringService"></param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishedStatusFilteringService">The service for filtering published content by status.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>
     ///     The ancestors of the content, at a level lesser or equal to the specified level, and of the specified
@@ -871,6 +939,15 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.AncestorsOrSelf<T>(navigationQueryService, publishedStatusFilteringService, maxLevel).FirstOrDefault();
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item, optionally filtered by a predicate.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="orSelf">Whether to include the content item itself.</param>
+    /// <param name="func">An optional predicate to filter the ancestors.</param>
+    /// <returns>An enumerable of ancestors or self matching the criteria.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -984,6 +1061,15 @@ public static class PublishedContentExtensions
     // - every node occurs before all of its children and descendants.
     // - the relative order of siblings is the order in which they occur in the children property of their parent node.
     // - children and descendants occur before following siblings.
+
+    /// <summary>
+    /// Gets all descendants of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of all descendant content items.</returns>
     public static IEnumerable<IPublishedContent> Descendants(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -991,6 +1077,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, false, null, culture);
 
+    /// <summary>
+    /// Gets all descendants of the content item at or above a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level of descendants to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items at or above the specified level.</returns>
     public static IEnumerable<IPublishedContent> Descendants(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1004,6 +1099,15 @@ public static class PublishedContentExtensions
             p => p.Level >= level,
             culture);
 
+    /// <summary>
+    /// Gets all descendants of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items of the specified type.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1017,6 +1121,15 @@ public static class PublishedContentExtensions
             false,
             contentTypeAlias);
 
+    /// <summary>
+    /// Gets all descendants of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items of the specified type.</returns>
     public static IEnumerable<T> Descendants<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1025,6 +1138,16 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Descendants(navigationQueryService, publishedStatusFilteringService, culture).OfType<T>();
 
+    /// <summary>
+    /// Gets all descendants of the content item of a specific type at or above a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level of descendants to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items of the specified type at or above the level.</returns>
     public static IEnumerable<T> Descendants<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1034,6 +1157,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Descendants(navigationQueryService, publishedStatusFilteringService, level, culture).OfType<T>();
 
+    /// <summary>
+    /// Gets all descendants of the content item including itself.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and all its descendants.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1041,6 +1172,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, true, null, culture);
 
+    /// <summary>
+    /// Gets all descendants of the content item including itself at or above a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and all its descendants at or above the level.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1049,6 +1189,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, true, p => p.Level >= level, culture);
 
+    /// <summary>
+    /// Gets all descendants of the content item including itself of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and its descendants of the specified type.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1062,6 +1211,15 @@ public static class PublishedContentExtensions
             true,
             contentTypeAlias);
 
+    /// <summary>
+    /// Gets all descendants of the content item including itself of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and its descendants of the specified type.</returns>
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1070,6 +1228,16 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, culture).OfType<T>();
 
+    /// <summary>
+    /// Gets all descendants of the content item including itself of a specific type at or above a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and its descendants of the specified type at or above the level.</returns>
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1079,6 +1247,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, level, culture).OfType<T>();
 
+    /// <summary>
+    /// Gets the first descendant of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant, or null if none exists.</returns>
     public static IPublishedContent? Descendant(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1086,6 +1262,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.Children(navigationQueryService, publishedStatusFilteringService, culture)?.FirstOrDefault();
 
+    /// <summary>
+    /// Gets the first descendant of the content item at a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant at the specified level, or null if none exists.</returns>
     public static IPublishedContent? Descendant(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1096,6 +1281,15 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, false, culture)
             .FirstOrDefault(x => x.Level == level);
 
+    /// <summary>
+    /// Gets the first descendant of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant of the specified type, or null if none exists.</returns>
     public static IPublishedContent? DescendantOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1111,6 +1305,15 @@ public static class PublishedContentExtensions
                 contentTypeAlias)
             .FirstOrDefault();
 
+    /// <summary>
+    /// Gets the first descendant of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant of the specified type, or null if none exists.</returns>
     public static T? Descendant<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1121,6 +1324,16 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, false, culture)
             .FirstOrDefault(x => x is T) as T;
 
+    /// <summary>
+    /// Gets the first descendant of the content item of a specific type at a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant of the specified type at the level, or null if none exists.</returns>
     public static T? Descendant<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1130,6 +1343,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Descendant(navigationQueryService, publishedStatusFilteringService, level, culture) as T;
 
+    /// <summary>
+    /// Gets the first descendant or self of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant, or the content item itself if no descendants exist.</returns>
     public static IPublishedContent DescendantOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1143,6 +1364,15 @@ public static class PublishedContentExtensions
             .FirstOrDefault() ??
         content;
 
+    /// <summary>
+    /// Gets the first descendant or self of the content item at a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self at the specified level, or null if none exists.</returns>
     public static IPublishedContent? DescendantOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1153,6 +1383,15 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, true, culture)
             .FirstOrDefault(x => x.Level == level);
 
+    /// <summary>
+    /// Gets the first descendant or self of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self of the specified type, or null if none exists.</returns>
     public static IPublishedContent? DescendantOrSelfOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1168,6 +1407,15 @@ public static class PublishedContentExtensions
                 contentTypeAlias)
             .FirstOrDefault();
 
+    /// <summary>
+    /// Gets the first descendant or self of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self of the specified type, or null if none exists.</returns>
     public static T? DescendantOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1178,6 +1426,16 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, true, culture)
             .FirstOrDefault(x => x is T) as T;
 
+    /// <summary>
+    /// Gets the first descendant or self of the content item of a specific type at a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self of the specified type at the level, or null if none exists.</returns>
     public static T? DescendantOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1225,13 +1483,12 @@ public static class PublishedContentExtensions
     ///     Gets the children of the content item.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishedStatusFilteringService"></param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
     /// <param name="culture">
     ///     The specific culture to get the URL children for. Default is null which will use the current culture in
     ///     <see cref="VariationContext" />
     /// </param>
-    /// <param name="publishedCache"></param>
     /// <remarks>
     ///     <para>Gets children that are available for the specified culture.</para>
     ///     <para>Children are sorted by their sortOrder.</para>
@@ -1260,14 +1517,13 @@ public static class PublishedContentExtensions
     ///     Gets the children of the content, filtered by a predicate.
     /// </summary>
     /// <param name="content">The content.</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishedStatusFilteringService"></param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
     /// <param name="predicate">The predicate.</param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
-    /// <param name="publishedCache"></param>
     /// <returns>The children of the content, filtered by the predicate.</returns>
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
@@ -1307,14 +1563,12 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="variationContextAccessor">The accessor for the VariationContext</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishStatusQueryService"></param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishedStatusFilteringService">The service for filtering published content by status.</param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
-    /// <param name="publishedCache"></param>
     /// <returns>The children of content, of the given content type.</returns>
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
@@ -1327,6 +1581,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Children(navigationQueryService, publishedStatusFilteringService, culture).OfType<T>();
 
+    /// <summary>
+    /// Gets the first child of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child, or null if no children exist.</returns>
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1349,6 +1611,15 @@ public static class PublishedContentExtensions
             .ChildrenOfType(navigationQueryService, publishedStatusFilteringService, contentTypeAlias, culture)
             .FirstOrDefault();
 
+    /// <summary>
+    /// Gets the first child of the content item that matches a predicate.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="predicate">The predicate to filter children.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child matching the predicate, or null if none exists.</returns>
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1359,6 +1630,15 @@ public static class PublishedContentExtensions
             .Children(navigationQueryService, publishedStatusFilteringService, predicate, culture)
             .FirstOrDefault();
 
+    /// <summary>
+    /// Gets the first child of the content item with a specific unique identifier.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="uniqueId">The unique identifier of the child to find.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child with the specified unique identifier, or null if none exists.</returns>
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1369,6 +1649,15 @@ public static class PublishedContentExtensions
             .Children(navigationQueryService, publishedStatusFilteringService, x => x.Key == uniqueId, culture)
             .FirstOrDefault();
 
+    /// <summary>
+    /// Gets the first child of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child of the specified type, or null if none exists.</returns>
     public static T? FirstChild<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1379,6 +1668,16 @@ public static class PublishedContentExtensions
             .Children<T>(navigationQueryService, publishedStatusFilteringService, culture)
             .FirstOrDefault();
 
+    /// <summary>
+    /// Gets the first child of the content item of a specific type that matches a predicate.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="predicate">The predicate to filter children.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child of the specified type matching the predicate, or null if none exists.</returns>
     public static T? FirstChild<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1579,12 +1878,24 @@ public static class PublishedContentExtensions
 
     #region Writer and creator
 
+    /// <summary>
+    /// Gets the name of the user who created the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="userService">The user service.</param>
+    /// <returns>The name of the creator, or an empty string if not found.</returns>
     public static string GetCreatorName(this IPublishedContent content, IUserService userService)
     {
         IProfile? user = userService.GetProfileById(content.CreatorId);
         return user?.Name ?? string.Empty;
     }
 
+    /// <summary>
+    /// Gets the name of the user who last updated the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="userService">The user service.</param>
+    /// <returns>The name of the writer, or an empty string if not found.</returns>
     public static string GetWriterName(this IPublishedContent content, IUserService userService)
     {
         IProfile? user = userService.GetProfileById(content.WriterId);
@@ -1642,70 +1953,190 @@ public static class PublishedContentExtensions
 
     #endregion
 
+    #region Convenience overloads (using service locator)
+
+    /// <summary>
+    /// Gets an ancestor of the content item up to a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The ancestor at or below the maximum level, or null if not found.</returns>
     public static IPublishedContent? Ancestor(this IPublishedContent content, int maxLevel)
         => content.Ancestor(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets an ancestor of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to find.</param>
+    /// <returns>The first ancestor of the specified type, or null if not found.</returns>
     public static IPublishedContent? Ancestor(this IPublishedContent content, string contentTypeAlias)
         => content.Ancestor(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets an ancestor of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The ancestor of the specified type at or below the maximum level, or null if not found.</returns>
     public static T? Ancestor<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.Ancestor<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors of the content item up to a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of ancestors at or below the maximum level.</returns>
     public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int maxLevel)
         => content.Ancestors(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <returns>An enumerable of ancestors of the specified type.</returns>
     public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
         => content.Ancestors(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets the ancestors of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <returns>An enumerable of ancestors of the specified type.</returns>
     public static IEnumerable<T> Ancestors<T>(this IPublishedContent content)
         where T : class, IPublishedContent
         => content.Ancestors<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content));
 
+    /// <summary>
+    /// Gets the ancestors of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of ancestors of the specified type at or below the maximum level.</returns>
     public static IEnumerable<T> Ancestors<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.Ancestors<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets an ancestor or self of the content item at or below a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The content item or an ancestor at or below the maximum level.</returns>
     public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int maxLevel)
         => content.AncestorOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets an ancestor or self of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to find.</param>
+    /// <returns>The content item or an ancestor of the specified type.</returns>
     public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         => content.AncestorOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets an ancestor or self of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The content item or an ancestor of the specified type at or below the maximum level, or null if not found.</returns>
     public static T? AncestorOrSelf<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.AncestorOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item up to a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of the content item and its ancestors at or below the maximum level.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int maxLevel)
         => content.AncestorsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <returns>An enumerable of the content item and its ancestors of the specified type.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         => content.Ancestors(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of the content item and its ancestors of the specified type at or below the maximum level.</returns>
     public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.AncestorsOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item, optionally filtered by a predicate.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="orSelf">Whether to include the content item itself.</param>
+    /// <param name="func">An optional predicate to filter the ancestors.</param>
+    /// <returns>An enumerable of the content item and/or its ancestors matching the criteria.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool>? func)
         => content.AncestorsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), orSelf, func);
 
+    /// <summary>
+    /// Gets the breadcrumbs (ancestors and self, top to bottom) for the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="andSelf">Whether to include the content item itself. Default is true.</param>
+    /// <returns>An enumerable of the breadcrumb trail from root to the content item.</returns>
     public static IEnumerable<IPublishedContent> Breadcrumbs(
         this IPublishedContent content,
         bool andSelf = true) =>
         content.Breadcrumbs(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), andSelf);
 
+    /// <summary>
+    /// Gets the breadcrumbs (ancestors and self, top to bottom) for the content item at or above a minimum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="minLevel">The minimum level to include in the breadcrumbs.</param>
+    /// <param name="andSelf">Whether to include the content item itself. Default is true.</param>
+    /// <returns>An enumerable of the breadcrumb trail from the minimum level to the content item.</returns>
     public static IEnumerable<IPublishedContent> Breadcrumbs(
         this IPublishedContent content,
         int minLevel,
         bool andSelf = true) =>
         content.Breadcrumbs(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), minLevel, andSelf);
 
+    /// <summary>
+    /// Gets the breadcrumbs (ancestors and self, top to bottom) for the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to include in the breadcrumbs.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="andSelf">Whether to include the content item itself. Default is true.</param>
+    /// <returns>An enumerable of the breadcrumb trail of the specified type.</returns>
     public static IEnumerable<IPublishedContent> Breadcrumbs<T>(
         this IPublishedContent content,
         bool andSelf = true)
-        where T : class, IPublishedContent=>
+        where T : class, IPublishedContent =>
         content.Breadcrumbs<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), andSelf);
 
+    /// <summary>
+    /// Gets all descendants or self of a collection of content items of a specific content type.
+    /// </summary>
+    /// <param name="parentNodes">The collection of parent content items.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="docTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of all content items and their descendants of the specified type.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
         this IEnumerable<IPublishedContent> parentNodes,
         INavigationQueryService navigationQueryService,
@@ -1718,6 +2149,15 @@ public static class PublishedContentExtensions
             docTypeAlias,
             culture));
 
+    /// <summary>
+    /// Gets all descendants or self of a collection of content items of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="parentNodes">The collection of parent content items.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of all content items and their descendants of the specified type.</returns>
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IEnumerable<IPublishedContent> parentNodes,
         INavigationQueryService navigationQueryService,
@@ -1728,6 +2168,8 @@ public static class PublishedContentExtensions
             navigationQueryService,
             publishedStatusFilteringService,
             culture));
+
+    #endregion
 
     private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)
     {

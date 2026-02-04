@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi.Transformers;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.OpenApi;

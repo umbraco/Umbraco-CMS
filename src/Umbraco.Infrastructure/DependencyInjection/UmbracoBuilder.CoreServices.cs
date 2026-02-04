@@ -174,7 +174,7 @@ public static partial class UmbracoBuilderExtensions
             .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
-        builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
+        builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
@@ -321,7 +321,8 @@ public static partial class UmbracoBuilderExtensions
                 default:
                     return new FileSystemMainDomLock(
                         loggerFactory.CreateLogger<FileSystemMainDomLock>(),
-                        mainDomKeyGenerator, hostingEnvironment,
+                        mainDomKeyGenerator,
+                        hostingEnvironment,
                         factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
             }
         });
@@ -351,7 +352,11 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
+            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<ElementMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<EntityContainerMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
         // add notification handlers for property editors
         builder
@@ -420,6 +425,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberTypeChangedNotification, MemberTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>()
             ;
 
         // add notification handlers for auditing
@@ -448,7 +454,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
-            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>();
+            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementPublishedNotification, ContentRelationsUpdate>();
 
         return builder;
     }

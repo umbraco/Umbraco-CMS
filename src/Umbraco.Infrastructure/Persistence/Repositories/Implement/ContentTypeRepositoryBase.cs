@@ -171,7 +171,9 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
     protected abstract IEnumerable<TEntity>? GetAllWithFullCachePolicy();
 
-    protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType,
+    protected virtual PropertyType CreatePropertyType(
+        string propertyEditorAlias,
+        ValueStorageType storageType,
         string propertyTypeAlias) =>
         new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, propertyTypeAlias);
 
@@ -986,8 +988,12 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             // now we need to insert names into these 2 tables based on the invariant data
 
             // insert rows into the versionCultureVariationDto table based on the data from contentVersionDto for the default lang
-            var cols = Sql().ColumnsForInsert<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name,
-                x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
+            var cols = Sql().ColumnsForInsert<ContentVersionCultureVariationDto>(
+                x => x.VersionId,
+                x => x.Name,
+                x => x.UpdateUserId,
+                x => x.UpdateDate,
+                x => x.LanguageId);
             Sql<ISqlContext> sqlSelect2 = Sql().Select<ContentVersionDto>(x => x.Id, x => x.Text, x => x.UserId, x => x.VersionDate)
                 .Append($", {defaultLanguageId}") // default language ID
                 .From<ContentVersionDto>()
@@ -999,8 +1005,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             Database.Execute(sqlInsertContentVersion);
 
             // insert rows into the documentCultureVariation table
-            cols = Sql().ColumnsForInsert<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published,
-                x => x.Name, x => x.Available, x => x.LanguageId);
+            cols = Sql().ColumnsForInsert<DocumentCultureVariationDto>(
+                x => x.NodeId,
+                x => x.Edited,
+                x => x.Published,
+                x => x.Name,
+                x => x.Available,
+                x => x.LanguageId);
             Sql<ISqlContext> sqlSelectDocument = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
                 .AndSelect<NodeDto>(x => x.Text)
                 .Append($", {SqlSyntax.ConvertIntegerToBoolean(1)}, {defaultLanguageId}") // make Available + default language ID
@@ -1067,10 +1078,10 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // select tags to insert: tags pointed to by a relation ship, for proper property/content types,
         // and of source language, and where we cannot left join to an existing tag with same text,
         // group and languageId
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
         Sql<ISqlContext> sqlSelectTagsToInsert1 = Sql()
             .SelectDistinct<TagDto>(x => x.Text, x => x.Group)
-            .Append(", " + targetLanguageIdS)
+            .Append($", {targetLanguageIdS} ")
             .From<TagDto>();
 
         sqlSelectTagsToInsert1
@@ -1078,7 +1089,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .LeftJoin<TagDto>("xtags")
             .On<TagDto, TagDto>(
                 (tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group &&
-                               xtag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "xtags");
+                               xtag.LanguageId.SqlNullableEquals(targetLanguageId, -1),
+                aliasRight: "xtags");
 
         if (contentTypeIds != null)
         {
@@ -1112,7 +1124,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .InnerJoin<TagDto>("otag")
             .On<TagDto, TagDto>(
                 (tag, otag) => tag.Text == otag.Text && tag.Group == otag.Group &&
-                               otag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "otag");
+                               otag.LanguageId.SqlNullableEquals(targetLanguageId, -1),
+                aliasRight: "otag");
 
         if (contentTypeIds != null)
         {
@@ -1175,8 +1188,11 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <param name="targetLanguageId">The target language (can be null ie invariant)</param>
     /// <param name="propertyTypeIds">The property type identifiers.</param>
     /// <param name="contentTypeIds">The content type identifiers.</param>
-    private void CopyPropertyData(int? sourceLanguageId, int? targetLanguageId,
-        IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int>? contentTypeIds = null)
+    private void CopyPropertyData(
+        int? sourceLanguageId,
+        int? targetLanguageId,
+        IReadOnlyCollection<int> propertyTypeIds,
+        IReadOnlyCollection<int>? contentTypeIds = null)
     {
         // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
         var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
@@ -1218,12 +1234,25 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         Database.Execute(sqlDelete);
 
         // now insert all property data into the target language that exists under the source language
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
-        var cols = Sql().ColumnsForInsert<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment,
-            x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue,
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
+        var cols = Sql().ColumnsForInsert<PropertyDataDto>(
+            x => x.VersionId,
+            x => x.PropertyTypeId,
+            x => x.Segment,
+            x => x.IntegerValue,
+            x => x.DecimalValue,
+            x => x.DateValue,
+            x => x.VarcharValue,
+            x => x.TextValue,
             x => x.LanguageId);
-        Sql<ISqlContext> sqlSelectData = Sql().Select<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId,
-                x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue,
+        Sql<ISqlContext> sqlSelectData = Sql().Select<PropertyDataDto>(
+                x => x.VersionId,
+                x => x.PropertyTypeId,
+                x => x.Segment,
+                x => x.IntegerValue,
+                x => x.DecimalValue,
+                x => x.DateValue,
+                x => x.VarcharValue,
                 x => x.TextValue)
             .Append(", " + targetLanguageIdS) // default language ID
             .From<PropertyDataDto>();
@@ -1439,9 +1468,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             }
             else if (ev.Key.langId.HasValue)
             {
-                // This should never happen! If a property culture is flagged as edited then the culture must exist at the document level
-                throw new PanicException(
-                    $"The existing DocumentCultureVariationDto was not found for node {ev.Key.nodeId} and language {ev.Key.langId}");
+                // This can happen when a property changes from invariant to variant and the content
+                // was only created in non-default languages. The invariant property data gets migrated
+                // to the default language, but no DocumentCultureVariationDto exists for the default
+                // language because the content was never created in that language.
+                // In this case, we simply skip updating the edited flag since there's no document
+                // culture variation record to update.
+                continue;
             }
         }
 
@@ -1625,7 +1658,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     public bool HasContentNodes(int id)
     {
         var sql = new Sql(
-            $"SELECT CASE WHEN EXISTS (SELECT * FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName("contentTypeId")} = @id) THEN 1 ELSE 0 END",
+            $"SELECT CASE WHEN EXISTS (SELECT * FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName(ContentDto.ContentTypeIdColumnName)} = @id) THEN 1 ELSE 0 END",
             new { id });
         return Database.ExecuteScalar<int>(sql) == 1;
     }
@@ -1637,18 +1670,18 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // is included here just to be 100% sure since it has a FK on cmsPropertyType.
         var list = new List<string>
         {
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {QuoteColumnName("nodeId")} = @id",
-            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {QuoteColumnName("uniqueId")} IN
-                (SELECT {QuoteColumnName("uniqueId")} FROM {QuoteTableName(NodeDto.TableName)} WHERE id = @id)",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("nodeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {QuoteColumnName("Id")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {QuoteColumnName("AllowedId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {QuoteColumnName("parentContentTypeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {QuoteColumnName("childContentTypeId")} = @id",
-            $@"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName("propertyTypeId")} IN
-                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {QuoteColumnName("contentTypeId")} = @id)",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {QuoteColumnName("contentTypeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)} WHERE {QuoteColumnName("contenttypeNodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName(User2NodeNotifyDto.NodeIdColumnName)} = @id",
+            $@"DELETE FROM {QuoteTableName(UserGroup2GranularPermissionDto.TableName)} WHERE {QuoteColumnName(UserGroup2GranularPermissionDto.UniqueIdColumnName)} IN
+                (SELECT {QuoteColumnName("uniqueId")} FROM {QuoteTableName(NodeDto.TableName)} WHERE {QuoteColumnName(NodeDto.PrimaryKeyColumnName)} = @id)",
+            $"DELETE FROM {QuoteTableName(TagRelationshipDto.TableName)} WHERE {QuoteColumnName(TagRelationshipDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.AllowedIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.ChildIdColumnName)} = @id",
+            $@"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName(PropertyDataDto.PropertyTypeIdColumnName)} IN
+                (SELECT id FROM {QuoteTableName(PropertyTypeDto.TableName)} WHERE {QuoteColumnName(PropertyTypeDto.ContentTypeIdColumnName)} = @id)",
+            $"DELETE FROM {QuoteTableName(PropertyTypeDto.TableName)} WHERE {QuoteColumnName(PropertyTypeDto.ContentTypeIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(PropertyTypeGroupDto.TableName)} WHERE {QuoteColumnName(PropertyTypeGroupDto.ContentTypeNodeIdColumnName)} = @id",
         };
         return list;
     }
@@ -1671,6 +1704,29 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         //       the 0 based sort order, so they will be returned as [0, 1, 2]).
         return PerformGetAll(allowedContentTypeKeys)?.Select(c => (c, allowedContentTypeKeys.IndexOf(c.Key))).ToArray()
             ?? Array.Empty<(TEntity, int)>();
+    }
+
+
+    /// <summary>
+    /// Retrieves a collection of allowed parent keys for the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the key for which to retrieve allowed parent keys.</param>
+    /// <returns>An enumerable collection of GUIDs representing the allowed parent keys.</returns>
+    public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
+    {
+        Sql<ISqlContext> childNodeIdQuery = Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key);
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<ContentTypeAllowedContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeAllowedContentTypeDto, NodeDto>((allowed, node) => allowed.Id == node.NodeId)
+            .WhereIn<ContentTypeAllowedContentTypeDto>(x => x.AllowedId, childNodeIdQuery);
+
+        return Database.Fetch<Guid>(sql);
     }
 
     private sealed class NameCompareDto

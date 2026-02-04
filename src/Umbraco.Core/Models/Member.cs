@@ -274,6 +274,9 @@ public class Member : ContentBase, IMember
         set => SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
     }
 
+    /// <summary>
+    ///     Gets or sets the date and time when the member's email was confirmed.
+    /// </summary>
     [DataMember]
     public DateTime? EmailConfirmedDate
     {
@@ -303,6 +306,9 @@ public class Member : ContentBase, IMember
         }
     }
 
+    /// <summary>
+    ///     Gets or sets the password configuration used for hashing/encrypting the password.
+    /// </summary>
     [IgnoreDataMember]
     public string? PasswordConfiguration
     {
@@ -507,14 +513,22 @@ public class Member : ContentBase, IMember
     [EditorBrowsable(EditorBrowsableState.Never)]
     public string? PropertyTypeAlias { get; set; }
 
+    /// <summary>
+    ///     Checks if a property type exists and logs a warning if not found when getting a value.
+    /// </summary>
+    /// <typeparam name="T">The type of value being retrieved.</typeparam>
+    /// <param name="propertyAlias">The alias of the property to check.</param>
+    /// <param name="propertyName">The name of the property for logging purposes.</param>
+    /// <param name="defaultVal">The default value to return if property is not found.</param>
+    /// <returns>An <see cref="Attempt{T}" /> indicating success or failure with a default value.</returns>
     private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
     {
         static void DoLog(string logPropertyAlias, string logPropertyName)
         {
             StaticApplicationLogging.Logger.LogWarning(
                 "Trying to access the '{PropertyName}' property on '{MemberType}' " +
-                "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
-                "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
+                "but the property type with alias '{PropertyAlias}' does not exist on the member type. " +
+                "A default value is returned. Ensure this property type is configured on your member type.",
                 logPropertyName,
                 typeof(Member),
                 logPropertyAlias);
@@ -536,6 +550,12 @@ public class Member : ContentBase, IMember
         return Attempt<T>.Succeed();
     }
 
+    /// <summary>
+    ///     Checks if a property type exists and logs a warning if not found when setting a value.
+    /// </summary>
+    /// <param name="propertyAlias">The alias of the property to check.</param>
+    /// <param name="propertyName">The name of the property for logging purposes.</param>
+    /// <returns><c>true</c> if the property exists; otherwise, <c>false</c>.</returns>
     private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyName)
     {
         static void DoLog(string logPropertyAlias, string logPropertyName)

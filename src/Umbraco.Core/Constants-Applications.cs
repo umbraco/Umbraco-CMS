@@ -46,6 +46,11 @@ public static partial class Constants
         ///     Application alias for the forms section.
         /// </summary>
         public const string Forms = "forms";
+
+        /// <summary>
+        ///     Application alias for the library section.
+        /// </summary>
+        public const string Library = "library";
     }
 
     /// <summary>
@@ -88,6 +93,9 @@ public static partial class Constants
         /// </summary>
         public const string Dictionary = "dictionary";
 
+        /// <summary>
+        ///     Alias for the stylesheets tree.
+        /// </summary>
         public const string Stylesheets = "stylesheets";
 
         /// <summary>
@@ -115,8 +123,14 @@ public static partial class Constants
         /// </summary>
         public const string Templates = "templates";
 
+        /// <summary>
+        ///     Alias for the relation types tree.
+        /// </summary>
         public const string RelationTypes = "relationTypes";
 
+        /// <summary>
+        ///     Alias for the languages tree.
+        /// </summary>
         public const string Languages = "languages";
 
         /// <summary>
@@ -134,20 +148,44 @@ public static partial class Constants
         /// </summary>
         public const string Users = "users";
 
+        /// <summary>
+        ///     Alias for the scripts tree.
+        /// </summary>
         public const string Scripts = "scripts";
 
+        /// <summary>
+        ///     Alias for the partial views tree.
+        /// </summary>
         public const string PartialViews = "partialViews";
 
+        /// <summary>
+        ///     Alias for the log viewer tree.
+        /// </summary>
         public const string LogViewer = "logViewer";
 
+        /// <summary>
+        ///     Alias for the webhooks tree.
+        /// </summary>
         public const string Webhooks = "webhooks";
 
+        /// <summary>
+        ///     Contains tree group aliases.
+        /// </summary>
         public static class Groups
         {
+            /// <summary>
+            ///     The settings tree group alias.
+            /// </summary>
             public const string Settings = "settingsGroup";
 
+            /// <summary>
+            ///     The templating tree group alias.
+            /// </summary>
             public const string Templating = "templatingGroup";
 
+            /// <summary>
+            ///     The third party tree group alias.
+            /// </summary>
             public const string ThirdParty = "thirdPartyGroup";
         }
 

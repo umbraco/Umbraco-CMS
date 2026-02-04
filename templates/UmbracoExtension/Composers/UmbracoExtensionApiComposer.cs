@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
-using Swashbuckle.AspNetCore.SwaggerUI;
-using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Common.DependencyInjection;
+using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 
@@ -18,7 +17,7 @@ public class UmbracoExtensionApiComposer : IComposer
             {
                 // Related documentation:
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api
-                // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/adding-a-custom-swagger-document
+                // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/adding-a-custom-openapi-document
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/versioning-your-api
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/access-policies
 
@@ -53,9 +52,7 @@ public class UmbracoExtensionApiComposer : IComposer
                     return Task.CompletedTask;
                 });
             });
-        builder.Services.Configure<SwaggerUIOptions>(options =>
-        {
-            options.SwaggerEndpoint($"/umbraco/swagger/{Constants.ApiName}/swagger.json", "Umbraco Extension Backoffice API");
-        });
+
+        builder.Services.AddOpenApiDocumentToUi(Constants.ApiName, "Umbraco Extension Backoffice API");
     }
 }

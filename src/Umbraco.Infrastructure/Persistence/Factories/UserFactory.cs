@@ -22,12 +22,20 @@ internal static class UserFactory
             key = dto.Id.ToGuid();
         }
 
-        var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login, dto.Password,
+        var user = new User(
+            globalSettings,
+            dto.Id,
+            dto.UserName,
+            dto.Email,
+            dto.Login,
+            dto.Password,
             dto.PasswordConfig,
             dto.UserGroupDtos.Select(x => ToReadOnlyGroup(x, permissionMappers)).ToArray(),
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content)
                 .Select(x => x.StartNode).ToArray(),
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media)
+                .Select(x => x.StartNode).ToArray(),
+            dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Element)
                 .Select(x => x.StartNode).ToArray());
 
         try
@@ -85,7 +93,7 @@ internal static class UserFactory
             Avatar = entity.Avatar,
             EmailConfirmedDate = entity.EmailConfirmedDate,
             InvitedDate = entity.InvitedDate,
-            Kind = (short)entity.Kind
+            Kind = (short)entity.Kind,
         };
 
         if (entity.StartContentIds is not null)
@@ -114,6 +122,19 @@ internal static class UserFactory
             }
         }
 
+        if (entity.StartElementIds is not null)
+        {
+            foreach (var startNodeId in entity.StartElementIds)
+            {
+                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                {
+                    StartNode = startNodeId,
+                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Element,
+                    UserId = entity.Id,
+                });
+            }
+        }
+
         if (entity.HasIdentity)
         {
             dto.Id = entity.Id;
@@ -122,15 +143,16 @@ internal static class UserFactory
         return dto;
     }
 
-    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group, IDictionary<string, IPermissionMapper> permissionMappers)
-    {
-        return new ReadOnlyUserGroup(
+    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group, IDictionary<string, IPermissionMapper> permissionMappers) =>
+        new ReadOnlyUserGroup(
             group.Id,
             group.Key,
             group.Name,
+            group.Description,
             group.Icon,
             group.StartContentId,
             group.StartMediaId,
+            group.StartElementId,
             group.Alias,
             group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
@@ -142,12 +164,11 @@ internal static class UserFactory
                     return mapper.MapFromDto(granularPermission);
                 }
 
-                return new UnknownTypeGranularPermission()
+                return new UnknownTypeGranularPermission
                 {
                     Permission = granularPermission.Permission,
-                    Context = granularPermission.Context
+                    Context = granularPermission.Context,
                 };
             })),
             group.HasAccessToAllLanguages);
-    }
 }

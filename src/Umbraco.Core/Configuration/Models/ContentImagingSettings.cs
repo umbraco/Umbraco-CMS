@@ -10,9 +10,12 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class ContentImagingSettings
 {
+    /// <summary>
+    ///     The default set of accepted image file extensions.
+    /// </summary>
     internal const string StaticImageFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
 
-    private static readonly ISet<ImagingAutoFillUploadField> DefaultImagingAutoFillUploadField = new HashSet<ImagingAutoFillUploadField>
+    private static readonly ISet<ImagingAutoFillUploadField> _defaultImagingAutoFillUploadField = new HashSet<ImagingAutoFillUploadField>
     {
         new()
         {
@@ -31,8 +34,7 @@ public class ContentImagingSettings
     public ISet<string> ImageFileTypes { get; set; } = new HashSet<string>(StaticImageFileTypes.Split(Constants.CharArrays.Comma));
 
     /// <summary>
-    ///     Gets or sets a value for the imaging autofill following media file upload fields.
+    ///     Gets or sets the collection of media property mappings that are automatically populated with image metadata after a media file is uploaded.
     /// </summary>
-    /// <value>
-    public ISet<ImagingAutoFillUploadField> AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
+    public ISet<ImagingAutoFillUploadField> AutoFillImageProperties { get; set; } = _defaultImagingAutoFillUploadField;
 }

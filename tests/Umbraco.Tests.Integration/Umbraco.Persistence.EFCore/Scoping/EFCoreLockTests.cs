@@ -32,7 +32,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    protected async Task SetUp()
+    public async Task SetUp()
     {
         // create a few lock objects
         using var scope = EFScopeProvider.CreateScope();

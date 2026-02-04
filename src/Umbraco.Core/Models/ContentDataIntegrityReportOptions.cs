@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents options for configuring content data integrity checks.
+/// </summary>
 public class ContentDataIntegrityReportOptions
 {
     /// <summary>

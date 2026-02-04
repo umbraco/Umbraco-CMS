@@ -146,6 +146,11 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         return result;
     }
 
+    /// <summary>
+    /// Gets all automatic relation type aliases for all property editors.
+    /// </summary>
+    /// <param name="propertyEditors">The property editors collection.</param>
+    /// <returns>A set of automatic relation type aliases.</returns>
     public ISet<string> GetAllAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
     {
         // Always add default automatic relation types

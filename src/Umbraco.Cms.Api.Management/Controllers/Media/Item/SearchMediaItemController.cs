@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -19,7 +20,6 @@ public class SearchMediaItemController : MediaItemControllerBase
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
 
-    [ActivatorUtilitiesConstructor]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -77,6 +77,13 @@ public class SearchMediaItemController : MediaItemControllerBase
         [FromQuery] IEnumerable<Guid>? allowedMediaTypes = null,
         Guid? dataTypeId = null)
     {
+        // We always want to include folders in the search results (aligns with behaviour in Umbraco 13, and allows folders
+        // to be selected to find the selectable items inside).
+        if (allowedMediaTypes is not null && allowedMediaTypes.Contains(Constants.MediaTypes.Guids.FolderGuid) is false)
+        {
+            allowedMediaTypes = [.. allowedMediaTypes, Constants.MediaTypes.Guids.FolderGuid];
+        }
+
         var ignoreUserStartNodes = await IgnoreUserStartNodes(dataTypeId);
         PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Media,

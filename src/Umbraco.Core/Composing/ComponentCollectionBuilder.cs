@@ -10,8 +10,10 @@ public class ComponentCollectionBuilder : OrderedCollectionBuilderBase<Component
 {
     private const int LogThresholdMilliseconds = 100;
 
+    /// <inheritdoc />
     protected override ComponentCollectionBuilder This => this;
 
+    /// <inheritdoc />
     protected override IEnumerable<IAsyncComponent> CreateItems(IServiceProvider factory)
     {
         IProfilingLogger logger = factory.GetRequiredService<IProfilingLogger>();
@@ -24,6 +26,7 @@ public class ComponentCollectionBuilder : OrderedCollectionBuilderBase<Component
         }
     }
 
+    /// <inheritdoc />
     protected override IAsyncComponent CreateItem(IServiceProvider factory, Type itemType)
     {
         IProfilingLogger logger = factory.GetRequiredService<IProfilingLogger>();

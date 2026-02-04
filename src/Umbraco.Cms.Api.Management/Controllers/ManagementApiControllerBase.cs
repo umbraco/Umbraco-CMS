@@ -55,7 +55,7 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
     ///     Creates a 403 Forbidden result.
     /// </summary>
     /// <remarks>
-    ///     Use this method instead of <see cref="ManagementApiControllerBase.Forbid()"/> on the controller base.
+    ///     Use this method instead of the controller base class's Forbid() method.
     ///     This method ensures that a proper 403 Forbidden status code is returned to the client.
     /// </remarks>
     // Duplicate code copied between Management API and Delivery API.
@@ -65,8 +65,8 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
         where TEnum : Enum
         => result(new ProblemDetailsBuilder().WithOperationStatus(status));
 
-    protected BadRequestObjectResult SkipTakeToPagingProblem() =>
-        BadRequest(new ProblemDetails
+    protected static BadRequestObjectResult SkipTakeToPagingProblem() =>
+        new(new ProblemDetails
         {
             Title = "Invalid skip/take",
             Detail = "Skip must be a multiple of take - i.e. skip = 10, take = 5",

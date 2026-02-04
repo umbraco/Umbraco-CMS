@@ -13,7 +13,7 @@ internal sealed class PartialViewRepository : FileRepository<string, IPartialVie
     {
     }
 
-    protected PartialViewRepository(IFileSystem? fileSystem)
+    private PartialViewRepository(IFileSystem? fileSystem)
         : base(fileSystem)
     {
     }

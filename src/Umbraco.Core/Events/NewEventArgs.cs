@@ -1,7 +1,19 @@
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Represents event data for new entity creation operations.
+/// </summary>
+/// <typeparam name="TEntity">The type of the entity being created.</typeparam>
 public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<NewEventArgs<TEntity>>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parentId">The identifier of the parent entity.</param>
+    /// <param name="eventMessages">The event messages.</param>
     public NewEventArgs(TEntity eventObject, bool canCancel, string alias, int parentId, EventMessages eventMessages)
         : base(eventObject, canCancel, eventMessages)
     {
@@ -9,6 +21,14 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         ParentId = parentId;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parent">The parent entity.</param>
+    /// <param name="eventMessages">The event messages.</param>
     public NewEventArgs(TEntity eventObject, bool canCancel, string alias, TEntity? parent, EventMessages eventMessages)
         : base(eventObject, canCancel, eventMessages)
     {
@@ -16,6 +36,13 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         Parent = parent;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class with cancellation enabled.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parentId">The identifier of the parent entity.</param>
+    /// <param name="eventMessages">The event messages.</param>
     public NewEventArgs(TEntity eventObject, string alias, int parentId, EventMessages eventMessages)
         : base(eventObject, eventMessages)
     {
@@ -23,6 +50,13 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         ParentId = parentId;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class with cancellation enabled.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parent">The parent entity.</param>
+    /// <param name="eventMessages">The event messages.</param>
     public NewEventArgs(TEntity eventObject, string alias, TEntity? parent, EventMessages eventMessages)
         : base(eventObject, eventMessages)
     {
@@ -30,6 +64,13 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         Parent = parent;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parentId">The identifier of the parent entity.</param>
     public NewEventArgs(TEntity eventObject, bool canCancel, string alias, int parentId)
         : base(eventObject, canCancel)
     {
@@ -37,6 +78,13 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         ParentId = parentId;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parent">The parent entity.</param>
     public NewEventArgs(TEntity eventObject, bool canCancel, string alias, TEntity? parent)
         : base(eventObject, canCancel)
     {
@@ -44,6 +92,12 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         Parent = parent;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class with cancellation enabled.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parentId">The identifier of the parent entity.</param>
     public NewEventArgs(TEntity eventObject, string alias, int parentId)
         : base(eventObject)
     {
@@ -51,6 +105,12 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         ParentId = parentId;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NewEventArgs{TEntity}" /> class with cancellation enabled.
+    /// </summary>
+    /// <param name="eventObject">The entity being created.</param>
+    /// <param name="alias">The alias of the entity.</param>
+    /// <param name="parent">The parent entity.</param>
     public NewEventArgs(TEntity eventObject, string alias, TEntity? parent)
         : base(eventObject)
     {
@@ -78,8 +138,15 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
     /// </summary>
     public TEntity? Parent { get; }
 
+    /// <summary>
+    ///     Determines whether two <see cref="NewEventArgs{TEntity}" /> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(NewEventArgs<TEntity> left, NewEventArgs<TEntity> right) => Equals(left, right);
 
+    /// <inheritdoc />
     public bool Equals(NewEventArgs<TEntity>? other)
     {
         if (ReferenceEquals(null, other))
@@ -96,6 +163,7 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
                EqualityComparer<TEntity>.Default.Equals(Parent, other.Parent) && ParentId == other.ParentId;
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -116,6 +184,7 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         return Equals((NewEventArgs<TEntity>?)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -132,5 +201,11 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         }
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="NewEventArgs{TEntity}" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(NewEventArgs<TEntity> left, NewEventArgs<TEntity> right) => !Equals(left, right);
 }

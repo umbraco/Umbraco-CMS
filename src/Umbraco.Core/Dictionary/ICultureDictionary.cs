@@ -3,26 +3,26 @@ using System.Globalization;
 namespace Umbraco.Cms.Core.Dictionary;
 
 /// <summary>
-///     Represents a dictionary based on a specific culture
+/// Represents a dictionary based on a specific culture.
 /// </summary>
 public interface ICultureDictionary
 {
     /// <summary>
-    ///     Returns the current culture
+    /// Gets the culture for the dictionary.
     /// </summary>
     CultureInfo Culture { get; }
 
     /// <summary>
-    ///     Returns the dictionary value based on the key supplied
+    /// Gets the value for a given key.
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    string? this[string key] { get; }
+    /// <param name="key">The key for the dictionary item.</param>
+    /// <returns>The value matching the provided key. If no value is found, an empty string is returned.</returns>
+    string this[string key] { get; }
 
     /// <summary>
-    ///     Returns the child dictionary entries for a given key
+    /// Returns the child dictionary entries for a given key.
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
+    /// <param name="key">The key for the dictionary item.</param>
+    /// <returns>The value matching the provided key. If no value is found, an empty dictionary is returned.</returns>
     IDictionary<string, string> GetChildren(string key);
 }

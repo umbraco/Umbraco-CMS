@@ -1,6 +1,6 @@
 using Microsoft.OpenApi;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+using Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.OpenApi;
 

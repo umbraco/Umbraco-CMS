@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+using Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.OpenApi;

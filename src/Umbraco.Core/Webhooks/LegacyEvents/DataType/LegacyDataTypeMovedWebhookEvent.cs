@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a data type is moved, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Data Type Moved")]
 public class LegacyDataTypeMovedWebhookEvent : WebhookEventBase<DataTypeMovedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyDataTypeMovedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyDataTypeMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class LegacyDataTypeMovedWebhookEvent : WebhookEventBase<DataTypeMovedNot
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.DataTypeMoved;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(DataTypeMovedNotification notification)
         => notification.MoveInfoCollection;
 }

@@ -15,11 +15,44 @@ public static partial class Constants
     /// </remarks>
     public static class ReferenceType
     {
+        /// <summary>
+        ///     The reference type for document entities.
+        /// </summary>
         public const string Document = UdiEntityType.Document;
+
+        /// <summary>
+        ///     The reference type for element entities.
+        /// </summary>
+        public const string Element = UdiEntityType.Element;
+
+        /// <summary>
+        ///     The reference type for element container entities.
+        /// </summary>
+        public const string ElementContainer = UdiEntityType.ElementContainer;
+
+        /// <summary>
+        ///     The reference type for media entities.
+        /// </summary>
         public const string Media = UdiEntityType.Media;
+
+        /// <summary>
+        ///     The reference type for member entities.
+        /// </summary>
         public const string Member = UdiEntityType.Member;
+
+        /// <summary>
+        ///     The reference type for document type property type references.
+        /// </summary>
         public const string DocumentTypePropertyType = "document-type-property-type";
+
+        /// <summary>
+        ///     The reference type for media type property type references.
+        /// </summary>
         public const string MediaTypePropertyType = "media-type-property-type";
+
+        /// <summary>
+        ///     The reference type for member type property type references.
+        /// </summary>
         public const string MemberTypePropertyType = "member-type-property-type";
     }
 }
