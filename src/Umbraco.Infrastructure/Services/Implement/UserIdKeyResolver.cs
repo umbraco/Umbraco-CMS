@@ -75,7 +75,6 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 return Attempt.Fail<int>();
             }
 
-
             _keyToId[key] = fetchedId.Value;
             return Attempt.Succeed(fetchedId.Value);
         }
@@ -121,7 +120,9 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id == id);
 
-            Guid? fetchedKey = scope.Database.ExecuteScalar<Guid?>(query);
+            // We must use FirstOrDefault over ExecuteScalar when retrieving a nullable Guid, to ensure we go through the full NPoco mapping pipeline.
+            // Without that, though it will succeed on SQLite and SQLServer, it could fail on other database providers.
+            Guid? fetchedKey = scope.Database.FirstOrDefault<Guid?>(query);
             if (fetchedKey is null)
             {
                 return Attempt<Guid>.Fail();

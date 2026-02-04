@@ -6,7 +6,7 @@ For example, using a folder location of `c:\nuget.local`:
 
 ```
 # Pack the templates to a local folder
-dotnet pack -o "c:\nuget.local"
+dotnet pack Umbraco.Templates.csproj -c Release --no-build -o "c:\nuget.local"
 
 # Add this folder as a local nuget source 
 dotnet nuget add source "c:\nuget.local" --name "local nuget"
