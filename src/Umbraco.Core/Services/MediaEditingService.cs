@@ -46,7 +46,10 @@ internal sealed class MediaEditingService
         IMediaValidationService mediaValidationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService,
+        ILocalizationService localizationService)
         : base(
             contentService,
             contentTypeService,
@@ -59,7 +62,10 @@ internal sealed class MediaEditingService
             treeEntitySortingService,
             optionsMonitor,
             relationService,
-            contentTypeFilters)
+            contentTypeFilters,
+            languageService,
+            userService,
+            localizationService)
         => _logger = logger;
 
     /// <inheritdoc/>
