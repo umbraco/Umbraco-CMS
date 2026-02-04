@@ -111,8 +111,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         return Ok(result);
     }
-
-    // todo remove service injection
+    
     protected async Task<ActionResult<PagedViewModel<TItem>>> SearchTreeEntities(
         string? query,
         int skip,

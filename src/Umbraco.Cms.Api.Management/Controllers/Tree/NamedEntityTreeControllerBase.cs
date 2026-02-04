@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
@@ -14,8 +16,22 @@ public abstract class NamedEntityTreeControllerBase<TItem> : EntityTreeControlle
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected NamedEntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
-        : base(entityService, flagProviders)
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
+    }
+
+    protected NamedEntityTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap)
     {
     }
 

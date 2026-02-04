@@ -39,8 +39,22 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected FolderTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
+    }
+
+    protected FolderTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _folderObjectTypeId = FolderObjectType.GetGuid();
 
 

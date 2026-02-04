@@ -30,8 +30,24 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DictionaryTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            dictionaryItemService)
+    {
+    }
+
+    public DictionaryTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IDictionaryItemService dictionaryItemService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         DictionaryItemService = dictionaryItemService;
 
     // dictionary items do not currently have a known UmbracoObjectType, so we'll settle with Unknown for now
