@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
@@ -16,8 +16,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     {
         private readonly IVariationContextAccessor? _variationContextAccessor;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="PublishedContentBase" /> class.
+        /// </summary>
+        /// <param name="variationContextAccessor">The variation context accessor.</param>
         protected PublishedContentBase(IVariationContextAccessor? variationContextAccessor) => _variationContextAccessor = variationContextAccessor;
 
+        /// <inheritdoc />
         /// <inheritdoc />
         public virtual string Name => this.Name(_variationContextAccessor);
 
@@ -44,6 +49,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
         public virtual IEnumerable<IPublishedContent> Children => GetChildren();
 
+        /// <summary>
+        ///     Gets the children of the current content item.
+        /// </summary>
+        /// <returns>The children of the current content item.</returns>
         private IEnumerable<IPublishedContent> GetChildren()
         {
             INavigationQueryService? navigationQueryService;

@@ -36,9 +36,18 @@ public class LabelPropertyEditor : DataEditor
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new LabelConfigurationEditor(_ioHelper);
 
-    // provides the property value editor
+    /// <summary>
+    /// Provides the property value editor for label properties.
+    /// </summary>
     internal sealed class LabelPropertyValueEditor : DataValueEditor
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LabelPropertyValueEditor"/> class.
+        /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
         public LabelPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,

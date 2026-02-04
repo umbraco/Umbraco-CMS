@@ -8,6 +8,11 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ContentTypeBaseExtensions
 {
+    /// <summary>
+    ///     Gets the published item type for the content type.
+    /// </summary>
+    /// <param name="contentType">The content type.</param>
+    /// <returns>The <see cref="PublishedItemType" /> for the content type.</returns>
     public static PublishedItemType GetItemType(this IContentTypeBase contentType)
     {
         Type type = contentType.GetType();

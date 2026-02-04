@@ -11,7 +11,14 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigCoreDebug)]
 public class CoreDebugSettings
 {
+    /// <summary>
+    ///     The default value for logging incompleted scopes.
+    /// </summary>
     internal const bool StaticLogIncompletedScopes = false;
+
+    /// <summary>
+    ///     The default value for dumping on timeout thread abort.
+    /// </summary>
     internal const bool StaticDumpOnTimeoutThreadAbort = false;
 
     /// <summary>

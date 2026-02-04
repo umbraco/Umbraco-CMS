@@ -15,34 +15,36 @@ public interface IUserService : IMembershipUserService
     /// <summary>
     ///     Creates a database entry for starting a new login session for a user
     /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="requestingIpAddress"></param>
-    /// <returns></returns>
+    /// <param name="userId">The integer id of the user.</param>
+    /// <param name="requestingIpAddress">The IP address from which the login request originated.</param>
+    /// <returns>A <see cref="Guid"/> representing the session id.</returns>
     Guid CreateLoginSession(int userId, string requestingIpAddress);
 
     /// <summary>
     ///     Validates that a user login session is valid/current and hasn't been closed
     /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="sessionId"></param>
-    /// <returns></returns>
+    /// <param name="userId">The integer id of the user.</param>
+    /// <param name="sessionId">The session id to validate.</param>
+    /// <returns><c>true</c> if the session is valid; otherwise, <c>false</c>.</returns>
     bool ValidateLoginSession(int userId, Guid sessionId);
 
     /// <summary>
     ///     Removes the session's validity
     /// </summary>
-    /// <param name="sessionId"></param>
+    /// <param name="sessionId">The session id to clear.</param>
     void ClearLoginSession(Guid sessionId);
 
     /// <summary>
     ///     Removes all valid sessions for the user
     /// </summary>
-    /// <param name="userId"></param>
+    /// <param name="userId">The integer id of the user.</param>
+    /// <returns>The number of sessions that were cleared.</returns>
     int ClearLoginSessions(int userId);
 
     /// <summary>
     ///     This is basically facets of UserStates key = state, value = count
     /// </summary>
+    /// <returns>A dictionary where the key is the <see cref="UserState"/> and the value is the count of users in that state.</returns>
     IDictionary<UserState, int> GetUserStates();
 
     /// <summary>
@@ -57,30 +59,107 @@ public interface IUserService : IMembershipUserService
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false);
 
+    /// <summary>
+    ///     Invites a new user to the system by sending an invitation email.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="model">The model containing the invitation details.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
 
+    /// <summary>
+    ///     Verifies an invitation token for a user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="token">The invitation token to verify.</param>
+    /// <returns>An attempt indicating if the verification was successful as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserOperationStatus>> VerifyInviteAsync(Guid userKey, string token);
 
+    /// <summary>
+    ///     Creates an initial password for a user after invitation verification.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="token">The invitation token.</param>
+    /// <param name="password">The password to set for the user.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password);
 
+    /// <summary>
+    ///     Updates an existing user.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="model">The model containing the updated user details.</param>
+    /// <returns>An attempt containing the updated <see cref="IUser"/> if successful, as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
+    /// <summary>
+    ///     Sets the avatar for a user from a temporary file.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="temporaryFileKey">The key of the temporary file containing the avatar image.</param>
+    /// <returns>A <see cref="UserOperationStatus"/> indicating the result of the operation.</returns>
     Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 
+    /// <summary>
+    ///     Deletes multiple users by their keys.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="keys">The set of user keys to delete.</param>
+    /// <returns>A <see cref="UserOperationStatus"/> indicating the result of the operation.</returns>
     Task<UserOperationStatus> DeleteAsync(Guid performingUserKey, ISet<Guid> keys);
 
+    /// <summary>
+    ///     Deletes a single user by their key.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="key">The unique key of the user to delete.</param>
+    /// <returns>A <see cref="UserOperationStatus"/> indicating the result of the operation.</returns>
     Task<UserOperationStatus> DeleteAsync(Guid performingUserKey, Guid key) => DeleteAsync(performingUserKey, new HashSet<Guid> { key });
 
+    /// <summary>
+    ///     Disables multiple users by their keys.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="keys">The set of user keys to disable.</param>
+    /// <returns>A <see cref="UserOperationStatus"/> indicating the result of the operation.</returns>
     Task<UserOperationStatus> DisableAsync(Guid performingUserKey, ISet<Guid> keys);
 
+    /// <summary>
+    ///     Enables multiple users by their keys.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="keys">The set of user keys to enable.</param>
+    /// <returns>A <see cref="UserOperationStatus"/> indicating the result of the operation.</returns>
     Task<UserOperationStatus> EnableAsync(Guid performingUserKey, ISet<Guid> keys);
 
+    /// <summary>
+    ///     Unlocks users that have been locked out.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="keys">The keys of the users to unlock.</param>
+    /// <returns>An attempt containing the unlock result as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
 
+    /// <summary>
+    ///     Changes a user's password.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="model">The model containing the password change details.</param>
+    /// <returns>An attempt containing the password changed result as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model);
 
+    /// <summary>
+    ///     Clears the avatar for a user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <returns>A <see cref="UserOperationStatus"/> indicating the result of the operation.</returns>
     Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
 
+    /// <summary>
+    ///     Gets all linked external logins for a user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <returns>An attempt containing the collection of linked logins as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey);
 
     /// <summary>
@@ -92,6 +171,16 @@ public interface IUserService : IMembershipUserService
     /// <returns>All users that the user is allowed to see.</returns>
     Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid performingUserKey, int skip, int take) => throw new NotImplementedException();
 
+    /// <summary>
+    ///     Filters users based on the specified criteria.
+    /// </summary>
+    /// <param name="userKey">The key of the user performing the filter operation.</param>
+    /// <param name="filter">The filter criteria to apply.</param>
+    /// <param name="skip">The number of records to skip. Default is 0.</param>
+    /// <param name="take">The number of records to take. Default is 100.</param>
+    /// <param name="orderBy">The field to order results by. Default is <see cref="UserOrder.UserName"/>.</param>
+    /// <param name="orderDirection">The direction to order results. Default is <see cref="Direction.Ascending"/>.</param>
+    /// <returns>An attempt containing a paged model of filtered users as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
         Guid userKey,
         UserFilter filter,
@@ -103,20 +192,20 @@ public interface IUserService : IMembershipUserService
     /// <summary>
     ///     Get paged users
     /// </summary>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="orderDirection"></param>
-    /// <param name="userState"></param>
+    /// <param name="pageIndex">The page index (zero-based).</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">The total number of records found (out).</param>
+    /// <param name="orderBy">The field to order by.</param>
+    /// <param name="orderDirection">The direction to order by.</param>
+    /// <param name="userState">Optional array of user states to filter by.</param>
     /// <param name="includeUserGroups">
     ///     A filter to only include user that belong to these user groups
     /// </param>
     /// <param name="excludeUserGroups">
     ///     A filter to only include users that do not belong to these user groups
     /// </param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
+    /// <param name="filter">Optional query filter.</param>
+    /// <returns>An enumerable collection of <see cref="IUser"/> objects.</returns>
     IEnumerable<IUser> GetAll(
         long pageIndex,
         int pageSize,
@@ -131,17 +220,17 @@ public interface IUserService : IMembershipUserService
     /// <summary>
     ///     Get paged users
     /// </summary>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="orderDirection"></param>
-    /// <param name="userState"></param>
+    /// <param name="pageIndex">The page index (zero-based).</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">The total number of records found (out).</param>
+    /// <param name="orderBy">The field to order by.</param>
+    /// <param name="orderDirection">The direction to order by.</param>
+    /// <param name="userState">Optional array of user states to filter by.</param>
     /// <param name="userGroups">
     ///     A filter to only include user that belong to these user groups
     /// </param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
+    /// <param name="filter">Optional string filter.</param>
+    /// <returns>An enumerable collection of <see cref="IUser"/> objects.</returns>
     IEnumerable<IUser> GetAll(
         long pageIndex,
         int pageSize,
@@ -184,6 +273,11 @@ public interface IUserService : IMembershipUserService
     /// <returns>The found user, or null if nothing was found.</returns>
     Task<IUser?> GetAsync(Guid key) => Task.FromResult(GetAll(0, int.MaxValue, out _).FirstOrDefault(x=>x.Key == key));
 
+    /// <summary>
+    ///     Gets multiple users by their keys.
+    /// </summary>
+    /// <param name="keys">The keys of the users to retrieve.</param>
+    /// <returns>An enumerable collection of <see cref="IUser"/> objects matching the specified keys.</returns>
     Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys) => Task.FromResult(GetAll(0, int.MaxValue, out _).Where(x => keys.Contains(x.Key)));
 
     /// <summary>
@@ -264,7 +358,7 @@ public interface IUserService : IMembershipUserService
     /// <summary>
     ///     Get explicitly assigned permissions for groups and optional node Ids
     /// </summary>
-    /// <param name="groups"></param>
+    /// <param name="groups">The user groups to get permissions for.</param>
     /// <param name="fallbackToDefaultPermissions">
     ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit
     ///     permissions set
@@ -278,17 +372,19 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="user">User to check permissions for</param>
     /// <param name="path">Path to check permissions for</param>
+    /// <returns>An <see cref="EntityPermissionSet"/> containing the calculated permissions.</returns>
     EntityPermissionSet GetPermissionsForPath(IUser? user, string? path);
 
     /// <summary>
     ///     Gets the permissions for the provided groups and path
     /// </summary>
-    /// <param name="groups"></param>
+    /// <param name="groups">The user groups to get permissions for.</param>
     /// <param name="path">Path to check permissions for</param>
     /// <param name="fallbackToDefaultPermissions">
     ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit
     ///     permissions set
     /// </param>
+    /// <returns>An <see cref="EntityPermissionSet"/> containing the calculated permissions.</returns>
     EntityPermissionSet GetPermissionsForPath(IUserGroup[] groups, string path, bool fallbackToDefaultPermissions = false);
 
     /// <summary>
@@ -310,7 +406,7 @@ public interface IUserService : IMembershipUserService
     ///     Assigns the same permission set for a single user group to any number of entities
     /// </summary>
     /// <param name="groupId">Id of the group</param>
-    /// <param name="permission"></param>
+    /// <param name="permission">The permission to assign.</param>
     /// <param name="entityIds">Specify the nodes to replace permissions for</param>
     void AssignUserGroupPermission(int groupId, string permission, params int[] entityIds);
 
@@ -337,6 +433,7 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="userKey">The unique key of the user.</param>
     /// <param name="token">The reset password token.</param>
+    /// <returns>An attempt indicating if the verification was successful as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserOperationStatus>> VerifyPasswordResetAsync(Guid userKey, string token);
 
     /// <summary>
@@ -345,23 +442,59 @@ public interface IUserService : IMembershipUserService
     /// <param name="userKey">The unique key of the user.</param>
     /// <param name="token">The reset password token.</param>
     /// <param name="password">The new password of the user.</param>
+    /// <returns>An attempt containing the password changed result as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password);
 
     /// <summary>
     ///     Sends an email with a link to reset user's password.
     /// </summary>
     /// <param name="userEmail">The email address of the user.</param>
+    /// <returns>An attempt indicating if the operation was successful as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
 
+    /// <summary>
+    ///     Resends an invitation email to a user.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="model">The model containing the resend invitation details.</param>
+    /// <returns>An attempt containing the invitation result as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserInvitationResult, UserOperationStatus>> ResendInvitationAsync(Guid performingUserKey, UserResendInviteModel model);
 
+    /// <summary>
+    ///     Resets a user's password without requiring a token.
+    /// </summary>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="userKey">The unique key of the user whose password will be reset.</param>
+    /// <returns>An attempt containing the password changed result as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid performingUserKey, Guid userKey);
 
+    /// <summary>
+    ///     Adds a client ID to a user for OAuth client credentials authentication.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="clientId">The client ID to add.</param>
+    /// <returns>A <see cref="UserClientCredentialsOperationStatus"/> indicating the result of the operation.</returns>
     Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId);
 
+    /// <summary>
+    ///     Removes a client ID from a user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="clientId">The client ID to remove.</param>
+    /// <returns><c>true</c> if the client ID was successfully removed; otherwise, <c>false</c>.</returns>
     Task<bool> RemoveClientIdAsync(Guid userKey, string clientId);
 
+    /// <summary>
+    ///     Finds a user by their client ID.
+    /// </summary>
+    /// <param name="clientId">The client ID to search for.</param>
+    /// <returns>The <see cref="IUser"/> associated with the client ID, or <c>null</c> if not found.</returns>
     Task<IUser?> FindByClientIdAsync(string clientId);
 
+    /// <summary>
+    ///     Gets all client IDs associated with a user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <returns>An enumerable collection of client IDs.</returns>
     Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey);
 }

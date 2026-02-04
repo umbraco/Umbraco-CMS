@@ -9,6 +9,12 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(Name = "pagedCollection", Namespace = "")]
 public abstract class PagedResult
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PagedResult" /> class.
+    /// </summary>
+    /// <param name="totalItems">The total number of items.</param>
+    /// <param name="pageNumber">The current page number (1-based).</param>
+    /// <param name="pageSize">The number of items per page.</param>
     public PagedResult(long totalItems, long pageNumber, long pageSize)
     {
         TotalItems = totalItems;
@@ -25,15 +31,27 @@ public abstract class PagedResult
         }
     }
 
+    /// <summary>
+    ///     Gets the current page number (1-based).
+    /// </summary>
     [DataMember(Name = "pageNumber")]
     public long PageNumber { get; private set; }
 
+    /// <summary>
+    ///     Gets the number of items per page.
+    /// </summary>
     [DataMember(Name = "pageSize")]
     public long PageSize { get; private set; }
 
+    /// <summary>
+    ///     Gets the total number of pages.
+    /// </summary>
     [DataMember(Name = "totalPages")]
     public long TotalPages { get; private set; }
 
+    /// <summary>
+    ///     Gets the total number of items across all pages.
+    /// </summary>
     [DataMember(Name = "totalItems")]
     public long TotalItems { get; private set; }
 

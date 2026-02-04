@@ -7,6 +7,17 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
+/// <summary>
+///     Abstract base class for content navigation services that provides common functionality
+///     for managing hierarchical navigation structures for content and media items.
+/// </summary>
+/// <typeparam name="TContentType">The type of content type, must implement <see cref="IContentTypeComposition"/>.</typeparam>
+/// <typeparam name="TContentTypeService">The type of content type service, must implement <see cref="IContentTypeBaseService{TContentType}"/>.</typeparam>
+/// <remarks>
+///     This class maintains two navigation structures: a main structure for active content
+///     and a recycle bin structure for trashed content. Both structures use concurrent
+///     dictionaries to ensure thread-safe operations.
+/// </remarks>
 internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeService>
     where TContentType : class, IContentTypeComposition
     where TContentTypeService : IContentTypeBaseService<TContentType>
@@ -20,6 +31,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private HashSet<Guid> _roots = [];
     private HashSet<Guid> _recycleBinRoots = [];
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/> class.
+    /// </summary>
+    /// <param name="coreScopeProvider">The core scope provider for database operations.</param>
+    /// <param name="navigationRepository">The repository for accessing navigation data.</param>
+    /// <param name="typeService">The content type service for retrieving content type information.</param>
     protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, TContentTypeService typeService)
     {
         _coreScopeProvider = coreScopeProvider;
@@ -38,12 +55,39 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </summary>
     public abstract Task RebuildBinAsync();
 
+    /// <summary>
+    ///     Attempts to get the parent key of a child node in the main navigation structure.
+    /// </summary>
+    /// <param name="childKey">The unique identifier of the child node.</param>
+    /// <param name="parentKey">
+    ///     When this method returns, contains the parent's unique identifier if the child exists;
+    ///     otherwise, <c>null</c>. The value will be <c>null</c> if the child is at root level.
+    /// </param>
+    /// <returns><c>true</c> if the child node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetParentKey(Guid childKey, out Guid? parentKey)
         => TryGetParentKeyFromStructure(_navigationStructure, childKey, out parentKey);
 
+    /// <summary>
+    ///     Attempts to get all root-level node keys from the main navigation structure.
+    /// </summary>
+    /// <param name="rootKeys">
+    ///     When this method returns, contains the collection of root node keys ordered by sort order.
+    /// </param>
+    /// <returns><c>true</c> if the operation succeeds; otherwise, <c>false</c>.</returns>
     public bool TryGetRootKeys(out IEnumerable<Guid> rootKeys)
         => TryGetRootKeysFromStructure(_roots, out rootKeys);
 
+    /// <summary>
+    ///     Attempts to get all root-level node keys of a specific content type from the main navigation structure.
+    /// </summary>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by.</param>
+    /// <param name="rootKeys">
+    ///     When this method returns, contains the collection of root node keys of the specified
+    ///     content type, ordered by sort order; or an empty collection if the content type doesn't exist.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the content type exists and root keys were retrieved; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryGetRootKeysOfType(string contentTypeAlias, out IEnumerable<Guid> rootKeys)
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
@@ -56,9 +100,30 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return false;
     }
 
+    /// <summary>
+    ///     Attempts to get all child node keys of a parent node in the main navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="childrenKeys">
+    ///     When this method returns, contains the collection of child node keys ordered by sort order;
+    ///     or an empty collection if the parent doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys);
 
+    /// <summary>
+    ///     Attempts to get all child node keys of a specific content type under a parent node.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by.</param>
+    /// <param name="childrenKeys">
+    ///     When this method returns, contains the collection of child node keys of the specified
+    ///     content type, ordered by sort order; or an empty collection if the parent or content type doesn't exist.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the parent and content type exist and children were retrieved; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryGetChildrenKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> childrenKeys)
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
@@ -71,9 +136,30 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return false;
     }
 
+    /// <summary>
+    ///     Attempts to get all descendant node keys of a parent node in the main navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="descendantsKeys">
+    ///     When this method returns, contains the collection of all descendant node keys
+    ///     (children, grandchildren, etc.) in depth-first order; or an empty collection if the parent doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
         => TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys);
 
+    /// <summary>
+    ///     Attempts to get all descendant node keys of a specific content type under a parent node.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by.</param>
+    /// <param name="descendantsKeys">
+    ///     When this method returns, contains the collection of descendant node keys of the specified
+    ///     content type; or an empty collection if the parent or content type doesn't exist.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the parent and content type exist and descendants were retrieved; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryGetDescendantsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> descendantsKeys)
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
@@ -86,9 +172,30 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return false;
     }
 
+    /// <summary>
+    ///     Attempts to get all ancestor node keys of a child node in the main navigation structure.
+    /// </summary>
+    /// <param name="childKey">The unique identifier of the child node.</param>
+    /// <param name="ancestorsKeys">
+    ///     When this method returns, contains the collection of ancestor node keys
+    ///     (parent, grandparent, etc.) starting from the immediate parent; or an empty collection if the child doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the child node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
         => TryGetAncestorsKeysFromStructure(_navigationStructure, childKey, out ancestorsKeys);
 
+    /// <summary>
+    ///     Attempts to get all ancestor node keys of a specific content type for a given node.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the node to find ancestors for.</param>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by.</param>
+    /// <param name="ancestorsKeys">
+    ///     When this method returns, contains the collection of ancestor node keys of the specified
+    ///     content type; or an empty collection if the node or content type doesn't exist.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the node and content type exist and ancestors were retrieved; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryGetAncestorsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> ancestorsKeys)
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
@@ -101,9 +208,31 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return false;
     }
 
+    /// <summary>
+    ///     Attempts to get all sibling node keys of a node in the main navigation structure.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node.</param>
+    /// <param name="siblingsKeys">
+    ///     When this method returns, contains the collection of sibling node keys
+    ///     (nodes with the same parent, excluding the node itself), ordered by sort order;
+    ///     or an empty collection if the node doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_navigationStructure, key, out siblingsKeys);
 
+    /// <summary>
+    ///     Attempts to get all sibling node keys of a specific content type for a given node.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node.</param>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by.</param>
+    /// <param name="siblingsKeys">
+    ///     When this method returns, contains the collection of sibling node keys of the specified
+    ///     content type, ordered by sort order; or an empty collection if the node or content type doesn't exist.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the node and content type exist and siblings were retrieved; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryGetSiblingsKeysOfType(Guid key, string contentTypeAlias, out IEnumerable<Guid> siblingsKeys)
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
@@ -116,21 +245,75 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return false;
     }
 
+    /// <summary>
+    ///     Attempts to get the parent key of a child node in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="childKey">The unique identifier of the child node in the recycle bin.</param>
+    /// <param name="parentKey">
+    ///     When this method returns, contains the parent's unique identifier if the child exists in the bin;
+    ///     otherwise, <c>null</c>. The value will be <c>null</c> if the child is at bin root level.
+    /// </param>
+    /// <returns><c>true</c> if the child node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetParentKeyInBin(Guid childKey, out Guid? parentKey)
         => TryGetParentKeyFromStructure(_recycleBinNavigationStructure, childKey, out parentKey);
 
+    /// <summary>
+    ///     Attempts to get all child node keys of a parent node in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node in the recycle bin.</param>
+    /// <param name="childrenKeys">
+    ///     When this method returns, contains the collection of child node keys ordered by sort order;
+    ///     or an empty collection if the parent doesn't exist in the bin.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetChildrenKeysInBin(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_recycleBinNavigationStructure, parentKey, out childrenKeys);
 
+    /// <summary>
+    ///     Attempts to get all descendant node keys of a parent node in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node in the recycle bin.</param>
+    /// <param name="descendantsKeys">
+    ///     When this method returns, contains the collection of all descendant node keys in the bin;
+    ///     or an empty collection if the parent doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetDescendantsKeysInBin(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
         => TryGetDescendantsKeysFromStructure(_recycleBinNavigationStructure, parentKey, out descendantsKeys);
 
+    /// <summary>
+    ///     Attempts to get all ancestor node keys of a child node in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="childKey">The unique identifier of the child node in the recycle bin.</param>
+    /// <param name="ancestorsKeys">
+    ///     When this method returns, contains the collection of ancestor node keys in the bin;
+    ///     or an empty collection if the child doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the child node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetAncestorsKeysInBin(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
         => TryGetAncestorsKeysFromStructure(_recycleBinNavigationStructure, childKey, out ancestorsKeys);
 
+    /// <summary>
+    ///     Attempts to get all sibling node keys of a node in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node in the recycle bin.</param>
+    /// <param name="siblingsKeys">
+    ///     When this method returns, contains the collection of sibling node keys in the bin,
+    ///     ordered by sort order; or an empty collection if the node doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetSiblingsKeysInBin(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_recycleBinNavigationStructure, key, out siblingsKeys);
 
+    /// <summary>
+    ///     Attempts to get the hierarchical level of a content node in the main navigation structure.
+    /// </summary>
+    /// <param name="contentKey">The unique identifier of the content node.</param>
+    /// <param name="level">
+    ///     When this method returns, contains the level of the node (1 for root-level nodes,
+    ///     2 for their children, etc.); or <c>null</c> if the node doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the node exists and its level was determined; otherwise, <c>false</c>.</returns>
     public bool TryGetLevel(Guid contentKey, [NotNullWhen(true)] out int? level)
     {
         level = 1;
@@ -154,6 +337,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
+    /// <summary>
+    ///     Moves a node and all its descendants from the main navigation structure to the recycle bin.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node to move to the recycle bin.</param>
+    /// <returns>
+    ///     <c>true</c> if the node and its descendants were successfully moved to the recycle bin;
+    ///     otherwise, <c>false</c> if the node doesn't exist.
+    /// </returns>
     public bool MoveToBin(Guid key)
     {
         if (TryRemoveNodeFromParentInStructure(_navigationStructure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
@@ -170,6 +361,21 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                _navigationStructure.TryRemove(key, out _);
     }
 
+    /// <summary>
+    ///     Adds a new node to the main navigation structure.
+    /// </summary>
+    /// <param name="key">The unique identifier of the new node.</param>
+    /// <param name="contentTypeKey">The unique identifier of the node's content type.</param>
+    /// <param name="parentKey">
+    ///     The unique identifier of the parent node. If <c>null</c>, the node is added at root level.
+    /// </param>
+    /// <param name="sortOrder">
+    ///     The sort order for the new node. Required when adding nodes at root level.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the node was successfully added; otherwise, <c>false</c> if the parent
+    ///     doesn't exist or a node with the same key already exists.
+    /// </returns>
     public bool Add(Guid key, Guid contentTypeKey, Guid? parentKey = null, int? sortOrder = null)
     {
         NavigationNode? parentNode = null;
@@ -197,6 +403,17 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
+    /// <summary>
+    ///     Moves an existing node to a new location in the main navigation structure.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node to move.</param>
+    /// <param name="targetParentKey">
+    ///     The unique identifier of the new parent node. If <c>null</c>, the node is moved to root level.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the node was successfully moved; otherwise, <c>false</c> if the node doesn't exist,
+    ///     the target parent doesn't exist, or the node is being moved to itself.
+    /// </returns>
     public bool Move(Guid key, Guid? targetParentKey = null)
     {
         if (_navigationStructure.TryGetValue(key, out NavigationNode? nodeToMove) is false)
@@ -236,6 +453,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
+    /// <summary>
+    ///     Updates the sort order of a node in the main navigation structure.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node to update.</param>
+    /// <param name="newSortOrder">The new sort order value.</param>
+    /// <returns>
+    ///     <c>true</c> if the sort order was successfully updated; otherwise, <c>false</c> if the node doesn't exist.
+    /// </returns>
     public bool UpdateSortOrder(Guid key, int newSortOrder)
     {
         if (_navigationStructure.TryGetValue(key, out NavigationNode? node) is false)
@@ -248,6 +473,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
+    /// <summary>
+    ///     Permanently removes a node and all its descendants from the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node to remove from the recycle bin.</param>
+    /// <returns>
+    ///     <c>true</c> if the node and its descendants were successfully removed from the recycle bin;
+    ///     otherwise, <c>false</c> if the node doesn't exist in the bin.
+    /// </returns>
     public bool RemoveFromBin(Guid key)
     {
         if (TryRemoveNodeFromParentInStructure(_recycleBinNavigationStructure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
@@ -262,6 +495,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return _recycleBinNavigationStructure.TryRemove(key, out _);
     }
 
+    /// <summary>
+    ///     Restores a node and all its descendants from the recycle bin to the main navigation structure.
+    /// </summary>
+    /// <param name="key">The unique identifier of the node to restore.</param>
+    /// <param name="targetParentKey">
+    ///     The unique identifier of the target parent node in the main structure.
+    ///     If <c>null</c>, the node is restored to root level.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the node and its descendants were successfully restored;
+    ///     otherwise, <c>false</c> if the node doesn't exist in the bin or the target parent doesn't exist.
+    /// </returns>
     public bool RestoreFromBin(Guid key, Guid? targetParentKey = null)
     {
         if (_recycleBinNavigationStructure.TryGetValue(key, out NavigationNode? nodeToRestore) is false)

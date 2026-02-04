@@ -147,6 +147,9 @@ public static partial class Constants
         /// </summary>
         public const string DataDirectoryPlaceholder = "|DataDirectory|";
 
+        /// <summary>
+        ///     The wildcard character used to represent the invariant culture.
+        /// </summary>
         public const string InvariantCulture = "*";
     }
 }

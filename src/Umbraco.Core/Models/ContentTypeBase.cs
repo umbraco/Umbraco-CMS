@@ -35,6 +35,12 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     private string? _thumbnail = "folder.png";
     private ContentVariation _variations;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeBase" /> class with a parent identifier.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper for alias generation.</param>
+    /// <param name="parentId">The identifier of the parent content type.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="parentId" /> is zero.</exception>
     protected ContentTypeBase(IShortStringHelper shortStringHelper, int parentId)
     {
         _alias = string.Empty;
@@ -57,11 +63,23 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         _variations = ContentVariation.Nothing;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeBase" /> class with a parent content type.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper for alias generation.</param>
+    /// <param name="parent">The parent content type.</param>
     protected ContentTypeBase(IShortStringHelper shortStringHelper, IContentTypeBase parent)
         : this(shortStringHelper, parent, string.Empty)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeBase" /> class with a parent content type and alias.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper for alias generation.</param>
+    /// <param name="parent">The parent content type.</param>
+    /// <param name="alias">The alias for this content type.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="parent" /> is null.</exception>
     protected ContentTypeBase(IShortStringHelper shortStringHelper, IContentTypeBase parent, string alias)
     {
         if (parent == null)
@@ -140,6 +158,10 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     // TODO: should we mark this as EditorBrowsable hidden since it really isn't ever used?
     internal PropertyTypeCollection PropertyTypeCollection { get; private set; }
 
+    /// <summary>
+    ///     Converts this content type to a simple content type representation.
+    /// </summary>
+    /// <returns>A simple content type representation.</returns>
     public abstract ISimpleContentType ToSimple();
 
     /// <summary>
@@ -467,6 +489,11 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         }
     }
 
+    /// <summary>
+    ///     Creates a deep clone of this content type with reset identities.
+    /// </summary>
+    /// <param name="alias">The alias for the cloned content type.</param>
+    /// <returns>A deep clone with reset identities.</returns>
     public IContentTypeBase DeepCloneWithResetIdentities(string alias)
     {
         var clone = (IContentTypeBase)DeepClone();
@@ -489,9 +516,19 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         return clone;
     }
 
+    /// <summary>
+    ///     Handles changes to the property groups collection.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments.</param>
     protected void PropertyGroupsChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         OnPropertyChanged(nameof(PropertyGroups));
 
+    /// <summary>
+    ///     Handles changes to the property types collection.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments.</param>
     protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
 
         // enable this to detect duplicate property aliases. We do want this, however making this change in a
@@ -509,6 +546,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         // }
         OnPropertyChanged(nameof(PropertyTypes));
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);
