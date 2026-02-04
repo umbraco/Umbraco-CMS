@@ -363,14 +363,20 @@ export abstract class UmbTreeItemElementBase<
 				--umb-sign-bundle-bg: var(--uui-color-surface-emphasis);
 			}
 
-			uui-menu-item[active],
-			uui-menu-item[selected] {
+			uui-menu-item[active] {
 				--umb-sign-bundle-bg: var(--uui-color-current);
 			}
 
-			uui-menu-item[selected]:hover,
 			uui-menu-item[active]:hover {
 				--umb-sign-bundle-bg: var(--uui-color-current-emphasis);
+			}
+
+			uui-menu-item[selected] {
+				--umb-sign-bundle-bg: var(--uui-color-selected);
+			}
+
+			uui-menu-item[selected]:hover {
+				--umb-sign-bundle-bg: var(--uui-color-selected-emphasis);
 			}
 
 			#label {

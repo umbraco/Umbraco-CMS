@@ -32,20 +32,15 @@ public class MediaUrlFactory : IMediaUrlFactory
             .Select(mediaUrl => new MediaUrlInfo
             {
                 Culture = null,
-                Url = CreateMediaUrl(mediaUrl),
+                Url = CreateMediaUrl(mediaUrl, media.Trashed),
             })
             .ToArray();
 
-    private string CreateMediaUrl(string mediaUrl)
+    private string CreateMediaUrl(string mediaUrl, bool isTrashed)
     {
         var url = _absoluteUrlBuilder.ToAbsoluteUrl(mediaUrl).ToString();
 
-        if (_contentSettings.EnableMediaRecycleBinProtection is false)
-        {
-            return url;
-        }
-
-        return _contentSettings.EnableMediaRecycleBinProtection
+        return isTrashed && _contentSettings.EnableMediaRecycleBinProtection
             ? AddProtectedSuffixToMediaUrl(url)
             : url;
     }
