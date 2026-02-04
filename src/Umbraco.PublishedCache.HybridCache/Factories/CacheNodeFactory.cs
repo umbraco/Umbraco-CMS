@@ -37,7 +37,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
         };
     }
 
-    private static bool GetPublishedValue(IContent content, bool preview)
+    private static bool GetPublishedValue(IPublishableContentBase content, bool preview)
     {
         switch (content.PublishedState)
         {
@@ -79,6 +79,26 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             CreateDate = media.CreateDate,
             CreatorId = media.CreatorId,
             ContentTypeId = media.ContentTypeId,
+            Data = contentData,
+            IsDraft = false,
+        };
+    }
+
+    public ContentCacheNode ToContentCacheNode(IElement element, bool preview)
+    {
+        ContentData contentData = GetContentData(
+            element,
+            GetPublishedValue(element, preview),
+            null,
+            element.PublishCultureInfos?.Values.Select(x => x.Culture).ToHashSet() ?? []);
+        return new ContentCacheNode
+        {
+            Id = element.Id,
+            Key = element.Key,
+            SortOrder = element.SortOrder,
+            CreateDate = element.CreateDate,
+            CreatorId = element.CreatorId,
+            ContentTypeId = element.ContentTypeId,
             Data = contentData,
             IsDraft = false,
         };
@@ -128,10 +148,11 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
         // sanitize - names should be ok but ... never knows
         if (content.ContentType.VariesByCulture())
         {
-            ContentCultureInfosCollection? infos = content is IContent document
+            var publishableContent = content as IPublishableContentBase;
+            ContentCultureInfosCollection? infos = publishableContent is not null
                 ? published
-                    ? document.PublishCultureInfos
-                    : document.CultureInfos
+                    ? publishableContent.PublishCultureInfos
+                    : publishableContent.CultureInfos
                 : content.CultureInfos;
 
             // ReSharper disable once UseDeconstruction
@@ -139,7 +160,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             {
                 foreach (ContentCultureInfos cultureInfo in infos)
                 {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
+                    var cultureIsDraft = !published && publishableContent is not null && publishableContent.IsCultureEdited(cultureInfo.Culture);
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,

@@ -65,8 +65,8 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
         where TEnum : Enum
         => result(new ProblemDetailsBuilder().WithOperationStatus(status));
 
-    protected BadRequestObjectResult SkipTakeToPagingProblem() =>
-        BadRequest(new ProblemDetails
+    protected static BadRequestObjectResult SkipTakeToPagingProblem() =>
+        new(new ProblemDetails
         {
             Title = "Invalid skip/take",
             Detail = "Skip must be a multiple of take - i.e. skip = 10, take = 5",

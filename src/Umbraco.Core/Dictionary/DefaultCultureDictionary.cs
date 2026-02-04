@@ -139,5 +139,10 @@ internal sealed class DefaultCultureDictionary : ICultureDictionary
         return result;
     }
 
+    /// <summary>
+    /// Determines whether the specified translation matches the current language.
+    /// </summary>
+    /// <param name="translation">The dictionary translation to check.</param>
+    /// <returns><c>true</c> if the translation's language ISO code matches the current language; otherwise, <c>false</c>.</returns>
     private bool IsCurrentLanguage(IDictionaryTranslation translation) => translation.LanguageIsoCode.Equals(Language?.IsoCode);
 }

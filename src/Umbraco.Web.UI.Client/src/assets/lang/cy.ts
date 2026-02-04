@@ -1278,7 +1278,8 @@ export default {
 		headline: 'Dewis fersiwn i gymharu efo fersiwn bresennol',
 		changes: 'Newidiadau',
 		diffHelp:
-			"May hyn yn dangos y gwahaniaeth rhwng y fersiwn bresennol ac y fersiwn dewiswyd<br />Ni fydd testun <del>coch</del> yn cael ei ddangos yn y fersiwn dewiswyd. , <ins>mae gwyrdd yn golygu wedi'i ychwanegu</ins>",
+			'Bydd <del>testun coch</del> yn cael ei dynnu yn y fersiwn a ddewiswyd, bydd <ins>testun gwyrdd</ins> yn cael ei ychwanegu.',
+		showDiff: "Dangos gwahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd.",
 		documentRolledBack: "Dogfen wedi'i rolio yn ôl",
 		htmlHelp:
 			'Mae hyn yn dangos y fersiwn dewiswyd ar ffurf HTML, os hoffwch weld y gwahaniaeth rhwng 2 fersiwn ar yr un pryd, defnyddiwch y wedd gwahaniaethol',
@@ -1291,7 +1292,7 @@ export default {
 		currentPublishedVersion: 'Fersiwn cyhoeddedig cyfredol',
 		created: 'Wedi creu',
 		currentVersion: 'Fersiwn gyfredol',
-		noDiff: "Nid oes unrhyw wahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd",
+		noDiff: "Nid oes unrhyw wahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd.",
 	},
 	scripts: {
 		editscript: 'Golygu ffeil sgript',

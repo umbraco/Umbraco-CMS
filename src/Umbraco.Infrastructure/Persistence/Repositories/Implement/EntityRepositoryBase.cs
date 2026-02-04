@@ -61,9 +61,13 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     {
     }
 
+// TODO (V18): Make these fields into read-only properties.
+
+#pragma warning disable IDE1006 // Naming Styles
     protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
 
     protected readonly ICacheSyncService CacheSyncService;
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Gets the logger
@@ -178,11 +182,11 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             // don't query by anything that is a default of T (like a zero)
             // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
             // .Where(x => Equals(x, default(TId)) == false)
-            .ToArray();
+            .ToArray() ?? [];
 
         // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-        if (ids?.Length <= Constants.Sql.MaxParameterCount)
+        if (ids.Length <= Constants.Sql.MaxParameterCount)
         {
             return CachePolicy.GetAll(ids, PerformGetAll);
         }

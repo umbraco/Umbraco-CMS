@@ -8,11 +8,8 @@ using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -84,8 +81,6 @@ internal sealed class DatabaseDataCreator
             Query = "@Message like 'end%'",
         }
     ];
-
-    private const string ImageMediaTypeKey = "cc07b313-0843-4aa8-bbda-871c8da728c8";
 
     private readonly IDatabase _database;
 
@@ -216,10 +211,91 @@ internal sealed class DatabaseDataCreator
     {
         var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.AdminGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionAssignDomain.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionRights.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "7",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+            ],
+            [Constants.Security.EditorGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+            ],
+            [Constants.Security.WriterGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+            ],
+            [Constants.Security.TranslatorGroupKey] =
+            [
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+            ],
         };
 
         var i = 1;
@@ -290,7 +366,7 @@ internal sealed class DatabaseDataCreator
                 Level = 0,
                 Path = "-1",
                 SortOrder = 0,
-                UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"),
+                UniqueId = Constants.System.RootSystemKey,
                 Text = "SYSTEM DATA: umbraco master root",
                 NodeObjectType = Constants.ObjectTypes.SystemRoot,
                 CreateDate = DateTime.UtcNow,
@@ -329,6 +405,21 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
+                CreateDate = DateTime.UtcNow,
+            });
+        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+            new NodeDto
+            {
+                NodeId = Constants.System.RecycleBinElement,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 0,
+                Path = "-1,-22",
+                SortOrder = 0,
+                UniqueId = Constants.System.RecycleBinElementKey,
+                Text = "Recycle Bin",
+                NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
                 CreateDate = DateTime.UtcNow,
             });
 
@@ -932,10 +1023,9 @@ internal sealed class DatabaseDataCreator
 
     private void CreateNodeDataForMediaTypes()
     {
-        var folderUniqueId = new Guid("f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            folderUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Folder,
             new NodeDto
             {
                 NodeId = 1031,
@@ -945,7 +1035,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1031",
                 SortOrder = 2,
-                UniqueId = folderUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.FolderGuid,
                 Text = Constants.Conventions.MediaTypes.Folder,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -953,10 +1043,9 @@ internal sealed class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var imageUniqueId = new Guid(ImageMediaTypeKey);
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            imageUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Image,
             new NodeDto
             {
                 NodeId = 1032,
@@ -966,7 +1055,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1032",
                 SortOrder = 2,
-                UniqueId = imageUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.ImageGuid,
                 Text = Constants.Conventions.MediaTypes.Image,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -974,10 +1063,9 @@ internal sealed class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var fileUniqueId = new Guid("4c52d8ab-54e6-40cd-999c-7a5f24903e4d");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            fileUniqueId.ToString(),
+            Constants.MediaTypes.Guids.File,
             new NodeDto
             {
                 NodeId = 1033,
@@ -987,7 +1075,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1033",
                 SortOrder = 2,
-                UniqueId = fileUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.FileGuid,
                 Text = Constants.Conventions.MediaTypes.File,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -995,10 +1083,9 @@ internal sealed class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var videoUniqueId = new Guid("f6c515bb-653c-4bdc-821c-987729ebe327");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            videoUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Video,
             new NodeDto
             {
                 NodeId = 1034,
@@ -1008,7 +1095,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1034",
                 SortOrder = 2,
-                UniqueId = videoUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.VideoGuid,
                 Text = Constants.Conventions.MediaTypes.Video,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -1016,10 +1103,9 @@ internal sealed class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var audioUniqueId = new Guid("a5ddeee0-8fd8-4cee-a658-6f1fcdb00de3");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            audioUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Audio,
             new NodeDto
             {
                 NodeId = 1035,
@@ -1029,7 +1115,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1035",
                 SortOrder = 2,
-                UniqueId = audioUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.AudioGuid,
                 Text = Constants.Conventions.MediaTypes.Audio,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -1037,10 +1123,9 @@ internal sealed class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var articleUniqueId = new Guid("a43e3414-9599-4230-a7d3-943a21b20122");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            articleUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Article,
             new NodeDto
             {
                 NodeId = 1036,
@@ -1050,7 +1135,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1036",
                 SortOrder = 2,
-                UniqueId = articleUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.ArticleGuid,
                 Text = Constants.Conventions.MediaTypes.Article,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -1058,10 +1143,9 @@ internal sealed class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var svgUniqueId = new Guid("c4b1efcf-a9d5-41c4-9621-e9d273b52a9c");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            svgUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Svg,
             new NodeDto
             {
                 NodeId = 1037,
@@ -1071,7 +1155,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1037",
                 SortOrder = 2,
-                UniqueId = svgUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.SvgGuid,
                 Text = "Vector Graphics (SVG)",
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -1082,10 +1166,9 @@ internal sealed class DatabaseDataCreator
 
     private void CreateNodeDataForMemberTypes()
     {
-        var memberUniqueId = new Guid("d59be02f-1df9-4228-aa1e-01917d806cda");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
-            memberUniqueId.ToString(),
+            Constants.MemberTypes.Guids.Member,
             new NodeDto
             {
                 NodeId = 1044,
@@ -1095,7 +1178,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1044",
                 SortOrder = 0,
-                UniqueId = memberUniqueId,
+                UniqueId = Constants.MemberTypes.Guids.MemberGuid,
                 Text = Constants.Conventions.MemberTypes.DefaultAlias,
                 NodeObjectType = Constants.ObjectTypes.MemberType,
                 CreateDate = DateTime.UtcNow,
@@ -1125,6 +1208,8 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ElementTree, Name = "ElementTree" });
     }
 
     private void CreateContentTypeData()
@@ -1310,6 +1395,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.AdminGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
                 Description = "Users with full access to all sections and functionality",
@@ -1328,6 +1414,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.WriterGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = WriterGroupAlias,
                 Name = "Writers",
                 Description = "Users with permission to create and update but not publish content",
@@ -1346,6 +1433,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.EditorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
                 Description = "Users with full permission to create, update and publish content",
@@ -1364,6 +1452,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.TranslatorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = TranslatorGroupAlias,
                 Name = "Translators",
                 Description = "Users with permission to manage dictionary entries",
@@ -1414,12 +1503,15 @@ internal sealed class DatabaseDataCreator
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Users });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Forms });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Translation });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Content });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Content });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Media });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Forms });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 4, AppAlias = Constants.Applications.Translation });
     }
@@ -2576,7 +2668,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
                                     "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
                 });
         }
@@ -2593,7 +2685,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
                                     "\", \"multiple\": true}",
                 });
         }
@@ -2665,7 +2757,30 @@ internal sealed class DatabaseDataCreator
             null,
             false,
             true);
-
+        CreateRelationTypeData(
+            7,
+            Constants.Conventions.RelationTypes.RelatedElementAlias,
+            Constants.Conventions.RelationTypes.RelatedElementName,
+            null,
+            null,
+            false,
+            true);
+        CreateRelationTypeData(
+            8,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.Element,
+            false,
+            false);
+        CreateRelationTypeData(
+            9,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.ElementContainer,
+            false,
+            false);
     }
 
     private void CreateRelationTypeData(

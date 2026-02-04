@@ -13,16 +13,36 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for creating, updating, and managing content (documents).
+/// </summary>
 internal sealed class ContentEditingService
     : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
-    private readonly IUserService _userService;
-    private readonly ILocalizationService _localizationService;
     private readonly ILanguageService _languageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentEditingService"/> class.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="treeEntitySortingService">The tree entity sorting service.</param>
+    /// <param name="contentValidationService">The content validation service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="localizationService">The localization service.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
     public ContentEditingService(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -52,62 +72,54 @@ internal sealed class ContentEditingService
             treeEntitySortingService,
             optionsMonitor,
             relationService,
-            contentTypeFilters)
+            contentTypeFilters,
+            languageService,
+            userService,
+            localizationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
         _logger = logger;
-        _userService = userService;
-        _localizationService = localizationService;
         _languageService = languageService;
     }
 
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
 
+    /// <inheritdoc />
     public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
         return Task.FromResult(content);
     }
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel, Guid userKey)
+    /// <inheritdoc />
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(
+        Guid key,
+        ValidateContentUpdateModel updateModel,
+        Guid userKey)
     {
         IContent? content = ContentService.GetById(key);
         return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key, await GetCulturesToValidate(updateModel.Cultures, userKey))
+            ? await ValidateCulturesAndPropertiesAsync(
+                updateModel,
+                content.ContentType.Key,
+                updateModel.Cultures,
+                userKey)
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel, Guid userKey)
-        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, await GetCulturesToValidate(createModel.Variants.Select(variant => variant.Culture), userKey));
+    /// <inheritdoc />
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
+        ContentCreateModel createModel,
+        Guid userKey)
+        => await ValidateCulturesAndPropertiesAsync(
+            createModel,
+            createModel.ContentTypeKey,
+            createModel.Variants.Select(variant => variant.Culture),
+            userKey);
 
-    private async Task<IEnumerable<string?>?> GetCulturesToValidate(IEnumerable<string?>? cultures, Guid userKey)
-    {
-        // Cultures to validate can be provided by the calling code, but if the editor is restricted to only have
-        // access to certain languages, we don't want to validate by any they aren't allowed to edit.
-
-        // TODO: Remove this check once the obsolete overloads to ValidateCreateAsync and ValidateUpdateAsync that don't provide a user key are removed.
-        // We only have this to ensure backwards compatibility with the obsolete overloads.
-        if (userKey == Guid.Empty)
-        {
-            return cultures;
-        }
-
-        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
-
-        if (cultures == null)
-        {
-            // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
-            // should only validate the ones they do.
-            IEnumerable<string> allCultures = await _languageService.GetAllIsoCodesAsync();
-            return allowedCultures.Count == allCultures.Count() ? null : allowedCultures;
-        }
-
-        // If explicit cultures are provided, we should only validate the ones the user has access to.
-        return cultures.Where(x => !string.IsNullOrEmpty(x) && allowedCultures.Contains(x)).ToList();
-    }
-
+    /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
@@ -226,16 +238,7 @@ internal sealed class ContentEditingService
         return contentWithPotentialUnallowedChanges;
     }
 
-    private async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
-    {
-        IUser? user = await _userService.GetAsync(userKey)
-            ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
-
-        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
-
-        return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
-    }
-
+    /// <inheritdoc />
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
     {
         IContent? content = ContentService.GetById(key);
@@ -274,37 +277,36 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
         => await HandleMoveToRecycleBinAsync(key, userKey);
 
+    /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey,true);
 
+    /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey,false);
 
+    /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
 
+    /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey, true);
 
+    /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => await HandleCopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey);
 
+    /// <inheritdoc />
     public async Task<ContentEditingOperationStatus> SortAsync(
         Guid? parentKey,
         IEnumerable<SortingModel> sortingModels,
         Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
-
-    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
-        ContentEditingModelBase contentEditingModelBase,
-        Guid contentTypeKey,
-        IEnumerable<string?>? culturesToValidate = null)
-        => await ValidateCulturesAsync(contentEditingModelBase) is false
-            ? Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult())
-            : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
 
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)
     {
@@ -331,22 +333,29 @@ internal sealed class ContentEditingService
         return ContentEditingOperationStatus.Success;
     }
 
+    /// <inheritdoc />
     protected override IContent New(string? name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
+    /// <inheritdoc />
     protected override OperationResult? Move(IContent content, int newParentId, int userId)
         => ContentService.Move(content, newParentId, userId);
 
+    /// <inheritdoc />
     protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
 
+    /// <inheritdoc />
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
 
+    /// <inheritdoc />
     protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
 
+    /// <inheritdoc />
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
+    /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)
     {
         OperationResult result = ContentService.Sort(items, userId);

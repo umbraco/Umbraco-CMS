@@ -10,7 +10,14 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class DatabaseServerRegistrarSettings
 {
+    /// <summary>
+    ///     The default time to wait between database calls.
+    /// </summary>
     internal const string StaticWaitTimeBetweenCalls = "00:01:00";
+
+    /// <summary>
+    ///     The default timeout for considering a server stale.
+    /// </summary>
     internal const string StaticStaleServerTimeout = "00:02:00";
 
     /// <summary>

@@ -32,7 +32,7 @@ public static class PublishedContentExtensions
     ///     The specific culture to get the name for. If null is used the current culture is used (Default is
     ///     null).
     /// </param>
-    public static string Name(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
+    public static string Name(this IPublishedElement content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
         if (content == null)
         {

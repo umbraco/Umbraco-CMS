@@ -5,12 +5,15 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides validation services for content properties.
+/// </summary>
 public interface IPropertyValidationService
 {
     /// <summary>
     ///     Validates the content item's properties pass validation rules
     /// </summary>
-    bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact);
+    bool IsPropertyDataValid(IPublishableContentBase content, out IProperty[] invalidProperties, CultureImpact? impact);
 
     /// <summary>
     ///     Gets a value indicating whether the property has valid values.

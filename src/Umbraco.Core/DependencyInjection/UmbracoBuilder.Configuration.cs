@@ -14,6 +14,14 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    ///     Adds Umbraco options of type <typeparamref name="TOptions" /> to the builder.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options to add. Must have the <see cref="UmbracoOptionsAttribute" />.</typeparam>
+    /// <param name="builder">The builder.</param>
+    /// <param name="configure">Optional action to configure the <see cref="OptionsBuilder{TOptions}" />.</param>
+    /// <returns>The <see cref="IUmbracoBuilder" />.</returns>
+    /// <exception cref="ArgumentException">Thrown when <typeparamref name="TOptions" /> does not have the <see cref="UmbracoOptionsAttribute" />.</exception>
     private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
@@ -57,6 +65,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
+            .AddUmbracoOptions<DictionarySettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
             {

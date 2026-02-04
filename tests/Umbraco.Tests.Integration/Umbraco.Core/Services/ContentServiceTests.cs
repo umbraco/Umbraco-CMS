@@ -1413,7 +1413,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
                 parentId,
                 0,
                 500,
-                out var totalChildren); // we only want the first so page size, etc.. is abitrary
+                out var totalChildren,
+                propertyAliases: null,
+                filter: null,
+                ordering: null); // we only want the first so page size, etc.. is abitrary
 
         // children are published including ... that was released 5 mins ago
         Assert.IsTrue(children.First(x => x.Id == Subpage.Id).Published);
@@ -2256,7 +2259,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
 
         var child = ContentService.GetById(Subpage.Id);
-        var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
+        var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total, propertyAliases: null, filter: null, ordering: null).First();
         Assert.AreEqual(childCopy.Name, child.Name);
         Assert.AreNotEqual(childCopy.Id, child.Id);
         Assert.AreNotEqual(childCopy.Key, child.Key);
@@ -2815,10 +2818,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             ContentService.Save(c1);
         }
 
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total).ToArray();
+        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
@@ -2853,20 +2856,186 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         }
 
         // children in root including the folder - not the descendants in the folder
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total).ToArray();
+        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
 
         // children in folder
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Null_PropertyAliases_Returns_All_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - null propertyAliases should load all properties
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: null);
+
+        // Assert - All properties should have their values loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Not.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Empty_PropertyAliases_Returns_No_Property_Values()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - empty propertyAliases should load no custom properties
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: []);
+
+        // Assert - Properties should not be present when propertyAliases is empty
+        Assert.That(retrievedChild.Properties.Contains("title"), Is.False, "title property should not be present");
+        Assert.That(retrievedChild.Properties.Contains("bodyText"), Is.False, "bodyText property should not be present");
+        Assert.That(retrievedChild.Properties.Contains("author"), Is.False, "author property should not be present");
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Single_PropertyAlias_Returns_Only_That_Property()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - only "title" should be loaded
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title"]);
+
+        // Assert - Only "title" property should have its value loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Multiple_PropertyAliases_Returns_Only_Those_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - "title" and "author" should be loaded, but not "bodyText"
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title", "author"]);
+
+        // Assert - Only "title" and "author" properties should have values loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_NonExistent_PropertyAlias_Returns_No_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - non-existent property alias should result in no property values
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["nonExistentProperty"]);
+
+        // Assert - No property values should be loaded since the alias doesn't exist
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties.Contains("nonExistentProperty"), Is.False);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_LoadTemplates_True_Loads_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - loadTemplates: true (default) should load templates
+        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: true);
+
+        // Assert - Template should be loaded
+        Assert.That(retrievedChild.TemplateId, Is.Not.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_LoadTemplates_False_Does_Not_Load_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - loadTemplates: false should not load templates
+        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: false);
+
+        // Assert - Template should not be loaded
+        Assert.That(retrievedChild.TemplateId, Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_Default_LoadTemplates_Loads_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - default (no loadTemplates specified) should load templates (backwards compatible)
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+
+        // Assert - Template should be loaded by default
+        Assert.That(children[0].TemplateId, Is.Not.Null);
+    }
+
+    /// <summary>
+    /// Creates a content type with properties (title, bodyText, author) and a parent with one child.
+    /// Returns the parent ID for use in GetPagedChildren tests.
+    /// </summary>
+    private int CreateContentWithChildForGetPagedChildrenParameterTests()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+        ContentTypeService.Save(contentType);
+
+        var parent = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(parent);
+
+        var child = ContentBuilder.CreateSimpleContent(contentType, "Child", parent.Id);
+        ContentService.Save(child);
+
+        return parent.Id;
+    }
+
+    /// <summary>
+    /// Gets the single child of the parent using GetPagedChildren with the specified propertyAliases.
+    /// Asserts that exactly one child is returned.
+    /// </summary>
+    private IContent GetSingleChildWithPropertyAliases(int parentId, string[]? propertyAliases)
+    {
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases, filter: null, ordering: null).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(1));
+
+        return children[0];
+    }
+
+    /// <summary>
+    /// Gets the single child of the parent using GetPagedChildren with the specified loadTemplates parameter.
+    /// Asserts that exactly one child is returned.
+    /// </summary>
+    private IContent GetSingleChildWithLoadTemplates(int parentId, bool loadTemplates)
+    {
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null, loadTemplates: loadTemplates).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(1));
+
+        return children[0];
     }
 
     [Test]
@@ -3129,7 +3298,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         }
 
         // get all
-        var list = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total).ToList();
+        var list = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToList();
 
         Console.WriteLine("ALL");
         WriteList(list);
@@ -3146,6 +3315,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -3158,6 +3328,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
             Ordering.By("name", culture: langDa.IsoCode)).ToList();
 
@@ -3173,6 +3344,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -3192,6 +3364,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
             Ordering.By("name", Direction.Descending, langFr.IsoCode)).ToList();
 

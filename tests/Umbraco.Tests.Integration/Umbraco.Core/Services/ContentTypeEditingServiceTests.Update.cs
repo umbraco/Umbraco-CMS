@@ -1024,4 +1024,80 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
     }
+
+    [Test]
+    public async Task Cannot_Add_Composition_With_Conflicting_Property_Type_Alias()
+    {
+        var targetContentTypePropertyType = ContentTypePropertyTypeModel("Test Property", "testProperty");
+        var targetContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Target",
+                propertyTypes: [targetContentTypePropertyType]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Composition",
+                propertyTypes: [ContentTypePropertyTypeModel("Same Test Property Alias", "testProperty")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Target",
+            propertyTypes: [targetContentTypePropertyType],
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(targetContentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
+        });
+    }
+
+    [Test]
+    public async Task Can_Add_Composition_With_Conflicting_Property_Type_Alias_When_The_Property_Type_Is_Removed_From_Target()
+    {
+        var targetContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Target",
+                propertyTypes: [ContentTypePropertyTypeModel("Test Property", "testProperty")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Composition",
+                propertyTypes: [ContentTypePropertyTypeModel("Same Test Property Alias", "testProperty")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Target",
+            propertyTypes: [],
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(targetContentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
+        });
+
+        // Verify the composition was added and the property from the composition is accessible.
+        var updatedContentType = result.Result!;
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, updatedContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(compositionContentType.Key, updatedContentType.ContentTypeComposition.Single().Key);
+
+            // The property should come from the composition, not be a local property
+            Assert.AreEqual(0, updatedContentType.PropertyTypes.Count());
+
+            // The property from the composition should be accessible via CompositionPropertyTypes
+            Assert.AreEqual(1, updatedContentType.CompositionPropertyTypes.Count());
+            var compositionProperty = updatedContentType.CompositionPropertyTypes.Single();
+            Assert.AreEqual("testProperty", compositionProperty.Alias);
+            Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
+        });
+    }
 }

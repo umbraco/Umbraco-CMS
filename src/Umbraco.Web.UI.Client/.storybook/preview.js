@@ -16,7 +16,7 @@ import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/packages/core/lit-element';
 import { umbLocalizationRegistry } from '../src/packages/core/localization';
-import customElementManifests from '../dist-cms/custom-elements.json';
+import customElementManifests from '../custom-elements.json';
 import icons from '../src/packages/core/icon-registry/icons';
 
 import '../src/libs/context-api/provide/context-provider.element';

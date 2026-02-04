@@ -281,6 +281,9 @@
     <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.Query.cs">
       <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.ThreadSafety.cs">
+      <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceTests.ChildUserAccessEntities.cs">
       <DependentUpon>UserStartNodeEntitiesServiceTests.cs</DependentUpon>
     </Compile>
@@ -301,6 +304,78 @@
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.GetScaffold.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Create.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Update.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Delete.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Create.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Update.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Delete.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Publish.cs">
+      <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Unpublish.cs">
+      <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Move.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Copy.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Move.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Create.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Update.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Get.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Delete.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.EmptyRecycleBin.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.DeleteFromRecycleBin.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.DeleteFromRecycleBin.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Validate.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.ChildUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.RootUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.SiblingUserAccessEntities.cs">
+      <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

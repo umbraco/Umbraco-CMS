@@ -73,6 +73,7 @@
     <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
   </area>
   <area alias="member">
+    <key alias="incorrectPassword">The provided password is incorrect</key>
     <key alias="duplicateMemberLogin">A member with this login already exists</key>
     <key alias="memberHasGroup">The member is already in group '%0%'</key>
     <key alias="memberHasPassword">The member already has a password set</key>
@@ -514,6 +515,8 @@
   <area alias="recycleBin">
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
     <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
+    <key alias="elementTrashed">Trashed element with Id: {0} related to original parent container with Id: {1}</key>
+    <key alias="elementContainerTrashed">Trashed element container with Id: {0} related to original parent container with Id: {1}</key>
   </area>
   <area alias="permissions">
     <key alias="FolderCreation">Folder creation</key>

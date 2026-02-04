@@ -129,12 +129,19 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     private void OnDeserialized(StreamingContext context) =>
         _isKeyAssigned = HasIdentity && _key != Guid.Empty;
 
+    /// <summary>
+    ///     Determines whether the specified <see cref="EntityBase" /> is equal to this instance.
+    /// </summary>
+    /// <param name="other">The <see cref="EntityBase" /> to compare with this instance.</param>
+    /// <returns><c>true</c> if the specified entity is equal to this instance; otherwise, <c>false</c>.</returns>
     public virtual bool Equals(EntityBase? other) =>
         other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));
 
+    /// <inheritdoc />
     public override bool Equals(object? obj) =>
         obj != null && (ReferenceEquals(this, obj) || SameIdentityAs(obj as EntityBase));
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -146,6 +153,11 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
         }
     }
 
+    /// <summary>
+    ///     Determines whether this entity has the same identity as another entity.
+    /// </summary>
+    /// <param name="other">The other entity to compare.</param>
+    /// <returns><c>true</c> if the entities have the same identity; otherwise, <c>false</c>.</returns>
     private bool SameIdentityAs(EntityBase? other)
     {
         if (other == null)
@@ -164,6 +176,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
         return GetType() == other.GetType() && HasIdentity && other.HasIdentity && Id == other.Id;
     }
 
+    /// <inheritdoc />
     public object DeepClone()
     {
         // memberwise-clone (ie shallow clone) the entity

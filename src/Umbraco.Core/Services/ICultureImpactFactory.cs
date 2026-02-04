@@ -1,7 +1,11 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for creating <see cref="CultureImpact"/> instances that represent
+///     the impact of culture variations on content operations.
+/// </summary>
 public interface ICultureImpactFactory
 {
     /// <summary>
@@ -14,7 +18,7 @@ public interface ICultureImpactFactory
     /// <remarks>
     /// <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    CultureImpact? Create(string culture, bool isDefault, IContent content);
+    CultureImpact? Create(string culture, bool isDefault, IContentBase content);
 
     /// <summary>
     /// Gets the impact of 'all' cultures (including the invariant culture).

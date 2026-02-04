@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a template is deleted.
+/// </summary>
 [WebhookEvent("Template Deleted")]
 public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplateDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public TemplateDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotif
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.TemplateDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(TemplateDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

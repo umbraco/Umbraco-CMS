@@ -6,38 +6,46 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class PropertyDataDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyData;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PropertyTypeIdColumnName = "propertyTypeId";
+    public const string VersionIdColumnName = "versionId";
     public const int VarcharLength = 512;
     public const int SegmentLength = 256;
+
+    internal const string ReferenceColumnName = "PropertyTypeId"; // should be PropertyTypeId, but for database compatibility we keep it like this
+
+    private const string LanguageIdColumnName = "languageId";
+    private const string SegmentColumnName = "segment";
 
     private decimal? _decimalValue;
 
     // pk, not used at the moment (never updating)
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("versionId")]
+    [Column(VersionIdColumnName)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,propertyTypeId,languageId,segment")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = $"{VersionIdColumnName},{PropertyTypeIdColumnName},{LanguageIdColumnName},{SegmentColumnName}")]
     public int VersionId { get; set; }
 
-    [Column("propertyTypeId")]
+    [Column(PropertyTypeIdColumnName)]
     [ForeignKey(typeof(PropertyTypeDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_PropertyTypeId")]
     public int PropertyTypeId { get; set; }
 
-    [Column("languageId")]
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? LanguageId { get; set; }
 
-    [Column("segment")]
+    [Column(SegmentColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Segment")]
     [NullSetting(NullSetting = NullSettings.Null)]
     [Length(SegmentLength)]
@@ -70,7 +78,7 @@ internal sealed class PropertyDataDto
     public string? TextValue { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = "PropertyTypeId")]
+    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
     public PropertyTypeDto? PropertyTypeDto { get; set; }
 
     [Ignore]

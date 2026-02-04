@@ -80,6 +80,10 @@ public static class UdiGetterExtensions
         {
             entityType = Constants.UdiEntityType.MemberTypeContainer;
         }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.Element)
+        {
+            entityType = Constants.UdiEntityType.ElementContainer;
+        }
         else
         {
             throw new NotSupportedException($"Contained object type {entity.ContainedObjectType} is not supported.");
