@@ -1,20 +1,20 @@
 import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, property, state, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 import '../ref-rte-block/index.js';
-import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
-import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @class UmbBlockRteEntryElement
@@ -291,9 +291,12 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderActionBar() {
-		return this._showActions
-			? html`<uui-action-bar>${this.#renderEditAction()}${this.#renderEditSettingsAction()}</uui-action-bar>`
-			: nothing;
+		if (!this._showActions) return nothing;
+		return html`
+			<uui-action-bar>
+				${this.#renderEditAction()}${this.#renderEditSettingsAction()}${this.#renderDeleteAction()}
+			</uui-action-bar>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -351,6 +354,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							: nothing}
 					</uui-button>`
 				: nothing}
+		`;
+	}
+
+	#renderDeleteAction() {
+		return html`
+			<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
+				<uui-icon name="icon-remove"></uui-icon>
+			</uui-button>
 		`;
 	}
 
