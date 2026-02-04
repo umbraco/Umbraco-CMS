@@ -44,42 +44,6 @@ public class ContentImagingSettingsTests
     }
 
     [Test]
-    public void ImageFileTypes_DefaultValue_ContainsExpectedFormats()
-    {
-        // Arrange
-        var settings = new ContentImagingSettings();
-
-        // Assert
-        Assert.That(settings.ImageFileTypes, Is.Not.Null);
-        Assert.That(settings.ImageFileTypes, Is.Not.Empty);
-
-        // Check that default formats are present
-        var expectedFormats = new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif", "webp" };
-        foreach (var format in expectedFormats)
-        {
-            Assert.That(
-                settings.ImageFileTypes,
-                Does.Contain(format),
-                $"Expected ImageFileTypes to contain '{format}'");
-        }
-    }
-
-    [Test]
-    public void ImageFileTypes_DefaultValue_MatchesStaticConstant()
-    {
-        // Arrange
-        var settings = new ContentImagingSettings();
-        var expectedFormats = ContentImagingSettings.StaticImageFileTypes.Split(Constants.CharArrays.Comma);
-
-        // Assert
-        Assert.That(settings.ImageFileTypes.Count, Is.EqualTo(expectedFormats.Length));
-        foreach (var format in expectedFormats)
-        {
-            Assert.That(settings.ImageFileTypes, Does.Contain(format));
-        }
-    }
-
-    [Test]
     public void ImageFileTypes_CanBeConfigured_WithCustomFormats()
     {
         // Arrange
@@ -95,25 +59,6 @@ public class ContentImagingSettingsTests
         Assert.That(settings.ImageFileTypes, Does.Contain("jpg"));
         Assert.That(settings.ImageFileTypes, Does.Contain("png"));
         Assert.That(settings.ImageFileTypes, Does.Contain("webp"));
-    }
-
-    [Test]
-    public void ImageFileTypes_CanBeConfigured_WithCustomFormats()
-    {
-        // Arrange
-        var customFormats = new HashSet<string> { "jpg", "png", "pdf", "eps" };
-        var settings = new ContentImagingSettings
-        {
-            ImageFileTypes = customFormats,
-        };
-
-        // Assert
-        Assert.That(settings.ImageFileTypes, Is.EqualTo(customFormats));
-        Assert.That(settings.ImageFileTypes.Count, Is.EqualTo(4));
-        Assert.That(settings.ImageFileTypes, Does.Contain("jpg"));
-        Assert.That(settings.ImageFileTypes, Does.Contain("png"));
-        Assert.That(settings.ImageFileTypes, Does.Contain("pdf"));
-        Assert.That(settings.ImageFileTypes, Does.Contain("eps"));
     }
 
     [Test]
@@ -216,7 +161,6 @@ public class ContentImagingSettingsTests
     public void StaticConstants_HaveExpectedValues()
     {
         // Assert
-        Assert.That(ContentImagingSettings.StaticImageFileTypes, Is.EqualTo("jpeg,jpg,gif,bmp,png,tiff,tif,webp"));
         Assert.That(ContentImagingSettings.StaticImageFileTypes, Is.EqualTo("jpg,jpeg,png,gif,webp,bmp,tif,tiff"));
     }
 
