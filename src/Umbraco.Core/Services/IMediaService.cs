@@ -8,16 +8,48 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IMediaService : IContentServiceBase<IMedia>
 {
+    /// <summary>
+    ///     Gets the count of media items that are not in the recycle bin.
+    /// </summary>
+    /// <param name="contentTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
+    /// <returns>The count of media items not in the recycle bin.</returns>
     int CountNotTrashed(string? contentTypeAlias = null);
 
+    /// <summary>
+    ///     Gets the total count of media items.
+    /// </summary>
+    /// <param name="mediaTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
+    /// <returns>The total count of media items.</returns>
     int Count(string? mediaTypeAlias = null);
 
+    /// <summary>
+    ///     Gets the count of child media items under the specified parent.
+    /// </summary>
+    /// <param name="parentId">The Id of the parent <see cref="IMedia" /> to count children for.</param>
+    /// <param name="mediaTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
+    /// <returns>The count of child media items.</returns>
     int CountChildren(int parentId, string? mediaTypeAlias = null);
 
+    /// <summary>
+    ///     Gets the count of descendant media items under the specified parent.
+    /// </summary>
+    /// <param name="parentId">The Id of the parent <see cref="IMedia" /> to count descendants for.</param>
+    /// <param name="mediaTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
+    /// <returns>The count of descendant media items.</returns>
     int CountDescendants(int parentId, string? mediaTypeAlias = null);
 
+    /// <summary>
+    ///     Gets a collection of <see cref="IMedia" /> objects by their integer Ids.
+    /// </summary>
+    /// <param name="ids">The collection of integer Ids to retrieve media for.</param>
+    /// <returns>An enumerable collection of <see cref="IMedia" /> objects.</returns>
     IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
 
+    /// <summary>
+    ///     Gets a collection of <see cref="IMedia" /> objects by their unique Guids.
+    /// </summary>
+    /// <param name="ids">The collection of <see cref="Guid" /> keys to retrieve media for.</param>
+    /// <returns>An enumerable collection of <see cref="IMedia" /> objects.</returns>
     IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
@@ -388,5 +420,10 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>The size of the media.</returns>
     long GetMediaFileSize(string filepath);
 
+    /// <summary>
+    ///     Empties the Recycle Bin asynchronously by deleting all <see cref="IMedia" /> that resides in the bin.
+    /// </summary>
+    /// <param name="userId">The <see cref="Guid" /> key of the user emptying the Recycle Bin.</param>
+    /// <returns>A <see cref="Task{TResult}" /> representing the asynchronous operation with an <see cref="OperationResult" />.</returns>
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
 }

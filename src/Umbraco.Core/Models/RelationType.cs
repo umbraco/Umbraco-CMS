@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -17,11 +17,28 @@ public class RelationType : EntityBase, IRelationTypeWithIsDependency
     private string _name;
     private Guid? _parentObjectType;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RelationType" /> class with alias and name.
+    /// </summary>
+    /// <param name="alias">The alias of the relation type.</param>
+    /// <param name="name">The name of the relation type.</param>
     public RelationType(string alias, string name)
         : this(name, alias, false, null, null, false)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RelationType" /> class with full configuration.
+    /// </summary>
+    /// <param name="name">The name of the relation type.</param>
+    /// <param name="alias">The alias of the relation type.</param>
+    /// <param name="isBidrectional">A value indicating whether the relation is bidirectional.</param>
+    /// <param name="parentObjectType">The object type GUID of the parent.</param>
+    /// <param name="childObjectType">The object type GUID of the child.</param>
+    /// <param name="isDependency">A value indicating whether this relation represents a dependency.</param>
+    /// <param name="key">The optional unique key for the relation type.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="alias"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> or <paramref name="alias"/> is empty or whitespace.</exception>
     public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency, Guid? key = null)
     {
         if (name == null)
@@ -113,6 +130,12 @@ public class RelationType : EntityBase, IRelationTypeWithIsDependency
         set => SetPropertyValueAndDetectChanges(value, ref _childObjectType, nameof(ChildObjectType));
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the relation represents a dependency.
+    /// </summary>
+    /// <remarks>
+    /// When <c>true</c>, the child entity depends on the parent entity.
+    /// </remarks>
     public bool IsDependency
     {
         get => _isDependency;

@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models.Installer;
+namespace Umbraco.Cms.Core.Models.Installer;
 
+/// <summary>
+///     Represents the result of an installation operation.
+/// </summary>
 public class InstallationResult
 {
     /// <summary>

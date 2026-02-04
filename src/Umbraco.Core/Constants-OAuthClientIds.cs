@@ -1,7 +1,10 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains OAuth client ID constants for different API clients.
+    /// </summary>
     public static class OAuthClientIds
     {
         /// <summary>

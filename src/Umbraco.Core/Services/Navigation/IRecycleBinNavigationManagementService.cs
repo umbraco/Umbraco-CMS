@@ -4,12 +4,17 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     Placeholder for sharing logic between the document and media navigation services
 ///     for managing the recycle bin navigation structure.
 /// </summary>
+/// <remarks>
+///     This interface defines methods for managing items in the recycle bin,
+///     including rebuilding, removing, and restoring items.
+/// </remarks>
 public interface IRecycleBinNavigationManagementService
 {
     /// <summary>
     ///     Rebuilds the recycle bin navigation structure by fetching the latest trashed nodes
     ///     from the underlying repository.
     /// </summary>
+    /// <returns>A task representing the asynchronous rebuild operation.</returns>
     Task RebuildBinAsync();
 
     /// <summary>
