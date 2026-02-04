@@ -23,6 +23,20 @@ internal static class WebhookFactory
         return entity;
     }
 
+    public static Webhook BuildEntity(Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto dto) =>
+        new(
+            dto.Url,
+            dto.Enabled,
+            dto.Webhook2ContentTypeKeys.Select(x => x.ContentTypeKey).ToArray(),
+            dto.Webhook2Events.Select(x => x.Event).ToArray(),
+            dto.Webhook2Headers.ToDictionary(x => x.Key, x => x.Value))
+        {
+            Id = dto.Id,
+            Key = dto.Key,
+            Name = dto.Name,
+            Description = dto.Description,
+        };
+
     public static WebhookDto BuildDto(IWebhook webhook)
     {
         var dto = new WebhookDto

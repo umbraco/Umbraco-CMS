@@ -94,4 +94,15 @@ public class UmbracoDbContext : DbContext
             }
         }
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        // TODO: Remove me
+        optionsBuilder.ConfigureWarnings(warn =>
+        {
+            warn.Ignore();
+        });
+    }
 }

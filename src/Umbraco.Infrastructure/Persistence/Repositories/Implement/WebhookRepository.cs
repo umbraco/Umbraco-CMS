@@ -1,19 +1,28 @@
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+
+using Microsoft.EntityFrameworkCore;
 using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-
-namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 public class WebhookRepository : IWebhookRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
+    private readonly IEFCoreScopeAccessor<UmbracoDbContext> _coreScopeAccessor;
 
-    public WebhookRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
+    public WebhookRepository(
+        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> coreScopeAccessor)
+    {
+        _scopeAccessor = scopeAccessor;
+        _coreScopeAccessor = coreScopeAccessor;
+    }
 
     public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
@@ -58,19 +67,23 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<IWebhook?> GetAsync(Guid key)
     {
-        if (_scopeAccessor.AmbientScope is null)
+        IEfCoreScope<UmbracoDbContext>? scope = _coreScopeAccessor.AmbientScope;
+        if (scope is null)
         {
             return null;
         }
 
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
-            .Select<WebhookDto>()
-            .From<WebhookDto>()
-            .Where<WebhookDto>(x => x.Key == key);
+        Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto? webhookDto = await scope.ExecuteWithContextAsync<Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto?>(async db =>
+        {
+            return await db.Webhooks
+                .Where(x => x.Key == key)
+                .Include(x => x.Webhook2ContentTypeKeys)
+                .Include(x => x.Webhook2Events)
+                .Include(x => x.Webhook2Headers)
+                .FirstOrDefaultAsync();
+        });
 
-        WebhookDto? webhookDto = await _scopeAccessor.AmbientScope.Database.FirstOrDefaultAsync<WebhookDto>(sql);
-
-        return webhookDto is null ? null : await DtoToEntity(webhookDto);
+        return webhookDto is null ? null : WebhookFactory.BuildEntity(webhookDto);
     }
 
     public async Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys)
