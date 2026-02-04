@@ -2,24 +2,43 @@ using System.Text.RegularExpressions;
 
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Represents a file system that shadows another file system, tracking changes without modifying the original.
+/// </summary>
+/// <remarks>
+/// This file system captures all file operations in memory and can later apply them to the inner file system.
+/// </remarks>
 internal sealed partial class ShadowFileSystem : IFileSystem
 {
     private readonly IFileSystem _sfs;
 
     private Dictionary<string, ShadowNode>? _nodes;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ShadowFileSystem"/> class.
+    /// </summary>
+    /// <param name="fs">The inner file system being shadowed.</param>
+    /// <param name="sfs">The shadow file system for storing temporary files.</param>
     public ShadowFileSystem(IFileSystem fs, IFileSystem sfs)
     {
         Inner = fs;
         _sfs = sfs;
     }
 
+    /// <summary>
+    /// Gets the inner file system being shadowed.
+    /// </summary>
     public IFileSystem Inner { get; }
 
+    /// <inheritdoc />
     public bool CanAddPhysical => true;
 
+    /// <summary>
+    /// Gets the dictionary of shadow nodes tracking file and directory changes.
+    /// </summary>
     private Dictionary<string, ShadowNode> Nodes => _nodes ??= new Dictionary<string, ShadowNode>();
 
+    /// <inheritdoc />
     public IEnumerable<string> GetDirectories(string path)
     {
         var normPath = NormPath(path);
@@ -33,8 +52,10 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             .Distinct();
     }
 
+    /// <inheritdoc />
     public void DeleteDirectory(string path) => DeleteDirectory(path, false);
 
+    /// <inheritdoc />
     public void DeleteDirectory(string path, bool recursive)
     {
         if (DirectoryExists(path) == false)
@@ -74,6 +95,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         }
     }
 
+    /// <inheritdoc />
     public bool DirectoryExists(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
@@ -84,8 +106,10 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return Inner.DirectoryExists(path);
     }
 
+    /// <inheritdoc />
     public void AddFile(string path, Stream stream) => AddFile(path, stream, true);
 
+    /// <inheritdoc />
     public void AddFile(string path, Stream stream, bool overrideIfExists)
     {
         var normPath = NormPath(path);
@@ -130,8 +154,10 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         Nodes[normPath] = new ShadowNode(false, false);
     }
 
+    /// <inheritdoc />
     public IEnumerable<string> GetFiles(string path) => GetFiles(path, null);
 
+    /// <inheritdoc />
     public IEnumerable<string> GetFiles(string path, string? filter)
     {
         var normPath = NormPath(path);
@@ -147,6 +173,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             .Distinct();
     }
 
+    /// <inheritdoc />
     public Stream OpenFile(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
@@ -157,6 +184,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return Inner.OpenFile(path);
     }
 
+    /// <inheritdoc />
     public void DeleteFile(string path)
     {
         if (FileExists(path) == false)
@@ -167,6 +195,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         Nodes[NormPath(path)] = new ShadowNode(true, false);
     }
 
+    /// <inheritdoc />
     public void MoveFile(string source, string target, bool overrideIfExists = true)
     {
         var normSource = NormPath(source);
@@ -221,6 +250,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         Nodes[normTarget] = new ShadowNode(false, false);
     }
 
+    /// <inheritdoc />
     public bool FileExists(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
@@ -231,8 +261,10 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return Inner.FileExists(path);
     }
 
+    /// <inheritdoc />
     public string GetRelativePath(string fullPathOrUrl) => Inner.GetRelativePath(fullPathOrUrl);
 
+    /// <inheritdoc />
     public string GetFullPath(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
@@ -243,8 +275,10 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return Inner.GetFullPath(path);
     }
 
+    /// <inheritdoc />
     public string GetUrl(string? path) => Inner.GetUrl(path);
 
+    /// <inheritdoc />
     public DateTimeOffset GetLastModified(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf) == false)
@@ -260,6 +294,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return _sfs.GetLastModified(path);
     }
 
+    /// <inheritdoc />
     public DateTimeOffset GetCreated(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf) == false)
@@ -275,6 +310,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return _sfs.GetCreated(path);
     }
 
+    /// <inheritdoc />
     public long GetSize(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf) == false)
@@ -290,6 +326,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return _sfs.GetSize(path);
     }
 
+    /// <inheritdoc />
     public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
     {
         var normPath = NormPath(path);
@@ -334,6 +371,10 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         Nodes[normPath] = new ShadowNode(false, false);
     }
 
+    /// <summary>
+    /// Applies all shadow changes to the inner file system.
+    /// </summary>
+    /// <exception cref="AggregateException">Thrown when one or more changes could not be applied.</exception>
     public void Complete()
     {
         if (_nodes == null)
@@ -399,9 +440,20 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         throw new AggregateException("Failed to apply all changes (see exceptions).", exceptions);
     }
 
+    /// <summary>
+    /// Normalizes a path to lowercase with forward slashes.
+    /// </summary>
+    /// <param name="path">The path to normalize.</param>
+    /// <returns>The normalized path.</returns>
     private static string NormPath(string path) => path.ToLowerInvariant().Replace("\\", "/");
 
-    // values can be "" (root), "foo", "foo/bar"...
+    /// <summary>
+    /// Determines whether the input path is a direct child of the specified path.
+    /// </summary>
+    /// <param name="path">The parent path.</param>
+    /// <param name="input">The input path to check.</param>
+    /// <returns><c>true</c> if input is a direct child of path; otherwise, <c>false</c>.</returns>
+    /// <remarks>Values can be "" (root), "foo", "foo/bar"...</remarks>
     private static bool IsChild(string path, string input)
     {
         if (input.StartsWith(path) == false || input.Length < path.Length + 2)
@@ -418,6 +470,12 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return pos < 0;
     }
 
+    /// <summary>
+    /// Determines whether the input path is a descendant (direct or indirect) of the specified path.
+    /// </summary>
+    /// <param name="path">The ancestor path.</param>
+    /// <param name="input">The input path to check.</param>
+    /// <returns><c>true</c> if input is a descendant of path; otherwise, <c>false</c>.</returns>
     private static bool IsDescendant(string path, string input)
     {
         if (input.StartsWith(path) == false || input.Length < path.Length + 2)
@@ -428,6 +486,11 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         return path.Length == 0 || input[path.Length] == '/';
     }
 
+    /// <summary>
+    /// Marks files and directories for deletion in the shadow.
+    /// </summary>
+    /// <param name="path">The path to delete.</param>
+    /// <param name="recurse">If <c>true</c>, recursively mark descendants for deletion.</param>
     private void Delete(string path, bool recurse)
     {
         foreach (var file in Inner.GetFiles(path))
@@ -445,7 +508,10 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         }
     }
 
-    // copied from System.Web.Util.Wildcard internal
+    /// <summary>
+    /// Represents a wildcard expression for matching file names.
+    /// </summary>
+    /// <remarks>Copied from System.Web.Util.Wildcard internal.</remarks>
     internal sealed partial class WildcardExpression
     {
         private static readonly Regex MetaRegex = GetMetaRegex();
@@ -472,18 +538,32 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         private readonly string _pattern;
         private Regex? _regex;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WildcardExpression"/> class.
+        /// </summary>
+        /// <param name="pattern">The wildcard pattern (e.g., "*.txt").</param>
+        /// <param name="caseInsensitive">Whether matching should be case-insensitive.</param>
         public WildcardExpression(string pattern, bool caseInsensitive = true)
         {
             _pattern = pattern;
             _caseInsensitive = caseInsensitive;
         }
 
+        /// <summary>
+        /// Determines whether the input string matches the wildcard pattern.
+        /// </summary>
+        /// <param name="input">The input string to match.</param>
+        /// <returns><c>true</c> if the input matches the pattern; otherwise, <c>false</c>.</returns>
         public bool IsMatch(string input)
         {
             EnsureRegex(_pattern);
             return _regex?.IsMatch(input) ?? false;
         }
 
+        /// <summary>
+        /// Ensures that the regex is compiled from the pattern.
+        /// </summary>
+        /// <param name="pattern">The wildcard pattern to compile.</param>
         private void EnsureRegex(string pattern)
         {
             if (_regex != null)
@@ -522,20 +602,40 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         }
     }
 
+    /// <summary>
+    /// Represents a node in the shadow file system tracking the state of a file or directory.
+    /// </summary>
     private sealed class ShadowNode
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShadowNode"/> class.
+        /// </summary>
+        /// <param name="isDelete">Whether this node represents a deletion.</param>
+        /// <param name="isdir">Whether this node represents a directory.</param>
         public ShadowNode(bool isDelete, bool isdir)
         {
             IsDelete = isDelete;
             IsDir = isdir;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this node represents a deletion.
+        /// </summary>
         public bool IsDelete { get; }
 
+        /// <summary>
+        /// Gets a value indicating whether this node represents a directory.
+        /// </summary>
         public bool IsDir { get; }
 
+        /// <summary>
+        /// Gets a value indicating whether this node represents an existing item (not deleted).
+        /// </summary>
         public bool IsExist => IsDelete == false;
 
+        /// <summary>
+        /// Gets a value indicating whether this node represents a file (not a directory).
+        /// </summary>
         public bool IsFile => IsDir == false;
     }
 }

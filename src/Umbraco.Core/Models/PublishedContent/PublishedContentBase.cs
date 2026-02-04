@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PublishedCache;
@@ -17,8 +17,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     {
         private readonly IVariationContextAccessor? _variationContextAccessor;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="PublishedContentBase" /> class.
+        /// </summary>
+        /// <param name="variationContextAccessor">The variation context accessor.</param>
         protected PublishedContentBase(IVariationContextAccessor? variationContextAccessor) => _variationContextAccessor = variationContextAccessor;
 
+        /// <inheritdoc />
         public abstract IPublishedContentType ContentType { get; }
 
         /// <inheritdoc />
@@ -87,6 +92,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public abstract IPublishedProperty? GetProperty(string alias);
 
+        /// <summary>
+        ///     Gets the children of the current content item.
+        /// </summary>
+        /// <returns>The children of the current content item.</returns>
         private IEnumerable<IPublishedContent> GetChildren()
         {
             INavigationQueryService? navigationQueryService;

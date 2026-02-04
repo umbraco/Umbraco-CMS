@@ -1,7 +1,11 @@
 namespace Umbraco.Cms.Core.Configuration.UmbracoSettings;
 
+/// <summary>
+///     Provides equality comparison for <see cref="IChar" /> instances based on character and replacement values.
+/// </summary>
 public class CharacterReplacementEqualityComparer : IEqualityComparer<IChar>
 {
+    /// <inheritdoc />
     public bool Equals(IChar? x, IChar? y)
     {
         if (ReferenceEquals(x, y))
@@ -27,6 +31,7 @@ public class CharacterReplacementEqualityComparer : IEqualityComparer<IChar>
         return x.Char == y.Char && x.Replacement == y.Replacement;
     }
 
+    /// <inheritdoc />
     public int GetHashCode(IChar obj)
     {
         unchecked

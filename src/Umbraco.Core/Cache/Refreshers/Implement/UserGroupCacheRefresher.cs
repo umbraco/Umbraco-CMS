@@ -15,21 +15,33 @@ public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheR
 {
     #region Define
 
+    /// <summary>
+    ///     The unique identifier for this cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("45178038-B232-4FE8-AA1A-F2B949C44762");
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserGroupCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The notification factory.</param>
     public UserGroupCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : base(appCaches, eventAggregator, factory)
     {
     }
 
+    /// <inheritdoc />
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc />
     public override string Name => "User Group Cache Refresher";
 
     #endregion
 
     #region Refresher
 
+    /// <inheritdoc />
     public override void RefreshAll()
     {
         ClearAllIsolatedCacheByEntityType<IUserGroup>();
@@ -45,12 +57,14 @@ public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheR
         base.RefreshAll();
     }
 
+    /// <inheritdoc />
     public override void Refresh(int id)
     {
         Remove(id);
         base.Refresh(id);
     }
 
+    /// <inheritdoc />
     public override void Remove(int id)
     {
         Attempt<IAppPolicyCache?> userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();

@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a user requests a forgotten password reset.
+/// </summary>
 [WebhookEvent("User Forgot Password Requested")]
 public class UserForgotPasswordRequestedWebhookEvent : WebhookEventBase<UserForgotPasswordRequestedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserForgotPasswordRequestedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public UserForgotPasswordRequestedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class UserForgotPasswordRequestedWebhookEvent : WebhookEventBase<UserForg
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserForgotPasswordRequested;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(UserForgotPasswordRequestedNotification notification)
         => new DefaultPayloadModel
         {

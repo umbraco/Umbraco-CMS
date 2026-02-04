@@ -2,6 +2,9 @@ using System.Net;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides extension methods for <see cref="IPublishedRequest" /> and <see cref="IPublishedRequestBuilder" />.
+/// </summary>
 public static class PublishedRequestExtensions
 {
     /// <summary>

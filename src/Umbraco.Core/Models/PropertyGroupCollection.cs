@@ -27,8 +27,10 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
     /// <param name="groups">The groups.</param>
     public PropertyGroupCollection(IEnumerable<PropertyGroup> groups) => Reset(groups);
 
+    /// <inheritdoc />
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
+    /// <inheritdoc />
     public object DeepClone()
     {
         var clone = new PropertyGroupCollection();
@@ -40,6 +42,12 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         return clone;
     }
 
+    /// <summary>
+    ///     Adds a property group to the collection.
+    /// </summary>
+    /// <param name="item">The property group to add.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the property group does not have an alias set.</exception>
+    /// <exception cref="ArgumentException">Thrown when changing the alias would result in duplicates.</exception>
     public new void Add(PropertyGroup item)
     {
         // Ensure alias is set
@@ -81,6 +89,11 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         base.Add(item);
     }
 
+    /// <summary>
+    ///     Determines whether the collection contains a property group with the specified identifier.
+    /// </summary>
+    /// <param name="id">The identifier to search for.</param>
+    /// <returns><c>true</c> if a property group with the specified identifier exists; otherwise, <c>false</c>.</returns>
     public bool Contains(int id) => IndexOfKey(id) != -1;
 
     /// <summary>
@@ -101,6 +114,7 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         }
     }
 
+    /// <inheritdoc />
     protected override void SetItem(int index, PropertyGroup item)
     {
         PropertyGroup oldItem = index >= 0 ? this[index] : item;
@@ -113,6 +127,7 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
     }
 
+    /// <inheritdoc />
     protected override void RemoveItem(int index)
     {
         PropertyGroup removed = this[index];
@@ -124,6 +139,7 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
     }
 
+    /// <inheritdoc />
     protected override void InsertItem(int index, PropertyGroup item)
     {
         base.InsertItem(index, item);
@@ -133,6 +149,7 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
     }
 
+    /// <inheritdoc />
     protected override void ClearItems()
     {
         foreach (PropertyGroup item in this)
@@ -144,10 +161,25 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
+    /// <summary>
+    ///     Changes the key (alias) of a property group in the collection.
+    /// </summary>
+    /// <param name="item">The property group to update.</param>
+    /// <param name="newKey">The new key (alias) value.</param>
     internal void ChangeKey(PropertyGroup item, string newKey) => ChangeItemKey(item, newKey);
 
+    /// <summary>
+    ///     Gets the index of the property group with the specified alias.
+    /// </summary>
+    /// <param name="key">The alias to search for.</param>
+    /// <returns>The zero-based index of the property group, or -1 if not found.</returns>
     public int IndexOfKey(string key) => this.FindIndex(x => x.Alias == key);
 
+    /// <summary>
+    ///     Gets the index of the property group with the specified identifier.
+    /// </summary>
+    /// <param name="id">The identifier to search for.</param>
+    /// <returns>The zero-based index of the property group, or -1 if not found.</returns>
     public int IndexOfKey(int id) => this.FindIndex(x => x.Id == id);
 
     /// <summary>
@@ -155,8 +187,13 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
     /// </summary>
     public void ClearCollectionChangedEvents() => CollectionChanged = null;
 
+    /// <inheritdoc />
     protected override string GetKeyForItem(PropertyGroup item) => item.Alias;
 
+    /// <summary>
+    ///     Raises the <see cref="CollectionChanged" /> event.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
     protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);
 }
