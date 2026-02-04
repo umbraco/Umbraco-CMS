@@ -34,6 +34,9 @@ public class Ordering
         IsCustomField = isCustomField;
     }
 
+    /// <summary>
+    ///     Gets or sets the next ordering in a chain of orderings.
+    /// </summary>
     public Ordering? Next { get; set; } = null;
     /// <summary>
     ///     Gets the name of the ordering field.

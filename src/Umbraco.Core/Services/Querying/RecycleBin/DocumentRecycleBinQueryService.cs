@@ -4,12 +4,21 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Querying.RecycleBin;
 
+/// <summary>
+/// Provides query operations for documents (content items) in the recycle bin.
+/// </summary>
 public class DocumentRecycleBinQueryService : IDocumentRecycleBinQueryService
 {
     private readonly IEntityService _entityService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IRelationService _relationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentRecycleBinQueryService"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
+    /// <param name="relationService">The relation service.</param>
     public DocumentRecycleBinQueryService(
         IEntityService entityService,
         ICoreScopeProvider scopeProvider,
@@ -20,6 +29,7 @@ public class DocumentRecycleBinQueryService : IDocumentRecycleBinQueryService
         _relationService = relationService;
     }
 
+    /// <inheritdoc />
     public Task<Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentAsync(Guid trashedDocumentId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);

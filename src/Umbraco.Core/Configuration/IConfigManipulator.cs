@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Configuration;
 
+/// <summary>
+///     Defines the contract for manipulating configuration settings.
+/// </summary>
 public interface IConfigManipulator
 {
     /// <summary>

@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for managing dictionary items (localized text entries).
+/// </summary>
 internal sealed class DictionaryItemService : RepositoryService, IDictionaryItemService
 {
     private readonly IDictionaryRepository _dictionaryRepository;
@@ -16,6 +19,16 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     private readonly ILanguageService _languageService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryItemService"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="dictionaryRepository">The dictionary repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     public DictionaryItemService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -74,8 +87,12 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
 
     /// <summary>
     /// Gets the dictionary items in a paged manner.
-    /// Currently implements the paging in memory on the itenkey property because the underlying repository does not support paging yet
     /// </summary>
+    /// <param name="parentId">The parent dictionary item ID, or null for root items.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    /// <returns>A paged model containing dictionary items.</returns>
+    /// <remarks>Currently implements the paging in memory on the item key property because the underlying repository does not support paging yet.</remarks>
     public async Task<PagedModel<IDictionaryItem>> GetPagedAsync(Guid? parentId, int skip, int take)
     {
         using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -102,6 +119,11 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     public async Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId)
         => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
 
+    /// <summary>
+    /// Counts the number of child dictionary items under a specified parent.
+    /// </summary>
+    /// <param name="parentId">The parent dictionary item ID.</param>
+    /// <returns>The number of child dictionary items.</returns>
     public async Task<int> CountChildrenAsync(Guid parentId)
         => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
 
@@ -119,6 +141,10 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     public async Task<IEnumerable<IDictionaryItem>> GetAtRootAsync()
         => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
 
+    /// <summary>
+    /// Counts the number of root dictionary items.
+    /// </summary>
+    /// <returns>The number of root dictionary items.</returns>
     public async Task<int> CountRootAsync()
         => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
 
@@ -288,6 +314,11 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
+    /// <summary>
+    /// Counts dictionary items matching the specified query.
+    /// </summary>
+    /// <param name="query">The query to execute.</param>
+    /// <returns>The count of matching dictionary items.</returns>
     private Task<int> CountByQueryAsync(IQuery<IDictionaryItem> query)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -297,6 +328,15 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
+    /// <summary>
+    /// Saves a dictionary item with validation and notification handling.
+    /// </summary>
+    /// <param name="dictionaryItem">The dictionary item to save.</param>
+    /// <param name="operationValidation">A function that validates the operation and returns the status.</param>
+    /// <param name="auditType">The type of audit entry to create.</param>
+    /// <param name="auditMessage">The audit message.</param>
+    /// <param name="userKey">The unique identifier of the user performing the save.</param>
+    /// <returns>An attempt containing the saved dictionary item and operation status.</returns>
     private async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> SaveAsync(
         IDictionaryItem dictionaryItem,
         Func<DictionaryItemOperationStatus> operationValidation,
@@ -348,6 +388,11 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
+    /// <summary>
+    /// Gets dictionary items matching the specified query.
+    /// </summary>
+    /// <param name="query">The query to execute.</param>
+    /// <returns>A collection of dictionary items matching the query.</returns>
     private Task<IEnumerable<IDictionaryItem>> GetByQueryAsync(IQuery<IDictionaryItem> query)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -357,6 +402,14 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
+    /// <summary>
+    /// Creates an audit entry for a dictionary item operation.
+    /// </summary>
+    /// <param name="type">The type of audit entry.</param>
+    /// <param name="message">The audit message.</param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <param name="objectId">The ID of the affected object.</param>
+    /// <param name="entityType">The type of entity being audited.</param>
     private async Task AuditAsync(AuditType type, string message, Guid userKey, int objectId, string? entityType) =>
         await _auditService.AddAsync(
             type,
@@ -365,9 +418,19 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             entityType,
             message);
 
+    /// <summary>
+    /// Validates that the dictionary item has a valid parent.
+    /// </summary>
+    /// <param name="dictionaryItem">The dictionary item to validate.</param>
+    /// <returns><c>true</c> if the parent is valid or no parent is specified; otherwise, <c>false</c>.</returns>
     private bool HasValidParent(IDictionaryItem dictionaryItem)
         => dictionaryItem.ParentId.HasValue == false || _dictionaryRepository.Get(dictionaryItem.ParentId.Value) != null;
 
+    /// <summary>
+    /// Removes translations for languages that no longer exist.
+    /// </summary>
+    /// <param name="dictionaryItem">The dictionary item to clean up.</param>
+    /// <param name="allLanguages">All available languages.</param>
     private void RemoveInvalidTranslations(IDictionaryItem dictionaryItem, IEnumerable<ILanguage> allLanguages)
     {
         IDictionaryTranslation[] translationsAsArray = dictionaryItem.Translations.ToArray();
@@ -380,6 +443,11 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         dictionaryItem.Translations = translationsAsArray.Where(translation => allLanguageIsoCodes.Contains(translation.LanguageIsoCode)).ToArray();
     }
 
+    /// <summary>
+    /// Checks whether another dictionary item exists with the same item key.
+    /// </summary>
+    /// <param name="dictionaryItem">The dictionary item to check.</param>
+    /// <returns><c>true</c> if a collision exists; otherwise, <c>false</c>.</returns>
     private bool HasItemKeyCollision(IDictionaryItem dictionaryItem)
     {
         IDictionaryItem? itemKeyCollision = _dictionaryRepository.Get(dictionaryItem.ItemKey);

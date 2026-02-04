@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+///     Cache refresher for media caches.
+/// </summary>
 public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
@@ -22,6 +25,19 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaCacheService _mediaCacheService;
     private readonly ICacheManager _cacheManager;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="idKeyMap">The ID-key mapping service.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="mediaNavigationQueryService">The media navigation query service.</param>
+    /// <param name="mediaNavigationManagementService">The media navigation management service.</param>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="mediaCacheService">The media cache service.</param>
+    /// <param name="cacheManager">The cache manager.</param>
     public MediaCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -47,14 +63,27 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     #region Indirect
 
+    /// <summary>
+    ///     Refreshes media type caches by clearing all cached media.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
     public static void RefreshMediaTypes(AppCaches appCaches) => appCaches.IsolatedCaches.ClearCache<IMedia>();
 
     #endregion
 
     #region Json
 
+    /// <summary>
+    ///     Represents the JSON payload for media cache refresh operations.
+    /// </summary>
     public class JsonPayload
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="id">The identifier of the media item.</param>
+        /// <param name="key">The unique key of the media item.</param>
+        /// <param name="changeTypes">The types of changes that occurred.</param>
         public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
         {
             Id = id;
@@ -62,10 +91,19 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             ChangeTypes = changeTypes;
         }
 
+        /// <summary>
+        ///     Gets the identifier of the media item.
+        /// </summary>
         public int Id { get; }
 
+        /// <summary>
+        ///     Gets the unique key of the media item.
+        /// </summary>
         public Guid? Key { get; }
 
+        /// <summary>
+        ///     Gets the types of changes that occurred.
+        /// </summary>
         public TreeChangeTypes ChangeTypes { get; }
     }
 
@@ -73,16 +111,22 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     #region Define
 
+    /// <summary>
+    ///     The unique identifier for this cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("B29286DD-2D40-4DDB-B325-681226589FEC");
 
+    /// <inheritdoc />
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc />
     public override string Name => "Media Cache Refresher";
 
     #endregion
 
     #region Refresher
 
+    /// <inheritdoc />
     public override void RefreshInternal(JsonPayload[] payloads)
     {
         // actions that always need to happen
@@ -125,6 +169,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         base.RefreshInternal(payloads);
     }
 
+    /// <inheritdoc />
     public override void Refresh(JsonPayload[]? payloads)
     {
         if (payloads is null)
@@ -284,12 +329,17 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     // these events should never trigger
     // everything should be JSON
+
+    /// <inheritdoc />
     public override void RefreshAll() => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(int id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(Guid id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Remove(int id) => throw new NotSupportedException();
 
     #endregion
