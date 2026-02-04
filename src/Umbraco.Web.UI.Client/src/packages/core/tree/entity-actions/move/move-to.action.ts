@@ -1,22 +1,38 @@
 import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
 import type { UmbMoveRepository } from './move-repository.interface.js';
-import type { MetaEntityActionMoveToKind } from './types.js';
+import type { MetaEntityActionMoveToKind, UmbMoveSelectableFilterProvider } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { UmbTreeItemModel } from '../../types.js';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
+		// Build the pickable filter
+		let pickableFilter = (treeItem: UmbTreeItemModel) => treeItem.unique !== this.args.unique;
+
+		// If a filter provider is configured, load it and combine filters
+		if (this.args.meta.selectableFilterProviderAlias) {
+			const filterProvider = await createExtensionApiByAlias<UmbMoveSelectableFilterProvider>(
+				this,
+				this.args.meta.selectableFilterProviderAlias,
+			);
+			if (filterProvider) {
+				const customFilter = await filterProvider.getSelectableFilter(this.args.unique);
+				pickableFilter = (treeItem) => pickableFilter(treeItem) && customFilter(treeItem);
+			}
+		}
+
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
-				pickableFilter: (treeItem) => treeItem.unique !== this.args.unique,
+				pickableFilter,
 			},
 		});
 

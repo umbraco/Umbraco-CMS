@@ -2,6 +2,7 @@ import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco
 
 export type { UmbMoveDataSource } from './move-data-source.interface.js';
 export type { UmbMoveRepository } from './move-repository.interface.js';
+export type { UmbMoveSelectableFilterProvider } from './move-selectable-filter-provider.interface.js';
 export interface UmbMoveToRequestArgs {
 	unique: string;
 	destination: {
@@ -19,6 +20,7 @@ export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind 
 	treeRepositoryAlias: string;
 	treeAlias: string;
 	foldersOnly?: boolean;
+	selectableFilterProviderAlias?: string;
 }
 
 declare global {
