@@ -41,7 +41,6 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
     /// </summary>
     public int? Quality { get; set; }
 
-
     /// <summary>
     ///     Gets or sets the image format to use (for example "webp").
     /// </summary>
