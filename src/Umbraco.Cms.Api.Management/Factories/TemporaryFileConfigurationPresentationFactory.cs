@@ -21,20 +21,23 @@ public class TemporaryFileConfigurationPresentationFactory : ITemporaryFileConfi
         : this(
             contentSettings,
             runtimeSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<ContentImagingSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<ContentImagingSettings>>(),
+            imageUrlGenerator)
     {
-        // IImageUrlGenerator parameter is ignored - kept for backward compatibility
     }
 
     [ActivatorUtilitiesConstructor]
     public TemporaryFileConfigurationPresentationFactory(
         IOptionsSnapshot<ContentSettings> contentSettings,
         IOptionsSnapshot<RuntimeSettings> runtimeSettings,
-        IOptionsSnapshot<ContentImagingSettings> imagingSettings)
+        IOptionsSnapshot<ContentImagingSettings> imagingSettings,
+        IImageUrlGenerator imageUrlGenerator)
     {
         _runtimeSettings = runtimeSettings.Value;
         _contentSettings = contentSettings.Value;
         _imagingSettings = imagingSettings.Value;
+
+        // IImageUrlGenerator parameter is ignored - kept for backward compatibility
     }
 
     public TemporaryFileConfigurationResponseModel Create() =>
