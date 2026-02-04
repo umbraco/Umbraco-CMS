@@ -26,6 +26,7 @@ public class TemporaryFileConfigurationPresentationFactory : ITemporaryFileConfi
         // IImageUrlGenerator parameter is ignored - kept for backward compatibility
     }
 
+    [ActivatorUtilitiesConstructor]
     public TemporaryFileConfigurationPresentationFactory(
         IOptionsSnapshot<ContentSettings> contentSettings,
         IOptionsSnapshot<RuntimeSettings> runtimeSettings,
