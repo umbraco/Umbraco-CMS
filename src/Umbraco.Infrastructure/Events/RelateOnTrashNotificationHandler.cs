@@ -100,13 +100,16 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
 
     /// <inheritdoc />
-    public async Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-        => await CreateOriginalParentRelationOnTrashAsync(
+    public Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+    {
+        CreateOriginalParentRelationOnTrash(
             notification.MoveInfoCollection,
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
             Constants.ObjectTypes.Document,
             Constants.ObjectTypes.Document);
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
     public void Handle(MediaMovedNotification notification)
@@ -116,13 +119,16 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias);
 
     /// <inheritdoc />
-    public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-        => await CreateOriginalParentRelationOnTrashAsync(
+    public Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+    {
+        CreateOriginalParentRelationOnTrash(
             notification.MoveInfoCollection,
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
             Constants.ObjectTypes.Media,
             Constants.ObjectTypes.Media);
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
     public void Handle(ElementMovedNotification notification)
@@ -132,13 +138,16 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias);
 
     /// <inheritdoc />
-    public async Task HandleAsync(ElementMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-        => await CreateOriginalParentRelationOnTrashAsync(
+    public Task HandleAsync(ElementMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+    {
+        CreateOriginalParentRelationOnTrash(
             notification.MoveInfoCollection,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
             Constants.ObjectTypes.ElementContainer,
             Constants.ObjectTypes.Element);
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
     public void Handle(EntityContainerMovedNotification notification)
@@ -154,7 +163,7 @@ public sealed class RelateOnTrashNotificationHandler :
     }
 
     /// <inheritdoc />
-    public async Task HandleAsync(
+    public Task HandleAsync(
         EntityContainerMovedToRecycleBinNotification notification,
         CancellationToken cancellationToken)
     {
@@ -165,15 +174,16 @@ public sealed class RelateOnTrashNotificationHandler :
 
         if (elementContainerItems.Any() is false)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        await CreateOriginalParentRelationOnTrashAsync(
+        CreateOriginalParentRelationOnTrash(
             elementContainerItems,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
             Constants.ObjectTypes.ElementContainer,
             Constants.ObjectTypes.ElementContainer);
+        return Task.CompletedTask;
     }
 
     private void DeleteOriginalParentRelationsOnRestore<T>(
@@ -192,7 +202,7 @@ public sealed class RelateOnTrashNotificationHandler :
         }
     }
 
-    private Task CreateOriginalParentRelationOnTrashAsync<T>(
+    private void CreateOriginalParentRelationOnTrash<T>(
         IEnumerable<MoveToRecycleBinEventInfo<T>> moveInfoCollection,
         string originalParentRelationTypeAlias,
         string originalParentRelationTypeName,
@@ -230,6 +240,5 @@ public sealed class RelateOnTrashNotificationHandler :
         }
 
         scope.Complete();
-        return Task.CompletedTask;
     }
 }
