@@ -18,14 +18,6 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddBackgroundJobs(this IUmbracoBuilder builder)
     {
-        // Idempotency check using a private marker class
-        if (builder.Services.Any(s => s.ServiceType == typeof(BackgroundJobsMarker)))
-        {
-            return builder;
-        }
-
-        builder.Services.AddSingleton<BackgroundJobsMarker>();
-
         // Add background jobs
         builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
@@ -50,12 +42,5 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, PublishStatusInitializationNotificationHandler>();
 
         return builder;
-    }
-
-    /// <summary>
-    /// Marker class to ensure AddBackgroundJobs is only called once.
-    /// </summary>
-    private sealed class BackgroundJobsMarker
-    {
     }
 }

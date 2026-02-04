@@ -345,14 +345,6 @@ public static partial class UmbracoBuilderExtensions
 
     public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
     {
-        // Idempotency check using a private marker class
-        if (builder.Services.Any(s => s.ServiceType == typeof(CoreNotificationsMarker)))
-        {
-            return builder;
-        }
-
-        builder.Services.AddSingleton<CoreNotificationsMarker>();
-
         // add handlers for sending user notifications (i.e. emails)
         builder.Services.AddSingleton<UserNotificationsHandler.Notifier>();
         builder
@@ -473,13 +465,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>();
 
         return builder;
-    }
-
-    /// <summary>
-    /// Marker class to ensure AddCoreNotifications is only called once.
-    /// </summary>
-    private sealed class CoreNotificationsMarker
-    {
     }
 
     private static IUmbracoBuilder AddDeliveryApiCoreServices(this IUmbracoBuilder builder)

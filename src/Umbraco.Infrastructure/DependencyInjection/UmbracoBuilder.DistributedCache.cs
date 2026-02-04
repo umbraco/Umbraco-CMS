@@ -30,13 +30,6 @@ public static partial class UmbracoBuilderExtensions
     /// </remarks>
     public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
     {
-        // Idempotency check using a private marker class
-        if (builder.Services.Any(s => s.ServiceType == typeof(DistributedCacheMarker)))
-        {
-            return builder;
-        }
-
-        builder.Services.AddSingleton<DistributedCacheMarker>();
         builder.Services.AddSingleton<LastSyncedFileManager>();
         builder.Services.AddSingleton<ISyncBootStateAccessor, SyncBootStateAccessor>();
         builder.SetServerMessenger(factory => new BatchedDatabaseServerMessenger(
@@ -126,12 +119,5 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddUnique(registrar);
         return builder;
-    }
-
-    /// <summary>
-    /// Marker class to ensure AddDistributedCache is only called once.
-    /// </summary>
-    private sealed class DistributedCacheMarker
-    {
     }
 }

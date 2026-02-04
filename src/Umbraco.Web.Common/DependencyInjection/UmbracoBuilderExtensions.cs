@@ -188,14 +188,6 @@ public static partial class UmbracoBuilderExtensions
             throw new ArgumentNullException(nameof(builder));
         }
 
-        // Idempotency check using a private marker class
-        if (builder.Services.Any(s => s.ServiceType == typeof(UmbracoCoreMarker)))
-        {
-            return builder;
-        }
-
-        builder.Services.AddSingleton<UmbracoCoreMarker>();
-
         // Add ASP.NET specific services
         builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
         builder.Services.AddUnique<IHostingEnvironment>(sp =>
@@ -238,14 +230,6 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoProfiler(this IUmbracoBuilder builder)
     {
-        // Idempotency check using a private marker class
-        if (builder.Services.Any(s => s.ServiceType == typeof(UmbracoProfilerMarker)))
-        {
-            return builder;
-        }
-
-        builder.Services.AddSingleton<UmbracoProfilerMarker>();
-
         builder.Services.AddSingleton<WebProfilerHtml>();
 
         builder.Services.AddMiniProfiler();
@@ -294,14 +278,6 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddWebComponents(this IUmbracoBuilder builder)
     {
-        // Idempotency check using a private marker class
-        if (builder.Services.Any(s => s.ServiceType == typeof(WebComponentsMarker)))
-        {
-            return builder;
-        }
-
-        builder.Services.AddSingleton<WebComponentsMarker>();
-
         // Add service session
         // This can be overwritten by the user by adding their own call to AddSession
         // since the last call of AddSession take precedence
@@ -415,27 +391,6 @@ public static partial class UmbracoBuilderExtensions
             wrappedHostingSettings,
             wrappedWebRoutingSettings,
             webHostEnvironment);
-    }
-
-    /// <summary>
-    /// Marker class to ensure AddUmbracoCore is only called once.
-    /// </summary>
-    private sealed class UmbracoCoreMarker
-    {
-    }
-
-    /// <summary>
-    /// Marker class to ensure AddWebComponents is only called once.
-    /// </summary>
-    private sealed class WebComponentsMarker
-    {
-    }
-
-    /// <summary>
-    /// Marker class to ensure AddUmbracoProfiler is only called once.
-    /// </summary>
-    private sealed class UmbracoProfilerMarker
-    {
     }
 
     /// <summary>

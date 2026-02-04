@@ -47,14 +47,6 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddConfiguration(this IUmbracoBuilder builder)
     {
-        // Idempotency check using a private marker class
-        if (builder.Services.Any(s => s.ServiceType == typeof(ConfigurationMarker)))
-        {
-            return builder;
-        }
-
-        builder.Services.AddSingleton<ConfigurationMarker>();
-
         // Register configuration validators.
         builder.Services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<DeliveryApiSettings>, DeliveryApiSettingsValidator>();
@@ -129,12 +121,5 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddOptions<TinyMceToTiptapMigrationSettings>();
 
         return builder;
-    }
-
-    /// <summary>
-    /// Marker class to ensure AddConfiguration is only called once.
-    /// </summary>
-    private sealed class ConfigurationMarker
-    {
     }
 }
