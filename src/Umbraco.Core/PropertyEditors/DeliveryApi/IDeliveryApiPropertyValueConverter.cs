@@ -2,6 +2,13 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 
+/// <summary>
+///     Provides property value conversion for the Delivery API.
+/// </summary>
+/// <remarks>
+///     Implement this interface in addition to <see cref="IPropertyValueConverter" /> to provide
+///     specialized value conversion for the Delivery API output.
+/// </remarks>
 public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
 {
     /// <summary>

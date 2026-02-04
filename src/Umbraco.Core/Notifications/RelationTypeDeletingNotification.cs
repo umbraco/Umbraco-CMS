@@ -10,6 +10,12 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class RelationTypeDeletingNotification : DeletingNotification<IRelationType>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationTypeDeletingNotification"/> class
+    ///     with a single relation type.
+    /// </summary>
+    /// <param name="target">The relation type being deleted.</param>
+    /// <param name="messages">The event messages collection.</param>
     public RelationTypeDeletingNotification(IRelationType target, EventMessages messages)
         : base(target, messages)
     {

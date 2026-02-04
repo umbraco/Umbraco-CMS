@@ -21,18 +21,33 @@ public struct CompositeStringStringKey : IEquatable<CompositeStringStringKey>
         _key2 = key2?.ToLowerInvariant() ?? throw new ArgumentNullException(nameof(key2));
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="CompositeStringStringKey" /> instances are equal.
+    /// </summary>
+    /// <param name="key1">The first key to compare.</param>
+    /// <param name="key2">The second key to compare.</param>
+    /// <returns><c>true</c> if the two keys are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(CompositeStringStringKey key1, CompositeStringStringKey key2)
         => key1._key2 == key2._key2 && key1._key1 == key2._key1;
 
+    /// <summary>
+    ///     Determines whether two <see cref="CompositeStringStringKey" /> instances are not equal.
+    /// </summary>
+    /// <param name="key1">The first key to compare.</param>
+    /// <param name="key2">The second key to compare.</param>
+    /// <returns><c>true</c> if the two keys are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(CompositeStringStringKey key1, CompositeStringStringKey key2)
         => key1._key2 != key2._key2 || key1._key1 != key2._key1;
 
+    /// <inheritdoc />
     public bool Equals(CompositeStringStringKey other)
         => _key2 == other._key2 && _key1 == other._key1;
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
         => obj is CompositeStringStringKey other && _key2 == other._key2 && _key1 == other._key1;
 
+    /// <inheritdoc />
     public override int GetHashCode()
         => (_key2.GetHashCode() * 31) + _key1.GetHashCode();
 }

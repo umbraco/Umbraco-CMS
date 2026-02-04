@@ -2,6 +2,9 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains SQL-related constants.
+    /// </summary>
     public static class Sql
     {
         /// <summary>

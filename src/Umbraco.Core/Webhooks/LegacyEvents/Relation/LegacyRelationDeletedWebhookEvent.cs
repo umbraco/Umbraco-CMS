@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a relation is deleted, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Relation Deleted")]
 public class LegacyRelationDeletedWebhookEvent : WebhookEventBase<RelationDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyRelationDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyRelationDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class LegacyRelationDeletedWebhookEvent : WebhookEventBase<RelationDelete
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.RelationDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(RelationDeletedNotification notification)
         => notification.DeletedEntities;
 }
