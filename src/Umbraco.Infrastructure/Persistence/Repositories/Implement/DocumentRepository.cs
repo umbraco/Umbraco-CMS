@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class DocumentRepository : PublishableContentRepositoryBase<IContent, DocumentRepository, DocumentDto, DocumentVersionDto, DocumentCultureVariationDto>, IDocumentRepository
 {
     private readonly AppCaches _appCaches;
-    private readonly IContentTypeRepository _contentTypeRepository;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
@@ -66,10 +65,9 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
             serializer,
             eventAggregator,
             repositoryCacheVersionService,
-            cacheSyncService)
+            cacheSyncService,
+            contentTypeRepository)
     {
-        _contentTypeRepository =
-            contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
         _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
         _repositoryCacheVersionService = repositoryCacheVersionService;
         _cacheSyncService = cacheSyncService;
@@ -127,202 +125,70 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
                                                                            _repositoryCacheVersionService,
                                                                            _cacheSyncService);
 
-    protected override IEnumerable<IContent> MapDtosToContent(
+    protected override void AddAdditionalTempContentMapping(
         List<DocumentDto> dtos,
-        bool withCache = false,
-        string[]? propertyAliases = null,
-        bool loadTemplates = true,
-        bool loadVariants = true)
+        List<TempContent<IContent>> temps,
+        bool withCache,
+        string[]? propertyAliases,
+        bool loadTemplates,
+        bool loadVariants)
     {
-        var temps = new List<TempContent<Content>>();
-        var contentTypes = new Dictionary<int, IContentType?>();
-        var templateIds = new List<int>();
-
-        var content = new Content[dtos.Count];
-
-        for (var i = 0; i < dtos.Count; i++)
+        if (loadTemplates is false)
         {
-            DocumentDto dto = dtos[i];
+            return;
+        }
 
-            if (withCache)
+        var templateIds = new List<int>();
+        foreach (DocumentDto dto in dtos)
+        {
+            TempContent<IContent>? temp = temps.FirstOrDefault(t => t.Id == dto.NodeId);
+            if (temp is null)
             {
-                // if the cache contains the (proper version of the) item, use it
-                IContent? cached =
-                    IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
-                if (cached != null && cached.VersionId == dto.ContentVersionDto.ContentVersionDto.Id)
-                {
-                    content[i] = (Content)cached;
-                    continue;
-                }
+                continue;
             }
 
-            // else, need to build it
-
-            // get the content type - the repository is full cache *but* still deep-clones
-            // whatever comes out of it, so use our own local index here to avoid this
-            var contentTypeId = dto.ContentDto.ContentTypeId;
-            if (contentTypes.TryGetValue(contentTypeId, out IContentType? contentType) == false)
+            temp.Template1Id = dto.ContentVersionDto.TemplateId;
+            if (temp.Template1Id.HasValue)
             {
-                contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
+                templateIds.Add(temp.Template1Id.Value);
             }
 
-            Content c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
-
-            if (loadTemplates)
-            {
-                // need templates
-                var templateId = dto.ContentVersionDto.TemplateId;
-                if (templateId.HasValue)
-                {
-                    templateIds.Add(templateId.Value);
-                }
-
-                if (dto.Published)
-                {
-                    templateId = dto.PublishedVersionDto!.TemplateId;
-                    if (templateId.HasValue)
-                    {
-                        templateIds.Add(templateId.Value);
-                    }
-                }
-            }
-
-            // need temps, for properties, templates and variations
-            var versionId = dto.ContentVersionDto.Id;
-            var publishedVersionId = dto.Published ? dto.PublishedVersionDto!.Id : 0;
-            var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
-            {
-                Template1Id = dto.ContentVersionDto.TemplateId
-            };
             if (dto.Published)
             {
                 temp.Template2Id = dto.PublishedVersionDto!.TemplateId;
+                if (temp.Template2Id.HasValue)
+                {
+                    templateIds.Add(temp.Template2Id.Value);
+                }
             }
-
-            temps.Add(temp);
         }
 
-        Dictionary<int, ITemplate>? templates = null;
-        if (loadTemplates)
-        {
-            // load all required templates in 1 query, and index
-            templates = _templateRepository.GetMany(templateIds.ToArray())?
-                .ToDictionary(x => x.Id, x => x);
-        }
+        // load all required templates in 1 query, and index
+        var templates = _templateRepository
+            .GetMany(templateIds.Distinct().ToArray())?
+            .ToDictionary(x => x.Id, x => x);
 
-        // An empty array of propertyAliases indicates that no properties need to be loaded (null = load all properties).
-        var loadProperties = propertyAliases is { Length: 0 } is false;
-
-        IDictionary<int, PropertyCollection>? properties = null;
-        if (loadProperties)
+        foreach (TempContent<IContent> temp in temps)
         {
-            // load properties for all documents from database in 1 query - indexed by version id
-            // if propertyAliases is provided, only load those specific properties
-            properties = GetPropertyCollections(temps, propertyAliases);
-        }
-
-        // assign templates and properties
-        foreach (TempContent<Content> temp in temps)
-        {
-            if (loadTemplates)
+            // set the template ID if it matches an existing template
+            if (temp.Template1Id.HasValue && (templates?.ContainsKey(temp.Template1Id.Value) ?? false))
             {
-                // set the template ID if it matches an existing template
-                if (temp.Template1Id.HasValue && (templates?.ContainsKey(temp.Template1Id.Value) ?? false))
-                {
-                    temp.Content!.TemplateId = temp.Template1Id;
-                }
-
-                if (temp.Template2Id.HasValue && (templates?.ContainsKey(temp.Template2Id.Value) ?? false))
-                {
-                    temp.Content!.PublishTemplateId = temp.Template2Id;
-                }
+                temp.Content!.TemplateId = temp.Template1Id;
             }
 
-            // set properties
-            if (loadProperties)
+            if (temp.Template2Id.HasValue && (templates?.ContainsKey(temp.Template2Id.Value) ?? false))
             {
-                if (properties?.ContainsKey(temp.VersionId) ?? false)
-                {
-                    temp.Content!.Properties = properties[temp.VersionId];
-                }
-                else
-                {
-                    throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
-                }
-            }
-            else
-            {
-                // When loadProperties is false (propertyAliases is empty array), clear the property collection
-                temp.Content!.Properties = new PropertyCollection();
+                temp.Content!.PublishTemplateId = temp.Template2Id;
             }
         }
-
-        if (loadVariants)
-        {
-            // set variations, if varying
-            temps = temps.Where(x => x.ContentType?.VariesByCulture() ?? false).ToList();
-            if (temps.Count > 0)
-            {
-                // load all variations for all documents from database, in one query
-                IDictionary<int, List<ContentVariation>> contentVariations = GetContentVariations(temps);
-                IDictionary<int, List<EntityVariation>> documentVariations = GetEntityVariations(temps);
-                foreach (TempContent<Content> temp in temps)
-                {
-                    SetVariations(temp.Content, contentVariations, documentVariations);
-                }
-            }
-        }
-
-        foreach (Content c in content)
-        {
-            c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
-        }
-
-        return content;
     }
 
-    protected override IContent MapDtoToContent(DocumentDto dto)
+    protected override void AddAdditionalContentMapping(DocumentDto dto, IContent content)
     {
-        IContentType? contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
-        Content content = ContentBaseFactory.BuildEntity(dto, contentType);
-
-        try
+        // get template
+        if (dto.ContentVersionDto.TemplateId.HasValue)
         {
-            content.DisableChangeTracking();
-
-            // get template
-            if (dto.ContentVersionDto.TemplateId.HasValue)
-            {
-                content.TemplateId = dto.ContentVersionDto.TemplateId;
-            }
-
-            // get properties - indexed by version id
-            var versionId = dto.ContentVersionDto.Id;
-
-            // TODO: shall we get published properties or not?
-            //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-            var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
-
-            var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
-            var ltemp = new List<TempContent<Content>> { temp };
-            IDictionary<int, PropertyCollection> properties = GetPropertyCollections(ltemp);
-            content.Properties = properties[dto.ContentVersionDto.Id];
-
-            // set variations, if varying
-            if (contentType?.VariesByCulture() ?? false)
-            {
-                IDictionary<int, List<ContentVariation>> contentVariations = GetContentVariations(ltemp);
-                IDictionary<int, List<EntityVariation>> documentVariations = GetEntityVariations(ltemp);
-                SetVariations(content, contentVariations, documentVariations);
-            }
-
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
-        }
-        finally
-        {
-            content.EnableChangeTracking();
+            content.TemplateId = dto.ContentVersionDto.TemplateId;
         }
     }
 

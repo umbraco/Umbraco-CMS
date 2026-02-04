@@ -36,17 +36,9 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     private readonly ITagRepository _tagRepository;
     private readonly EntityByGuidReadRepository _entityByGuidReadRepository;
     private readonly AppCaches _appCaches;
+    private readonly IContentTypeRepository _contentTypeRepository;
 
     protected abstract string RecycleBinCacheKey { get; }
-
-    protected abstract TEntity MapDtoToContent(TEntityDto dto);
-
-    protected abstract IEnumerable<TEntity> MapDtosToContent(
-        List<TEntityDto> dtos,
-        bool withCache = false,
-        string[]? propertyAliases = null,
-        bool loadTemplates = true,
-        bool loadVariants = true);
 
     protected PublishableContentRepositoryBase(
         IScopeAccessor scopeAccessor,
@@ -63,7 +55,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IContentTypeRepository contentTypeRepository)
         : base(
             scopeAccessor,
             appCaches,
@@ -81,6 +74,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         _appCaches = appCaches;
         _tagRepository = tagRepository;
         _serializer = serializer;
+        _contentTypeRepository = contentTypeRepository;
         _entityByGuidReadRepository = new EntityByGuidReadRepository(
             this,
             scopeAccessor,
@@ -128,7 +122,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             Sql<ISqlContext> joins = Sql()
                 .InnerJoin<UserDto>("updaterUser")
                 .On<ContentVersionDto, UserDto>(
-                (version, user) => version.UserId == user.Id,
+                    (version, user) => version.UserId == user.Id,
                     aliasRight: "updaterUser");
 
             // see notes in ApplyOrdering: the field MUST be selected + aliased
@@ -162,13 +156,13 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
                 .LeftJoin<ContentVersionCultureVariationDto>(
                     nested => nested.InnerJoin<LanguageDto>("langp")
-                    .On<ContentVersionCultureVariationDto, LanguageDto>(
+                        .On<ContentVersionCultureVariationDto, LanguageDto>(
                             (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]",
                             "ccvp",
                             "langp"),
                     "ccvp")
                 .On<ContentVersionDto, ContentVersionCultureVariationDto>(
-                (version, ccv) => version.Id == ccv.VersionId,
+                    (version, ccv) => version.Id == ccv.VersionId,
                     "pcv",
                     "ccvp");
 
@@ -190,6 +184,179 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         }
 
         return base.ApplySystemOrdering(ref sql, ordering);
+    }
+
+    protected virtual void AddAdditionalTempContentMapping(
+        List<TEntityDto> dtos,
+        List<TempContent<TEntity>> temps,
+        bool withCache,
+        string[]? propertyAliases,
+        bool loadTemplates,
+        bool loadVariants)
+    {
+    }
+
+    protected virtual void AddAdditionalContentMapping(TEntityDto dto, TEntity content)
+    {
+    }
+
+    protected IEnumerable<TEntity> MapDtosToContent(
+        List<TEntityDto> dtos,
+        bool withCache = false,
+        string[]? propertyAliases = null,
+        bool loadTemplates = true,
+        bool loadVariants = true)
+    {
+        var temps = new List<TempContent<TEntity>>();
+        var contentTypes = new Dictionary<int, IContentType?>();
+        var templateIds = new List<int>();
+
+        var content = new TEntity[dtos.Count];
+
+        for (var i = 0; i < dtos.Count; i++)
+        {
+            TEntityDto dto = dtos[i];
+
+            if (withCache)
+            {
+                // if the cache contains the (proper version of the) item, use it
+                TEntity? cached =
+                    IsolatedCache.GetCacheItem<TEntity>(RepositoryCacheKeys.GetKey<TEntity, int>(dto.NodeId));
+                if (cached != null && cached.VersionId == dto.ContentVersionDto.ContentVersionDto.Id)
+                {
+                    content[i] = cached;
+                    continue;
+                }
+            }
+
+            // else, need to build it
+
+            // get the content type - the repository is full cache *but* still deep-clones
+            // whatever comes out of it, so use our own local index here to avoid this
+            var contentTypeId = dto.ContentDto.ContentTypeId;
+            if (contentTypes.TryGetValue(contentTypeId, out IContentType? contentType) == false)
+            {
+                contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
+            }
+
+            // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
+            TEntity c = content[i] = (dto is DocumentDto tempDocumentDto
+                ? ContentBaseFactory.BuildEntity(tempDocumentDto, contentType) as TEntity
+                : dto is ElementDto tempElementDto
+                    ? ContentBaseFactory.BuildEntity(tempElementDto, contentType) as TEntity
+                    : throw new InvalidOperationException("Unsupported entity type"))!;
+
+            // need temps, for properties, templates and variations
+            var versionId = dto.ContentVersionDto.Id;
+            var publishedVersionId = dto.Published ? dto.PublishedVersionDto!.Id : 0;
+            var temp = new TempContent<TEntity>(dto.NodeId, versionId, publishedVersionId, contentType, c);
+
+            temps.Add(temp);
+        }
+
+        AddAdditionalTempContentMapping(dtos, temps, withCache, propertyAliases, loadTemplates, loadVariants);
+
+        // An empty array of propertyAliases indicates that no properties need to be loaded (null = load all properties).
+        var loadProperties = propertyAliases is { Length: 0 } is false;
+
+        IDictionary<int, PropertyCollection>? properties = null;
+        if (loadProperties)
+        {
+            // load properties for all documents from database in 1 query - indexed by version id
+            // if propertyAliases is provided, only load those specific properties
+            properties = GetPropertyCollections(temps, propertyAliases);
+        }
+
+        // assign templates and properties
+        foreach (TempContent<TEntity> temp in temps)
+        {
+            // set properties
+            if (loadProperties)
+            {
+                if (properties?.ContainsKey(temp.VersionId) ?? false)
+                {
+                    temp.Content!.Properties = properties[temp.VersionId];
+                }
+                else
+                {
+                    throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+                }
+            }
+            else
+            {
+                // When loadProperties is false (propertyAliases is empty array), clear the property collection
+                temp.Content!.Properties = new PropertyCollection();
+            }
+        }
+
+        if (loadVariants)
+        {
+            // set variations, if varying
+            temps = temps.Where(x => x.ContentType?.VariesByCulture() ?? false).ToList();
+            if (temps.Count > 0)
+            {
+                // load all variations for all documents from database, in one query
+                IDictionary<int, List<ContentVariation>> contentVariations = GetContentVariations(temps);
+                IDictionary<int, List<EntityVariation>> documentVariations = GetEntityVariations(temps);
+                foreach (TempContent<TEntity> temp in temps)
+                {
+                    SetVariations(temp.Content, contentVariations, documentVariations);
+                }
+            }
+        }
+
+        foreach (TEntity c in content)
+        {
+            c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
+        }
+
+        return content;
+    }
+
+    protected TEntity MapDtoToContent(TEntityDto dto)
+    {
+        IContentType? contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
+        // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
+        TEntity content = (dto is DocumentDto tempDocumentDto
+            ? ContentBaseFactory.BuildEntity(tempDocumentDto, contentType) as TEntity
+            : dto is ElementDto tempElementDto
+                ? ContentBaseFactory.BuildEntity(tempElementDto, contentType) as TEntity
+                : throw new InvalidOperationException("Unsupported entity type"))!;
+
+        try
+        {
+            content.DisableChangeTracking();
+
+            // get properties - indexed by version id
+            var versionId = dto.ContentVersionDto.Id;
+
+            // TODO: shall we get published properties or not?
+            //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+            var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
+
+            var temp = new TempContent<TEntity>(dto.NodeId, versionId, publishedVersionId, contentType);
+            var ltemp = new List<TempContent<TEntity>> { temp };
+            IDictionary<int, PropertyCollection> properties = GetPropertyCollections(ltemp);
+            content.Properties = properties[dto.ContentVersionDto.Id];
+
+            // set variations, if varying
+            if (contentType?.VariesByCulture() ?? false)
+            {
+                IDictionary<int, List<ContentVariation>> contentVariations = GetContentVariations(ltemp);
+                IDictionary<int, List<EntityVariation>> documentVariations = GetEntityVariations(ltemp);
+                SetVariations(content, contentVariations, documentVariations);
+            }
+
+            AddAdditionalContentMapping(dto, content);
+
+            // reset dirty initial properties (U4-1946)
+            content.ResetDirtyProperties(false);
+            return content;
+        }
+        finally
+        {
+            content.EnableChangeTracking();
+        }
     }
 
     protected void SetVariations(
