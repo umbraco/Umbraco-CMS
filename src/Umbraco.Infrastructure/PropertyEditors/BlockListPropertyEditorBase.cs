@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Abstract base class for block list based editors.
 /// </summary>
-public abstract class BlockListPropertyEditorBase : DataEditor
+public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
@@ -35,6 +36,141 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
     /// <inheritdoc/>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
+
+    /// <inheritdoc />
+    public virtual Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
+
+    /// <inheritdoc />
+    public virtual JsonObject? GetValueSchema(object? configuration)
+    {
+        var config = configuration as BlockListConfiguration;
+
+        // Build layout item schema
+        var layoutItemSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["required"] = new JsonArray("contentUdi"),
+            ["properties"] = new JsonObject
+            {
+                ["contentUdi"] = new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
+                ["settingsUdi"] = new JsonObject
+                {
+                    ["oneOf"] = new JsonArray
+                    {
+                        new JsonObject { ["type"] = "null" },
+                        new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
+                    },
+                },
+            },
+        };
+
+        // Build block item data schema
+        var blockItemDataSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["required"] = new JsonArray("key", "contentTypeKey"),
+            ["properties"] = new JsonObject
+            {
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["contentTypeKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["values"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = new JsonObject
+                    {
+                        ["type"] = "object",
+                        ["properties"] = new JsonObject
+                        {
+                            ["alias"] = new JsonObject { ["type"] = "string" },
+                            ["culture"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
+                            ["segment"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
+                            ["value"] = new JsonObject { }, // Any type - depends on property editor
+                        },
+                    },
+                },
+            },
+        };
+
+        // Build expose schema
+        var exposeItemSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["cultures"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = "string" } },
+                ["segments"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = new JsonArray("string", "null") } },
+            },
+        };
+
+        // Add contentTypeKey constraints if blocks are configured
+        if (config?.Blocks is { Length: > 0 })
+        {
+            var allowedContentTypes = new JsonArray();
+            var allowedSettingsTypes = new JsonArray();
+
+            foreach (var block in config.Blocks)
+            {
+                allowedContentTypes.Add(JsonValue.Create(block.ContentElementTypeKey.ToString()));
+                if (block.SettingsElementTypeKey.HasValue)
+                {
+                    allowedSettingsTypes.Add(JsonValue.Create(block.SettingsElementTypeKey.Value.ToString()));
+                }
+            }
+        }
+
+        // Build the main schema
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("object", "null"),
+            ["properties"] = new JsonObject
+            {
+                ["layout"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        [Constants.PropertyEditors.Aliases.BlockList] = new JsonObject
+                        {
+                            ["type"] = "array",
+                            ["items"] = layoutItemSchema,
+                        },
+                    },
+                },
+                ["contentData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = blockItemDataSchema,
+                },
+                ["settingsData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = blockItemDataSchema,
+                },
+                ["expose"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = exposeItemSchema,
+                },
+            },
+        };
+
+        // Add validation constraints
+        if (config?.ValidationLimit.Min is int min && min > 0)
+        {
+            var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockList]!.AsObject();
+            layoutArray["minItems"] = min;
+        }
+
+        if (config?.ValidationLimit.Max is int max && max > 0)
+        {
+            var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockList]!.AsObject();
+            layoutArray["maxItems"] = max;
+        }
+
+        return schema;
+    }
 
     /// <summary>
     /// Instantiates a new <see cref="BlockEditorDataConverter{BlockListValue, BlockListLayoutItem}"/> for use with the block list editor property value editor.

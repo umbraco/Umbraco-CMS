@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Abstract base class for block grid based editors.
 /// </summary>
-public abstract class BlockGridPropertyEditorBase : DataEditor
+public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
 
@@ -34,6 +35,139 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
+    /// <inheritdoc />
+    public virtual Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
+
+    /// <inheritdoc />
+    public virtual JsonObject? GetValueSchema(object? configuration)
+    {
+        var config = configuration as BlockGridConfiguration;
+
+        // Build area item schema
+        var areaItemSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["items"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = new JsonObject { ["$ref"] = "#/$defs/layoutItem" },
+                },
+            },
+        };
+
+        // Build layout item schema (with grid-specific properties)
+        var layoutItemSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["required"] = new JsonArray("contentUdi"),
+            ["properties"] = new JsonObject
+            {
+                ["contentUdi"] = new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
+                ["settingsUdi"] = new JsonObject
+                {
+                    ["oneOf"] = new JsonArray
+                    {
+                        new JsonObject { ["type"] = "null" },
+                        new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
+                    },
+                },
+                ["columnSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 },
+                ["rowSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 },
+                ["areas"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = areaItemSchema,
+                },
+            },
+        };
+
+        // Build block item data schema
+        var blockItemDataSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["required"] = new JsonArray("key", "contentTypeKey"),
+            ["properties"] = new JsonObject
+            {
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["contentTypeKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["values"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = new JsonObject
+                    {
+                        ["type"] = "object",
+                        ["properties"] = new JsonObject
+                        {
+                            ["alias"] = new JsonObject { ["type"] = "string" },
+                            ["culture"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
+                            ["segment"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
+                            ["value"] = new JsonObject { }, // Any type - depends on property editor
+                        },
+                    },
+                },
+            },
+        };
+
+        // Build the main schema
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("object", "null"),
+            ["$defs"] = new JsonObject
+            {
+                ["layoutItem"] = layoutItemSchema,
+            },
+            ["properties"] = new JsonObject
+            {
+                ["layout"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        [Constants.PropertyEditors.Aliases.BlockGrid] = new JsonObject
+                        {
+                            ["type"] = "array",
+                            ["items"] = new JsonObject { ["$ref"] = "#/$defs/layoutItem" },
+                        },
+                    },
+                },
+                ["contentData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = blockItemDataSchema,
+                },
+                ["settingsData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = blockItemDataSchema,
+                },
+            },
+        };
+
+        // Add grid columns constraint from configuration
+        if (config?.GridColumns is int gridColumns && gridColumns > 0)
+        {
+            layoutItemSchema["properties"]!["columnSpan"]!.AsObject()["maximum"] = gridColumns;
+        }
+
+        // Add validation constraints
+        if (config?.ValidationLimit?.Min is int min && min > 0)
+        {
+            var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockGrid]!.AsObject();
+            layoutArray["minItems"] = min;
+        }
+
+        if (config?.ValidationLimit?.Max is int max && max > 0)
+        {
+            var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockGrid]!.AsObject();
+            layoutArray["maxItems"] = max;
+        }
+
+        return schema;
+    }
 
     #region Value Editor
 

@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.ContentPicker,
     ValueType = ValueTypes.String,
     ValueEditorIsReusable = true)]
-public class ContentPickerPropertyEditor : DataEditor
+public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
 
@@ -35,6 +36,18 @@ public class ContentPickerPropertyEditor : DataEditor
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
     }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(string);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["pattern"] = "^umb:\\/\\/document\\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+        ["description"] = "UDI reference to a document (e.g., umb://document/a1b2c3d4-e5f6-7890-1234-567890abcdef)",
+    };
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
