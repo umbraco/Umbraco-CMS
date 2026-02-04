@@ -487,9 +487,14 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderCopyToClipboardAction() {
-		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#copyToClipboard()}>
-			<uui-icon name="icon-clipboard-copy"></uui-icon>
-		</uui-button>`;
+		return html`
+			<uui-button
+				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
+				look="secondary"
+				@click=${() => this.#copyToClipboard()}>
+				<uui-icon name="icon-clipboard-copy"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	override render() {
