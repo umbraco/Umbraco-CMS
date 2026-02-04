@@ -62,6 +62,17 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     private ITemplateRepository CreateRepository(IScopeProvider provider, AppCaches? appCaches = null) =>
         new TemplateRepository((IScopeAccessor)provider, appCaches ?? AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, RuntimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
+    private ITemplateRepository CreateRepository(IScopeProvider provider, IOptionsMonitor<RuntimeSettings> runtimeSettings) =>
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, ShortStringHelper, ViewHelper, runtimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+
+    private static IOptionsMonitor<RuntimeSettings> CreateRuntimeSettingsMonitor(RuntimeMode mode)
+    {
+        var settings = new RuntimeSettings { Mode = mode };
+        var monitor = new Mock<IOptionsMonitor<RuntimeSettings>>();
+        monitor.Setup(m => m.CurrentValue).Returns(settings);
+        return monitor.Object;
+    }
+
     [Test]
     public void Can_Instantiate_Repository()
     {
@@ -783,17 +794,108 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private Stream CreateStream(string contents = null)
+    [Test]
+    public void Save_In_Production_Mode_Does_Not_Write_New_File()
     {
-        if (string.IsNullOrEmpty(contents))
+        // Arrange
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
         {
-            contents = "/* test */";
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var repository = CreateRepository(provider, productionRuntimeSettings);
+
+            // Act
+            var template = new Template(ShortStringHelper, "productionTestNew", "productionTestNew") { Content = "mock-content" };
+            repository.Save(template);
+
+            // Assert - database record should be created but file should NOT be created in production mode.
+            Assert.That(repository.Get("productionTestNew"), Is.Not.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestNew.cshtml"), Is.False);
         }
+    }
 
-        var bytes = Encoding.UTF8.GetBytes(contents);
-        var stream = new MemoryStream(bytes);
+    [Test]
+    public void Save_In_Production_Mode_Does_Not_Update_Existing_File()
+    {
+        // Arrange - create template in development mode first.
+        var provider = ScopeProvider;
 
-        return stream;
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var developmentRepository = CreateRepository(provider, developmentRuntimeSettings);
+
+            var template = new Template(ShortStringHelper, "productionTestUpdate", "productionTestUpdate") { Content = "original-content" };
+            developmentRepository.Save(template);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestUpdate.cshtml"), Is.True);
+
+            // Read original content.
+            using var originalStream = FileSystems.MvcViewsFileSystem.OpenFile("productionTestUpdate.cshtml");
+            using var originalReader = new StreamReader(originalStream);
+            var originalContent = originalReader.ReadToEnd();
+            Assert.That(originalContent, Does.Contain("original-content"));
+
+            // Act - try to update in production mode.
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var productionRepository = CreateRepository(provider, productionRuntimeSettings);
+
+            var updatedTemplate = productionRepository.Get("productionTestUpdate");
+            Assert.IsNotNull(updatedTemplate);
+
+            // Modify and try to save.
+            updatedTemplate.Content = "modified-content";
+            productionRepository.Save(updatedTemplate);
+
+            // Assert - file should still have original content.
+            using var updatedStream = FileSystems.MvcViewsFileSystem.OpenFile("productionTestUpdate.cshtml");
+            using var updatedReader = new StreamReader(updatedStream);
+            var updatedContent = updatedReader.ReadToEnd();
+            Assert.That(updatedContent, Does.Contain("original-content"));
+            Assert.That(updatedContent, Does.Not.Contain("modified-content"));
+        }
+    }
+
+    [Test]
+    public void Save_In_Development_Mode_Writes_File()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var repository = CreateRepository(provider, developmentRuntimeSettings);
+
+            // Act
+            var template = new Template(ShortStringHelper, "developmentTest", "developmentTest") { Content = "mock-content" };
+            repository.Save(template);
+
+            // Assert - file should be created in development mode.
+            Assert.That(repository.Get("developmentTest"), Is.Not.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("developmentTest.cshtml"), Is.True);
+        }
+    }
+
+    [Test]
+    public void Save_In_BackofficeDevelopment_Mode_Writes_File()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var backofficeDevelopmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.BackofficeDevelopment);
+            var repository = CreateRepository(provider, backofficeDevelopmentRuntimeSettings);
+
+            // Act
+            var template = new Template(ShortStringHelper, "backofficeDevelopmentTest", "backofficeDevelopmentTest") { Content = "mock-content" };
+            repository.Save(template);
+
+            // Assert - file should be created in backoffice development mode.
+            Assert.That(repository.Get("backofficeDevelopmentTest"), Is.Not.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("backofficeDevelopmentTest.cshtml"), Is.True);
+        }
     }
 
     private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository)

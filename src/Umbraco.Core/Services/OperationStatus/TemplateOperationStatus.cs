@@ -10,4 +10,6 @@ public enum TemplateOperationStatus
     MasterTemplateNotFound,
     CircularMasterTemplateReference,
     MasterTemplateCannotBeDeleted,
+    NotAllowedInProductionMode,
+    ContentChangeNotAllowedInProductionMode,
 }

@@ -1572,6 +1572,7 @@ export default {
 			'There is no hostname configured for %0%, please contact an administrator, see log for more information',
 		copySuccessMessage: 'Your system information has successfully been copied to the clipboard',
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
+		runtimeModeNotEditable: 'Content is not editable when using Production runtime mode.',
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',

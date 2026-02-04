@@ -1,12 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -17,8 +20,19 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 {
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
+    /// <summary>
+    /// Configures the runtime mode to Production for tests decorated with [ConfigureBuilder].
+    /// </summary>
+    public static void ConfigureProductionMode(IUmbracoBuilder builder)
+    {
+        builder.Services.Configure<RuntimeSettings>(settings => settings.Mode = RuntimeMode.Production);
+    }
+
     [SetUp]
     public void SetUp() => DeleteAllTemplateViewFiles();
+
+    [TearDown]
+    public void TearDownTemplateFiles() => DeleteAllTemplateViewFiles();
 
     [Test]
     public async Task Can_Create_Template_Then_Assign_Child()
@@ -289,6 +303,111 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
             Assert.IsNotNull(template);
             Assert.AreEqual(key, template.Key);
         });
+    }
 
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
+    public async Task Cannot_Create_Template_In_Production_Mode()
+    {
+        var result = await TemplateService.CreateAsync("Template", "template", "test", Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.NotAllowedInProductionMode, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
+    public async Task Cannot_Delete_Template_In_Production_Mode()
+    {
+        // The production mode check happens before the template lookup,
+        // so we don't need an actual template in the database for this test.
+        var result = await TemplateService.DeleteAsync("AnyTemplateAlias", Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.NotAllowedInProductionMode, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
+    public async Task Cannot_Update_Template_Content_In_Production_Mode()
+    {
+        // Create template directly via repository to bypass the service's production mode check,
+        // allowing us to have an existing template to test the update behavior against.
+        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
+        var viewFileSystem = fileSystems.MvcViewsFileSystem!;
+        const string fileName = "ExistingTemplate.cshtml";
+        const string originalContent = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Original</p>";
+
+        using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(originalContent)))
+        {
+            viewFileSystem.AddFile(fileName, stream);
+        }
+
+        // Create the template in the database.
+        var shortStringHelper = GetRequiredService<Cms.Core.Strings.IShortStringHelper>();
+        var template = new Template(shortStringHelper, "ExistingTemplate", "ExistingTemplate")
+        {
+            Content = originalContent
+        };
+
+        // Save via scope to bypass service production check.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var templateRepository = GetRequiredService<Cms.Core.Persistence.Repositories.ITemplateRepository>();
+            templateRepository.Save(template);
+            scope.Complete();
+        }
+
+        // Now try to update the content in production mode.
+        template.Content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Modified</p>";
+        var result = await TemplateService.UpdateAsync(template, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.ContentChangeNotAllowedInProductionMode, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
+    public async Task Can_Update_Template_Metadata_In_Production_Mode()
+    {
+        // Create template directly via repository to bypass the service's production mode check.
+        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
+        var viewFileSystem = fileSystems.MvcViewsFileSystem!;
+        const string fileName = "MetadataTemplate.cshtml";
+        const string content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>";
+
+        using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content)))
+        {
+            viewFileSystem.AddFile(fileName, stream);
+        }
+
+        var shortStringHelper = GetRequiredService<Cms.Core.Strings.IShortStringHelper>();
+        var template = new Template(shortStringHelper, "MetadataTemplate", "MetadataTemplate")
+        {
+            Content = content
+        };
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var templateRepository = GetRequiredService<Cms.Core.Persistence.Repositories.ITemplateRepository>();
+            templateRepository.Save(template);
+            scope.Complete();
+        }
+
+        // Reload to get the saved version.
+        template = (Template?)await TemplateService.GetAsync(template.Key);
+        Assert.IsNotNull(template);
+
+        // Now update only the name (metadata), keeping content the same.
+        template.Name = "Updated Template Name";
+        var result = await TemplateService.UpdateAsync(template, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.Success, result.Status);
+
+        // Verify the name was updated.
+        var updatedTemplate = await TemplateService.GetAsync(template.Key);
+        Assert.IsNotNull(updatedTemplate);
+        Assert.AreEqual("Updated Template Name", updatedTemplate.Name);
     }
 }

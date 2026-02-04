@@ -1,4 +1,6 @@
 using System.Text;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -6,18 +8,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Provides methods to manage and retrieve partial view items from a file system.
+/// </summary>
 internal sealed class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
 {
-    public PartialViewRepository(FileSystems fileSystems)
-        : base(fileSystems.PartialViewsFileSystem)
-    {
-    }
+    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
 
-    private PartialViewRepository(IFileSystem? fileSystem)
-        : base(fileSystem)
-    {
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PartialViewRepository"/> class.
+    /// </summary>
+    public PartialViewRepository(FileSystems fileSystems, IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        : base(fileSystems.PartialViewsFileSystem) => _runtimeSettings = runtimeSettings;
 
+    /// <inheritdoc/>
     public override IPartialView? Get(string? id)
     {
         if (FileSystem is null)
@@ -57,19 +61,19 @@ internal sealed class PartialViewRepository : FileRepository<string, IPartialVie
         return view;
     }
 
+    /// <inheritdoc/>
     public override void Save(IPartialView entity)
     {
-        var partialView = entity as PartialView;
-
         base.Save(entity);
 
         // ensure that from now on, content is lazy-loaded
-        if (partialView != null && partialView.GetFileContent == null)
+        if (entity is PartialView partialView && partialView.GetFileContent == null)
         {
             partialView.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
     }
 
+    /// <inheritdoc/>
     public override IEnumerable<IPartialView> GetMany(params string[]? ids)
     {
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
@@ -120,12 +124,42 @@ internal sealed class PartialViewRepository : FileRepository<string, IPartialVie
     public void SetFileContent(string filepath, Stream content) => FileSystem?.AddFile(filepath, content, true);
 
     /// <summary>
-    ///     Gets a stream that is used to write to the file
+    ///     Persists a new partial view item, but only when not in production runtime mode.
+    /// </summary>
+    /// <param name="entity">The partial view entity to persist.</param>
+    protected override void PersistNewItem(IPartialView entity)
+    {
+        // Only save file when not in production runtime mode.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistNewItem(entity);
+    }
+
+    /// <summary>
+    ///     Persists an updated partial view item, but only when not in production runtime mode.
+    /// </summary>
+    /// <param name="entity">The partial view entity to persist.</param>
+    protected override void PersistUpdatedItem(IPartialView entity)
+    {
+        // Only save file when not in production runtime mode.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistUpdatedItem(entity);
+    }
+
+    /// <summary>
+    ///     Gets a stream that is used to write to the file.
     /// </summary>
     /// <param name="content"></param>
     /// <returns></returns>
     /// <remarks>
-    ///     This ensures the stream includes a utf8 BOM
+    ///     This ensures the stream includes a utf8 BOM.
     /// </remarks>
     protected override Stream GetContentStream(string content)
     {
