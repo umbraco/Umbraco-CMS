@@ -12,8 +12,8 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		// Build the pickable filter
-		let pickableFilter = (treeItem: UmbTreeItemModel) => treeItem.unique !== this.args.unique;
+		// Get custom filter if provider is configured
+		let customFilter: ((treeItem: UmbTreeItemModel) => boolean) | undefined;
 
 		// If a filter provider is configured, load it and combine filters
 		if (this.args.meta.selectableFilterProviderAlias) {
@@ -22,8 +22,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				this.args.meta.selectableFilterProviderAlias,
 			);
 			if (filterProvider) {
-				const customFilter = await filterProvider.getSelectableFilter(this.args.unique);
-				pickableFilter = (treeItem) => pickableFilter(treeItem) && customFilter(treeItem);
+				customFilter = await filterProvider.getSelectableFilter(this.args.unique);
 			}
 		}
 
@@ -32,7 +31,8 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
-				pickableFilter,
+				pickableFilter: (treeItem) =>
+					treeItem.unique !== this.args.unique && (customFilter ? customFilter(treeItem) : true),
 			},
 		});
 
