@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class ElementEditingService
     : ContentEditingServiceBase<IElement, IContentType, IElementService, IContentTypeService>, IElementEditingService
 {
+    private readonly IElementService _elementService;
     private readonly ILogger<ElementEditingService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
@@ -40,6 +41,9 @@ internal sealed class ElementEditingService
         ContentTypeFilterCollection contentTypeFilters,
         IEventMessagesFactory eventMessagesFactory,
         IIdKeyMap idKeyMap,
+        ILanguageService languageService,
+        IUserService userService,
+        ILocalizationService localizationService,
         IAuditService auditService)
         : base(
             elementService,
@@ -52,8 +56,12 @@ internal sealed class ElementEditingService
             validationService,
             optionsMonitor,
             relationService,
-            contentTypeFilters)
+            contentTypeFilters,
+            languageService,
+            userService,
+            localizationService)
     {
+        _elementService = elementService;
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
@@ -68,13 +76,26 @@ internal sealed class ElementEditingService
         return Task.FromResult(element);
     }
 
-    // TODO ELEMENTS: implement validation here
-    public Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
-        => Task.FromResult(Attempt<ContentValidationResult, ContentEditingOperationStatus>.Succeed(ContentEditingOperationStatus.Success, new ()));
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
+    {
+        IElement? content = _elementService.GetById(key);
+        return content is not null
+            ? await ValidateCulturesAndPropertiesAsync(
+                updateModel,
+                content.ContentType.Key,
+                updateModel.Cultures,
+                userKey)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
 
-    // TODO ELEMENTS: implement validation here
-    public Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
-        => Task.FromResult(Attempt<ContentValidationResult, ContentEditingOperationStatus>.Succeed(ContentEditingOperationStatus.Success, new ()));
+    /// <inheritdoc />
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
+        => await ValidateCulturesAndPropertiesAsync(
+            createModel,
+            createModel.ContentTypeKey,
+            createModel.Variants.Select(variant => variant.Culture),
+            userKey);
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
