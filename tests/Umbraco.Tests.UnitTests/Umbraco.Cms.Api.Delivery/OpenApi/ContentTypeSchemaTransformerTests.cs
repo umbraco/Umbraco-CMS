@@ -8,8 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Common.OpenApi;
-using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+using Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -21,7 +20,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.OpenApi;
 public class ContentTypeSchemaTransformerTests
 {
     private Mock<IContentTypeSchemaService> _contentTypeSchemaServiceMock = null!;
-    private Mock<ISchemaIdSelector> _schemaIdSelectorMock = null!;
     private Mock<IOptionsMonitor<JsonOptions>> _jsonOptionsMonitorMock = null!;
     private Mock<ILogger<ContentTypeSchemaTransformer>> _loggerMock = null!;
     private JsonSerializerOptions _jsonSerializerOptions = null!;
@@ -31,7 +29,6 @@ public class ContentTypeSchemaTransformerTests
     public void SetUp()
     {
         _contentTypeSchemaServiceMock = new Mock<IContentTypeSchemaService>(MockBehavior.Strict);
-        _schemaIdSelectorMock = new Mock<ISchemaIdSelector>(MockBehavior.Strict);
         _loggerMock = new Mock<ILogger<ContentTypeSchemaTransformer>>(MockBehavior.Strict);
         _jsonOptionsMonitorMock = new Mock<IOptionsMonitor<JsonOptions>>(MockBehavior.Strict);
 
@@ -345,10 +342,6 @@ public class ContentTypeSchemaTransformerTests
             .Setup(x => x.GetDocumentTypes())
             .Returns(documentTypes);
 
-        _schemaIdSelectorMock
-            .Setup(x => x.SchemaId(It.IsAny<Type>()))
-            .Returns<Type>(t => t.Name);
-
         var transformer = CreateTransformer();
         var schema = new OpenApiSchema();
 
@@ -384,10 +377,6 @@ public class ContentTypeSchemaTransformerTests
         _contentTypeSchemaServiceMock
             .Setup(x => x.GetDocumentTypes())
             .Returns(documentTypes);
-
-        _schemaIdSelectorMock
-            .Setup(x => x.SchemaId(It.IsAny<Type>()))
-            .Returns<Type>(t => t.Name);
 
         var transformer = CreateTransformer();
         var schema = new OpenApiSchema();
@@ -425,10 +414,6 @@ public class ContentTypeSchemaTransformerTests
             .Setup(x => x.GetDocumentTypes())
             .Returns(documentTypes);
 
-        _schemaIdSelectorMock
-            .Setup(x => x.SchemaId(It.IsAny<Type>()))
-            .Returns<Type>(t => t.Name);
-
         var transformer = CreateTransformer();
         var schema = new OpenApiSchema();
 
@@ -464,10 +449,6 @@ public class ContentTypeSchemaTransformerTests
             .Setup(x => x.GetMediaTypes())
             .Returns(mediaTypes);
 
-        _schemaIdSelectorMock
-            .Setup(x => x.SchemaId(It.IsAny<Type>()))
-            .Returns<Type>(t => t.Name);
-
         var transformer = CreateTransformer();
         var schema = new OpenApiSchema();
 
@@ -502,10 +483,6 @@ public class ContentTypeSchemaTransformerTests
             .Setup(x => x.GetMediaTypes())
             .Returns(mediaTypes);
 
-        _schemaIdSelectorMock
-            .Setup(x => x.SchemaId(It.IsAny<Type>()))
-            .Returns<Type>(t => t.Name);
-
         var transformer = CreateTransformer();
         var schema = new OpenApiSchema();
 
@@ -530,7 +507,6 @@ public class ContentTypeSchemaTransformerTests
     private ContentTypeSchemaTransformer CreateTransformer() =>
         new(
             _contentTypeSchemaServiceMock.Object,
-            _schemaIdSelectorMock.Object,
             _jsonOptionsMonitorMock.Object,
             _loggerMock.Object);
 

@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 /// <summary>
 /// Transforms the OpenAPI document to add schemas for the instance's document types.
@@ -22,7 +22,6 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
 {
     private const string CustomRecursiveRefKey = "x-recursive-ref";
     private readonly IContentTypeSchemaService _contentTypeSchemaService;
-    private readonly ISchemaIdSelector _schemaIdSelector;
     private readonly ILogger<ContentTypeSchemaTransformer> _logger;
     private readonly HashSet<string> _handledSchemas = [];
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
@@ -32,17 +31,14 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     /// Initializes a new instance of the <see cref="ContentTypeSchemaTransformer"/> class.
     /// </summary>
     /// <param name="contentTypeSchemaService">The content type info service.</param>
-    /// <param name="schemaIdSelector">The schema ID selector.</param>
     /// <param name="jsonOptionsMonitor">The JSON options monitor.</param>
     /// <param name="logger">The logger.</param>
     public ContentTypeSchemaTransformer(
         IContentTypeSchemaService contentTypeSchemaService,
-        ISchemaIdSelector schemaIdSelector,
         IOptionsMonitor<JsonOptions> jsonOptionsMonitor,
         ILogger<ContentTypeSchemaTransformer> logger)
     {
         _contentTypeSchemaService = contentTypeSchemaService;
-        _schemaIdSelector = schemaIdSelector;
         _logger = logger;
         _serializerOptions = jsonOptionsMonitor
             .Get(Constants.JsonOptionsNames.DeliveryApi)
@@ -237,7 +233,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     private string? GetSchemaId(JsonTypeInfo type)
     {
         var defaultSchemaReferenceId = OpenApiOptions.CreateDefaultSchemaReferenceId(type);
-        return defaultSchemaReferenceId is null ? null : _schemaIdSelector.SchemaId(type.Type);
+        return defaultSchemaReferenceId is null ? null : UmbracoSchemaIdGenerator.Generate(type.Type);
     }
 
     private static OpenApiSchema GetPlaceholderSchema(string schemaId)
