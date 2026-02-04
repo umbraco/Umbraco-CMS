@@ -17,4 +17,13 @@
     <Right>lib/net10.0/Umbraco.Cms.Api.Management.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+
+  <!-- Suppress CP0002 for TemporaryFileConfigurationPresentationFactory constructor change -->
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Api.Management.Factories.TemporaryFileConfigurationPresentationFactory.#ctor(Microsoft.Extensions.Options.IOptionsSnapshot{Umbraco.Cms.Core.Configuration.Models.ContentSettings},Microsoft.Extensions.Options.IOptionsSnapshot{Umbraco.Cms.Core.Configuration.Models.RuntimeSettings},Umbraco.Cms.Core.Media.IImageUrlGenerator)</Target>
+    <Left>lib/net10.0/Umbraco.Cms.Api.Management.dll</Left>
+    <Right>lib/net10.0/Umbraco.Cms.Api.Management.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>
