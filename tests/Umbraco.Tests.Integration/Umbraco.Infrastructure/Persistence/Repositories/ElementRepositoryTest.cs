@@ -145,10 +145,10 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             udb.EnableSqlCount = false;
             udb.EnableSqlCount = true;
 
-            // now get by GUID, this won't be cached yet because the default repo key is not a GUID
+            // now get by GUID, this will also be cached because of the sub-repo-by-key pattern in the entity service
             repository.Get(content.Key);
             var sqlCount = udb.SqlCount;
-            Assert.Greater(sqlCount, 0);
+            Assert.AreEqual(sqlCount, 0);
 
             // retrieve again, this should use cache now
             repository.Get(content.Key);
