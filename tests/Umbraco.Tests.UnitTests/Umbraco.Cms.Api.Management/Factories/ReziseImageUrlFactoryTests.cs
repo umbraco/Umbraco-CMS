@@ -86,7 +86,7 @@ public class ReziseImageUrlFactoryTests
     }
 
     [Test]
-    public void CreateUrlSets_UrlWithQueryString_ReturnsEmpty()
+    public void CreateUrlSets_UrlWithQueryString_HandlesCorrectly()
     {
         // Arrange
         var factory = CreateFactory();
@@ -98,11 +98,14 @@ public class ReziseImageUrlFactoryTests
         var result = factory.CreateUrlSets([media], options).ToList();
 
         // Assert
-        // URLs with query strings cause Path.GetExtension to include the query string
-        // (e.g., ".pdf?v=123"), which doesn't match SupportedImageFileTypes, so returns empty
-        // Note: This is a limitation of the current implementation
+        // URLs with query strings are now handled correctly by stripping the query string
+        // before extracting the extension, so PDFs are processed and converted to WebP
         Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].UrlInfos, Is.Empty);
+        var urlInfo = result[0].UrlInfos.FirstOrDefault();
+        Assert.That(urlInfo, Is.Not.Null);
+        Assert.That(urlInfo!.Url, Does.Contain("format=webp"));
+        // Original query string should be preserved in the output
+        Assert.That(urlInfo.Url, Does.Contain("v=123"));
     }
 
     [Test]
