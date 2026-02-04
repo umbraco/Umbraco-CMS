@@ -116,6 +116,8 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
         return QueryHelpers.AddQueryString(options.ImageUrl, queryString);
     }
 
+    private static readonly string[] TrueImageFormats = { "jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff" };
+
     /// <summary>
     /// Determines if the source file requires format conversion because it's not a true image format.
     /// </summary>
@@ -128,18 +130,25 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             return false;
         }
 
-        // Extract extension from URL (handle query strings)
-        var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
-        var path = uri.IsAbsoluteUri ? uri.LocalPath : imageUrl.Split('?')[0];
-        var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
-
-        if (string.IsNullOrEmpty(extension))
+        try
         {
+            // Extract extension from URL (handle query strings)
+            var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
+            var path = uri.IsAbsoluteUri ? uri.LocalPath : imageUrl.Split('?')[0];
+            var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
+
+            if (string.IsNullOrEmpty(extension))
+            {
+                return false;
+            }
+
+            // True image formats that don't require conversion
+            return !TrueImageFormats.Contains(extension);
+        }
+        catch (UriFormatException)
+        {
+            // If URL parsing fails, treat as non-image requiring conversion
             return false;
         }
-
-        // True image formats that don't require conversion
-        string[] trueImageFormats = { "jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff" };
-        return !trueImageFormats.Contains(extension);
     }
 }
