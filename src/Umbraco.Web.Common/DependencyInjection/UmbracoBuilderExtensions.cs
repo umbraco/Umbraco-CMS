@@ -72,6 +72,42 @@ namespace Umbraco.Extensions;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
+    /// Adds all core Umbraco services required to run without the backoffice.
+    /// Use this for delivery-only scenarios (Delivery API, Website) without the management backoffice.
+    /// For full Umbraco with backoffice, use <see cref="AddBackOffice"/> instead.
+    /// </summary>
+    /// <remarks>
+    /// This method is idempotent - calling it multiple times has no effect after the first call.
+    /// The individual service registration methods are also idempotent, so calling both
+    /// <see cref="AddBackOffice"/> and <see cref="AddCore"/> is safe (though not expected).
+    /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <param name="configureMvc">Optional action to configure the MVC builder.</param>
+    /// <returns>The Umbraco builder.</returns>
+    public static IUmbracoBuilder AddCore(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null)
+    {
+        // Idempotency check - safe to call multiple times
+        if (builder.Services.Any(s => s.ServiceType == typeof(AddCoreMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<AddCoreMarker>();
+
+        return builder
+            .AddConfiguration()
+            .AddUmbracoCore()
+            .AddWebComponents()
+            .AddHelpers()
+            .AddUmbracoProfiler()
+            .AddMvcAndRazor(configureMvc)
+            .AddBackgroundJobs()
+            .AddUmbracoHybridCache()
+            .AddDistributedCache()
+            .AddCoreNotifications();
+    }
+
+    /// <summary>
     ///     Creates an <see cref="IUmbracoBuilder" /> and registers basic Umbraco services
     /// </summary>
     public static IUmbracoBuilder AddUmbraco(
@@ -135,6 +171,14 @@ public static partial class UmbracoBuilderExtensions
             throw new ArgumentNullException(nameof(builder));
         }
 
+        // Idempotency check using a private marker class
+        if (builder.Services.Any(s => s.ServiceType == typeof(UmbracoCoreMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<UmbracoCoreMarker>();
+
         // Add ASP.NET specific services
         builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
         builder.Services.AddUnique<IHostingEnvironment>(sp =>
@@ -177,6 +221,14 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoProfiler(this IUmbracoBuilder builder)
     {
+        // Idempotency check using a private marker class
+        if (builder.Services.Any(s => s.ServiceType == typeof(UmbracoProfilerMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<UmbracoProfilerMarker>();
+
         builder.Services.AddSingleton<WebProfilerHtml>();
 
         builder.Services.AddMiniProfiler();
@@ -207,6 +259,10 @@ public static partial class UmbracoBuilderExtensions
 
     public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder>? mvcBuilding = null)
     {
+        // NOTE: AddControllersWithViews() is already idempotent for service registration.
+        // We intentionally do NOT add an idempotency check here because the mvcBuilding callback
+        // may contain important configuration (e.g., Razor runtime compilation) that needs to
+        // be applied even if MVC services were already registered by a previous call.
         // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
         // this will directly affect developers who need to call that themselves.
         IMvcBuilder mvcBuilder = builder.Services.AddControllersWithViews();
@@ -221,6 +277,14 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddWebComponents(this IUmbracoBuilder builder)
     {
+        // Idempotency check using a private marker class
+        if (builder.Services.Any(s => s.ServiceType == typeof(WebComponentsMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<WebComponentsMarker>();
+
         // Add service session
         // This can be overwritten by the user by adding their own call to AddSession
         // since the last call of AddSession take precedence
@@ -334,5 +398,33 @@ public static partial class UmbracoBuilderExtensions
             wrappedHostingSettings,
             wrappedWebRoutingSettings,
             webHostEnvironment);
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddUmbracoCore is only called once.
+    /// </summary>
+    private sealed class UmbracoCoreMarker
+    {
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddWebComponents is only called once.
+    /// </summary>
+    private sealed class WebComponentsMarker
+    {
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddUmbracoProfiler is only called once.
+    /// </summary>
+    private sealed class UmbracoProfilerMarker
+    {
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddCore is only executed once.
+    /// </summary>
+    private sealed class AddCoreMarker
+    {
     }
 }

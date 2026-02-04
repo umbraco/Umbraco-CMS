@@ -27,6 +27,14 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoHybridCache(this IUmbracoBuilder builder)
     {
+        // Idempotency check using a private marker class
+        if (builder.Services.Any(s => s.ServiceType == typeof(HybridCacheMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<HybridCacheMarker>();
+
 #pragma warning disable EXTEXP0018
         builder.Services.AddHybridCache(options =>
         {
@@ -86,5 +94,12 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IMediaSeedKeyProvider, MediaBreadthFirstKeyProvider>();
         return builder;
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddUmbracoHybridCache is only called once.
+    /// </summary>
+    private sealed class HybridCacheMarker
+    {
     }
 }

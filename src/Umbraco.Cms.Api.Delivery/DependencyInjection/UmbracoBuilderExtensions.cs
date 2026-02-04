@@ -22,7 +22,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -30,6 +29,15 @@ namespace Umbraco.Extensions;
 
 public static class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Add services for the Umbraco Delivery API (headless content delivery).
+    /// </summary>
+    /// <remarks>
+    /// This method assumes that either <c>AddBackOffice()</c> or <c>AddCore()</c> has already been called.
+    /// It registers Delivery API-specific services such as controllers, output caching, and member authentication.
+    /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddDeliveryApi(this IUmbracoBuilder builder)
     {
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
