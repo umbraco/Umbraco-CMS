@@ -1,13 +1,17 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.Element.Folder;
+using Umbraco.Cms.Api.Management.Controllers.Element.References;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.Element.Folder;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Element.References;
 
-public class DeleteElementFolderControllerTests : ManagementApiUserGroupTestBase<DeleteElementFolderController>
+public class ReferencedDescendantsElementFolderControllerTests
+    : ManagementApiUserGroupTestBase<ReferencedDescendantsElementFolderController>
 {
     private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
 
@@ -16,13 +20,17 @@ public class DeleteElementFolderControllerTests : ManagementApiUserGroupTestBase
     [SetUp]
     public async Task Setup()
     {
-        var result = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success, $"Failed to create folder: {result.Status}");
-        _folderKey = result.Result!.Key;
+        var folderResult = await ElementContainerService.CreateAsync(
+            null,
+            $"Test Folder {Guid.NewGuid()}",
+            null,
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(folderResult.Success);
+        _folderKey = folderResult.Result!.Key;
     }
 
-    protected override Expression<Func<DeleteElementFolderController, object>> MethodSelector =>
-        x => x.Delete(CancellationToken.None, _folderKey);
+    protected override Expression<Func<ReferencedDescendantsElementFolderController, object>> MethodSelector =>
+        x => x.ReferencedDescendants(CancellationToken.None, _folderKey, 0, 20);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.OK };
@@ -37,11 +45,8 @@ public class DeleteElementFolderControllerTests : ManagementApiUserGroupTestBase
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
+        => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
-
-    protected override async Task<HttpResponseMessage> ClientRequest()
-        => await Client.DeleteAsync(Url);
 }

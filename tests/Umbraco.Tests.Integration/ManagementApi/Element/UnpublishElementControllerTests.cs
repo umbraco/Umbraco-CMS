@@ -40,6 +40,7 @@ public class UnpublishElementControllerTests : ManagementApiUserGroupTestBase<Un
             Variants = [new VariantModel { Name = "Test Element" }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
 
         // Publish the element so we can unpublish it

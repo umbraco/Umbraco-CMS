@@ -69,20 +69,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             ISqlSyntaxProvider sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
-            string[] columns = [
-                    sx.ColumnWithAlias("x", "otherId", "nodeId"),
-                    sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
-                    sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
-                    sx.ColumnWithAlias("d", "published", "nodePublished"),
-                    sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
-                    sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
-                    sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
-                    sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
-                    sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
-                    sx.ColumnWithAlias("x", "name", "relationTypeName"),
-                    sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
-                    sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
-                ];
+            string[] columns =
+            [
+                sx.ColumnWithAlias("x", "otherId", "nodeId"),
+                sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
+                $"COALESCE({sx.ColumnWithAlias("d", "published")}, {sx.ColumnWithAlias("e", "published")}) AS nodePublished",
+                sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
+                sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
+                sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
+                sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
+                sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
+                sx.ColumnWithAlias("x", "name", "relationTypeName"),
+                sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
+                sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
+            ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
             Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                 .SelectDistinct(columns)
@@ -109,6 +110,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "d")
+                .LeftJoin<ElementDto>("e")
+                .On<NodeDto, ElementDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "n",
+                    aliasRight: "e")
                 .Where(itemsFilter, "x");
 
 
@@ -289,21 +295,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .WhereLike<NodeDto>(x => x.Path, subsubQuery, ",%");
 
             ISqlSyntaxProvider sx = sqlContext.SqlSyntax;
-            string[] columns = [
-                    sx.ColumnWithAlias("x", "id", "nodeId"),
-                    sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
-                    sx.ColumnWithAlias("n", "text", "nodeName"),
-                    sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
-                    sx.ColumnWithAlias("d", "published", "nodePublished"),
-                    sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
-                    sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
-                    sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
-                    sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
-                    sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
-                    sx.ColumnWithAlias("x", "name", "relationTypeName"),
-                    sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
-                    sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
-                ];
+            string[] columns =
+            [
+                sx.ColumnWithAlias("x", "id", "nodeId"),
+                sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                sx.ColumnWithAlias("n", "text", "nodeName"),
+                sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
+                $"COALESCE({sx.ColumnWithAlias("d", "published")}, {sx.ColumnWithAlias("e", "published")}) AS nodePublished",
+                sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
+                sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
+                sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
+                sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
+                sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
+                sx.ColumnWithAlias("x", "name", "relationTypeName"),
+                sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
+                sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
+            ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
             Sql<ISqlContext> sql = sqlContext.Sql()
                 .SelectDistinct(columns)
@@ -330,6 +337,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "d")
+                .LeftJoin<ElementDto>("e")
+                .On<NodeDto, ElementDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "n",
+                    aliasRight: "e")
                 .WhereIn((Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
 
             if (filterMustBeIsDependency)

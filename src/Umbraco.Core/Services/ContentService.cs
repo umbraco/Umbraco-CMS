@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -1188,7 +1189,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.Notifications.Publish(
                 new ContentMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
                     movingToRecycleBinNotification));
-            Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
+
+            Audit(AuditType.Move, userId, content.Id, $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}");
 
             scope.Complete();
         }

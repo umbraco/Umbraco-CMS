@@ -328,6 +328,16 @@ public static partial class Constants
             public const string RelatedDocumentAlias = "umbDocument";
 
             /// <summary>
+            ///     Name for default relation type "Related Element".
+            /// </summary>
+            public const string RelatedElementName = "Related Element";
+
+            /// <summary>
+            ///     Alias for default relation type "Related Element".
+            /// </summary>
+            public const string RelatedElementAlias = "umbElement";
+
+            /// <summary>
             ///     Name for default relation type "Relate Document On Copy".
             /// </summary>
             public const string RelateDocumentOnCopyName = "Relate Document On Copy";
@@ -358,13 +368,33 @@ public static partial class Constants
             public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
 
             /// <summary>
+            ///     Name for default relation type "Relate Parent Element Container On Element Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnElementDeleteName = "Relate Parent Element Container On Element Delete";
+
+            /// <summary>
+            ///     Alias for default relation type "Relate Parent Element Container On Element Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnElementDeleteAlias = "relateParentElementContainerOnElementDelete";
+
+            /// <summary>
+            ///     Name for default relation type "Relate Parent Element Container On Container Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnContainerDeleteName = "Relate Parent Element Container On Container Delete";
+
+            /// <summary>
+            ///     Alias for default relation type "Relate Parent Element Container On Container Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnContainerDeleteAlias = "relateParentElementContainerOnContainerDelete";
+
+            /// <summary>
             ///     Returns the types of relations that are automatically tracked.
             /// </summary>
             /// <remarks>
             ///     Developers should not manually use these relation types since they will all be cleared whenever an entity
-            ///     (content, media or member) is saved since they are auto-populated based on property values.
+            ///     (content, media, member or element) is saved since they are auto-populated based on property values.
             /// </remarks>
-            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedMemberAlias, RelatedDocumentAlias };
+            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedMemberAlias, RelatedDocumentAlias, RelatedElementAlias };
 
             // TODO: return a list of built in types so we can use that to prevent deletion in the UI
         }

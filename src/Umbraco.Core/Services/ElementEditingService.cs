@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -22,6 +24,7 @@ internal sealed class ElementEditingService
     private readonly IElementContainerService _containerService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IAuditService _auditService;
 
     public ElementEditingService(
         IElementService elementService,
@@ -40,7 +43,8 @@ internal sealed class ElementEditingService
         IIdKeyMap idKeyMap,
         ILanguageService languageService,
         IUserService userService,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IAuditService auditService)
         : base(
             elementService,
             contentTypeService,
@@ -63,6 +67,7 @@ internal sealed class ElementEditingService
         _containerService = containerService;
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
+        _auditService = auditService;
     }
 
     public Task<IElement?> GetAsync(Guid key)
@@ -290,6 +295,9 @@ internal sealed class ElementEditingService
             return Attempt.Fail(ContentEditingOperationStatus.NotFound);
         }
 
+        // Capture original path before any modifications (needed for audit message when trashing)
+        var originalPath = toMove.Path;
+
         if (toMove.ParentId == parentId)
         {
             return Attempt.Succeed(ContentEditingOperationStatus.Success);
@@ -322,6 +330,11 @@ internal sealed class ElementEditingService
         {
             return Attempt.Fail(saveResult);
         }
+
+        string? auditMessage = trash
+            ? $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}"
+            : null;
+        await _auditService.AddAsync(AuditType.Move, userKey, toMove.Id, UmbracoObjectTypes.Element.GetName(), auditMessage);
 
         IStatefulNotification movedNotification = movedNotificationFactory(toMove, eventMessages);
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));

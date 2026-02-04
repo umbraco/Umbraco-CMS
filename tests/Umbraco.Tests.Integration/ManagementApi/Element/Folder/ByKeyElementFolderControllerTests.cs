@@ -17,6 +17,7 @@ public class ByKeyElementFolderControllerTests : ManagementApiUserGroupTestBase<
     public async Task Setup()
     {
         var result = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to create folder: {result.Status}");
         _folderKey = result.Result!.Key;
     }
 

@@ -2757,7 +2757,30 @@ internal sealed class DatabaseDataCreator
             null,
             false,
             true);
-
+        CreateRelationTypeData(
+            7,
+            Constants.Conventions.RelationTypes.RelatedElementAlias,
+            Constants.Conventions.RelationTypes.RelatedElementName,
+            null,
+            null,
+            false,
+            true);
+        CreateRelationTypeData(
+            8,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.Element,
+            false,
+            false);
+        CreateRelationTypeData(
+            9,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.ElementContainer,
+            false,
+            false);
     }
 
     private void CreateRelationTypeData(

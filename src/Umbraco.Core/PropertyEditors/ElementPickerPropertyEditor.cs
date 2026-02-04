@@ -24,16 +24,34 @@ public class ElementPickerPropertyEditor : DataEditor
 
     internal sealed class ElementPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
         public ElementPickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
-        {
-        }
+            => _jsonSerializer = jsonSerializer;
 
-        // TODO ELEMENTS: implement reference tracking from element picker
-        public IEnumerable<UmbracoEntityReference> GetReferences(object? value) => [];
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
+        {
+            var asString = value as string ?? value?.ToString();
+            if (string.IsNullOrEmpty(asString))
+            {
+                yield break;
+            }
+
+            IEnumerable<Guid>? elementIds = _jsonSerializer.Deserialize<IEnumerable<Guid>>(asString);
+            if (elementIds is null)
+            {
+                yield break;
+            }
+
+            foreach (Guid elementId in elementIds)
+            {
+                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, elementId));
+            }
+        }
     }
 }
