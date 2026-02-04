@@ -161,7 +161,7 @@ public class ContentImagingSettingsTests
     public void StaticConstants_HaveExpectedValues()
     {
         // Assert
-        Assert.That(ContentImagingSettings.StaticImageFileTypes, Is.EqualTo("jpg,jpeg,png,gif,webp,bmp,tif,tiff"));
+        Assert.That(ContentImagingSettings.StaticImageFileTypes, Is.EqualTo("jpeg,jpg,gif,bmp,png,tiff,tif,webp"));
     }
 
     [TestCase("jpg", true)]
