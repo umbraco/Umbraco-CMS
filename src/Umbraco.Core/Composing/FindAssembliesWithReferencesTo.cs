@@ -38,6 +38,10 @@ internal sealed class FindAssembliesWithReferencesTo
         _logger = _loggerFactory.CreateLogger<FindAssembliesWithReferencesTo>();
     }
 
+    /// <summary>
+    /// Finds all assemblies that reference the target assemblies.
+    /// </summary>
+    /// <returns>A collection of assemblies that reference the target assemblies.</returns>
     public IEnumerable<Assembly> Find()
     {
         var referenceItems = new List<Assembly>();

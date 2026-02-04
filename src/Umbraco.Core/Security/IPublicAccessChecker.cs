@@ -2,6 +2,9 @@ using System.Security.Claims;
 
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Provides functionality to check public access rules for content items.
+/// </summary>
 public interface IPublicAccessChecker
 {
     /// <summary>

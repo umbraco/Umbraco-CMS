@@ -3,9 +3,16 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="IAuditItem" /> entities.
+/// </summary>
 public interface IAuditRepository : IReadRepository<int, IAuditItem>, IWriteRepository<IAuditItem>,
     IQueryRepository<IAuditItem>
 {
+    /// <summary>
+    ///     Cleans audit logs older than the specified maximum age.
+    /// </summary>
+    /// <param name="maximumAgeOfLogsInMinutes">The maximum age of logs in minutes.</param>
     void CleanLogs(int maximumAgeOfLogsInMinutes);
 
     /// <summary>
@@ -36,5 +43,11 @@ public interface IAuditRepository : IReadRepository<int, IAuditItem>, IWriteRepo
         AuditType[]? auditTypeFilter,
         IQuery<IAuditItem>? customFilter);
 
+    /// <summary>
+    ///     Gets audit items by type and query.
+    /// </summary>
+    /// <param name="type">The audit type to filter by.</param>
+    /// <param name="query">The query to apply.</param>
+    /// <returns>A collection of <see cref="IAuditItem" /> objects.</returns>
     IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query);
 }

@@ -7,6 +7,9 @@ public static partial class Constants
     /// </summary>
     public static class Marketplace
     {
+        /// <summary>
+        ///     The URL for the Umbraco Marketplace.
+        /// </summary>
         public const string Url = "https://marketplace.umbraco.com";
     }
 }

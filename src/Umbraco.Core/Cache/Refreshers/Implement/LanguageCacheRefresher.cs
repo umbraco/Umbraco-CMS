@@ -8,11 +8,22 @@ using static Umbraco.Cms.Core.Cache.LanguageCacheRefresher.JsonPayload;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+///     Cache refresher for language caches.
+/// </summary>
 public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageCacheRefresherNotification,
     LanguageCacheRefresher.JsonPayload>
 {
     private readonly IDomainCacheService _domainCacheService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LanguageCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="domainCache">The domain cache service.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
     public LanguageCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -43,8 +54,14 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
 
     #region Json
 
+    /// <summary>
+    ///     Represents the JSON payload for language cache refresh operations.
+    /// </summary>
     public class JsonPayload
     {
+        /// <summary>
+        ///     Defines the types of changes that can occur to a language.
+        /// </summary>
         public enum LanguageChangeType
         {
             /// <summary>
@@ -68,6 +85,12 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             ChangeCulture = 3,
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="id">The identifier of the language.</param>
+        /// <param name="isoCode">The ISO code of the language.</param>
+        /// <param name="changeType">The type of change that occurred.</param>
         public JsonPayload(int id, string isoCode, LanguageChangeType changeType)
         {
             Id = id;
@@ -75,10 +98,19 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             ChangeType = changeType;
         }
 
+        /// <summary>
+        ///     Gets the identifier of the language.
+        /// </summary>
         public int Id { get; }
 
+        /// <summary>
+        ///     Gets the ISO code of the language.
+        /// </summary>
         public string IsoCode { get; }
 
+        /// <summary>
+        ///     Gets the type of change that occurred.
+        /// </summary>
         public LanguageChangeType ChangeType { get; }
     }
 
@@ -86,16 +118,22 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
 
     #region Define
 
+    /// <summary>
+    ///     The unique identifier for this cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("3E0F95D8-0BE5-44B8-8394-2B8750B62654");
 
+    /// <inheritdoc />
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc />
     public override string Name => "Language Cache Refresher";
 
     #endregion
 
     #region Refresher
 
+    /// <inheritdoc />
     public override void RefreshInternal(JsonPayload[] payloads)
     {
         // Languages has no concept of "published" languages, so all caches are "internal"
@@ -142,12 +180,17 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
 
     // these events should never trigger
     // everything should be PAYLOAD/JSON
+
+    /// <inheritdoc />
     public override void RefreshAll() => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(int id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(Guid id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Remove(int id) => throw new NotSupportedException();
 
     #endregion
