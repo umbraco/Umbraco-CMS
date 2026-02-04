@@ -11,7 +11,7 @@ export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind =
 		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		api: () => import('./property-action-clear.controller.js'),
 		meta: {
-			icon: 'icon-trash',
+			icon: 'icon-delete',
 			label: '#actions_clear',
 		},
 		conditions: [{ alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS }],
