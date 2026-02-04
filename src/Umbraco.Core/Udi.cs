@@ -30,6 +30,9 @@ public abstract class Udi : IComparable<Udi>
         UriValue = uriValue;
     }
 
+    /// <summary>
+    ///     Gets the URI representation of this Udi.
+    /// </summary>
     public Uri UriValue { get; }
 
     /// <summary>
@@ -43,6 +46,12 @@ public abstract class Udi : IComparable<Udi>
     /// <remarks>A root Udi points to the "root of all things" for a given entity type, e.g. the content tree root.</remarks>
     public abstract bool IsRoot { get; }
 
+    /// <summary>
+    ///     Determines whether two Udi instances are equal.
+    /// </summary>
+    /// <param name="udi1">The first Udi to compare.</param>
+    /// <param name="udi2">The second Udi to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(Udi? udi1, Udi? udi2)
     {
         if (ReferenceEquals(udi1, udi2))
@@ -65,8 +74,10 @@ public abstract class Udi : IComparable<Udi>
     /// <returns>The root Udi for the entity type.</returns>
     public static Udi Create(string entityType) => UdiParser.GetRootUdi(entityType);
 
+    /// <inheritdoc />
     public int CompareTo(Udi? other) => string.Compare(UriValue.ToString(), other?.UriValue.ToString(), StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc />
     public override string ToString() =>
 
         // UriValue is created in the ctor and is never null
@@ -129,6 +140,12 @@ public abstract class Udi : IComparable<Udi>
         return new GuidUdi(entityType, id);
     }
 
+    /// <summary>
+    ///     Creates a Udi from a URI.
+    /// </summary>
+    /// <param name="uri">The URI to create the Udi from.</param>
+    /// <returns>The Udi for the specified URI.</returns>
+    /// <exception cref="ArgumentException">The URI is not a valid Udi or the entity type is unknown.</exception>
     public static Udi Create(Uri uri)
     {
         // if it's a know type go fast and use ctors
@@ -151,6 +168,11 @@ public abstract class Udi : IComparable<Udi>
         throw new ArgumentException(string.Format("Uri \"{0}\" is not a valid udi.", uri));
     }
 
+    /// <summary>
+    ///     Ensures that this Udi is of one of the specified entity types.
+    /// </summary>
+    /// <param name="validTypes">The valid entity types.</param>
+    /// <exception cref="Exception">When the entity type is not one of the valid types.</exception>
     public void EnsureType(params string[] validTypes)
     {
         if (validTypes.Contains(EntityType) == false)
@@ -174,13 +196,21 @@ public abstract class Udi : IComparable<Udi>
         return this;
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         var other = obj as Udi;
         return other is not null && GetType() == other.GetType() && UriValue == other.UriValue;
     }
 
+    /// <inheritdoc />
     public override int GetHashCode() => UriValue.GetHashCode();
 
+    /// <summary>
+    ///     Determines whether two Udi instances are not equal.
+    /// </summary>
+    /// <param name="udi1">The first Udi to compare.</param>
+    /// <param name="udi2">The second Udi to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(Udi? udi1, Udi? udi2) => udi1 == udi2 == false;
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Represents a property editor for configuration-less time properties.
@@ -9,6 +9,10 @@
     ValueType = ValueTypes.Time)]
 public class PlainTimePropertyEditor : DataEditor
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PlainTimePropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
     public PlainTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;

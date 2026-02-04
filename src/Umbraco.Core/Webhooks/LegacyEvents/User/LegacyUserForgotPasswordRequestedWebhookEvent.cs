@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a user requests a forgot password reset, using the legacy payload format.
+/// </summary>
 [WebhookEvent("User Forgot Password Requested")]
 public class LegacyUserForgotPasswordRequestedWebhookEvent : WebhookEventBase<UserForgotPasswordRequestedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyUserForgotPasswordRequestedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyUserForgotPasswordRequestedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,6 +28,6 @@ public class LegacyUserForgotPasswordRequestedWebhookEvent : WebhookEventBase<Us
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserForgotPasswordRequested;
-
 }

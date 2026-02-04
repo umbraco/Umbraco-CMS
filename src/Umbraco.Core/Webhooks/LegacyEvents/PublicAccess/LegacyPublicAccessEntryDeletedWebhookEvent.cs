@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a public access entry is deleted, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Public Access Entry Deleted")]
 public class LegacyPublicAccessEntryDeletedWebhookEvent : WebhookEventBase<PublicAccessEntryDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyPublicAccessEntryDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyPublicAccessEntryDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,7 +28,9 @@ public class LegacyPublicAccessEntryDeletedWebhookEvent : WebhookEventBase<Publi
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.PublicAccessEntryDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(PublicAccessEntryDeletedNotification notification) => notification.DeletedEntities;
 }

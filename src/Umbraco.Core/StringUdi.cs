@@ -33,6 +33,11 @@ public class StringUdi : Udi
     /// <inheritdoc />
     public override bool IsRoot => Id == string.Empty;
 
+    /// <summary>
+    ///     Ensures that this StringUdi is not a root Udi.
+    /// </summary>
+    /// <returns>This StringUdi.</returns>
+    /// <exception cref="Exception">When this Udi is a root Udi.</exception>
     public StringUdi EnsureClosed()
     {
         EnsureNotRoot();

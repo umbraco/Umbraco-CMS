@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Strings;
 
+/// <summary>
+///     Provides utility methods for working with file and URL paths.
+/// </summary>
 public static class PathUtility
 {
     /// <summary>
