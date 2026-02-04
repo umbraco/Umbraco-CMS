@@ -1504,6 +1504,111 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
     #endregion
 
+    #region Schedule
+
+    /// <inheritdoc />
+    public void ClearSchedule(DateTime date)
+    {
+        Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>().Where<ContentScheduleDto>(x => x.Date <= date);
+        Database.Execute(sql);
+    }
+
+    /// <inheritdoc />
+    public void ClearSchedule(DateTime date, ContentScheduleAction action)
+    {
+        var a = action.ToString();
+        Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>()
+            .Where<ContentScheduleDto>(x => x.Date <= date && x.Action == a);
+        Database.Execute(sql);
+    }
+
+    private Sql GetSqlForHasScheduling(ContentScheduleAction action, DateTime date)
+    {
+        SqlTemplate template = SqlContext.Templates.Get(
+            $"Umbraco.Core.{GetType().Name}.GetSqlForHasScheduling",
+            tsql => tsql
+                .SelectCount()
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x =>
+                    x.Action == SqlTemplate.Arg<string>("action") && x.Date <= SqlTemplate.Arg<DateTime>("date")));
+
+        Sql<ISqlContext> sql = template.Sql(action.ToString(), date);
+        return sql;
+    }
+
+    public bool HasContentForExpiration(DateTime date)
+    {
+        Sql sql = GetSqlForHasScheduling(ContentScheduleAction.Expire, date);
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
+    public bool HasContentForRelease(DateTime date)
+    {
+        Sql sql = GetSqlForHasScheduling(ContentScheduleAction.Release, date);
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<TEntity> GetContentForRelease(DateTime date)
+    {
+        var action = ContentScheduleAction.Release.ToString();
+
+        Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many)
+            .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
+
+        AddGetByQueryOrderBy(sql);
+
+        return MapDtosToContent(Database.Fetch<TEntityDto>(sql));
+    }
+
+    /// <inheritdoc />
+    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] contentIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<ContentScheduleDto>()
+            .From<ContentScheduleDto>()
+            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, contentIds);
+
+        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
+
+        IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
+            .GroupBy(contentSchedule => contentSchedule.NodeId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(scheduleDto => new ContentSchedule(
+                    scheduleDto.Id,
+                    LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
+                    scheduleDto.Date,
+                    scheduleDto.Action == ContentScheduleAction.Release.ToString()
+                        ? ContentScheduleAction.Release
+                        : ContentScheduleAction.Expire))
+                    .ToList().AsEnumerable()); // We have to materialize it here,
+                                               // to avoid this being used after the scope is disposed.
+
+        return dictionary;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<TEntity> GetContentForExpiration(DateTime date)
+    {
+        var action = ContentScheduleAction.Expire.ToString();
+
+        Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many)
+            .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
+
+        AddGetByQueryOrderBy(sql);
+
+        return MapDtosToContent(Database.Fetch<TEntityDto>(sql));
+    }
+
+    #endregion
+
     #region Utilities
 
     private void SanitizeNames(TEntity content, bool publishing)
