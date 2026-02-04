@@ -24,6 +24,6 @@ public class SearchDocumentTypeTreeController : DocumentTypeTreeControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<DocumentTypeTreeItemResponseModel>>> Search(CancellationToken cancellationToken, string? query, int skip = 0, int take = 100)
-        => await SearchTreeEntities(query, skip, take);
+    public async Task<ActionResult<PagedViewModel<DocumentTypeTreeItemResponseModel>>> Search(CancellationToken cancellationToken, string? query, int skip = 0, int take = 100, FolderOrItems folderOrItems = FolderOrItems.Both)
+        => await SearchTreeEntities(query, skip, take, folderOrItems);
 }

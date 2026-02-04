@@ -111,17 +111,17 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         return Ok(result);
     }
-    
+
     protected async Task<ActionResult<PagedViewModel<TItem>>> SearchTreeEntities(
         string? query,
         int skip,
         int take,
-        bool includeFolders = true)
+        FolderOrItems folderOrItems)
     {
         PagedModel<IEntitySlim> itemSearchResult =
             query.IsNullOrWhiteSpace()
-                ? _entitySearchService.Search(FolderAndItemObjectTypes(includeFolders), skip, take)
-                : _entitySearchService.Search(FolderAndItemObjectTypes(includeFolders), query, skip, take);
+                ? _entitySearchService.Search(GetItemObjectTypes(folderOrItems), skip, take)
+                : _entitySearchService.Search(GetItemObjectTypes(folderOrItems), query, skip, take);
 
         (IEntitySlim[] rootEntities, long totalItems) =
             await FilterTreeEntities(itemSearchResult.Items.ToArray(), itemSearchResult.Total);
@@ -288,8 +288,27 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         long totalAfter)
         => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
 
-    private IEnumerable<UmbracoObjectTypes> FolderAndItemObjectTypes(bool includeFolders) =>
-        includeFolders is false || FolderObjectType == UmbracoObjectTypes.Unknown || FolderObjectType == ItemObjectType
-            ? new[] { ItemObjectType }
-            : new[] { ItemObjectType, FolderObjectType };
+    private IEnumerable<UmbracoObjectTypes> GetItemObjectTypes(FolderOrItems folderOrItems)
+    {
+        switch (folderOrItems)
+        {
+            case FolderOrItems.Both:
+                return FolderObjectType == UmbracoObjectTypes.Unknown || FolderObjectType == ItemObjectType
+                    ? [ItemObjectType]
+                    : [ItemObjectType, FolderObjectType];
+            case FolderOrItems.Folder:
+                return [FolderObjectType];
+            case FolderOrItems.Item:
+                return [ItemObjectType];
+            default:
+                throw new ArgumentOutOfRangeException(nameof(folderOrItems), folderOrItems, null);
+        }
+    }
+
+    public enum FolderOrItems
+    {
+        Item,
+        Folder,
+        Both
+    }
 }
