@@ -192,6 +192,12 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         }
     }
 
+    protected override DocumentDto BuildEntityDto(IContent entity)
+        => ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
+
+    protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType)
+        => ContentBaseFactory.BuildEntity(entityDto, contentType);
+
     #region Repository Base
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Document;

@@ -186,6 +186,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return base.ApplySystemOrdering(ref sql, ordering);
     }
 
+    protected abstract TEntity BuildEntity(TEntityDto entityDto, IContentType? contentType);
+
     protected virtual void AddAdditionalTempContentMapping(
         List<TEntityDto> dtos,
         List<TempContent<TEntity>> temps,
@@ -239,12 +241,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
             }
 
-            // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-            TEntity c = content[i] = (dto is DocumentDto tempDocumentDto
-                ? ContentBaseFactory.BuildEntity(tempDocumentDto, contentType) as TEntity
-                : dto is ElementDto tempElementDto
-                    ? ContentBaseFactory.BuildEntity(tempElementDto, contentType) as TEntity
-                    : throw new InvalidOperationException("Unsupported entity type"))!;
+            TEntity c = content[i] = BuildEntity(dto, contentType);
 
             // need temps, for properties, templates and variations
             var versionId = dto.ContentVersionDto.Id;
@@ -316,12 +313,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     protected TEntity MapDtoToContent(TEntityDto dto)
     {
         IContentType? contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
-        // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-        TEntity content = (dto is DocumentDto tempDocumentDto
-            ? ContentBaseFactory.BuildEntity(tempDocumentDto, contentType) as TEntity
-            : dto is ElementDto tempElementDto
-                ? ContentBaseFactory.BuildEntity(tempElementDto, contentType) as TEntity
-                : throw new InvalidOperationException("Unsupported entity type"))!;
+        TEntity content = BuildEntity(dto, contentType);
 
         try
         {
@@ -908,13 +900,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         // TODO: do we really want to keep doing this here?
         entity.SanitizeEntityPropertiesForXmlStorage();
 
-        // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
         // create the dto
-        TEntityDto dto = (entity is IContent tempContent
-            ? ContentBaseFactory.BuildDto(tempContent, NodeObjectTypeId) as TEntityDto
-            : entity is IElement tempElement
-                ? ContentBaseFactory.BuildDto(tempElement, NodeObjectTypeId) as TEntityDto
-                : throw new InvalidOperationException("Unsupported entity type"))!;
+        TEntityDto dto = BuildEntityDto(entity);
 
         // derive path and level from parent
         NodeDto parent = GetParentNodeDto(entity.ParentId);
@@ -1165,13 +1152,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             }
         }
 
-        // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
         // create the dto
-        TEntityDto dto = (entity is IContent tempContent
-            ? ContentBaseFactory.BuildDto(tempContent, NodeObjectTypeId) as TEntityDto
-            : entity is IElement tempElement
-                ? ContentBaseFactory.BuildDto(tempElement, NodeObjectTypeId) as TEntityDto
-                : throw new InvalidOperationException("Unsupported entity type"))!;
+        TEntityDto dto = BuildEntityDto(entity);
 
         // update the node dto
         NodeDto nodeDto = dto.ContentDto.NodeDto;
@@ -1438,6 +1420,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         //now let the normal delete clauses take care of everything else
         base.PersistDeletedItem(entity);
     }
+
+    protected abstract TEntityDto BuildEntityDto(TEntity entity);
 
     #endregion
 
