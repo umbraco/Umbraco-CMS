@@ -8,8 +8,8 @@ public class ManagementApiComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
-        // Only register Management API services if backoffice is enabled
-        if (!builder.Services.Any(s => s.ServiceType == typeof(IBackOfficeEnabledMarker)))
+        // Only register Management API services if backoffice is enabled.
+        if (builder.Services.Any(s => s.ServiceType == typeof(IBackOfficeEnabledMarker)) is false)
         {
             return;
         }

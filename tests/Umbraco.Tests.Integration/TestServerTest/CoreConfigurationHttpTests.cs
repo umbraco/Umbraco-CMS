@@ -45,24 +45,31 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
 {
     /// <summary>
     /// Gets the content root directory for the test project.
-    /// Computes directly from the assembly location to avoid static caching issues.
+    /// Walks up the directory tree from the assembly location until we leave the bin/obj folders.
     /// </summary>
     private static string GetTestContentRoot()
     {
-        var codeBase = Assembly.GetExecutingAssembly().Location;
-        var uri = new Uri(codeBase);
-        var path = uri.LocalPath;
-        var baseDirectory = Path.GetDirectoryName(path);
+        var assemblyLocation = Assembly.GetExecutingAssembly().Location;
+        var directory = new DirectoryInfo(Path.GetDirectoryName(assemblyLocation)
+            ?? throw new InvalidOperationException("Could not determine assembly directory."));
 
-        if (string.IsNullOrEmpty(baseDirectory))
+        // Walk up parent directories until we're no longer in a bin or obj folder
+        while (directory.Parent is not null)
         {
-            throw new Exception("No root directory could be resolved.");
+            var name = directory.Name;
+            if (name.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
+                name.Equals("obj", StringComparison.OrdinalIgnoreCase))
+            {
+                // Found bin/obj folder, return its parent (the project directory)
+                return directory.Parent.FullName;
+            }
+
+            directory = directory.Parent;
         }
 
-        // Navigate up from bin directory
-        return baseDirectory.Contains("bin")
-            ? baseDirectory[..(baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)]
-            : baseDirectory;
+        // No bin/obj folder found, return the original directory
+        return Path.GetDirectoryName(assemblyLocation)
+            ?? throw new InvalidOperationException("Could not determine content root directory.");
     }
 
     private WebApplicationFactory<CoreConfigurationHttpTests> CreateFactory(

@@ -76,19 +76,19 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     /// Adds all core Umbraco services required to run without the backoffice.
     /// Use this for delivery-only scenarios (Delivery API, Website) without the management backoffice.
-    /// For full Umbraco with backoffice, use <see cref="AddBackOffice"/> instead.
+    /// For full Umbraco with backoffice, use <c>AddBackOffice()</c> instead.
     /// </summary>
     /// <remarks>
     /// This method is idempotent - calling it multiple times has no effect after the first call.
     /// The individual service registration methods are also idempotent, so calling both
-    /// <see cref="AddBackOffice"/> and <see cref="AddCore"/> is safe (though not expected).
+    /// <c>AddBackOffice()</c> and <see cref="AddCore"/> is safe (though not expected).
     /// </remarks>
     /// <param name="builder">The Umbraco builder.</param>
     /// <param name="configureMvc">Optional action to configure the MVC builder.</param>
     /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddCore(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null)
     {
-        // Idempotency check - safe to call multiple times
+        // Idempotency check - safe to call multiple times.
         if (builder.Services.Any(s => s.ServiceType == typeof(AddCoreMarker)))
         {
             return builder;
@@ -98,10 +98,12 @@ public static partial class UmbracoBuilderExtensions
 
         // Register the feature authorization handler and policy.
         // This enables the UmbracoFeatureEnabled policy used by Delivery API and other controllers.
-        builder.Services.TryAddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
+        // Use TryAddEnumerable because IAuthorizationHandler is a multi-registration service -
+        // TryAddSingleton would skip registration if ANY handler exists, not just this specific one.
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, FeatureAuthorizeHandler>());
         builder.Services.AddAuthorization(options =>
         {
-            // Only add the policy if it doesn't already exist
+            // Only add the policy if it doesn't already exist.
             if (options.GetPolicy(AuthorizationPolicies.UmbracoFeatureEnabled) is null)
             {
                 options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy =>

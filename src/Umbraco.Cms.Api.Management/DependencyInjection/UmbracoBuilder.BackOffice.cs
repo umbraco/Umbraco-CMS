@@ -1,11 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
@@ -19,7 +17,7 @@ public static partial class UmbracoBuilderExtensions
     /// Adds all required components to run the Umbraco back office.
     /// </summary>
     /// <remarks>
-    /// This method calls <see cref="AddCore"/> internally to register all core services,
+    /// This method calls <c>AddCore()</c> internally to register all core services,
     /// then adds backoffice-specific services on top.
     /// </remarks>
     /// <param name="builder">The Umbraco builder.</param>
@@ -36,7 +34,7 @@ public static partial class UmbracoBuilderExtensions
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
-        // Register marker indicating backoffice is enabled
+        // Register marker indicating backoffice is enabled.
         builder.Services.AddSingleton<IBackOfficeEnabledMarker, BackOfficeEnabledMarker>();
 
         builder.Services.AddUnique<IBackOfficePathGenerator, UmbracoBackOfficePathGenerator>();
