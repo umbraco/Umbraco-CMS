@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -882,15 +881,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         entity.AddingEntity();
 
         var publishing = entity.PublishedState == PublishedState.Publishing;
+        var templatedContent = entity as ITemplatedContent;
 
-        // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-        if (entity is IContent content)
+        if (templatedContent is not null && templatedContent.TemplateId.HasValue is false)
         {
             // ensure that the default template is assigned
-            if (content.TemplateId.HasValue == false)
-            {
-                content.TemplateId = entity.ContentType.DefaultTemplate?.Id;
-            }
+            templatedContent.TemplateId = entity.ContentType.DefaultTemplate?.Id;
         }
 
         // sanitize names
@@ -1045,11 +1041,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         if (entity.PublishedState == PublishedState.Publishing)
         {
             entity.Published = true;
-            // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-            if (entity is IContent tempContent3)
-            {
-                tempContent3.PublishTemplateId = tempContent3.TemplateId;
-            }
+            templatedContent?.PublishTemplateId = templatedContent.TemplateId;
             entity.PublisherId = entity.WriterId;
             entity.PublishName = entity.Name;
             entity.PublishDate = entity.UpdateDate;
@@ -1059,11 +1051,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         else if (entity.PublishedState == PublishedState.Unpublishing)
         {
             entity.Published = false;
-            // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-            if (entity is IContent tempContent3)
-            {
-                tempContent3.PublishTemplateId = null;
-            }
+            templatedContent?.PublishTemplateId = null;
             entity.PublisherId = null;
             entity.PublishName = null;
             entity.PublishDate = null;
@@ -1301,16 +1289,14 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
         if (!isMoving)
         {
+            var templatedContent = entity as ITemplatedContent;
+
             // flip the entity's published property
             // this also flips its published state
             if (entity.PublishedState == PublishedState.Publishing)
             {
                 entity.Published = true;
-                // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-                if (entity is IContent tempContent3)
-                {
-                    tempContent3.PublishTemplateId = tempContent3.TemplateId;
-                }
+                templatedContent?.PublishTemplateId = templatedContent.TemplateId;
                 entity.PublisherId = entity.WriterId;
                 entity.PublishName = entity.Name;
                 entity.PublishDate = entity.UpdateDate;
@@ -1320,11 +1306,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             else if (entity.PublishedState == PublishedState.Unpublishing)
             {
                 entity.Published = false;
-                // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-                if (entity is IContent tempContent3)
-                {
-                    tempContent3.PublishTemplateId = null;
-                }
+                templatedContent?.PublishTemplateId = null;
                 entity.PublisherId = null;
                 entity.PublishName = null;
                 entity.PublishDate = null;
