@@ -204,4 +204,11 @@ public enum UmbracoObjectTypes
     [FriendlyName("Element Container")]
     [UmbracoUdiType(Constants.UdiEntityType.ElementContainer)]
     ElementContainer,
+
+    /// <summary>
+    ///     Element Recycle Bin
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.ElementRecycleBin)]
+    [FriendlyName("Element Recycle Bin")]
+    ElementRecycleBin,
 }

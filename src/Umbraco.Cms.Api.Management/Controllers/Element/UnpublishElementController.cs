@@ -57,7 +57,6 @@ public class UnpublishElementController : ElementControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            : BadRequest();
+            : ElementPublishingOperationStatusResult(attempt.Result);
     }
 }
