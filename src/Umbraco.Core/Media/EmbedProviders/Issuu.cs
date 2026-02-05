@@ -1,4 +1,3 @@
-using System.Xml;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
@@ -9,7 +8,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 public class Issuu : OEmbedProviderBase
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Issuu"/> class.
+    /// Initializes a new instance of the <see cref="Issuu"/> class.
     /// </summary>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     public Issuu(IJsonSerializer jsonSerializer)
@@ -17,13 +16,13 @@ public class Issuu : OEmbedProviderBase
     {
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ApiEndpoint => "https://issuu.com/oembed";
 
-    /// <inheritdoc />
-    public override string[] UrlSchemeRegex => new[] { @"issuu.com/.*/docs/.*" };
+    /// <inheritdoc/>
+    public override string[] UrlSchemeRegex => [@"^https?:\/\/(www\.)?issuu\.com\/[^\/]+\/docs\/"];
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override Dictionary<string, string> RequestParams => new()
     {
         // ApiUrl/?iframe=true
@@ -33,7 +32,7 @@ public class Issuu : OEmbedProviderBase
         { "format", "xml" },
     };
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
         => await GetXmlBasedMarkupAsync(url, maxWidth, maxHeight, cancellationToken);
 }
