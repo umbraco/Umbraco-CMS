@@ -15,15 +15,6 @@ delete packageJson.devDependencies;
 // Convert version to a looser range that allows plugin developers to use newer versions
 // while still enforcing a minimum version and safety ceiling
 const looseVersionRange = (version) => {
-	// If it already has a caret and major >= 1, keep it as-is (e.g., ^3.3.1)
-	if (version.startsWith('^')) {
-		const minVersion = semver.minVersion(version);
-		if (minVersion && minVersion.major >= 1) {
-			console.log('Keeping caret range for stable version:', version);
-			return version;
-		}
-	}
-
 	// Extract minimum version from a range (e.g., ^0.85.0 -> 0.85.0)
 	const minVersion = semver.minVersion(version);
 	if (!minVersion) {
@@ -35,12 +26,19 @@ const looseVersionRange = (version) => {
 	const minor = minVersion.minor;
 	const patch = minVersion.patch;
 
-	// For pre-release (0.x.y), use floor at current version and ceiling at 1.0.0
+	// For pre-release (0.x.y), always use floor at current version and ceiling at 1.0.0
 	if (major === 0) {
 		return `>=${major}.${minor}.${patch} <1.0.0`;
 	}
 
-	// For stable versions without caret (exact versions), add caret (e.g., 3.16.0 -> ^3.16.0)
+	// For stable versions (major >= 1)
+	// If it already has a caret, keep it as-is (e.g., ^3.3.1)
+	if (version.startsWith('^')) {
+		console.log('Keeping caret range for stable version:', version);
+		return version;
+	}
+
+	// Exact version without caret, add caret (e.g., 3.16.0 -> ^3.16.0)
 	return `^${major}.${minor}.${patch}`;
 };
 
