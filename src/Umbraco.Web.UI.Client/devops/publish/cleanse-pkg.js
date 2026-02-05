@@ -15,15 +15,16 @@ delete packageJson.devDependencies;
 // Convert version to a looser range that allows plugin developers to use newer versions
 // while still enforcing a minimum version and safety ceiling
 const looseVersionRange = (version) => {
-	const parsed = semver.parse(version);
-	if (!parsed) {
+	// Extract minimum version from a range (e.g., ^0.85.0 -> 0.85.0)
+	const minVersion = semver.minVersion(version);
+	if (!minVersion) {
 		console.warn('Could not parse version:', version, 'keeping original');
 		return version;
 	}
 
-	const major = parsed.major;
-	const minor = parsed.minor;
-	const patch = parsed.patch;
+	const major = minVersion.major;
+	const minor = minVersion.minor;
+	const patch = minVersion.patch;
 
 	// For pre-release (0.x.y), use floor at current version and ceiling at 1.0.0
 	if (major === 0) {
