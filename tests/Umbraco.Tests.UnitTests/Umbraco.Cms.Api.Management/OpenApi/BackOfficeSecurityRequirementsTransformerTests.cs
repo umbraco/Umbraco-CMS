@@ -264,6 +264,38 @@ public class BackOfficeSecurityRequirementsTransformerTests
         Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status403Forbidden.ToString()));
     }
 
+    [Test]
+    public async Task TransformAsync_Operation_Adds_403_Response_For_Controller_With_IAuthorizationService_Injection()
+    {
+        // Arrange
+        var operation = new OpenApiOperation();
+        var methodInfo = typeof(ControllerWithAuthorizationServiceInjection).GetMethod(nameof(ControllerWithAuthorizationServiceInjection.SomeAction))!;
+        var apiDescription = new ApiDescription
+        {
+            ActionDescriptor = new ControllerActionDescriptor
+            {
+                MethodInfo = methodInfo,
+                ControllerTypeInfo = typeof(ControllerWithAuthorizationServiceInjection).GetTypeInfo(),
+            },
+        };
+        var document = new OpenApiDocument();
+        var context = new OpenApiOperationTransformerContext
+        {
+            Document = document,
+            Description = apiDescription,
+            DocumentName = "test",
+            ApplicationServices = _services,
+        };
+
+        // Act
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+
+        // Assert - Should have both 401 and 403 because IAuthorizationService is injected
+        Assert.IsNotNull(operation.Responses);
+        Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status401Unauthorized.ToString()));
+        Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status403Forbidden.ToString()));
+    }
+
     #endregion
 
     #region Test Helper Classes
@@ -291,6 +323,15 @@ public class BackOfficeSecurityRequirementsTransformerTests
     private class MultipleAuthorizeController : Controller
     {
         public IActionResult RestrictedAction() => Ok();
+    }
+
+    private class ControllerWithAuthorizationServiceInjection : Controller
+    {
+        public ControllerWithAuthorizationServiceInjection(IAuthorizationService authorizationService)
+        {
+        }
+
+        public IActionResult SomeAction() => Ok();
     }
 
     #endregion

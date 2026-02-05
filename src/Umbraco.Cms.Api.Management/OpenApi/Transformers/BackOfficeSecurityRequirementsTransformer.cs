@@ -14,6 +14,12 @@ namespace Umbraco.Cms.Api.Management.OpenApi.Transformers;
 public class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTransformer,
     IOpenApiDocumentTransformer
 {
+    /// <summary>
+    /// The number of base AuthorizeAttribute instances on ManagementApiControllerBase
+    /// (backoffice access + feature flags).
+    /// </summary>
+    private const int BaseAuthorizeAttributeCount = 2;
+
     /// <inheritdoc />
     public Task TransformAsync(
         OpenApiOperation operation,
@@ -39,17 +45,15 @@ public class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTransf
         operation.Security ??= new List<OpenApiSecurityRequirement>();
         operation.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
 
-        // Assuming if and endpoint have more then one AuthorizeAttribute, there is a risk the user do not have access while still being authorized.
-        // The two is the simple two on ManagementApiControllerBase that just requires access to backoffice and feature flags
+        // If an endpoint has more than the base number of AuthorizeAttributes (defined on ManagementApiControllerBase),
+        // or if the controller injects IAuthorizationService for programmatic authorization checks, there's a
+        // possibility the user may be authenticated but not authorized.
         var numberOfAuthorizeAttributes =
             description.MethodInfo.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute)
             + description.MethodInfo.DeclaringType?.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute);
 
-        var hasConstructorInjectingIAuthorizationService = description.MethodInfo.DeclaringType?.GetConstructors()
-            .Any(ctor =>
-                ctor.GetParameters().Any(parameter => parameter.GetType() == typeof(IAuthorizationService))) ?? false;
-
-        if (numberOfAuthorizeAttributes > 2 || hasConstructorInjectingIAuthorizationService)
+        if (numberOfAuthorizeAttributes > BaseAuthorizeAttributeCount ||
+            InjectsAuthorizationService(description.MethodInfo.DeclaringType))
         {
             operation.Responses.Add(
                 StatusCodes.Status403Forbidden.ToString(),
@@ -77,9 +81,9 @@ public class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTransf
                 {
                     AuthorizationUrl =
                         new Uri(Paths.BackOfficeApi.AuthorizationEndpoint, UriKind.Relative),
-                    TokenUrl = new Uri(Paths.BackOfficeApi.TokenEndpoint, UriKind.Relative)
-                }
-            }
+                    TokenUrl = new Uri(Paths.BackOfficeApi.TokenEndpoint, UriKind.Relative),
+                },
+            },
         };
 
         document.Components ??= new OpenApiComponents();
@@ -90,5 +94,17 @@ public class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTransf
         document.Security ??= new List<OpenApiSecurityRequirement>();
         document.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
         return Task.CompletedTask;
+    }
+
+    private static bool InjectsAuthorizationService(Type? type)
+    {
+        if (type is null)
+        {
+            return false;
+        }
+
+        return type.GetConstructors()
+            .Any(ctor => ctor.GetParameters()
+                .Any(parameter => parameter.ParameterType == typeof(IAuthorizationService)));
     }
 }
