@@ -1,4 +1,4 @@
-      _       _              _                                                          
+_       _              _                                                          
      | |     | |            | |                                                         
    __| | ___ | |_ _ __   ___| |_   _ __   _____      __                                 
   / _` |/ _ \| __| '_ \ / _ \ __| | '_ \ / _ \ \ /\ / /                                 
@@ -9,8 +9,8 @@
  | | | | '_ ` _ \| '_ \| '__/ _` |/ __/ _ \   / _ \ \/ / __/ _ \ '_ \/ __| |/ _ \| '_ \ 
  | |_| | | | | | | |_) | | | (_| | (_| (_) | |  __/>  <| ||  __/ | | \__ \ | (_) | | | |
   \__,_|_| |_| |_|_.__/|_|  \__,_|\___\___/   \___/_/\_\\__\___|_| |_|___/_|\___/|_| |_|
-                                                                                        
 
+  
 == Requirements ==
 * Node LTS Version 20.17.0+
 * Use a tool such as NVM (Node Version Manager) for your OS to help manage multiple versions of Node
@@ -30,6 +30,12 @@
 * Add this Razor Class Library Project as a project reference to an Umbraco Website project
 * From the `\Client` folder run the command `npm run watch` this will monitor the changes to the *.ts files and rebuild the project
 * With the Umbraco website project running the Razor Class Library Project will refresh the browser when the build is complete
+
+== Central Package Management ==
+* This project uses Central Package Management (CPM) to manage NuGet package versions
+* Package versions are defined in `Directory.Packages.props`
+* If you move projects into subfolders, ensure `Directory.Packages.props` remains in a parent directory
+* Learn more: https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management
 
 == Suggestion ==
 * Use VSCode as the editor of choice as it has good tooling support for TypeScript and it will recommend a VSCode Extension for good Lit WebComponent completions
