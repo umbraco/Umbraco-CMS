@@ -37,6 +37,7 @@
 		"./culture": "./dist-cms/packages/core/culture/index.js",
 		"./current-user": "./dist-cms/packages/user/current-user/index.js",
 		"./dashboard": "./dist-cms/packages/core/dashboard/index.js",
+		"./data-source": "./dist-cms/packages/core/data-source/index.js",
 		"./data-type": "./dist-cms/packages/data-type/index.js",
 		"./debug": "./dist-cms/packages/core/debug/index.js",
 		"./dictionary": "./dist-cms/packages/dictionary/index.js",
