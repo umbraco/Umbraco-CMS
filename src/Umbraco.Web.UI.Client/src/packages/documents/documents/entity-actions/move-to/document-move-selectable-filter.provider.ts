@@ -21,20 +21,24 @@ export class UmbDocumentMoveSelectableFilterProvider
 
 		const documentTypeUnique = item.documentType.unique;
 
-		// 2. Fetch allowed parents and allowed at root
-		const [allowedParentsResponse, allowedAtRootResponse] = await Promise.all([
+		// 2. Fetch document type details and allowed parents in parallel
+		const [documentTypeResponse, allowedParentsResponse] = await Promise.all([
+			tryExecute(
+				this,
+				DocumentTypeService.getDocumentTypeById({
+					path: { id: documentTypeUnique },
+				}),
+			),
 			tryExecute(
 				this,
 				DocumentTypeService.getDocumentTypeByIdAllowedParents({
 					path: { id: documentTypeUnique },
 				}),
 			),
-			tryExecute(this, DocumentTypeService.getDocumentTypeAllowedAtRoot({})),
 		]);
 
+		const isAllowedAtRoot = documentTypeResponse.data?.allowedAsRoot ?? false;
 		const allowedParentDocTypeIds = allowedParentsResponse.data?.allowedParentIds.map((ref) => ref.id) ?? [];
-		const allowedAtRootIds = allowedAtRootResponse.data?.items.map((item) => item.id) ?? [];
-		const isAllowedAtRoot = allowedAtRootIds.includes(documentTypeUnique);
 
 		// 3. Return the filter function
 		return (treeItem: UmbTreeItemModelBase): boolean => {

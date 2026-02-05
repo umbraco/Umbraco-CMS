@@ -17,19 +17,23 @@ export class UmbMediaMoveSelectableFilterProvider extends UmbControllerBase impl
 
 		const mediaTypeUnique = item.mediaType.unique;
 
-		const [allowedParentsResponse, allowedAtRootResponse] = await Promise.all([
+		const [allowedParentsResponse, mediaTypeResponse] = await Promise.all([
 			tryExecute(
 				this,
 				MediaTypeService.getMediaTypeByIdAllowedParents({
 					path: { id: mediaTypeUnique },
 				}),
 			),
-			tryExecute(this, MediaTypeService.getMediaTypeAllowedAtRoot({})),
+			tryExecute(
+				this,
+				MediaTypeService.getMediaTypeById({
+					path: { id: mediaTypeUnique },
+				}),
+			),
 		]);
 
 		const allowedParentMediaTypeIds = allowedParentsResponse.data?.allowedParentIds.map((ref) => ref.id) ?? [];
-		const allowedAtRootIds = allowedAtRootResponse.data?.items.map((item) => item.id) ?? [];
-		const isAllowedAtRoot = allowedAtRootIds.includes(mediaTypeUnique);
+		const isAllowedAtRoot = mediaTypeResponse.data?.allowedAsRoot ?? false;
 
 		return (treeItem: UmbTreeItemModelBase): boolean => {
 			const mediaItem = treeItem as UmbMediaTreeItemModel;
