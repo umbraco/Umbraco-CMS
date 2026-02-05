@@ -179,73 +179,25 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
 
         IDataType? dataType = Get(id);
 
-        if (dataType != null && dataType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ListView))
+        if (dataType is null || dataType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ListView) is false)
         {
-            // Get All contentTypes where isContainer (list view enabled) is set to true
-            Sql<ISqlContext> sql = Sql()
+            return usages;
+        }
+
+        // Get all content types that use this list view data type.
+        Sql<ISqlContext> sql = Sql()
            .Select<ContentTypeDto>(ct => ct.Select(node => node.NodeDto))
            .From<ContentTypeDto>()
            .InnerJoin<NodeDto>().On<NodeDto, ContentTypeDto>(n => n.NodeId, ct => ct.NodeId)
-           .Where<ContentTypeDto>(ct => ct.ListView != null);
+           .Where<ContentTypeDto>(ct => ct.ListView == dataType.Key);
 
-            List<ContentTypeDto> ctds = Database.Fetch<ContentTypeDto>(sql);
+        List<ContentTypeDto> contentTypesUsingListView = Database.Fetch<ContentTypeDto>(sql);
 
-            // If there are not any ContentTypes with a ListView return.
-            if (!ctds.Any())
-            {
-                return usages;
-            }
-
-            // First check if it is a custom list view
-            ContentTypeDto? customListView = ctds.Where(x => (Constants.Conventions.DataTypes.ListViewPrefix + x.Alias).Equals(dataType.Name)).FirstOrDefault();
-
-            if (customListView != null)
-            {
-                // Add usages as customListView
-                usages.Add(
-                    new GuidUdi(ObjectTypes.GetUdiType(customListView.NodeDto.NodeObjectType!.Value), customListView.NodeDto.UniqueId),
-                    new List<string> { dataType.Name! });
-            }
-            else
-            {
-                // It is not a custom ListView, so check the default ones.
-                foreach (ContentTypeDto contentWithListView in ctds)
-                {
-                    var customListViewName = Constants.Conventions.DataTypes.ListViewPrefix + contentWithListView.Alias;
-                    IDataType? clv = Get(Query<IDataType>().Where(x => x.Name == customListViewName))?.FirstOrDefault();
-
-                    // Check if the content type has a custom listview (extra check to prevent duplicates)
-                    if (clv == null)
-                    {
-                        // ContentType has no custom listview so it uses the default one
-                        var udi = new GuidUdi(ObjectTypes.GetUdiType(contentWithListView.NodeDto.NodeObjectType!.Value), contentWithListView.NodeDto.UniqueId);
-                        var listViewType = new List<string>();
-
-                        if (dataType.Id.Equals(Constants.DataTypes.DefaultContentListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
-                        {
-                            listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Content");
-                        }
-                        else if (dataType.Id.Equals(Constants.DataTypes.DefaultMediaListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
-                        {
-                            listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Media");
-                        }
-                        else if (dataType.Id.Equals(Constants.DataTypes.DefaultMembersListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
-                        {
-                            listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Members");
-                        }
-
-                        if (listViewType.Any())
-                        {
-                            var added = usages.TryAdd(udi, listViewType);
-                            if (!added)
-                            {
-                                usages[udi] = usages[udi].Append(dataType.Name!);
-                            }
-                        }
-                    }
-                }
-
-            }
+        foreach (ContentTypeDto contentType in contentTypesUsingListView)
+        {
+            usages.Add(
+                new GuidUdi(ObjectTypes.GetUdiType(contentType.NodeDto.NodeObjectType!.Value), contentType.NodeDto.UniqueId),
+                [dataType.Name!]);
         }
 
         return usages;
