@@ -313,6 +313,65 @@ APIs use `Asp.Versioning.Mvc`:
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
 - OpenAPI/Swagger docs per version
 
+### Backoffice npm Package Structure
+
+The backoffice (`Umbraco.Web.UI.Client`) is published to npm as **`@umbraco-cms/backoffice`** with a plugin architecture:
+
+#### Architecture Overview
+
+- **Multi-workspace structure**: Subprojects in `src/libs/*`, `src/packages/*`, `src/external/*`
+- **Export model**: All exports defined in root `package.json` → `./exports` field
+- **Importmap-driven runtime**: Dependencies provided at runtime via importmap (single source of truth)
+- **Build-time types**: TypeScript types come from npm peerDependencies
+- **Plugin model**: Developers create plugins that import from `@umbraco-cms/backoffice/*` exports
+
+#### Dependency Hoisting Strategy
+
+When building for npm (`npm pack`), the `cleanse-pkg.js` script hoists subproject dependencies to root `peerDependencies` with intelligent version range conversion:
+
+**Version Range Logic** (uses `semver` package):
+
+1. **Pre-release (0.x.y)**: Convert to explicit range
+   - Input: `^0.85.0` or `0.85.0`
+   - Output: `>=0.85.0 <1.0.0`
+   - Rationale: Pre-release caret only allows patch updates, explicit range allows minor upgrades within 0.x.x
+   - Example: Plugin can use `@hey-api/openapi-ts@0.91.1` while backoffice uses `0.85.0`
+
+2. **Stable with caret (^X.Y.Z where X ≥ 1)**: Keep as-is
+   - Input: `^3.3.1`
+   - Output: `^3.3.1` (unchanged)
+   - Rationale: Caret already implements correct semantics for stable versions
+
+3. **Stable exact versions (X.Y.Z where X ≥ 1)**: Add caret
+   - Input: `3.16.0`
+   - Output: `^3.16.0`
+   - Rationale: Normalizes to conventional semver format
+
+#### Key Dependencies
+
+**Runtime via importmap** (types available from peerDependencies):
+- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework
+- `monaco-editor`, `@tiptap/*` - Feature-specific editors
+- `@hey-api/openapi-ts` - HTTP client type generation
+
+**Build-time only** (not hoisted):
+- `vite`, `typescript`, `eslint` - Dev tooling
+
+#### Plugin Development Implications
+
+Plugin developers should:
+- **Declare explicit dependencies** in their own `package.json` (avoid relying on transitive deps)
+- **Understand the version ranges**: `>=0.85.0 <1.0.0` means they can use newer pre-release versions
+- **Know that types match npm ranges**, but runtime comes from importmap (managed by backoffice)
+- **When `@hey-api` hits 1.0.0**: Published constraint will automatically become `^1.0.0`
+
+#### Implementation Details
+
+- Script location: `src/Umbraco.Web.UI.Client/devops/publish/cleanse-pkg.js`
+- Runs as `prepack` hook before npm pack
+- Uses `semver.minVersion()` for robust version range parsing
+- Generates single source of truth for importmap versions
+
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
