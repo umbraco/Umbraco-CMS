@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -49,68 +50,71 @@ internal sealed class PropertyEditorSchemaServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetValueSchemaAsync_Returns_Schema_For_Integer_DataType()
+    public async Task GetSchemaAsync_Returns_Success_For_Integer_DataType()
     {
         // Arrange
         var dataType = new DataType(
             new IntegerPropertyEditor(DataValueEditorFactory),
             ConfigurationEditorJsonSerializer)
         {
-            Name = "Test Integer",
+            Name = "Test Integer GetSchemaAsync",
             DatabaseType = ValueStorageType.Integer,
             ConfigurationData = new Dictionary<string, object>
             {
                 { "min", 0 },
                 { "max", 100 },
-                { "step", 1 },
             },
         };
         var createResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
         Assert.That(createResult.Success, Is.True);
 
         // Act
-        var schema = await PropertyEditorSchemaService.GetValueSchemaAsync(dataType.Key);
+        var result = await PropertyEditorSchemaService.GetSchemaAsync(dataType.Key);
 
         // Assert
-        Assert.That(schema, Is.Not.Null);
-        Assert.That(schema!["$schema"]?.GetValue<string>(), Is.EqualTo("https://json-schema.org/draft/2020-12/schema"));
-        Assert.That(schema["minimum"]?.GetValue<int>(), Is.EqualTo(0));
-        Assert.That(schema["maximum"]?.GetValue<int>(), Is.EqualTo(100));
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.Success));
+        Assert.That(result.Result.ValueType, Is.EqualTo(typeof(int?)));
+        Assert.That(result.Result.JsonSchema, Is.Not.Null);
+        Assert.That(result.Result.JsonSchema!["minimum"]?.GetValue<int>(), Is.EqualTo(0));
+        Assert.That(result.Result.JsonSchema["maximum"]?.GetValue<int>(), Is.EqualTo(100));
     }
 
     [Test]
-    public async Task GetValueTypeAsync_Returns_Type_For_Integer_DataType()
+    public async Task GetSchemaAsync_Returns_DataTypeNotFound_For_NonExistent_DataType()
     {
-        // Arrange
+        // Act
+        var result = await PropertyEditorSchemaService.GetSchemaAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.DataTypeNotFound));
+    }
+
+    [Test]
+    public async Task GetSchemaAsync_Returns_SchemaNotSupported_For_Editor_Without_Schema()
+    {
+        // Arrange - Label editor doesn't implement IValueSchemaProvider
         var dataType = new DataType(
-            new IntegerPropertyEditor(DataValueEditorFactory),
+            new LabelPropertyEditor(DataValueEditorFactory, IOHelper),
             ConfigurationEditorJsonSerializer)
         {
-            Name = "Test Integer Type",
-            DatabaseType = ValueStorageType.Integer,
+            Name = "Test Label GetSchemaAsync",
+            DatabaseType = ValueStorageType.Nvarchar,
         };
         var createResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
         Assert.That(createResult.Success, Is.True);
 
         // Act
-        var valueType = await PropertyEditorSchemaService.GetValueTypeAsync(dataType.Key);
+        var result = await PropertyEditorSchemaService.GetSchemaAsync(dataType.Key);
 
         // Assert
-        Assert.That(valueType, Is.EqualTo(typeof(int?)));
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.SchemaNotSupported));
     }
 
     [Test]
-    public async Task GetValueSchemaAsync_Returns_Null_For_NonExistent_DataType()
-    {
-        // Act
-        var schema = await PropertyEditorSchemaService.GetValueSchemaAsync(Guid.NewGuid());
-
-        // Assert
-        Assert.That(schema, Is.Null);
-    }
-
-    [Test]
-    public async Task ValidateValueAsync_Returns_Empty_For_Valid_Integer_Value()
+    public async Task ValidateValueAsync_Returns_Success_Empty_For_Valid_Integer_Value()
     {
         // Arrange
         var dataType = new DataType(
@@ -129,14 +133,16 @@ internal sealed class PropertyEditorSchemaServiceTests : UmbracoIntegrationTest
         Assert.That(createResult.Success, Is.True);
 
         // Act
-        var results = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "50");
+        var result = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "50");
 
         // Assert
-        Assert.That(results, Is.Empty);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.Success));
+        Assert.That(result.Result, Is.Empty);
     }
 
     [Test]
-    public async Task ValidateValueAsync_Returns_Errors_For_Out_Of_Range_Integer()
+    public async Task ValidateValueAsync_Returns_Success_With_Errors_For_Out_Of_Range_Integer()
     {
         // Arrange
         var dataType = new DataType(
@@ -155,15 +161,16 @@ internal sealed class PropertyEditorSchemaServiceTests : UmbracoIntegrationTest
         Assert.That(createResult.Success, Is.True);
 
         // Act
-        var results = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "150");
+        var result = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "150");
 
         // Assert
-        Assert.That(results, Is.Not.Empty);
-        Assert.That(results.Any(r => r.Keyword == "maximum"), Is.True);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Empty);
+        Assert.That(result.Result.Any(r => r.Keyword == "maximum"), Is.True);
     }
 
     [Test]
-    public async Task ValidateValueAsync_Returns_Errors_For_Invalid_Type()
+    public async Task ValidateValueAsync_Returns_Success_With_Errors_For_Invalid_Type()
     {
         // Arrange
         var dataType = new DataType(
@@ -177,15 +184,16 @@ internal sealed class PropertyEditorSchemaServiceTests : UmbracoIntegrationTest
         Assert.That(createResult.Success, Is.True);
 
         // Act
-        var results = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "\"not an integer\"");
+        var result = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "\"not an integer\"");
 
         // Assert
-        Assert.That(results, Is.Not.Empty);
-        Assert.That(results.Any(r => r.Keyword == "type"), Is.True);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Empty);
+        Assert.That(result.Result.Any(r => r.Keyword == "type"), Is.True);
     }
 
     [Test]
-    public async Task ValidateValueAsync_Returns_Empty_For_Null_Value_When_Nullable()
+    public async Task ValidateValueAsync_Returns_Success_Empty_For_Null_Value_When_Nullable()
     {
         // Arrange
         var dataType = new DataType(
@@ -199,19 +207,21 @@ internal sealed class PropertyEditorSchemaServiceTests : UmbracoIntegrationTest
         Assert.That(createResult.Success, Is.True);
 
         // Act
-        var results = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "null");
+        var result = await PropertyEditorSchemaService.ValidateValueAsync(dataType.Key, "null");
 
         // Assert
-        Assert.That(results, Is.Empty);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Empty);
     }
 
     [Test]
-    public async Task ValidateValueAsync_Returns_Empty_For_NonExistent_DataType()
+    public async Task ValidateValueAsync_Returns_DataTypeNotFound_For_NonExistent_DataType()
     {
         // Act
-        var results = await PropertyEditorSchemaService.ValidateValueAsync(Guid.NewGuid(), "any value");
+        var result = await PropertyEditorSchemaService.ValidateValueAsync(Guid.NewGuid(), "any value");
 
-        // Assert - No schema means validation passes by default
-        Assert.That(results, Is.Empty);
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.DataTypeNotFound));
     }
 }

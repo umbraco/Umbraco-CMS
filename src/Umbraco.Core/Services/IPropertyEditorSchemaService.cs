@@ -1,5 +1,6 @@
 using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -18,24 +19,14 @@ namespace Umbraco.Cms.Core.Services;
 public interface IPropertyEditorSchemaService : IService
 {
     /// <summary>
-    /// Gets the CLR type for a specific data type's stored values.
+    /// Gets the complete schema information for a specific data type, including both CLR type and JSON Schema.
     /// </summary>
     /// <param name="dataTypeKey">The unique key of the data type.</param>
     /// <returns>
-    /// The CLR type of values stored by this data type, or <c>null</c> if the type cannot be determined
-    /// or the data type's property editor doesn't implement <see cref="IValueSchemaProvider"/>.
+    /// An attempt containing the schema information with both CLR type and JSON Schema,
+    /// or an appropriate operation status if the data type was not found or doesn't support schemas.
     /// </returns>
-    Task<Type?> GetValueTypeAsync(Guid dataTypeKey);
-
-    /// <summary>
-    /// Gets the JSON Schema for a specific data type's stored values.
-    /// </summary>
-    /// <param name="dataTypeKey">The unique key of the data type.</param>
-    /// <returns>
-    /// A JSON Schema (draft 2020-12) describing the value structure, or <c>null</c> if the schema cannot be generated
-    /// or the data type's property editor doesn't implement <see cref="IValueSchemaProvider"/>.
-    /// </returns>
-    Task<JsonObject?> GetValueSchemaAsync(Guid dataTypeKey);
+    Task<Attempt<PropertyValueSchema, PropertyEditorSchemaOperationStatus>> GetSchemaAsync(Guid dataTypeKey);
 
     /// <summary>
     /// Gets the CLR type for a property editor with the specified configuration.
@@ -70,12 +61,8 @@ public interface IPropertyEditorSchemaService : IService
     /// <param name="dataTypeKey">The unique key of the data type.</param>
     /// <param name="value">The value to validate, as a JSON string or JSON-compatible object.</param>
     /// <returns>
-    /// A collection of validation results. Returns empty if validation passes, or if the data type
-    /// doesn't support schema validation. Returns errors if the value doesn't conform to the schema.
+    /// An attempt containing a collection of validation results (empty if validation passes, or errors if not),
+    /// or an appropriate operation status if the data type was not found or doesn't support schemas.
     /// </returns>
-    /// <remarks>
-    /// If the data type's property editor doesn't implement <see cref="IValueSchemaProvider"/> or doesn't provide
-    /// a schema, this method returns an empty collection (validation passes by default).
-    /// </remarks>
-    Task<IEnumerable<SchemaValidationResult>> ValidateValueAsync(Guid dataTypeKey, object? value);
+    Task<Attempt<IEnumerable<SchemaValidationResult>, PropertyEditorSchemaOperationStatus>> ValidateValueAsync(Guid dataTypeKey, object? value);
 }

@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services;
@@ -20,7 +21,7 @@ public class PropertyEditorSchemaServiceTests
     public void SetUp()
     {
         _dataTypeServiceMock = new Mock<IDataTypeService>();
-        _dataEditors = new List<IDataEditor>();
+        _dataEditors = [];
         var dataEditorCollection = new DataEditorCollection(() => _dataEditors);
         _sut = new PropertyEditorSchemaService(_dataTypeServiceMock.Object, dataEditorCollection);
     }
@@ -124,7 +125,7 @@ public class PropertyEditorSchemaServiceTests
     }
 
     [Test]
-    public async Task GetValueTypeAsync_Retrieves_DataType_And_Returns_Type()
+    public async Task GetSchemaAsync_Returns_Success_With_Both_Type_And_Schema()
     {
         // Arrange
         var dataTypeKey = Guid.NewGuid();
@@ -133,60 +134,50 @@ public class PropertyEditorSchemaServiceTests
         SetupDataType(dataTypeKey, "test.schemaProvider");
 
         // Act
-        var result = await _sut.GetValueTypeAsync(dataTypeKey);
+        var result = await _sut.GetSchemaAsync(dataTypeKey);
 
         // Assert
-        Assert.That(result, Is.EqualTo(typeof(string)));
-        _dataTypeServiceMock.Verify(x => x.GetAsync(dataTypeKey), Times.Once);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.Success));
+        Assert.That(result.Result.ValueType, Is.EqualTo(typeof(string)));
+        Assert.That(result.Result.JsonSchema, Is.Not.Null);
+        Assert.That(result.Result.JsonSchema!["type"]?.GetValue<string>(), Is.EqualTo("string"));
     }
 
     [Test]
-    public async Task GetValueTypeAsync_Returns_Null_When_DataType_Not_Found()
+    public async Task GetSchemaAsync_Returns_DataTypeNotFound_When_DataType_Not_Found()
     {
         // Arrange
         var dataTypeKey = Guid.NewGuid();
         _dataTypeServiceMock.Setup(x => x.GetAsync(dataTypeKey)).ReturnsAsync((IDataType?)null);
 
         // Act
-        var result = await _sut.GetValueTypeAsync(dataTypeKey);
+        var result = await _sut.GetSchemaAsync(dataTypeKey);
 
         // Assert
-        Assert.That(result, Is.Null);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.DataTypeNotFound));
     }
 
     [Test]
-    public async Task GetValueSchemaAsync_Retrieves_DataType_And_Returns_Schema()
+    public async Task GetSchemaAsync_Returns_SchemaNotSupported_When_Editor_Does_Not_Support_Schema()
     {
         // Arrange
         var dataTypeKey = Guid.NewGuid();
-        var schemaProviderEditor = new MockSchemaProviderEditor();
-        SetupDataEditors(schemaProviderEditor);
-        SetupDataType(dataTypeKey, "test.schemaProvider");
+        var regularEditor = new MockRegularEditor();
+        SetupDataEditors(regularEditor);
+        SetupDataType(dataTypeKey, "test.regular");
 
         // Act
-        var result = await _sut.GetValueSchemaAsync(dataTypeKey);
+        var result = await _sut.GetSchemaAsync(dataTypeKey);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!["type"]?.GetValue<string>(), Is.EqualTo("string"));
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.SchemaNotSupported));
     }
 
     [Test]
-    public async Task GetValueSchemaAsync_Returns_Null_When_DataType_Not_Found()
-    {
-        // Arrange
-        var dataTypeKey = Guid.NewGuid();
-        _dataTypeServiceMock.Setup(x => x.GetAsync(dataTypeKey)).ReturnsAsync((IDataType?)null);
-
-        // Act
-        var result = await _sut.GetValueSchemaAsync(dataTypeKey);
-
-        // Assert
-        Assert.That(result, Is.Null);
-    }
-
-    [Test]
-    public async Task ValidateValueAsync_Returns_Empty_When_No_Schema()
+    public async Task ValidateValueAsync_Returns_DataTypeNotFound_When_DataType_Not_Found()
     {
         // Arrange
         var dataTypeKey = Guid.NewGuid();
@@ -196,11 +187,29 @@ public class PropertyEditorSchemaServiceTests
         var result = await _sut.ValidateValueAsync(dataTypeKey, "any value");
 
         // Assert
-        Assert.That(result, Is.Empty);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.DataTypeNotFound));
     }
 
     [Test]
-    public async Task ValidateValueAsync_Returns_Empty_For_Valid_Value()
+    public async Task ValidateValueAsync_Returns_SchemaNotSupported_When_Editor_Does_Not_Support_Schema()
+    {
+        // Arrange
+        var dataTypeKey = Guid.NewGuid();
+        var regularEditor = new MockRegularEditor();
+        SetupDataEditors(regularEditor);
+        SetupDataType(dataTypeKey, "test.regular");
+
+        // Act
+        var result = await _sut.ValidateValueAsync(dataTypeKey, "any value");
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.SchemaNotSupported));
+    }
+
+    [Test]
+    public async Task ValidateValueAsync_Returns_Success_Empty_For_Valid_Value()
     {
         // Arrange
         var dataTypeKey = Guid.NewGuid();
@@ -212,11 +221,13 @@ public class PropertyEditorSchemaServiceTests
         var result = await _sut.ValidateValueAsync(dataTypeKey, "\"valid string\"");
 
         // Assert
-        Assert.That(result, Is.Empty);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.Success));
+        Assert.That(result.Result, Is.Empty);
     }
 
     [Test]
-    public async Task ValidateValueAsync_Returns_Errors_For_Invalid_Value()
+    public async Task ValidateValueAsync_Returns_Success_With_Errors_For_Invalid_Value()
     {
         // Arrange
         var dataTypeKey = Guid.NewGuid();
@@ -228,8 +239,10 @@ public class PropertyEditorSchemaServiceTests
         var result = await _sut.ValidateValueAsync(dataTypeKey, "123");
 
         // Assert
-        Assert.That(result, Is.Not.Empty);
-        Assert.That(result.First().Keyword, Is.EqualTo("type"));
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PropertyEditorSchemaOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Empty);
+        Assert.That(result.Result.First().Keyword, Is.EqualTo("type"));
     }
 
     [Test]
@@ -246,11 +259,12 @@ public class PropertyEditorSchemaServiceTests
         var result = await _sut.ValidateValueAsync(dataTypeKey, jsonValue);
 
         // Assert
-        Assert.That(result, Is.Empty);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Empty);
     }
 
     [Test]
-    public async Task ValidateValueAsync_Returns_Error_For_Invalid_Json_String()
+    public async Task ValidateValueAsync_Returns_Success_For_Invalid_Json_String()
     {
         // Arrange
         var dataTypeKey = Guid.NewGuid();
@@ -262,7 +276,8 @@ public class PropertyEditorSchemaServiceTests
         var result = await _sut.ValidateValueAsync(dataTypeKey, "{invalid json}");
 
         // Assert - it should be treated as a string value which validates against string schema
-        Assert.That(result, Is.Empty);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Empty);
     }
 
     private void SetupDataEditors(params IDataEditor[] editors)

@@ -1,8 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Schema;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
@@ -26,41 +28,40 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
     }
 
     /// <inheritdoc />
-    public async Task<Type?> GetValueTypeAsync(Guid dataTypeKey)
+    public async Task<Attempt<PropertyValueSchema, PropertyEditorSchemaOperationStatus>> GetSchemaAsync(Guid dataTypeKey)
     {
         var dataType = await _dataTypeService.GetAsync(dataTypeKey);
         if (dataType is null)
         {
-            return null;
+            return Attempt.FailWithStatus(PropertyEditorSchemaOperationStatus.DataTypeNotFound, new PropertyValueSchema(null, null));
         }
 
-        return GetValueType(dataType.EditorAlias, dataType.ConfigurationObject);
-    }
-
-    /// <inheritdoc />
-    public async Task<JsonObject?> GetValueSchemaAsync(Guid dataTypeKey)
-    {
-        var dataType = await _dataTypeService.GetAsync(dataTypeKey);
-        if (dataType is null)
+        IValueSchemaProvider? provider = GetSchemaProvider(dataType.EditorAlias);
+        if (provider is null)
         {
-            return null;
+            return Attempt.FailWithStatus(PropertyEditorSchemaOperationStatus.SchemaNotSupported, new PropertyValueSchema(null, null));
         }
 
-        return GetValueSchema(dataType.EditorAlias, dataType.ConfigurationObject);
+        Type? valueType = GetValueTypeFromProvider(provider, dataType.ConfigurationObject);
+        JsonObject? jsonSchema = GetValueSchemaFromProvider(provider, dataType.ConfigurationObject);
+
+        return Attempt.SucceedWithStatus(
+            PropertyEditorSchemaOperationStatus.Success,
+            new PropertyValueSchema(valueType, jsonSchema));
     }
 
     /// <inheritdoc />
     public Type? GetValueType(string propertyEditorAlias, object? configuration)
     {
         IValueSchemaProvider? provider = GetSchemaProvider(propertyEditorAlias);
-        return provider?.GetValueType(configuration);
+        return provider is not null ? GetValueTypeFromProvider(provider, configuration) : null;
     }
 
     /// <inheritdoc />
     public JsonObject? GetValueSchema(string propertyEditorAlias, object? configuration)
     {
         IValueSchemaProvider? provider = GetSchemaProvider(propertyEditorAlias);
-        return provider?.GetValueSchema(configuration);
+        return provider is not null ? GetValueSchemaFromProvider(provider, configuration) : null;
     }
 
     /// <inheritdoc />
@@ -68,13 +69,19 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
         => GetSchemaProvider(propertyEditorAlias) is not null;
 
     /// <inheritdoc />
-    public async Task<IEnumerable<SchemaValidationResult>> ValidateValueAsync(Guid dataTypeKey, object? value)
+    public async Task<Attempt<IEnumerable<SchemaValidationResult>, PropertyEditorSchemaOperationStatus>> ValidateValueAsync(Guid dataTypeKey, object? value)
     {
-        JsonObject? schemaJson = await GetValueSchemaAsync(dataTypeKey);
+        Attempt<PropertyValueSchema, PropertyEditorSchemaOperationStatus> schemaAttempt = await GetSchemaAsync(dataTypeKey);
+        if (schemaAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus(schemaAttempt.Status, Enumerable.Empty<SchemaValidationResult>());
+        }
+
+        JsonObject? schemaJson = schemaAttempt.Result.JsonSchema;
         if (schemaJson is null)
         {
-            // No schema available - validation passes by default
-            return [];
+            // Schema provider returned null schema - validation passes
+            return Attempt.SucceedWithStatus(PropertyEditorSchemaOperationStatus.Success, Enumerable.Empty<SchemaValidationResult>());
         }
 
         try
@@ -95,17 +102,23 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
 
             if (results.IsValid)
             {
-                return [];
+                return Attempt.SucceedWithStatus(PropertyEditorSchemaOperationStatus.Success, Enumerable.Empty<SchemaValidationResult>());
             }
 
             // Collect validation errors
-            return ExtractValidationErrors(results);
+            return Attempt.SucceedWithStatus(PropertyEditorSchemaOperationStatus.Success, ExtractValidationErrors(results).AsEnumerable());
         }
         catch (JsonException ex)
         {
-            return [new SchemaValidationResult($"Invalid JSON: {ex.Message}")];
+            return Attempt.SucceedWithStatus(PropertyEditorSchemaOperationStatus.Success, new[] { new SchemaValidationResult($"Invalid JSON: {ex.Message}") }.AsEnumerable());
         }
     }
+
+    private static Type? GetValueTypeFromProvider(IValueSchemaProvider provider, object? configuration)
+        => provider.GetValueType(configuration);
+
+    private static JsonObject? GetValueSchemaFromProvider(IValueSchemaProvider provider, object? configuration)
+        => provider.GetValueSchema(configuration);
 
     private static JsonNode? ConvertToJsonNode(object? value)
     {

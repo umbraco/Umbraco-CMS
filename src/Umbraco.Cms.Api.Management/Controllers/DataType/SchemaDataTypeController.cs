@@ -2,7 +2,9 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
@@ -36,18 +38,17 @@ public class SchemaDataTypeController : DataTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Schema(Guid id)
     {
-        var valueType = await _schemaService.GetValueTypeAsync(id);
-        var jsonSchema = await _schemaService.GetValueSchemaAsync(id);
-
-        if (valueType is null && jsonSchema is null)
+        Attempt<PropertyValueSchema, PropertyEditorSchemaOperationStatus> attempt = await _schemaService.GetSchemaAsync(id);
+        if (attempt.Success is false)
         {
-            return DataTypeNotFound();
+            return PropertyEditorSchemaOperationStatusResult(attempt.Status);
         }
 
+        PropertyValueSchema result = attempt.Result;
         return Ok(new DataTypeSchemaResponseModel
         {
-            ValueTypeName = valueType?.FullName,
-            JsonSchema = jsonSchema,
+            ValueTypeName = result.ValueType?.FullName,
+            JsonSchema = result.JsonSchema,
         });
     }
 }
