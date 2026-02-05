@@ -13,6 +13,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing relations and relation types between entities.
+/// </summary>
+/// <remarks>
+///     Relations allow entities like content, media, and members to be linked together
+///     through various relationship types. This service handles CRUD operations for both
+///     relations and relation types.
+/// </remarks>
 public class RelationService : RepositoryService, IRelationService
 {
     private readonly IAuditService _auditService;
@@ -21,6 +29,17 @@ public class RelationService : RepositoryService, IRelationService
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationService" /> class.
+    /// </summary>
+    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="entityService">The entity service for entity operations.</param>
+    /// <param name="relationRepository">The repository for relation data access.</param>
+    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
+    /// <param name="auditService">The audit service for recording audit entries.</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
     public RelationService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -39,6 +58,17 @@ public class RelationService : RepositoryService, IRelationService
         _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationService" /> class.
+    /// </summary>
+    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="entityService">The entity service for entity operations.</param>
+    /// <param name="relationRepository">The repository for relation data access.</param>
+    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
+    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public RelationService(
         ICoreScopeProvider uowProvider,
@@ -61,6 +91,18 @@ public class RelationService : RepositoryService, IRelationService
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationService" /> class.
+    /// </summary>
+    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="entityService">The entity service for entity operations.</param>
+    /// <param name="relationRepository">The repository for relation data access.</param>
+    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
+    /// <param name="auditService">The audit service for recording audit entries.</param>
+    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public RelationService(
         ICoreScopeProvider uowProvider,
@@ -134,10 +176,7 @@ public class RelationService : RepositoryService, IRelationService
         return _relationTypeRepository.GetMany(ids);
     }
 
-    /// <summary>
-    /// Gets the Relation types in a paged manner.
-    /// Currently implements the paging in memory on the name property because the underlying repository does not support paging yet
-    /// </summary>
+    /// <inheritdoc />
     public Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -485,9 +524,20 @@ public class RelationService : RepositoryService, IRelationService
         return _relationRepository.Get(query).Any();
     }
 
+    /// <summary>
+    /// Checks whether an entity has any relations.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns><c>true</c> if the entity has any relations; otherwise, <c>false</c>.</returns>
     [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
     public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
 
+    /// <summary>
+    /// Checks whether an entity has relations in the specified direction.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <param name="directionFilter">The direction filter to apply when checking relations.</param>
+    /// <returns><c>true</c> if the entity has relations matching the filter; otherwise, <c>false</c>.</returns>
     [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
 

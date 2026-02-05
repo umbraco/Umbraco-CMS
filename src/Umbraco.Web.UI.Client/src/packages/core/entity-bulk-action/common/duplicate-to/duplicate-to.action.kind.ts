@@ -14,7 +14,7 @@ export const manifest: UmbExtensionManifestKind = {
 		weight: 700,
 		forEntityTypes: [],
 		meta: {
-			icon: 'icon-enter',
+			icon: 'icon-split',
 			label: '#actions_copyTo',
 			bulkDuplicateRepositoryAlias: '',
 			treeAlias: '',

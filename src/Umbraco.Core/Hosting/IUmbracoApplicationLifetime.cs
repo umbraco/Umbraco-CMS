@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Hosting;
 
+/// <summary>
+///     Provides methods to manage the Umbraco application lifetime, including restart functionality.
+/// </summary>
 public interface IUmbracoApplicationLifetime
 {
     /// <summary>

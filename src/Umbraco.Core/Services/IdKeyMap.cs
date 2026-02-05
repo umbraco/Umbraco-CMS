@@ -5,6 +5,25 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides bidirectional mapping between integer IDs and GUIDs (keys) for Umbraco entities.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This class provides an efficient caching layer for ID/Key lookups. The cache assumes that
+///         the id/guid map is unique; that is, if an id and a guid map to each other, then the id
+///         will never map to another guid, and the guid will never map to another id.
+///     </para>
+///     <para>
+///         Cache is cleared by MediaCacheRefresher, UnpublishedPageCacheRefresher, and other
+///         refreshers - because id/guid map is unique, we only clear to avoid leaking memory,
+///         as we don't risk caching obsolete values - and only when actually deleting.
+///     </para>
+///     <para>
+///         External mappers can be registered (e.g., from NuCache) to provide lookups from
+///         alternative sources before hitting the database.
+///     </para>
+/// </remarks>
 public class IdKeyMap : IIdKeyMap, IDisposable
 {
     private readonly ICoreScopeProvider _scopeProvider;
@@ -41,6 +60,11 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         _dictionary
             = new();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="IdKeyMap" /> class.
+    /// </summary>
+    /// <param name="scopeProvider">The core scope provider for database operations.</param>
+    /// <param name="idKeyMapRepository">The repository for ID/Key mapping data access.</param>
     public IdKeyMap(ICoreScopeProvider scopeProvider, IIdKeyMapRepository idKeyMapRepository)
     {
         _scopeProvider = scopeProvider;
@@ -49,6 +73,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
     private bool _disposedValue;
 
+    /// <inheritdoc />
     public void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id) =>
         _dictionary[umbracoObjectType] = (id2key, key2id);
 
@@ -113,6 +138,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
 #endif
 
+    /// <inheritdoc />
     public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
     {
         if (key == Constants.System.RecycleBinContentKey && umbracoObjectType == UmbracoObjectTypes.Document)
@@ -198,6 +224,11 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         return Attempt.Succeed(val.Value);
     }
 
+    /// <summary>
+    ///     Populates the cache with multiple ID/Key pairs for a specific object type.
+    /// </summary>
+    /// <param name="pairs">The collection of ID/Key pairs to cache.</param>
+    /// <param name="umbracoObjectType">The Umbraco object type for the pairs.</param>
     internal void Populate(IEnumerable<(int id, Guid key)> pairs, UmbracoObjectTypes umbracoObjectType)
     {
         try
@@ -218,6 +249,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public Attempt<int> GetIdForUdi(Udi udi)
     {
         var guidUdi = udi as GuidUdi;
@@ -230,6 +262,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         return GetIdForKey(guidUdi.Guid, umbracoType);
     }
 
+    /// <inheritdoc />
     public Attempt<Udi?> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
     {
         Attempt<Guid> keyAttempt = GetKeyForId(id, umbracoObjectType);
@@ -240,6 +273,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
             : Attempt<Udi?>.Fail();
     }
 
+    /// <inheritdoc />
     public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
     {
         if (id == Constants.System.RecycleBinContent && umbracoObjectType == UmbracoObjectTypes.Document)
@@ -325,8 +359,10 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         return Attempt.Succeed(val.Value);
     }
 
-    // invoked on UnpublishedPageCacheRefresher.RefreshAll
-    // anything else will use the id-specific overloads
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Invoked on UnpublishedPageCacheRefresher.RefreshAll. For specific items, use the ID or Key specific overloads.
+    /// </remarks>
     public void ClearCache()
     {
         try
@@ -344,6 +380,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public void ClearCache(int id)
     {
         try
@@ -366,6 +403,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public void ClearCache(Guid key)
     {
         try
@@ -388,6 +426,10 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
     }
 
+    /// <summary>
+    ///     Releases the unmanaged resources used by the <see cref="IdKeyMap" /> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
@@ -403,16 +445,32 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
     // ReSharper restore ClassNeverInstantiated.Local
     // ReSharper restore UnusedAutoPropertyAccessor.Local
+
+    /// <summary>
+    ///     Represents an identifier value with its associated Umbraco object type.
+    /// </summary>
+    /// <typeparam name="T">The type of the identifier (int or Guid).</typeparam>
     private struct TypedId<T>
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="TypedId{T}" /> struct.
+        /// </summary>
+        /// <param name="id">The identifier value.</param>
+        /// <param name="umbracoObjectType">The Umbraco object type.</param>
         public TypedId(T id, UmbracoObjectTypes umbracoObjectType)
         {
             UmbracoObjectType = umbracoObjectType;
             Id = id;
         }
 
+        /// <summary>
+        ///     Gets the Umbraco object type for this identifier.
+        /// </summary>
         public UmbracoObjectTypes UmbracoObjectType { get; }
 
+        /// <summary>
+        ///     Gets the identifier value.
+        /// </summary>
         public T Id { get; }
     }
 
@@ -427,6 +485,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         public Guid NodeObjectType { get; set; }
     }
 
+    /// <inheritdoc />
     public void Dispose() =>
 
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

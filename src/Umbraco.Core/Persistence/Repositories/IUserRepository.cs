@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="IUser" /> entities.
+/// </summary>
 public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
 {
     /// <summary>
@@ -135,30 +138,96 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     /// </returns>
     IUser? Get(int? id, bool includeSecurityData);
 
+    /// <summary>
+    ///     Gets a user profile by username.
+    /// </summary>
+    /// <param name="username">The username.</param>
+    /// <returns>The user profile if found; otherwise, <c>null</c>.</returns>
     IProfile? GetProfile(string username);
 
+    /// <summary>
+    ///     Gets a user profile by identifier.
+    /// </summary>
+    /// <param name="id">The user identifier.</param>
+    /// <returns>The user profile if found; otherwise, <c>null</c>.</returns>
     IProfile? GetProfile(int id);
 
+    /// <summary>
+    ///     Gets the count of users grouped by their state.
+    /// </summary>
+    /// <returns>A dictionary mapping user states to their counts.</returns>
     IDictionary<UserState, int> GetUserStates();
 
+    /// <summary>
+    ///     Creates a login session for a user.
+    /// </summary>
+    /// <param name="userId">The user identifier.</param>
+    /// <param name="requestingIpAddress">The IP address of the requesting client.</param>
+    /// <param name="cleanStaleSessions">Whether to clean stale sessions.</param>
+    /// <returns>The unique identifier of the created session.</returns>
     Guid CreateLoginSession(int? userId, string requestingIpAddress, bool cleanStaleSessions = true);
 
+    /// <summary>
+    ///     Validates a login session for a user.
+    /// </summary>
+    /// <param name="userId">The user identifier.</param>
+    /// <param name="sessionId">The session identifier.</param>
+    /// <returns><c>true</c> if the session is valid; otherwise, <c>false</c>.</returns>
     bool ValidateLoginSession(int userId, Guid sessionId);
 
+    /// <summary>
+    ///     Clears all login sessions for a user.
+    /// </summary>
+    /// <param name="userId">The user identifier.</param>
+    /// <returns>The number of sessions cleared.</returns>
     int ClearLoginSessions(int userId);
 
+    /// <summary>
+    ///     Clears login sessions older than the specified timespan.
+    /// </summary>
+    /// <param name="timespan">The timespan after which sessions are considered stale.</param>
+    /// <returns>The number of sessions cleared.</returns>
     int ClearLoginSessions(TimeSpan timespan);
 
+    /// <summary>
+    ///     Clears a specific login session.
+    /// </summary>
+    /// <param name="sessionId">The session identifier.</param>
     void ClearLoginSession(Guid sessionId);
 
+    /// <summary>
+    ///     Gets all client identifiers.
+    /// </summary>
+    /// <returns>A collection of client identifiers.</returns>
     IEnumerable<string> GetAllClientIds();
 
+    /// <summary>
+    ///     Gets all client identifiers for a user.
+    /// </summary>
+    /// <param name="id">The user identifier.</param>
+    /// <returns>A collection of client identifiers.</returns>
     IEnumerable<string> GetClientIds(int id);
 
+    /// <summary>
+    ///     Adds a client identifier for a user.
+    /// </summary>
+    /// <param name="id">The user identifier.</param>
+    /// <param name="clientId">The client identifier to add.</param>
     void AddClientId(int id, string clientId);
 
+    /// <summary>
+    ///     Removes a client identifier from a user.
+    /// </summary>
+    /// <param name="id">The user identifier.</param>
+    /// <param name="clientId">The client identifier to remove.</param>
+    /// <returns><c>true</c> if the client identifier was removed; otherwise, <c>false</c>.</returns>
     bool RemoveClientId(int id, string clientId);
 
+    /// <summary>
+    ///     Gets a user by their client identifier.
+    /// </summary>
+    /// <param name="clientId">The client identifier.</param>
+    /// <returns>The user if found; otherwise, <c>null</c>.</returns>
     IUser? GetByClientId(string clientId);
 
     /// <summary>

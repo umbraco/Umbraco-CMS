@@ -9,6 +9,10 @@ internal sealed class UserPermissionAuthorizer : IUserPermissionAuthorizer
 {
     private readonly IUserPermissionService _userPermissionService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserPermissionAuthorizer" /> class.
+    /// </summary>
+    /// <param name="userPermissionService">The user permission service.</param>
     public UserPermissionAuthorizer(IUserPermissionService userPermissionService) =>
         _userPermissionService = userPermissionService;
 

@@ -6,8 +6,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging;
 
+/// <summary>
+///     Provides utility methods for accessing embedded package migration resources.
+/// </summary>
 public static class PackageMigrationResource
 {
+    /// <summary>
+    ///     Gets the embedded package data manifest from the specified plan type.
+    /// </summary>
+    /// <param name="planType">The type of the migration plan to get the embedded package from.</param>
+    /// <param name="zipArchive">When this method returns, contains the zip archive if the package is a zip file; otherwise, <c>null</c>.</param>
+    /// <returns>The package XML document, or <c>null</c> if no embedded package was found.</returns>
     public static XDocument? GetEmbeddedPackageDataManifest(Type planType, out ZipArchive? zipArchive)
     {
         XDocument? packageXml;
@@ -23,6 +32,11 @@ public static class PackageMigrationResource
         return packageXml;
     }
 
+    /// <summary>
+    ///     Gets the embedded package zip stream from the specified plan type.
+    /// </summary>
+    /// <param name="planType">The type of the migration plan.</param>
+    /// <returns>The stream for the embedded zip file, or <c>null</c> if not found.</returns>
     private static Stream? GetEmbeddedPackageZipStream(Type planType)
     {
         // lookup the embedded resource by convention
@@ -33,9 +47,20 @@ public static class PackageMigrationResource
         return stream;
     }
 
+    /// <summary>
+    ///     Gets the embedded package data manifest from the specified plan type.
+    /// </summary>
+    /// <param name="planType">The type of the migration plan to get the embedded package from.</param>
+    /// <returns>The package XML document, or <c>null</c> if no embedded package was found.</returns>
     public static XDocument? GetEmbeddedPackageDataManifest(Type planType) =>
         GetEmbeddedPackageDataManifest(planType, out _);
 
+    /// <summary>
+    ///     Gets a hash of the embedded package data manifest for the specified plan type.
+    /// </summary>
+    /// <param name="planType">The type of the migration plan.</param>
+    /// <returns>A hash string representing the package contents.</returns>
+    /// <exception cref="IOException">Thrown when no embedded package files are found for the plan type.</exception>
     public static string GetEmbeddedPackageDataManifestHash(Type planType)
     {
         // SEE: HashFromStreams in the benchmarks project for how fast this is. It will run
@@ -59,6 +84,11 @@ public static class PackageMigrationResource
         throw new IOException("Missing embedded files for planType: " + planType);
     }
 
+    /// <summary>
+    ///     Gets the embedded package XML document from the specified plan type.
+    /// </summary>
+    /// <param name="planType">The type of the migration plan.</param>
+    /// <returns>The package XML document, or <c>null</c> if not found.</returns>
     private static XDocument? GetEmbeddedPackageXmlDoc(Type planType)
     {
         // lookup the embedded resource by convention
@@ -79,6 +109,13 @@ public static class PackageMigrationResource
         return xml;
     }
 
+    /// <summary>
+    ///     Attempts to get the embedded package data manifest from the specified plan type.
+    /// </summary>
+    /// <param name="planType">The type of the migration plan.</param>
+    /// <param name="packageXml">When this method returns, contains the package XML document if found; otherwise, <c>null</c>.</param>
+    /// <param name="zipArchive">When this method returns, contains the zip archive if the package is a zip file; otherwise, <c>null</c>.</param>
+    /// <returns><c>true</c> if an embedded package was found; otherwise, <c>false</c>.</returns>
     public static bool TryGetEmbeddedPackageDataManifest(Type planType, out XDocument? packageXml, out ZipArchive? zipArchive)
     {
         Stream? zipStream = GetEmbeddedPackageZipStream(planType);
@@ -93,6 +130,14 @@ public static class PackageMigrationResource
         return packageXml is not null;
     }
 
+    /// <summary>
+    ///     Gets the package data manifest from a zip stream.
+    /// </summary>
+    /// <param name="packageZipStream">The zip stream containing the package.</param>
+    /// <param name="packageXml">When this method returns, contains the package XML document.</param>
+    /// <returns>The opened <see cref="ZipArchive"/> for the package.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="packageZipStream"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the zip package does not contain the required package.xml file.</exception>
     public static ZipArchive GetPackageDataManifest(Stream packageZipStream, out XDocument packageXml)
     {
         if (packageZipStream == null)
