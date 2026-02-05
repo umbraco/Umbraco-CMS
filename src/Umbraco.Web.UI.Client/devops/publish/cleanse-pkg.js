@@ -40,9 +40,8 @@ const looseVersionRange = (version) => {
 		return `>=${major}.${minor}.${patch} <1.0.0`;
 	}
 
-	// For stable versions without caret (exact versions), use >=X.Y.Z <(MAJOR+1).0.0
-	const nextMajor = major + 1;
-	return `>=${major}.${minor}.${patch} <${nextMajor}.0.0`;
+	// For stable versions without caret (exact versions), add caret (e.g., 3.16.0 -> ^3.16.0)
+	return `^${major}.${minor}.${patch}`;
 };
 
 // Rename dependencies to peerDependencies with looser version ranges
