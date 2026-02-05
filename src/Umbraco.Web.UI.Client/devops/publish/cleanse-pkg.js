@@ -1,6 +1,7 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import glob from 'tiny-glob'
+import glob from 'tiny-glob';
 import semver from 'semver';
 
 console.log('[Prepublish] Cleansing package.json');
@@ -44,12 +45,12 @@ delete packageJson.dependencies;
 
 // Iterate all workspaces and hoist the dependencies to the root package.json
 const workspaces = packageJson.workspaces || [];
-const workspacePromises = workspaces.map(async workspaceGlob => {
+const workspacePromises = workspaces.map(async (workspaceGlob) => {
 	// Use glob to find the workspace path
 	const localWorkspace = workspaceGlob.replace(/\.\/src/, './dist-cms');
 	const workspacePaths = await glob(localWorkspace, { cwd: './', absolute: true });
 
-	workspacePaths.forEach(workspace => {
+	workspacePaths.forEach((workspace) => {
 		const workspacePackageFile = join(workspace, 'package.json');
 
 		// Ensure the workspace package.json exists
@@ -65,11 +66,20 @@ const workspacePromises = workspaces.map(async workspaceGlob => {
 		if (workspacePackageJson.dependencies) {
 			Object.entries(workspacePackageJson.dependencies).forEach(([key, value]) => {
 				const loosenedVersion = looseVersionRange(value);
-				console.log('Hoisting dependency:', key, 'from workspace:', workspace, 'with version:', value, 'loosened to:', loosenedVersion);
+				console.log(
+					'Hoisting dependency:',
+					key,
+					'from workspace:',
+					workspace,
+					'with version:',
+					value,
+					'loosened to:',
+					loosenedVersion,
+				);
 				packageJson.peerDependencies[key] = loosenedVersion;
 			});
 		}
-	})
+	});
 });
 
 // Wait for all workspace processing to complete
