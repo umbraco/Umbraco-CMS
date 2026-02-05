@@ -90,7 +90,7 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
     /// </summary>
     /// <param name="jsonTypeInfo">The JSON type info to create a schema reference ID for.</param>
     /// <returns>The schema reference ID, or null if the type should be inlined.</returns>
-    internal static string? CreateSchemaReferenceId(JsonTypeInfo jsonTypeInfo)
+    public static string? CreateSchemaReferenceId(JsonTypeInfo jsonTypeInfo)
     {
         // Ensure that only types that would normally be included in the schema generation are given a schema reference ID.
         // Otherwise, we should return null to inline them.

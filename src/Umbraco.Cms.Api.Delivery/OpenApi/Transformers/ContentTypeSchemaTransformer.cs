@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
-using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -230,11 +230,8 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         return schema;
     }
 
-    private string? GetSchemaId(JsonTypeInfo type)
-    {
-        var defaultSchemaReferenceId = OpenApiOptions.CreateDefaultSchemaReferenceId(type);
-        return defaultSchemaReferenceId is null ? null : UmbracoSchemaIdGenerator.Generate(type.Type);
-    }
+    private static string? GetSchemaId(JsonTypeInfo type)
+        => ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(type);
 
     private static OpenApiSchema GetPlaceholderSchema(string schemaId)
         => new()
@@ -277,7 +274,11 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         var propertiesSchema = new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
-            AllOf = [..contentType.CompositionSchemaIds.Select(compositionSchemaId => GetPlaceholderSchema($"{compositionSchemaId}PropertiesModel"))],
+            AllOf =
+            [
+                ..contentType.CompositionSchemaIds.Select(compositionSchemaId
+                    => GetPlaceholderSchema($"{compositionSchemaId}PropertiesModel"))
+            ],
             Properties = await ContentTypePropertiesMapper(contentType, context, cancellationToken),
             Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
             AdditionalPropertiesAllowed = false,
@@ -398,7 +399,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         return new OpenApiSchemaReference(recursiveRefId, document);
     }
 
-    private string GetTypePropertyName(PublishedItemType itemType)
+    private static string GetTypePropertyName(PublishedItemType itemType)
         => itemType switch
         {
             PublishedItemType.Content => "contentType",
