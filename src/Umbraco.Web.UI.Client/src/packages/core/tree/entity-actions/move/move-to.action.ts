@@ -1,6 +1,6 @@
 import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
 import type { UmbMoveRepository } from './move-repository.interface.js';
-import type { MetaEntityActionMoveToKind, UmbMoveSelectableFilterProvider } from './types.js';
+import type { MetaEntityActionMoveToKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -12,18 +12,16 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		// Get custom filter if provider is configured
-		let customFilter: ((treeItem: UmbTreeItemModel) => boolean) | undefined;
+		// 1. Get the repository
+		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
+		if (!moveRepository) throw new Error('Move Repository is not available');
 
-		// If a filter provider is configured, load it and combine filters
-		if (this.args.meta.selectableFilterProviderAlias) {
-			const filterProvider = await createExtensionApiByAlias<UmbMoveSelectableFilterProvider>(
-				this,
-				this.args.meta.selectableFilterProviderAlias,
-			);
-			if (filterProvider) {
-				customFilter = await filterProvider.getSelectableFilter(this.args.unique);
-			}
+		// 2. Get the filter if the repository provides one
+		let customFilter: ((item: UmbTreeItemModel) => boolean) | undefined = undefined;
+
+		if (moveRepository.getSelectableFilter) {
+			const selectableFilter = await moveRepository.getSelectableFilter!(this.args.unique);
+			customFilter = selectableFilter;
 		}
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
@@ -38,9 +36,6 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
-
-		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
-		if (!moveRepository) throw new Error('Move Repository is not available');
 
 		const { error } = await moveRepository.requestMoveTo({
 			unique: this.args.unique,
