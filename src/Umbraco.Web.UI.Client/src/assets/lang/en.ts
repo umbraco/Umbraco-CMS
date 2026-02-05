@@ -2152,7 +2152,7 @@ export default {
 		userNotInGroup: "The user is not in group '%0%'",
 		userPermissions: 'User permissions',
 		usergroup: 'User group',
-		usergroups: 'User groups',
+		usergroups: 'User Groups',
 		userInvited: 'has been invited',
 		userInvitedSuccessHelp: 'An invitation has been sent to the new user with details about how to log in to Umbraco.',
 		userinviteWelcomeMessage:
