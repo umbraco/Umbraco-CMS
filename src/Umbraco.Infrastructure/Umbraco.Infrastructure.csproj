@@ -37,6 +37,7 @@
   <ItemGroup>
     <PackageReference Include="Examine.Core" />
     <PackageReference Include="HtmlAgilityPack" />
+    <PackageReference Include="JsonSchema.Net" />
     <PackageReference Include="MailKit" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="Markdown" />

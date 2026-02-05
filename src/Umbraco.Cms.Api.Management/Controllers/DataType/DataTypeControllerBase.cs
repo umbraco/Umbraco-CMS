@@ -55,8 +55,15 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
 
     protected IActionResult DataTypeNotFound() => OperationStatusResult(DataTypeOperationStatus.NotFound, DataTypeNotFound);
 
+    protected IActionResult SchemaNotFound() => OperationStatusResult(DataTypeOperationStatus.NotFound, SchemaNotFound);
+
     private IActionResult DataTypeNotFound(ProblemDetailsBuilder problemDetailsBuilder)
         => NotFound(problemDetailsBuilder
             .WithTitle("The data type could not be found")
+            .Build());
+
+    private IActionResult SchemaNotFound(ProblemDetailsBuilder problemDetailsBuilder)
+        => NotFound(problemDetailsBuilder
+            .WithTitle("The data type schema definition could not be found")
             .Build());
 }
