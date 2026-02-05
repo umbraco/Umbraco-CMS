@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import glob from 'tiny-glob'
+import semver from 'semver';
 
 console.log('[Prepublish] Cleansing package.json');
 
@@ -13,24 +14,24 @@ delete packageJson.devDependencies;
 // Convert version to a looser range that allows plugin developers to use newer versions
 // while still enforcing a minimum version and safety ceiling
 const looseVersionRange = (version) => {
-	// Parse semantic version
-	const match = version.match(/^(0|[1-9]\d*)\.(\d+)\.(\d+)(-.*)?(\+.*)?$/);
-	if (!match) {
+	const parsed = semver.parse(version);
+	if (!parsed) {
 		console.warn('Could not parse version:', version, 'keeping original');
 		return version;
 	}
 
-	const major = match[1];
-	const minor = match[2];
-	const patch = match[3];
+	const major = parsed.major;
+	const minor = parsed.minor;
+	const patch = parsed.patch;
 
 	// For pre-release (0.x.y), use floor at current version and ceiling at 1.0.0
-	if (major === '0') {
+	if (major === 0) {
 		return `>=${major}.${minor}.${patch} <1.0.0`;
 	}
 
-	// For stable versions (1.x.y+), use major.x.x to allow any patch/minor within that major
-	return `${major}.x.x`;
+	// For stable versions (major ≥ 1), use >=X.Y.Z <(MAJOR+1).0.0
+	const nextMajor = major + 1;
+	return `>=${major}.${minor}.${patch} <${nextMajor}.0.0`;
 };
 
 // Rename dependencies to peerDependencies with looser version ranges
