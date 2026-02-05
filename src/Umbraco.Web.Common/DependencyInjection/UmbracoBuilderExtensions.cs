@@ -179,7 +179,7 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddSingleton<WebProfilerHtml>();
 
-        builder.Services.AddMiniProfiler();
+        builder.Services.AddMiniProfiler().AddEntityFramework();
         builder.Services.ConfigureOptions<ConfigureMiniProfilerOptions>();
 
         builder.Services.AddSingleton<IWebProfilerRepository, WebProfilerRepository>();

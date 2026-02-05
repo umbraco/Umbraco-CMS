@@ -29,6 +29,7 @@
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="Dazinator.Extensions.FileProviders" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
+    <PackageReference Include="MiniProfiler.EntityFrameworkCore" />
     <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>
 
