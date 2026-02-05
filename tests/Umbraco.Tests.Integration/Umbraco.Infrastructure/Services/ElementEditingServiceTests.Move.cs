@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -99,10 +98,10 @@ public partial class ElementEditingServiceTests
     {
         var element = await CreateInvariantElement();
 
-        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success);
+        var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveToRecycleBinResult.Success);
 
-        moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveResult.Success);
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -123,10 +122,10 @@ public partial class ElementEditingServiceTests
 
         var element = await CreateInvariantElement();
 
-        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success);
+        var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveToRecycleBinResult.Success);
 
-        moveResult = await ElementEditingService.MoveAsync(element.Key, containerKey1, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, containerKey1, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveResult.Success);
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -140,7 +139,7 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
-    public async Task Restoring_Trashed_Published_Invariant_Element_Performs_Explicit_Unpublish()
+    public async Task Moving_Trashed_Published_Invariant_Element_Performs_Explicit_Unpublish()
     {
         var element = await CreateInvariantElement();
 
@@ -150,15 +149,15 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
 
-        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success);
+        var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveToRecycleBinResult.Success);
 
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.NotNull(element);
         Assert.IsTrue(element.Published);
         Assert.IsTrue(element.Trashed);
 
-        moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveResult.Success);
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -170,7 +169,7 @@ public partial class ElementEditingServiceTests
     [TestCase("en-US", "da-DK")]
     [TestCase("en-US")]
     [TestCase("da-DK")]
-    public async Task Restoring_Trashed_Published_Variant_Element_Performs_Explicit_Unpublish(params string[] publishedCultures)
+    public async Task Moving_Trashed_Published_Variant_Element_Performs_Explicit_Unpublish(params string[] publishedCultures)
     {
         var elementType = await CreateVariantElementType();
 
@@ -198,13 +197,14 @@ public partial class ElementEditingServiceTests
         var culturePublishScheduleModels = publishedCultures
             .Select(culture => new CulturePublishScheduleModel { Culture = culture })
             .ToArray();
-        var publishResult = await ElementPublishingService.PublishAsync(element.Key,
+        var publishResult = await ElementPublishingService.PublishAsync(
+            element.Key,
             culturePublishScheduleModels,
             Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
 
-        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success);
+        var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveToRecycleBinResult.Success);
 
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.NotNull(element);
@@ -212,7 +212,7 @@ public partial class ElementEditingServiceTests
         CollectionAssert.AreEquivalent(publishedCultures, element.PublishedCultures);
         Assert.IsTrue(element.Trashed);
 
-        moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveResult.Success);
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -223,7 +223,7 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Cancel_Unpublishing_When_Restoring_Trashed_Published_Element()
+    public async Task Can_Cancel_Unpublishing_When_Moving_Trashed_Published_Element()
     {
         var element = await CreateInvariantElement();
 
@@ -233,8 +233,8 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
 
-        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success);
+        var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveToRecycleBinResult.Success);
 
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.NotNull(element);
@@ -245,7 +245,7 @@ public partial class ElementEditingServiceTests
         {
             ElementNotificationHandler.UnpublishingElement = (notification) => notification.Cancel = true;
 
-            moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+            var moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
             Assert.IsTrue(moveResult.Success);
 
             element = await ElementEditingService.GetAsync(element.Key);
@@ -268,11 +268,11 @@ public partial class ElementEditingServiceTests
         await ElementContainerService.CreateAsync(trashedContainerKey, "Trashed Container", null, Constants.Security.SuperUserKey);
         await ElementContainerService.MoveToRecycleBinAsync(trashedContainerKey, Constants.Security.SuperUserKey);
 
-        var moveResult = await ElementContainerService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.InTrash, moveResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
@@ -283,7 +283,7 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Move_Element_In_Recycle_Bin_To_Container_In_Recycle_Bin()
+    public async Task Cannot_Move_Trashed_Element_To_Container_In_Recycle_Bin()
     {
         var element = await CreateInvariantElement();
         await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
@@ -292,11 +292,11 @@ public partial class ElementEditingServiceTests
         await ElementContainerService.CreateAsync(trashedContainerKey, "Trashed Container", null, Constants.Security.SuperUserKey);
         await ElementContainerService.MoveToRecycleBinAsync(trashedContainerKey, Constants.Security.SuperUserKey);
 
-        var moveResult = await ElementContainerService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
+            Assert.AreEqual(ContentEditingOperationStatus.InTrash, moveResult.Result);
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
