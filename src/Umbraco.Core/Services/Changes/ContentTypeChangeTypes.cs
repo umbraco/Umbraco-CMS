@@ -12,22 +12,28 @@ public enum ContentTypeChangeTypes : byte
     None = 0,
 
     /// <summary>
-    ///     Item type has been created, no impact
+    ///     Item type has been created, no impact.
     /// </summary>
     Create = 1,
 
     /// <summary>
-    ///     Content type changes impact only the Content type being saved
+    ///     Content type changes impact only the Content type being saved.
     /// </summary>
     RefreshMain = 2,
 
     /// <summary>
-    ///     Content type changes impacts the content type being saved and others used that are composed of it
+    ///     Content type changes impacts the content type being saved and others used that are composed of it.
     /// </summary>
     RefreshOther = 4, // changed, other change
 
     /// <summary>
-    ///     Content type was removed
+    ///     Content type was removed.
     /// </summary>
     Remove = 8,
+
+    /// <summary>
+    ///     Content type variation setting has changed (e.g., from invariant to variant or vice versa).
+    ///     This impacts how URL segments and aliases are stored (NULL languageId for invariant, specific ID for variant).
+    /// </summary>
+    VariationChanged = 16,
 }

@@ -151,6 +151,9 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_2_0.AddDescriptionToUserGroup>("{F1A2B3C4-D5E6-4789-ABCD-1234567890AB}");
         To<V_17_2_0.AddDocumentUrlAlias>("{A7B8C9D0-E1F2-4A5B-8C7D-9E0F1A2B3C4D}");
 
+        // To 17.3.0
+        To<V_17_3_0.OptimizeInvariantUrlRecords>("{B8C9D0E1-F2A3-4B5C-8D7E-9F0A1B2C3D4E}");
+
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
         //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");

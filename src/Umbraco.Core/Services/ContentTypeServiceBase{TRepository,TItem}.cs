@@ -409,6 +409,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
 
+                // Add VariationChanged flag if content type variation changed.
+                // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
+                if (hasContentTypeVariationChanged)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
+                }
+
                 if (hasPropertyMainImpact)
                 {
                     foreach (TItem c in GetComposedOf(contentType.Id))
