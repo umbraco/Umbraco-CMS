@@ -14,6 +14,10 @@ This project uses [Central Package Management (CPM)](https://learn.microsoft.com
 
 If you move projects into subfolders, ensure `Directory.Packages.props` remains in a parent directory of all projects, or copy it to the appropriate location.
 
+If you add an Umbraco extension project to this solution, you may need to:
+1. Move `Directory.Packages.props` to the solution root folder
+2. Merge package versions from both projects into one file
+
 ### Example structure
 ```
 MySolution/
