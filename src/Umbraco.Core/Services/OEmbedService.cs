@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Media;
@@ -11,6 +12,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class OEmbedService : IOEmbedService
 {
+    private static readonly ConcurrentDictionary<string, Regex> RegexCache = new();
+
     private readonly EmbedProvidersCollection _embedProvidersCollection;
     private readonly ILogger<OEmbedService> _logger;
 
@@ -28,8 +31,7 @@ public class OEmbedService : IOEmbedService
     {
         // Find the first provider that supports the URL
         IEmbedProvider? matchedProvider = _embedProvidersCollection
-            .FirstOrDefault(provider => provider.UrlSchemeRegex
-                .Any(regex => new Regex(regex, RegexOptions.IgnoreCase).IsMatch(url.OriginalString)));
+            .FirstOrDefault(provider => MatchesUrlScheme(url.OriginalString, provider.UrlSchemeRegex));
 
         if (matchedProvider is null)
         {
@@ -53,4 +55,16 @@ public class OEmbedService : IOEmbedService
 
         return Attempt.FailWithStatus(OEmbedOperationStatus.ProviderReturnedInvalidResult, string.Empty);
     }
+
+    /// <summary>
+    /// Determines whether a URL matches any of the provider's URL scheme regex patterns.
+    /// </summary>
+    /// <param name="url">The URL to test.</param>
+    /// <param name="urlSchemeRegexPatterns">The regex patterns to match against.</param>
+    /// <returns><c>true</c> if the URL matches any pattern; otherwise, <c>false</c>.</returns>
+    internal static bool MatchesUrlScheme(string url, string[] urlSchemeRegexPatterns)
+        => urlSchemeRegexPatterns.Any(pattern => GetOrCreateRegex(pattern).IsMatch(url));
+
+    private static Regex GetOrCreateRegex(string pattern)
+        => RegexCache.GetOrAdd(pattern, p => new Regex(p, RegexOptions.IgnoreCase | RegexOptions.Compiled));
 }
