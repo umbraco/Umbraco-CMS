@@ -31,14 +31,7 @@ const looseVersionRange = (version) => {
 		return `>=${major}.${minor}.${patch} <1.0.0`;
 	}
 
-	// For stable versions (major >= 1)
-	// If it already has a caret, keep it as-is (e.g., ^3.3.1)
-	if (version.startsWith('^')) {
-		console.log('Keeping caret range for stable version:', version);
-		return version;
-	}
-
-	// Exact version without caret, add caret (e.g., 3.16.0 -> ^3.16.0)
+	// Exact version without caret, add caret (e.g., 3.16.0 -> ^3.16.0 and ^3.16.0 -> ^3.16.0 and ~3.16.0 -> ^3.16.0)
 	return `^${major}.${minor}.${patch}`;
 };
 
