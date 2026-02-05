@@ -6,12 +6,29 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
+/// <summary>
+///     Implementation of <see cref="IMemberTypeEditingService"/> for managing member types.
+/// </summary>
+/// <remarks>
+///     This service handles creating and updating member types including their properties,
+///     compositions, and member-specific settings such as property sensitivity and visibility.
+/// </remarks>
 internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<IMemberType, IMemberTypeService, MemberTypePropertyTypeModel, MemberTypePropertyContainerModel>, IMemberTypeEditingService
 {
     private readonly IMemberTypeService _memberTypeService;
     private readonly IUserService _userService;
     private readonly IReservedFieldNamesService _reservedFieldNamesService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberTypeEditingService"/> class.
+    /// </summary>
+    /// <param name="contentTypeService">The content type service for composition validation.</param>
+    /// <param name="memberTypeService">The member type service for managing member types.</param>
+    /// <param name="dataTypeService">The data type service for validating property data types.</param>
+    /// <param name="entityService">The entity service for resolving entity relationships.</param>
+    /// <param name="shortStringHelper">The helper for generating safe aliases.</param>
+    /// <param name="userService">The user service for validating user permissions.</param>
+    /// <param name="reservedFieldNamesService">The service providing reserved field names.</param>
     public MemberTypeEditingService(
         IContentTypeService contentTypeService,
         IMemberTypeService memberTypeService,
@@ -27,6 +44,7 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
         _reservedFieldNamesService = reservedFieldNamesService;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IMemberType?, ContentTypeOperationStatus>> CreateAsync(MemberTypeCreateModel model, Guid userKey)
     {
         Attempt<IMemberType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, model.ContainerKey);
@@ -47,6 +65,7 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
         return result;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IMemberType?, ContentTypeOperationStatus>> UpdateAsync(IMemberType memberType, MemberTypeUpdateModel model, Guid userKey)
     {
         Attempt<IMemberType?, ContentTypeOperationStatus> result = await ValidateAndMapForUpdateAsync(memberType, model);
@@ -67,23 +86,34 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
         return result;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
         Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases) =>
         await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases);
 
+    /// <inheritdoc />
     protected override IMemberType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new MemberType(shortStringHelper, parentId);
 
+    /// <inheritdoc />
     protected override bool SupportsPublishing => false;
 
+    /// <inheritdoc />
     protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.MemberType;
 
+    /// <inheritdoc />
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.MemberTypeContainer;
 
+    /// <inheritdoc />
     protected override ISet<string> GetReservedFieldNames() => _reservedFieldNamesService.GetMemberReservedFieldNames();
 
+    /// <summary>
+    ///     Updates the visibility settings for member type properties.
+    /// </summary>
+    /// <param name="memberType">The member type to update.</param>
+    /// <param name="model">The model containing property visibility settings.</param>
     private void UpdatePropertyTypeVisibility(IMemberType memberType, MemberTypeModelBase model)
     {
         foreach (MemberTypePropertyTypeModel propertyType in model.Properties)
@@ -93,6 +123,19 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
         }
     }
 
+    /// <summary>
+    ///     Updates the sensitivity settings for member type properties.
+    /// </summary>
+    /// <param name="memberType">The member type to update.</param>
+    /// <param name="model">The model containing property sensitivity settings.</param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <returns>
+    ///     <c>true</c> if the sensitivity settings were updated successfully;
+    ///     <c>false</c> if the user does not have permission to change sensitivity settings.
+    /// </returns>
+    /// <remarks>
+    ///     Only users with access to sensitive data can modify the sensitivity flag on properties.
+    /// </remarks>
     private async Task<bool> UpdatePropertyTypeSensitivity(IMemberType memberType, MemberTypeModelBase model, Guid userKey)
     {
         IUser user = await _userService.GetAsync(userKey)

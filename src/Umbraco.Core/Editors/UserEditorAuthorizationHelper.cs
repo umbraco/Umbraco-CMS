@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -10,6 +7,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Editors;
 
+/// <summary>
+/// Provides authorization helper methods for user editor operations in the backoffice.
+/// </summary>
+/// <remarks>
+/// This helper validates that the current user has the necessary permissions to modify
+/// another user's settings, including start nodes, user groups, and section access.
+/// </remarks>
 public class UserEditorAuthorizationHelper
 {
     private readonly AppCaches _appCaches;
@@ -17,6 +21,13 @@ public class UserEditorAuthorizationHelper
     private readonly IEntityService _entityService;
     private readonly IMediaService _mediaService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserEditorAuthorizationHelper"/> class.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
     public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
     {
         _contentService = contentService;
@@ -126,6 +137,15 @@ public class UserEditorAuthorizationHelper
         return Attempt<string?>.Succeed();
     }
 
+    /// <summary>
+    /// Authorizes that the current user has access to the specified start content and media paths.
+    /// </summary>
+    /// <param name="currentUser">The current user attempting the operation.</param>
+    /// <param name="startContentIds">The content start node IDs to authorize.</param>
+    /// <param name="startMediaIds">The media start node IDs to authorize.</param>
+    /// <returns>
+    /// A successful attempt if the user has access to all paths; otherwise, a failed attempt with an error message.
+    /// </returns>
     private Attempt<string?> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds)
     {
         if (startContentIds != null)

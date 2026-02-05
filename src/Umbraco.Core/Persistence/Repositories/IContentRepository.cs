@@ -109,5 +109,10 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
         => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
 #pragma warning restore CS0618 // Type or member is obsolete
 
+    /// <summary>
+    ///     Checks the data integrity of content items.
+    /// </summary>
+    /// <param name="options">The options for the data integrity check.</param>
+    /// <returns>A report containing the results of the integrity check.</returns>
     ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 }

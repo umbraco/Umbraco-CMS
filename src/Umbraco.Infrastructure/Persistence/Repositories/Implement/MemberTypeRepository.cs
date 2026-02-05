@@ -144,9 +144,9 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add($"DELETE FROM {QuoteTableName("cmsMemberType")} WHERE NodeId = @id");
-        l.Add($"DELETE FROM {QuoteTableName("cmsContentType")} WHERE nodeId = @id");
-        l.Add($"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName(MemberPropertyTypeDto.TableName)} WHERE {QuoteColumnName(MemberPropertyTypeDto.NodeIdColumnName)} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeDto.NodeIdColumnName)} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(NodeDto.TableName)} WHERE id = @id");
         return l;
     }
 

@@ -4,6 +4,9 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains constants for webhook configuration.
+    /// </summary>
     public static class Webhooks
     {
         /// <summary>

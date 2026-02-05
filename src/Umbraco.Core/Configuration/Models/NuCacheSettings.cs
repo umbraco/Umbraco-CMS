@@ -11,8 +11,19 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigNuCache)]
 public class NuCacheSettings
 {
+    /// <summary>
+    ///     The default serializer type for NuCache.
+    /// </summary>
     internal const string StaticNuCacheSerializerType = "MessagePack";
+
+    /// <summary>
+    ///     The default SQL page size for NuCache queries.
+    /// </summary>
     internal const int StaticSqlPageSize = 1000;
+
+    /// <summary>
+    ///     The default value for using paged SQL queries.
+    /// </summary>
     internal const bool StaticUsePagedSqlQuery = true;
 
     /// <summary>
@@ -27,6 +38,9 @@ public class NuCacheSettings
     [DefaultValue(StaticSqlPageSize)]
     public int SqlPageSize { get; set; } = StaticSqlPageSize;
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether to use paged SQL queries for nucache.
+    /// </summary>
     [DefaultValue(StaticUsePagedSqlQuery)]
     public bool UsePagedSqlQuery { get; set; } = true;
 }

@@ -1,9 +1,22 @@
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Provides helper methods for IO operations.
+/// </summary>
 public interface IIOHelper
 {
+    /// <summary>
+    /// Finds a file by its virtual path and returns the resolved path.
+    /// </summary>
+    /// <param name="virtualPath">The virtual path to find.</param>
+    /// <returns>The resolved file path.</returns>
     string FindFile(string virtualPath);
 
+    /// <summary>
+    ///     Resolves a virtual path to an absolute URL.
+    /// </summary>
+    /// <param name="virtualPath">The virtual path to resolve.</param>
+    /// <returns>The absolute URL.</returns>
     [Obsolete("Use IHostingEnvironment.ToAbsolute instead")]
     string ResolveUrl(string virtualPath);
 
@@ -39,8 +52,19 @@ public interface IIOHelper
     /// <returns>A value indicating whether the filepath is valid.</returns>
     bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions);
 
+    /// <summary>
+    /// Determines whether a path starts with the specified root path.
+    /// </summary>
+    /// <param name="path">The path to check.</param>
+    /// <param name="root">The root path to compare against.</param>
+    /// <param name="separators">The directory separator characters to use.</param>
+    /// <returns><c>true</c> if the path starts with the root; otherwise, <c>false</c>.</returns>
     bool PathStartsWith(string path, string root, params char[] separators);
 
+    /// <summary>
+    /// Ensures that the specified path exists by creating it if necessary.
+    /// </summary>
+    /// <param name="path">The path to ensure exists.</param>
     void EnsurePathExists(string path);
 
     /// <summary>

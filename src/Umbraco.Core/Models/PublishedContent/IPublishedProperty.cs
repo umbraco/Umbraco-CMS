@@ -5,6 +5,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 public interface IPublishedProperty
 {
+    /// <summary>
+    ///     Gets the property type.
+    /// </summary>
     IPublishedPropertyType PropertyType { get; }
 
     /// <summary>

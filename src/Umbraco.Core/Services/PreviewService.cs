@@ -9,6 +9,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing content preview mode.
+/// </summary>
+/// <remarks>
+///     Preview mode allows backoffice users to view unpublished content changes
+///     as they would appear on the front-end website. This implementation uses
+///     secure cookies with SameSite=None to support cross-site preview scenarios.
+/// </remarks>
 public class PreviewService : IPreviewService
 {
     private readonly ICookieManager _cookieManager;
@@ -16,6 +24,13 @@ public class PreviewService : IPreviewService
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IRequestCache _requestCache;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PreviewService" /> class.
+    /// </summary>
+    /// <param name="cookieManager">The cookie manager for handling preview cookies.</param>
+    /// <param name="previewTokenGenerator">The generator for creating and validating preview tokens.</param>
+    /// <param name="serviceScopeFactory">The factory for creating service scopes.</param>
+    /// <param name="requestCache">The request cache for caching preview state per request.</param>
     public PreviewService(
         ICookieManager cookieManager,
         IPreviewTokenGenerator previewTokenGenerator,
@@ -28,6 +43,7 @@ public class PreviewService : IPreviewService
         _requestCache = requestCache;
     }
 
+    /// <inheritdoc />
     public async Task<bool> TryEnterPreviewAsync(IUser user)
     {
         Attempt<string?> attempt = await _previewTokenGenerator.GenerateTokenAsync(user.Key);
@@ -43,17 +59,20 @@ public class PreviewService : IPreviewService
         return attempt.Success;
     }
 
+    /// <inheritdoc />
     public Task EndPreviewAsync()
     {
          _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
          return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public bool IsInPreview() =>
         _requestCache.Get(
             "IsInPreview",
             () => TryGetPreviewClaimsIdentityAsync().GetAwaiter().GetResult().Success) as bool? ?? false;
 
+    /// <inheritdoc />
     public async Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync()
     {
         var cookieValue = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName);

@@ -7,6 +7,12 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class MediaTypeDeletingNotification : DeletingNotification<IMediaType>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaTypeDeletingNotification"/> class
+    ///     with a single media type.
+    /// </summary>
+    /// <param name="target">The media type being deleted.</param>
+    /// <param name="messages">The event messages collection.</param>
     public MediaTypeDeletingNotification(IMediaType target, EventMessages messages)
         : base(target, messages)
     {

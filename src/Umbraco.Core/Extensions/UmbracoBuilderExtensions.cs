@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IUmbracoBuilder"/> related to notification handler registration.
+/// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>

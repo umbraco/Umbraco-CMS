@@ -1,12 +1,25 @@
 namespace Umbraco.Cms.Core;
+
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains constants for caching.
+    /// </summary>
     public static class Cache
     {
+        /// <summary>
+        ///     Contains cache tag constants used for cache invalidation.
+        /// </summary>
         public static class Tags
         {
+            /// <summary>
+            ///     The cache tag for content items.
+            /// </summary>
             public const string Content = "content";
 
+            /// <summary>
+            ///     The cache tag for media items.
+            /// </summary>
             public const string Media = "media";
         }
 
