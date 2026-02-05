@@ -24,9 +24,9 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
     {
         var backOfficePath = HostingEnvironment.GetBackOfficePath();
 
-        var swaggerPath = $"{backOfficePath}/openapi/delivery.json";
+        var openApiPath = $"{backOfficePath}/openapi/delivery.json";
 
-        var generatedOpenApiContract = await Client.GetStringAsync(swaggerPath);
+        var generatedOpenApiContract = await Client.GetStringAsync(openApiPath);
         var generatedOpenApiJson = JsonNode.Parse(generatedOpenApiContract);
         var expectedOpenApiJson = JsonNode.Parse(ExpectedOpenApiContract);
 
