@@ -8,18 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms"/>
     <!--#if (ModelsBuilderMode == "InMemoryAuto" || (DevelopmentMode == "BackofficeDevelopment" && ModelsBuilderMode == "Default")) -->
-    <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice"/>
     <!--#endif -->
     <!--#if (StarterKit != "None") -->
-    <PackageReference Include="STARTER_KIT_NAME" Version="STARTER_KIT_VERSION"/>
+    <PackageReference Include="STARTER_KIT_NAME"/>
     <!--#endif -->
   </ItemGroup>
 
   <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime"/>
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 

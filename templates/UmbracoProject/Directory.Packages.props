@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <!--#if (StarterKit != "None") -->
+    <PackageVersion Include="STARTER_KIT_NAME" Version="STARTER_KIT_VERSION" />
+    <!--#endif -->
+  </ItemGroup>
+</Project>
