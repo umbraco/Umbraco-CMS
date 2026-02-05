@@ -294,6 +294,13 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         foreach (ContentTypePropertySchemaInfo propertyInfo in contentType.Properties.Where(p => !p.Inherited))
         {
             IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.DeliveryApiClrType), context, cancellationToken);
+
+            // All properties can be null (e.g., when a property is added but content has not been republished)
+            if (schema is OpenApiSchema openApiSchema && openApiSchema.Type.HasValue)
+            {
+                openApiSchema.Type |= JsonSchemaType.Null;
+            }
+
             properties[propertyInfo.Alias] = schema;
         }
 
