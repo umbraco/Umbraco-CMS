@@ -529,8 +529,8 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event arguments.</param>
-    protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-
+    protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
         // enable this to detect duplicate property aliases. We do want this, however making this change in a
         // patch release might be a little dangerous
         ////detect if there are any duplicate aliases - this cannot be allowed
@@ -545,6 +545,11 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         //    }
         // }
         OnPropertyChanged(nameof(PropertyTypes));
+
+        // Also mark NoGroupPropertyTypes as dirty so the persistence layer
+        // detects changes to properties without containers (tabs/groups).
+        OnPropertyChanged(nameof(NoGroupPropertyTypes));
+    }
 
     /// <inheritdoc />
     protected override void PerformDeepClone(object clone)

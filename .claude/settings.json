@@ -15,7 +15,6 @@
       "Bash(npm run check:*)",
       "Bash(npm run compile:*)",
       "Bash(npm run lint:*)",
-      "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
       "Bash(npx eslint:*)",
       "Bash(npx tsc:*)",

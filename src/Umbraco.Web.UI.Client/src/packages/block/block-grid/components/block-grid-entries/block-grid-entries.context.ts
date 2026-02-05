@@ -182,9 +182,17 @@ export class UmbBlockGridEntriesContext
 				const config = propertyContext.getConfig() as UmbBlockGridPropertyEditorConfig;
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
+				const blockTypes = this.#allowedBlockTypes.getValue();
+				/*
+				modal size logic:
+				If more than 8 block types, medium modal, more than 12 large modal:
+				*/
+				const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
+
 				return {
+					modal: { size: modalSize },
 					data: {
-						blocks: this.#allowedBlockTypes.getValue(),
+						blocks: blockTypes,
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						clipboardFilter: async (clipboardEntryDetail) => {
