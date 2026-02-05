@@ -46,7 +46,8 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
-- **Swashbuckle** - OpenAPI/Swagger documentation
+- **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
+- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI for API documentation
 - **Lucene.NET** - Full-text search via Examine
 - **ImageSharp** - Image processing
 
@@ -267,10 +268,10 @@ Project ownership is distributed across teams. Check individual project director
 
 ```xml
 <!-- Individual projects reference WITHOUT version -->
-<PackageReference Include="Swashbuckle.AspNetCore" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 
 <!-- Versions defined in Directory.Packages.props -->
-<PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 ```
 
 ### Build Configuration
@@ -311,7 +312,8 @@ All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
 APIs use `Asp.Versioning.Mvc`:
 - Management API: `/umbraco/management/api/v{version}/*`
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
-- OpenAPI/Swagger docs per version
+- OpenAPI docs: `/umbraco/openapi/management.json`, `/umbraco/openapi/delivery.json`
+- Swagger UI: `/umbraco/openapi/`
 
 ### Known Limitations
 

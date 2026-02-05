@@ -70,7 +70,7 @@ internal sealed class MediaApiTransformer : DeliveryApiTransformerBase
     private Dictionary<string, IOpenApiExample> FilterQueryParameterExamples() =>
         new()
         {
-            { "Default filter", new OpenApiExample { Value = new JsonArray("") } },
+            { "Default filter", new OpenApiExample { Value = new JsonArray(string.Empty) } },
             { "Filter by media type", new OpenApiExample { Value = new JsonArray("mediaType:alias1") } },
             { "Filter by name", new OpenApiExample { Value = new JsonArray("name:nodeName") } },
         };
@@ -78,7 +78,7 @@ internal sealed class MediaApiTransformer : DeliveryApiTransformerBase
     private Dictionary<string, IOpenApiExample> SortQueryParameterExamples() =>
         new()
         {
-            { "Default sort", new OpenApiExample { Value = new JsonArray("") } },
+            { "Default sort", new OpenApiExample { Value = new JsonArray(string.Empty) } },
             { "Sort by create date", new OpenApiExample { Value = new JsonArray("createDate:asc", "createDate:desc") } },
             { "Sort by name", new OpenApiExample { Value = new JsonArray("name:asc", "name:desc") } },
             { "Sort by sort order", new OpenApiExample { Value = new JsonArray("sortOrder:asc", "sortOrder:desc") } },

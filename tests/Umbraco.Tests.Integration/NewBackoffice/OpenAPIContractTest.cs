@@ -43,10 +43,10 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
         var backOfficePath = HostingEnvironment.GetBackOfficePath();
 
         var urlToContract = $"{backOfficePath}/management/api/openapi.json";
-        var swaggerPath = $"{backOfficePath}/openapi/management.json";
+        var openApiPath = $"{backOfficePath}/openapi/management.json";
         var apiContract = JsonNode.Parse(await Client.GetStringAsync(urlToContract)).AsObject();
 
-        var generatedJsonString = await Client.GetStringAsync(swaggerPath);
+        var generatedJsonString = await Client.GetStringAsync(openApiPath);
         var mergedContract = JsonNode.Parse(generatedJsonString).AsObject();
         var originalGeneratedContract = JsonNode.Parse(generatedJsonString).AsObject();
 

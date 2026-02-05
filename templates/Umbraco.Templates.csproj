@@ -10,6 +10,8 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
     <NoWarn>$(NoWarn),NU5128</NoWarn>
+    <!-- Required for Microsoft.AspNetCore.OpenApi source generators that propagate through ProjectReferences.
+         Web SDK projects get this automatically, but Template projects do not. -->
     <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
   </PropertyGroup>
 

@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Delivery API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Delivery API.</Description>
-    <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
   </PropertyGroup>
 
   <PropertyGroup>
