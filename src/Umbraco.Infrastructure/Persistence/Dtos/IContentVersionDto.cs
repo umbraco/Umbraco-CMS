@@ -4,15 +4,21 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 // TODO ELEMENTS: split this into two interfaces - like "IEntityDto" and "IPublishedDto"?
-public interface IContentVersionDto
+internal interface IContentVersionDto
 {
-    internal const string IdColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    internal static class Columns
+    {
+        internal const string Id = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    internal const string PublishedColumnName = "published";
+        internal const string Published = "published";
+    }
 
-    [Column(IdColumnName)]
-    int Id { get; }
+    [Column(Columns.Id)]
+    int Id { get; set; }
 
-    [Column(PublishedColumnName)]
-    bool Published { get; }
+    [Column(Columns.Published)]
+    bool Published { get; set; }
+
+    [ResultColumn]
+    ContentVersionDto ContentVersionDto { get; }
 }

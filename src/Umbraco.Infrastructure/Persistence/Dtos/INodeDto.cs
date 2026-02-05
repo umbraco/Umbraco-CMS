@@ -3,10 +3,13 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-public interface INodeDto
+internal interface INodeDto
 {
-    internal const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+    internal static class Columns
+    {
+        internal const string NodeId = Constants.DatabaseSchema.Columns.NodeIdName;
+    }
 
-    [Column(NodeIdColumnName)]
-    int NodeId { get; }
+    [Column(Columns.NodeId)]
+    int NodeId { get; set; }
 }

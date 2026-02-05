@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(IContentVersionDto.IdColumnName, AutoIncrement = false)]
+[PrimaryKey(IContentVersionDto.Columns.Id, AutoIncrement = false)]
 [ExplicitColumns]
 public class DocumentVersionDto : IContentVersionDto
 {
@@ -13,10 +13,10 @@ public class DocumentVersionDto : IContentVersionDto
 
     private const string TemplateIdColumnName = "templateId";
 
-    [Column(IContentVersionDto.IdColumnName)]
+    [Column(IContentVersionDto.Columns.Id)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{IContentVersionDto.IdColumnName},{IContentVersionDto.PublishedColumnName}", IncludeColumns = TemplateIdColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{IContentVersionDto.Columns.Id},{IContentVersionDto.Columns.Published}", IncludeColumns = TemplateIdColumnName)]
     public int Id { get; set; }
 
     [Column(TemplateIdColumnName)]
@@ -24,8 +24,8 @@ public class DocumentVersionDto : IContentVersionDto
     [ForeignKey(typeof(TemplateDto), Column = TemplateDto.NodeIdColumnName)]
     public int? TemplateId { get; set; }
 
-    [Column(IContentVersionDto.PublishedColumnName)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = IContentVersionDto.PublishedColumnName, IncludeColumns = $"{IContentVersionDto.IdColumnName},{TemplateIdColumnName}")]
+    [Column(IContentVersionDto.Columns.Published)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = IContentVersionDto.Columns.Published, IncludeColumns = $"{IContentVersionDto.Columns.Id},{TemplateIdColumnName}")]
     public bool Published { get; set; }
 
     [ResultColumn]

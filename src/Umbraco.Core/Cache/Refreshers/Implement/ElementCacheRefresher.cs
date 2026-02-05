@@ -69,8 +69,7 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
 
     public override void Refresh(JsonPayload[] payloads)
     {
-        // TODO ELEMENTS: implement recycle bin
-        // AppCaches.RuntimeCache.ClearByKey(CacheKeys.ElementRecycleBinCacheKey);
+        AppCaches.RuntimeCache.ClearByKey(CacheKeys.ElementRecycleBinCacheKey);
 
         // Ideally, we'd like to not have to clear the entire cache here. However, this was the existing behavior in NuCache.
         // The reason for this is that we have no way to know which elements are affected by the changes or what their keys are.

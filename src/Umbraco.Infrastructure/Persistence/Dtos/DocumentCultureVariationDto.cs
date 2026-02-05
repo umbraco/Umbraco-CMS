@@ -7,27 +7,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
-internal sealed class DocumentCultureVariationDto
+internal sealed class DocumentCultureVariationDto : ICultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
-    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    // Public constants to bind properties between DTOs
-    public const string PublishedColumnName = "published";
-
-    private const string LanguageIdColumnName = "languageId";
-    private const string NodeIdColumnName = "nodeId";
+    private const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column(NodeIdColumnName)]
+    [Column(ICultureVariationDto.Columns.NodeId)]
     [ForeignKey(typeof(NodeDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{NodeIdColumnName},{LanguageIdColumnName}")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{INodeDto.Columns.NodeId},{ICultureVariationDto.Columns.LanguageId}")]
     public int NodeId { get; set; }
 
-    [Column(LanguageIdColumnName)]
+    [Column(ICultureVariationDto.Columns.LanguageId)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }
@@ -37,23 +32,23 @@ internal sealed class DocumentCultureVariationDto
     public string? Culture { get; set; }
 
     // authority on whether a culture has been edited
-    [Column("edited")]
+    [Column(ICultureVariationDto.Columns.Edited)]
     public bool Edited { get; set; }
 
     // de-normalized for perfs
     // (means there is a current content version culture variation for the language)
-    [Column("available")]
+    [Column(ICultureVariationDto.Columns.Available)]
     public bool Available { get; set; }
 
     // de-normalized for perfs
     // (means there is a published content version culture variation for the language)
-    [Column(PublishedColumnName)]
+    [Column(ICultureVariationDto.Columns.Published)]
     public bool Published { get; set; }
 
     // de-normalized for perfs
     // (when available, copies name from current content version culture variation for the language)
     // (otherwise, it's the published one, 'cos we need to have one)
-    [Column("name")]
+    [Column(ICultureVariationDto.Columns.Name)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Name { get; set; }
 }
