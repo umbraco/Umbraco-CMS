@@ -268,6 +268,42 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
     }
 
+    [Test]
+    public async Task Can_Remove_Properties_Without_Container()
+    {
+        // Create a content type with a property that has no container (no tab/group).
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
+        var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty");
+        createModel.Properties = new[] { propertyType };
+
+        var contentTypeCreateAttempt = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeCreateAttempt.Success);
+        Assert.IsNotNull(contentTypeCreateAttempt.Result);
+
+        // Verify the property was created without a container (should be in NoGroupPropertyTypes).
+        var contentType = contentTypeCreateAttempt.Result;
+        Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
+        Assert.AreEqual("testProperty", contentType.NoGroupPropertyTypes.Single().Alias);
+        Assert.AreEqual(0, contentType.PropertyGroups.Count);
+
+        // Update the content type removing the property.
+        var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
+        updateModel.Properties = Array.Empty<ContentTypePropertyTypeModel>();
+
+        var contentTypeUpdateAttempt = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeUpdateAttempt.Success);
+        Assert.IsNotNull(contentTypeUpdateAttempt.Result);
+
+        // Ensure it's actually persisted - retrieve from database to verify deletion.
+        contentType = await ContentTypeService.GetAsync(contentTypeUpdateAttempt.Result.Key);
+
+        Assert.IsNotNull(contentType);
+        Assert.IsTrue(contentType.IsElement);
+        Assert.AreEqual(0, contentType.PropertyGroups.Count);
+        Assert.AreEqual(0, contentType.PropertyTypes.Count());
+        Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public async Task Can_Edit_Properties(bool isElement)
