@@ -1,29 +1,11 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class WebhookFactory
 {
-    public static Webhook BuildEntity(WebhookDto dto, IEnumerable<Webhook2ContentTypeKeysDto>? entityKey2WebhookDtos = null, IEnumerable<Webhook2EventsDto>? event2WebhookDtos = null, IEnumerable<Webhook2HeadersDto>? headersWebhookDtos = null)
-    {
-        var entity = new Webhook(
-            dto.Url,
-            dto.Enabled,
-            entityKey2WebhookDtos?.Select(x => x.ContentTypeKey).ToArray(),
-            event2WebhookDtos?.Select(x => x.Event).ToArray(),
-            headersWebhookDtos?.ToDictionary(x => x.Key, x => x.Value))
-        {
-            Id = dto.Id,
-            Key = dto.Key,
-            Name = dto.Name,
-            Description = dto.Description,
-        };
-
-        return entity;
-    }
-
-    public static Webhook BuildEntity(Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto dto) =>
+    public static Webhook BuildEntity(WebhookDto dto) =>
         new(
             dto.Url,
             dto.Enabled,
@@ -47,6 +29,9 @@ internal static class WebhookFactory
             Description = webhook.Description,
             Url = webhook.Url,
             Enabled = webhook.Enabled,
+            Webhook2ContentTypeKeys = BuildEntityKey2WebhookDto(webhook).ToList(),
+            Webhook2Events = BuildEvent2WebhookDto(webhook).ToList(),
+            Webhook2Headers = BuildHeaders2WebhookDtos(webhook).ToList(),
         };
 
         return dto;
