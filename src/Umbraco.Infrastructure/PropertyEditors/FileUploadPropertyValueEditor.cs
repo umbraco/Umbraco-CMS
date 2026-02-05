@@ -28,8 +28,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     to be disposable in order to properly clean up resources such as
 ///     the settings change subscription and avoid a memory leak.
 /// </remarks>
-internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
+public class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
 {
+    private bool _disposed;
+
     private readonly MediaFileManager _mediaFileManager;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
@@ -38,7 +40,6 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
 
     private ContentSettings _contentSettings;
     private readonly IDisposable? _contentSettingsChangeSubscription;
-
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
@@ -220,11 +221,36 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     /// Provides media path.
     /// </summary>
     /// <returns>File system relative path</returns>
-    private string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
+    protected virtual string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
     {
         // in case we are using the old path scheme, try to re-use numbers (bah...)
         return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
 
-    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
+    /// <summary>
+    /// Disposes the object.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Disposes the object.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _contentSettingsChangeSubscription?.Dispose();
+        }
+
+        _disposed = true;
+    }
 }

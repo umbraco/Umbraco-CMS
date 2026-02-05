@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 /// Provides base class for notification handler that processes file uploads when a content entity is deleted or media
 /// operations are carried out, processing the associated files.
 /// </summary>
-internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNotificationHandlerBase,
+public class FileUploadContentDeletedNotificationHandler : FileUploadNotificationHandlerBase,
     INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<ContentDeletedBlueprintNotification>,
     INotificationHandler<MediaDeletedNotification>,
