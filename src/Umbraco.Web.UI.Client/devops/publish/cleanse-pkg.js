@@ -10,8 +10,35 @@ const packageJson = JSON.parse(readFileSync(packageFile, 'utf8'));
 // Remove all DevDependencies
 delete packageJson.devDependencies;
 
-// Rename dependencies to peerDependencies
-packageJson.peerDependencies = { ...packageJson.dependencies };
+// Convert version to a looser range that allows plugin developers to use newer versions
+// while still enforcing a minimum version and safety ceiling
+const looseVersionRange = (version) => {
+	// Parse semantic version
+	const match = version.match(/^(0|[1-9]\d*)\.(\d+)\.(\d+)(-.*)?(\+.*)?$/);
+	if (!match) {
+		console.warn('Could not parse version:', version, 'keeping original');
+		return version;
+	}
+
+	const major = match[1];
+	const minor = match[2];
+	const patch = match[3];
+
+	// For pre-release (0.x.y), use floor at current version and ceiling at 1.0.0
+	if (major === '0') {
+		return `>=${major}.${minor}.${patch} <1.0.0`;
+	}
+
+	// For stable versions (1.x.y+), use major.x.x to allow any patch/minor within that major
+	return `${major}.x.x`;
+};
+
+// Rename dependencies to peerDependencies with looser version ranges
+packageJson.peerDependencies = {};
+Object.entries(packageJson.dependencies || {}).forEach(([key, value]) => {
+	packageJson.peerDependencies[key] = looseVersionRange(value);
+	console.log('Converting to peer dependency:', key, 'from', value, 'to', packageJson.peerDependencies[key]);
+});
 delete packageJson.dependencies;
 
 // Iterate all workspaces and hoist the dependencies to the root package.json
@@ -36,8 +63,9 @@ const workspacePromises = workspaces.map(async workspaceGlob => {
 		// Move dependencies from the workspace to the root package.json
 		if (workspacePackageJson.dependencies) {
 			Object.entries(workspacePackageJson.dependencies).forEach(([key, value]) => {
-				console.log('Hoisting dependency:', key, 'from workspace:', workspace, 'with version:', value);
-				packageJson.peerDependencies[key] = value;
+				const loosenedVersion = looseVersionRange(value);
+				console.log('Hoisting dependency:', key, 'from workspace:', workspace, 'with version:', value, 'loosened to:', loosenedVersion);
+				packageJson.peerDependencies[key] = loosenedVersion;
 			});
 		}
 	})
