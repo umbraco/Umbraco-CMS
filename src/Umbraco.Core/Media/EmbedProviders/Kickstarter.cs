@@ -17,7 +17,7 @@ public class Kickstarter : OEmbedProviderBase
     }
 
     /// <inheritdoc/>
-    public override string ApiEndpoint => "http://www.kickstarter.com/services/oembed";
+    public override string ApiEndpoint => "https://www.kickstarter.com/services/oembed";
 
     /// <inheritdoc/>
     public override string[] UrlSchemeRegex => [@"^https?:\/\/(www\.)?kickstarter\.com\/projects\/"];

@@ -17,7 +17,7 @@ public class Hulu : OEmbedProviderBase
     }
 
     /// <inheritdoc/>
-    public override string ApiEndpoint => "http://www.hulu.com/api/oembed.json";
+    public override string ApiEndpoint => "https://www.hulu.com/api/oembed.json";
 
     /// <inheritdoc/>
     public override string[] UrlSchemeRegex => [@"^https?:\/\/(www\.)?hulu\.com\/watch\/"];

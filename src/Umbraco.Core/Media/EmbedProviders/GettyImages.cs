@@ -17,11 +17,13 @@ public class GettyImages : OEmbedProviderBase
     }
 
     /// <inheritdoc/>
-    public override string ApiEndpoint => "http://embed.gettyimages.com/oembed";
+    public override string ApiEndpoint => "https://embed.gettyimages.com/oembed";
 
-    // http://gty.im/74917285
-    // http://www.gettyimages.com/detail/74917285
     /// <inheritdoc/>
+    /// <example>
+    /// https://gty.im/74917285
+    /// https://www.gettyimages.com/detail/74917285
+    /// </example>
     public override string[] UrlSchemeRegex =>
     [
         @"^https?:\/\/(www\.)?gty\.im\/",
