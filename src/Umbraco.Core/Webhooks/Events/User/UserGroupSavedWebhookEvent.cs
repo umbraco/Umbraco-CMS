@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a user group is saved.
+/// </summary>
 [WebhookEvent("User Group Saved")]
 public class UserGroupSavedWebhookEvent : WebhookEventBase<UserGroupSavedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserGroupSavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public UserGroupSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class UserGroupSavedWebhookEvent : WebhookEventBase<UserGroupSavedNotific
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserGroupSaved;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(UserGroupSavedNotification notification)
         => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

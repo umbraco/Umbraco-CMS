@@ -2,6 +2,9 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains OAuth claim type constants.
+    /// </summary>
     public static class OAuthClaims
     {
         /// <summary>

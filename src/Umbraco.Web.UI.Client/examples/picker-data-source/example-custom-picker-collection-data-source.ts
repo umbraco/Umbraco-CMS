@@ -18,10 +18,13 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource
 	collectionPickableFilter = (item: ExampleCollectionItemModel) => item.isPickable;
 
 	async requestCollection(args: UmbCollectionFilterModel) {
-		// TODO: use args to filter/paginate etc
-		console.log(args);
+		const skip = args.skip ?? 0;
+		const take = args.take ?? 100;
+
+		const paginatedItems = customItems.slice(skip, skip + take);
+
 		const data = {
-			items: customItems,
+			items: paginatedItems,
 			total: customItems.length,
 		};
 
@@ -34,12 +37,15 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource
 	}
 
 	async search(args: UmbSearchRequestArgs) {
-		const items = customItems.filter((item) => item.name?.toLowerCase().includes(args.query.toLowerCase()));
-		const total = items.length;
+		const skip = args.paging?.skip ?? 0;
+		const take = args.paging?.take ?? 100;
+
+		const filteredItems = customItems.filter((item) => item.name?.toLowerCase().includes(args.query.toLowerCase()));
+		const paginatedItems = filteredItems.slice(skip, skip + take);
 
 		const data = {
-			items,
-			total,
+			items: paginatedItems,
+			total: filteredItems.length,
 		};
 
 		return { data };
@@ -81,6 +87,76 @@ const customItems: Array<ExampleCollectionItemModel> = [
 		unique: '5',
 		entityType: 'example',
 		name: 'Example 5',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '6',
+		entityType: 'example',
+		name: 'Example 6',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '7',
+		entityType: 'example',
+		name: 'Example 7',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '8',
+		entityType: 'example',
+		name: 'Example 8',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '9',
+		entityType: 'example',
+		name: 'Example 9',
+		icon: 'icon-shape-triangle blue',
+		isPickable: false,
+	},
+	{
+		unique: '10',
+		entityType: 'example',
+		name: 'Example 10',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '11',
+		entityType: 'example',
+		name: 'Example 11',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '12',
+		entityType: 'example',
+		name: 'Example 12',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '13',
+		entityType: 'example',
+		name: 'Example 13',
+		icon: 'icon-shape-triangle blue',
+		isPickable: true,
+	},
+	{
+		unique: '14',
+		entityType: 'example',
+		name: 'Example 14',
+		icon: 'icon-shape-triangle blue',
+		isPickable: false,
+	},
+	{
+		unique: '15',
+		entityType: 'example',
+		name: 'Example 15',
 		icon: 'icon-shape-triangle blue',
 		isPickable: true,
 	},

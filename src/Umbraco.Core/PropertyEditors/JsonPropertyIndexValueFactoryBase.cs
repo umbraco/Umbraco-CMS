@@ -15,6 +15,9 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     private readonly IJsonSerializer _jsonSerializer;
     private IndexingSettings _indexingSettings;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to force explicit indexing of each nested property.
+    /// </summary>
     protected bool ForceExplicitlyIndexEachNestedProperty { get; set; }
 
     /// <summary>
@@ -27,6 +30,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         indexingSettings.OnChange(newValue => _indexingSettings = newValue);
     }
 
+    /// <inheritdoc />
     public virtual IEnumerable<IndexValue> GetIndexValues(
         IProperty property,
         string? culture,

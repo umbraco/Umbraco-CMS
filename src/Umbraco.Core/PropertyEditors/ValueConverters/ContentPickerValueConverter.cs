@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+///     Provides property value conversion for content picker properties.
+/// </summary>
 public class ContentPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
@@ -20,6 +23,11 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IApiContentBuilder _apiContentBuilder;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPickerValueConverter" /> class.
+    /// </summary>
+    /// <param name="publishedContentCache">The published content cache.</param>
+    /// <param name="apiContentBuilder">The API content builder.</param>
     public ContentPickerValueConverter(
         IPublishedContentCache publishedContentCache,
         IApiContentBuilder apiContentBuilder)
@@ -28,15 +36,19 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         _apiContentBuilder = apiContentBuilder;
     }
 
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IPublishedContent);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Elements;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
@@ -71,18 +83,23 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         return null;
     }
 
+    /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         IPublishedContent? content = GetContent(propertyType, inter);
         return content ?? inter;
     }
 
+    /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
+    /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
+    /// <inheritdoc />
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
 
+    /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         IPublishedContent? content = GetContent(propertyType, inter);

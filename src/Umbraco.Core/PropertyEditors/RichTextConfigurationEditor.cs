@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -10,6 +10,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class RichTextConfigurationEditor : ConfigurationEditor<RichTextConfiguration>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RichTextConfigurationEditor"/> class.
+    /// </summary>
+    /// <param name="ioHelper">The IO helper.</param>
     public RichTextConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {

@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="ClaimsIdentity"/> and <see cref="IIdentity"/>.
+/// </summary>
 public static class ClaimsIdentityExtensions
 {
     private static string? _authenticationType;
@@ -37,6 +40,12 @@ public static class ClaimsIdentityExtensions
         ClaimTypes.Locality, Constants.Security.SecurityStampClaimType,
     };
 
+    /// <summary>
+    /// Gets the user ID from the identity, converted to the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type to convert the user ID to.</typeparam>
+    /// <param name="identity">The identity.</param>
+    /// <returns>The user ID converted to the specified type, or the default value if not found or conversion fails.</returns>
     public static T? GetUserId<T>(this IIdentity identity)
     {
         var strId = identity.GetUserId();
@@ -119,6 +128,12 @@ public static class ClaimsIdentityExtensions
         return username;
     }
 
+    /// <summary>
+    /// Gets the email address from the identity.
+    /// </summary>
+    /// <param name="identity">The identity.</param>
+    /// <returns>The email address if found; otherwise, null.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when identity is null.</exception>
     public static string? GetEmail(this IIdentity identity)
     {
         if (identity == null)

@@ -4,6 +4,12 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Sync;
 
+/// <summary>
+/// Represents an instruction to refresh or remove items in a distributed cache.
+/// </summary>
+/// <remarks>
+/// This class is serializable and used for distributed cache synchronization across servers.
+/// </remarks>
 [Serializable]
 [DataContract]
 public class RefreshInstruction
@@ -129,8 +135,26 @@ public class RefreshInstruction
     [DataMember]
     public string? JsonPayload { get; set; }
 
+    /// <summary>
+    /// Determines whether two <see cref="RefreshInstruction"/> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instruction to compare.</param>
+    /// <param name="right">The second instruction to compare.</param>
+    /// <returns><c>true</c> if the instructions are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(RefreshInstruction left, RefreshInstruction right) => Equals(left, right);
 
+    /// <summary>
+    /// Creates refresh instructions based on the specified message type and parameters.
+    /// </summary>
+    /// <param name="refresher">The cache refresher that will handle the instruction.</param>
+    /// <param name="jsonSerializer">The JSON serializer for serializing IDs.</param>
+    /// <param name="messageType">The type of refresh message.</param>
+    /// <param name="ids">The collection of IDs to refresh or remove.</param>
+    /// <param name="idType">The type of the IDs (int or Guid).</param>
+    /// <param name="json">Optional JSON payload data.</param>
+    /// <returns>A collection of refresh instructions.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when idType is null for ID-based operations.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when messageType is not supported.</exception>
     public static IEnumerable<RefreshInstruction> GetInstructions(
         ICacheRefresher refresher,
         IJsonSerializer jsonSerializer,
@@ -185,6 +209,7 @@ public class RefreshInstruction
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? other)
     {
         if (other is null)
@@ -205,6 +230,11 @@ public class RefreshInstruction
         return Equals((RefreshInstruction)other);
     }
 
+    /// <summary>
+    /// Determines whether the specified <see cref="RefreshInstruction"/> is equal to this instance.
+    /// </summary>
+    /// <param name="other">The instruction to compare with this instance.</param>
+    /// <returns><c>true</c> if the instructions are equal; otherwise, <c>false</c>.</returns>
     protected bool Equals(RefreshInstruction other) =>
         RefreshType == other.RefreshType
         && RefresherId.Equals(other.RefresherId)
@@ -213,6 +243,7 @@ public class RefreshInstruction
         && string.Equals(JsonIds, other.JsonIds)
         && string.Equals(JsonPayload, other.JsonPayload);
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -227,5 +258,11 @@ public class RefreshInstruction
         }
     }
 
+    /// <summary>
+    /// Determines whether two <see cref="RefreshInstruction"/> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instruction to compare.</param>
+    /// <param name="right">The second instruction to compare.</param>
+    /// <returns><c>true</c> if the instructions are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(RefreshInstruction left, RefreshInstruction right) => Equals(left, right) == false;
 }

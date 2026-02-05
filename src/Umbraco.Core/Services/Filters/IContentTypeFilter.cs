@@ -10,6 +10,7 @@ public interface IContentTypeFilter
     /// <summary>
     /// Filters the content types retrieved for being allowed at the root.
     /// </summary>
+    /// <typeparam name="TItem">The type of content type, which must implement <see cref="IContentTypeComposition"/>.</typeparam>
     /// <param name="contentTypes">Retrieved collection of content types.</param>
     /// <returns>Filtered collection of content types.</returns>
     Task<IEnumerable<TItem>> FilterAllowedAtRootAsync<TItem>(IEnumerable<TItem> contentTypes)

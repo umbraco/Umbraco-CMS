@@ -7,6 +7,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 public class HybridVariationContextAccessor : HybridAccessorBase<VariationContext>, IVariationContextAccessor
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HybridVariationContextAccessor"/> class.
+    /// </summary>
+    /// <param name="requestCache">The request cache.</param>
     public HybridVariationContextAccessor(IRequestCache requestCache)
         : base(requestCache)
     {
