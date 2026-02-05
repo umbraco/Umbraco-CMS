@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -197,6 +198,9 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType)
         => ContentBaseFactory.BuildEntity(entityDto, contentType);
+
+    protected override void OnUowRefreshedEntity(IContent entity)
+        => OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
 
     #region Repository Base
 

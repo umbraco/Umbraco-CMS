@@ -1037,12 +1037,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         }
 
         // trigger here, before we reset Published etc
-        // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-        // TODO: ELEMENTS: implement
-        if (entity is IContent tempContent2)
-        {
-            OnUowRefreshedEntity(new ContentRefreshNotification(tempContent2, new EventMessages()));
-        }
+        OnUowRefreshedEntity(entity);
 
         // flip the entity's published property
         // this also flips its published state
@@ -1302,12 +1297,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         }
 
         // trigger here, before we reset Published etc
-        // TODO: ELEMENTS: handle this by abstraction, not by hardcoding
-        // TODO: ELEMENTS: implement
-        if (entity is IContent tempContent2)
-        {
-            OnUowRefreshedEntity(new ContentRefreshNotification(tempContent2, new EventMessages()));
-        }
+        OnUowRefreshedEntity(entity);
 
         if (!isMoving)
         {
@@ -1422,6 +1412,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     }
 
     protected abstract TEntityDto BuildEntityDto(TEntity entity);
+
+    protected abstract void OnUowRefreshedEntity(TEntity entity);
 
     #endregion
 

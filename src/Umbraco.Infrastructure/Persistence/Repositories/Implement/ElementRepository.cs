@@ -87,6 +87,11 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
     protected override IElement BuildEntity(ElementDto entityDto, IContentType? contentType)
         => ContentBaseFactory.BuildEntity(entityDto, contentType);
 
+    protected override void OnUowRefreshedEntity(IElement entity)
+    {
+        // TODO ELEMENTS: implement this for elements
+    }
+
     #region Repository Base
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Element;
