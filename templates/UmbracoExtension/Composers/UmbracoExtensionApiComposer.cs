@@ -43,8 +43,8 @@ public class UmbracoExtensionApiComposer : IComposer
                 // Enable Umbraco authentication for the "Example" Swagger document
                 options.AddBackofficeSecurityRequirements();
 
-                // This is used to generate nice operation IDs in our swagger json file
-                // So that the generated TypeScript client has nice method names and not too verbose
+                // This is used to generate operation IDs in our OpenAPI JSON file so that the generated 
+                // TypeScript client has nice method names which are not too verbose.
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/umbraco-schema-and-operation-ids#operation-ids
                 options.AddOperationTransformer((operation, context, _) =>
                 {

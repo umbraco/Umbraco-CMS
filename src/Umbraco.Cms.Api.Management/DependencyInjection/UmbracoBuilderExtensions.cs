@@ -119,7 +119,8 @@ public static partial class UmbracoBuilderExtensions
     private static void ReplaceOpenApiSchemaService(this IServiceCollection serviceCollection)
     {
         ServiceDescriptor serviceDescriptor = serviceCollection
-            .First(x => x.ServiceType.Name == "OpenApiSchemaService" && Equals(x.ServiceKey, ManagementApiConfiguration.ApiName));
+            .FirstOrDefault(x => x.ServiceType.Name == "OpenApiSchemaService" && Equals(x.ServiceKey, ManagementApiConfiguration.ApiName))
+            ?? throw new InvalidOperationException("Could not find the OpenApiSchemaService when replacing the registered implementation with one created with the management API JSON options.");
 
         serviceCollection.Remove(serviceDescriptor);
         serviceCollection.Add(
