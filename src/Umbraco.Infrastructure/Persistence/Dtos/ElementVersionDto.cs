@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal sealed class ElementVersionDto : IContentVersionDto
+public sealed class ElementVersionDto : IContentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ElementVersion;
 

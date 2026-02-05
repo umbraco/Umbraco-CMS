@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey(IPublishableContentDto<ElementVersionDto>.Columns.NodeId, AutoIncrement = false)]
 [ExplicitColumns]
-internal sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
+public sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.Element;
 
