@@ -5,7 +5,6 @@ import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@u
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { UmbTreeItemModel } from '../../types.js';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
 	override async execute() {
