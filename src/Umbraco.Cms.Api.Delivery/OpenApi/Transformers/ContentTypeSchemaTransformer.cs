@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Api.Delivery.OpenApi.Extensions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -18,13 +19,57 @@ namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 /// <summary>
 /// Transforms the OpenAPI document to add schemas for the instance's document types.
 /// </summary>
-public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiDocumentTransformer
+/// <remarks>
+/// <para>
+/// This transformer implements both <see cref="IOpenApiSchemaTransformer"/> and <see cref="IOpenApiDocumentTransformer"/>
+/// to handle schema generation in two phases:
+/// </para>
+/// <para>
+/// <b>Phase 1 - Schema Transformation:</b> When the schema transformer encounters types like
+/// <see cref="IApiContentResponse"/> or <see cref="IApiMediaWithCrops"/>, it generates content-type-specific
+/// schemas (e.g., "ArticleContentResponseModel") and registers them as components in the OpenAPI document.
+/// </para>
+/// <para>
+/// <b>Circular Reference Handling:</b> Content type schemas can reference each other (e.g., a "Page"
+/// might have a property of type "Article", which might reference "Page" again). To prevent infinite recursion
+/// during schema generation, we use a placeholder pattern:
+/// <list type="bullet">
+///   <item>When generating a schema, we track its ID in <c>_handledSchemas</c></item>
+///   <item>If we encounter the same schema ID again (circular reference), we return a temporary placeholder
+///   schema with metadata marking it for later replacement</item>
+///   <item>The placeholder contains a <c>x-recursive-ref</c> metadata key with the target schema ID</item>
+/// </list>
+/// </para>
+/// <para>
+/// <b>Phase 2 - Document Transformation:</b> After all schemas are generated, the document transformer
+/// runs and replaces all placeholder schemas with proper <c>$ref</c> references to the actual schemas.
+/// This is done by <see cref="ReplacePlaceholderSchemas(OpenApiDocument, IOpenApiSchema)"/> which recursively walks through all schemas
+/// and substitutes placeholders with <see cref="OpenApiSchemaReference"/> instances.
+/// </para>
+/// </remarks>
+public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiDocumentTransformer
 {
-    private const string CustomRecursiveRefKey = "x-recursive-ref";
+    // Metadata keys
+    private const string RecursiveRefMetadataKey = "x-recursive-ref";
+    private const string SchemaIdMetadataKey = "x-schema-id";
+
+    // Schema ID suffixes
+    private const string ContentResponseModelSuffix = "ContentResponseModel";
+    private const string ContentModelSuffix = "ContentModel";
+    private const string ElementModelSuffix = "ElementModel";
+    private const string MediaWithCropsResponseModelSuffix = "MediaWithCropsResponseModel";
+    private const string MediaWithCropsModelSuffix = "MediaWithCropsModel";
+    private const string PropertiesModelSuffix = "PropertiesModel";
+
     private readonly IContentTypeSchemaService _contentTypeSchemaService;
     private readonly ILogger<ContentTypeSchemaTransformer> _logger;
-    private readonly HashSet<string> _handledSchemas = [];
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
+
+    /// <summary>
+    /// Tracks schema IDs that have been or are being generated to detect circular references.
+    /// When a schema ID is encountered a second time, a placeholder is returned instead of recursing infinitely.
+    /// </summary>
+    private readonly HashSet<string> _handledSchemas = [];
     private readonly JsonSerializerOptions _serializerOptions;
 
     /// <summary>
@@ -46,6 +91,12 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         _jsonTypeInfoResolver = _serializerOptions.TypeInfoResolver
                                 ?? throw new InvalidOperationException("The JSON serializer options must have a TypeInfoResolver configured.");
     }
+
+    private IReadOnlyCollection<ContentTypeSchemaInfo> DocumentTypes
+        => field ??= _contentTypeSchemaService.GetDocumentTypes();
+
+    private IReadOnlyCollection<ContentTypeSchemaInfo> MediaTypes
+        => field ??= _contentTypeSchemaService.GetMediaTypes();
 
     /// <inheritdoc />
     public Task TransformAsync(
@@ -79,11 +130,17 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Content,
-                    _contentTypeSchemaService.GetDocumentTypes().Where(c => !c.IsElement).ToList(),
-                    async contentType =>
+                    DocumentTypes.Where(c => !c.IsElement),
+                    async (contentType, derivedTypeSchemas) =>
                     {
-                        var schemaId = $"{contentType.SchemaId}ContentResponseModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Content, contentType, context, cancellationToken));
+                        var schemaId = $"{contentType.SchemaId}{ContentResponseModelSuffix}";
+                        return await CreateContentTypeSchema(
+                            schemaId,
+                            PublishedItemType.Content,
+                            contentType,
+                            derivedTypeSchemas,
+                            context,
+                            cancellationToken);
                     },
                     cancellationToken);
                 return;
@@ -92,11 +149,17 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Content,
-                    _contentTypeSchemaService.GetDocumentTypes().Where(c => !c.IsElement).ToList(),
-                    async contentType =>
+                    DocumentTypes.Where(c => !c.IsElement),
+                    async (contentType, derivedTypeSchemas) =>
                     {
-                        var schemaId = $"{contentType.SchemaId}ContentModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Content, contentType, context, cancellationToken));
+                        var schemaId = $"{contentType.SchemaId}{ContentModelSuffix}";
+                        return await CreateContentTypeSchema(
+                            schemaId,
+                            PublishedItemType.Content,
+                            contentType,
+                            derivedTypeSchemas,
+                            context,
+                            cancellationToken);
                     },
                     cancellationToken);
                 return;
@@ -105,11 +168,17 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Content,
-                    _contentTypeSchemaService.GetDocumentTypes().Where(c => c.IsElement).ToList(),
-                    async contentType =>
+                    DocumentTypes.Where(c => c.IsElement),
+                    async (contentType, derivedTypeSchemas) =>
                     {
-                        var schemaId = $"{contentType.SchemaId}ElementModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Content, contentType, context, cancellationToken));
+                        var schemaId = $"{contentType.SchemaId}{ElementModelSuffix}";
+                        return await CreateContentTypeSchema(
+                            schemaId,
+                            PublishedItemType.Content,
+                            contentType,
+                            derivedTypeSchemas,
+                            context,
+                            cancellationToken);
                     },
                     cancellationToken);
                 return;
@@ -118,11 +187,17 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Media,
-                    _contentTypeSchemaService.GetMediaTypes().ToList(),
-                    async contentType =>
+                    MediaTypes,
+                    async (contentType, derivedTypeSchemas) =>
                     {
-                        var schemaId = $"{contentType.SchemaId}MediaWithCropsResponseModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Media, contentType, context, cancellationToken));
+                        var schemaId = $"{contentType.SchemaId}{MediaWithCropsResponseModelSuffix}";
+                        return await CreateContentTypeSchema(
+                            schemaId,
+                            PublishedItemType.Media,
+                            contentType,
+                            derivedTypeSchemas,
+                            context,
+                            cancellationToken);
                     },
                     cancellationToken);
                 return;
@@ -131,11 +206,17 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Media,
-                    _contentTypeSchemaService.GetMediaTypes().ToList(),
-                    async contentType =>
+                    MediaTypes,
+                    async (contentType, derivedTypeSchemas) =>
                     {
-                        var schemaId = $"{contentType.SchemaId}MediaWithCropsModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Media, contentType, context, cancellationToken));
+                        var schemaId = $"{contentType.SchemaId}{MediaWithCropsModelSuffix}";
+                        return await CreateContentTypeSchema(
+                            schemaId,
+                            PublishedItemType.Media,
+                            contentType,
+                            derivedTypeSchemas,
+                            context,
+                            cancellationToken);
                     },
                     cancellationToken);
                 return;
@@ -146,8 +227,8 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         OpenApiSchema schema,
         OpenApiSchemaTransformerContext context,
         PublishedItemType itemType,
-        List<ContentTypeSchemaInfo> contentTypes,
-        Func<ContentTypeSchemaInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper,
+        IEnumerable<ContentTypeSchemaInfo> contentTypes,
+        Func<ContentTypeSchemaInfo, List<IOpenApiSchema>, Task<OpenApiSchemaReference>> contentTypeSchemaMapper,
         CancellationToken cancellationToken)
     {
         List<IOpenApiSchema> derivedTypeSchemas = [];
@@ -169,9 +250,8 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
 
         foreach (ContentTypeSchemaInfo contentType in contentTypes)
         {
-            (var contentTypeSchemaId, OpenApiSchema contentTypeSchema) = await contentTypeSchemaMapper(contentType);
-            contentTypeSchema.AllOf = derivedTypeSchemas;
-            schema.Discriminator.Mapping[contentType.Alias] = new OpenApiSchemaReference(contentTypeSchemaId, context.Document);
+            OpenApiSchemaReference contentTypeSchema = await contentTypeSchemaMapper(contentType, derivedTypeSchemas);
+            schema.Discriminator.Mapping[contentType.Alias] = contentTypeSchema;
             schema.OneOf.Add(contentTypeSchema);
         }
 
@@ -222,35 +302,37 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         }
         catch (Exception ex)
         {
+            // Log the error but continue with a fallback schema to avoid failing the entire document generation.
+            // The fallback schema includes a description indicating the failure, making it visible to API consumers.
             _logger.LogError(ex, "Failed to create OpenAPI schema for type {TypeName}", jsonTypeInfo.Type.FullName);
-            schema = new OpenApiSchema();
+            schema = new OpenApiSchema
+            {
+                Description = $"[Schema generation failed for type '{jsonTypeInfo.Type.FullName}'. See server logs for details.]",
+            };
         }
 
         configureSchema?.Invoke(schema);
-        return schema;
+
+        if (schemaId is null)
+        {
+            return schema;
+        }
+
+        OpenApiDocument document = context.GetRequiredDocument();
+        document.AddComponent(schemaId, schema);
+        return new OpenApiSchemaReference(schemaId, document);
     }
 
-    private static string? GetSchemaId(JsonTypeInfo type)
-        => ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(type);
-
-    private static OpenApiSchema GetPlaceholderSchema(string schemaId)
-        => new()
-        {
-            Metadata = new Dictionary<string, object>
-            {
-                [CustomRecursiveRefKey] = schemaId,
-            },
-        };
-
-    private async Task<OpenApiSchema> CreateContentTypeSchema(
+    private async Task<OpenApiSchemaReference> CreateContentTypeSchema(
         string schemaId,
         PublishedItemType itemType,
         ContentTypeSchemaInfo contentType,
+        List<IOpenApiSchema> derivedTypeSchemas,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken)
     {
         var typePropertyName = GetTypePropertyName(itemType);
-        return new OpenApiSchema
+        var schema = new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
             Properties = new Dictionary<string, IOpenApiSchema>
@@ -260,16 +342,21 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
             },
             Required = new HashSet<string> { typePropertyName },
             AdditionalPropertiesAllowed = false,
-            Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
+            AllOf = derivedTypeSchemas.Count > 0 ? derivedTypeSchemas : null,
+            Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId, },
         };
+
+        OpenApiDocument document = context.GetRequiredDocument();
+        document.AddComponent(schemaId, schema);
+        return new OpenApiSchemaReference(schemaId, document);
     }
 
-    private async Task<IOpenApiSchema> CreatePropertiesSchema(
+    private async Task<OpenApiSchemaReference> CreatePropertiesSchema(
         ContentTypeSchemaInfo contentType,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken)
     {
-        var schemaId = $"{contentType.SchemaId}PropertiesModel";
+        var schemaId = $"{contentType.SchemaId}{PropertiesModelSuffix}";
 
         var propertiesSchema = new OpenApiSchema
         {
@@ -277,13 +364,16 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
             AllOf =
             [
                 ..contentType.CompositionSchemaIds.Select(compositionSchemaId
-                    => GetPlaceholderSchema($"{compositionSchemaId}PropertiesModel"))
+                    => GetPlaceholderSchema($"{compositionSchemaId}{PropertiesModelSuffix}"))
             ],
             Properties = await ContentTypePropertiesMapper(contentType, context, cancellationToken),
-            Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
+            Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId },
             AdditionalPropertiesAllowed = false,
         };
-        return propertiesSchema;
+
+        OpenApiDocument document = context.GetRequiredDocument();
+        document.AddComponent(schemaId, propertiesSchema);
+        return new OpenApiSchemaReference(schemaId, document);
     }
 
     private async Task<Dictionary<string, IOpenApiSchema>> ContentTypePropertiesMapper(
@@ -294,13 +384,12 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         var properties = new Dictionary<string, IOpenApiSchema>();
         foreach (ContentTypePropertySchemaInfo propertyInfo in contentType.Properties.Where(p => !p.Inherited))
         {
-            IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.DeliveryApiClrType), context, cancellationToken);
-
-            // All properties can be null (e.g., when a property is added but content has not been republished)
-            if (schema is OpenApiSchema openApiSchema && openApiSchema.Type.HasValue)
-            {
-                openApiSchema.Type |= JsonSchemaType.Null;
-            }
+            IOpenApiSchema schema = await CreateSchema(
+                GetJsonTypeInfo(propertyInfo.DeliveryApiClrType),
+                context,
+                cancellationToken,
+                // All properties can be null (e.g., when a property is added but content has not been republished)
+                schema => schema.Type |= JsonSchemaType.Null);
 
             properties[propertyInfo.Alias] = schema;
         }
@@ -314,11 +403,50 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         return jsonTypeInfo ?? throw new InvalidOperationException("Could not get JsonTypeInfo for type " + type.FullName);
     }
 
+    private string GetTypePropertyName(PublishedItemType itemType)
+    {
+        var propertyName = itemType switch
+        {
+            PublishedItemType.Content => nameof(IApiElement.ContentType),
+            PublishedItemType.Media => nameof(IApiMedia.MediaType),
+            _ => throw new NotSupportedException($"Unsupported PublishedItemType: {itemType}"),
+        };
+
+        return _serializerOptions.PropertyNamingPolicy?.ConvertName(propertyName) ?? propertyName;
+    }
+
+    private static string? GetSchemaId(JsonTypeInfo type)
+        => ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(type);
+
     /// <summary>
-    /// Replaces placeholder schemas (that caused circular references) with the actual schemas in the OpenAPI document.
+    /// Creates a temporary placeholder schema to break circular reference chains during schema generation.
     /// </summary>
-    /// <param name="document">The OpenAPI document.</param>
-    /// <param name="schema">The schema to process.</param>
+    /// <remarks>
+    /// The placeholder contains metadata with the target schema ID. During the document transformation phase,
+    /// <see cref="ReplacePlaceholderSchemas(OpenApiDocument, IOpenApiSchema)"/> will replace these placeholders with actual schema references.
+    /// </remarks>
+    /// <param name="schemaId">The ID of the schema this placeholder represents.</param>
+    /// <returns>A placeholder schema with metadata indicating the target schema reference.</returns>
+    private static OpenApiSchema GetPlaceholderSchema(string schemaId)
+        => new()
+        {
+            Metadata = new Dictionary<string, object>
+            {
+                [RecursiveRefMetadataKey] = schemaId,
+            },
+        };
+
+    /// <summary>
+    /// Recursively replaces placeholder schemas with proper <c>$ref</c> references to the actual schemas.
+    /// </summary>
+    /// <remarks>
+    /// This method is called during the document transformation phase (after all schemas have been generated).
+    /// It walks through all schema properties, allOf, oneOf, and anyOf collections, looking for placeholders
+    /// created by <see cref="GetPlaceholderSchema"/>. Each placeholder is replaced with an
+    /// <see cref="OpenApiSchemaReference"/> pointing to the actual schema in the document's components.
+    /// </remarks>
+    /// <param name="document">The OpenAPI document containing the registered schema components.</param>
+    /// <param name="schema">The schema to process (will be modified in place).</param>
     private static void ReplacePlaceholderSchemas(OpenApiDocument document, IOpenApiSchema schema)
     {
         // Replace in allOf, oneOf, anyOf
@@ -378,7 +506,10 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     }
 
     [return: NotNullIfNotNull(nameof(schema))]
-    private static IOpenApiSchema? GetActualSchemaOrReference(OpenApiDocument document, IOpenApiSchema? schema, out bool replaced)
+    private static IOpenApiSchema? GetActualSchemaOrReference(
+        OpenApiDocument document,
+        IOpenApiSchema? schema,
+        out bool replaced)
     {
         if (schema is not OpenApiSchema openApiSchema)
         {
@@ -387,7 +518,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         }
 
         // Check if this is a placeholder schema
-        if (openApiSchema.Metadata?.TryGetValue(CustomRecursiveRefKey, out var recursiveRefIdObj) != true
+        if (openApiSchema.Metadata?.TryGetValue(RecursiveRefMetadataKey, out var recursiveRefIdObj) != true
             || recursiveRefIdObj is not string recursiveRefId)
         {
             replaced = false;
@@ -398,12 +529,4 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         replaced = true;
         return new OpenApiSchemaReference(recursiveRefId, document);
     }
-
-    private static string GetTypePropertyName(PublishedItemType itemType)
-        => itemType switch
-        {
-            PublishedItemType.Content => "contentType",
-            PublishedItemType.Media => "mediaType",
-            _ => throw new NotSupportedException($"Unsupported PublishedItemType: {itemType}"),
-        };
 }
