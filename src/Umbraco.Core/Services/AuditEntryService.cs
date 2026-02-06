@@ -15,6 +15,11 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     /// <summary>
     ///    Initializes a new instance of the <see cref="AuditEntryService" /> class.
     /// </summary>
+    /// <param name="auditEntryRepository">The audit entry repository.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
     public AuditEntryService(
         IAuditEntryRepository auditEntryRepository,
         IUserIdKeyResolver userIdKeyResolver,
@@ -54,7 +59,19 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             eventDetails);
     }
 
-    // This method is used by the AuditService while the AuditService.Write() method is not removed.
+    /// <summary>
+    /// Writes an audit entry using user IDs instead of keys.
+    /// </summary>
+    /// <param name="performingUserId">The ID of the user performing the action.</param>
+    /// <param name="performingDetails">Details about the performing user.</param>
+    /// <param name="performingIp">The IP address of the performing user.</param>
+    /// <param name="eventDateUtc">The UTC date and time of the event.</param>
+    /// <param name="affectedUserId">The ID of the affected user, if any.</param>
+    /// <param name="affectedDetails">Details about the affected user.</param>
+    /// <param name="eventType">The type of event.</param>
+    /// <param name="eventDetails">Details about the event.</param>
+    /// <returns>The created audit entry.</returns>
+    /// <remarks>This method is used by the AuditService while the AuditService.Write() method is not removed.</remarks>
     internal async Task<IAuditEntry> WriteInner(
         int? performingUserId,
         string performingDetails,
@@ -81,6 +98,20 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             eventDetails);
     }
 
+    /// <summary>
+    /// Internal implementation that writes an audit entry with all required data.
+    /// </summary>
+    /// <param name="performingUserId">The ID of the user performing the action.</param>
+    /// <param name="performingUserKey">The key of the user performing the action.</param>
+    /// <param name="performingDetails">Details about the performing user.</param>
+    /// <param name="performingIp">The IP address of the performing user.</param>
+    /// <param name="eventDateUtc">The UTC date and time of the event.</param>
+    /// <param name="affectedUserId">The ID of the affected user, if any.</param>
+    /// <param name="affectedUserKey">The key of the affected user, if any.</param>
+    /// <param name="affectedDetails">Details about the affected user.</param>
+    /// <param name="eventType">The type of event.</param>
+    /// <param name="eventDetails">Details about the event.</param>
+    /// <returns>The created audit entry.</returns>
     private IAuditEntry WriteInner(
         int? performingUserId,
         Guid? performingUserKey,
@@ -160,17 +191,31 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         return entry;
     }
 
+    /// <summary>
+    /// Gets the user ID for a given user key.
+    /// </summary>
+    /// <param name="key">The user key to resolve.</param>
+    /// <returns>The user ID if found; otherwise, <c>null</c>.</returns>
     internal async Task<int?> GetUserId(Guid? key) =>
         key is not null && await _userIdKeyResolver.TryGetAsync(key.Value) is { Success: true } attempt
             ? attempt.Result
             : null;
 
+    /// <summary>
+    /// Gets the user key for a given user ID.
+    /// </summary>
+    /// <param name="id">The user ID to resolve.</param>
+    /// <returns>The user key if found; otherwise, <c>null</c>.</returns>
     internal async Task<Guid?> GetUserKey(int? id) =>
         id is not null && await _userIdKeyResolver.TryGetAsync(id.Value) is { Success: true } attempt
             ? attempt.Result
             : null;
 
-    // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
+    /// <summary>
+    /// Gets all audit entries.
+    /// </summary>
+    /// <returns>A collection of all audit entries.</returns>
+    /// <remarks>Currently used in testing only. This is not part of the interface; queryable methods should be added to the interface instead.</remarks>
     internal IEnumerable<IAuditEntry> GetAll()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))

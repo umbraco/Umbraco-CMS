@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a user is locked.
+/// </summary>
 [WebhookEvent("User Locked")]
 public class UserLockedWebhookEvent : WebhookEventBase<UserLockedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserLockedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public UserLockedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class UserLockedWebhookEvent : WebhookEventBase<UserLockedNotification>
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserLocked;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(UserLockedNotification notification)
         => new DefaultPayloadModel
         {

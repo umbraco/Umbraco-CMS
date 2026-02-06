@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Routing;
+namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides options for configuring <see cref="UmbracoRequestPaths" />.
+/// </summary>
 public class UmbracoRequestPathsOptions
 {
     /// <summary>

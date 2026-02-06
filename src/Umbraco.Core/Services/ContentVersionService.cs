@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for managing content versions, including retrieval, cleanup, and rollback operations.
+/// </summary>
 internal sealed class ContentVersionService : IContentVersionService
 {
     private readonly IAuditService _auditService;
@@ -26,6 +29,19 @@ internal sealed class ContentVersionService : IContentVersionService
     private readonly ILogger<ContentVersionService> _logger;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentVersionService"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="documentVersionRepository">The document version repository.</param>
+    /// <param name="contentVersionCleanupPolicy">The content version cleanup policy.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     public ContentVersionService(
         ILogger<ContentVersionService> logger,
         IDocumentVersionRepository documentVersionRepository,
@@ -57,6 +73,11 @@ internal sealed class ContentVersionService : IContentVersionService
         // Members - ignored
         CleanupDocumentVersions(asAtDate);
 
+    /// <summary>
+    /// Gets a content version by its ID.
+    /// </summary>
+    /// <param name="versionId">The version ID.</param>
+    /// <returns>The content version metadata, or null if not found.</returns>
     public ContentVersionMeta? Get(int versionId)
     {
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
@@ -66,6 +87,7 @@ internal sealed class ContentVersionService : IContentVersionService
         }
     }
 
+    /// <inheritdoc />
     public Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
     {
         IEntitySlim? document = _entityService.Get(contentId, UmbracoObjectTypes.Document);
@@ -91,6 +113,7 @@ internal sealed class ContentVersionService : IContentVersionService
             ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions)));
     }
 
+    /// <inheritdoc />
     public Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId)
     {
         IContent? version = _contentService.GetVersion(versionId.ToInt());
@@ -102,6 +125,7 @@ internal sealed class ContentVersionService : IContentVersionService
         return Task.FromResult(Attempt<IContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version));
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<ContentVersionOperationStatus>> SetPreventCleanupAsync(Guid versionId, bool preventCleanup, Guid userKey)
     {
         ContentVersionMeta? version = Get(versionId.ToInt());
@@ -115,6 +139,7 @@ internal sealed class ContentVersionService : IContentVersionService
         return Attempt<ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<ContentVersionOperationStatus>> RollBackAsync(Guid versionId, string? culture, Guid userKey)
     {
         ContentVersionMeta? version = Get(versionId.ToInt());

@@ -3,21 +3,33 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+///     Provides property value conversion for decimal properties.
+/// </summary>
 [DefaultPropertyValueConverter]
 public class DecimalValueConverter : PropertyValueConverterBase
 {
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => Constants.PropertyEditors.Aliases.Decimal.Equals(propertyType.EditorAlias);
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(decimal);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => ParseDecimalValue(source);
 
+    /// <summary>
+    ///     Parses a source value to a decimal value.
+    /// </summary>
+    /// <param name="source">The source value to parse.</param>
+    /// <returns>The parsed decimal value, or 0 if parsing fails.</returns>
     internal static decimal ParseDecimalValue(object? source)
     {
         if (source == null)

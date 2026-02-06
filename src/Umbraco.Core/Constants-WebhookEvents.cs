@@ -2,8 +2,14 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains constants for webhook events.
+    /// </summary>
     public static class WebhookEvents
     {
+        /// <summary>
+        ///     Contains HTTP header name constants for webhook requests.
+        /// </summary>
         public static class HeaderNames
         {
             /// <summary>
@@ -17,6 +23,9 @@ public static partial class Constants
             public const string RetryCount = "Umb-Webhook-RetryCount";
         }
 
+        /// <summary>
+        ///     Contains webhook event alias constants.
+        /// </summary>
         public static class Aliases
         {
             /// <summary>
@@ -405,6 +414,9 @@ public static partial class Constants
             public const string UserUnlocked = "userUnlocked";
         }
 
+        /// <summary>
+        ///     Contains webhook event type category constants.
+        /// </summary>
         public static class Types
         {
             /// <summary>

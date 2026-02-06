@@ -9,10 +9,17 @@ public class EntityPermissionCollection : HashSet<EntityPermission>
 
     private ISet<string>? _aggregatePermissions;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EntityPermissionCollection" /> class.
+    /// </summary>
     public EntityPermissionCollection()
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EntityPermissionCollection" /> class with the specified collection.
+    /// </summary>
+    /// <param name="collection">The collection of entity permissions to initialize with.</param>
     public EntityPermissionCollection(IEnumerable<EntityPermission> collection)
         : base(collection)
     {
