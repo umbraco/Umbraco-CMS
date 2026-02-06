@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NPoco.DatabaseTypes;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -141,7 +142,12 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
         // Assert
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
+            var db = scope.Database;
+            var sql = db.SqlContext.Sql()
+                .SelectCount()
+                .From<ServerRegistrationDto>();
+            var serverCount = db.ExecuteScalar<int>(sql);
+            Assert.That(serverCount, Is.EqualTo(0));
         }
     }
 
@@ -161,18 +167,19 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             });
         }
 
+        string pF = "@";
         IDbCommand[] commands;
         using (var scope = ScopeProvider.CreateScope())
         {
+            pF = SqlContext.DatabaseType.GetParameterPrefix(ScopeAccessor.AmbientScope.Database.ConnectionString);
             commands = ScopeAccessor.AmbientScope.Database.GenerateBulkInsertCommands(servers.ToArray());
             scope.Complete();
         }
 
         // Assert
-        Assert.That(
-            commands[0].CommandText,
-            Is.EqualTo(
-                "INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isSchedulingPublisher]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
+        var defaultSqlText = $"INSERT INTO {QTab("umbracoServer")} ({QTab("umbracoServer")}.{QCol("address")}, {QTab("umbracoServer")}.{QCol("computerName")}, {QTab("umbracoServer")}.{QCol("registeredDate")}, {QTab("umbracoServer")}.{QCol("lastNotifiedDate")}, {QTab("umbracoServer")}.{QCol("isActive")}, {QTab("umbracoServer")}.{QCol("isSchedulingPublisher")}) VALUES ({pF}0,{pF}1,{pF}2,{pF}3,{pF}4,{pF}5), ({pF}6,{pF}7,{pF}8,{pF}9,{pF}10,{pF}11)";
+
+        Assert.That(commands[0].CommandText, Is.EqualTo(defaultSqlText));
     }
 
     [Test]

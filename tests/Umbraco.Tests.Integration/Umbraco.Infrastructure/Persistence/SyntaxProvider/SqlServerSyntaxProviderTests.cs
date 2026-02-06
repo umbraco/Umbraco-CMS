@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Synta
 [TestFixture]
 internal sealed class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
 {
-    private ISqlContext SqlContext => GetRequiredService<IUmbracoDatabaseFactory>().SqlContext;
     private SqlServerSyntaxProvider GetSqlSyntax() => new(Options.Create(new GlobalSettings()));
 
     private class TestPlan : MigrationPlan
@@ -54,24 +53,10 @@ internal sealed class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             .On<ContentNuDto, NodeDto>(left => left.NodeId, right => right.NodeId)
             .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
 
-        var sqlOutput = SqlContext.SqlSyntax.GetDeleteSubquery("cmsContentNu", "nodeId", subQuery);
+        var sqlOutput = SqlContext.SqlSyntax.GetDeleteSubquery(ContentNuDto.TableName, ContentNuDto.NodeIdColumnName, subQuery);
 
-        string t(string x)
-        {
-            return SqlContext.SqlSyntax.GetQuotedTableName(x);
-        }
 
-        string c(string x)
-        {
-            return SqlContext.SqlSyntax.GetQuotedColumnName(x);
-        }
-
-        string n(string x)
-        {
-            return SqlContext.SqlSyntax.GetQuotedName(x);
-        }
-
-        var expectedSql = @$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT {t("cmsContentNu")}.{c("nodeId")} AS {n("NodeId")} FROM {t("cmsContentNu")} INNER JOIN {t("umbracoNode")} ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")} WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ")
+        var expectedSql = @$"DELETE FROM {QTab(ContentNuDto.TableName)} WHERE {QCol(ContentNuDto.NodeIdColumnName)} IN (SELECT {QCol(ContentNuDto.NodeIdColumnName)} FROM (SELECT DISTINCT {QTab(ContentNuDto.TableName)}.{QCol(ContentNuDto.NodeIdColumnName)} AS {QAli(nameof(ContentNuDto.NodeId))} FROM {QTab(ContentNuDto.TableName)} INNER JOIN {QTab(NodeDto.TableName)} ON {QTab(ContentNuDto.TableName)}.{QCol(ContentNuDto.NodeIdColumnName)} = {QTab(NodeDto.TableName)}.{QCol(NodeDto.PrimaryKeyColumnName)} WHERE (({QTab(NodeDto.TableName)}.{QCol(NodeDto.NodeObjectTypeColumnName)} = @0))) x)".Replace(Environment.NewLine, " ")
                 .Replace("\n", " ").Replace("\r", " ");
         var sqlOutputSql = sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " ");
 
