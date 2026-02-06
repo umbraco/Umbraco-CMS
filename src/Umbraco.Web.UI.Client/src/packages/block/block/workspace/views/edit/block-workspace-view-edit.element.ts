@@ -1,5 +1,7 @@
 import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
+import type UmbBlockElementManager from '../../block-element-manager.js';
+import type { UmbBlockLayoutBaseModel } from '../../../types.js';
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -16,9 +18,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UmbViewController } from '@umbraco-cms/backoffice/view';
-import type UmbBlockElementManager from '../../block-element-manager.js';
-import { throttleTime } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbBlockLayoutBaseModel } from '../../../types.js';
 
 @customElement('umb-block-workspace-view-edit')
 export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -178,11 +177,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
 			}
 
-			console.log('setup view with parent as', this.#blockManager.view);
-			view.hints.hints.subscribe((hints) => {
-				console.log('view:', viewAlias, hints);
-			});
-
 			view.setTitle(tabName);
 			view.inheritFrom(this.#blockManager.view);
 
@@ -282,6 +276,9 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 				display: block;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
+			}
+			umb-badge {
+				--uui-badge-inset: 0 0 auto auto;
 			}
 		`,
 	];

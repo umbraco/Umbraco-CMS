@@ -84,10 +84,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			[],
 		);
 
-		this.view.hints.hints.subscribe((hints) => {
-			console.log('manager', workspaceViewAlias, hints);
-		});
-
 		// Ugly, but we just inherit these from the workspace context: [NL]
 		this.name = host.name;
 
