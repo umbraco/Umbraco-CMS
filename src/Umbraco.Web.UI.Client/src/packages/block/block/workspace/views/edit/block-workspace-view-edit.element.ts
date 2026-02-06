@@ -15,7 +15,10 @@ import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { UmbViewController, UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
+import { UmbViewController } from '@umbraco-cms/backoffice/view';
+import type UmbBlockElementManager from '../../block-element-manager.js';
+import { throttleTime } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbBlockLayoutBaseModel } from '../../../types.js';
 
 @customElement('umb-block-workspace-view-edit')
 export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -28,9 +31,9 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		return;
 	}
 	#managerName?: UmbBlockWorkspaceElementManagerNames;
+	#blockManager?: UmbBlockElementManager<UmbBlockLayoutBaseModel>;
 	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
-	#viewContext?: typeof UMB_VIEW_CONTEXT.TYPE;
 
 	@state()
 	private _hasRootProperties = false;
@@ -57,13 +60,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_VIEW_CONTEXT, (context) => {
-			this.#viewContext = context;
-			this.#tabViewContexts.forEach((view) => {
-				view.inheritFrom(this.#viewContext);
-			});
-		});
 
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
@@ -94,6 +90,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 	async #setStructureManager() {
 		if (!this.#blockWorkspace || !this.#managerName) return;
 		const blockManager = this.#blockWorkspace[this.#managerName];
+		this.#blockManager = blockManager;
 		this.#tabsStructureHelper.setStructureManager(blockManager.structure);
 
 		this.observe(
@@ -169,6 +166,9 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 	}
 
 	#createViewContext(viewAlias: string | null, tabName: string) {
+		if (!this.#blockManager) {
+			throw new Error('Block Manager not found');
+		}
 		if (!this.#tabViewContexts.find((context) => context.viewAlias === viewAlias)) {
 			const view = new UmbViewController(this, viewAlias);
 			this.#tabViewContexts.push(view);
@@ -178,8 +178,13 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
 			}
 
+			console.log('setup view with parent as', this.#blockManager.view);
+			view.hints.hints.subscribe((hints) => {
+				console.log('view:', viewAlias, hints);
+			});
+
 			view.setTitle(tabName);
-			view.inheritFrom(this.#viewContext);
+			view.inheritFrom(this.#blockManager.view);
 
 			this.observe(
 				view.firstHintOfVariant,
