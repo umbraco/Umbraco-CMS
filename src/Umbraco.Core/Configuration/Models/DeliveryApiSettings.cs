@@ -84,6 +84,11 @@ public class DeliveryApiSettings
     public OutputCacheSettings OutputCache { get; set; } = new ();
 
     /// <summary>
+    ///     Gets or sets the settings for the Delivery API OpenAPI document.
+    /// </summary>
+    public OpenApiSettings OpenApi { get; set; } = new ();
+
+    /// <summary>
     ///     Gets a value indicating if any member authorization type is enabled for the Delivery API.
     /// </summary>
     /// <remarks>
@@ -253,5 +258,29 @@ public class DeliveryApiSettings
         /// </summary>
         /// <value>The client secret.</value>
         public string ClientSecret { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    ///     Typed configuration options for the OpenAPI document of the Delivery API.
+    /// </summary>
+    public class OpenApiSettings
+    {
+        private const bool StaticGenerateContentTypeSchemas = true;
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the Delivery API OpenAPI document should include
+        ///     schemas for the instance's content types (document types, element types, and media types).
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> to generate content-type-specific schemas in the OpenAPI document;
+        ///     <c>false</c> to use only the base interface schemas.
+        /// </value>
+        /// <remarks>
+        ///     When enabled (default), the OpenAPI document will contain schemas like "ArticleContentResponseModel"
+        ///     for each content type, with their specific properties. When disabled, only the base schemas like
+        ///     "IApiContentResponseModel" will be used.
+        /// </remarks>
+        [DefaultValue(StaticGenerateContentTypeSchemas)]
+        public bool GenerateContentTypeSchemas { get; set; } = StaticGenerateContentTypeSchemas;
     }
 }
