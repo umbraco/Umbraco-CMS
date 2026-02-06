@@ -1,0 +1,4271 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Umbraco Delivery API",
+    "description": "You can find out more about the Umbraco Delivery API in [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api).",
+    "version": "Latest"
+  },
+  "paths": {
+    "/umbraco/delivery/api/v2/content": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "GetContent2.0",
+        "parameters": [
+          {
+            "name": "fetch",
+            "in": "query",
+            "description": "Specifies the content items to fetch. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Select all": {
+                "value": ""
+              },
+              "Select all ancestors of a node by id": {
+                "value": "ancestors:id"
+              },
+              "Select all ancestors of a node by path": {
+                "value": "ancestors:path"
+              },
+              "Select all children of a node by id": {
+                "value": "children:id"
+              },
+              "Select all children of a node by path": {
+                "value": "children:path"
+              },
+              "Select all descendants of a node by id": {
+                "value": "descendants:id"
+              },
+              "Select all descendants of a node by path": {
+                "value": "descendants:path"
+              }
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Defines how to filter the fetched content items. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Default filter": {
+                "value": [
+                  ""
+                ]
+              },
+              "Filter by content type (equals)": {
+                "value": [
+                  "contentType:alias1"
+                ]
+              },
+              "Filter by name (contains)": {
+                "value": [
+                  "name:nodeName"
+                ]
+              },
+              "Filter by creation date (less than)": {
+                "value": [
+                  "createDate<2024-01-01"
+                ]
+              },
+              "Filter by update date (greater than or equal)": {
+                "value": [
+                  "updateDate>:2023-01-01"
+                ]
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Defines how to sort the found content items. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Default sort": {
+                "value": [
+                  ""
+                ]
+              },
+              "Sort by create date": {
+                "value": [
+                  "createDate:asc",
+                  "createDate:desc"
+                ]
+              },
+              "Sort by level": {
+                "value": [
+                  "level:asc",
+                  "level:desc"
+                ]
+              },
+              "Sort by name": {
+                "value": [
+                  "name:asc",
+                  "name:desc"
+                ]
+              },
+              "Sort by sort order": {
+                "value": [
+                  "sortOrder:asc",
+                  "sortOrder:desc"
+                ]
+              },
+              "Sort by update date": {
+                "value": [
+                  "updateDate:asc",
+                  "updateDate:desc"
+                ]
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Specifies the number of found content items to skip. Use this to control pagination of the response.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "Specifies the number of found content items to take. Use this to control pagination of the response.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Defines the language to return. Use this when querying language variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "English culture": {
+                "value": "en-us"
+              }
+            }
+          },
+          {
+            "name": "Accept-Segment",
+            "in": "header",
+            "description": "Defines the segment to return. Use this when querying segment variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "Segment One": {
+                "value": "segment-one"
+              }
+            }
+          },
+          {
+            "name": "Preview",
+            "in": "header",
+            "description": "Whether to request draft content.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Start-Item",
+            "in": "header",
+            "description": "URL segment or GUID of a root content item.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIApiContentResponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/delivery/api/v2/content/item/{id}": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "GetContentItemById2.0",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Defines the language to return. Use this when querying language variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "English culture": {
+                "value": "en-us"
+              }
+            }
+          },
+          {
+            "name": "Accept-Segment",
+            "in": "header",
+            "description": "Defines the segment to return. Use this when querying segment variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "Segment One": {
+                "value": "segment-one"
+              }
+            }
+          },
+          {
+            "name": "Preview",
+            "in": "header",
+            "description": "Whether to request draft content.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Start-Item",
+            "in": "header",
+            "description": "URL segment or GUID of a root content item.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IApiContentResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/delivery/api/v2/content/item/{path}": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "GetContentItemByPath2.0",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Defines the language to return. Use this when querying language variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "English culture": {
+                "value": "en-us"
+              }
+            }
+          },
+          {
+            "name": "Accept-Segment",
+            "in": "header",
+            "description": "Defines the segment to return. Use this when querying segment variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "Segment One": {
+                "value": "segment-one"
+              }
+            }
+          },
+          {
+            "name": "Preview",
+            "in": "header",
+            "description": "Whether to request draft content.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Start-Item",
+            "in": "header",
+            "description": "URL segment or GUID of a root content item.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IApiContentResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/delivery/api/v2/content/items": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "GetContentItems2.0",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Defines the language to return. Use this when querying language variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "English culture": {
+                "value": "en-us"
+              }
+            }
+          },
+          {
+            "name": "Accept-Segment",
+            "in": "header",
+            "description": "Defines the segment to return. Use this when querying segment variant content items.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Default": {
+                "value": ""
+              },
+              "Segment One": {
+                "value": "segment-one"
+              }
+            }
+          },
+          {
+            "name": "Preview",
+            "in": "header",
+            "description": "Whether to request draft content.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Start-Item",
+            "in": "header",
+            "description": "URL segment or GUID of a root content item.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IApiContentResponseModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/delivery/api/v2/media": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMedia2.0",
+        "parameters": [
+          {
+            "name": "fetch",
+            "in": "query",
+            "description": "Specifies the media items to fetch. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Select all children at root level": {
+                "value": "children:/"
+              },
+              "Select all children of a media item by id": {
+                "value": "children:id"
+              },
+              "Select all children of a media item by path": {
+                "value": "children:path"
+              }
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Defines how to filter the fetched media items. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Default filter": {
+                "value": [
+                  ""
+                ]
+              },
+              "Filter by media type": {
+                "value": [
+                  "mediaType:alias1"
+                ]
+              },
+              "Filter by name": {
+                "value": [
+                  "name:nodeName"
+                ]
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Defines how to sort the found media items. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Default sort": {
+                "value": [
+                  ""
+                ]
+              },
+              "Sort by create date": {
+                "value": [
+                  "createDate:asc",
+                  "createDate:desc"
+                ]
+              },
+              "Sort by name": {
+                "value": [
+                  "name:asc",
+                  "name:desc"
+                ]
+              },
+              "Sort by sort order": {
+                "value": [
+                  "sortOrder:asc",
+                  "sortOrder:desc"
+                ]
+              },
+              "Sort by update date": {
+                "value": [
+                  "updateDate:asc",
+                  "updateDate:desc"
+                ]
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Specifies the number of found media items to skip. Use this to control pagination of the response.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "Specifies the number of found media items to take. Use this to control pagination of the response.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIApiMediaWithCropsResponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/delivery/api/v2/media/item/{id}": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaItemById2.0",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/delivery/api/v2/media/item/{path}": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaItemByPath2.0",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/delivery/api/v2/media/items": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaItems2.0",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "description": "Defines the properties that should be expanded in the response. Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Expand none": {
+                "value": ""
+              },
+              "Expand all properties": {
+                "value": "properties[$all]"
+              },
+              "Expand specific property": {
+                "value": "properties[alias1]"
+              },
+              "Expand specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Expand nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Explicitly defines which properties should be included in the response (by default all properties are included). Refer to [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api#query-parameters) for more details on this.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "Include all properties": {
+                "value": "properties[$all]"
+              },
+              "Include only specific property": {
+                "value": "properties[alias1]"
+              },
+              "Include only specific properties": {
+                "value": "properties[alias1,alias2]"
+              },
+              "Include only specific nested properties": {
+                "value": "properties[alias1[properties[nestedAlias1,nestedAlias2]]]"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiContentResponseModel": {
+        "required": [
+          "contentType",
+          "name",
+          "createDate",
+          "updateDate",
+          "route",
+          "id",
+          "properties",
+          "cultures"
+        ],
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "route": {
+            "required": [
+              "path",
+              "startItem"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "queryString": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "startItem": {
+                "required": [
+                  "id",
+                  "path"
+                ],
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "path": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "properties": {
+            "type": "object"
+          },
+          "cultures": {
+            "type": "object",
+            "additionalProperties": {
+              "required": [
+                "path",
+                "startItem"
+              ],
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "queryString": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "startItem": {
+                  "required": [
+                    "id",
+                    "path"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "path": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ApiImageCropperValueModel": {
+        "required": [
+          "url",
+          "focalPoint",
+          "crops"
+        ],
+        "type": [
+          "null",
+          "object"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "focalPoint": {
+            "$ref": "#/components/schemas/ImageFocalPointModel"
+          },
+          "crops": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ImageCropModel"
+            }
+          }
+        }
+      },
+      "ApiMediaWithCropsResponseModel": {
+        "required": [
+          "path",
+          "createDate",
+          "updateDate",
+          "focalPoint",
+          "crops",
+          "id",
+          "name",
+          "mediaType",
+          "url",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mediaType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "width": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "height": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "properties": {
+            "type": [
+              "null",
+              "object"
+            ]
+          },
+          "focalPoint": {
+            "required": [
+              "left",
+              "top"
+            ],
+            "type": "object",
+            "properties": {
+              "left": {
+                "type": "number",
+                "format": "double"
+              },
+              "top": {
+                "type": "number",
+                "format": "double"
+              }
+            }
+          },
+          "crops": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "required": [
+                "alias",
+                "width",
+                "height",
+                "coordinates"
+              ],
+              "type": "object",
+              "properties": {
+                "alias": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "width": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "height": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "coordinates": {
+                  "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "FileMediaWithCropsResponseModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "required": [
+              "path",
+              "createDate",
+              "updateDate",
+              "focalPoint",
+              "crops",
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "createDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
+              },
+              "focalPoint": {
+                "required": [
+                  "left",
+                  "top"
+                ],
+                "type": "object",
+                "properties": {
+                  "left": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "top": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "required": [
+                    "alias",
+                    "width",
+                    "height",
+                    "coordinates"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "alias": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "height": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "coordinates": {
+                      "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "File"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "umbracoFile": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoExtension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoBytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int64"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "FilePropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FolderMediaWithCropsResponseModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "required": [
+              "path",
+              "createDate",
+              "updateDate",
+              "focalPoint",
+              "crops",
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "createDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
+              },
+              "focalPoint": {
+                "required": [
+                  "left",
+                  "top"
+                ],
+                "type": "object",
+                "properties": {
+                  "left": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "top": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "required": [
+                    "alias",
+                    "width",
+                    "height",
+                    "coordinates"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "alias": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "height": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "coordinates": {
+                      "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "Folder"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "FolderPropertiesModel": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "IApiContentResponseModel": {
+        "discriminator": {
+          "propertyName": "contentType"
+        }
+      },
+      "IApiMediaWithCropsResponseModel": {
+        "oneOf": [
+          {
+            "required": [
+              "mediaType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "required": [
+                  "path",
+                  "createDate",
+                  "updateDate",
+                  "focalPoint",
+                  "crops",
+                  "id",
+                  "name",
+                  "mediaType",
+                  "url",
+                  "properties"
+                ],
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "createDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updateDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "mediaType": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "extension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "width": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "height": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "bytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "properties": {
+                    "type": [
+                      "null",
+                      "object"
+                    ]
+                  },
+                  "focalPoint": {
+                    "required": [
+                      "left",
+                      "top"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "top": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "required": [
+                        "alias",
+                        "width",
+                        "height",
+                        "coordinates"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "width": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "height": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "coordinates": {
+                          "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "mediaType": {
+                "const": "Folder"
+              },
+              "properties": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "mediaType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "required": [
+                  "path",
+                  "createDate",
+                  "updateDate",
+                  "focalPoint",
+                  "crops",
+                  "id",
+                  "name",
+                  "mediaType",
+                  "url",
+                  "properties"
+                ],
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "createDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updateDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "mediaType": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "extension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "width": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "height": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "bytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "properties": {
+                    "type": [
+                      "null",
+                      "object"
+                    ]
+                  },
+                  "focalPoint": {
+                    "required": [
+                      "left",
+                      "top"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "top": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "required": [
+                        "alias",
+                        "width",
+                        "height",
+                        "coordinates"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "width": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "height": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "coordinates": {
+                          "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "mediaType": {
+                "const": "Image"
+              },
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "umbracoFile": {
+                    "required": [
+                      "url",
+                      "focalPoint",
+                      "crops"
+                    ],
+                    "type": [
+                      "null",
+                      "object"
+                    ],
+                    "properties": {
+                      "url": {
+                        "type": "string"
+                      },
+                      "focalPoint": {
+                        "$ref": "#/components/schemas/ImageFocalPointModel"
+                      },
+                      "crops": {
+                        "type": [
+                          "null",
+                          "array"
+                        ],
+                        "items": {
+                          "$ref": "#/components/schemas/ImageCropModel"
+                        }
+                      }
+                    }
+                  },
+                  "umbracoWidth": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "umbracoHeight": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "umbracoBytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int64"
+                  },
+                  "umbracoExtension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "mediaType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "required": [
+                  "path",
+                  "createDate",
+                  "updateDate",
+                  "focalPoint",
+                  "crops",
+                  "id",
+                  "name",
+                  "mediaType",
+                  "url",
+                  "properties"
+                ],
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "createDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updateDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "mediaType": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "extension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "width": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "height": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "bytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "properties": {
+                    "type": [
+                      "null",
+                      "object"
+                    ]
+                  },
+                  "focalPoint": {
+                    "required": [
+                      "left",
+                      "top"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "top": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "required": [
+                        "alias",
+                        "width",
+                        "height",
+                        "coordinates"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "width": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "height": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "coordinates": {
+                          "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "mediaType": {
+                "const": "File"
+              },
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "umbracoFile": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoExtension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoBytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int64"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "mediaType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "required": [
+                  "path",
+                  "createDate",
+                  "updateDate",
+                  "focalPoint",
+                  "crops",
+                  "id",
+                  "name",
+                  "mediaType",
+                  "url",
+                  "properties"
+                ],
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "createDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updateDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "mediaType": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "extension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "width": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "height": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "bytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "properties": {
+                    "type": [
+                      "null",
+                      "object"
+                    ]
+                  },
+                  "focalPoint": {
+                    "required": [
+                      "left",
+                      "top"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "top": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "required": [
+                        "alias",
+                        "width",
+                        "height",
+                        "coordinates"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "width": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "height": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "coordinates": {
+                          "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "mediaType": {
+                "const": "umbracoMediaVideo"
+              },
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "umbracoFile": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoExtension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoBytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int64"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "mediaType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "required": [
+                  "path",
+                  "createDate",
+                  "updateDate",
+                  "focalPoint",
+                  "crops",
+                  "id",
+                  "name",
+                  "mediaType",
+                  "url",
+                  "properties"
+                ],
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "createDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updateDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "mediaType": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "extension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "width": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "height": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "bytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "properties": {
+                    "type": [
+                      "null",
+                      "object"
+                    ]
+                  },
+                  "focalPoint": {
+                    "required": [
+                      "left",
+                      "top"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "top": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "required": [
+                        "alias",
+                        "width",
+                        "height",
+                        "coordinates"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "width": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "height": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "coordinates": {
+                          "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "mediaType": {
+                "const": "umbracoMediaAudio"
+              },
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "umbracoFile": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoExtension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoBytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int64"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "mediaType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "required": [
+                  "path",
+                  "createDate",
+                  "updateDate",
+                  "focalPoint",
+                  "crops",
+                  "id",
+                  "name",
+                  "mediaType",
+                  "url",
+                  "properties"
+                ],
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "createDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updateDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "mediaType": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "extension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "width": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "height": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "bytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "properties": {
+                    "type": [
+                      "null",
+                      "object"
+                    ]
+                  },
+                  "focalPoint": {
+                    "required": [
+                      "left",
+                      "top"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "top": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "required": [
+                        "alias",
+                        "width",
+                        "height",
+                        "coordinates"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "width": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "height": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "coordinates": {
+                          "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "mediaType": {
+                "const": "umbracoMediaArticle"
+              },
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "umbracoFile": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoExtension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoBytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int64"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "mediaType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "required": [
+                  "path",
+                  "createDate",
+                  "updateDate",
+                  "focalPoint",
+                  "crops",
+                  "id",
+                  "name",
+                  "mediaType",
+                  "url",
+                  "properties"
+                ],
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "createDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updateDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "mediaType": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "extension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "width": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "height": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "bytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int32"
+                  },
+                  "properties": {
+                    "type": [
+                      "null",
+                      "object"
+                    ]
+                  },
+                  "focalPoint": {
+                    "required": [
+                      "left",
+                      "top"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "top": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "required": [
+                        "alias",
+                        "width",
+                        "height",
+                        "coordinates"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "alias": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "width": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "height": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "coordinates": {
+                          "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "mediaType": {
+                "const": "umbracoMediaVectorGraphics"
+              },
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "umbracoFile": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoExtension": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "umbracoBytes": {
+                    "type": [
+                      "null",
+                      "integer"
+                    ],
+                    "format": "int64"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "discriminator": {
+          "propertyName": "mediaType",
+          "mapping": {
+            "Folder": "#/components/schemas/FolderMediaWithCropsResponseModel",
+            "Image": "#/components/schemas/ImageMediaWithCropsResponseModel",
+            "File": "#/components/schemas/FileMediaWithCropsResponseModel",
+            "umbracoMediaVideo": "#/components/schemas/UmbracoMediaVideoMediaWithCropsResponseModel",
+            "umbracoMediaAudio": "#/components/schemas/UmbracoMediaAudioMediaWithCropsResponseModel",
+            "umbracoMediaArticle": "#/components/schemas/UmbracoMediaArticleMediaWithCropsResponseModel",
+            "umbracoMediaVectorGraphics": "#/components/schemas/UmbracoMediaVectorGraphicsMediaWithCropsResponseModel"
+          }
+        }
+      },
+      "ImageCropCoordinatesModel": {
+        "required": [
+          "x1",
+          "y1",
+          "x2",
+          "y2"
+        ],
+        "type": "object",
+        "properties": {
+          "x1": {
+            "type": "number",
+            "format": "double"
+          },
+          "y1": {
+            "type": "number",
+            "format": "double"
+          },
+          "x2": {
+            "type": "number",
+            "format": "double"
+          },
+          "y2": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ImageCropModel": {
+        "required": [
+          "alias",
+          "width",
+          "height",
+          "coordinates"
+        ],
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+          }
+        }
+      },
+      "ImageFocalPointModel": {
+        "required": [
+          "left",
+          "top"
+        ],
+        "type": "object",
+        "properties": {
+          "left": {
+            "type": "number",
+            "format": "double"
+          },
+          "top": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ImageMediaWithCropsResponseModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "required": [
+              "path",
+              "createDate",
+              "updateDate",
+              "focalPoint",
+              "crops",
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "createDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
+              },
+              "focalPoint": {
+                "required": [
+                  "left",
+                  "top"
+                ],
+                "type": "object",
+                "properties": {
+                  "left": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "top": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "required": [
+                    "alias",
+                    "width",
+                    "height",
+                    "coordinates"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "alias": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "height": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "coordinates": {
+                      "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "Image"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "umbracoFile": {
+                "required": [
+                  "url",
+                  "focalPoint",
+                  "crops"
+                ],
+                "type": [
+                  "null",
+                  "object"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "focalPoint": {
+                    "$ref": "#/components/schemas/ImageFocalPointModel"
+                  },
+                  "crops": {
+                    "type": [
+                      "null",
+                      "array"
+                    ],
+                    "items": {
+                      "$ref": "#/components/schemas/ImageCropModel"
+                    }
+                  }
+                }
+              },
+              "umbracoWidth": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "umbracoHeight": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "umbracoBytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int64"
+              },
+              "umbracoExtension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImagePropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "required": [
+              "url",
+              "focalPoint",
+              "crops"
+            ],
+            "type": [
+              "null",
+              "object"
+            ],
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "focalPoint": {
+                "$ref": "#/components/schemas/ImageFocalPointModel"
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "$ref": "#/components/schemas/ImageCropModel"
+                }
+              }
+            }
+          },
+          "umbracoWidth": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "umbracoHeight": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedIApiContentResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IApiContentResponseModel"
+            }
+          }
+        }
+      },
+      "PagedIApiMediaWithCropsResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
+            }
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UmbracoMediaArticleMediaWithCropsResponseModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "required": [
+              "path",
+              "createDate",
+              "updateDate",
+              "focalPoint",
+              "crops",
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "createDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
+              },
+              "focalPoint": {
+                "required": [
+                  "left",
+                  "top"
+                ],
+                "type": "object",
+                "properties": {
+                  "left": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "top": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "required": [
+                    "alias",
+                    "width",
+                    "height",
+                    "coordinates"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "alias": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "height": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "coordinates": {
+                      "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "umbracoMediaArticle"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "umbracoFile": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoExtension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoBytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int64"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoMediaArticlePropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoMediaAudioMediaWithCropsResponseModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "required": [
+              "path",
+              "createDate",
+              "updateDate",
+              "focalPoint",
+              "crops",
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "createDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
+              },
+              "focalPoint": {
+                "required": [
+                  "left",
+                  "top"
+                ],
+                "type": "object",
+                "properties": {
+                  "left": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "top": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "required": [
+                    "alias",
+                    "width",
+                    "height",
+                    "coordinates"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "alias": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "height": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "coordinates": {
+                      "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "umbracoMediaAudio"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "umbracoFile": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoExtension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoBytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int64"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoMediaAudioPropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoMediaVectorGraphicsMediaWithCropsResponseModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "required": [
+              "path",
+              "createDate",
+              "updateDate",
+              "focalPoint",
+              "crops",
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "createDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
+              },
+              "focalPoint": {
+                "required": [
+                  "left",
+                  "top"
+                ],
+                "type": "object",
+                "properties": {
+                  "left": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "top": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "required": [
+                    "alias",
+                    "width",
+                    "height",
+                    "coordinates"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "alias": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "height": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "coordinates": {
+                      "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "umbracoMediaVectorGraphics"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "umbracoFile": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoExtension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoBytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int64"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoMediaVectorGraphicsPropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoMediaVideoMediaWithCropsResponseModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "required": [
+              "path",
+              "createDate",
+              "updateDate",
+              "focalPoint",
+              "crops",
+              "id",
+              "name",
+              "mediaType",
+              "url",
+              "properties"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "createDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "mediaType": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "url": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "extension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "width": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "height": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "bytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int32"
+              },
+              "properties": {
+                "type": [
+                  "null",
+                  "object"
+                ]
+              },
+              "focalPoint": {
+                "required": [
+                  "left",
+                  "top"
+                ],
+                "type": "object",
+                "properties": {
+                  "left": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "top": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              },
+              "crops": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "required": [
+                    "alias",
+                    "width",
+                    "height",
+                    "coordinates"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "alias": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "height": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "coordinates": {
+                      "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "umbracoMediaVideo"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "umbracoFile": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoExtension": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "umbracoBytes": {
+                "type": [
+                  "null",
+                  "integer"
+                ],
+                "format": "int64"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoMediaVideoPropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "description": "API key specified through configuration to authorize access to the API.",
+        "name": "Api-Key",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Content"
+    },
+    {
+      "name": "Media"
+    }
+  ]
+}
