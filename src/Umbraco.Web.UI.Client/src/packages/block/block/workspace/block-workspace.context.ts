@@ -612,6 +612,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.settings.validation.report();
 	}
 
+	/**
+	 * Used by Inline Editing Modes as they are inline we want the validation state to be reported instantly, as well they do not have a submit action.
+	 */
+	autoReportValidation() {
+		this.content.validation.autoReport();
+		this.settings.validation.autoReport();
+	}
+
 	expose() {
 		const contentKey = this.#layout.value?.contentKey;
 		if (!contentKey) throw new Error('Failed to expose block, missing content key.');

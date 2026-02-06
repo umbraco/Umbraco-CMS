@@ -101,6 +101,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					// Avoid view context becoming active: [NL]
 					// in this case its not a routable workspace and we do not want it to become an active view, appending shortcuts or setting browser title. (maybe this code needs to be more explicit. Like a inlineMode()?) [NL]
 					this.#workspaceContext.view.destroy();
+					this.#workspaceContext.autoReportValidation();
 					this.#load();
 
 					this.observe(
