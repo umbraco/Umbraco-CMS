@@ -33,7 +33,6 @@ public class WebhookRepository : IWebhookRepository
         List<WebhookDto> webhookDtos = await scope.ExecuteWithContextAsync<List<WebhookDto>>(async db =>
         {
             return await db.Webhooks
-                .AsNoTracking()
                 .OrderBy(x => x.Id)
                 .Skip(skip)
                 .Take(take)
@@ -84,7 +83,6 @@ public class WebhookRepository : IWebhookRepository
         WebhookDto? webhookDto = await scope.ExecuteWithContextAsync<WebhookDto?>(async db =>
         {
             return await db.Webhooks
-                .AsNoTracking()
                 .Where(x => x.Key == key)
                 .Include(x => x.Webhook2ContentTypeKeys)
                 .Include(x => x.Webhook2Events)
@@ -110,7 +108,6 @@ public class WebhookRepository : IWebhookRepository
         List<WebhookDto> webhookDtos = await scope.ExecuteWithContextAsync<List<WebhookDto>>(async db =>
         {
             return await db.Webhooks
-                .AsNoTracking()
                 .Where(x => keys.Contains(x.Key))
                 .Include(x => x.Webhook2ContentTypeKeys)
                 .Include(x => x.Webhook2Events)
@@ -140,7 +137,6 @@ public class WebhookRepository : IWebhookRepository
         List<WebhookDto> dtos = await scope.ExecuteWithContextAsync(async db =>
         {
             return await db.Webhooks
-                .AsNoTracking()
                 .Include(x => x.Webhook2Events)
                 .Where(x => x.Webhook2Events.Any(e => e.Event == alias))
                 .Include(x => x.Webhook2ContentTypeKeys)
@@ -183,9 +179,15 @@ public class WebhookRepository : IWebhookRepository
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
             await DeleteManyToOneReferences(db, dto);
-            db.Webhooks.Update(dto);
-            await AddManyToOneReferences(db, dto);
 
+            await db.Webhooks.Where(x => x.Id == dto.Id).ExecuteUpdateAsync(setters => setters
+                .SetProperty(x => x.Key, dto.Key)
+                .SetProperty(x => x.Name, dto.Name)
+                .SetProperty(x => x.Description, dto.Description)
+                .SetProperty(x => x.Url, dto.Url)
+                .SetProperty(x => x.Enabled, dto.Enabled));
+
+            await AddManyToOneReferences(db, dto);
             await db.SaveChangesAsync();
         });
     }

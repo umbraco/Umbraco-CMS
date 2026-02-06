@@ -27,22 +27,30 @@ public class UmbracoEFCoreComposer : IComposer
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
 
+        // UmbracoDbContext — keep UseOpenIddict() so EF Core migrations still include the OpenIddict schema.
         builder.Services.AddUmbracoDbContext<UmbracoDbContext>((provider, options, connectionString, providerName) =>
         {
-            // Register the entity sets needed by OpenIddict.
             options.UseOpenIddict();
         });
         builder.Services.AddUnique<IScopeAccessor>(sp => sp.GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>());
         builder.Services.AddUnique<IScopeProvider>(sp => sp.GetRequiredService<IEFCoreScopeProvider<UmbracoDbContext>>());
 
-        builder.Services.AddOpenIddict()
+        // OpenIddictDbContext — runtime context for OpenIddict with change tracking enabled.
+        builder.Services.AddPooledDbContextFactory<OpenIddictDbContext>((sp, options) =>
+        {
+            options.UseUmbracoDatabaseProvider(sp);
+            options.UseOpenIddict();
+        });
+        builder.Services.AddTransient(sp =>
+            sp.GetRequiredService<IDbContextFactory<OpenIddictDbContext>>().CreateDbContext());
 
-            // Register the OpenIddict core components.
+        // Point OpenIddict runtime to the dedicated context.
+        builder.Services.AddOpenIddict()
             .AddCore(options =>
             {
                 options
                     .UseEntityFrameworkCore()
-                    .UseDbContext<UmbracoDbContext>();
+                    .UseDbContext<OpenIddictDbContext>();
             });
     }
 }
