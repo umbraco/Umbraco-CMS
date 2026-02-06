@@ -54,7 +54,6 @@ test('can insert specific preset values into text box and text area properties',
 });
 
 test('can insert preset value into textstring property that vary by culture in second language', async ({umbracoApi, umbracoUi}) => {
-  test.slow();
   // Arrange
   const languageId = await umbracoApi.language.createDanishLanguage();
   const languageData = await umbracoApi.language.get(languageId);
@@ -74,9 +73,7 @@ test('can insert preset value into textstring property that vary by culture in s
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(variantPresetValue);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   expect(await umbracoApi.document.doesNameExist(secondContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(secondContentName);
   expect(contentData.values.find(item=>item.culture === languageData.isoCode).value).toBe(variantPresetValue);
