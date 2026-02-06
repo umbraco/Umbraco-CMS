@@ -21,11 +21,22 @@ public abstract class HybridAccessorBase<T>
     private readonly IRequestCache _requestCache;
     private string? _itemKey;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HybridAccessorBase{T}" /> class.
+    /// </summary>
+    /// <param name="requestCache">The request cache for storing the value in the HTTP context.</param>
+    /// <exception cref="ArgumentNullException">The request cache is null.</exception>
     protected HybridAccessorBase(IRequestCache requestCache)
         => _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
+    /// <summary>
+    ///     Gets the unique key used to store the value in the request cache.
+    /// </summary>
     protected string ItemKey => _itemKey ??= GetType().FullName!;
 
+    /// <summary>
+    ///     Gets or sets the current value, storing it either in the HTTP context or the ambient context.
+    /// </summary>
     protected T? Value
     {
         get

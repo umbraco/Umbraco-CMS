@@ -9,6 +9,10 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 {
     private readonly IMediaPermissionService _mediaPermissionService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaPermissionAuthorizer" /> class.
+    /// </summary>
+    /// <param name="mediaPermissionService">The media permission service.</param>
     public MediaPermissionAuthorizer(IMediaPermissionService mediaPermissionService) =>
         _mediaPermissionService = mediaPermissionService;
 
@@ -44,4 +48,8 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
         // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
+
+    /// <inheritdoc/>
+    public async Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> mediaKeys) =>
+        await _mediaPermissionService.FilterAuthorizedAccessAsync(currentUser, mediaKeys);
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -242,6 +243,36 @@ public class MemberManagerTests
 
         // assert
         Assert.IsFalse(result);
+    }
+
+    [Test]
+    public async Task GivenAUserExists_AndIncorrectCurrentPasswordIsProvided_ThenChangePasswordShouldReturnPasswordMismatchError()
+    {
+        // arrange
+        var currentPassword = "wrongPassword";
+        var newPassword = "newPassword123!";
+
+        var sut = CreateSut();
+
+        var fakeUser = CreateValidUser();
+        var fakeMember = CreateMember(fakeUser);
+
+        MockMemberServiceForCreateMember(fakeMember);
+
+        _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == fakeUser.UserName))).Returns(fakeMember);
+
+        _mockPasswordHasher
+            .Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.Is<string>(p => p == currentPassword)))
+            .Returns(PasswordVerificationResult.Failed);
+
+        // act
+        await sut.CreateAsync(fakeUser);
+        var result = await sut.ChangePasswordAsync(fakeUser, currentPassword, newPassword);
+
+        // assert
+        Assert.IsFalse(result.Succeeded);
+        var passwordMismatchError = result.Errors.FirstOrDefault(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch));
+        Assert.IsNotNull(passwordMismatchError);
     }
 
     private static MemberIdentityUser CreateValidUser() =>

@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides operations for managing content segments.
+/// </summary>
 public interface ISegmentService
 {
     /// <summary>

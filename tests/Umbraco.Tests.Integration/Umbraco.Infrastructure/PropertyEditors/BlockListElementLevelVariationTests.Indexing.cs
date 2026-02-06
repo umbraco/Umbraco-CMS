@@ -219,7 +219,7 @@ internal partial class BlockListElementLevelVariationTests
         Assert.IsNotNull(indexedValue);
         if (published)
         {
-            Assert.AreEqual("#1: The content value in English #1: The invariant content value", TrimAndStripNewlines(indexedValue));
+            Assert.AreEqual("#1: The invariant content value #1: The content value in English", TrimAndStripNewlines(indexedValue));
         }
         else
         {

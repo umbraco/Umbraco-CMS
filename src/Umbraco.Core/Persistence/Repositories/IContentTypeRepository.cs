@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="IContentType" /> entities (document types).
+/// </summary>
 public interface IContentTypeRepository : IContentTypeRepositoryBase<IContentType>
 {
     /// <summary>
@@ -28,5 +31,10 @@ public interface IContentTypeRepository : IContentTypeRepositoryBase<IContentTyp
     /// <returns></returns>
     IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
 
+    /// <summary>
+    ///     Gets content type identifiers by their aliases.
+    /// </summary>
+    /// <param name="aliases">The aliases of the content types.</param>
+    /// <returns>A collection of content type identifiers.</returns>
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
 }

@@ -265,7 +265,11 @@ export class UmbPropertyEditorUIBlockSingleElement
 		this.addValidator(
 			'valueMissing',
 			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => !!this.mandatory && this.#entriesContext.getLength() === 0,
+			() => {
+				if (!this.mandatory || this.readonly) return false;
+				const count = this.value?.layout?.[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.length ?? 0;
+				return count === 0;
+			},
 		);
 
 		this.observe(

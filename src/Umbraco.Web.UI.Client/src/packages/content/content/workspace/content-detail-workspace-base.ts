@@ -431,14 +431,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this._segments.setValue([]);
 		}
 
-		// Set culture and segment for all values:
-		const cultures = this.#languages.getValue().map((x) => x.unique);
-
-		let segments: Array<string> | undefined;
-		if (this.#variesBySegment) {
-			segments = this._segments.getValue().map((s) => s.alias);
-		}
-
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
@@ -470,10 +462,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cultures);
-		if (segments) {
-			controller.setSegments(segments);
+
+		const variantOptions = (await firstValueFrom(this.variantOptions)).map(
+			(o) => new UmbVariantId(o.culture, o.segment),
+		);
+		if (contentTypeVariesByCulture) {
+			variantOptions.push(UmbVariantId.CreateInvariant()); // Ensure invariant is included, when the contentType varies by culture, because we do not have a invariant-variant in our variant-options. [NL]
 		}
+		controller.setVariantOptions(variantOptions);
 
 		controller.setValues(data.values);
 

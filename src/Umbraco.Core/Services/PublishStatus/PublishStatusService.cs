@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -16,26 +17,34 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ILanguageService _languageService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
-    private readonly IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
-
-    private string? DefaultCulture { get; set; }
+    private readonly ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+    /// Gets or sets the default culture ISO code used when no culture is specified.
     /// </summary>
-    public PublishStatusService(
-        ILogger<PublishStatusService> logger,
-        IPublishStatusRepository publishStatusRepository,
-        ICoreScopeProvider coreScopeProvider,
-        ILanguageService languageService,
-        IDocumentNavigationQueryService documentNavigationQueryService)
-    {
-        _logger = logger;
-        _publishStatusRepository = publishStatusRepository;
-        _coreScopeProvider = coreScopeProvider;
-        _languageService = languageService;
-        _documentNavigationQueryService = documentNavigationQueryService;
-    }
+    private string? DefaultCulture { get; set; }
+
+/// <summary>
+/// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+/// </summary>
+/// <param name="logger">The logger for diagnostic output.</param>
+/// <param name="publishStatusRepository">The repository for accessing publish status data.</param>
+/// <param name="coreScopeProvider">The provider for creating database scopes.</param>
+/// <param name="languageService">The service for retrieving language information.</param>
+/// <param name="documentNavigationQueryService">The service for querying document navigation structure.</param>
+public PublishStatusService(
+    ILogger<PublishStatusService> logger,
+    IPublishStatusRepository publishStatusRepository,
+    ICoreScopeProvider coreScopeProvider,
+    ILanguageService languageService,
+    IDocumentNavigationQueryService documentNavigationQueryService)
+{
+    _logger = logger;
+    _publishStatusRepository = publishStatusRepository;
+    _coreScopeProvider = coreScopeProvider;
+    _languageService = languageService;
+    _documentNavigationQueryService = documentNavigationQueryService;
+}
 
     /// <inheritdoc/>
     public async Task InitializeAsync(CancellationToken cancellationToken)
@@ -126,7 +135,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     /// <inheritdoc/>
     public Task RemoveAsync(Guid documentKey, CancellationToken cancellationToken)
     {
-        _publishedCultures.Remove(documentKey);
+        _publishedCultures.TryRemove(documentKey, out _);
         return Task.CompletedTask;
     }
 

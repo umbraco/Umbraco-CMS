@@ -737,6 +737,13 @@ export class UmbContentTypeStructureManager<
 		return this.getOwnerContentType()?.properties?.find((property) => property.unique === propertyUnique);
 	}
 
+	async getOwnerPropertiesOf(containerId: string | null): Promise<Array<UmbPropertyTypeModel> | undefined> {
+		await this.#init;
+		return this.getOwnerContentType()?.properties?.filter((property) =>
+			containerId ? property.container?.id === containerId : !property.container,
+		);
+	}
+
 	async getPropertyStructureByAlias(propertyAlias: string) {
 		await this.#init;
 		for (const docType of this.#contentTypes.getValue()) {
@@ -752,7 +759,9 @@ export class UmbContentTypeStructureManager<
 		return this.#contentTypes.asObservablePart((docTypes) => {
 			return (
 				docTypes.find((docType) => {
-					return docType.properties?.find((property) => property.container?.id === containerId);
+					return docType.properties?.find((property) =>
+						containerId ? property.container?.id === containerId : !property.container,
+					);
 				}) !== undefined
 			);
 		});
@@ -767,7 +776,7 @@ export class UmbContentTypeStructureManager<
 			const props: UmbPropertyTypeModel[] = [];
 			docTypes.forEach((docType) => {
 				docType.properties?.forEach((property) => {
-					if (property.container?.id === containerId) {
+					if ((containerId === null && !property.container) || property.container?.id === containerId) {
 						props.push(property);
 					}
 				});
