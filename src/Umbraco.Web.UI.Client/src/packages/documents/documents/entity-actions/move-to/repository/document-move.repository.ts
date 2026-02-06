@@ -3,8 +3,6 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbMoveRepository, UmbMoveToRequestArgs, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UmbDocumentItemRepository } from '../../../item/index.js';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentTreeItemModel } from '../../../types.js';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 
@@ -44,12 +42,7 @@ export class UmbMoveDocumentRepository extends UmbRepositoryBase implements UmbM
 		const isAllowedAtRoot = documentType?.allowedAtRoot ?? false;
 
 		// 3. Fetch allowed parents from backend
-		const allowedParentsResponse = await tryExecute(
-			this,
-			DocumentTypeService.getDocumentTypeByIdAllowedParents({
-				path: { id: documentTypeUnique },
-			}),
-		);
+		const allowedParentsResponse = await this.#moveSource.getAllowedParents(documentTypeUnique);
 		const allowedParentDocTypeIds = allowedParentsResponse.data?.allowedParentIds.map((ref) => ref.id) ?? [];
 
 		// 4. Return the filter function

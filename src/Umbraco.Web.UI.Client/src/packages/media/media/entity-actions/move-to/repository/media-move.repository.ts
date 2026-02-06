@@ -3,8 +3,6 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbMoveRepository, UmbMoveToRequestArgs, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbMediaTreeItemModel } from '../../../types.js';
 import { UmbMediaItemRepository } from '../../../repository/index.js';
 
@@ -44,12 +42,7 @@ export class UmbMoveMediaRepository extends UmbRepositoryBase implements UmbMove
 		const isAllowedAtRoot = mediaType?.allowedAtRoot ?? false;
 
 		// 3. Fetch allowed parents from backend
-		const allowedParentsResponse = await tryExecute(
-			this,
-			MediaTypeService.getMediaTypeByIdAllowedParents({
-				path: { id: mediaTypeUnique },
-			}),
-		);
+		const allowedParentsResponse = await this.#moveSource.getAllowedParents(mediaTypeUnique);
 		const allowedParentMediaTypeIds = allowedParentsResponse.data?.allowedParentIds.map((ref) => ref.id) ?? [];
 
 		// 4. Return the filter function

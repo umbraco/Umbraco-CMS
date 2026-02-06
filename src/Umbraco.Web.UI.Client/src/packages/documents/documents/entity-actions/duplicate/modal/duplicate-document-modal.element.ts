@@ -10,8 +10,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentTreeItemModel } from '../../../types.js';
 
 const elementName = 'umb-document-duplicate-to-modal';
@@ -22,30 +20,6 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 > {
 	@state()
 	private _destinationUnique?: string | null;
-
-	@state()
-	private _allowedParentDocTypeIds: Array<string> = [];
-	@state()
-	private _isAllowedAtRoot: boolean = false;
-
-	override async firstUpdated() {
-		if (!this.data?.documentTypeUnique) return;
-		// Fetch both in parallel
-		const [allowedParentsResponse, allowedAtRootResponse] = await Promise.all([
-			tryExecute(
-				this,
-				DocumentTypeService.getDocumentTypeByIdAllowedParents({
-					path: { id: this.data.documentTypeUnique },
-				}),
-			),
-			tryExecute(this, DocumentTypeService.getDocumentTypeAllowedAtRoot({})),
-		]);
-		this._allowedParentDocTypeIds = allowedParentsResponse.data?.allowedParentIds.map((ref) => ref.id) ?? [];
-
-		// Check if this document's type is in the allowed-at-root list
-		const allowedAtRootIds = allowedAtRootResponse.data?.items.map((item) => item.id) ?? [];
-		this._isAllowedAtRoot = allowedAtRootIds.includes(this.data.documentTypeUnique);
-	}
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
@@ -68,12 +42,8 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	}
 
 	#selectableFilter = (item: UmbDocumentTreeItemModel): boolean => {
-		if (item.unique === null) {
-			return this._isAllowedAtRoot;
-		}
-
-		// Check if this item's documentType is in the allowed list
-		return this._allowedParentDocTypeIds.includes(item.documentType.unique);
+		if (!this.data?.selectableFilter) return true;
+		return this.data.selectableFilter(item);
 	};
 
 	override render() {

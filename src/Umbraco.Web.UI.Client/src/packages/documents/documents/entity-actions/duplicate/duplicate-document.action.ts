@@ -17,18 +17,19 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 
 		if (!item) throw new Error('Document item not found');
 
+		const duplicateRepository = new UmbDuplicateDocumentRepository(this);
+		const selectableFilter = await duplicateRepository.getSelectableFilter(this.args.unique);
+
 		const value = await umbOpenModal(this, UMB_DUPLICATE_DOCUMENT_MODAL, {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
-				documentTypeUnique: item.documentType.unique,
+				selectableFilter,
 			},
 		});
 
 		const destinationUnique = value.destination.unique;
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
-
-		const duplicateRepository = new UmbDuplicateDocumentRepository(this);
 
 		const { error } = await duplicateRepository.requestDuplicate({
 			unique: this.args.unique,

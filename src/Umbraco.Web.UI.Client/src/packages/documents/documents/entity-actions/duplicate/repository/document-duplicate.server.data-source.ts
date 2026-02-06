@@ -1,5 +1,5 @@
 import type { UmbDuplicateDocumentRequestArgs } from './types.js';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService, DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -40,6 +40,15 @@ export class UmbDuplicateDocumentServerDataSource {
 				},
 			}),
 			{ disableNotifications: true },
+		);
+	}
+
+	async getAllowedParents(documentTypeId: string) {
+		return tryExecute(
+			this.#host,
+			DocumentTypeService.getDocumentTypeByIdAllowedParents({
+				path: { id: documentTypeId },
+			}),
 		);
 	}
 }
