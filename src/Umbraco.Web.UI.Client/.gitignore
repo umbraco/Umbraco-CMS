@@ -55,3 +55,6 @@ vscode-html-custom-data.json
 # Vite runtime files
 vite.config.ts.timestamp-*.mjs
 .vite/
+
+# AI tools
+.claude/settings.local.json

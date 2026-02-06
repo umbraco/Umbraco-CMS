@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "17.2.0-rc",
+	"version": "17.3.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -263,6 +263,7 @@
 		"postcss-cli": "^11.0.1",
 		"prettier": "3.6.2",
 		"remark-gfm": "^4.0.1",
+		"semver": "^7.6.0",
 		"storybook": "10.1.10",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.16",

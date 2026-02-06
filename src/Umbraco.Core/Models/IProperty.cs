@@ -3,8 +3,14 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a property on a content item.
+/// </summary>
 public interface IProperty : IEntity, IRememberBeingDirty
 {
+    /// <summary>
+    ///     Gets the value storage type for this property.
+    /// </summary>
     ValueStorageType ValueStorageType { get; }
 
     /// <summary>
@@ -22,6 +28,9 @@ public interface IProperty : IEntity, IRememberBeingDirty
     /// </summary>
     string Alias { get; }
 
+    /// <summary>
+    ///     Gets the identifier of the property type.
+    /// </summary>
     int PropertyTypeId { get; }
 
     /// <summary>
@@ -39,9 +48,24 @@ public interface IProperty : IEntity, IRememberBeingDirty
     /// </remarks>
     bool SetValue(object? value, string? culture = null, string? segment = null);
 
+    /// <summary>
+    ///     Publishes property values for the specified culture and segment.
+    /// </summary>
+    /// <param name="culture">The culture to publish, or "*" for all cultures.</param>
+    /// <param name="segment">The segment to publish, or "*" for all segments.</param>
     void PublishValues(string? culture = "*", string segment = "*");
 
+    /// <summary>
+    ///     Publishes partial property values for a specific data editor and culture.
+    /// </summary>
+    /// <param name="dataEditor">The data editor handling the partial publish.</param>
+    /// <param name="culture">The culture to publish.</param>
     void PublishPartialValues(IDataEditor dataEditor, string? culture);
 
+    /// <summary>
+    ///     Unpublishes property values for the specified culture and segment.
+    /// </summary>
+    /// <param name="culture">The culture to unpublish, or "*" for all cultures.</param>
+    /// <param name="segment">The segment to unpublish, or "*" for all segments.</param>
     void UnpublishValues(string? culture = "*", string segment = "*");
 }

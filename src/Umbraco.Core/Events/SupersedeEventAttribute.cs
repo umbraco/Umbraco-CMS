@@ -9,7 +9,14 @@ namespace Umbraco.Cms.Core.Events;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class SupersedeEventAttribute : Attribute
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SupersedeEventAttribute" /> class.
+    /// </summary>
+    /// <param name="supersededEventArgsType">The type of event arguments that this event supersedes.</param>
     public SupersedeEventAttribute(Type supersededEventArgsType) => SupersededEventArgsType = supersededEventArgsType;
 
+    /// <summary>
+    ///     Gets the type of event arguments that this event supersedes.
+    /// </summary>
     public Type SupersededEventArgsType { get; }
 }

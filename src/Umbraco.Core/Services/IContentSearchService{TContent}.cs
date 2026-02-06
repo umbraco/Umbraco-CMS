@@ -3,15 +3,15 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-/// Defines methods for searching and retrieving child content items of a specified parent, with support for filtering,
-/// ordering, and paging.
+///     Provides search services for content items of a specific type.
 /// </summary>
+/// <typeparam name="TContent">The type of content to search for.</typeparam>
 /// <typeparam name="TContent">The type of content item to search for. Must implement <see cref="IContentBase"/>.</typeparam>
 public interface IContentSearchService<TContent>
     where TContent : class, IContentBase
 {
     /// <summary>
-    ///     Searches for children of a content item.
+    ///     Searches for child content items under a specified parent.
     /// </summary>
     /// <param name="query">The search query.</param>
     /// <param name="parentId">The parent content item key.</param>

@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for managing <see cref="ILanguage"/> objects for localization.
+/// </summary>
 public interface ILanguageService
 {
     /// <summary>

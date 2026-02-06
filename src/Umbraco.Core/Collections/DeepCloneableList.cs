@@ -12,21 +12,33 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
 {
     private readonly ListCloneBehavior _listCloneBehavior;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DeepCloneableList{T}" /> class with the specified clone behavior.
+    /// </summary>
+    /// <param name="listCloneBehavior">The clone behavior for the list.</param>
     public DeepCloneableList(ListCloneBehavior listCloneBehavior) => _listCloneBehavior = listCloneBehavior;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DeepCloneableList{T}" /> class with a collection and the specified clone behavior.
+    /// </summary>
+    /// <param name="collection">The collection whose elements are copied to the new list.</param>
+    /// <param name="listCloneBehavior">The clone behavior for the list.</param>
     public DeepCloneableList(IEnumerable<T> collection, ListCloneBehavior listCloneBehavior)
         : base(collection) =>
         _listCloneBehavior = listCloneBehavior;
 
     /// <summary>
-    ///     Default behavior is CloneOnce
+    ///     Initializes a new instance of the <see cref="DeepCloneableList{T}" /> class with a collection.
     /// </summary>
-    /// <param name="collection"></param>
+    /// <param name="collection">The collection whose elements are copied to the new list.</param>
+    /// <remarks>Default behavior is <see cref="ListCloneBehavior.CloneOnce" />.</remarks>
     public DeepCloneableList(IEnumerable<T> collection)
         : this(collection, ListCloneBehavior.CloneOnce)
     {
     }
 
+    /// <inheritdoc />
+    /// <remarks>This event is not used by the list but is required by the interface.</remarks>
     public event PropertyChangedEventHandler? PropertyChanged; // noop
 
     /// <summary>
@@ -60,8 +72,10 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
 
     #region IRememberBeingDirty
 
+    /// <inheritdoc />
     public bool IsDirty() => this.OfType<IRememberBeingDirty>().Any(x => x.IsDirty());
 
+    /// <inheritdoc />
     public bool WasDirty() => this.OfType<IRememberBeingDirty>().Any(x => x.WasDirty());
 
     /// <inheritdoc />
@@ -76,6 +90,7 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     /// <remarks>Always return an empty enumerable, the list has no properties that can be dirty.</remarks>
     public IEnumerable<string> GetDirtyProperties() => Enumerable.Empty<string>();
 
+    /// <inheritdoc />
     public void ResetDirtyProperties()
     {
         foreach (IRememberBeingDirty dc in this.OfType<IRememberBeingDirty>())
@@ -84,16 +99,19 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
         }
     }
 
+    /// <inheritdoc />
     public void DisableChangeTracking()
     {
         // noop
     }
 
+    /// <inheritdoc />
     public void EnableChangeTracking()
     {
         // noop
     }
 
+    /// <inheritdoc />
     public void ResetWereDirtyProperties()
     {
         foreach (IRememberBeingDirty dc in this.OfType<IRememberBeingDirty>())
@@ -102,6 +120,7 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
         }
     }
 
+    /// <inheritdoc />
     public void ResetDirtyProperties(bool rememberDirty)
     {
         foreach (IRememberBeingDirty dc in this.OfType<IRememberBeingDirty>())

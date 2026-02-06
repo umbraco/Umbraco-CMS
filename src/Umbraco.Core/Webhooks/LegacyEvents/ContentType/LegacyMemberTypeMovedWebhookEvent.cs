@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a member type is moved, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Member Type Moved")]
 public class LegacyMemberTypeMovedWebhookEvent : WebhookEventBase<MemberTypeMovedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyMemberTypeMovedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyMemberTypeMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class LegacyMemberTypeMovedWebhookEvent : WebhookEventBase<MemberTypeMove
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.MemberTypeMoved;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(MemberTypeMovedNotification notification)
         => notification.MoveInfoCollection;
 }

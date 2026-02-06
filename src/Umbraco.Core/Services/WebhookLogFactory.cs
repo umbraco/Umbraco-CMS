@@ -1,11 +1,15 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Implements <see cref="IWebhookLogFactory" /> to create webhook log entries.
+/// </summary>
 public class WebhookLogFactory : IWebhookLogFactory
 {
+    /// <inheritdoc />
     public async Task<WebhookLog> CreateAsync(string eventAlias, HttpRequestMessage requestMessage, HttpResponseMessage? httpResponseMessage, int retryCount, Exception? exception, IWebhook webhook, CancellationToken cancellationToken)
     {
         var log = new WebhookLog
@@ -49,8 +53,18 @@ public class WebhookLogFactory : IWebhookLogFactory
         return log;
     }
 
+    /// <summary>
+    ///     Maps an HTTP status code to a human-readable message.
+    /// </summary>
+    /// <param name="statusCode">The HTTP status code.</param>
+    /// <returns>A formatted string containing the status code name and numeric value.</returns>
     private string MapStatusCodeToMessage(HttpStatusCode statusCode) => $"{statusCode.ToString()} ({(int)statusCode})";
 
+    /// <summary>
+    ///     Calculates and formats the headers from an HTTP response message.
+    /// </summary>
+    /// <param name="responseMessage">The HTTP response message.</param>
+    /// <returns>A formatted string containing all headers.</returns>
     private string CalculateHeaders(HttpResponseMessage responseMessage)
     {
         IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers = responseMessage.RequestMessage!.Headers.Concat(responseMessage.RequestMessage.Content!.Headers);
