@@ -2,36 +2,59 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const allPermissions = {
-  uiPermission:
-    ['Read',
-      'Create Document Blueprint',
-      'Delete',
-      'Create',
-      'Notifications',
-      'Publish',
-      'Unpublish',
-      'Update',
-      'Duplicate',
-      'Move to',
-      'Sort children',
-      'Culture and Hostnames',
-      'Public Access',
-      'Rollback'],
-  verbPermission: [
-    'Umb.Document.Read',
-    'Umb.Document.CreateBlueprint',
-    'Umb.Document.Delete',
-    'Umb.Document.Create',
-    'Umb.Document.Notifications',
-    'Umb.Document.Publish',
-    'Umb.Document.Unpublish',
-    'Umb.Document.Update',
-    'Umb.Document.Duplicate',
-    'Umb.Document.Move',
-    'Umb.Document.Sort',
-    'Umb.Document.CultureAndHostnames',
-    'Umb.Document.PublicAccess',
-    'Umb.Document.Rollback'
+  uiDocumentPermission: [
+    "Read",
+    "Create Document Blueprint",
+    "Delete",
+    "Create",
+    "Notifications",
+    "Publish",
+    "Unpublish",
+    "Update",
+    "Duplicate",
+    "Move to",
+    "Sort children",
+    "Culture and Hostnames",
+    "Public Access",
+    "Rollback",
+  ],
+  verbDocumentPermission: [
+    "Umb.Document.Read",
+    "Umb.Document.CreateBlueprint",
+    "Umb.Document.Delete",
+    "Umb.Document.Create",
+    "Umb.Document.Notifications",
+    "Umb.Document.Publish",
+    "Umb.Document.Unpublish",
+    "Umb.Document.Update",
+    "Umb.Document.Duplicate",
+    "Umb.Document.Move",
+    "Umb.Document.Sort",
+    "Umb.Document.CultureAndHostnames",
+    "Umb.Document.PublicAccess",
+    "Umb.Document.Rollback",
+  ],
+  uiElementPermission: [
+    "Read",
+    "Create",
+    "Delete",
+    "Publish",
+    "Unpublish",
+    "Update",
+    "Duplicate",
+    "Move",
+    "Rollback",
+  ],
+  verbElementPermission: [
+    "Umb.Element.Read",
+    "Umb.Element.Create",
+    "Umb.Element.Delete",
+    "Umb.Element.Publish",
+    "Umb.Element.Unpublish",
+    "Umb.Element.Update",
+    "Umb.Element.Duplicate",
+    "Umb.Element.Move",
+    "Umb.Element.Rollback",
   ]
 };
 
@@ -90,14 +113,14 @@ test('can update a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
   // Act
-  await umbracoUi.userGroup.clickPermissionsByName([allPermissions.uiPermission[0]]);
+  await umbracoUi.userGroup.clickDocumentPermissionsByName([allPermissions.uiDocumentPermission[0]]);
   await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
 
   // Assert
   await umbracoUi.reloadPage();
-  await umbracoUi.userGroup.doesUserGroupHavePermission(allPermissions.uiPermission[0]);
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermission(allPermissions.uiDocumentPermission[0]);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.fallbackPermissions).toContain(allPermissions.verbPermission[0]);
+  expect(userGroupData.fallbackPermissions).toContain(allPermissions.verbDocumentPermission[0]);
 });
 
 test('can delete a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -365,14 +388,17 @@ test('can enable all permissions for a user group', async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
-  await umbracoUi.userGroup.clickPermissionsByName(allPermissions.uiPermission);
+  await umbracoUi.userGroup.clickDocumentPermissionsByName(allPermissions.uiDocumentPermission);
+  await umbracoUi.userGroup.clickElementPermissionsByName(allPermissions.uiElementPermission);
   await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
 
   // Assert
   await umbracoUi.reloadPage();
-  await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(allPermissions.uiPermission);
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermissionEnabled(allPermissions.uiDocumentPermission);
+  await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(allPermissions.uiElementPermission);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.fallbackPermissions).toEqual(allPermissions.verbPermission);
+  const allFallbackPermissions = [...allPermissions.verbDocumentPermission, ...allPermissions.verbElementPermission];
+  expect(userGroupData.fallbackPermissions).toEqual(allFallbackPermissions);
 });
 
 test('can add granular permission to a specific document for a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -389,12 +415,12 @@ test('can add granular permission to a specific document for a user group', {tag
   // Act
   await umbracoUi.userGroup.clickAddGranularPermission();
   await umbracoUi.userGroup.clickLabelWithName(documentName);
-  await umbracoUi.userGroup.clickGranularPermissionsByName([allPermissions.uiPermission[0]]);
+  await umbracoUi.userGroup.clickGranularPermissionsByName([allPermissions.uiDocumentPermission[0]]);
   await umbracoUi.userGroup.clickConfirmButton();
   await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbPermission[0]])).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbDocumentPermission[0]])).toBeTruthy();
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(documentTypeName);
@@ -414,15 +440,15 @@ test('can add all granular permissions to a specific document for a user group',
   // Act
   await umbracoUi.userGroup.clickAddGranularPermission();
   await umbracoUi.userGroup.clickLabelWithName(documentName);
-  await umbracoUi.userGroup.clickGranularPermissionsByName(allPermissions.uiPermission);
+  await umbracoUi.userGroup.clickGranularPermissionsByName(allPermissions.uiDocumentPermission);
   await umbracoUi.userGroup.clickConfirmButton();
   await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
 
   // Assert
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.clickGranularPermissionWithName(documentName);
-  await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(allPermissions.uiPermission);
-  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, allPermissions.verbPermission)).toBeTruthy();
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermissionEnabled(allPermissions.uiDocumentPermission);
+  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, allPermissions.verbDocumentPermission)).toBeTruthy();
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(documentTypeName);
@@ -436,7 +462,7 @@ test('can remove granular permission to a specific document for a user group', a
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
   await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentWithRead(userGroupName, documentId);
-  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbPermission[0]])).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbDocumentPermission[0]])).toBeTruthy();
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
@@ -445,7 +471,7 @@ test('can remove granular permission to a specific document for a user group', a
   await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbPermission[0]])).toBeFalsy();
+  expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbDocumentPermission[0]])).toBeFalsy();
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(documentTypeName);
