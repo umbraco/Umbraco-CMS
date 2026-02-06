@@ -65,19 +65,19 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 				data: [
 					{
 						columnAlias: 'extensionType',
-						value: extension.type,
+						value: extension.manifest.type,
 					},
 					{
 						columnAlias: 'extensionName',
-						value: extension.name,
+						value: extension.manifest.name,
 					},
 					{
 						columnAlias: 'extensionAlias',
-						value: extension.alias,
+						value: extension.manifest.alias,
 					},
 					{
 						columnAlias: 'extensionWeight',
-						value: extension.weight,
+						value: extension.manifest.weight,
 					},
 					{
 						columnAlias: 'entityActions',
@@ -85,7 +85,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 							.value=${{
 								entityType: extension.entityType,
 								unique: extension.unique,
-								name: extension.name,
+								name: extension.manifest.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],

@@ -18,12 +18,15 @@ export class UmbExtensionCollectionRepository
 			.getAllExtensions()
 			.map((manifest) => {
 				return {
-					type: manifest.type,
-					alias: manifest.alias,
-					name: manifest.name,
-					weight: manifest.weight,
 					unique: manifest.alias,
 					entityType: UMB_EXTENSION_ENTITY_TYPE,
+					manifest: {
+						type: manifest.type,
+						alias: manifest.alias,
+						name: manifest.name,
+						weight: manifest.weight,
+						kind: manifest.kind,
+					},
 				};
 			});
 
@@ -33,15 +36,17 @@ export class UmbExtensionCollectionRepository
 		if (query.filter) {
 			const text = query.filter.toLowerCase();
 			extensions = extensions.filter(
-				(x) => x.name.toLowerCase().includes(text) || x.alias.toLowerCase().includes(text),
+				(x) => x.manifest.name.toLowerCase().includes(text) || x.manifest.alias.toLowerCase().includes(text),
 			);
 		}
 
 		if (query.type) {
-			extensions = extensions.filter((x) => x.type === query.type);
+			extensions = extensions.filter((x) => x.manifest.type === query.type);
 		}
 
-		extensions.sort((a, b) => a.type.localeCompare(b.type) || a.alias.localeCompare(b.alias));
+		extensions.sort(
+			(a, b) => a.manifest.type.localeCompare(b.manifest.type) || a.manifest.alias.localeCompare(b.manifest.alias),
+		);
 
 		const total = extensions.length;
 		const items = extensions.slice(skip, skip + take);

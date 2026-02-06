@@ -1,5 +1,6 @@
 import type { UmbExtensionEntityType } from '../entity.js';
 import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbExtensionCollectionFilterModel extends UmbCollectionFilterModel {
 	type?: string;
@@ -7,8 +8,5 @@ export interface UmbExtensionCollectionFilterModel extends UmbCollectionFilterMo
 
 export interface UmbExtensionCollectionItemModel extends UmbCollectionItemModel {
 	entityType: UmbExtensionEntityType;
-	type: string;
-	alias: string;
-	name: string;
-	weight?: number;
+	manifest: ManifestBase;
 }
