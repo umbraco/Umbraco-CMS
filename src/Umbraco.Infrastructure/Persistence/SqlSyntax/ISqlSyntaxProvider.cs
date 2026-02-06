@@ -85,6 +85,11 @@ public interface ISqlSyntaxProvider
 
     string DbProvider { get; }
 
+    /// <summary>
+    /// Retuns the format for a string column definition with a specified length for Unicode text types (e.g. NVARCHAR in SQL Server). The format should include a placeholder for the length, such as "NVARCHAR({0})". This is used when generating SQL for string columns that require a length specification.
+    /// </summary>
+    string StringLengthUnicodeColumnDefinitionFormat { get; }
+
     IDictionary<Type, IScalarMapper>? ScalarMappers => null;
 
     DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) =>
@@ -179,6 +184,16 @@ public interface ISqlSyntaxProvider
     /// </summary>
     /// <returns>true if the provider supports sequences; otherwise, false.</returns>
     bool SupportsSequences() => false;
+
+    /// <summary>
+    /// This is an additional setting for databases that use auto-increment columns but require special handling during insert operations.
+    /// </summary>
+    /// <returns>true if the provider requires special handling for auto-increment inserts; otherwise, false.</returns>
+    /// <remarks>
+    /// Use case PostgreSQL which uses sequences for auto-incrementing columns but may require specific insert logic.
+    /// After inserting a dedicated value the sequence needs to be updated to avoid conflicts.
+    /// </remarks>
+    bool InsertWithSpecialAutoInkrement() => false;
 
     /// <summary>
     /// Alters the database sequences to match the current schema requirements.

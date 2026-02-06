@@ -231,15 +231,17 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
             await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
 
             var db = ScopeAccessor.AmbientScope.Database;
+            var sqlSyntax = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
-            var columnInfo = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.GetColumnsInSchema(db)
-                .Where(x => x.TableName == "umbracoUser")
-                .FirstOrDefault(x => x.ColumnName == "Foo");
+            var columnInfos = sqlSyntax.GetColumnsInSchema(db)
+                .Where(x => x.TableName == "umbracoUser");
+            var columnInfo = columnInfos
+                .FirstOrDefault(x => x.ColumnName.InvariantEquals("foo"));
 
             Assert.Multiple(() =>
             {
                 Assert.NotNull(columnInfo);
-                Assert.IsTrue(columnInfo.DataType.Contains("nvarchar"));
+                Assert.IsTrue(sqlSyntax.StringLengthUnicodeColumnDefinitionFormat.InvariantContains(columnInfo.DataType));
             });
         }
     }
@@ -326,7 +328,10 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
         {
         }
 
-        protected override void Migrate() =>
-            Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo nvarchar(255)");
+        protected override void Migrate()
+        {
+            var sql = string.Format(_context.Database.SqlContext.SqlSyntax.StringLengthUnicodeColumnDefinitionFormat, 255);
+            Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo {sql}");
+        }
     }
 }
