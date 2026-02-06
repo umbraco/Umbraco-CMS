@@ -12,12 +12,6 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 	@state()
 	private _currentPage = 1;
 
-	@state()
-	private _totalItems = 0;
-
-	@state()
-	private _currentItemsCount = 0;
-
 	private _collectionContext?: UmbDefaultCollectionContext<any, any>;
 
 	constructor() {
@@ -26,8 +20,6 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			this._collectionContext = instance;
 			this.#observeCurrentPage();
 			this.#observerTotalPages();
-			this.#observeTotalItems();
-			this.#observeItems();
 		});
 	}
 
@@ -51,32 +43,12 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		);
 	}
 
-	#observeTotalItems() {
-		this.observe(
-			this._collectionContext?.totalItems,
-			(totalItems) => {
-				this._totalItems = totalItems ?? 0;
-			},
-			'umbTotalItemsObserver',
-		);
-	}
-
-	#observeItems() {
-		this.observe(
-			this._collectionContext?.items,
-			(items) => {
-				this._currentItemsCount = items?.length ?? 0;
-			},
-			'umbItemsObserver',
-		);
-	}
-
 	#onChange(event: UUIPaginationEvent) {
 		this._collectionContext?.pagination.setCurrentPageNumber(event.target.current);
 	}
 
 	override render() {
-		if (this._currentItemsCount === this._totalItems || this._totalPages <= 1) {
+		if (this._totalPages <= 1) {
 			return nothing;
 		}
 

@@ -20,7 +20,6 @@ public class SearchMediaItemController : MediaItemControllerBase
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
 
-    [ActivatorUtilitiesConstructor]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,

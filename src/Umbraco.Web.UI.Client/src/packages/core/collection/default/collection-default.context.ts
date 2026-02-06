@@ -40,12 +40,11 @@ import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
 export class UmbDefaultCollectionContext<
-		CollectionItemType extends { entityType: string; unique: string } = any,
-		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
-	>
+	CollectionItemType extends { entityType: string; unique: string } = any,
+	FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
+>
 	extends UmbContextBase
-	implements UmbCollectionContext, UmbApi
-{
+	implements UmbCollectionContext, UmbApi {
 	#config?: UmbCollectionConfiguration = { pageSize: 50 };
 	protected _manifest?: ManifestCollection;
 	protected _repository?: UmbCollectionRepository;
@@ -115,9 +114,9 @@ export class UmbDefaultCollectionContext<
 			const parent: UmbEntityModel | undefined =
 				currentEntityUnique && currentEntityType
 					? {
-							unique: currentEntityUnique,
-							entityType: currentEntityType,
-						}
+						unique: currentEntityUnique,
+						entityType: currentEntityType,
+					}
 					: undefined;
 
 			this.#parentEntityContext?.setParent(parent);
@@ -199,7 +198,9 @@ export class UmbDefaultCollectionContext<
 			'umbCollectionHasBulkActionsObserver',
 		);
 
-		this.pagination.setPageSize(this.#config.pageSize ?? 50);
+		if (this.#config.pageSize) {
+			this.pagination.setPageSize(this.#config.pageSize);
+		}
 
 		const filterValue = this._filter.getValue() as FilterModelType;
 
@@ -208,7 +209,7 @@ export class UmbDefaultCollectionContext<
 			...this.#config,
 			...filterValue,
 			skip: filterValue.skip ?? 0,
-			take: this.pagination.getPageSize(),
+			take: this.#config.pageSize,
 		});
 
 		this.#userDefinedProperties.setValue(this.#config?.userDefinedProperties ?? []);
