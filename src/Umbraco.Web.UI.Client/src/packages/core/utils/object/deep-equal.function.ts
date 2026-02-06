@@ -7,7 +7,7 @@
  * @returns `true` if the values are deeply equal, `false` otherwise.
  */
 export function umbDeepEqual(a: unknown, b: unknown): boolean {
-	return sortedStringify(a) === sortedStringify(b);
+	return (a === undefined && b === undefined) || sortedStringify(a) === sortedStringify(b);
 }
 
 function sortedStringify(value: unknown): string {
