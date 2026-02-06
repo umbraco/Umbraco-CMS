@@ -23,7 +23,7 @@ internal sealed class ConfigureMiniProfilerOptions(IHostingEnvironment hostingEn
         options.ShouldProfile = request => false;
 
         options.IgnoredPaths.Clear();
-        options.IgnoredPaths.Add(WebPath.Combine(_backOfficePath, "swagger"));
+        options.IgnoredPaths.Add(WebPath.Combine(_backOfficePath, "openapi"));
         options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results-list"));
         options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results-index"));
         options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results"));

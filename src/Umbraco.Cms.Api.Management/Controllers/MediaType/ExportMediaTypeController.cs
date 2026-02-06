@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,8 +15,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class ExportMediaTypeController : MediaTypeControllerBase
 {
-    private readonly IMediaTypeService _mediaTypeService;
     private readonly IUdtFileContentFactory _fileContentFactory;
+    private readonly IMediaTypeService _mediaTypeService;
 
     public ExportMediaTypeController(
         IMediaTypeService mediaTypeService,
@@ -27,7 +28,7 @@ public class ExportMediaTypeController : MediaTypeControllerBase
 
     [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK, MediaTypeNames.Application.Octet)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public IActionResult Export(
         CancellationToken cancellationToken,

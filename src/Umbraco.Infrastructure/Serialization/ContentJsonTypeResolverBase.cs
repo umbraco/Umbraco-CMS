@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 
@@ -24,28 +23,25 @@ public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
     {
         if (jsonTypeInfo.Type == typeof(IApiContent))
         {
-            return new[] { typeof(ApiContent) };
+            return [typeof(ApiContent)];
         }
 
         if (jsonTypeInfo.Type == typeof(IApiContentResponse))
         {
-            return new[] { typeof(ApiContentResponse) };
+            return [typeof(ApiContentResponse)];
         }
 
         if (jsonTypeInfo.Type == typeof(IRichTextElement))
         {
-            return new[] { typeof(RichTextRootElement), typeof(RichTextGenericElement), typeof(RichTextTextElement) };
+            return [typeof(RichTextRootElement), typeof(RichTextGenericElement), typeof(RichTextTextElement)];
         }
 
-        return Array.Empty<Type>();
+        return [];
     }
 
     public void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, params Type[] derivedTypes)
     {
-        jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
-        {
-            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
-        };
+        jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions();
 
         foreach (Type derivedType in derivedTypes)
         {

@@ -24,7 +24,7 @@ public class ExportDictionaryController : DictionaryControllerBase
 
     [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK, MediaTypeNames.Application.Octet)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Export(CancellationToken cancellationToken, Guid id, bool includeChildren = false)
     {

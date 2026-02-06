@@ -89,16 +89,16 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
         if (_webHostEnvironment.IsProduction())
         {
-            await Delete(Constants.OAuthClientIds.Swagger, cancellationToken);
+            await Delete(Constants.OAuthClientIds.OpenApiUi, cancellationToken);
             await Delete(Constants.OAuthClientIds.Postman, cancellationToken);
         }
         else
         {
             await CreateOrUpdate(
                 DeveloperOpenIddictApplicationDescriptor(
-                    "Umbraco Swagger access",
-                    Constants.OAuthClientIds.Swagger,
-                    backOfficeHostsAsArray.Select(backOfficeUrl => CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")).ToArray()),
+                    "Umbraco OpenAPI access",
+                    Constants.OAuthClientIds.OpenApiUi,
+                    backOfficeHostsAsArray.Select(backOfficeUrl => CallbackUrlFor(backOfficeUrl, "/umbraco/openapi/oauth2-redirect.html")).ToArray()),
                 cancellationToken);
 
             await CreateOrUpdate(

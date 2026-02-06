@@ -4,7 +4,7 @@ import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique 
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ElementPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IPermissionPresentationModelElementPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbElementUserPermissionCondition
@@ -13,7 +13,7 @@ export class UmbElementUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
-	#elementPermissions: Array<ElementPermissionPresentationModel> = [];
+	#elementPermissions: Array<IPermissionPresentationModelElementPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
 	#ancestors: Array<UmbEntityUnique> = [];
 
@@ -124,8 +124,11 @@ export class UmbElementUserPermissionCondition
 		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 
-	#isElementUserPermission(permission: unknown): permission is ElementPermissionPresentationModel {
-		return (permission as ElementPermissionPresentationModel).$type === 'ElementPermissionPresentationModel';
+	#isElementUserPermission(permission: unknown): permission is IPermissionPresentationModelElementPermissionPresentationModel {
+		return (
+			(permission as IPermissionPresentationModelElementPermissionPresentationModel).$type ===
+			'ElementPermissionPresentationModel'
+		);
 	}
 }
 

@@ -2,9 +2,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
@@ -22,7 +24,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -73,19 +74,27 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
 
-        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
+        builder.Services.AddUmbracoApi<ConfigureUmbracoDeliveryApiOpenApiOptions>(DeliveryApiConfiguration.ApiName, DeliveryApiConfiguration.ApiTitle);
+
+        // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
+        builder.Services.ReplaceOpenApiSchemaService();
         builder.AddUmbracoApiOpenApiUI();
 
         builder
             .Services
             .AddControllers()
-            .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
-            {
-                // all Delivery API specific JSON options go here
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            .AddJsonOptions(
+                Constants.JsonOptionsNames.DeliveryApi,
+                options =>
+                {
+                    // all Delivery API specific JSON options go here
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
+        // Configures the JSON options for the Open API schema generation (based on the Delivery API MVC JSON options)
+        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryHttpJsonOptions>();
 
         builder.Services.AddAuthentication();
         builder.AddUmbracoOpenIddict();
@@ -138,5 +147,31 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new OutputCachePipelineFilter("UmbracoDeliveryApiOutputCache")));
         return builder;
+    }
+
+    /// <summary>
+    /// Replaces the OpenApiSchemaService to use the Delivery API JSON serializer options, instead of the default http JSON options.
+    /// </summary>
+    /// <param name="serviceCollection">The <see cref="IServiceCollection"/>.</param>
+    /// <remarks>This is needed because the OpenAPI schema generation relies on the JSON options to determine how to generate the schemas.
+    /// There is a proposal to add support for this currently open: https://github.com/dotnet/aspnetcore/issues/60738.</remarks>
+    private static void ReplaceOpenApiSchemaService(this IServiceCollection serviceCollection)
+    {
+        ServiceDescriptor serviceDescriptor = serviceCollection
+            .FirstOrDefault(x => x.ServiceType.Name == "OpenApiSchemaService" && Equals(x.ServiceKey, DeliveryApiConfiguration.ApiName))
+            ?? throw new InvalidOperationException("Could not find the OpenApiSchemaService when replacing the registered implementation with one created with the delivery API JSON options.");
+
+        serviceCollection.Remove(serviceDescriptor);
+        serviceCollection.Add(
+            new ServiceDescriptor(
+                serviceDescriptor.ServiceType,
+                serviceDescriptor.ServiceKey,
+                (sp, serviceKey) => sp.CreateInstance(
+                    serviceDescriptor.KeyedImplementationType!,
+                    serviceKey!,
+                    Options.Create(
+                        sp.GetRequiredService<IOptionsMonitor<JsonOptions>>()
+                            .Get(Constants.JsonOptionsNames.DeliveryApi))),
+                ServiceLifetime.Singleton));
     }
 }
