@@ -100,6 +100,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						parentUnique: this.#parentUnique,
 					} as UmbBlockGridWorkspaceOriginData);
 					this.#workspaceContext.establishLiveSync();
+					this.#workspaceContext.autoReportValidation();
 
 					this.#load();
 
