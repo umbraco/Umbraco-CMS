@@ -258,7 +258,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath) ||
 			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === this._activePath);
 		return html`<uui-tab label=${this.localize.string(name ?? '#general_unnamed')} .active=${active} href=${fullPath}
-			>${this.localize.string(name)}${hint && !active
+			>${hint && !active
 				? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 						>${hint.text}</umb-badge
 					>`
