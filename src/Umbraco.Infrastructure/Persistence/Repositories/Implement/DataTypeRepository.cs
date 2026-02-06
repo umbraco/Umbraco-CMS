@@ -196,7 +196,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         foreach (ContentTypeDto contentType in contentTypesUsingListView)
         {
             usages.Add(
-                new GuidUdi(ObjectTypes.GetUdiType(contentType.NodeDto.NodeObjectType!.Value), contentType.NodeDto.UniqueId),
+                new GuidUdi(ObjectTypes.GetUdiType(contentType.NodeDto.NodeObjectType!.Value), contentType.NodeDto.UniqueId).EnsureClosed(),
                 [dataType.Name!]);
         }
 
