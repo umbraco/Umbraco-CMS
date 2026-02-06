@@ -17,12 +17,9 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!moveRepository) throw new Error('Move Repository is not available');
 
 		// 2. Get the filter if the repository provides one
-		let customFilter: ((item: UmbTreeItemModel) => boolean) | undefined = undefined;
-
-		if (moveRepository.getSelectableFilter) {
-			const selectableFilter = await moveRepository.getSelectableFilter!(this.args.unique);
-			customFilter = selectableFilter;
-		}
+		const customFilter = moveRepository.getSelectableFilter
+			? await moveRepository.getSelectableFilter(this.args.unique)
+			: undefined;
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
