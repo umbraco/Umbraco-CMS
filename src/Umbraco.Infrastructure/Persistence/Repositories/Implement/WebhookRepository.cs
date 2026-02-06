@@ -62,7 +62,6 @@ public class WebhookRepository : IWebhookRepository
 
         var id = await scope.ExecuteWithContextAsync(async db =>
         {
-            // TODO: Check ID and child dtos gets inserted.
             EntityEntry<WebhookDto> entry = await db.Webhooks.AddAsync(webhookDto);
             await db.SaveChangesAsync();
             return entry.Entity.Id;

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
