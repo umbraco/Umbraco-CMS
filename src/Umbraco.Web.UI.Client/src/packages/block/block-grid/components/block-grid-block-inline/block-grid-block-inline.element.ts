@@ -87,8 +87,8 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 	#extensionInitializer?: UmbExtensionApiInitializer;
 	#initExtension() {
+		this.#extensionInitializer?.destroy();
 		if (this.#parentUnique === undefined && this.#areaKey === undefined) {
-			this.#extensionInitializer?.destroy();
 			return;
 		}
 
