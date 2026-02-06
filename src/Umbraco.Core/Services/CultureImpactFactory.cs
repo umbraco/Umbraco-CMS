@@ -7,10 +7,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Factory for creating <see cref="CultureImpact"/> instances that represent
+///     the impact of culture settings on content variations.
+/// </summary>
 public class CultureImpactFactory : ICultureImpactFactory
 {
     private ContentSettings _contentSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CultureImpactFactory"/> class.
+    /// </summary>
+    /// <param name="contentSettings">The content settings options monitor.</param>
     public CultureImpactFactory(IOptionsMonitor<ContentSettings> contentSettings)
     {
         _contentSettings = contentSettings.CurrentValue;
@@ -19,7 +27,7 @@ public class CultureImpactFactory : ICultureImpactFactory
     }
 
     /// <inheritdoc/>
-    public CultureImpact? Create(string? culture, bool isDefault, IContent content)
+    public CultureImpact? Create(string? culture, bool isDefault, IContentBase content)
     {
         TryCreate(culture, isDefault, content.ContentType.Variations, true, _contentSettings.AllowEditInvariantFromNonDefault, out CultureImpact? impact);
 

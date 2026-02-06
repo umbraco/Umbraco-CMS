@@ -39,7 +39,8 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
         return Ok(new FolderResponseModel
         {
             Name = container.Name!,
-            Id = container.Key
+            Id = container.Key,
+            IsTrashed = container.Trashed
         });
     }
 
@@ -78,33 +79,33 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             : OperationStatusResult(result.Status);
     }
 
-    protected IActionResult OperationStatusResult(EntityContainerOperationStatus status)
+    internal static IActionResult OperationStatusResult(EntityContainerOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            EntityContainerOperationStatus.NotFound => NotFound(problemDetailsBuilder
+            EntityContainerOperationStatus.NotFound => new NotFoundObjectResult(problemDetailsBuilder
                 .WithTitle("The folder could not be found")
                 .Build()),
-            EntityContainerOperationStatus.ParentNotFound => NotFound(problemDetailsBuilder
+            EntityContainerOperationStatus.ParentNotFound => new NotFoundObjectResult(problemDetailsBuilder
                 .WithTitle("The parent folder could not be found")
                 .Build()),
-            EntityContainerOperationStatus.DuplicateName => BadRequest(problemDetailsBuilder
+            EntityContainerOperationStatus.DuplicateName => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("The name is already used")
                 .WithDetail("The folder name must be unique on this parent.")
                 .Build()),
-            EntityContainerOperationStatus.DuplicateKey => BadRequest(problemDetailsBuilder
+            EntityContainerOperationStatus.DuplicateKey => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("The id is already used")
                 .WithDetail("The folder id must be unique.")
                 .Build()),
-            EntityContainerOperationStatus.NotEmpty => BadRequest(problemDetailsBuilder
+            EntityContainerOperationStatus.NotEmpty => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("The folder is not empty")
                 .WithDetail("The folder must be empty to perform this action.")
                 .Build()),
-            EntityContainerOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
+            EntityContainerOperationStatus.CancelledByNotification => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the folder operation.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+            _ => new ObjectResult(problemDetailsBuilder
                 .WithTitle("Unknown folder operation status.")
-                .Build()),
+                .Build()) { StatusCode = StatusCodes.Status500InternalServerError },
         });
 }

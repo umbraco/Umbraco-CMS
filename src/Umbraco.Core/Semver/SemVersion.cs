@@ -501,6 +501,12 @@ namespace Umbraco.Cms.Core.Semver
         }
 
 #if !NETSTANDARD
+        /// <summary>
+        ///     Populates a <see cref="SerializationInfo" /> with the data needed to serialize this instance.
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo" /> to populate with data.</param>
+        /// <param name="context">The destination for this serialization.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="info" /> is null.</exception>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)

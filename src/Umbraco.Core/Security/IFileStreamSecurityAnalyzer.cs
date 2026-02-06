@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Analyzes file streams for potential security threats.
+/// </summary>
 public interface IFileStreamSecurityAnalyzer
 {
 

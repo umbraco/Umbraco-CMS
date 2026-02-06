@@ -8,12 +8,21 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Implements <see cref="IWebhookService" /> to manage webhooks.
+/// </summary>
 public class WebhookService : IWebhookService
 {
     private readonly IWebhookRepository _webhookRepository;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IScopeProvider _provider;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="WebhookService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="webhookRepository">The webhook repository.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
     public WebhookService(
         IWebhookRepository webhookRepository,
         IEventMessagesFactory eventMessagesFactory,
@@ -24,6 +33,11 @@ public class WebhookService : IWebhookService
         _provider = scopeProvider;
     }
 
+    /// <summary>
+    ///     Validates that a webhook has the required configuration.
+    /// </summary>
+    /// <param name="webhook">The webhook to validate.</param>
+    /// <returns>The <see cref="WebhookOperationStatus" /> indicating the validation result.</returns>
     private WebhookOperationStatus ValidateWebhook(IWebhook webhook)
     {
         if (webhook.Events.Length <= 0)

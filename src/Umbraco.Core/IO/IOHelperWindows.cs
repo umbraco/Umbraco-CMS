@@ -2,13 +2,21 @@ using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Provides IO helper implementations for Windows operating systems.
+/// </summary>
 public class IOHelperWindows : IOHelper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IOHelperWindows"/> class.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
     public IOHelperWindows(IHostingEnvironment hostingEnvironment)
         : base(hostingEnvironment)
     {
     }
 
+    /// <inheritdoc />
     public override bool PathStartsWith(string path, string root, params char[] separators)
     {
         // either it is identical to root,

@@ -8,18 +8,44 @@ namespace Umbraco.Cms.Core.Models.Membership;
 /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
 public interface IUser : IMembershipUser, IRememberBeingDirty
 {
+    /// <summary>
+    ///     Gets the current state of the user.
+    /// </summary>
     UserState UserState { get; }
 
+    /// <summary>
+    ///     Gets or sets the display name of the user.
+    /// </summary>
     string? Name { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the session timeout in minutes.
+    /// </summary>
     int SessionTimeout { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the starting content node identifiers for this user.
+    /// </summary>
     int[]? StartContentIds { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the starting media node identifiers for this user.
+    /// </summary>
     int[]? StartMediaIds { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the starting element node identifiers for this user.
+    /// </summary>
+    int[]? StartElementIds { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the preferred language for the user's backoffice UI.
+    /// </summary>
     string? Language { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the date and time when the user was invited.
+    /// </summary>
     DateTime? InvitedDate { get; set; }
 
     /// <summary>
@@ -27,6 +53,9 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     /// </summary>
     IEnumerable<IReadOnlyUserGroup> Groups { get; }
 
+    /// <summary>
+    ///     Gets the collection of section aliases that this user has access to.
+    /// </summary>
     IEnumerable<string> AllowedSections { get; }
 
     /// <summary>
@@ -44,9 +73,20 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     /// </summary>
     UserKind Kind { get; set; }
 
+    /// <summary>
+    ///     Removes the user from the specified group.
+    /// </summary>
+    /// <param name="group">The alias of the group to remove the user from.</param>
     void RemoveGroup(string group);
 
+    /// <summary>
+    ///     Removes the user from all groups.
+    /// </summary>
     void ClearGroups();
 
+    /// <summary>
+    ///     Adds the user to the specified group.
+    /// </summary>
+    /// <param name="group">The group to add the user to.</param>
     void AddGroup(IReadOnlyUserGroup group);
 }

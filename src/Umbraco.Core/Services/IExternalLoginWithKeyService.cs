@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for managing external login providers and tokens for users and members.
+/// </summary>
 public interface IExternalLoginWithKeyService : IService
 {
     /// <summary>

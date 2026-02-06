@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
+/// <summary>
+///     Provides caching and retrieval of domain information for published content.
+/// </summary>
 public interface IDomainCache
 {
     /// <summary>

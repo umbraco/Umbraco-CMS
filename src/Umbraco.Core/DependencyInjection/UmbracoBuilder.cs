@@ -54,21 +54,29 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
+    /// <summary>
+    ///     The default implementation of <see cref="IUmbracoBuilder" /> used to configure Umbraco services and dependencies.
+    /// </summary>
     public class UmbracoBuilder : IUmbracoBuilder
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
+        /// <inheritdoc />
         public IServiceCollection Services { get; }
 
+        /// <inheritdoc />
         public IConfiguration Config { get; }
 
+        /// <inheritdoc />
         public TypeLoader TypeLoader { get; }
 
         /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
+        /// <inheritdoc />
         public IProfiler Profiler { get; }
 
+        /// <inheritdoc />
         public AppCaches AppCaches { get; }
 
         /// <summary>
@@ -133,6 +141,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             return builder;
         }
 
+        /// <inheritdoc />
         public void Build()
         {
             foreach (ICollectionBuilder builder in _builders.Values)
@@ -143,6 +152,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             _builders.Clear();
         }
 
+        /// <summary>
+        ///     Adds all core Umbraco services to the service collection.
+        /// </summary>
         private void AddCoreServices()
         {
             Services.AddSingleton(AppCaches);
@@ -298,11 +310,18 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITagService, TagService>();
             Services.AddUnique<IContentPermissionService, ContentPermissionService>();
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
+            Services.AddUnique<IElementPermissionService, ElementPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
+            Services.AddUnique<IElementService, ElementService>();
+            Services.AddUnique<IElementVersionService, ElementVersionService>();
+            Services.AddUnique<IElementContainerService, ElementContainerService>();
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
+            Services.AddUnique<IElementEditingService, ElementEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
+            Services.AddUnique<IElementPublishingService, ElementPublishingService>();
             Services.AddUnique<IContentValidationService, ContentValidationService>();
+            Services.AddUnique<IElementValidationService, ElementValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
             Services.AddUnique<IMemberValidationService, MemberValidationService>();
@@ -413,12 +432,14 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
             Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
+            Services.AddUnique<IElementRecycleBinQueryService, ElementRecycleBinQueryService>();
             Services.AddUnique<IContentQueryService, ContentQueryService>();
 
             // Authorizers
             Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
             Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
             Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
+            Services.AddSingleton<IElementPermissionAuthorizer, ElementPermissionAuthorizer>();
             Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
             Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
             Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();

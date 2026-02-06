@@ -35,6 +35,14 @@ public class BlockListItem : IBlockReference<IPublishedElement, IPublishedElemen
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockListItem" /> class.
+    /// </summary>
+    /// <param name="contentKey">The content key.</param>
+    /// <param name="content">The content.</param>
+    /// <param name="settingsKey">The settings key.</param>
+    /// <param name="settings">The settings.</param>
+    /// <exception cref="ArgumentNullException">Thrown when content is null.</exception>
     public BlockListItem(Guid contentKey, IPublishedElement content, Guid? settingsKey, IPublishedElement? settings)
     {
         ContentKey = contentKey;
@@ -112,6 +120,13 @@ public class BlockListItem<T> : BlockListItem
         : base(contentUdi, content, settingsUdi, settings) =>
         Content = content;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockListItem{T}" /> class.
+    /// </summary>
+    /// <param name="contentKey">The content key.</param>
+    /// <param name="content">The content.</param>
+    /// <param name="settingsKey">The settings key.</param>
+    /// <param name="settings">The settings.</param>
     public BlockListItem(Guid contentKey, T content, Guid? settingsKey, IPublishedElement? settings)
         : base(contentKey, content, settingsKey, settings) =>
         Content = content;
@@ -147,6 +162,13 @@ public class BlockListItem<TContent, TSettings> : BlockListItem<TContent>
         : base(contentUdi, content, settingsUdi, settings) =>
         Settings = settings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockListItem{TContent, TSettings}" /> class.
+    /// </summary>
+    /// <param name="contentKey">The content key.</param>
+    /// <param name="content">The content.</param>
+    /// <param name="settingsKey">The settings key.</param>
+    /// <param name="settings">The settings.</param>
     public BlockListItem(Guid contentKey, TContent content, Guid? settingsKey, TSettings? settings)
         : base(contentKey, content, settingsKey, settings) =>
         Settings = settings;

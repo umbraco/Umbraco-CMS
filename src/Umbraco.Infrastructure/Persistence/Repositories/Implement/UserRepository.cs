@@ -741,6 +741,15 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                 entity.StartMediaIds);
         }
 
+        if (entity.IsPropertyDirty("StartElementIds"))
+        {
+            AddingOrUpdateStartNodes(
+                entity,
+                Enumerable.Empty<UserStartNodeDto>(),
+                UserStartNodeDto.StartNodeTypeValue.Element,
+                entity.StartElementIds);
+        }
+
         if (entity.IsPropertyDirty("Groups"))
         {
             // Lookup all assigned groups.
@@ -859,7 +868,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             Database.Update(userDto, changedCols);
         }
 
-        if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds"))
+        if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds") || entity.IsPropertyDirty("StartElementIds"))
         {
             Sql<ISqlContext> sql = SqlContext.Sql()
                 .SelectAll()
@@ -876,6 +885,11 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             if (entity.IsPropertyDirty("StartMediaIds"))
             {
                 AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
+            }
+
+            if (entity.IsPropertyDirty("StartElementIds"))
+            {
+                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Element, entity.StartElementIds);
             }
         }
 
@@ -1133,105 +1147,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         UserState[]? userState = null,
         IQuery<IUser>? filter = null)
     {
-        if (orderBy == null)
-        {
-            throw new ArgumentNullException(nameof(orderBy));
-        }
-
-        Sql<ISqlContext>? filterSql = null;
-        Tuple<string, object[]>[]? customFilterWheres = filter?.GetWhereClauses().ToArray();
-        var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
-        if (hasCustomFilter
-            || (includeUserGroups != null && includeUserGroups.Length > 0)
-            || (excludeUserGroups != null && excludeUserGroups.Length > 0)
-            || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
-        {
-            filterSql = SqlContext.Sql();
-        }
-
-        if (hasCustomFilter)
-        {
-            foreach (Tuple<string, object[]> clause in customFilterWheres!)
-            {
-                filterSql?.Append($"AND ({clause.Item1})", clause.Item2);
-            }
-        }
-
-        var userIdQuoted = SqlSyntax.GetQuotedColumn("umbracoUser", "id");
-        if (includeUserGroups != null && includeUserGroups.Length > 0)
-        {
-            string subQuery = GetSuQueryInExclude("IN");
-            filterSql?.Append(subQuery, new { userGroups = includeUserGroups });
-        }
-
-        if (excludeUserGroups != null && excludeUserGroups.Length > 0)
-        {
-            string subQuery = GetSuQueryInExclude("NOT IN");
-            filterSql?.Append(subQuery, new { userGroups = excludeUserGroups });
-        }
-
-        if (userState != null && userState.Length > 0)
-        {
-            //the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
-            if (userState.Contains(UserState.All) == false)
-            {
-                var sb = new StringBuilder("(");
-                var appended = false;
-
-                if (userState.Contains(UserState.Active))
-                {
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Inactive))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Disabled))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(userDisabled = 1)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.LockedOut))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(userNoConsole = 1)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Invited))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
-                    appended = true;
-                }
-
-                sb.Append(")");
-                filterSql?.Append("AND " + sb);
-            }
-        }
+        ArgumentNullException.ThrowIfNull(orderBy);
 
         // create base query
         Sql<ISqlContext> sql = SqlContext.Sql()
@@ -1244,9 +1160,12 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             sql = new SqlTranslator<IUser>(sql, query).Translate();
         }
 
-        // get sorted and filtered sql
+        // get filtered sql
+        Sql<ISqlContext> filteredSql = ApplyFilter(sql, query, includeUserGroups, excludeUserGroups, userState, filter);
+
+        // get sorted sql
         Sql<ISqlContext> sqlNodeIdsWithSort =
-            ApplySort(ApplyFilter(sql, filterSql, query != null), orderBy, orderDirection);
+            ApplySort(filteredSql, orderBy, orderDirection);
 
         // get a page of results and total count
         Page<UserDto>? pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
@@ -1264,10 +1183,10 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return @$"AND ({userIdQuoted} {inOrNotIn} (SELECT DISTINCT {userIdQuoted}
             FROM {QuoteTableName("umbracoUser")}
             INNER JOIN {QuoteTableName("umbracoUser2UserGroup")}
-            ON {SqlSyntax.GetQuotedColumn("umbracoUser2UserGroup", "userId")} = {userIdQuoted}
+            ON {QuoteColumnName("umbracoUser2UserGroup", "userId")} = {userIdQuoted}
             INNER JOIN {QuoteTableName("umbracoUserGroup")}
-            ON {SqlSyntax.GetQuotedColumn("umbracoUserGroup", "id")} = {SqlSyntax.GetQuotedColumn("umbracoUser2UserGroup", "userGroupId")}
-            WHERE {SqlSyntax.GetQuotedColumn("umbracoUserGroup", "userGroupAlias")} IN (@userGroups)))";
+            ON {QuoteColumnName("umbracoUserGroup", "id")} = {QuoteColumnName("umbracoUser2UserGroup", "userGroupId")}
+            WHERE {QuoteColumnName("umbracoUserGroup", "userGroupAlias")} IN (@userGroups)))";
     }
 
     public IEnumerable<string> GetAllClientIds()
@@ -1303,16 +1222,17 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return Get(userId);
     }
 
-    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)
+    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IQuery<IUser>? query, string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, IQuery<IUser>? filter)
     {
+        Sql<ISqlContext>? filterSql = PrepareFilterSql(includeUserGroups, excludeUserGroups, userState, filter);
         if (filterSql == null)
         {
             return sql;
         }
 
-        //ensure we don't append a WHERE if there is already one
+        // ensure we don't append a WHERE if there is already one
         var args = filterSql.Arguments;
-        var sqlFilter = hasWhereClause
+        var sqlFilter = query != null
             ? filterSql.SQL
             : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
@@ -1392,6 +1312,135 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
         var userKeysForInClause = string.Join("','", userKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
         Database.Execute($"DELETE FROM {QuoteTableName("umbracoOpenIddictTokens")} WHERE {QuoteColumnName("Subject")} IN ('{userKeysForInClause}')");
+    }
+
+    private Sql<ISqlContext>? PrepareFilterSql(string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, IQuery<IUser>? filter)
+    {
+        Sql<ISqlContext>? filterSql = null;
+
+        Tuple<string, object[]>[]? customFilterWheres = filter?.GetWhereClauses().ToArray();
+        var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
+        if (hasCustomFilter
+            || (includeUserGroups != null && includeUserGroups.Length > 0)
+            || (excludeUserGroups != null && excludeUserGroups.Length > 0)
+            || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
+        {
+            filterSql = SqlContext.Sql();
+
+            if (hasCustomFilter)
+            {
+                foreach (Tuple<string, object[]> clause in customFilterWheres!)
+                {
+                    filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+                }
+            }
+
+            FilterByIncludedUserGroups(includeUserGroups, filterSql);
+
+            FilterByExcludedUserGroups(excludeUserGroups, filterSql);
+
+            FilterByUserState(userState, filterSql);
+        }
+
+        return filterSql;
+    }
+
+    private void FilterByIncludedUserGroups(string[]? includeUserGroups, Sql<ISqlContext> filterSql)
+    {
+        if (includeUserGroups != null && includeUserGroups.Length > 0)
+        {
+            string subQuery = GetSuQueryInExclude("IN");
+            filterSql.Append(subQuery, new { userGroups = includeUserGroups });
+        }
+    }
+
+    private void FilterByExcludedUserGroups(string[]? excludeUserGroups, Sql<ISqlContext> filterSql)
+    {
+        if (excludeUserGroups != null && excludeUserGroups.Length > 0)
+        {
+            string subQuery = GetSuQueryInExclude("NOT IN");
+            filterSql.Append(subQuery, new { userGroups = excludeUserGroups });
+        }
+    }
+
+    /// <summary>
+    /// Appends user state filtering conditions to the specified SQL filter based on the provided user states.
+    /// </summary>
+    /// <remarks>If multiple user states are specified, the resulting filter will match users in any of the
+    /// given states. The method does not modify the filter if no applicable user states are provided.</remarks>
+    /// <param name="userState">An array of user states to filter by. If null, empty, or contains the 'All' state, no filtering is applied.</param>
+    /// <param name="filterSql">The SQL filter to which the user state conditions are appended. If null, no conditions are added.</param>
+    private void FilterByUserState(UserState[]? userState, Sql<ISqlContext> filterSql)
+    {
+        // the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
+        if (userState != null && userState.Length > 0)
+        {
+            if (userState.Contains(UserState.All) == false)
+            {
+                var sb = new StringBuilder("(");
+                var appended = false;
+                var userDisabled = QuoteColumnName("userDisabled");
+                var userNoConsole = QuoteColumnName("userNoConsole");
+                var lastLoginDate = QuoteColumnName("lastLoginDate");
+                var invitedDate = QuoteColumnName("invitedDate");
+
+                var falseValue = SqlSyntax.ConvertIntegerToBoolean(0);
+                var trueValue = SqlSyntax.ConvertIntegerToBoolean(1);
+                if (userState.Contains(UserState.Active))
+                {
+                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NOT NULL)");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.Inactive))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NULL)");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.Disabled))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({userDisabled} = {trueValue})");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.LockedOut))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({userNoConsole} = {trueValue})");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.Invited))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({lastLoginDate} IS NULL AND {userDisabled} = {trueValue} AND {invitedDate} IS NOT NULL)");
+                    appended = true;
+                }
+
+                sb.Append(")");
+
+                filterSql.Append("AND " + sb);
+            }
+        }
     }
 
     #endregion

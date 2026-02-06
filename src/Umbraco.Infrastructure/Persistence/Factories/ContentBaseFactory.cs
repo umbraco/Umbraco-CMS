@@ -73,6 +73,73 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
+    ///     Builds an IElement item from a dto and content type.
+    /// </summary>
+    // TODO ELEMENTS: refactor and reuse code from BuildEntity(DocumentDto dto, IContentType? contentType)
+    public static IElement BuildEntity(ElementDto dto, IContentType? contentType)
+    {
+        ArgumentNullException.ThrowIfNull(contentType);
+
+        ContentDto contentDto = dto.ContentDto;
+        NodeDto nodeDto = contentDto.NodeDto;
+        ElementVersionDto elementVersionDto = dto.ElementVersionDto;
+        ContentVersionDto contentVersionDto = elementVersionDto.ContentVersionDto;
+        ElementVersionDto? publishedVersionDto = dto.PublishedVersionDto;
+
+        var content = new Element(
+            nodeDto.Text ?? throw new ArgumentException("The element did not have a name", nameof(dto)),
+            contentType);
+
+        try
+        {
+            content.DisableChangeTracking();
+
+            content.Id = dto.NodeId;
+            content.Key = nodeDto.UniqueId;
+            content.VersionId = contentVersionDto.Id;
+
+            content.Name = contentVersionDto.Text;
+
+            content.Path = nodeDto.Path;
+            content.Level = nodeDto.Level;
+            content.ParentId = nodeDto.ParentId;
+            content.SortOrder = nodeDto.SortOrder;
+            content.Trashed = nodeDto.Trashed;
+
+            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
+            content.CreateDate = nodeDto.CreateDate;
+            content.UpdateDate = contentVersionDto.VersionDate;
+
+            content.Published = dto.Published;
+            content.Edited = dto.Edited;
+
+            if (publishedVersionDto != null)
+            {
+                // We need this to get the proper versionId to match to unpublished values.
+                // This is only needed if the content has been published before.
+                content.PublishedVersionId = publishedVersionDto.Id;
+                if (dto.Published)
+                {
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
+                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+                }
+            }
+
+            // templates = ignored, managed by the repository
+
+            // reset dirty initial properties (U4-1946)
+            content.ResetDirtyProperties(false);
+            return content;
+        }
+        finally
+        {
+            content.EnableChangeTracking();
+        }
+    }
+
+    /// <summary>
     ///     Builds a Media item from a dto and content type.
     /// </summary>
     public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
@@ -187,8 +254,26 @@ internal sealed class ContentBaseFactory
         return dto;
     }
 
+    /// <summary>
+    ///     Builds a dto from an IElement item.
+    /// </summary>
+    public static ElementDto BuildDto(IElement entity, Guid objectType)
+    {
+        ContentDto contentDto = BuildContentDto(entity, objectType);
+
+        var dto = new ElementDto
+        {
+            NodeId = entity.Id,
+            Published = entity.Published,
+            ContentDto = contentDto,
+            ElementVersionDto = BuildElementVersionDto(entity, contentDto),
+        };
+
+        return dto;
+    }
+
     public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(
-        IContent entity,
+        IPublishableContentBase entity,
         ContentScheduleCollection contentSchedule,
         ILanguageRepository languageRepository) =>
         contentSchedule.FullSchedule.Select(x =>
@@ -303,6 +388,21 @@ internal sealed class ContentBaseFactory
         {
             Id = entity.VersionId,
             TemplateId = entity.TemplateId,
+            Published = false, // always building the current, unpublished one
+
+            ContentVersionDto = BuildContentVersionDto(entity, contentDto),
+        };
+
+        return dto;
+    }
+
+    // always build the current / VersionPk dto
+    // we're never going to build / save old versions (which are immutable)
+    private static ElementVersionDto BuildElementVersionDto(IElement entity, ContentDto contentDto)
+    {
+        var dto = new ElementVersionDto
+        {
+            Id = entity.VersionId,
             Published = false, // always building the current, unpublished one
 
             ContentVersionDto = BuildContentVersionDto(entity, contentDto),

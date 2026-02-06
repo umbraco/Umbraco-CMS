@@ -4,13 +4,25 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Packaging;
 
 /// <summary>
-///     Converts a <see cref="PackageDefinition" /> to and from XML
+///     Converts a <see cref="PackageDefinition" /> to and from XML.
 /// </summary>
 public class PackageDefinitionXmlParser
 {
+    /// <summary>
+    ///     An empty string list used as a default value for package definition collections.
+    /// </summary>
     private static readonly IList<string> EmptyStringList = new List<string>();
+
+    /// <summary>
+    ///     An empty GuidUdi list used as a default value for package definition media collections.
+    /// </summary>
     private static readonly IList<GuidUdi> EmptyGuidUdiList = new List<GuidUdi>();
 
+    /// <summary>
+    ///     Converts an XML element to a <see cref="PackageDefinition"/>.
+    /// </summary>
+    /// <param name="xml">The XML element containing the package definition.</param>
+    /// <returns>The parsed <see cref="PackageDefinition"/>, or <c>null</c> if the XML is <c>null</c>.</returns>
     public PackageDefinition? ToPackageDefinition(XElement xml)
     {
         if (xml == null)
@@ -69,6 +81,11 @@ public class PackageDefinitionXmlParser
         return retVal;
     }
 
+    /// <summary>
+    ///     Converts a <see cref="PackageDefinition"/> to its XML representation.
+    /// </summary>
+    /// <param name="def">The package definition to convert.</param>
+    /// <returns>An <see cref="XElement"/> representing the package definition.</returns>
     public XElement ToXml(PackageDefinition def)
     {
         var packageXml = new XElement(

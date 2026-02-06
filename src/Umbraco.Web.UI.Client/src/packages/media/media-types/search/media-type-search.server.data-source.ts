@@ -32,7 +32,11 @@ export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<U
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getItemMediaTypeSearch({
-				query: { query: args.query },
+				query: {
+					query: args.query,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
+				},
 			}),
 		);
 

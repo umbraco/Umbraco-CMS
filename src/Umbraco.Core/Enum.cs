@@ -15,6 +15,9 @@ public static class Enum<T>
     private static readonly Dictionary<int, T> IntToValue;
     private static readonly Dictionary<T, string> ValueToName;
 
+    /// <summary>
+    ///     Static constructor that initializes the enum value dictionaries.
+    /// </summary>
     static Enum()
     {
         Values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
@@ -35,18 +38,53 @@ public static class Enum<T>
         }
     }
 
+    /// <summary>
+    ///     Determines whether the specified value is defined in the enumeration.
+    /// </summary>
+    /// <param name="value">The enum value to check.</param>
+    /// <returns><c>true</c> if the value is defined; otherwise, <c>false</c>.</returns>
     public static bool IsDefined(T value) => ValueToName.ContainsKey(value);
 
+    /// <summary>
+    ///     Determines whether the specified string is a defined name in the enumeration.
+    /// </summary>
+    /// <param name="value">The string value to check.</param>
+    /// <returns><c>true</c> if the name is defined; otherwise, <c>false</c>.</returns>
     public static bool IsDefined(string value) => SensitiveNameToValue.ContainsKey(value);
 
+    /// <summary>
+    ///     Determines whether the specified integer is a defined value in the enumeration.
+    /// </summary>
+    /// <param name="value">The integer value to check.</param>
+    /// <returns><c>true</c> if the value is defined; otherwise, <c>false</c>.</returns>
     public static bool IsDefined(int value) => IntToValue.ContainsKey(value);
 
+    /// <summary>
+    ///     Gets all values defined in the enumeration.
+    /// </summary>
+    /// <returns>An enumerable containing all enum values.</returns>
     public static IEnumerable<T> GetValues() => Values;
 
+    /// <summary>
+    ///     Gets all names defined in the enumeration.
+    /// </summary>
+    /// <returns>An array containing all enum names.</returns>
     public static string[] GetNames() => ValueToName.Values.ToArray();
 
+    /// <summary>
+    ///     Gets the name of the specified enum value.
+    /// </summary>
+    /// <param name="value">The enum value.</param>
+    /// <returns>The name of the value, or null if not found.</returns>
     public static string? GetName(T value) => ValueToName.GetValueOrDefault(value);
 
+    /// <summary>
+    ///     Parses the string representation of an enum value.
+    /// </summary>
+    /// <param name="value">The string to parse.</param>
+    /// <param name="ignoreCase">If <c>true</c>, case is ignored during parsing.</param>
+    /// <returns>The parsed enum value.</returns>
+    /// <exception cref="ArgumentException">The string is not a valid enum name.</exception>
     public static T Parse(string value, bool ignoreCase = false)
     {
         Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
@@ -56,6 +94,13 @@ public static class Enum<T>
         T Throw() => throw new ArgumentException($"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.", nameof(value));
     }
 
+    /// <summary>
+    ///     Tries to parse the string representation of an enum value.
+    /// </summary>
+    /// <param name="value">The string to parse.</param>
+    /// <param name="returnValue">When this method returns, contains the parsed value if successful.</param>
+    /// <param name="ignoreCase">If <c>true</c>, case is ignored during parsing.</param>
+    /// <returns><c>true</c> if parsing succeeded; otherwise, <c>false</c>.</returns>
     public static bool TryParse(string value, out T returnValue, bool ignoreCase = false)
     {
         Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
@@ -63,6 +108,11 @@ public static class Enum<T>
         return names.TryGetValue(value, out returnValue);
     }
 
+    /// <summary>
+    ///     Parses the string representation of an enum value, returning null if parsing fails.
+    /// </summary>
+    /// <param name="value">The string to parse.</param>
+    /// <returns>The parsed enum value, or null if parsing failed.</returns>
     public static T? ParseOrNull(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -78,6 +128,11 @@ public static class Enum<T>
         return null;
     }
 
+    /// <summary>
+    ///     Casts an integer to the enum type, returning null if the integer is not a valid value.
+    /// </summary>
+    /// <param name="value">The integer value to cast.</param>
+    /// <returns>The enum value, or null if the integer is not valid.</returns>
     public static T? CastOrNull(int value)
     {
         if (IntToValue.TryGetValue(value, out T foundValue))

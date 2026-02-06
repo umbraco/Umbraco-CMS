@@ -5,20 +5,18 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey(IContentVersionDto.IdColumnName, AutoIncrement = false)]
 [ExplicitColumns]
-public class DocumentVersionDto
+public class DocumentVersionDto : IContentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentVersion;
-    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
-    public const string PublishedColumnName = "published";
 
     private const string TemplateIdColumnName = "templateId";
 
-    [Column(PrimaryKeyColumnName)]
+    [Column(IContentVersionDto.IdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{PrimaryKeyColumnName},{PublishedColumnName}", IncludeColumns = TemplateIdColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{IContentVersionDto.IdColumnName},{IContentVersionDto.PublishedColumnName}", IncludeColumns = TemplateIdColumnName)]
     public int Id { get; set; }
 
     [Column(TemplateIdColumnName)]
@@ -26,8 +24,8 @@ public class DocumentVersionDto
     [ForeignKey(typeof(TemplateDto), Column = TemplateDto.NodeIdColumnName)]
     public int? TemplateId { get; set; }
 
-    [Column(PublishedColumnName)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = PublishedColumnName, IncludeColumns = $"{PrimaryKeyColumnName},{TemplateIdColumnName}")]
+    [Column(IContentVersionDto.PublishedColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = IContentVersionDto.PublishedColumnName, IncludeColumns = $"{IContentVersionDto.IdColumnName},{TemplateIdColumnName}")]
     public bool Published { get; set; }
 
     [ResultColumn]

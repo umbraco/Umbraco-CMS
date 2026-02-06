@@ -13,12 +13,31 @@ namespace Umbraco.Cms.Core.PublishedCache;
 // an entirely new models factory + not even sure it makes sense at all since
 // sets are created manually todo yes it does! - what does this all mean?
 //
+
+/// <summary>
+/// Represents a published element that provides access to content type information and properties.
+/// </summary>
+/// <remarks>
+/// A published element does NOT manage any tree-like elements. It represents detached content
+/// that is not part of the content tree hierarchy (e.g., nested content items, block list items).
+/// </remarks>
 public class PublishedElement : IPublishedElement
 {
     private readonly IPublishedProperty[] _propertiesArray;
 
-    // initializes a new instance of the PublishedElement class
-    // within the context of a published snapshot service (eg a published content property value)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedElement"/> class
+    /// within the context of a published snapshot service (e.g., a published content property value).
+    /// </summary>
+    /// <param name="contentType">The published content type.</param>
+    /// <param name="key">The unique identifier for this element.</param>
+    /// <param name="values">The property values dictionary.</param>
+    /// <param name="previewing">A value indicating whether this is a preview request.</param>
+    /// <param name="referenceCacheLevel">The reference cache level for property value caching.</param>
+    /// <param name="variationContext">The variation context for culture and segment.</param>
+    /// <param name="cacheManager">The cache manager for property value caching.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> is an empty GUID.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="values"/> or <paramref name="contentType"/> is null.</exception>
     public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values, bool previewing, PropertyCacheLevel referenceCacheLevel, VariationContext variationContext, ICacheManager? cacheManager)
     {
         if (key == Guid.Empty)
@@ -45,22 +64,41 @@ public class PublishedElement : IPublishedElement
                                })
                                .ToArray()
                            ?? [];
+
+        Name = string.Empty;
+        Path = string.Empty;
+        Cultures = new Dictionary<string, PublishedCultureInfo>();
     }
 
-    // initializes a new instance of the PublishedElement class
-    // without any context, so it's purely 'standalone' and should NOT interfere with the published snapshot service
-    // + using an initial reference cache level of .None ensures that everything will be
-    // cached at .Content level - and that reference cache level will propagate to all
-    // properties
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedElement"/> class
+    /// without any context, making it purely standalone and not interfering with the published snapshot service.
+    /// </summary>
+    /// <param name="contentType">The published content type.</param>
+    /// <param name="key">The unique identifier for this element.</param>
+    /// <param name="values">The property values dictionary.</param>
+    /// <param name="previewing">A value indicating whether this is a preview request.</param>
+    /// <param name="variationContext">The variation context for culture and segment.</param>
+    /// <remarks>
+    /// Using an initial reference cache level of <see cref="PropertyCacheLevel.None"/> ensures that everything will be
+    /// cached at element level, and that reference cache level will propagate to all properties.
+    /// </remarks>
     public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?> values, bool previewing, VariationContext variationContext)
         : this(contentType, key, values, previewing, PropertyCacheLevel.None, variationContext, null)
     {
     }
 
+    /// <inheritdoc />
     public IPublishedContentType ContentType { get; }
 
+    /// <inheritdoc />
     public Guid Key { get; }
 
+    /// <summary>
+    /// Converts a property values dictionary to use case-insensitive key comparison.
+    /// </summary>
+    /// <param name="values">The original property values dictionary.</param>
+    /// <returns>A dictionary with case-insensitive key comparison.</returns>
     private static Dictionary<string, object?> GetCaseInsensitiveValueDictionary(Dictionary<string, object?> values)
     {
         // ensure we ignore case for property aliases
@@ -71,12 +109,30 @@ public class PublishedElement : IPublishedElement
         return ignoreCase ? values : new Dictionary<string, object?>(values, StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <inheritdoc />
     public IEnumerable<IPublishedProperty> Properties => _propertiesArray;
 
+    /// <inheritdoc />
     public IPublishedProperty? GetProperty(string alias)
     {
         var index = ContentType.GetPropertyIndex(alias);
         IPublishedProperty? property = index < 0 ? null : _propertiesArray?[index];
         return property;
     }
+
+    // TODO ELEMENTS: figure out what to do with all these
+    //                perhaps replace this whole class with PublishedElementWrapped? in that case, we also need to do the same for PublishedContent
+    public int Id { get; }
+    public string Name { get; }
+    public int SortOrder { get; }
+    public int Level { get; }
+    public string Path { get; }
+    public int CreatorId { get; }
+    public DateTime CreateDate { get; }
+    public int WriterId { get; }
+    public DateTime UpdateDate { get; }
+    public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
+    public PublishedItemType ItemType { get; }
+    public bool IsDraft(string? culture = null) => throw new NotImplementedException();
+    public bool IsPublished(string? culture = null) => throw new NotImplementedException();
 }

@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -6,7 +5,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
+/// <summary>
+///     Represents a repository for <see cref="IContent" /> document entities.
+/// </summary>
+public interface IDocumentRepository : IPublishableContentRepository<IContent>
 {
     /// <summary>
     ///     Gets paged documents.
@@ -35,73 +37,31 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
         string[]? propertyAliases,
         IQuery<IContent>? filter,
         Ordering? ordering,
-        bool loadTemplates)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering);
-
+        bool loadTemplates);
     /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
+    ///     Clears the publishing schedule for all entries having a date before (lower than, or equal to) a specified date.
     /// </summary>
-    /// <param name="contentId"></param>
-    /// <returns>
-    ///     <see cref="ContentScheduleCollection" />
-    /// </returns>
-    ContentScheduleCollection GetContentSchedule(int contentId);
-
+    /// <param name="date">The cutoff date.</param>
     /// <summary>
-    ///     Persists publish/unpublish schedule for a content node.
+    ///     Clears the publishing schedule for entries matching the specified action and having a date before the specified date.
     /// </summary>
-    /// <param name="content"></param>
-    /// <param name="schedule"></param>
-    void PersistContentSchedule(IContent content, ContentScheduleCollection schedule);
-
+    /// <param name="date">The cutoff date.</param>
+    /// <param name="action">The schedule action to clear.</param>
     /// <summary>
-    ///     Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
+    ///     Checks whether there is content scheduled for expiration before the specified date.
     /// </summary>
-    void ClearSchedule(DateTime date);
-
-    void ClearSchedule(DateTime date, ContentScheduleAction action);
-
-    bool HasContentForExpiration(DateTime date);
-
-    bool HasContentForRelease(DateTime date);
-
+    /// <param name="date">The date to check.</param>
+    /// <returns><c>true</c> if there is content scheduled for expiration; otherwise, <c>false</c>.</returns>
     /// <summary>
-    ///     Gets <see cref="IContent" /> objects having an expiration date before (lower than, or equal to) a specified date.
+    ///     Checks whether there is content scheduled for release before the specified date.
     /// </summary>
-    /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
-    /// </remarks>
-    IEnumerable<IContent> GetContentForExpiration(DateTime date);
-
+    /// <param name="date">The date to check.</param>
+    /// <returns><c>true</c> if there is content scheduled for release; otherwise, <c>false</c>.</returns>
     /// <summary>
-    ///     Gets <see cref="IContent" /> objects having a release date before (lower than, or equal to) a specified date.
+    ///     Checks whether the path to a content item is published.
     /// </summary>
-    /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
-    /// </remarks>
-    IEnumerable<IContent> GetContentForRelease(DateTime date);
-
-    /// <summary>
-    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
-    /// </summary>
-    /// <param name="documentIds">The IDs of the documents.</param>
-    /// <returns>
-    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
-    /// </returns>
-    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
-
-    /// <summary>
-    ///     Get the count of published items
-    /// </summary>
-    /// <returns></returns>
-    /// <remarks>
-    ///     We require this on the repo because the IQuery{IContent} cannot supply the 'newest' parameter
-    /// </remarks>
-    int CountPublished(string? contentTypeAlias = null);
-
-    bool IsPathPublished(IContent? content);
+    /// <param name="content">The content item.</param>
+    /// <returns><c>true</c> if the path is published; otherwise, <c>false</c>.</returns>
 
     /// <summary>
     ///     Used to bulk update the permissions set for a content item. This will replace all permissions

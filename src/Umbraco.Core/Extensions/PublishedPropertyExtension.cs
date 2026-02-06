@@ -13,6 +13,16 @@ public static class PublishedPropertyExtension
 {
     #region Value
 
+    /// <summary>
+    /// Gets the value of a published property with fallback support.
+    /// </summary>
+    /// <param name="property">The published property.</param>
+    /// <param name="publishedValueFallback">The published value fallback implementation.</param>
+    /// <param name="culture">The variation language.</param>
+    /// <param name="segment">The variation segment.</param>
+    /// <param name="fallback">The fallback strategy.</param>
+    /// <param name="defaultValue">The default value if no value is found.</param>
+    /// <returns>The property value, or the fallback/default value if not found.</returns>
     public static object? Value(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, object? defaultValue = default)
     {
         if (property.HasValue(culture, segment))
@@ -29,6 +39,17 @@ public static class PublishedPropertyExtension
 
     #region Value<T>
 
+    /// <summary>
+    /// Gets the value of a published property converted to the specified type, with fallback support.
+    /// </summary>
+    /// <typeparam name="T">The target type to convert the value to.</typeparam>
+    /// <param name="property">The published property.</param>
+    /// <param name="publishedValueFallback">The published value fallback implementation.</param>
+    /// <param name="culture">The variation language.</param>
+    /// <param name="segment">The variation segment.</param>
+    /// <param name="fallback">The fallback strategy.</param>
+    /// <param name="defaultValue">The default value if no value is found.</param>
+    /// <returns>The property value converted to the specified type, or the fallback/default value if not found.</returns>
     public static T? Value<T>(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, T? defaultValue = default)
     {
         if (property.HasValue(culture, segment))

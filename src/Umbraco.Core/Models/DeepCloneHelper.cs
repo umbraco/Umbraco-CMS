@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Provides helper methods for deep cloning objects.
+/// </summary>
 public static class DeepCloneHelper
 {
     /// <summary>
@@ -213,6 +216,13 @@ public static class DeepCloneHelper
         public bool IsList => GenericListType != null;
     }
 
+    /// <summary>
+    ///     Clones list items from a source collection to a target collection.
+    /// </summary>
+    /// <typeparam name="TList">The type of collection.</typeparam>
+    /// <typeparam name="TEntity">The type of entity in the collection.</typeparam>
+    /// <param name="source">The source collection to clone from.</param>
+    /// <param name="target">The target collection to clone to.</param>
     public static void CloneListItems<TList, TEntity>(TList source, TList target)
         where TList : ICollection<TEntity>
     {

@@ -5,17 +5,17 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey(INodeDto.NodeIdColumnName, AutoIncrement = false)]
 [ExplicitColumns]
-public class DocumentDto
+public class DocumentDto : INodeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
-    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+
 
     // Public constants to bind properties between DTOs
     public const string PublishedColumnName = "published";
 
-    [Column(PrimaryKeyColumnName)]
+    [Column(INodeDto.NodeIdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }

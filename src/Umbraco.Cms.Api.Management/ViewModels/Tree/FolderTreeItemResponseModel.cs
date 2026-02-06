@@ -3,4 +3,6 @@
 public class FolderTreeItemResponseModel : NamedEntityTreeItemResponseModel
 {
     public bool IsFolder { get; set; }
+
+    public bool NoAccess { get; set; }
 }

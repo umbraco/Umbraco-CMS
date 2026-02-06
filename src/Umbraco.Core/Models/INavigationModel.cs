@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a model used for content navigation in the tree structure.
+/// </summary>
 public interface INavigationModel
 {
     /// <summary>

@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IContentBase"/>, <see cref="IContent"/>, and <see cref="IMedia"/> types.
+/// </summary>
 public static class ContentExtensions
 {
     /// <summary>
@@ -50,10 +53,29 @@ public static class ContentExtensions
         return true;
     }
 
+    /// <summary>
+    /// Determines whether any user property of the content base is dirty (has been modified).
+    /// </summary>
+    /// <param name="entity">The content entity to check.</param>
+    /// <returns><c>true</c> if any property is dirty; otherwise, <c>false</c>.</returns>
     public static bool IsAnyUserPropertyDirty(this IContentBase entity) => entity.Properties.Any(x => x.IsDirty());
 
+    /// <summary>
+    /// Determines whether any user property of the content base was dirty (was modified before the last save).
+    /// </summary>
+    /// <param name="entity">The content entity to check.</param>
+    /// <returns><c>true</c> if any property was dirty; otherwise, <c>false</c>.</returns>
     public static bool WasAnyUserPropertyDirty(this IContentBase entity) => entity.Properties.Any(x => x.WasDirty());
 
+    /// <summary>
+    /// Determines whether the content entity is being moved as part of a bulk move operation.
+    /// </summary>
+    /// <param name="entity">The content entity to check.</param>
+    /// <returns><c>true</c> if the entity is being moved; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// When moving, only Path, Level, and UpdateDate properties are changed.
+    /// This allows bypassing version creation operations since the move cannot be rolled back.
+    /// </remarks>
     public static bool IsMoving(this IContentBase entity)
     {
         // Check if this entity is being moved as a descendant as part of a bulk moving operations.
@@ -184,6 +206,11 @@ public static class ContentExtensions
 
     #region Dirty
 
+    /// <summary>
+    /// Gets the aliases of all dirty (modified) user properties.
+    /// </summary>
+    /// <param name="entity">The content entity.</param>
+    /// <returns>A collection of property aliases that are dirty.</returns>
     public static IEnumerable<string> GetDirtyUserProperties(this IContentBase entity) =>
         entity.Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
 
@@ -228,7 +255,7 @@ public static class ContentExtensions
     /// <summary>
     ///     Gets the current status of the Content
     /// </summary>
-    public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string? culture = null)
+    public static ContentStatus GetStatus(this IPublishableContentBase content, ContentScheduleCollection contentSchedule, string? culture = null)
     {
         if (content.Trashed)
         {

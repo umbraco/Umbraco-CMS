@@ -15,11 +15,13 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
 	readonly avatarUrls = this.#currentUser.asObservablePart((user) => user?.avatarUrls);
 	readonly documentStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.documentStartNodeUniques);
+	readonly elementStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.elementStartNodeUniques);
 	readonly email = this.#currentUser.asObservablePart((user) => user?.email);
 	readonly fallbackPermissions = this.#currentUser.asObservablePart((user) => user?.fallbackPermissions);
 	readonly hasAccessToAllLanguages = this.#currentUser.asObservablePart((user) => user?.hasAccessToAllLanguages);
 	readonly hasAccessToSensitiveData = this.#currentUser.asObservablePart((user) => user?.hasAccessToSensitiveData);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
+	readonly hasElementRootAccess = this.#currentUser.asObservablePart((user) => user?.hasElementRootAccess);
 	readonly hasMediaRootAccess = this.#currentUser.asObservablePart((user) => user?.hasMediaRootAccess);
 	readonly isAdmin = this.#currentUser.asObservablePart((user) => user?.isAdmin);
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);

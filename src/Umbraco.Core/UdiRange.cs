@@ -58,6 +58,12 @@ public class UdiRange
     /// </summary>
     public string EntityType => Udi.EntityType;
 
+    /// <summary>
+    ///     Determines whether two <see cref="UdiRange" /> instances are equal.
+    /// </summary>
+    /// <param name="range1">The first range to compare.</param>
+    /// <param name="range2">The second range to compare.</param>
+    /// <returns><c>true</c> if the ranges are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(UdiRange? range1, UdiRange? range2)
     {
         if (ReferenceEquals(range1, range2))
@@ -73,8 +79,20 @@ public class UdiRange
         return range1.Equals(range2);
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="UdiRange" /> instances are not equal.
+    /// </summary>
+    /// <param name="range1">The first range to compare.</param>
+    /// <param name="range2">The second range to compare.</param>
+    /// <returns><c>true</c> if the ranges are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(UdiRange range1, UdiRange range2) => !(range1 == range2);
 
+    /// <summary>
+    ///     Parses a string representation of a UDI range.
+    /// </summary>
+    /// <param name="value">The string to parse.</param>
+    /// <returns>A <see cref="UdiRange" /> instance.</returns>
+    /// <exception cref="FormatException">Thrown when the string is not a valid UDI range.</exception>
     public static UdiRange Parse(string value)
     {
         if (Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) is false ||
@@ -96,10 +114,13 @@ public class UdiRange
             : new UdiRange(udi, uri.Query.TrimStart(Constants.CharArrays.QuestionMark));
     }
 
+    /// <inheritdoc />
     public override string ToString() => _uriValue.ToString();
 
+    /// <inheritdoc />
     public override bool Equals(object? obj) =>
         obj is UdiRange other && GetType() == other.GetType() && _uriValue == other._uriValue;
 
+    /// <inheritdoc />
     public override int GetHashCode() => _uriValue.GetHashCode();
 }

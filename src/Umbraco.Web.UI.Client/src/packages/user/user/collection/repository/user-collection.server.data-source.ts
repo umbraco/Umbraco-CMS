@@ -67,18 +67,12 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					}),
 					unique: item.id,
 					languageIsoCode: item.languageIsoCode || null,
-					documentStartNodeUniques: item.documentStartNodeIds.map((node) => {
-						return {
-							unique: node.id,
-						};
-					}),
-					mediaStartNodeUniques: item.mediaStartNodeIds.map((node) => {
-						return {
-							unique: node.id,
-						};
-					}),
+					documentStartNodeUniques: item.documentStartNodeIds.map((node) => ({ unique: node.id })),
+					mediaStartNodeUniques: item.mediaStartNodeIds.map((node) => ({ unique: node.id })),
+					elementStartNodeUniques: item.elementStartNodeIds.map((node) => ({ unique: node.id })),
 					hasDocumentRootAccess: item.hasDocumentRootAccess,
 					hasMediaRootAccess: item.hasMediaRootAccess,
+					hasElementRootAccess: item.hasElementRootAccess,
 					avatarUrls: item.avatarUrls,
 					state: item.state,
 					failedLoginAttempts: item.failedLoginAttempts,

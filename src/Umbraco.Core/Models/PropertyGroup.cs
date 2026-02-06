@@ -15,6 +15,9 @@ namespace Umbraco.Cms.Core.Models;
 [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
 public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
 {
+    /// <summary>
+    ///     The parent collection this group belongs to. Internal use only.
+    /// </summary>
     [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This field is for internal use only (to allow changing item keys).")]
     internal PropertyGroupCollection? Collection;
 
@@ -25,11 +28,19 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
 
     private PropertyGroupType _type;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PropertyGroup" /> class.
+    /// </summary>
+    /// <param name="isPublishing">A value indicating whether the property types support publishing.</param>
     public PropertyGroup(bool isPublishing)
         : this(new PropertyTypeCollection(isPublishing))
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PropertyGroup" /> class with a property type collection.
+    /// </summary>
+    /// <param name="propertyTypeCollection">The collection of property types for this group.</param>
     public PropertyGroup(PropertyTypeCollection propertyTypeCollection)
     {
         PropertyTypes = propertyTypeCollection;
@@ -132,11 +143,14 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
         }
     }
 
+    /// <inheritdoc />
     public bool Equals(PropertyGroup? other) =>
         base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias && Id == other.Id);
 
+    /// <inheritdoc />
     public override int GetHashCode() => (base.GetHashCode(), Type, Alias).GetHashCode();
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);
