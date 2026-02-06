@@ -245,24 +245,35 @@ public class PublishedContentQuery : IPublishedContentQuery
     #region Search
 
     /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*",
+    public IEnumerable<PublishedSearchResult> Search(
+        string term,
+        string culture = "*",
         string indexName = Constants.UmbracoIndexes.ExternalIndexName)
         => Search(term, 0, 0, out _, culture, indexName);
 
     /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords,
-        string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName,
+    public IEnumerable<PublishedSearchResult> Search(
+        string term,
+        int skip,
+        int take,
+        out long totalRecords,
+        string culture = "*",
+        string indexName = Constants.UmbracoIndexes.ExternalIndexName,
         ISet<string>? loadedFields = null)
     {
         if (skip < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(skip), skip,
+            throw new ArgumentOutOfRangeException(
+                nameof(skip),
+                skip,
                 "The value must be greater than or equal to zero.");
         }
 
         if (take < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(take), take,
+            throw new ArgumentOutOfRangeException(
+                nameof(take),
+                take,
                 "The value must be greater than or equal to zero.");
         }
 
@@ -324,13 +335,17 @@ public class PublishedContentQuery : IPublishedContentQuery
     {
         if (skip < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(skip), skip,
+            throw new ArgumentOutOfRangeException(
+                nameof(skip),
+                skip,
                 "The value must be greater than or equal to zero.");
         }
 
         if (take < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(take), take,
+            throw new ArgumentOutOfRangeException(
+                nameof(take),
+                take,
                 "The value must be greater than or equal to zero.");
         }
 
@@ -381,7 +396,9 @@ public class PublishedContentQuery : IPublishedContentQuery
             }
 
             // Now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
-            return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor,
+            return new CultureContextualSearchResultsEnumerator(
+                _wrapped.GetEnumerator(),
+                _variationContextAccessor,
                 originalContext);
         }
 

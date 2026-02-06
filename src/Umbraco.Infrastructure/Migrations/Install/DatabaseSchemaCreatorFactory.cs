@@ -32,6 +32,16 @@ public class DatabaseSchemaCreatorFactory
             _installDefaultDataSettings = installDefaultDataSettings;
         }
 
-    public DatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(database, _logger,
-        _loggerFactory, _umbracoVersion, _eventAggregator, _installDefaultDataSettings);
+    /// <summary>
+    ///     Creates a new instance of <see cref="DatabaseSchemaCreator" />.
+    /// </summary>
+    /// <param name="database">The database.</param>
+    /// <returns>A new <see cref="DatabaseSchemaCreator" /> instance.</returns>
+    public DatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(
+        database,
+        _logger,
+        _loggerFactory,
+        _umbracoVersion,
+        _eventAggregator,
+        _installDefaultDataSettings);
 }

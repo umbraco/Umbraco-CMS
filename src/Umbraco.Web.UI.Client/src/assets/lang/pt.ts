@@ -1378,8 +1378,9 @@ export default {
 		created: 'Criado',
 		currentVersion: 'Versão atual',
 		diffHelp:
-			'Isto mostra as diferenças entre a versão atual (rascunho) e a versão selecionada<br /><del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado',
-		noDiff: 'Não existem diferenças entre a versão atual (rascunho) e a versão selecionada',
+			'<del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado.',
+		showDiff: 'Mostrar diferenças entre a versão atual (rascunho) e a versão selecionada.',
+		noDiff: 'Não existem diferenças entre a versão atual (rascunho) e a versão selecionada.',
 		documentRolledBack: 'O documento foi revertido',
 		headline: 'Selecione uma versão para comparar com a versão atual',
 		htmlHelp:

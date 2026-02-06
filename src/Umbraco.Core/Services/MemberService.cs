@@ -28,6 +28,19 @@ namespace Umbraco.Cms.Core.Services
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemberService"/> class.
+        /// </summary>
+        /// <param name="provider">The core scope provider for managing database operations.</param>
+        /// <param name="loggerFactory">The factory for creating loggers.</param>
+        /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+        /// <param name="memberGroupService">The service for managing member groups.</param>
+        /// <param name="memberRepository">The repository for member data access.</param>
+        /// <param name="memberTypeRepository">The repository for member type data access.</param>
+        /// <param name="memberGroupRepository">The repository for member group data access.</param>
+        /// <param name="auditService">The service for audit logging.</param>
+        /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
+        /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
         public MemberService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -50,6 +63,18 @@ namespace Umbraco.Cms.Core.Services
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemberService"/> class.
+        /// </summary>
+        /// <param name="provider">The core scope provider for managing database operations.</param>
+        /// <param name="loggerFactory">The factory for creating loggers.</param>
+        /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+        /// <param name="memberGroupService">The service for managing member groups.</param>
+        /// <param name="memberRepository">The repository for member data access.</param>
+        /// <param name="memberTypeRepository">The repository for member type data access.</param>
+        /// <param name="memberGroupRepository">The repository for member group data access.</param>
+        /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
+        /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
         [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
         public MemberService(
             ICoreScopeProvider provider,
@@ -75,6 +100,20 @@ namespace Umbraco.Cms.Core.Services
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemberService"/> class.
+        /// </summary>
+        /// <param name="provider">The core scope provider for managing database operations.</param>
+        /// <param name="loggerFactory">The factory for creating loggers.</param>
+        /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+        /// <param name="memberGroupService">The service for managing member groups.</param>
+        /// <param name="memberRepository">The repository for member data access.</param>
+        /// <param name="memberTypeRepository">The repository for member type data access.</param>
+        /// <param name="memberGroupRepository">The repository for member group data access.</param>
+        /// <param name="auditService">The service for audit logging.</param>
+        /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
+        /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
+        /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
         [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
         public MemberService(
             ICoreScopeProvider provider,
@@ -158,6 +197,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Create
 
+        /// <inheritdoc />
         public async Task<PagedModel<IMember>> FilterAsync(
             MemberFilter memberFilter,
             string orderBy = "username",
@@ -245,15 +285,19 @@ namespace Umbraco.Cms.Core.Services
         IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
             => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias, isApproved);
 
+        /// <inheritdoc />
         public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias)
             => CreateMemberWithIdentity(username, email, username, string.Empty, memberTypeAlias);
 
+        /// <inheritdoc />
         public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved)
             => CreateMemberWithIdentity(username, email, username, string.Empty, memberTypeAlias, isApproved);
 
+        /// <inheritdoc />
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
             => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias);
 
+        /// <inheritdoc />
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
             => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias, isApproved);
 
@@ -292,6 +336,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
+        /// <inheritdoc />
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
             => CreateMemberWithIdentity(username, email, username, string.Empty, memberType);
 
@@ -308,6 +353,7 @@ namespace Umbraco.Cms.Core.Services
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType, bool isApproved)
             => CreateMemberWithIdentity(username, email, username, string.Empty, memberType, isApproved);
 
+        /// <inheritdoc />
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType)
             => CreateMemberWithIdentity(username, email, name, string.Empty, memberType);
 
@@ -406,9 +452,10 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
-            return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
+            return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("LoginName"));
         }
 
+        /// <inheritdoc />
         public IEnumerable<IMember> GetAll(
             int skip,
             int take,
@@ -419,6 +466,7 @@ namespace Umbraco.Cms.Core.Services
             string filter = "") =>
             GetAll(skip, take, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
 
+        /// <inheritdoc />
         public IEnumerable<IMember> GetAll(
             long pageIndex,
             int pageSize,
@@ -435,7 +483,7 @@ namespace Umbraco.Cms.Core.Services
             int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
             Guid.TryParse(filter, out Guid filterAsGuid);
             IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
-            return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
+            return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, propertyAliases: null, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 
         /// <summary>
@@ -548,7 +596,8 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query = Query<IMember>().Where(x => ids.Contains(x.Key));
+            List<Guid> idsAsList = [.. ids];
+            IQuery<IMember> query = Query<IMember>().Where(x => idsAsList.Contains(x.Key));
             return Task.FromResult(_memberRepository.Get(query));
         }
 
@@ -588,7 +637,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
             }
 
-            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Name"));
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("Name"));
         }
 
         /// <summary>
@@ -627,7 +676,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Email"));
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("Email"));
         }
 
         /// <summary>
@@ -666,7 +715,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("LoginName"));
         }
 
         /// <inheritdoc />
@@ -802,12 +851,19 @@ namespace Umbraco.Cms.Core.Services
 
         #region Save
 
+        /// <summary>
+        /// Sets the last login date for a member.
+        /// </summary>
+        /// <param name="username">The username of the member.</param>
+        /// <param name="date">The date and time of the last login.</param>
+        /// <exception cref="NotImplementedException">This method is not implemented.</exception>
         public void SetLastLogin(string username, DateTime date) => throw new NotImplementedException();
 
         /// <inheritdoc />
         public Attempt<OperationResult?> Save(IMember member, int userId = Constants.Security.SuperUserId)
         	=> Save(member, PublishNotificationSaveOptions.All, userId);
 
+        /// <inheritdoc />
         public Attempt<OperationResult?> Save(IMember member, PublishNotificationSaveOptions publishNotificationSaveOptions, int userId = Constants.Security.SuperUserId)
         {
             // trimming username and email to make sure we have no trailing space
@@ -817,6 +873,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             MemberSavingNotification? savingNotification = null;
             if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving))
             {
@@ -834,8 +892,6 @@ namespace Umbraco.Cms.Core.Services
             }
 
             var previousUsername = _memberRepository.Get(member.Id)?.Username;
-
-            scope.WriteLock(Constants.Locks.MemberTree);
 
             _memberRepository.Save(member);
 
@@ -864,6 +920,7 @@ namespace Umbraco.Cms.Core.Services
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
+        /// <inheritdoc />
         public void Save(IMember member)
             => Save(member, Constants.Security.SuperUserId);
 
@@ -875,14 +932,14 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
-
-            scope.WriteLock(Constants.Locks.MemberTree);
 
             foreach (IMember member in membersA)
             {
@@ -957,6 +1014,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
             var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
@@ -964,7 +1023,6 @@ namespace Umbraco.Cms.Core.Services
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
-            scope.WriteLock(Constants.Locks.MemberTree);
             DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
 
             Audit(AuditType.Delete, userId, member.Id);
@@ -990,6 +1048,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Roles
 
+        /// <inheritdoc />
         public void AddRole(string roleName)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1023,6 +1082,7 @@ namespace Umbraco.Cms.Core.Services
             return result.Select(x => x.Name).WhereNotNull().Distinct();
         }
 
+        /// <inheritdoc />
         public IEnumerable<string> GetAllRoles(string username)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1031,6 +1091,7 @@ namespace Umbraco.Cms.Core.Services
             return result.Where(x => x.Name != null).Select(x => x.Name).Distinct()!;
         }
 
+        /// <inheritdoc />
         public IEnumerable<int> GetAllRolesIds()
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1038,6 +1099,7 @@ namespace Umbraco.Cms.Core.Services
             return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
         }
 
+        /// <inheritdoc />
         public IEnumerable<int> GetAllRolesIds(int memberId)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1046,6 +1108,7 @@ namespace Umbraco.Cms.Core.Services
             return result.Select(x => x.Id).Distinct();
         }
 
+        /// <inheritdoc />
         public IEnumerable<int> GetAllRolesIds(string username)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1054,6 +1117,7 @@ namespace Umbraco.Cms.Core.Services
             return result.Select(x => x.Id).Distinct();
         }
 
+        /// <inheritdoc />
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1061,6 +1125,7 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.GetByMemberGroup(roleName);
         }
 
+        /// <inheritdoc />
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1068,6 +1133,7 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.FindMembersInRole(roleName, usernameToMatch, matchType);
         }
 
+        /// <inheritdoc />
         public bool DeleteRole(string roleName, bool throwIfBeingUsed)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1098,8 +1164,10 @@ namespace Umbraco.Cms.Core.Services
             return found?.Length > 0;
         }
 
+        /// <inheritdoc />
         public void AssignRole(string username, string roleName) => AssignRoles(new[] { username }, new[] { roleName });
 
+        /// <inheritdoc />
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1110,8 +1178,10 @@ namespace Umbraco.Cms.Core.Services
             scope.Complete();
         }
 
+        /// <inheritdoc />
         public void DissociateRole(string username, string roleName) => DissociateRoles(new[] { username }, new[] { roleName });
 
+        /// <inheritdoc />
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1122,8 +1192,10 @@ namespace Umbraco.Cms.Core.Services
             scope.Complete();
         }
 
+        /// <inheritdoc />
         public void AssignRole(int memberId, string roleName) => AssignRoles(new[] { memberId }, new[] { roleName });
 
+        /// <inheritdoc />
         public void AssignRoles(int[] memberIds, string[] roleNames)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1133,8 +1205,10 @@ namespace Umbraco.Cms.Core.Services
             scope.Complete();
         }
 
+        /// <inheritdoc />
         public void DissociateRole(int memberId, string roleName) => DissociateRoles(new[] { memberId }, new[] { roleName });
 
+        /// <inheritdoc />
         public void DissociateRoles(int[] memberIds, string[] roleNames)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1144,6 +1218,7 @@ namespace Umbraco.Cms.Core.Services
             scope.Complete();
         }
 
+        /// <inheritdoc />
         public void ReplaceRoles(string[] usernames, string[] roleNames)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1154,6 +1229,7 @@ namespace Umbraco.Cms.Core.Services
             scope.Complete();
         }
 
+        /// <inheritdoc />
         public void ReplaceRoles(int[] memberIds, string[] roleNames)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1170,6 +1246,12 @@ namespace Umbraco.Cms.Core.Services
         // NOTE: at the time of writing we do not have MemberTreeChangeNotification to publish changes as a result of a data integrity
         //       check. we cannot support this feature until such notification exists.
         //       see the content or media services for implementation details if this is ever going to be a relevant feature for members.
+        /// <summary>
+        /// Checks the data integrity of the member tree.
+        /// </summary>
+        /// <param name="options">The options for the data integrity report.</param>
+        /// <returns>A <see cref="ContentDataIntegrityReport"/> containing the results of the check.</returns>
+        /// <exception cref="InvalidOperationException">Data integrity checks are not implemented for members.</exception>
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
             => throw new InvalidOperationException("Data integrity checks are not (yet) implemented for members.");
 

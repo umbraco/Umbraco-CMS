@@ -47,7 +47,9 @@ internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepos
     {
         IEnumerable<TagDto> dtos = ids?.Length == 0
             ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
-            : Database.FetchByGroups<TagDto, int>(ids!, Constants.Sql.MaxParameterCount,
+            : Database.FetchByGroups<TagDto, int>(
+                ids!,
+                Constants.Sql.MaxParameterCount,
                 batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
 
         return dtos.Select(TagFactory.BuildEntity).ToList();
@@ -150,7 +152,7 @@ SELECT tagset.tag, tagset.{group}, tagset.languageid
 FROM {tagSetSql}
 LEFT OUTER JOIN {cmsTags}
 ON (LOWER(tagset.tag) = LOWER({cmsTags}.tag) AND LOWER(tagset.{group}) = LOWER({cmsTags}.{group}) AND COALESCE(tagset.languageid, -1) = COALESCE({cmsTagsLanguageIdCol}, -1))
-WHERE {cmsTags}.id IS NULL"; // cmsTags.id is never null
+WHERE {cmsTags}.id IS NULL";
 
         Database.Execute(sql1);
 
@@ -158,13 +160,13 @@ WHERE {cmsTags}.id IS NULL"; // cmsTags.id is never null
         var sql2 = $@"INSERT INTO {QuoteTableName(TagRelationshipDto.TableName)} ({nodeId}, {QuoteColumnName("propertyTypeId")}, {QuoteColumnName("tagId")})
 SELECT {contentId}, {propertyTypeId}, tagset2.Id
 FROM (
-    SELECT t.{QuoteColumnName("Id")}
+    SELECT t.id
     FROM {tagSetSql}
     INNER JOIN {cmsTags} as t ON (LOWER(tagset.tag) = LOWER(t.tag) AND LOWER(tagset.{group}) = LOWER(t.{group}) AND COALESCE(tagset.languageid, -1) = COALESCE(t.{languageIdCol}, -1))
 ) AS tagset2
 LEFT OUTER JOIN {QuoteTableName(TagRelationshipDto.TableName)} r
-ON (tagset2.id = r.{QuoteColumnName("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteColumnName("propertyTypeID")} = {propertyTypeId})
-WHERE r.{QuoteColumnName("tagId")} IS NULL"; // cmsTagRelationship.tagId is never null
+ON (tagset2.id = r.{QuoteColumnName("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteColumnName("propertyTypeId")} = {propertyTypeId})
+WHERE r.{QuoteColumnName("tagId")} IS NULL";
 
         Database.Execute(sql2);
     }
@@ -254,7 +256,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
             }
             else
             {
-                sql.Append("NULL");
+                sql.Append("NULL" + SqlSyntax.GetNullCastSuffix<int?>());
             }
             sql.Append(" AS languageid");
         }
@@ -331,7 +333,9 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group,
+    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(
+        TaggableObjectTypes objectType,
+        string group,
         string? culture = null)
     {
         Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
@@ -343,8 +347,11 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag,
-        string? group = null, string? culture = null)
+    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(
+        TaggableObjectTypes objectType,
+        string tag,
+        string? group = null,
+        string? culture = null)
     {
         Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
@@ -365,10 +372,13 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
         Sql<ISqlContext> sql = Sql()
             .Select<TagRelationshipDto>(x => Alias(x.NodeId, "NodeId"))
             .AndSelect<PropertyTypeDto>(
-            x => Alias(x.Alias, "PropertyTypeAlias"),
+                x => Alias(x.Alias, "PropertyTypeAlias"),
                 x => Alias(x.Id, "PropertyTypeId"))
-            .AndSelect<TagDto>(x => Alias(x.Id, "TagId"), x => Alias(x.Text, "TagText"),
-                x => Alias(x.Group, "TagGroup"), x => Alias(x.LanguageId, "TagLanguage"))
+            .AndSelect<TagDto>(
+                x => Alias(x.Id, "TagId"),
+                x => Alias(x.Text, "TagText"),
+                x => Alias(x.Group, "TagGroup"),
+                x => Alias(x.LanguageId, "TagLanguage"))
             .From<TagDto>()
             .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId)
             .InnerJoin<ContentDto>()
@@ -442,7 +452,8 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
         }
 
         sql = sql
-            .GroupBy<TagDto>(x => x.Id, x => x.Text, x => x.Group, x => x.LanguageId);
+            .GroupBy<TagDto>(x => x.Id, x => x.Text, x => x.Group, x => x.LanguageId)
+            .OrderBy<TagDto>(o => o.Text);
 
         return ExecuteTagsQuery(sql);
     }
@@ -462,6 +473,9 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
             sql = sql
                 .Where<TagDto>(dto => dto.Group == group);
         }
+
+        sql = sql
+            .OrderBy<TagDto>(o => o.Text);
 
         return ExecuteTagsQuery(sql);
     }
@@ -486,7 +500,10 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
+    public IEnumerable<ITag> GetTagsForProperty(
+        int contentId,
+        string propertyTypeAlias,
+        string? group = null,
         string? culture = null)
     {
         Sql<ISqlContext> sql = GetTagsSql(culture);
@@ -509,7 +526,10 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null,
+    public IEnumerable<ITag> GetTagsForProperty(
+        Guid contentId,
+        string propertyTypeAlias,
+        string? group = null,
         string? culture = null)
     {
         Sql<ISqlContext> sql = GetTagsSql(culture);

@@ -85,6 +85,9 @@ public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     /// </summary>
     protected AppCaches AppCaches { get; }
 
+    /// <summary>
+    ///     Gets the event aggregator for publishing notifications.
+    /// </summary>
     protected IEventAggregator EventAggregator { get; }
 
     /// <summary>

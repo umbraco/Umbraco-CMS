@@ -60,15 +60,25 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Applications.Content, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForContentTree,
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
-            Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members);
+            Constants.Applications.Content,
+            Constants.Applications.Media,
+            Constants.Applications.Users,
+            Constants.Applications.Settings,
+            Constants.Applications.Packages,
+            Constants.Applications.Members);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForMediaTree,
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
-            Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members);
+            Constants.Applications.Content,
+            Constants.Applications.Media,
+            Constants.Applications.Users,
+            Constants.Applications.Settings,
+            Constants.Applications.Packages,
+            Constants.Applications.Members);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForMemberTree,
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members);
+            Constants.Applications.Content,
+            Constants.Applications.Media,
+            Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMembers, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessPackages, Constants.Applications.Packages);

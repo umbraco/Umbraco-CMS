@@ -6,23 +6,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
 [ExplicitColumns]
-[PrimaryKey("Id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 internal sealed class TwoFactorLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.TwoFactorLogin;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    [Column("id")]
+    private const string UserOrMemberKeyColumnName = "userOrMemberKey";
+    private const string ProviderNameColumnName = "providerName";
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("userOrMemberKey")]
+    [Column(UserOrMemberKeyColumnName)]
     [Index(IndexTypes.NonClustered)]
     public Guid UserOrMemberKey { get; set; }
 
-    [Column("providerName")]
+    [Column(ProviderNameColumnName)]
     [Length(400)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "providerName,userOrMemberKey", Name = "IX_" + TableName + "_ProviderName")]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{ProviderNameColumnName},{UserOrMemberKeyColumnName}", Name = "IX_" + TableName + "_ProviderName")]
     public string ProviderName { get; set; } = null!;
 
     [Column("secret")]

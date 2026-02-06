@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Core.Exceptions;
 /// <summary>
 ///     An exception that is thrown if an unattended installation occurs.
 /// </summary>
+/// <seealso cref="System.Exception" />
 [Serializable]
 public class UnattendedInstallException : Exception
 {
@@ -46,6 +47,7 @@ public class UnattendedInstallException : Exception
     ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
     ///     information about the source or destination.
     /// </param>
+    [Obsolete("Constructors taking a signature of SerializationInfo info, StreamingContext context are deprecated and not used within Umbraco. Scheduled for removal in Umbraco 19.", DiagnosticId = "SYSLIB0051")]
     protected UnattendedInstallException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {

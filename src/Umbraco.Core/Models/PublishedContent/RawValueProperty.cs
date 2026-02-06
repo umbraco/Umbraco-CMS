@@ -23,6 +23,14 @@ public class RawValueProperty : PublishedPropertyBase
     private readonly object _sourceValue; // the value in the db
     private readonly Lazy<object?> _deliveryApiValue;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RawValueProperty"/> class.
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <param name="content">The published element that owns this property.</param>
+    /// <param name="sourceValue">The source value from the database.</param>
+    /// <param name="isPreviewing">A value indicating whether the content is being previewed.</param>
+    /// <exception cref="ArgumentException">Thrown when the property type supports variations.</exception>
     public RawValueProperty(IPublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
         : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
     {
@@ -43,18 +51,23 @@ public class RawValueProperty : PublishedPropertyBase
 
     // RawValueProperty does not (yet?) support variants,
     // only manages the current "default" value
+
+    /// <inheritdoc />
     public override object? GetSourceValue(string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _sourceValue : null;
 
+    /// <inheritdoc />
     public override bool HasValue(string? culture = null, string? segment = null)
     {
         var sourceValue = GetSourceValue(culture, segment);
         return sourceValue is string s ? !string.IsNullOrWhiteSpace(s) : sourceValue != null;
     }
 
+    /// <inheritdoc />
     public override object? GetValue(string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _objectValue.Value : null;
 
+    /// <inheritdoc />
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _deliveryApiValue.Value : null;
 }

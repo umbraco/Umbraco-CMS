@@ -32,8 +32,8 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#viewContext?: typeof UMB_VIEW_CONTEXT.TYPE;
 
-	//@state()
-	//private _hasRootProperties = false;
+	@state()
+	private _hasRootProperties = false;
 
 	@state()
 	private _hasRootGroups = false;
@@ -76,7 +76,14 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			null,
 		);
 
-		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
+		this.observe(
+			this.#tabsStructureHelper.hasProperties,
+			(hasRootProperties) => {
+				this._hasRootProperties = hasRootProperties;
+				this.#createRoutes();
+			},
+			'observeRootProperties',
+		);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#blockWorkspace = workspaceContext;
@@ -131,7 +138,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			});
 		}
 
-		if (this._hasRootGroups) {
+		if (this._hasRootGroups || this._hasRootProperties) {
 			routes.push({
 				path: '',
 				component: () => import('./block-workspace-view-edit-tab.element.js'),
@@ -213,9 +220,12 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
-				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
+				${this._routerPath &&
+				(this._tabs.length > 1 || (this._tabs.length === 1 && (this._hasRootGroups || this._hasRootProperties)))
 					? html` <uui-tab-group slot="header">
-							${this._hasRootGroups && this._tabs.length > 0 ? this.#renderTab(null, '#general_generic') : nothing}
+							${(this._hasRootGroups || this._hasRootProperties) && this._tabs.length > 0
+								? this.#renderTab(null, '#general_generic')
+								: nothing}
 							${repeat(
 								this._tabs,
 								(tab) => tab.name,

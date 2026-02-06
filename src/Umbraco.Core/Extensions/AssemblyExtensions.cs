@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="Assembly"/>.
+/// </summary>
 public static class AssemblyExtensions
 {
     private static string _rootDir = string.Empty;

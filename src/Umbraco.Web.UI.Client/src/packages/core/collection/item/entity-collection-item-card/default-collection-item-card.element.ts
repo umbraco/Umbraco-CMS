@@ -1,14 +1,19 @@
-import type { UmbCollectionItemModel } from '../types.js';
 import type { UmbEntityCollectionItemElement } from '../entity-collection-item-element.interface.js';
+import type { UmbCollectionItemModel } from '../types.js';
 import { getItemFallbackName, getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbWithOptionalDescriptionModel, UmbWithOptionalThumbnailModel } from '@umbraco-cms/backoffice/models';
+
+type UmbDefaultCollectionItemCardItemModel = UmbCollectionItemModel &
+	UmbWithOptionalThumbnailModel &
+	UmbWithOptionalDescriptionModel;
 
 @customElement('umb-default-collection-item-card')
 export class UmbDefaultCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	@property({ type: Object })
-	item?: UmbCollectionItemModel;
+	item?: UmbDefaultCollectionItemCardItemModel;
 
 	@property({ type: Boolean })
 	selectable = false;
@@ -41,8 +46,9 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 		if (!this.item) return nothing;
 
 		return html`
-			<uui-card-content-node
+			<umb-figure-card
 				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+				description=${ifDefined(this.item.description ?? undefined)}
 				href=${ifDefined(this.href)}
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
@@ -50,16 +56,22 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 				?disabled=${this.disabled}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}
-				?readonly=${!this.href}>
+				?readonly=${!this.href}
+				background-color="var(--uui-color-surface)">
 				<slot name="actions" slot="actions"></slot>
-				${this.#renderIcon(this.item)}
-			</uui-card-content-node>
+				${this.item.thumbnail ? this.#renderThumbnail(this.item) : this.#renderIcon(this.item)}
+			</umb-figure-card>
 		`;
 	}
 
-	#renderIcon(item: UmbCollectionItemModel) {
+	#renderThumbnail(item: UmbDefaultCollectionItemCardItemModel) {
+		if (!item.thumbnail) return nothing;
+		return html`<img src=${item.thumbnail.src} alt=${item.thumbnail.alt || item.name || ''} />`;
+	}
+
+	#renderIcon(item: UmbDefaultCollectionItemCardItemModel) {
 		const icon = item.icon || getItemFallbackIcon();
-		return html`<umb-icon slot="icon" name=${icon}></umb-icon>`;
+		return html`<umb-icon name=${icon}></umb-icon>`;
 	}
 }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -15,6 +15,13 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     private readonly IRepositoryCacheVersionAccessor _repositoryCacheVersionAccessor;
     private readonly ConcurrentDictionary<string, Guid> _cacheVersions = new();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RepositoryCacheVersionService" /> class.
+    /// </summary>
+    /// <param name="scopeProvider">The scope provider.</param>
+    /// <param name="repositoryCacheVersionRepository">The repository cache version repository.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="repositoryCacheVersionAccessor">The repository cache version accessor.</param>
     public RepositoryCacheVersionService(
         ICoreScopeProvider scopeProvider,
         IRepositoryCacheVersionRepository repositoryCacheVersionRepository,
@@ -116,6 +123,11 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         scope.Complete();
     }
 
+    /// <summary>
+    ///     Gets the cache key for the specified entity type.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <returns>The cache key for the entity type.</returns>
     internal string GetCacheKey<TEntity>()
         where TEntity : class =>
         typeof(TEntity).FullName ?? typeof(TEntity).Name;

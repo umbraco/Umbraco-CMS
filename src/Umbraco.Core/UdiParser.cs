@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Umbraco.Cms.Core;
 
+/// <summary>
+///     Provides methods for parsing and managing UDI (Umbraco Document Identifier) strings.
+/// </summary>
 public sealed class UdiParser
 {
     private static readonly ConcurrentDictionary<string, Udi> RootUdis = new();
@@ -14,6 +17,9 @@ public sealed class UdiParser
         // we will add scanned types later on
         UdiTypes = new ConcurrentDictionary<string, UdiType>(GetKnownUdiTypes());
 
+    /// <summary>
+    ///     Gets the dictionary of registered UDI types and their corresponding entity types.
+    /// </summary>
     internal static ConcurrentDictionary<string, UdiType> UdiTypes { get; private set; }
 
     /// <summary>
@@ -112,6 +118,12 @@ public sealed class UdiParser
     /// <param name="udiType"></param>
     public static void RegisterUdiType(string entityType, UdiType udiType) => UdiTypes.TryAdd(entityType, udiType);
 
+    /// <summary>
+    ///     Gets the root UDI for a specified entity type.
+    /// </summary>
+    /// <param name="entityType">The entity type.</param>
+    /// <returns>A root UDI for the entity type.</returns>
+    /// <exception cref="ArgumentException">Thrown when the entity type is unknown.</exception>
     internal static Udi GetRootUdi(string entityType) =>
         RootUdis.GetOrAdd(entityType, x =>
         {
@@ -196,6 +208,10 @@ public sealed class UdiParser
         throw new InvalidOperationException(string.Format("Invalid udi type \"{0}\".", udiType));
     }
 
+    /// <summary>
+    ///     Gets a dictionary of all known UDI types and their entity type mappings.
+    /// </summary>
+    /// <returns>A dictionary mapping entity type strings to <see cref="UdiType" /> values.</returns>
     public static Dictionary<string, UdiType> GetKnownUdiTypes() =>
         new()
         {
@@ -217,7 +233,7 @@ public sealed class UdiParser
             { Constants.UdiEntityType.Member, UdiType.GuidUdi },
             { Constants.UdiEntityType.MemberGroup, UdiType.GuidUdi },
             { Constants.UdiEntityType.MemberType, UdiType.GuidUdi },
-            { Constants.UdiEntityType.MemberTypeContainer, UdiType.GuidUdi },        
+            { Constants.UdiEntityType.MemberTypeContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.Relation, UdiType.GuidUdi },
             { Constants.UdiEntityType.RelationType, UdiType.GuidUdi },
             { Constants.UdiEntityType.Template, UdiType.GuidUdi },

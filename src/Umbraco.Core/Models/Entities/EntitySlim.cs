@@ -98,11 +98,15 @@ public class EntitySlim : IEntitySlim
 
     #region IDeepCloneable
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public object DeepClone() => throw new InvalidOperationException("This method won't be implemented.");
 
     #endregion
 
+    /// <inheritdoc />
     public void ResetIdentity()
     {
         Id = default;
@@ -113,26 +117,66 @@ public class EntitySlim : IEntitySlim
 
     // IEntitySlim does *not* track changes, but since it indirectly implements IUmbracoEntity,
     // and therefore IRememberBeingDirty, we have to have those methods - which all throw.
+
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public bool IsDirty() => throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <param name="propName">The property name.</param>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public bool IsPropertyDirty(string propName) =>
         throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public IEnumerable<string> GetDirtyProperties() =>
         throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public void ResetDirtyProperties() => throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public bool WasDirty() => throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <param name="propertyName">The property name.</param>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public bool WasPropertyDirty(string propertyName) =>
         throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public void ResetWereDirtyProperties() => throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <param name="rememberDirty">A value indicating whether to remember dirty properties.</param>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public void ResetDirtyProperties(bool rememberDirty) =>
         throw new InvalidOperationException("This method won't be implemented.");
 
+    /// <summary>
+    ///     Not implemented. Always throws <see cref="InvalidOperationException" />.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Always thrown as this method is not implemented.</exception>
     public IEnumerable<string> GetWereDirtyProperties() =>
         throw new InvalidOperationException("This method won't be implemented.");
 

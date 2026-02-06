@@ -28,4 +28,12 @@ const sortMode: UmbExtensionManifest = {
 	],
 };
 
-export const manifests: Array<UmbExtensionManifest> = [clipboardPaste, sortMode];
+const clear: UmbExtensionManifest = {
+	type: 'propertyAction',
+	kind: 'clear',
+	alias: 'Umb.PropertyAction.BlockGrid.Clear',
+	name: 'Block Grid Clear Property Action',
+	forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
+};
+
+export const manifests: Array<UmbExtensionManifest> = [clipboardPaste, sortMode, clear];

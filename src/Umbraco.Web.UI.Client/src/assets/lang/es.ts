@@ -15,6 +15,7 @@ export default {
 		auditTrail: 'Historial',
 		browse: 'Nodo de Exploración',
 		changeDocType: 'Cambiar tipo de documento',
+		clear: 'Eliminar todo',
 		copy: 'Copiar',
 		create: 'Crear',
 		createPackage: 'Crear Paquete',
@@ -174,11 +175,13 @@ export default {
 		parentNotPublishedAnomaly: 'Ups: este documento está publicado pero no está en la caché (error interno)',
 		getUrlException: 'No se pudo obtener la URL',
 		routeError: 'Este documento está publicado pero tu URL colisionará con contenido %0%',
+		protected: 'Protegido',
 		publish: 'Publicar',
 		publishStatus: 'Estado de la Publicación',
 		releaseDate: 'Publicar el',
 		unpublishDate: 'Retirar publicación el',
 		removeDate: 'Fecha de Eliminación',
+		scheduledPublishing: 'Publicación programada',
 		sortDone: 'El Orden esta actualizado',
 		sortHelp:
 			'Para organizar los nodos, simplemente arrastra los nodos o realice un clic en uno de los encabezados de columna. Puedes seleccionar múltiple nodos manteniendo presionados "Shift" o "Control" mientras seleccionas',
@@ -186,6 +189,7 @@ export default {
 		titleOptional: 'Título (opcional)',
 		altTextOptional: 'Texto alternativo (opcional)',
 		type: 'Tipo',
+		unpublishedChanges: 'Cambios no publicados',
 		unpublish: 'Ocultar',
 		updateDate: 'Última actualización',
 		updateDateDesc: 'Fecha/hora este documento fue modificado',
@@ -873,8 +877,8 @@ export default {
 		reset: 'Reiniciar',
 	},
 	rollback: {
-		diffHelp:
-			'Esto muestra las diferencias entre la versión actual y la versión seleccionada<br /><del>Red</del> el texto de la versión seleccionada no se mostrará. , <ins>el verde significa añadido</ins>',
+		diffHelp: '<del>El texto rojo</del> se eliminará en la versión seleccionada, <ins>el texto verde</ins> se añadirá.',
+		showDiff: 'Mostrar diferencias entre la versión actual (borrador) y la versión seleccionada.',
 		documentRolledBack: 'Se ha recuperado la última versión del documento.',
 		htmlHelp:
 			'Esto muestra la versión seleccionada como html, si deseas ver la diferencia entre 2 versiones al mismo tiempo, por favor usa la vista diff',

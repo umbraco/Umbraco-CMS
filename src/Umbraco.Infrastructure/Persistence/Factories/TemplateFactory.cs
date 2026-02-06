@@ -29,8 +29,11 @@ internal static class TemplateFactory
 
     #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-    public static Template BuildEntity(IShortStringHelper shortStringHelper, TemplateDto dto,
-        IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string?> getFileContent)
+    public static Template BuildEntity(
+        IShortStringHelper shortStringHelper,
+        TemplateDto dto,
+        IEnumerable<IUmbracoEntity> childDefinitions,
+        Func<File, string?> getFileContent)
     {
         var template = new Template(shortStringHelper, dto.NodeDto.Text, dto.Alias, getFileContent);
 

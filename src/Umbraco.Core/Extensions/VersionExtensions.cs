@@ -6,8 +6,17 @@ using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="Version"/> and <see cref="SemVersion"/>.
+/// </summary>
 public static class VersionExtensions
 {
+    /// <summary>
+    /// Converts a <see cref="SemVersion"/> to a <see cref="Version"/>.
+    /// </summary>
+    /// <param name="semVersion">The semantic version to convert.</param>
+    /// <param name="maxParts">The maximum number of version parts to include (2, 3, or 4). Defaults to 4.</param>
+    /// <returns>A <see cref="Version"/> instance representing the semantic version.</returns>
     public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
     {
         int.TryParse(semVersion.Build, NumberStyles.Integer, CultureInfo.InvariantCulture, out int build);
@@ -25,6 +34,12 @@ public static class VersionExtensions
         return new Version(semVersion.Major, semVersion.Minor);
     }
 
+    /// <summary>
+    /// Subtracts one from the revision number of a version.
+    /// </summary>
+    /// <param name="version">The version to modify.</param>
+    /// <returns>A new version with the revision decremented by one.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when attempting to subtract from a zero version.</exception>
     public static Version SubtractRevision(this Version version)
     {
         var parts = new List<int>(new[] { version.Major, version.Minor, version.Build, version.Revision });
@@ -79,6 +94,11 @@ public static class VersionExtensions
         return FromList(parts);
     }
 
+    /// <summary>
+    /// Creates a version from a list of integer parts.
+    /// </summary>
+    /// <param name="parts">The list of version parts.</param>
+    /// <returns>A <see cref="Version"/> instance.</returns>
     private static Version FromList(IList<int> parts)
     {
         while (parts.Count < 4)

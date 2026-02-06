@@ -294,12 +294,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // the final query for before and after positions will increase. So we need to calculate the offset based on the provided values.
         int beforeAfterParameterIndexOffset = GetBeforeAfterParameterOffset(objectTypes, filter);
 
+        // use all lower case alias names to avoid sql syntax issues
+        string targetAlias = "target";
+
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
             .Select("rn")
-            .From().AppendSubQuery(rowNumberSql, "Target")
-            .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
+            .From().AppendSubQuery(rowNumberSql, targetAlias)
+            .Where<NodeDto>(x => x.UniqueId == targetKey, targetAlias);
 
         // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
         // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
@@ -316,8 +319,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         return Sql()
-            .Select("UniqueId")
-            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Select(QuoteColumnName("uniqueId"))
+            .From().AppendSubQuery(rowNumberSql, "nn")
             .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
             .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
@@ -355,9 +358,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
         Sql<ISqlContext>? sql = Sql()
             .SelectCount()
-            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .From().AppendSubQuery(rowNumberSql, "nn")
             .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
-        return Database.ExecuteScalar<long>(sql);
+        return Database.FirstOrDefault<long>(sql);
     }
 
 
@@ -459,7 +462,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
     {
         // NodeId is named Id on TreeEntityPath = use an alias
-        Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, nameof(TreeEntityPath.Id)), x => x.Path)
+        Sql<ISqlContext> sql = Sql().Select<NodeDto>(
+                x => Alias(x.NodeId, nameof(TreeEntityPath.Id)),
+                x => x.Path,
+                x => Alias(x.UniqueId, nameof(TreeEntityPath.Key)))
             .From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
         filter?.Invoke(sql);
         return Database.Fetch<TreeEntityPath>(sql);
@@ -495,14 +501,14 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
             .Where<NodeDto>(x => x.NodeId == id);
-        return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+        return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
     public UmbracoObjectTypes GetObjectType(Guid key)
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == key);
-        return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+        return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
     public int ReserveId(Guid key)
@@ -659,7 +665,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .OrderBy<LanguageDto>(x => x.Id);
 
     // gets the full sql for a given object type and a given unique id
-    private Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         Guid uniqueId)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, uniqueId);
@@ -667,7 +677,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     // gets the full sql for a given object type and a given node id
-    private Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         int nodeId)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, nodeId);
@@ -675,7 +689,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     // gets the full sql for a given object type, with a given filter
-    private Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    private Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
@@ -722,9 +740,18 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         else
         {
             sql
-                .Select<NodeDto>(x => x.NodeId, x => x.Trashed, x => x.ParentId, x => x.UserId, x => x.Level,
+                .Select<NodeDto>(
+                    x => x.NodeId,
+                    x => x.Trashed,
+                    x => x.ParentId,
+                    x => x.UserId,
+                    x => x.Level,
                     x => x.Path)
-                .AndSelect<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType,
+                .AndSelect<NodeDto>(
+                    x => x.SortOrder,
+                    x => x.UniqueId,
+                    x => x.Text,
+                    x => x.NodeObjectType,
                     x => x.CreateDate);
 
             if (objectTypes.Length == 0)
@@ -810,8 +837,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM [+ filter] + WHERE sql
     // for a given object type, with a given filter
-    private Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount,
-        Action<Sql<ISqlContext>>? filter, Guid[] objectTypes)
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Action<Sql<ISqlContext>>? filter,
+        Guid[] objectTypes)
     {
         Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, filter, objectTypes, isCount);
         if (objectTypes.Length > 0)
@@ -842,21 +874,35 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and node id
-    private Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Guid objectType,
         int nodeId) =>
         GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.NodeId == nodeId && x.NodeObjectType == objectType);
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and unique id
-    private Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    private Sql<ISqlContext> GetBaseWhere(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        bool isCount,
+        Guid objectType,
         Guid uniqueId) =>
         GetBase(isContent, isMedia, isMember, null, isCount)
             .Where<NodeDto>(x => x.UniqueId == uniqueId && x.NodeObjectType == objectType);
 
     // gets the GROUP BY / ORDER BY sql
     // required in order to count children
-    private Sql<ISqlContext> AddGroupBy(bool isContent, bool isMedia, bool isMember, Sql<ISqlContext> sql,
+    private Sql<ISqlContext> AddGroupBy(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Sql<ISqlContext> sql,
         bool defaultSort)
     {
         sql
@@ -929,11 +975,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
                 case "NODEID":
-                    orderBy = runner.OrderBy;
+                    orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "id");
                     orderingIncludesNodeId = true;
                     break;
                 default:
-                    orderBy = QuoteColumnName(runner.OrderBy) ?? string.Empty;
+                    orderBy = runner.OrderBy != null
+                        ? SqlSyntax.GetQuotedColumn(NodeDto.TableName, runner.OrderBy)
+                        : string.Empty;
                     break;
             }
 

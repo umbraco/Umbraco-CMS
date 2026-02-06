@@ -383,15 +383,24 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         };
 
         contentType.AddPropertyType(
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             { Name = "Title", Description = string.Empty, Mandatory = false, DataTypeId = -88 });
         contentType.AddPropertyType(
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.RichText, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.RichText,
+                ValueStorageType.Ntext,
                 "bodyText")
             { Name = "Body Text", Description = string.Empty, Mandatory = false, DataTypeId = -87 });
         contentType.AddPropertyType(
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             { Name = "Author", Description = "Name of the author", Mandatory = false, DataTypeId = -88 });
 
@@ -418,16 +427,28 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var global = ContentTypeBuilder.CreateSimpleContentType("global", "Global", defaultTemplateId: template.Id);
         ContentTypeService.Save(global);
 
-        var components = ContentTypeBuilder.CreateSimpleContentType("components", "Components", global,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var components = ContentTypeBuilder.CreateSimpleContentType(
+            "components",
+            "Components",
+            global,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(components);
 
-        var component = ContentTypeBuilder.CreateSimpleContentType("component", "Component", components,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var component = ContentTypeBuilder.CreateSimpleContentType(
+            "component",
+            "Component",
+            components,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(component);
 
-        var category = ContentTypeBuilder.CreateSimpleContentType("category", "Category", global,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var category = ContentTypeBuilder.CreateSimpleContentType(
+            "category",
+            "Category",
+            global,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(category);
 
         var success = category.AddContentType(component);
@@ -441,12 +462,20 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
 
-        var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true,
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(
+            "page",
+            "Page",
+            randomizeAliases: true,
             defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
 
-        var childContentType = ContentTypeBuilder.CreateSimpleContentType("childPage", "Child Page", contentType,
-            randomizeAliases: true, propertyGroupAlias: "childContent", propertyGroupName: "Child Content",
+        var childContentType = ContentTypeBuilder.CreateSimpleContentType(
+            "childPage",
+            "Child Page",
+            contentType,
+            randomizeAliases: true,
+            propertyGroupAlias: "childContent",
+            propertyGroupName: "Child Content",
             defaultTemplateId: template.Id);
         ContentTypeService.Save(childContentType);
         var content = ContentService.Create("Page 1", -1, childContentType.Alias);
@@ -618,7 +647,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var simpleContentType =
-            ContentTypeBuilder.CreateSimpleContentType("category", "Category", metaContentType,
+            ContentTypeBuilder.CreateSimpleContentType(
+                "category",
+                "Category",
+                metaContentType,
                 defaultTemplateId: template.Id) as IContentType;
         ContentTypeService.Save(simpleContentType);
         var categoryId = simpleContentType.Id;
@@ -660,12 +692,19 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var parentContentType1 =
             ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
         ContentTypeService.Save(parentContentType1);
-        var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType("parent2", "Parent2",
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType(
+            "parent2",
+            "Parent2",
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(parentContentType2);
 
-        var simpleContentType = ContentTypeBuilder.CreateSimpleContentType("category", "Category", parentContentType1,
-            randomizeAliases: true, defaultTemplateId: template.Id) as IContentType;
+        var simpleContentType = ContentTypeBuilder.CreateSimpleContentType(
+            "category",
+            "Category",
+            parentContentType1,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id) as IContentType;
         ContentTypeService.Save(simpleContentType);
 
         // Act
@@ -695,9 +734,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(clonedContentType.Key, originalContentType.Key);
         Assert.AreNotEqual(clonedContentType.Path, originalContentType.Path);
 
-        Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id,
+        Assert.AreNotEqual(
+            clonedContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id,
             originalContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id);
-        Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id,
+        Assert.AreNotEqual(
+            clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id,
             originalContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id);
     }
 
@@ -711,7 +752,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
 
-        var simpleContentType = ContentTypeBuilder.CreateSimpleContentType("category", "Category", metaContentType,
+        var simpleContentType = ContentTypeBuilder.CreateSimpleContentType(
+            "category",
+            "Category",
+            metaContentType,
             defaultTemplateId: template.Id);
         ContentTypeService.Save(simpleContentType);
         var categoryId = simpleContentType.Id;
@@ -750,9 +794,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(cloned.Key, original.Key);
         Assert.AreNotEqual(cloned.Path, original.Path);
         Assert.AreNotEqual(cloned.SortOrder, original.SortOrder);
-        Assert.AreNotEqual(cloned.PropertyTypes.First(x => x.Alias.Equals("title")).Id,
+        Assert.AreNotEqual(
+            cloned.PropertyTypes.First(x => x.Alias.Equals("title")).Id,
             original.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
-        Assert.AreNotEqual(cloned.PropertyGroups.First(x => x.Name.Equals("Content")).Id,
+        Assert.AreNotEqual(
+            cloned.PropertyGroups.First(x => x.Name.Equals("Content")).Id,
             original.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
     }
 
@@ -766,12 +812,19 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var parentContentType1 =
             ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
         ContentTypeService.Save(parentContentType1);
-        var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType("parent2", "Parent2",
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType(
+            "parent2",
+            "Parent2",
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(parentContentType2);
 
-        var simpleContentType = ContentTypeBuilder.CreateSimpleContentType("category", "Category", parentContentType1,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var simpleContentType = ContentTypeBuilder.CreateSimpleContentType(
+            "category",
+            "Category",
+            parentContentType1,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(simpleContentType);
 
         // Act
@@ -796,9 +849,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(clonedContentType.Key, originalContentType.Key);
         Assert.AreNotEqual(clonedContentType.Path, originalContentType.Path);
 
-        Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id,
+        Assert.AreNotEqual(
+            clonedContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id,
             originalContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id);
-        Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id,
+        Assert.AreNotEqual(
+            clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id,
             originalContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id);
     }
 
@@ -813,8 +868,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         var parent = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(parent);
-        var child = ContentTypeBuilder.CreateSimpleContentType("simpleChildPage", "Simple Child Page", parent,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var child = ContentTypeBuilder.CreateSimpleContentType(
+            "simpleChildPage",
+            "Simple Child Page",
+            parent,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(child);
         var composition = ContentTypeBuilder.CreateMetaContentType();
         ContentTypeService.Save(composition);
@@ -825,7 +884,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var duplicatePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -849,14 +911,24 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
 
-        var basePage = ContentTypeBuilder.CreateSimpleContentType("basePage", "Base Page", randomizeAliases: true,
+        var basePage = ContentTypeBuilder.CreateSimpleContentType(
+            "basePage",
+            "Base Page",
+            randomizeAliases: true,
             defaultTemplateId: template.Id);
         ContentTypeService.Save(basePage);
-        var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", basePage,
+        var contentPage = ContentTypeBuilder.CreateSimpleContentType(
+            "contentPage",
+            "Content Page",
+            basePage,
             defaultTemplateId: template.Id);
         ContentTypeService.Save(contentPage);
-        var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
+            "advancedPage",
+            "Advanced Page",
+            contentPage,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(advancedPage);
 
         var metaComposition = ContentTypeBuilder.CreateMetaContentType();
@@ -871,7 +943,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var duplicatePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -930,7 +1005,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -943,7 +1021,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(basePage);
 
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -960,7 +1041,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // NOTE: It should not be possible to Save 'BasePage' with the Title PropertyType added
         var titlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -1023,7 +1107,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -1036,7 +1123,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(basePage);
 
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1049,7 +1139,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentPage);
 
         var subtitlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "subtitle")
             {
                 Name = "Subtitle",
@@ -1062,7 +1155,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(advancedPage);
 
         var titlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -1127,7 +1223,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -1140,7 +1239,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(basePage);
 
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1153,7 +1255,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentPage);
 
         var subtitlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "subtitle")
             {
                 Name = "Subtitle",
@@ -1166,7 +1271,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(advancedPage);
 
         var titlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -1192,7 +1300,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(metaCompositionAdded, Is.True);
 
         var testPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "test")
             {
                 Name = "Test",
@@ -1218,15 +1329,28 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
 
-        var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true,
+        var page = ContentTypeBuilder.CreateSimpleContentType(
+            "page",
+            "Page",
+            randomizeAliases: true,
             defaultTemplateId: template.Id);
         ContentTypeService.Save(page);
-        var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page,
-            randomizeAliases: true, propertyGroupAlias: "content2", propertyGroupName: "Content_",
+        var contentPage = ContentTypeBuilder.CreateSimpleContentType(
+            "contentPage",
+            "Content Page",
+            page,
+            randomizeAliases: true,
+            propertyGroupAlias: "content2",
+            propertyGroupName: "Content_",
             defaultTemplateId: template.Id);
         ContentTypeService.Save(contentPage);
-        var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage,
-            randomizeAliases: true, propertyGroupAlias: "details", propertyGroupName: "Details",
+        var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
+            "advancedPage",
+            "Advanced Page",
+            contentPage,
+            randomizeAliases: true,
+            propertyGroupAlias: "details",
+            propertyGroupName: "Details",
             defaultTemplateId: template.Id);
         ContentTypeService.Save(advancedPage);
 
@@ -1235,7 +1359,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var subtitlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "subtitle")
             {
                 Name = "Subtitle",
@@ -1245,7 +1372,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1293,7 +1423,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var titlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -1304,7 +1437,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             };
         var titleAdded = basePage.AddPropertyType(titlePropertyType, "content", "Content");
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -1315,7 +1451,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             };
         var bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "content", "Content");
         var subtitlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "subtitle")
             {
                 Name = "Subtitle",
@@ -1326,7 +1465,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             };
         var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content");
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1369,14 +1511,25 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
-        var basePage = ContentTypeBuilder.CreateSimpleContentType("basePage", "Base Page", randomizeAliases: true,
+        var basePage = ContentTypeBuilder.CreateSimpleContentType(
+            "basePage",
+            "Base Page",
+            randomizeAliases: true,
             defaultTemplateId: template.Id);
         ContentTypeService.Save(basePage);
-        var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", basePage,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var contentPage = ContentTypeBuilder.CreateSimpleContentType(
+            "contentPage",
+            "Content Page",
+            basePage,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(contentPage);
-        var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
+            "advancedPage",
+            "Advanced Page",
+            contentPage,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(advancedPage);
 
         var metaComposition = ContentTypeBuilder.CreateMetaContentType();
@@ -1393,7 +1546,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var propertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -1421,8 +1577,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // create 'page' content type with a 'Content_' group
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
-        var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", propertyGroupAlias: "content2",
-            propertyGroupName: "Content_", defaultTemplateId: template.Id);
+        var page = ContentTypeBuilder.CreateSimpleContentType(
+            "page",
+            "Page",
+            propertyGroupAlias: "content2",
+            propertyGroupName: "Content_",
+            defaultTemplateId: template.Id);
         Assert.AreEqual(1, page.PropertyGroups.Count);
         Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
         Assert.AreEqual(3, page.PropertyTypes.Count());
@@ -1432,8 +1592,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(page);
 
         // create 'contentPage' content type as a child of 'page'
-        var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page,
-            randomizeAliases: true, defaultTemplateId: template.Id);
+        var contentPage = ContentTypeBuilder.CreateSimpleContentType(
+            "contentPage",
+            "Content Page",
+            page,
+            randomizeAliases: true,
+            defaultTemplateId: template.Id);
         Assert.AreEqual(1, page.PropertyGroups.Count);
         Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
         Assert.AreEqual(3, contentPage.PropertyTypes.Count());
@@ -1459,7 +1623,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // add property 'prop1' to 'contentPage' group 'Content_'
         var prop1 =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "testTextbox")
             {
                 Name = "Test Textbox",
@@ -1473,7 +1640,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // add property 'prop2' to 'contentPage' group 'Content'
         var prop2 =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "anotherTextbox")
             {
                 Name = "Another Test Textbox",
@@ -1516,15 +1686,30 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
-        var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true,
-            propertyGroupAlias: "content2", propertyGroupName: "Content_", defaultTemplateId: template.Id);
+        var page = ContentTypeBuilder.CreateSimpleContentType(
+            "page",
+            "Page",
+            randomizeAliases: true,
+            propertyGroupAlias: "content2",
+            propertyGroupName: "Content_",
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(page);
-        var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page,
-            randomizeAliases: true, propertyGroupAlias: "contentx", propertyGroupName: "Contentx",
+        var contentPage = ContentTypeBuilder.CreateSimpleContentType(
+            "contentPage",
+            "Content Page",
+            page,
+            randomizeAliases: true,
+            propertyGroupAlias: "contentx",
+            propertyGroupName: "Contentx",
             defaultTemplateId: template.Id);
         ContentTypeService.Save(contentPage);
-        var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage,
-            randomizeAliases: true, propertyGroupAlias: "contenty", propertyGroupName: "Contenty",
+        var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
+            "advancedPage",
+            "Advanced Page",
+            contentPage,
+            randomizeAliases: true,
+            propertyGroupAlias: "contenty",
+            propertyGroupName: "Contenty",
             defaultTemplateId: template.Id);
         ContentTypeService.Save(advancedPage);
 
@@ -1535,7 +1720,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -1545,7 +1733,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var subtitlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "subtitle")
             {
                 Name = "Subtitle",
@@ -1555,15 +1746,22 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var bodyTextAdded =
-            contentPage.AddPropertyType(bodyTextPropertyType, "content2",
+            contentPage.AddPropertyType(
+                bodyTextPropertyType,
+                "content2",
                 "Content_"); // Will be added to the parent tab
         var subtitleAdded =
-            contentPage.AddPropertyType(subtitlePropertyType, "content",
+            contentPage.AddPropertyType(
+                subtitlePropertyType,
+                "content",
                 "Content"); // Will be added to the "Content Meta" composition
         ContentTypeService.Save(contentPage);
 
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1573,7 +1771,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var descriptionPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "description")
             {
                 Name = "Description",
@@ -1583,7 +1784,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var keywordsPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "keywords")
             {
                 Name = "Keywords",
@@ -1593,13 +1797,19 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorAdded =
-            advancedPage.AddPropertyType(authorPropertyType, "content2",
+            advancedPage.AddPropertyType(
+                authorPropertyType,
+                "content2",
                 "Content_"); // Will be added to an ancestor tab
         var descriptionAdded =
-            advancedPage.AddPropertyType(descriptionPropertyType, "contentx",
+            advancedPage.AddPropertyType(
+                descriptionPropertyType,
+                "contentx",
                 "Contentx"); // Will be added to a parent tab
         var keywordsAdded =
-            advancedPage.AddPropertyType(keywordsPropertyType, "content",
+            advancedPage.AddPropertyType(
+                keywordsPropertyType,
+                "content",
                 "Content"); // Will be added to the "Content Meta" composition
         ContentTypeService.Save(advancedPage);
 
@@ -1642,11 +1852,21 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
-        var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true,
-            propertyGroupAlias: "content2", propertyGroupName: "Content_", defaultTemplateId: template.Id);
+        var page = ContentTypeBuilder.CreateSimpleContentType(
+            "page",
+            "Page",
+            randomizeAliases: true,
+            propertyGroupAlias: "content2",
+            propertyGroupName: "Content_",
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(page);
-        var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page,
-            randomizeAliases: true, propertyGroupAlias: "content", propertyGroupName: "Content",
+        var contentPage = ContentTypeBuilder.CreateSimpleContentType(
+            "contentPage",
+            "Content Page",
+            page,
+            randomizeAliases: true,
+            propertyGroupAlias: "content",
+            propertyGroupName: "Content",
             defaultTemplateId: template.Id);
         ContentTypeService.Save(contentPage);
 
@@ -1655,7 +1875,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -1665,7 +1888,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var subtitlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "subtitle")
             {
                 Name = "Subtitle",
@@ -1675,7 +1901,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1731,7 +1960,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -1744,7 +1976,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(basePage);
 
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1783,7 +2018,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(basePage);
 
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1795,7 +2033,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(basePage.AddPropertyType(authorPropertyType, "content", "Content"));
 
         var titlePropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "title")
             {
                 Name = "Title",
@@ -1845,7 +2086,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var authorPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "author")
             {
                 Name = "Author",
@@ -1858,7 +2102,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentPage);
 
         var bodyTextPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext,
                 "bodyText")
             {
                 Name = "Body Text",
@@ -1889,7 +2136,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Ensure that adding a new PropertyType to the "Content"-tab also adds it to the right group
         var descriptionPropertyType =
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Ntext)
             {
                 Alias = "description",
                 Name = "Description",
@@ -1937,29 +2187,41 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             ContentVariation.Culture; // with a variant property
         ContentTypeService.Save(typeA);
 
-        var typeB = ContentTypeBuilder.CreateSimpleContentType("b", "B", typeA, randomizeAliases: true,
+        var typeB = ContentTypeBuilder.CreateSimpleContentType(
+            "b",
+            "B",
+            typeA,
+            randomizeAliases: true,
             defaultTemplateId: template.Id);
         typeB.Variations = ContentVariation.Nothing; // make it invariant
         ContentTypeService.Save(typeB);
 
-        var typeC = ContentTypeBuilder.CreateSimpleContentType("c", "C", typeA, randomizeAliases: true,
+        var typeC = ContentTypeBuilder.CreateSimpleContentType(
+            "c",
+            "C",
+            typeA,
+            randomizeAliases: true,
             defaultTemplateId: template.Id);
         typeC.Variations = ContentVariation.Culture; // make it variant
         ContentTypeService.Save(typeC);
 
         // property is variant on A
         var test = ContentTypeService.Get(typeA.Id);
-        Assert.AreEqual(ContentVariation.Culture,
+        Assert.AreEqual(
+            ContentVariation.Culture,
             test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-        Assert.AreEqual(ContentVariation.Culture,
+        Assert.AreEqual(
+            ContentVariation.Culture,
             test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title"))
                 .Variations);
 
         // but not on B
         test = ContentTypeService.Get(typeB.Id);
-        Assert.AreEqual(ContentVariation.Nothing,
+        Assert.AreEqual(
+            ContentVariation.Nothing,
             test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-        Assert.AreEqual(ContentVariation.Nothing,
+        Assert.AreEqual(
+            ContentVariation.Nothing,
             test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title"))
                 .Variations);
 
@@ -2141,6 +2403,78 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(updatedContentType.DefaultTemplate!.Key, Is.EqualTo(result.Result));
     }
 
+    [Test]
+    public async Task GetAllowedParentKeysAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
+    {
+        // Arrange
+        var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        ContentTypeService.Save(childContentType);
+
+        var parentContentType = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
+
+        // Parent does not allow child as a child type
+        ContentTypeService.Save(parentContentType);
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAllowedParentKeysAsync_ReturnsParentKeys_WhenParentsAllowChildType()
+    {
+        // Arrange
+        var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        ContentTypeService.Save(childContentType);
+
+        var parentContentType1 = ContentTypeBuilder.CreateBasicContentType("parent1", "Parent1");
+        parentContentType1.AllowedContentTypes =
+        [
+            new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
+        ];
+        ContentTypeService.Save(parentContentType1);
+
+        var parentContentType2 = ContentTypeBuilder.CreateBasicContentType("parent2", "Parent2");
+        parentContentType2.AllowedContentTypes =
+        [
+            new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
+        ];
+        ContentTypeService.Save(parentContentType2);
+
+        // A parent that does NOT allow the child type
+        var unrelatedParentContentType = ContentTypeBuilder.CreateBasicContentType("unrelated", "Unrelated");
+        ContentTypeService.Save(unrelatedParentContentType);
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        var parentKeys = result.Result!.ToList();
+        Assert.That(parentKeys.Count, Is.EqualTo(2));
+        Assert.That(parentKeys, Does.Contain(parentContentType1.Key));
+        Assert.That(parentKeys, Does.Contain(parentContentType2.Key));
+        Assert.That(parentKeys, Does.Not.Contain(unrelatedParentContentType.Key));
+    }
+
+    [Test]
+    public async Task GetAllowedParentKeysAsync_ReturnsSuccessFalse_WhenContentTypeDoesNotExist()
+    {
+        // Arrange
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(nonExistentKey);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+    }
+
     private ContentType CreateComponent()
     {
         var component = new ContentType(ShortStringHelper, -1)
@@ -2192,7 +2526,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Trashed = false
         };
 
-        var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "bannerName")
+        var propertyType = new PropertyType(
+            ShortStringHelper,
+            "test",
+            ValueStorageType.Ntext,
+            "bannerName")
         {
             Name = "Banner Name",
             Description = string.Empty,
@@ -2239,7 +2577,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
-        return ContentTypeBuilder.CreateSimpleContentType("homepage", "Homepage", parent,
+        return ContentTypeBuilder.CreateSimpleContentType(
+            "homepage",
+            "Homepage",
+            parent,
             defaultTemplateId: template.Id);
     }
 
@@ -2248,7 +2589,9 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // create the master type
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
-        var masterContentType = ContentTypeBuilder.CreateSimpleContentType("masterContentType", "MasterContentType",
+        var masterContentType = ContentTypeBuilder.CreateSimpleContentType(
+            "masterContentType",
+            "MasterContentType",
             defaultTemplateId: template.Id);
         masterContentType.Key = new Guid("C00CA18E-5A9D-483B-A371-EECE0D89B4AE");
         ContentTypeService.Save(masterContentType);

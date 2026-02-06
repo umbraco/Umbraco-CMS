@@ -16,7 +16,8 @@ import { UmbViewController, UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/vie
  */
 @customElement('umb-block-workspace-view-edit-content-no-router')
 export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	// private _hasRootProperties = false;
+	@state()
+	private _hasRootProperties = false;
 
 	@state()
 	private _hasRootGroups = false;
@@ -54,7 +55,14 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			this.#setupViewContexts();
 		});
 
-		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
+		this.observe(
+			this.#tabsStructureHelper.hasProperties,
+			(hasRootProperties) => {
+				this._hasRootProperties = hasRootProperties;
+				this.#checkDefaultTabName();
+			},
+			'observeRootProperties',
+		);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.#blockWorkspace = context;
@@ -126,7 +134,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		// Find the default tab to grab
 		if (this._activeTabKey === undefined) {
-			if (this._hasRootGroups) {
+			if (this._hasRootGroups || this._hasRootProperties) {
 				this._activeTabKey = null;
 			} else if (this._tabs.length > 0) {
 				const tab = this._tabs[0];
@@ -143,9 +151,11 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		if (!this._tabs) return;
 
 		return html`
-			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
+			${this._tabs.length > 1 || (this._tabs.length === 1 && (this._hasRootGroups || this._hasRootProperties))
 				? html`<uui-tab-group slot="header">
-						${this._hasRootGroups && this._tabs.length > 0 ? this.#renderTab(null, '#general_generic') : nothing}
+						${(this._hasRootGroups || this._hasRootProperties) && this._tabs.length > 0
+							? this.#renderTab(null, '#general_generic')
+							: nothing}
 						${repeat(
 							this._tabs,
 							(tab) => tab.name,
