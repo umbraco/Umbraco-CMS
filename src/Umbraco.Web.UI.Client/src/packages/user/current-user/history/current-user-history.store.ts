@@ -22,7 +22,45 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	#lastAddedUnique: string | null = null;
 	#lastAddedPath: string | null = null;
 	#titleObserver: MutationObserver | null = null;
+	#headObserver: MutationObserver | null = null;
 	#titleUpdateTimer: ReturnType<typeof setTimeout> | null = null;
+
+	#handleNavigateSuccess = () => {
+		// Update label for the most recent history item after navigation completes.
+		this.#scheduleTitleUpdate();
+	};
+
+	#handleNavigate = (event: any) => {
+		const url = new URL(event.destination.url);
+		let path = url.pathname;
+
+		// Skip sub-routes (variant paths, view paths, tab paths)
+		// These are internal navigation within a workspace, not new entity navigations.
+		if (this.#isSubRoute(path)) {
+			return;
+		}
+
+		// Special case: we have some workspaces that default to a collection, so we strip the
+		// trailing /collection to de-duplicate with parent. This avoids two entries in the history.
+		path = path.replace(/\/collection$/, '');
+
+		// Before adding a new item, finalize the label of the previous item
+		// using the current document title (before it changes).
+		this.#finalizeCurrentLabel();
+
+		const unique = UmbId.new();
+		const historyItem = {
+			unique,
+			path,
+			displayPath: this.#formatDisplayPath(path),
+			label: this.#extractLabelFromPath(path),
+		};
+		const wasAdded = this.#pushIfNew(historyItem);
+		if (wasAdded) {
+			this.#lastAddedUnique = unique;
+			this.#lastAddedPath = path;
+		}
+	};
 
 	constructor(host: UmbControllerHost) {
 		super(
@@ -31,41 +69,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 			new UmbArrayState<UmbCurrentUserHistoryItem>([], (x) => x.unique),
 		);
 		if (!('navigation' in window)) return;
-		(window as any).navigation.addEventListener('navigatesuccess', () => {
-			// Update label for the most recent history item after navigation completes.
-			this.#scheduleTitleUpdate();
-		});
-		(window as any).navigation.addEventListener('navigate', (event: any) => {
-			const url = new URL(event.destination.url);
-			let path = url.pathname;
-
-			// Skip sub-routes (variant paths, view paths, tab paths)
-			// These are internal navigation within a workspace, not new entity navigations.
-			if (this.#isSubRoute(path)) {
-				return;
-			}
-
-			// Special case: we have some workspaces that default to a collection, so we strip the
-			// trailing /collection to de-duplicate with parent. This avoids two entries in the history.
-			path = path.replace(/\/collection$/, '');
-
-			// Before adding a new item, finalize the label of the previous item
-			// using the current document title (before it changes).
-			this.#finalizeCurrentLabel();
-
-			const unique = UmbId.new();
-			const historyItem = {
-				unique,
-				path,
-				displayPath: this.#formatDisplayPath(path),
-				label: this.#extractLabelFromPath(path),
-			};
-			const wasAdded = this.#pushIfNew(historyItem);
-			if (wasAdded) {
-				this.#lastAddedUnique = unique;
-				this.#lastAddedPath = path;
-			}
-		});
+		(window as any).navigation.addEventListener('navigatesuccess', this.#handleNavigateSuccess);
+		(window as any).navigation.addEventListener('navigate', this.#handleNavigate);
 
 		this.#setupTitleObserver();
 	}
@@ -183,15 +188,16 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 			this.#titleObserver.observe(titleElement, { childList: true, characterData: true, subtree: true });
 		} else {
 			// If title element doesn't exist yet, observe head for its creation.
-			const headObserver = new MutationObserver((mutations, observer) => {
+			this.#headObserver = new MutationObserver(() => {
 				const title = document.querySelector('title');
 				if (title) {
-					observer.disconnect();
+					this.#headObserver?.disconnect();
+					this.#headObserver = null;
 					this.#titleObserver = new MutationObserver(() => this.#onTitleChange());
 					this.#titleObserver.observe(title, { childList: true, characterData: true, subtree: true });
 				}
 			});
-			headObserver.observe(document.head, { childList: true });
+			this.#headObserver.observe(document.head, { childList: true });
 		}
 	}
 
@@ -277,6 +283,14 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	}
 
 	override destroy(): void {
+		if ('navigation' in window) {
+			(window as any).navigation.removeEventListener('navigatesuccess', this.#handleNavigateSuccess);
+			(window as any).navigation.removeEventListener('navigate', this.#handleNavigate);
+		}
+		if (this.#headObserver) {
+			this.#headObserver.disconnect();
+			this.#headObserver = null;
+		}
 		if (this.#titleObserver) {
 			this.#titleObserver.disconnect();
 			this.#titleObserver = null;

@@ -49,7 +49,7 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
-		this.#pagination.setCurrentPageNumber(event.target?.current);
+		this.#pagination.setCurrentPageNumber(event.target.current);
 	}
 
 	#getCurrentPageItems(): Array<UmbCurrentUserHistoryItem> {
