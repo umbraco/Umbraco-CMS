@@ -34,6 +34,7 @@ public class WebhookRepository : IWebhookRepository
         {
             return await db.Webhooks
                 .AsNoTracking()
+                .OrderBy(x => x.Id)
                 .Skip(skip)
                 .Take(take)
                 .Include(x => x.Webhook2ContentTypeKeys)
@@ -181,13 +182,25 @@ public class WebhookRepository : IWebhookRepository
         WebhookDto dto = WebhookFactory.BuildDto(webhook);
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
+            await DeleteManyToOneReferences(db, dto);
             db.Webhooks.Update(dto);
+            await AddManyToOneReferences(db, dto);
+
             await db.SaveChangesAsync();
         });
+    }
 
-        // TODO: Ensure this still works.
-        // Delete and re-insert the many to one references (event & entity keys)
-        // DeleteManyToOneReferences(dto.Id);
-        // InsertManyToOneReferences(webhook);
+    private static async Task AddManyToOneReferences(UmbracoDbContext db, WebhookDto dto)
+    {
+        await db.Set<Webhook2EventsDto>().AddRangeAsync(dto.Webhook2Events);
+        await db.Set<Webhook2ContentTypeKeysDto>().AddRangeAsync(dto.Webhook2ContentTypeKeys);
+        await db.Set<Webhook2HeadersDto>().AddRangeAsync(dto.Webhook2Headers);
+    }
+
+    private static async Task DeleteManyToOneReferences(UmbracoDbContext db, WebhookDto dto)
+    {
+        await db.Set<Webhook2EventsDto>().Where(x => x.WebhookId == dto.Id).ExecuteDeleteAsync();
+        await db.Set<Webhook2ContentTypeKeysDto>().Where(x => x.WebhookId == dto.Id).ExecuteDeleteAsync();
+        await db.Set<Webhook2HeadersDto>().Where(x => x.WebhookId == dto.Id).ExecuteDeleteAsync();
     }
 }
