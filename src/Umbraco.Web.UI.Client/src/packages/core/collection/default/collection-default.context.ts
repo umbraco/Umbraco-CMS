@@ -199,9 +199,7 @@ export class UmbDefaultCollectionContext<
 			'umbCollectionHasBulkActionsObserver',
 		);
 
-		if (this.#config.pageSize) {
-			this.pagination.setPageSize(this.#config.pageSize);
-		}
+		this.pagination.setPageSize(this.#config.pageSize ?? 50);
 
 		const filterValue = this._filter.getValue() as FilterModelType;
 
@@ -210,7 +208,7 @@ export class UmbDefaultCollectionContext<
 			...this.#config,
 			...filterValue,
 			skip: filterValue.skip ?? 0,
-			take: this.#config.pageSize,
+			take: this.pagination.getPageSize(),
 		});
 
 		this.#userDefinedProperties.setValue(this.#config?.userDefinedProperties ?? []);
