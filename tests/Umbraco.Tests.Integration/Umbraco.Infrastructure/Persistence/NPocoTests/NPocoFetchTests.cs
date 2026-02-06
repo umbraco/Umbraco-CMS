@@ -306,7 +306,7 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
             //    GROUP BY zbThing1.id, zbThing1.name";
             var sql = ScopeAccessor.AmbientScope.SqlContext.Sql()
                 .Select<Thing1Dto>()
-                .Append($", COUNT({QTab("zbThing2Group")}.{syntax.GetQuotedColumnName("groupId")}) AS {syntax.GetQuotedName("groupCount")}")
+                .Append($", COUNT({QTab("zbThing2Group")}.{QCol("groupId")}) AS {QCol("groupCount")}")
                 .From<Thing1Dto>()
                 .InnerJoin<Thing2GroupDto>().On<Thing1Dto, Thing2GroupDto>((t, t2g) => t.Id == t2g.ThingId)
                 .GroupBy<Thing1Dto>(x => x.Id, x => x.Name);

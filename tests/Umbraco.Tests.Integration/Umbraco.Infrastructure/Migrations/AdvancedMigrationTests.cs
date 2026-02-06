@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NPoco.DatabaseTypes;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
@@ -330,7 +331,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 
         protected override void Migrate()
         {
-            var sql = string.Format(_context.Database.SqlContext.SqlSyntax.StringLengthUnicodeColumnDefinitionFormat, 255);
+            var sql = string.Format(SqlSyntax.StringLengthUnicodeColumnDefinitionFormat, 255);
             Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo {sql}");
         }
     }
