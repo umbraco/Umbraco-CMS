@@ -32,17 +32,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 	#handleNavigate = (event: any) => {
 		const url = new URL(event.destination.url);
-		let path = url.pathname;
-
-		// Skip sub-routes (variant paths, view paths, tab paths)
-		// These are internal navigation within a workspace, not new entity navigations.
-		if (this.#isSubRoute(path)) {
-			return;
-		}
-
-		// Special case: we have some workspaces that default to a collection, so we strip the
-		// trailing /collection to de-duplicate with parent. This avoids two entries in the history.
-		path = path.replace(/\/collection$/, '');
+		const path = this.#normalizePath(url.pathname);
 
 		// Before adding a new item, finalize the label of the previous item
 		// using the current document title (before it changes).
@@ -76,20 +66,20 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	}
 
 	/**
-	 * Check if a path is a sub-route that should not create a new history entry.
-	 * Sub-routes include variant paths (/invariant, /en-us), view paths, and tab paths.
+	 * Normalize a path by stripping sub-route suffixes (variants, views, tabs)
+	 * and trailing /collection segments. This ensures that internal workspace
+	 * navigation (e.g., switching tabs or variants) does not create separate
+	 * history entries, while still creating an entry for the base entity path.
 	 */
-	#isSubRoute(path: string): boolean {
-		// Common sub-route patterns that shouldn't create new history entries
-		const subRoutePatterns = [
-			/\/invariant(\/|$)/, // Variant: invariant culture
-			/\/[a-z]{2}-[a-z]{2}(\/|$)/i, // Variant: culture codes like en-us, da-dk
-			/\/view\//, // View sub-routes
-			/\/tab\//, // Tab sub-routes
-			/\/root(\/|$)/, // Root tab
-		];
-
-		return subRoutePatterns.some((pattern) => pattern.test(path));
+	#normalizePath(path: string): string {
+		// Strip sub-route suffixes: variant paths (/invariant, /en-us), /root
+		path = path.replace(/\/(?:invariant|root)(?:\/.*)?$/, '');
+		path = path.replace(/\/[a-z]{2}-[a-z]{2}(?:\/.*)?$/i, '');
+		// Strip view and tab sub-routes
+		path = path.replace(/\/(?:view|tab)(?:\/.*)?$/, '');
+		// Strip trailing /collection to de-duplicate with parent
+		path = path.replace(/\/collection$/, '');
+		return path;
 	}
 
 	/**
@@ -209,8 +199,14 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 		if (this.#titleUpdateTimer) {
 			clearTimeout(this.#titleUpdateTimer);
 		}
+		// Capture the target path at schedule time so the update only fires
+		// if we're still on the same page when the timer completes.
+		// This prevents updating the wrong entry during fast navigation.
+		const targetPath = this.#lastAddedPath;
 		this.#titleUpdateTimer = setTimeout(() => {
-			this.#updateLatestLabel();
+			if (targetPath && this.#normalizePath(window.location.pathname) === targetPath) {
+				this.#updateLatestLabel();
+			}
 		}, 150);
 	}
 
