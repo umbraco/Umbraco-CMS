@@ -85,6 +85,11 @@ public interface ISqlSyntaxProvider
 
     string DbProvider { get; }
 
+    /// <summary>
+    /// Retuns the format for a string column definition with a specified length for Unicode text types (e.g. NVARCHAR in SQL Server). The format should include a placeholder for the length, such as "NVARCHAR({0})". This is used when generating SQL for string columns that require a length specification.
+    /// </summary>
+    string StringLengthUnicodeColumnDefinitionFormat { get; }
+
     IDictionary<Type, IScalarMapper>? ScalarMappers => null;
 
     DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) =>
