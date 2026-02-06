@@ -314,6 +314,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		// TODO: remove meta
 		await new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
+
+		// Reload workspace data to reflect the unpublished state
+		await this.#documentWorkspaceContext.reload();
+		await this.#loadAndProcessLastPublished();
 	}
 
 	async #handleSaveAndPublish() {
@@ -399,6 +403,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					message: this.#localize.term('speechBubbles_editContentPublishedHeader'),
 				},
 			});
+
+			// Clear stale published data and pending changes state so the
+			// persistedData observer does not run a comparison against outdated
+			// data during reload, which would briefly show a false-positive
+			// "pending changes" state.
+			this.#clear();
 
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
