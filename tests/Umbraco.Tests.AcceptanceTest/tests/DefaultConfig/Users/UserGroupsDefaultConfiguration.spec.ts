@@ -17,9 +17,10 @@ test('the default configuration of Administrators is correct', {tag: '@release'}
     "Umb.Section.Packages",
     "Umb.Section.Settings",
     "Umb.Section.Translation",
-    "Umb.Section.Users"
+    "Umb.Section.Users",
+    "Umb.Section.Library"
   ];
-  const fallbackPermissions = [
+  const fallbackDocumentPermissions = [
     "Umb.Document.Create",
     "Umb.Document.Update",
     "Umb.Document.Delete",
@@ -35,11 +36,23 @@ test('the default configuration of Administrators is correct', {tag: '@release'}
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
   ];
+  const fallbackElementPermissions = [
+    "Umb.Element.Create",
+    "Umb.Element.Update",
+    "Umb.Element.Delete",
+    "Umb.Element.Move",
+    "Umb.Element.Duplicate",
+    "Umb.Element.Publish",
+    "Umb.Element.Unpublish",
+    "Umb.Element.Read",
+    "Umb.Element.Rollback",
+  ];
   const granularPermissions: any = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiDocumentPermissions = await umbracoApi.userGroup.convertApiDocumentPermissionsToUiDocumentPermissions(fallbackDocumentPermissions);
+  const uiElementPermissions = await umbracoApi.userGroup.convertApiElementPermissionsToUiElementPermissions(fallbackElementPermissions);
   const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
@@ -49,8 +62,10 @@ test('the default configuration of Administrators is correct', {tag: '@release'}
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
-  await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
-  await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
+  await umbracoUi.userGroup.doesDocumentPermissionsSettingsHaveValue(ConstantHelper.userGroupDocumentPermissionsSettings);
+  await umbracoUi.userGroup.doesElementPermissionsSettingsHaveValue(ConstantHelper.userGroupElementPermissionsSettings);
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermissionEnabled(uiDocumentPermissions);
+  await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   // Fixme - Uncomment this when the front-end is ready. Currently the sections includes "Umb.Section.Forms" which should be removed.
@@ -69,9 +84,10 @@ test('the default configuration of Editors is correct', {tag: '@release'}, async
   const userGroupName = 'Editors';
   const sections = [
     "Umb.Section.Content",
-    "Umb.Section.Media"
+    "Umb.Section.Media",
+    "Umb.Section.Library"
   ];
-  const fallbackPermissions = [
+  const fallbackDocumentPermissions = [
     "Umb.Document.Create",
     "Umb.Document.Update",
     "Umb.Document.Delete",
@@ -86,11 +102,23 @@ test('the default configuration of Editors is correct', {tag: '@release'}, async
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
   ];
+  const fallbackElementPermissions = [
+    "Umb.Element.Create",
+    "Umb.Element.Update",
+    "Umb.Element.Delete",
+    "Umb.Element.Move",
+    "Umb.Element.Duplicate",
+    "Umb.Element.Publish",
+    "Umb.Element.Unpublish",
+    "Umb.Element.Read",
+    "Umb.Element.Rollback",
+  ];
   const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiDocumentPermissions = await umbracoApi.userGroup.convertApiDocumentPermissionsToUiDocumentPermissions(fallbackDocumentPermissions);
+  const uiElementPermissions = await umbracoApi.userGroup.convertApiElementPermissionsToUiElementPermissions(fallbackElementPermissions);
   const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
@@ -98,10 +126,12 @@ test('the default configuration of Editors is correct', {tag: '@release'}, async
 
   // Act
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
+   await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
-  await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
-  await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
+  await umbracoUi.userGroup.doesDocumentPermissionsSettingsHaveValue(ConstantHelper.userGroupDocumentPermissionsSettings);
+  await umbracoUi.userGroup.doesElementPermissionsSettingsHaveValue(ConstantHelper.userGroupElementPermissionsSettings);
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermissionEnabled(uiDocumentPermissions);
+  await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   // Fixme - Uncomment this when the front-end is ready. Currently the sections includes "Umb.Section.Forms" which should be removed.
@@ -119,12 +149,14 @@ test('the default configuration of Sensitive data is correct', {tag: '@release'}
   // Arrange
   const userGroupName = 'Sensitive data';
   const sections: string[] = [];
-  const fallbackPermissions: string[] = [];
+  const fallbackDocumentPermissions: string[] = [];
+  const fallbackElementPermissions: string[] = [];
   const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = false;
   const documentRootAccess = false;
   const mediaRootAccess = false;
-  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiDocumentPermissions = await umbracoApi.userGroup.convertApiDocumentPermissionsToUiDocumentPermissions(fallbackDocumentPermissions);
+  const uiElementPermissions = await umbracoApi.userGroup.convertApiElementPermissionsToUiElementPermissions(fallbackElementPermissions);
   const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
@@ -134,8 +166,10 @@ test('the default configuration of Sensitive data is correct', {tag: '@release'}
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
-  await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
-  await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
+  await umbracoUi.userGroup.doesDocumentPermissionsSettingsHaveValue(ConstantHelper.userGroupDocumentPermissionsSettings);
+  await umbracoUi.userGroup.doesElementPermissionsSettingsHaveValue(ConstantHelper.userGroupElementPermissionsSettings);
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermissionEnabled(uiDocumentPermissions);
+  await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   // Fixme - Uncomment this when the front-end is ready. Currently the sections includes "Umb.Section.Forms" which should be removed.
@@ -153,15 +187,20 @@ test('the default configuration of Translators data is correct', {tag: '@release
   // Arrange
   const userGroupName = 'Translators';
   const sections = ["Umb.Section.Translation"];
-  const fallbackPermissions = [
+  const fallbackDocumentPermissions = [
     "Umb.Document.Update",
     "Umb.Document.Read",
+  ];
+  const fallbackElementPermissions = [
+    "Umb.Document.Update",
+    "Umb.Element.Read",
   ];
   const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiDocumentPermissions = await umbracoApi.userGroup.convertApiDocumentPermissionsToUiDocumentPermissions(fallbackDocumentPermissions);
+  const uiElementPermissions = await umbracoApi.userGroup.convertApiElementPermissionsToUiElementPermissions(fallbackElementPermissions);
   const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
@@ -171,8 +210,10 @@ test('the default configuration of Translators data is correct', {tag: '@release
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
-  await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
-  await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
+  await umbracoUi.userGroup.doesDocumentPermissionsSettingsHaveValue(ConstantHelper.userGroupDocumentPermissionsSettings);
+  await umbracoUi.userGroup.doesElementPermissionsSettingsHaveValue(ConstantHelper.userGroupElementPermissionsSettings);
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermissionEnabled(uiDocumentPermissions);
+  await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
@@ -188,18 +229,24 @@ test('the default configuration of Translators data is correct', {tag: '@release
 test('the default configuration of Writers data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Writers';
-  const sections = ["Umb.Section.Content"];
-  const fallbackPermissions = [
+  const sections = ["Umb.Section.Content", "Umb.Section.Library"];
+  const fallbackDocumentPermissions = [
     "Umb.Document.Create",
     "Umb.Document.Update",
     "Umb.Document.Read",
     "Umb.Document.Notifications",
   ];
+  const fallbackElementPermissions = [
+    "Umb.Element.Create",
+    "Umb.Element.Update",
+    "Umb.Element.Read",
+  ];
   const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
-  const uiPermissions = await umbracoApi.userGroup.convertApiPermissionsToUiPermissions(fallbackPermissions);
+  const uiDocumentPermissions = await umbracoApi.userGroup.convertApiDocumentPermissionsToUiDocumentPermissions(fallbackDocumentPermissions);
+  const uiElementPermissions = await umbracoApi.userGroup.convertApiElementPermissionsToUiElementPermissions(fallbackElementPermissions);
   const uiSections = await umbracoApi.userGroup.convertApiSectionsToUiSections(sections);
 
   // Act 
@@ -209,8 +256,10 @@ test('the default configuration of Writers data is correct', {tag: '@release'}, 
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
   await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
-  await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
-  await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
+  await umbracoUi.userGroup.doesDocumentPermissionsSettingsHaveValue(ConstantHelper.userGroupDocumentPermissionsSettings);
+  await umbracoUi.userGroup.doesElementPermissionsSettingsHaveValue(ConstantHelper.userGroupElementPermissionsSettings);
+  await umbracoUi.userGroup.doesUserGroupHaveDocumentPermissionEnabled(uiDocumentPermissions);
+  await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
