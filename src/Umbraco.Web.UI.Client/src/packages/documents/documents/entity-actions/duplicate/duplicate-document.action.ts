@@ -4,18 +4,11 @@ import { UmbDuplicateDocumentRepository } from './repository/index.js';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDocumentItemRepository } from '../../item/index.js';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
-
-		const itemRepository = new UmbDocumentItemRepository(this);
-		const { data } = await itemRepository.requestItems([this.args.unique]);
-		const item = data?.[0];
-
-		if (!item) throw new Error('Document item not found');
 
 		const duplicateRepository = new UmbDuplicateDocumentRepository(this);
 		const selectableFilter = await duplicateRepository.getSelectableFilter(this.args.unique);
