@@ -285,7 +285,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
-			this.#loadAndProcessLastPublished();
+			await this.#loadAndProcessLastPublished();
 
 			// request reload of this entity
 			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
@@ -412,7 +412,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
-			this.#loadAndProcessLastPublished();
+			await this.#loadAndProcessLastPublished();
 
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			this.#eventContext?.dispatchEvent(event);
