@@ -1,4 +1,4 @@
-import type { UmbExtensionCollectionFilterModel, UmbExtensionDetailModel } from '../../types.js';
+import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from '../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
@@ -42,7 +42,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionDetailModel, UmbExtensionCollectionFilterModel>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionCollectionItemModel, UmbExtensionCollectionFilterModel>;
 
 	constructor() {
 		super();
@@ -58,7 +58,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
 	}
 
-	#createTableItems(extensions: Array<UmbExtensionDetailModel>) {
+	#createTableItems(extensions: Array<UmbExtensionCollectionItemModel>) {
 		this._tableItems = extensions.map((extension) => {
 			return {
 				id: extension.unique,
