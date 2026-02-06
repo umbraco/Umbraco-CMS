@@ -1,20 +1,21 @@
+using System.Text;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Install;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 
+/// <summary>
+/// Tests the Management API OpenAPI contract for correctness and consistency.
+/// </summary>
 [TestFixture]
 internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
 {
-    private GlobalSettings GlobalSettings => GetRequiredService<IOptions<GlobalSettings>>().Value;
-
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -37,27 +38,55 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     }
 
     [Test]
-    public async Task Validate_OpenApi_Contract_is_implemented()
+    public async Task OpenApiDocument_IsValid()
     {
-        string[] keysToIgnore = { "servers", "x-generator" };
+        var openApiContract = await FetchGeneratedContractAsync();
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(openApiContract));
+        var result = await OpenApiDocument.LoadAsync(stream, "json");
+
+        Assert.That(result.Document, Is.Not.Null, "Failed to parse OpenAPI document.");
+
+        // Fail on unexpected errors (each error reported individually)
+        Assert.Multiple(() =>
+        {
+            foreach (var error in result.Diagnostic?.Errors ?? [])
+            {
+                Assert.Fail($"(Error) {error.Message}");
+            }
+        });
+    }
+
+    [Test]
+    public async Task OpenApiContract_MatchesExpected()
+    {
         var backOfficePath = HostingEnvironment.GetBackOfficePath();
 
-        var urlToContract = $"{backOfficePath}/management/api/openapi.json";
+        // Fetch the expected OpenAPI contract
+        var expectedContractUrl = $"{backOfficePath}/management/api/openapi.json";
+        var expectedContract = JsonNode.Parse(await Client.GetStringAsync(expectedContractUrl))!.AsObject();
+
+        // Fetch the generated OpenAPI contract
+        var generatedContractJson = await FetchGeneratedContractAsync();
+        var generatedContract = JsonNode.Parse(generatedContractJson)!.AsObject();
+
+        // Merge the expected contract into a copy of generated (to check if generated contains everything from expected)
+        var mergedContract = JsonNode.Parse(generatedContractJson)!.AsObject();
+        mergedContract.MergeLeft(expectedContract);
+
+        Assert.AreEqual(
+            generatedContract.ToJsonString(),
+            mergedContract.ToJsonString(),
+            "Generated API does not respect the contract.");
+    }
+
+    /// <summary>
+    /// Fetches the generated OpenAPI contract from the Management API endpoint.
+    /// </summary>
+    private async Task<string> FetchGeneratedContractAsync()
+    {
+        var backOfficePath = HostingEnvironment.GetBackOfficePath();
         var openApiPath = $"{backOfficePath}/openapi/management.json";
-        var apiContract = JsonNode.Parse(await Client.GetStringAsync(urlToContract)).AsObject();
-
-        var generatedJsonString = await Client.GetStringAsync(openApiPath);
-        var mergedContract = JsonNode.Parse(generatedJsonString).AsObject();
-        var originalGeneratedContract = JsonNode.Parse(generatedJsonString).AsObject();
-
-        mergedContract.MergeLeft(apiContract);
-
-        foreach (var key in keysToIgnore)
-        {
-            originalGeneratedContract.Remove(key);
-            mergedContract.Remove(key);
-        }
-
-        Assert.AreEqual(originalGeneratedContract.ToJsonString(), mergedContract.ToJsonString(), $"Generated API do not respect the contract.");
+        return await Client.GetStringAsync(openApiPath);
     }
 }
