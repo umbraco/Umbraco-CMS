@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
-using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
@@ -84,6 +83,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
         builder.NPocoMappers().Add<NullableDateMapper>();
         builder.PackageMigrationPlans().Add(builder.TypeLoader.GetPackageMigrationPlans());
+
+        builder.AddDatabase();
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
