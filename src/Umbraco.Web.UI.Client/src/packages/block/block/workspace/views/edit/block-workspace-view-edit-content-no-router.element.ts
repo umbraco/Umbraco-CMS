@@ -8,6 +8,7 @@ import type { UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffic
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UmbViewController, UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 
 /**
  * @element umb-block-workspace-view-edit-content-no-router
@@ -96,17 +97,17 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		// Create view contexts for all tabs
 		this._tabs.forEach((tab) => {
-			const tabKey = tab.ownerId ?? tab.ids[0];
-			this.#createViewContext(tabKey, tab.name ?? '');
+			const path = 'tab/' + encodeFolderName(tab.name || '');
+			this.#createViewContext(path, tab.name ?? '');
 		});
 	}
 
-	#createViewContext(viewAlias: string | null, tabName: string) {
-		if (!this.#tabViewContexts.find((context) => context.viewAlias === viewAlias)) {
-			const view = new UmbViewController(this, viewAlias);
+	#createViewContext(path: string | null, tabName: string) {
+		if (!this.#tabViewContexts.find((context) => context.viewAlias === path)) {
+			const view = new UmbViewController(this, path);
 			this.#tabViewContexts.push(view);
 
-			if (viewAlias === null) {
+			if (path === null) {
 				// for the root tab, we need to filter hints
 				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
 			}
@@ -118,13 +119,13 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				view.firstHintOfVariant,
 				(hint) => {
 					if (hint) {
-						this._hintMap.set(viewAlias, hint);
+						this._hintMap.set(path, hint);
 					} else {
-						this._hintMap.delete(viewAlias);
+						this._hintMap.delete(path);
 					}
 					this.requestUpdate('_hintMap');
 				},
-				'umbObserveState_' + viewAlias,
+				'umbObserveState_' + path,
 			);
 		}
 	}
@@ -135,16 +136,46 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		// Find the default tab to grab
 		if (this._activeTabKey === undefined) {
 			if (this._hasRootGroups || this._hasRootProperties) {
-				this._activeTabKey = null;
+				const context = this.#tabViewContexts.find((context) => context.viewAlias === null);
+				if (context) {
+					this._activeTabKey = null;
+					this.#provideViewContext(null);
+				}
 			} else if (this._tabs.length > 0) {
 				const tab = this._tabs[0];
-				this._activeTabKey = tab.ownerId ?? tab.ids[0];
+				const path = 'tab/' + encodeFolderName(tab.name || '');
+				this.#provideViewContext(path);
 			}
 		}
 	}
 
-	#setTabKey(tabKey: string | null | undefined) {
-		this._activeTabKey = tabKey;
+	#setCurrentTabPath(viewAlias: string | null) {
+		// find the key of the view context that we want to show based on the path, and set it to active
+		const context = this.#tabViewContexts.find((context) => context.viewAlias === viewAlias);
+		if (context) {
+			this._activeTabKey = viewAlias;
+			this.#provideViewContext(viewAlias);
+		}
+	}
+
+	#currentProvidedView?: UmbViewController;
+
+	#provideViewContext(viewAlias: string | null) {
+		const view = this.#tabViewContexts.find((context) => context.viewAlias === viewAlias);
+		if (this.#currentProvidedView === view) {
+			return;
+		}
+		this.#currentProvidedView?.unprovide();
+		if (!view) {
+			throw new Error(`View context with alias ${viewAlias} not found`);
+		}
+		this.#currentProvidedView = view;
+		// ViewAlias null is only for the root tab, therefor we can implement this hack.
+		if (viewAlias === null) {
+			// Specific hack for the Generic tab to only show its name if there are other tabs.
+			view.setTitle(this._tabs && this._tabs?.length > 0 ? '#general_generic' : undefined);
+		}
+		view.provideAt(this);
 	}
 
 	override render() {
@@ -160,8 +191,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
-								const tabKey = tab.ownerId ?? tab.ids[0];
-								return this.#renderTab(tabKey, tab.name);
+								const path = 'tab/' + encodeFolderName(tab.name || '');
+								return this.#renderTab(path, tab.name);
 							},
 						)}
 					</uui-tab-group>`
@@ -176,13 +207,13 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		`;
 	}
 
-	#renderTab(tabKey: string | null, name: string) {
-		const hint = this._hintMap.get(tabKey);
-		const active = this._activeTabKey === tabKey;
+	#renderTab(path: string | null, name: string) {
+		const hint = this._hintMap.get(path);
+		const active = this._activeTabKey === path;
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
-			@click=${() => this.#setTabKey(tabKey)}
+			@click=${() => this.#setCurrentTabPath(path)}
 			>${hint && !active
 				? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 						>${hint.text}</umb-badge
