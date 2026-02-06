@@ -19,6 +19,9 @@ export class UmbExtensionCollectionRepository
 			.map((manifest) => {
 				return {
 					unique: manifest.alias,
+					name: manifest.name,
+					description: manifest.alias,
+					icon: 'icon-plugin',
 					entityType: UMB_EXTENSION_ENTITY_TYPE,
 					manifest: {
 						type: manifest.type,

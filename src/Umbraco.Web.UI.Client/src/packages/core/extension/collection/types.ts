@@ -1,1 +1,13 @@
-export type * from './data/types.js';
+import type { UmbExtensionEntityType } from '../entity.js';
+import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbWithDescriptionModel } from '@umbraco-cms/backoffice/models';
+
+export interface UmbExtensionCollectionFilterModel extends UmbCollectionFilterModel {
+	type?: string;
+}
+
+export interface UmbExtensionCollectionItemModel extends UmbCollectionItemModel, UmbWithDescriptionModel {
+	entityType: UmbExtensionEntityType;
+	manifest: ManifestBase;
+}

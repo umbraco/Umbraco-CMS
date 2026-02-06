@@ -1,4 +1,4 @@
-import { UmbExtensionCollectionRepository } from '../collection/data/collection.repository.js';
+import { UmbExtensionCollectionRepository } from '../collection/repository/extension-collection.repository.js';
 import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from '../collection/types.js';
 import { UmbExtensionItemRepository } from '../item/data/item.repository.js';
 import type { UmbPickerCollectionDataSource } from '@umbraco-cms/backoffice/picker-data-source';
@@ -29,7 +29,7 @@ export class UmbExtensionPickerDataSource
 
 		const extendedFilter: UmbExtensionCollectionFilterModel = {
 			...filter,
-			extensionTypes: allowedExtensionTypes,
+			type: allowedExtensionTypes?.[0],
 		};
 
 		return this.#collectionRepository.requestCollection(extendedFilter);
