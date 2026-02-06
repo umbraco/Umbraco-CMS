@@ -1,8 +1,10 @@
+import { UMB_EXTENSION_PICKER_DATA_SOURCE_ALIAS } from '../core/extension/index.js';
 import { UmbNewsDashboardRepository } from './repository/index.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
 import './components/umb-news-container.element.js';
 
@@ -15,6 +17,8 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	private _loaded: boolean = false;
 
 	#repo = new UmbNewsDashboardRepository(this);
+
+	#dataSourceConfig: UmbConfigCollectionModel = [{ alias: 'allowedExtensionTypes', value: ['collectionView'] }];
 
 	override async firstUpdated() {
 		const res = await this.#repo.getNewsDashboard();
@@ -31,7 +35,11 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			return this.#renderDefaultContent();
 		}
 
-		return html` <umb-news-container .items=${this._items}></umb-news-container> `;
+		return html`<umb-input-entity-data
+				.dataSourceAlias=${UMB_EXTENSION_PICKER_DATA_SOURCE_ALIAS}
+				.dataSourceConfig=${this.#dataSourceConfig}>
+			</umb-input-entity-data>
+			<umb-news-container .items=${this._items}></umb-news-container>`;
 	}
 
 	#renderDefaultContent() {
