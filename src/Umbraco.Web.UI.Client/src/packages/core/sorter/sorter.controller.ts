@@ -525,10 +525,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 				//UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
 				//UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
-				window.addEventListener('mouseup', this.#handleMouseUp);
-				window.addEventListener('mouseout', this.#handleMouseUp);
-				window.addEventListener('mouseleave', this.#handleMouseUp);
+				window.addEventListener('mouseout', this.#handleMouseOut);
+				window.addEventListener('mouseleave', this.#handleMouseOut);
 				window.addEventListener('mousemove', this.#handleMouseMove);
+				window.addEventListener('dragleave', this.#handleDragLeave);
+				window.addEventListener('dragenter', this.#handleDragEnter);
 
 				if (!this.#scrollElement) {
 					this.#scrollElement = getParentScrollElement(this.#containerElement, true);
@@ -765,10 +766,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		this.#setCurrentElement(element as ElementType);
 
 		//UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
-		window.addEventListener('mouseup', this.#handleMouseUp);
-		window.addEventListener('mouseout', this.#handleMouseUp);
-		window.addEventListener('mouseleave', this.#handleMouseUp);
+		window.addEventListener('mouseout', this.#handleMouseOut);
+		window.addEventListener('mouseleave', this.#handleMouseOut);
 		window.addEventListener('mousemove', this.#handleMouseMove);
+		window.addEventListener('dragleave', this.#handleDragLeave);
+		window.addEventListener('dragenter', this.#handleDragEnter);
 
 		UmbSorterController.activeItem = this.getItemOfElement(UmbSorterController.activeElement! as ElementType);
 		if (!UmbSorterController.activeItem) {
@@ -844,17 +846,31 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	/**
 	 * Listen to mouse move, to check if the mouse is still down.
 	 * This event does not happen while dragging, so its a indication that the drag is over.
+	 * NOTE: On Firefox Linux, mousemove can fire during drag with buttons === 0, so we need to be careful.
 	 */
-	#handleMouseMove = (event: MouseEvent) => {
-		// buttons should reprensent which buttons are held, and 0 => represents no button is pressed. [NL]
+	#handleMouseMove = () => {
+		// If mouse moves with #waitingForReentry set to true, it means that the mouse returned without firing a dragenter event, so we can assume the drag ended outside the window and we should end the drag-state.
+		if (this.#waitingForReentry) {
+			this.#handleMoveEnd();
+			this.#waitingForReentry = false;
+		}
+	};
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	#handleMouseOut = (event: MouseEvent) => {
 		if (event.buttons === 0) {
 			this.#handleMoveEnd();
 		}
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	#handleMouseUp = (event?: MouseEvent) => {
-		this.#handleMoveEnd();
+	#waitingForReentry = false;
+	#handleDragLeave = (e: MouseEvent) => {
+		if (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+			this.#waitingForReentry = true;
+		}
+	};
+	#handleDragEnter = () => {
+		this.#waitingForReentry = false;
 	};
 
 	#handleMoveEnd() {
@@ -892,6 +908,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.dropSorter = undefined;
 		UmbSorterController.originalIndex = undefined;
 		UmbSorterController.originalSorter = undefined;
+		this.#waitingForReentry = false;
 		this.#dragX = 0;
 		this.#dragY = 0;
 	}
@@ -900,10 +917,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (this.#containerElement) {
 			this.#containerElement.style.minHeight = '';
 		}
-		window.removeEventListener('mouseup', this.#handleMouseUp);
-		window.removeEventListener('mouseout', this.#handleMouseUp);
-		window.removeEventListener('mouseleave', this.#handleMouseUp);
+		window.removeEventListener('mouseout', this.#handleMouseOut);
+		window.removeEventListener('mouseleave', this.#handleMouseOut);
 		window.removeEventListener('mousemove', this.#handleMouseMove);
+		window.removeEventListener('dragleave', this.#handleDragLeave);
+		window.removeEventListener('dragenter', this.#handleDragEnter);
 	}
 
 	#handleDragMove(event: DragEvent, instant?: boolean) {
