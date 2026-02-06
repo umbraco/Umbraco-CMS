@@ -183,7 +183,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
 			@click=${() => this.#setTabKey(tabKey)}
-			>${this.localize.string(name)}${hint && !active
+			>${hint && !active
 				? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 						>${hint.text}</umb-badge
 					>`
