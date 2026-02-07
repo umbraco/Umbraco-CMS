@@ -445,7 +445,7 @@ JOIN {QTab("zbThingA3")} a3x ON a2x.id=a3x.id
         public Thing1Dto Thing { get; set; }
     }
 
-    [TableName("zbThing3")]
+    [TableName("zbThing1")]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class Thing3Dto
@@ -486,7 +486,7 @@ JOIN {QTab("zbThingA3")} a3x ON a2x.id=a3x.id
         public int GroupId { get; set; }
     }
 
-    [TableName("zbThing4")]
+    [TableName("zbThing1")]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class Thing4Dto
@@ -503,7 +503,7 @@ JOIN {QTab("zbThingA3")} a3x ON a2x.id=a3x.id
         public List<ThingGroupDto> Groups { get; set; }
     }
 
-    [TableName("zbThing5")]
+    [TableName("zbThing1")]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class Thing5Dto
@@ -568,7 +568,7 @@ JOIN {QTab("zbThingA3")} a3x ON a2x.id=a3x.id
     }
 
     [TableName("zbThingA12")]
-    [PrimaryKey("PK_thing1id_thing2id", AutoIncrement = false)]
+    [PrimaryKey(["thing1id", "thing2id"], AutoIncrement = false)]
     [ExplicitColumns]
     public class ThingA12Dto
     {

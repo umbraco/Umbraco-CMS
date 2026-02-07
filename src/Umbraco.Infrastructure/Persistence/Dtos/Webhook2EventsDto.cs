@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([WebhookIdColumnName, EventColumnName], AutoIncrement = false)]
 public class Webhook2EventsDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Events;

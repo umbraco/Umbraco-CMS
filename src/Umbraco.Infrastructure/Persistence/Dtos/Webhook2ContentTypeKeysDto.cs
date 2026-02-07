@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([WebhookIdColumnName, ContentTypeKeyColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 public class Webhook2ContentTypeKeysDto
 {

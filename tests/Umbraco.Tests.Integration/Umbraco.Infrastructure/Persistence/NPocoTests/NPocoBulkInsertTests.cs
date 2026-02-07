@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NPoco.DatabaseTypes;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
