@@ -19,20 +19,20 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     private readonly FlagProviderCollection _flagProviderCollection;
     private readonly IUmbracoMapper _mapper;
 
-    [Obsolete("Please use the controller with all parameters, will be removed in Umbraco 18")]
-    protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
-        : this(
-            mapper,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
-
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
         FlagProviderCollection flagProviderCollection)
     {
         _mapper = mapper;
         _flagProviderCollection = flagProviderCollection;
+    }
+
+    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18.")]
+    protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
+        : this(
+            mapper,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
     }
 
     public async Task<List<TCollectionResponseModel>> CreateCollectionModelAsync(ListViewPagedModel<TContent> contentCollection)

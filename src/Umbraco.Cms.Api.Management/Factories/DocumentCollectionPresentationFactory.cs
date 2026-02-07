@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -15,8 +15,16 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     private readonly IEntityService _entityService;
 
     [ActivatorUtilitiesConstructor]
+    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService)
+        : base(mapper, flagProviders)
+    {
+        _publicAccessService = publicAccessService;
+        _entityService = entityService;
+    }
+
+    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
-    : base(mapper)
+        : base(mapper)
     {
         _publicAccessService = publicAccessService;
         _entityService = entityService;
