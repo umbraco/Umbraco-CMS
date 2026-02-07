@@ -64,6 +64,7 @@ using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -247,6 +248,18 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
         builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
+
+        // Register default local login setting provider (allows local login by default).
+        // This will be replaced by the backoffice implementation when AddBackOffice() is called.
+        builder.Services.TryAddSingleton<ILocalLoginSettingProvider, NoopLocalLoginSettingProvider>();
+
+        // Register default conflicting route service (no conflicts when backoffice not enabled).
+        // This will be replaced by the backoffice implementation when AddBackOffice() is called.
+        builder.Services.TryAddSingleton<IConflictingRouteService, NoopConflictingRouteService>();
+
+        // Register URL assembler (needed by DefaultMediaUrlProvider).
+        builder.Services.TryAddTransient<IUrlAssembler, DefaultUrlAssembler>();
+
         builder.Services.AddTransient<IMemberEditingService, MemberEditingService>();
 
         builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
