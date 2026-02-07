@@ -197,7 +197,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             removedContentTypes.AddRange(_publishedContentTypeCache.ClearByDataTypeId(payload.Id));
         }
 
-        var changedIds = payloads.Select(x => x.Id).ToArray();
+        var changedIds = Array.ConvertAll(payloads, x => x.Id);
         _publishedContentTypeFactory.NotifyDataTypeChanges(changedIds);
 
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>

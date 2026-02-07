@@ -199,7 +199,7 @@ public abstract class IOHelper : IIOHelper
             Directory.CreateDirectory(tempFolderPath);
         }
 
-        return tempFolderPaths.Select(x => new DirectoryInfo(x)).ToArray();
+        return Array.ConvertAll(tempFolderPaths, x => new DirectoryInfo(x));
     }
 
     /// <summary>

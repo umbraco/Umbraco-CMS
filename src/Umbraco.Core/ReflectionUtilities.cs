@@ -523,7 +523,7 @@ public static class ReflectionUtilities
     {
         // get type and args
         Type? ctorDeclaring = ctor.DeclaringType;
-        Type[] ctorParameters = ctor.GetParameters().Select(x => x.ParameterType).ToArray();
+        Type[] ctorParameters = Array.ConvertAll(ctor.GetParameters(), x => x.ParameterType);
 
         // validate arguments
         if (lambdaParameters.Length != ctorParameters.Length)
@@ -701,7 +701,7 @@ public static class ReflectionUtilities
         // get type and args
         Type? methodDeclaring = method.DeclaringType;
         Type methodReturned = method.ReturnType;
-        Type[] methodParameters = method.GetParameters().Select(x => x.ParameterType).ToArray();
+        Type[] methodParameters = Array.ConvertAll(method.GetParameters(), x => x.ParameterType);
 
         var isStatic = method.IsStatic;
         (Type? lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) =

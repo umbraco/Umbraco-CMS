@@ -69,6 +69,25 @@ namespace Umbraco.Tests.Benchmarks
             }
         }
 
+        /// <summary>
+        /// A guess on what size array is typically used for .ToArray()
+        /// </summary>
+        private static readonly int[] _shortArray = Enumerable.Range(0, 8).ToArray();
+
+        /// <summary>
+        /// Native array convert, without type checks and less allocations
+        /// </summary>
+        /// <returns>Something to not optimize it away.</returns>
+        [Benchmark]
+        public int[] NativeArrayToArray() => Array.ConvertAll(_shortArray, value => _shortArray.Length ^ value);
+
+        /// <summary>
+        /// Use LINQ to convert an array, with type checks, extra allocations & extra branches that the branch predictor has to keep track of
+        /// </summary>
+        /// <returns>Something to not optimize it away.</returns>
+        [Benchmark]
+        public int[] LinqOnArrayToArray() => _shortArray.Select(value => _shortArray.Length ^ value).ToArray();
+
         //BenchmarkDotNet v0.13.12, Windows 11 (10.0.22631.4169/23H2/2023Update/SunValley3)
         //Intel Core i7-10750H CPU 2.60GHz, 1 CPU, 12 logical and 6 physical cores
         //.NET SDK 8.0.401

@@ -138,7 +138,7 @@ public class ModelType : Type
             throw new PanicException($"The type {type} has not generic type definition");
         }
 
-        Type[] args = type.GetGenericArguments().Select(x => Map(x, modelTypes, true)).ToArray();
+        Type[] args = Array.ConvertAll(type.GetGenericArguments(), x => Map(x, modelTypes, true));
         return def.MakeGenericType(args);
     }
 
@@ -248,7 +248,7 @@ public class ModelType : Type
             throw new PanicException($"The type {type} has not generic type definition");
         }
 
-        var args = type.GetGenericArguments().Select(x => MapToName(x, map, true)).ToArray();
+        var args = Array.ConvertAll(type.GetGenericArguments(), x => MapToName(x, map, true));
         var defFullName = def.FullName?[..def.FullName.IndexOf('`')];
         return defFullName + "<" + string.Join(", ", args) + ">";
     }
