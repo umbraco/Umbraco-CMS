@@ -131,19 +131,47 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         {
             [moving.Id] = moving.Path,
         };
+        var entityKeys = new Dictionary<int, Guid?>
+        {
+            [moving.Id] = moving.Key,
+        };
 
         foreach (TEntity descendant in descendants.OrderBy(x => x.Level))
         {
-            //FIXME: Use MoveEventInfo constructor that takes a parentKey when this method is refactored
-            moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
+            Guid? descendantParentKey = GetParentKey(descendant, moving, entityKeys);
+            moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId, descendantParentKey));
 
             descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
             descendant.Level += levelDelta;
+            entityKeys[descendant.Id] = descendant.Key;
 
             Save(descendant);
         }
 
         return moveInfo;
+    }
+
+    /// <summary>
+    ///     Gets the parent key for a descendant entity during a move operation.
+    /// </summary>
+    /// <param name="descendant">The descendant entity.</param>
+    /// <param name="moving">The entity being moved.</param>
+    /// <param name="entityKeys">Dictionary of already processed entity keys.</param>
+    /// <returns>The parent key, or null if not found.</returns>
+    private Guid? GetParentKey(TEntity descendant, TEntity moving, Dictionary<int, Guid?> entityKeys)
+    {
+        if (descendant.ParentId == moving.Id)
+        {
+            return moving.Key;
+        }
+
+        if (entityKeys.TryGetValue(descendant.ParentId, out Guid? existingKey))
+        {
+            return existingKey;
+        }
+
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(descendant.ParentId, UmbracoObjectTypes.Unknown);
+        return keyAttempt.Success ? keyAttempt.Result : null;
     }
 
     /// <summary>
