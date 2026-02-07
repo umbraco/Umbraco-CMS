@@ -541,13 +541,17 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#itemDraggedOver = async (e: DragEvent) => {
-		const newDrop = await this.#obtainIncomingItem(e);
+		// Firefox on Linux requires preventDefault to be called on dragover for drops to work
+		e.preventDefault();
+
+		// If dropSorter is already set for this identifier, we're already handling this drag
+		const dropSorterAlreadySet = UmbSorterController.dropSorter?.identifier === this.identifier;
+		const newDrop = dropSorterAlreadySet ? true : await this.#obtainIncomingItem(e);
 		const dropSorter = UmbSorterController.dropSorter as unknown as UmbSorterController<T, ElementType>;
 
 		if (!dropSorter || dropSorter.identifier !== this.identifier) return;
 
 		if (dropSorter === this) {
-			e.preventDefault();
 			if (e.dataTransfer) {
 				e.dataTransfer.dropEffect = 'move';
 			}
@@ -844,17 +848,24 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	/**
 	 * Listen to mouse move, to check if the mouse is still down.
 	 * This event does not happen while dragging, so its a indication that the drag is over.
+	 * NOTE: On Firefox Linux, mousemove can fire during drag with buttons === 0, so we need to be careful.
 	 */
 	#handleMouseMove = (event: MouseEvent) => {
 		// buttons should reprensent which buttons are held, and 0 => represents no button is pressed. [NL]
-		if (event.buttons === 0) {
+		// Firefox on Linux bug: buttons can be 0 during active drag, so don't end if actively dragging
+		if (event.buttons === 0 && !UmbSorterController.activeItem) {
+			// Only end the move if there's no active drag item
+			// If activeItem exists, we're in the middle of a drag and shouldn't end it
 			this.#handleMoveEnd();
 		}
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	#handleMouseUp = (event?: MouseEvent) => {
-		this.#handleMoveEnd();
+		// Firefox on Linux bug: mouseup can fire during active drag, so don't end if actively dragging
+		if (!UmbSorterController.activeItem) {
+			this.#handleMoveEnd();
+		}
 	};
 
 	#handleMoveEnd() {

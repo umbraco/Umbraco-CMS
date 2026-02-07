@@ -209,4 +209,94 @@ describe('UmbSorterController', () => {
 			expect(element.sorter.getItem('5')).to.be.undefined;
 		});
 	});
+
+	describe('Firefox Linux edge cases (fixes #19564)', () => {
+		beforeEach(() => {
+			element.sorter.setModel(['1', '2', '3', '4']);
+		});
+
+		afterEach(() => {
+			// Ensure clean state between tests
+			UmbSorterController.activeItem = undefined;
+			UmbSorterController.activeSorter = undefined;
+			UmbSorterController.dropSorter = undefined;
+		});
+
+		// Helper to set up active drag state
+		const setupActiveDrag = () => {
+			UmbSorterController.activeItem = '1';
+			UmbSorterController.activeSorter = element.sorter as any;
+			UmbSorterController.dropSorter = element.sorter as any;
+		};
+
+		// Helper to verify drag state is preserved
+		const expectDragStatePreserved = () => {
+			expect(UmbSorterController.activeItem).to.equal('1');
+			expect(UmbSorterController.activeSorter).to.not.be.undefined;
+			expect(UmbSorterController.dropSorter).to.not.be.undefined;
+		};
+
+		// Helper to verify drag state is cleared
+		const expectDragStateCleared = () => {
+			expect(UmbSorterController.activeItem).to.be.undefined;
+		};
+
+		describe('mousemove with buttons === 0', () => {
+			it('should not end drag when activeItem exists (Firefox Linux bug workaround)', async () => {
+				setupActiveDrag();
+
+				const mouseMoveEvent = new MouseEvent('mousemove', {
+					bubbles: true,
+					cancelable: true,
+					buttons: 0, // Firefox Linux reports 0 during drag
+				});
+
+				window.dispatchEvent(mouseMoveEvent);
+				await aTimeout(10);
+
+				expectDragStatePreserved();
+			});
+
+			it('should end drag when activeItem is undefined', async () => {
+				const mouseMoveEvent = new MouseEvent('mousemove', {
+					bubbles: true,
+					cancelable: true,
+					buttons: 0,
+				});
+
+				window.dispatchEvent(mouseMoveEvent);
+				await aTimeout(10);
+
+				expectDragStateCleared();
+			});
+		});
+
+		describe('mouseup during active drag', () => {
+			it('should not end drag when activeItem exists (Firefox Linux bug workaround)', async () => {
+				setupActiveDrag();
+
+				const mouseUpEvent = new MouseEvent('mouseup', {
+					bubbles: true,
+					cancelable: true,
+				});
+
+				window.dispatchEvent(mouseUpEvent);
+				await aTimeout(10);
+
+				expectDragStatePreserved();
+			});
+
+			it('should end drag when activeItem is undefined', async () => {
+				const mouseUpEvent = new MouseEvent('mouseup', {
+					bubbles: true,
+					cancelable: true,
+				});
+
+				window.dispatchEvent(mouseUpEvent);
+				await aTimeout(10);
+
+				expectDragStateCleared();
+			});
+		});
+	});
 });
