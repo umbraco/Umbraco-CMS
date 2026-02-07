@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 /// Implements a notification handler that processes file uploads when content is copied or scaffolded from a blueprint, making
 /// sure the new content references a new instance of the file.
 /// </summary>
-internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : FileUploadNotificationHandlerBase,
+public class FileUploadContentCopiedOrScaffoldedNotificationHandler : FileUploadNotificationHandlerBase,
     INotificationHandler<ContentCopiedNotification>,
     INotificationHandler<ContentScaffoldedNotification>,
     INotificationHandler<ContentSavedBlueprintNotification>
@@ -320,7 +320,7 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
         return UpdateBlockEditorData(content, richTextBlockValue);
     }
 
-    private string CopyFile(string sourceUrl, IContent destinationContent, IPropertyType propertyType)
+    protected virtual string CopyFile(string sourceUrl, IContent destinationContent, IPropertyType propertyType)
     {
         var sourcePath = MediaFileManager.FileSystem.GetRelativePath(sourceUrl);
         var copyPath = MediaFileManager.CopyFile(destinationContent, propertyType, sourcePath);
