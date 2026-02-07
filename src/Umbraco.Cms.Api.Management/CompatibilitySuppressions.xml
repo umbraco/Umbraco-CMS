@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Api.Management.Controllers.UrlSegment.ResizeImagingController.Urls(System.Collections.Generic.HashSet{System.Guid},System.Int32,System.Int32,System.Nullable{Umbraco.Cms.Core.Models.ImageCropMode})</Target>
+    <Left>lib/net10.0/Umbraco.Cms.Api.Management.dll</Left>
+    <Right>lib/net10.0/Umbraco.Cms.Api.Management.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+
+  <!-- Suppress CP0006 for new ImageResizeOptions overload -->
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Api.Management.Factories.IReziseImageUrlFactory.CreateUrlSets(System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Models.IMedia},Umbraco.Cms.Api.Management.Factories.ImageResizeOptions)</Target>
+    <Left>lib/net10.0/Umbraco.Cms.Api.Management.dll</Left>
+    <Right>lib/net10.0/Umbraco.Cms.Api.Management.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>

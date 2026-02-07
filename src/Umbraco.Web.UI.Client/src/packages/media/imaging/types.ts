@@ -6,6 +6,7 @@ export interface UmbImagingResizeModel {
 	height?: number;
 	width?: number;
 	mode?: UmbImagingCropMode;
+	format?: string;
 }
 
 /**

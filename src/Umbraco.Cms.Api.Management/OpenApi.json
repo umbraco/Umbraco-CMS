@@ -12249,6 +12249,13 @@
             "schema": {
               "$ref": "#/components/schemas/ImageCropModeModel"
             }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
