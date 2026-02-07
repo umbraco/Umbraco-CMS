@@ -26,6 +26,8 @@ public class AncestorsDataTypeTreeController : DataTypeTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor data type folders.")]
+    [EndpointDescription("Gets a collection of data type folders that are ancestors to the provided Id. The result returns the ancestor folders' properties.")]
     public async Task<ActionResult<IEnumerable<DataTypeTreeItemResponseModel>>> Ancestors(CancellationToken cancellationToken, Guid descendantId)
         => await GetAncestors(descendantId);
 }

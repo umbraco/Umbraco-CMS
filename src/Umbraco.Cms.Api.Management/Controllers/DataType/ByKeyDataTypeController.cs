@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
@@ -24,6 +24,8 @@ public class ByKeyDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Get a data type by the provided Id.")]
+    [EndpointDescription("Get a data type by using the provided Id and the result returns the data types' properties.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IDataType? dataType = await _dataTypeService.GetAsync(id);

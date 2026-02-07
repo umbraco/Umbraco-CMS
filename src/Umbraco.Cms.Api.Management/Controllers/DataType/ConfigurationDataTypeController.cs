@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -18,6 +18,8 @@ public class ConfigurationDataTypeController : DataTypeControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DatatypeConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the data type configuration.")]
+    [EndpointDescription("Gets the data type configuration settings.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var responseModel = new DatatypeConfigurationResponseModel
