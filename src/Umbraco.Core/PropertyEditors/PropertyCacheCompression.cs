@@ -16,6 +16,13 @@ public class PropertyCacheCompression : IPropertyCacheCompression
 
     private readonly PropertyEditorCollection _propertyEditors;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyCacheCompression"/> class.
+    /// </summary>
+    /// <param name="compressionOptions">The compression options.</param>
+    /// <param name="contentTypes">The content types dictionary.</param>
+    /// <param name="propertyEditors">The property editors collection.</param>
+    /// <param name="compressedStoragePropertyEditorCache">The cache for compressed storage lookup.</param>
     public PropertyCacheCompression(
         IPropertyCacheCompressionOptions compressionOptions,
         IReadOnlyDictionary<int, IContentTypeComposition> contentTypes,
@@ -28,6 +35,7 @@ public class PropertyCacheCompression : IPropertyCacheCompression
         _isCompressedCache = compressedStoragePropertyEditorCache;
     }
 
+    /// <inheritdoc />
     public bool IsCompressed(IReadOnlyContentBase content, string alias, bool published)
     {
         var compressedStorage = _isCompressedCache.GetOrAdd((content.ContentTypeId, alias, published), x =>

@@ -11,12 +11,26 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Extended webhook event that fires when content is published, including full Delivery API content payloads.
+/// </summary>
 [WebhookEvent("Content Published", Constants.WebhookEvents.Types.Content)]
 public class ExtendedContentPublishedWebhookEvent : ExtendedContentWebhookEventBase<ContentPublishedNotification>
 {
     private readonly IApiContentResponseBuilder _apiContentBuilder;
     private readonly IPublishedContentCache _publishedContentCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExtendedContentPublishedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="apiContentBuilder">The API content response builder.</param>
+    /// <param name="publishedContentCache">The published content cache.</param>
+    /// <param name="outputExpansionStrategyAccessor">The output expansion strategy accessor.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     public ExtendedContentPublishedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -38,11 +52,14 @@ public class ExtendedContentPublishedWebhookEvent : ExtendedContentWebhookEventB
         _publishedContentCache = publishedContentCache;
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.ContentPublish;
 
+    /// <inheritdoc />
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentPublishedNotification notification) =>
         notification.PublishedEntities;
 
+    /// <inheritdoc />
     protected override object? ConvertEntityToRequestPayload(IContent entity)
     {
         IPublishedContent? publishedContent = _publishedContentCache.GetById(entity.Key);

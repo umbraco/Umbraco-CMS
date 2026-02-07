@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides operations for managing server registrations in a load-balanced environment.
+/// </summary>
 public interface IServerRegistrationService
 {
     /// <summary>

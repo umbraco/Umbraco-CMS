@@ -14,8 +14,14 @@ public interface IDataEditor : IDiscoverable
     /// </summary>
     string Alias { get; }
 
+    /// <summary>
+    ///     Gets a value indicating whether the editor supports read-only mode.
+    /// </summary>
     bool SupportsReadOnly => false;
 
+    /// <summary>
+    ///     Gets a value indicating whether the editor supports configurable elements.
+    /// </summary>
     bool SupportsConfigurableElements => false;
 
     /// <summary>

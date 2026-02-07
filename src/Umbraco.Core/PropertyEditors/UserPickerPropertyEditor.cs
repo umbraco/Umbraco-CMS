@@ -8,19 +8,30 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+///     Represents a property editor for selecting users.
+/// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.UserPicker,
     ValueType = ValueTypes.Integer,
     ValueEditorIsReusable = true)]
 public class UserPickerPropertyEditor : DataEditor
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
     public UserPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
 
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<UserPickerPropertyValueEditor>(Attribute!);
 
+    /// <summary>
+    ///     Provides the value editor for the user picker property editor.
+    /// </summary>
     private sealed class UserPickerPropertyValueEditor : DataValueEditor
     {
         private readonly IUserService _userService;

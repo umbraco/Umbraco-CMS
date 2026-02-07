@@ -1257,7 +1257,8 @@ export default {
 		created: 'Erstellt',
 		headline: 'Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen',
 		currentVersion: 'Aktuelle Version',
-		diffHelp: '<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
+		diffHelp:
+			'<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
 		showDiff: 'Unterschiede zwischen der aktuellen Version und der ausgewählten Version anzeigen.',
 		noDiff: 'Keine Unterschiede zwischen den beiden Versionen gefunden.',
 		documentRolledBack: 'Dokument wurde zurückgesetzt',

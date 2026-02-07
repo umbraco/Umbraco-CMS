@@ -22,7 +22,20 @@ public class DisposableTimer : DisposableObjectSlim
     private Exception? _failException;
     private string? _failMessage;
 
-    // internal - created by profiling logger
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DisposableTimer"/> class.
+    /// </summary>
+    /// <param name="logger">The logger to write messages to.</param>
+    /// <param name="level">The log level for the messages.</param>
+    /// <param name="profiler">The profiler to use for timing.</param>
+    /// <param name="loggerType">The type to use as the logger category.</param>
+    /// <param name="startMessage">The message to log when the timer starts.</param>
+    /// <param name="endMessage">The message to log when the timer ends successfully.</param>
+    /// <param name="failMessage">The message to log if the operation fails.</param>
+    /// <param name="startMessageArgs">Arguments for the start message template.</param>
+    /// <param name="endMessageArgs">Arguments for the end message template.</param>
+    /// <param name="failMessageArgs">Arguments for the fail message template.</param>
+    /// <param name="thresholdMilliseconds">Minimum elapsed time in milliseconds before logging the end message.</param>
     internal DisposableTimer(
         ILogger logger,
         LogLevel level,
@@ -95,6 +108,9 @@ public class DisposableTimer : DisposableObjectSlim
         _profilerStep = profiler?.Step(loggerType, startMessage);
     }
 
+    /// <summary>
+    ///     Gets the stopwatch used to measure elapsed time.
+    /// </summary>
     public Stopwatch Stopwatch { get; } = Stopwatch.StartNew();
 
     /// <summary>

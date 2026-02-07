@@ -2,18 +2,25 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+///     Provides property value conversion for boolean (Yes/No) properties.
+/// </summary>
 [DefaultPropertyValueConverter]
 public class YesNoValueConverter : PropertyValueConverterBase
 {
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.Boolean;
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(bool);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source is null)
