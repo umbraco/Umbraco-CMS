@@ -17,13 +17,16 @@ import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/b
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 import '../search-result/search-result-item.element.js';
+import { UMB_BACKOFFICE_CONTEXT } from '../../../../apps/backoffice/backoffice.context.js';
 
 type GlobalSearchers = {
 	name: string;
 	api?: UmbSearchProvider<UmbSearchResultItemModel>;
 	alias: string;
+	sectionAlias?: string;
 };
 
 @customElement('umb-search-modal')
@@ -56,8 +59,18 @@ export class UmbSearchModalElement extends UmbLitElement {
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 300;
 
+	#currentSectionAlias?: string;
+
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (backofficeContext) => {
+			if (!backofficeContext) return;
+			this.observe(backofficeContext.activeSectionAlias, (alias) => {
+				this.#currentSectionAlias = alias;
+				this.#updateDefaultSearcher();
+			});
+		});
 
 		this.#observeGlobalSearchers();
 	}
@@ -114,6 +127,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 						name: controller.manifest.meta?.label || controller.manifest.name,
 						api: searchApi,
 						alias: controller.alias,
+						sectionAlias: this.#extractSectionAlias(controller.manifest.conditions),
 					};
 
 					globalSearch.push(searcher);
@@ -121,11 +135,34 @@ export class UmbSearchModalElement extends UmbLitElement {
 			}
 
 			this._globalSearchers = globalSearch;
-
-			if (this._globalSearchers.length > 0) {
-				this._currentGlobalSearcher = this._globalSearchers[0];
-			}
+			this.#updateDefaultSearcher();
 		});
+	}
+
+	#extractSectionAlias(conditions?: UmbExtensionConditionConfig[]): string | undefined {
+		if (!conditions) return undefined;
+		const sectionCondition = conditions.find((c) => c.alias === UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS);
+		if (sectionCondition && 'match' in sectionCondition && typeof sectionCondition.match === 'string') {
+			return sectionCondition.match;
+		}
+
+		return undefined;
+	}
+
+	#updateDefaultSearcher() {
+		if (this._globalSearchers.length === 0) return;
+
+		// Try to find a searcher matching the current section
+		if (this.#currentSectionAlias) {
+			const matchingSearcher = this._globalSearchers.find((s) => s.sectionAlias === this.#currentSectionAlias);
+			if (matchingSearcher) {
+				this._currentGlobalSearcher = matchingSearcher;
+				return;
+			}
+		}
+
+		// Fall back to first searcher
+		this._currentGlobalSearcher = this._globalSearchers[0];
 	}
 
 	async #setSearchItemNavIndex(index: number) {
