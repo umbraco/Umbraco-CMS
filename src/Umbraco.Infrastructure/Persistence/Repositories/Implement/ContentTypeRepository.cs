@@ -109,7 +109,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             .From<ContentTypeDto>()
             .InnerJoin<NodeDto>()
             .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-            .Where<ContentTypeDto>(dto => aliases.Contains(dto.Alias));
+            .WhereIn<ContentTypeDto>(x => x.Alias, aliases);
 
         return Database.Fetch<int>(sql);
     }
