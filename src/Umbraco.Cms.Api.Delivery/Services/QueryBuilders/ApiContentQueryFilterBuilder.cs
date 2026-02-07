@@ -137,13 +137,13 @@ internal sealed class ApiContentQueryFilterBuilder
         if (values.Length == 1)
         {
             // The trailing wildcard is added automatically
-            query.Field(fieldName, (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, $"*{values[0]}"));
+            query.Field(fieldName, ExamineValue.Create(Examineness.ComplexWildcard, $"*{values[0]}"));
         }
         else
         {
             // The trailing wildcard is added automatically
             IExamineValue[] examineValues = values
-                .Select(value => (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, $"*{value}"))
+                .Select(value => ExamineValue.Create(Examineness.ComplexWildcard, $"*{value}"))
                 .ToArray();
             query.GroupedOr(new[] { fieldName }, examineValues);
         }

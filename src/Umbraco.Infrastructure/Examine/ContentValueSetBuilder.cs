@@ -89,7 +89,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             var isVariant = c.ContentType.VariesByCulture();
 
             var urlValue = _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false); // Always add invariant urlName
-            var values = new Dictionary<string, IEnumerable<object?>>
+            var values = new Dictionary<string, IEnumerable<object>>
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 {

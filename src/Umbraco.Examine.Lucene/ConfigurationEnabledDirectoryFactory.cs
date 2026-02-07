@@ -12,9 +12,9 @@ using Directory = Lucene.Net.Store.Directory;
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 /// <summary>
-///     An Examine directory factory implementation based on configured values
+/// An Examine directory factory implementation based on configured values.
 /// </summary>
-public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
+public class ConfigurationEnabledDirectoryFactory : IDirectoryFactory
 {
     private readonly IApplicationRoot _applicationRoot;
     private readonly IServiceProvider _services;
@@ -31,9 +31,15 @@ public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
         _settings = settings.Value;
     }
 
-    protected override Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
+    public Directory CreateTaxonomyDirectory(LuceneIndex luceneIndex, bool forceUnlock)
     {
-        _directoryFactory = CreateFactory();
+        _directoryFactory ??= CreateFactory();
+        return _directoryFactory.CreateTaxonomyDirectory(luceneIndex, forceUnlock);
+    }
+
+    public Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
+    {
+        _directoryFactory ??= CreateFactory();
         return _directoryFactory.CreateDirectory(luceneIndex, forceUnlock);
     }
 
@@ -49,15 +55,11 @@ public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
             System.IO.Directory.CreateDirectory(dirInfo.FullName);
         }
 
-        switch (_settings.LuceneDirectoryFactory)
+        return _settings.LuceneDirectoryFactory switch
         {
-            case LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory:
-                return _services.GetRequiredService<SyncedFileSystemDirectoryFactory>();
-            case LuceneDirectoryFactory.TempFileSystemDirectoryFactory:
-                return _services.GetRequiredService<UmbracoTempEnvFileSystemDirectoryFactory>();
-            case LuceneDirectoryFactory.Default:
-            default:
-                return _services.GetRequiredService<FileSystemDirectoryFactory>();
-        }
+            LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory => _services.GetRequiredService<SyncedFileSystemDirectoryFactory>(),
+            LuceneDirectoryFactory.TempFileSystemDirectoryFactory => _services.GetRequiredService<UmbracoTempEnvFileSystemDirectoryFactory>(),
+            _ => _services.GetRequiredService<FileSystemDirectoryFactory>(),
+        };
     }
 }

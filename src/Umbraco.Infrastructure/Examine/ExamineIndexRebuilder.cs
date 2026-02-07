@@ -44,7 +44,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     /// <inheritdoc/>
     public bool CanRebuild(string indexName)
     {
-        if (!_examineManager.TryGetIndex(indexName, out IIndex index))
+        if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
             throw new InvalidOperationException("No index found by name " + indexName);
         }
@@ -141,7 +141,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             await Task.Delay(delay, cancellationToken);
         }
 
-        if (!_examineManager.TryGetIndex(indexName, out IIndex index))
+        if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
             throw new InvalidOperationException($"No index found with name {indexName}");
         }
