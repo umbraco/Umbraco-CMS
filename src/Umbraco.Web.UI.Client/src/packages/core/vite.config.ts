@@ -22,6 +22,7 @@ export default defineConfig({
 			'const/index': './const/index.ts',
 			'culture/index': './culture/index.ts',
 			'dashboard/index': './dashboard/index.ts',
+			'data-source/index': './data-source/index.ts',
 			'debug/index': './debug/index.ts',
 			'entity-action/index': './entity-action/index.ts',
 			'entity-bulk-action/index': './entity-bulk-action/index.ts',

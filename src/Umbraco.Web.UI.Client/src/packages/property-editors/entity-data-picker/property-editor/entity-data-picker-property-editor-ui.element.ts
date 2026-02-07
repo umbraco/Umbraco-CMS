@@ -13,9 +13,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
-// import of local component
-import '../input/input-entity-data.element.js';
-
 @customElement('umb-entity-data-picker-property-editor-ui')
 export class UmbEntityDataPickerPropertyEditorUIElement
 	extends UmbFormControlMixin<UmbEntityDataPickerPropertyEditorValue | undefined, typeof UmbLitElement>(
