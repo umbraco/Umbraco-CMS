@@ -80,9 +80,19 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
 			this.#parentUnique = entriesContext?.getParentUnique();
 			this.#areaKey = entriesContext?.getAreaKey();
-		});
 
-		new UmbExtensionApiInitializer(
+			this.#initExtension();
+		});
+	}
+
+	#extensionInitializer?: UmbExtensionApiInitializer;
+	#initExtension() {
+		this.#extensionInitializer?.destroy();
+		if (this.#parentUnique === undefined || this.#areaKey === undefined) {
+			return;
+		}
+
+		this.#extensionInitializer = new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			UMB_BLOCK_WORKSPACE_ALIAS,
