@@ -1,0 +1,26 @@
+{
+  "name": "Preset Text Value",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "propertyValuePreset",
+      "alias": "presettextvalue",
+      "name": "Preset Text Value",
+      "api": "/App_Plugins/property-preset-value/property-preset-value.js",
+      "forPropertyEditorUiAlias": "Umb.PropertyEditorUi.TextBox"
+    },
+    {
+      "type": "propertyValuePreset",
+      "alias": "presetvalueforpropertyschema",
+      "name": "Preset Value for Property Schema alias",
+      "api": "/App_Plugins/property-preset-value/preset-value-schema-alias.js",
+      "forPropertyEditorSchemaAlias": "Umbraco.TextArea"
+    },
+    {
+      "type": "propertyValuePreset",
+      "alias": "presetvaluefornopropertyeditor",
+      "name": "Preset Value for No Property Editor",
+      "api": "/App_Plugins/property-preset-value/preset-value-no-property.js"
+    }
+  ]
+}
