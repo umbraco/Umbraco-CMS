@@ -35,12 +35,30 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected UserStartNodeTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService)
-        : base(entityService, flagProviders)
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            userStartNodeEntitiesService,
+            dataTypeService)
+    {
+    }
+
+    protected UserStartNodeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap)
     {
         _userStartNodeEntitiesService = userStartNodeEntitiesService;
         _dataTypeService = dataTypeService;

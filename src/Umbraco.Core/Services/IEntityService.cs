@@ -489,4 +489,13 @@ public interface IEntityService
     /// <param name="omitSelf">A value indicating whether to omit the entity's own key from the result.</param>
     /// <returns>The path with each ID converted to a GUID.</returns>
     Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false) => [];
+
+    IEnumerable<IEntitySlim> GetPagedDescendants(
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null,
+        bool includeTrashed = true);
 }
