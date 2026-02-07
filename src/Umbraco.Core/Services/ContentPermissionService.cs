@@ -195,7 +195,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
         var authorizedKeys = new HashSet<Guid>();
         int[]? startNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
 
-        // First pass: check path access and collect all unique node IDs across all paths.
+        // Check path access and collect all unique node IDs across all paths.
         var pathDataByKey = new Dictionary<Guid, int[]>();
         var allUniqueNodeIds = new HashSet<int>();
 

@@ -1,11 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -37,7 +34,7 @@ public class DocumentCollectionPresentationFactoryTests
     }
 
     [Test]
-    public async Task SetUnmappedProperties_Sets_IsProtected_Correctly()
+    public async Task SetUnmappedProperties_Sets_IsProtected_Via_Batched_GetAll()
     {
         // Arrange
         var contentKey1 = Guid.NewGuid();
@@ -45,9 +42,10 @@ public class DocumentCollectionPresentationFactoryTests
         var contentKey3 = Guid.NewGuid();
         var ancestorKey = Guid.NewGuid();
 
-        var content1 = Mock.Of<IContent>(c => c.Key == contentKey1);
-        var content2 = Mock.Of<IContent>(c => c.Key == contentKey2);
-        var content3 = Mock.Of<IContent>(c => c.Key == contentKey3);
+        // content1 path includes protected node 100, content2 path includes protected node 200
+        var content1 = CreateContentMock(contentKey1, id: 10, path: "-1,100,10");
+        var content2 = CreateContentMock(contentKey2, id: 20, path: "-1,200,20");
+        var content3 = CreateContentMock(contentKey3, id: 30, path: "-1,300,30");
 
         var contentCollection = new ListViewPagedModel<IContent>
         {
@@ -64,13 +62,13 @@ public class DocumentCollectionPresentationFactoryTests
                 It.IsAny<Action<MapperContext>>()))
             .Returns([responseModel1, responseModel2, responseModel3]);
 
-        // content1 and content2 are protected, content3 is not
-        _publicAccessService.Setup(x => x.IsProtected(content1))
-            .Returns(Attempt<PublicAccessEntry?>.Succeed(null));
-        _publicAccessService.Setup(x => x.IsProtected(content2))
-            .Returns(Attempt<PublicAccessEntry?>.Succeed(null));
-        _publicAccessService.Setup(x => x.IsProtected(content3))
-            .Returns(Attempt<PublicAccessEntry?>.Fail());
+        // Public access entries protect nodes 100 and 200 (ancestors of content1 and content2)
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(new[]
+            {
+                CreatePublicAccessEntry(protectedNodeId: 100),
+                CreatePublicAccessEntry(protectedNodeId: 200),
+            });
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns([ancestorKey]);
@@ -80,9 +78,13 @@ public class DocumentCollectionPresentationFactoryTests
 
         // Assert
         Assert.AreEqual(3, result.Count);
-        Assert.IsTrue(result[0].IsProtected, "Content 1 should be protected");
-        Assert.IsTrue(result[1].IsProtected, "Content 2 should be protected");
-        Assert.IsFalse(result[2].IsProtected, "Content 3 should not be protected");
+        Assert.IsTrue(result[0].IsProtected, "Content 1 should be protected (ancestor 100 is protected)");
+        Assert.IsTrue(result[1].IsProtected, "Content 2 should be protected (ancestor 200 is protected)");
+        Assert.IsFalse(result[2].IsProtected, "Content 3 should not be protected (no protected ancestor)");
+
+        // Verify GetAll was called once (batched) and IsProtected was never called per-item
+        _publicAccessService.Verify(x => x.GetAll(), Times.Once);
+        _publicAccessService.Verify(x => x.IsProtected(It.IsAny<IContent>()), Times.Never);
 
         // Verify ancestors are set for all items
         Assert.AreEqual(ancestorKey, result[0].Ancestors.First().Id);
@@ -91,14 +93,14 @@ public class DocumentCollectionPresentationFactoryTests
     }
 
     [Test]
-    public async Task SetUnmappedProperties_Handles_No_Protected_Content()
+    public async Task SetUnmappedProperties_Handles_No_Public_Access_Entries()
     {
         // Arrange
         var contentKey1 = Guid.NewGuid();
         var contentKey2 = Guid.NewGuid();
 
-        var content1 = Mock.Of<IContent>(c => c.Key == contentKey1);
-        var content2 = Mock.Of<IContent>(c => c.Key == contentKey2);
+        var content1 = CreateContentMock(contentKey1, id: 10, path: "-1,100,10");
+        var content2 = CreateContentMock(contentKey2, id: 20, path: "-1,200,20");
 
         var contentCollection = new ListViewPagedModel<IContent>
         {
@@ -114,9 +116,9 @@ public class DocumentCollectionPresentationFactoryTests
                 It.IsAny<Action<MapperContext>>()))
             .Returns([responseModel1, responseModel2]);
 
-        // Neither item is protected
-        _publicAccessService.Setup(x => x.IsProtected(It.IsAny<IContent>()))
-            .Returns(Attempt<PublicAccessEntry?>.Fail());
+        // No public access entries exist
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(Enumerable.Empty<PublicAccessEntry>());
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns(Array.Empty<Guid>());
@@ -137,7 +139,7 @@ public class DocumentCollectionPresentationFactoryTests
         var contentKey = Guid.NewGuid();
         var orphanKey = Guid.NewGuid();
 
-        var content = Mock.Of<IContent>(c => c.Key == contentKey);
+        var content = CreateContentMock(contentKey, id: 10, path: "-1,100,10");
 
         var contentCollection = new ListViewPagedModel<IContent>
         {
@@ -153,8 +155,9 @@ public class DocumentCollectionPresentationFactoryTests
                 It.IsAny<Action<MapperContext>>()))
             .Returns([matchingResponseModel, orphanResponseModel]);
 
-        _publicAccessService.Setup(x => x.IsProtected(content))
-            .Returns(Attempt<PublicAccessEntry?>.Succeed(null));
+        // Node 100 is protected (ancestor of content)
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(new[] { CreatePublicAccessEntry(protectedNodeId: 100) });
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns(Array.Empty<Guid>());
@@ -166,8 +169,98 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.AreEqual(2, result.Count);
         Assert.IsTrue(result[0].IsProtected, "Matching content should be protected");
         Assert.IsFalse(result[1].IsProtected, "Orphan item should remain default (not protected)");
-
-        // IsProtected should only be called once (for the matching content)
-        _publicAccessService.Verify(x => x.IsProtected(It.IsAny<IContent>()), Times.Once);
     }
+
+    [Test]
+    public async Task SetUnmappedProperties_Detects_Protection_On_Content_Item_Itself()
+    {
+        // Arrange - the content item's own ID is the protected node
+        var contentKey = Guid.NewGuid();
+
+        var content = CreateContentMock(contentKey, id: 42, path: "-1,100,42");
+
+        var contentCollection = new ListViewPagedModel<IContent>
+        {
+            Items = new PagedModel<IContent>(1, new[] { content }),
+            ListViewConfiguration = new ListViewConfiguration(),
+        };
+
+        var responseModel = new DocumentCollectionResponseModel { Id = contentKey };
+
+        _mapper.Setup(m => m.MapEnumerable<IContent, DocumentCollectionResponseModel>(
+                It.IsAny<IEnumerable<IContent>>(),
+                It.IsAny<Action<MapperContext>>()))
+            .Returns([responseModel]);
+
+        // The item itself (node 42) is protected
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(new[] { CreatePublicAccessEntry(protectedNodeId: 42) });
+
+        _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
+            .Returns(Array.Empty<Guid>());
+
+        // Act
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        // Assert
+        Assert.IsTrue(result[0].IsProtected, "Content should be protected when its own node is the protected node");
+    }
+
+    [Test]
+    public async Task SetUnmappedProperties_Computes_Ancestors_Once_For_Siblings()
+    {
+        // Arrange - 3 siblings under the same parent
+        var contentKey1 = Guid.NewGuid();
+        var contentKey2 = Guid.NewGuid();
+        var contentKey3 = Guid.NewGuid();
+        var ancestorKey = Guid.NewGuid();
+
+        var content1 = CreateContentMock(contentKey1, id: 10, path: "-1,100,10");
+        var content2 = CreateContentMock(contentKey2, id: 20, path: "-1,100,20");
+        var content3 = CreateContentMock(contentKey3, id: 30, path: "-1,100,30");
+
+        var contentCollection = new ListViewPagedModel<IContent>
+        {
+            Items = new PagedModel<IContent>(3, new[] { content1, content2, content3 }),
+            ListViewConfiguration = new ListViewConfiguration(),
+        };
+
+        var responseModel1 = new DocumentCollectionResponseModel { Id = contentKey1 };
+        var responseModel2 = new DocumentCollectionResponseModel { Id = contentKey2 };
+        var responseModel3 = new DocumentCollectionResponseModel { Id = contentKey3 };
+
+        _mapper.Setup(m => m.MapEnumerable<IContent, DocumentCollectionResponseModel>(
+                It.IsAny<IEnumerable<IContent>>(),
+                It.IsAny<Action<MapperContext>>()))
+            .Returns([responseModel1, responseModel2, responseModel3]);
+
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(Enumerable.Empty<PublicAccessEntry>());
+
+        _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
+            .Returns([ancestorKey]);
+
+        // Act
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        // Assert - GetPathKeys called only once, not 3 times
+        _entityService.Verify(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true), Times.Once);
+
+        // All items share the same ancestors
+        Assert.AreEqual(ancestorKey, result[0].Ancestors.First().Id);
+        Assert.AreEqual(ancestorKey, result[1].Ancestors.First().Id);
+        Assert.AreEqual(ancestorKey, result[2].Ancestors.First().Id);
+    }
+
+    private static IContent CreateContentMock(Guid key, int id, string path)
+    {
+        var mock = new Mock<IContent>();
+        mock.Setup(c => c.Key).Returns(key);
+        mock.Setup(c => c.Id).Returns(id);
+        mock.Setup(c => c.Path).Returns(path);
+        return mock.Object;
+    }
+
+    private static PublicAccessEntry CreatePublicAccessEntry(int protectedNodeId) =>
+        new(Guid.NewGuid(), protectedNodeId, 0, 0, Enumerable.Empty<PublicAccessRule>());
 }

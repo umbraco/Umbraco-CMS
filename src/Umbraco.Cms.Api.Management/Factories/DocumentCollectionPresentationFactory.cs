@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -30,8 +31,18 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         _entityService = entityService;
     }
 
+    /// <inheritdoc/>
     protected override Task SetUnmappedProperties(ListViewPagedModel<IContent> contentCollection, List<DocumentCollectionResponseModel> collectionResponseModels)
     {
+        // Retrieve all public access entries once (single scope) instead of
+        // calling IsProtected per item which creates N scopes.
+        var protectedNodeIds = new HashSet<int>(
+            _publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId));
+
+        // All items in a collection are siblings (same parent), so with omitSelf
+        // they share the same ancestor array. Compute once, reuse for all.
+        IEnumerable<ReferenceByIdModel>? sharedAncestors = null;
+
         foreach (DocumentCollectionResponseModel item in collectionResponseModels)
         {
             IContent? matchingContentItem = contentCollection.Items.Items.FirstOrDefault(x => x.Key == item.Id);
@@ -40,11 +51,37 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
                 continue;
             }
 
-            item.IsProtected = _publicAccessService.IsProtected(matchingContentItem).Success;
-            item.Ancestors = _entityService.GetPathKeys(matchingContentItem, omitSelf: true)
-                .Select(x => new ReferenceByIdModel(x));
+            item.IsProtected = IsProtected(matchingContentItem, protectedNodeIds);
+            sharedAncestors ??= _entityService.GetPathKeys(matchingContentItem, omitSelf: true)
+                .Select(x => new ReferenceByIdModel(x))
+                .ToArray();
+            item.Ancestors = sharedAncestors;
         }
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Checks whether a content item is protected by public access, using a pre-fetched
+    /// set of protected node IDs.
+    /// </summary>
+    private static bool IsProtected(IContent content, HashSet<int> protectedNodeIds)
+    {
+        if (protectedNodeIds.Count == 0)
+        {
+            return false;
+        }
+
+        // Walk the content path from deepest to shallowest, checking for a match.
+        int[] pathIds = content.Path.EnsureEndsWith("," + content.Id).GetIdsFromPathReversed();
+        foreach (var id in pathIds)
+        {
+            if (id != -1 && protectedNodeIds.Contains(id))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
