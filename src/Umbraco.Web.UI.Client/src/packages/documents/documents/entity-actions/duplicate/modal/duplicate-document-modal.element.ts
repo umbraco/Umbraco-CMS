@@ -10,6 +10,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import type { UmbDocumentTreeItemModel } from '../../../types.js';
 
 const elementName = 'umb-document-duplicate-to-modal';
 @customElement(elementName)
@@ -40,6 +41,11 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		this.updateValue({ includeDescendants: target.checked });
 	}
 
+	#selectableFilter = (item: UmbDocumentTreeItemModel): boolean => {
+		if (!this.data?.selectableFilter) return true;
+		return this.data.selectableFilter(item);
+	};
+
 	override render() {
 		if (!this.data) return nothing;
 
@@ -51,6 +57,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 						.props=${{
 							expandTreeRoot: true,
 							hideTreeItemActions: true,
+							selectableFilter: this.#selectableFilter,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
