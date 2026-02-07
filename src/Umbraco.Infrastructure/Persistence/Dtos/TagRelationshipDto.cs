@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([NodeIdColumnName, PropertyTypeIdColumnName, TagIdColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class TagRelationshipDto
 {

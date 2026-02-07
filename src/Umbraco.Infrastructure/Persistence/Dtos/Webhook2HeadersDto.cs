@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([WebhookIdColumnName, KeyColumnName], AutoIncrement = false)]
 public class Webhook2HeadersDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Headers;
@@ -19,7 +19,7 @@ public class Webhook2HeadersDto
     private const string ValueColumnName = "Value";
 
     [Column(WebhookIdColumnName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = PrimaryKeyColumnName, OnColumns = $"{WebhookIdColumnName}, {KeyColumnName}")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = PrimaryKeyColumnName, OnColumns = $"{WebhookIdColumnName},{KeyColumnName}")]
     [ForeignKey(typeof(WebhookDto), OnDelete = Rule.Cascade)]
     public int WebhookId { get; set; }
 

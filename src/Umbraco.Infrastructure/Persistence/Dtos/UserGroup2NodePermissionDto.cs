@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [Obsolete("Will be removed in Umbraco 18.")]
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([UserGroupIdColumnName, NodeIdColumnName, PermissionColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 internal class UserGroup2NodePermissionDto
 {
