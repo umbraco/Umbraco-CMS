@@ -169,6 +169,7 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
         }
 
         // Assert
+        // ToDo: the escaping of the table and column names should be done by SqlSyntaxProvider methods! @dseefeld: I'll do it in PR #21671
         Assert.That(
             commands[0].CommandText,
             Is.EqualTo(

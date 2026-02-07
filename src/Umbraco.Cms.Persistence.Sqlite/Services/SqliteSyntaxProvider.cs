@@ -188,6 +188,24 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
     /// <inheritdoc />
+    public override string GetQuotedTableName(string? tableName)
+    {
+        if (tableName?.Contains('.') == false)
+        {
+            return $"[{tableName}]";
+        }
+
+        var tableNameParts = tableName?.Split(Core.Constants.CharArrays.Period, 2);
+        return $"[{tableNameParts?[0]}].[{tableNameParts?[1]}]";
+    }
+
+    /// <inheritdoc />
+    public override string GetQuotedColumnName(string? columnName) => $"[{columnName}]";
+
+    /// <inheritdoc />
+    public override string GetQuotedName(string? name) => $"[{name}]";
+
+    /// <inheritdoc />
     public override string GetSpecialDbType(SpecialDbType dbType) => "TEXT COLLATE NOCASE";
 
     /// <inheritdoc />
