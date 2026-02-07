@@ -2760,8 +2760,14 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // SD: This is failing because the 'content' call to GetValue<DateTime> always has empty milliseconds
         // MCH: I'm guessing this is an issue because of the format the date is actually stored as, right? Cause we don't do any formatting when saving or loading
-        Assert.That(sut.GetValue<DateTime>("dateTime").ToString("G"),
-            Is.EqualTo(content.GetValue<DateTime>("dateTime").ToString("G")));
+        var expectedDateTime = content.GetValue<DateTime>("dateTime");
+        var resultDateTime = sut.GetValue<DateTime>("dateTime");
+        var expectedDate = content.GetValue<DateTime>("date");
+        var resultDate = sut.GetValue<DateTime>("date");
+
+        Assert.That(resultDateTime.ToString("G"), Is.EqualTo(expectedDateTime.ToString("G")));
+        Assert.That(resultDate.ToString("G"), Is.EqualTo(expectedDate.ToString("G")));
+
         Assert.That(sut.GetValue<string>("colorPicker"), Is.EqualTo("black"));
         Assert.That(sut.GetValue<string>("ddlMultiple"), Is.EqualTo("1234,1235"));
         Assert.That(sut.GetValue<string>("rbList"), Is.EqualTo("random"));

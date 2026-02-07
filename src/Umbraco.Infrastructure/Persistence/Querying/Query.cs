@@ -2,7 +2,9 @@ using System.Collections;
 using System.Linq.Expressions;
 using System.Text;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
 
@@ -38,21 +40,19 @@ public class Query<T> : IQuery<T>
     /// </summary>
     public virtual IQuery<T> WhereIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values)
     {
-        if (fieldSelector is null)
-        {
-            return this;
-        }
-
-        var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
-        var whereExpression = expressionHelper.Visit(fieldSelector);
-        _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { values } }));
-        return this;
+        return WhereInOrNotIn(fieldSelector, values, true);
     }
 
     /// <summary>
     ///     Adds a where-not-in clause to the query.
     /// </summary>
     public virtual IQuery<T> WhereNotIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values)
+    {
+        return WhereInOrNotIn(fieldSelector, values, false);
+    }
+
+    /// <inheritdoc/>
+    public virtual IQuery<T> WhereInOrNotIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values, bool isIn = true)
     {
         if (fieldSelector is null)
         {
@@ -61,8 +61,23 @@ public class Query<T> : IQuery<T>
 
         var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
         var whereExpression = expressionHelper.Visit(fieldSelector);
-        _wheres.Add(new Tuple<string, object[]>(whereExpression + " NOT IN (@values)", new object[] { new { values } }));
+
+        LowerCaseCompare(ref values, ref whereExpression);
+
+        var inNot = isIn ? string.Empty : " NOT";
+        _wheres.Add(new Tuple<string, object[]>($"{whereExpression}{inNot} IN (@values)", new object[] { new { values } }));
         return this;
+    }
+
+    private static void LowerCaseCompare(ref IEnumerable? values, ref string whereExpression)
+    {
+        Attempt<string[]> attempt = values.TryConvertTo<string[]>();
+        if (attempt.Success)
+        {
+            // fix for case insensitive comparison in databases like PostgreSQL
+            whereExpression = $"LOWER({whereExpression})";
+            values = attempt.Result?.Select(v => v.ToLower());
+        }
     }
 
     /// <summary>

@@ -43,6 +43,12 @@ namespace Umbraco.Extensions
             return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
+        public static Sql<ISqlContext> WhereParam<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string param)
+        {
+            string s = $"{sql.GetColumns(columnExpressions: [field], withAlias: false).FirstOrDefault()} = {param}";
+            return sql.Where(s, []);
+        }
+
         /// <summary>
         /// Appends a WHERE clause to the Sql statement.
         /// </summary>
@@ -87,7 +93,25 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
         {
+            if (values == null)
+            {
+                return sql;
+            }
+
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
+
+            string[] stringValues = [.. values.OfType<string>()]; // This is necessary to avoid failing attempting to convert to string[] when values contains non-string types
+            if (stringValues.Length > 0)
+            {
+                Attempt<string[]> attempt = values.TryConvertTo<string[]>();
+                if (attempt.Success)
+                {
+                    values = attempt.Result?.Select(v => v?.ToLower());
+                    sql.Where($"LOWER({fieldName}) IN (@values)", new { values });
+                    return sql;
+                }
+            }
+
             sql.Where($"{fieldName} IN (@values)", new { values });
             return sql;
         }

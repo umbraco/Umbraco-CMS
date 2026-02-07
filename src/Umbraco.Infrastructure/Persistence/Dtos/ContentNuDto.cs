@@ -6,24 +6,25 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([NodeIdColumnName, PublishedColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 public class ContentNuDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.NodeData;
-    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+    public const string PrimaryKeyColumnName = "PK_cmsContentNu";
+    public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
     private const string PublishedColumnName = "published";
     private const string RvColumnName = "rv";
     private const string DataRawColumnName = "dataRaw";
 
-    [Column(PrimaryKeyColumnName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentNu", OnColumns = $"{PrimaryKeyColumnName}, {PublishedColumnName}")]
-    [ForeignKey(typeof(ContentDto), Column = PrimaryKeyColumnName, OnDelete = Rule.Cascade)]
+    [Column(NodeIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = PrimaryKeyColumnName, OnColumns = $"{NodeIdColumnName}, {PublishedColumnName}")]
+    [ForeignKey(typeof(ContentDto), Column = ContentDto.PrimaryKeyColumnName, OnDelete = Rule.Cascade)]
     public int NodeId { get; set; }
 
     [Column(PublishedColumnName)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_" + PublishedColumnName, ForColumns = $"{PublishedColumnName},{PrimaryKeyColumnName},{RvColumnName}", IncludeColumns = DataRawColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_" + PublishedColumnName, ForColumns = $"{PublishedColumnName},{NodeIdColumnName},{RvColumnName}", IncludeColumns = DataRawColumnName)]
     public bool Published { get; set; }
 
     /// <summary>
