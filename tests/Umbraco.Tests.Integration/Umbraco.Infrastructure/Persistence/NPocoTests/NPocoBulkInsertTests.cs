@@ -175,6 +175,36 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             Is.EqualTo(
                 "INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isSchedulingPublisher]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
     }
+    [Test]
+    public void Generate_Bulk_Import_Sql_Fails()
+    {
+        var servers = new List<ServerRegistrationDto>();
+        for (var i = 0; i < 2; i++)
+        {
+            servers.Add(new ServerRegistrationDto
+            {
+                ServerAddress = "address" + i,
+                ServerIdentity = "computer" + i,
+                DateRegistered = DateTime.UtcNow,
+                IsActive = true,
+                DateAccessed = DateTime.UtcNow
+            });
+        }
+
+        IDbCommand[] commands;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            commands = ScopeAccessor.AmbientScope.Database.GenerateBulkInsertCommands(servers.ToArray());
+            scope.Complete();
+        }
+
+        // Assert
+        // ToDo: the escaping of the table and column names should be done by SqlSyntaxProvider methods! @dseefeld: I'll do it in PR #21671
+        Assert.That(
+            commands[0].CommandText,
+            Is.Not.EqualTo(
+                "INSERT INTO \"umbracoServer\" (\"umbracoServer\".\"address\", \"umbracoServer\".\"computerName\", \"umbracoServer\".\"registeredDate\", \"umbracoServer\".\"lastNotifiedDate\", \"umbracoServer\".\"isActive\", \"umbracoServer\".\"isSchedulingPublisher\") VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
+    }
 
     [Test]
     public void Generate_Bulk_Import_Sql_Exceeding_Max_Params()
