@@ -43,10 +43,12 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         // they share the same ancestor array. Compute once, reuse for all.
         IEnumerable<ReferenceByIdModel>? sharedAncestors = null;
 
+        // Create a lookup of content items by key for efficient matching when looping the response models.
+        var contentByKey = contentCollection.Items.Items.ToDictionary(x => x.Key);
+
         foreach (DocumentCollectionResponseModel item in collectionResponseModels)
         {
-            IContent? matchingContentItem = contentCollection.Items.Items.FirstOrDefault(x => x.Key == item.Id);
-            if (matchingContentItem is null)
+            if (contentByKey.TryGetValue(item.Id, out IContent? matchingContentItem) is false)
             {
                 continue;
             }

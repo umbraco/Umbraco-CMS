@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -20,9 +19,8 @@ internal class HasScheduleFlagProviderTests
     public void HasScheduleFlagProvider_Can_Provide_Document_Tree_Flags()
     {
         var contentServiceMock = new Mock<IContentService>();
-        var idKeyMapMock = new Mock<IIdKeyMap>();
 
-        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object);
         Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
     }
 
@@ -30,9 +28,8 @@ internal class HasScheduleFlagProviderTests
     public void HasScheduleFlagProvider_Can_Provide_Document_Collection_Flags()
     {
         var contentServiceMock = new Mock<IContentService>();
-        var idKeyMapMock = new Mock<IIdKeyMap>();
 
-        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object);
         Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
     }
 
@@ -40,9 +37,8 @@ internal class HasScheduleFlagProviderTests
     public void HasScheduleFlagProvider_Can_Provide_Document_Item_Flags()
     {
         var contentServiceMock = new Mock<IContentService>();
-        var idKeyMapMock = new Mock<IIdKeyMap>();
 
-        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object);
         Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
     }
 
@@ -54,20 +50,13 @@ internal class HasScheduleFlagProviderTests
             new() { Key = Guid.NewGuid(), Name = "Item 1" }, new() { Key = Guid.NewGuid(), Name = "Item 2" },
         };
 
-        var idKeyMapMock = new Mock<IIdKeyMap>();
-        idKeyMapMock.Setup(x => x.GetIdForKey(entities[0].Key, UmbracoObjectTypes.Document))
-            .Returns(Attempt.Succeed(1));
-        idKeyMapMock.Setup(x => x.GetIdForKey(entities[1].Key, UmbracoObjectTypes.Document))
-            .Returns(Attempt.Succeed(2));
-
         Guid[] keys = entities.Select(x => x.Key).ToArray();
         var contentServiceMock = new Mock<IContentService>();
         contentServiceMock
-            .Setup(x => x.GetContentSchedulesByIds(keys))
-            .Returns(CreateContentSchedules());
+            .Setup(x => x.GetContentSchedulesByKeys(keys))
+            .Returns(CreateContentSchedules(entities[0].Key, entities[1].Key));
 
-
-        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object);
 
         var variant1 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "en-EN" };
         var variant2 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "da-DA" };
@@ -96,19 +85,13 @@ internal class HasScheduleFlagProviderTests
             new() { Key = Guid.NewGuid(), Name = "Item 1" }, new() { Key = Guid.NewGuid(), Name = "Item 2" },
         };
 
-        var idKeyMapMock = new Mock<IIdKeyMap>();
-        idKeyMapMock.Setup(x => x.GetIdForKey(entities[0].Key, UmbracoObjectTypes.Document))
-            .Returns(Attempt.Succeed(1));
-        idKeyMapMock.Setup(x => x.GetIdForKey(entities[1].Key, UmbracoObjectTypes.Document))
-            .Returns(Attempt.Succeed(2));
-
         Guid[] keys = entities.Select(x => x.Key).ToArray();
         var contentServiceMock = new Mock<IContentService>();
         contentServiceMock
-            .Setup(x => x.GetContentSchedulesByIds(keys))
-            .Returns(CreateContentSchedules());
+            .Setup(x => x.GetContentSchedulesByKeys(keys))
+            .Returns(CreateContentSchedules(entities[0].Key, entities[1].Key));
 
-        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object);
 
         var variant1 = new DocumentVariantResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "en-EN" };
         var variant2 = new DocumentVariantResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "da-DA" };
@@ -137,19 +120,13 @@ internal class HasScheduleFlagProviderTests
             new() { Key = Guid.NewGuid(), Name = "Item 1" }, new() { Key = Guid.NewGuid(), Name = "Item 2" },
         };
 
-        var idKeyMapMock = new Mock<IIdKeyMap>();
-        idKeyMapMock.Setup(x => x.GetIdForKey(entities[0].Key, UmbracoObjectTypes.Document))
-            .Returns(Attempt.Succeed(1));
-        idKeyMapMock.Setup(x => x.GetIdForKey(entities[1].Key, UmbracoObjectTypes.Document))
-            .Returns(Attempt.Succeed(2));
-
         Guid[] keys = entities.Select(x => x.Key).ToArray();
         var contentServiceMock = new Mock<IContentService>();
         contentServiceMock
-            .Setup(x => x.GetContentSchedulesByIds(keys))
-            .Returns(CreateContentSchedules());
+            .Setup(x => x.GetContentSchedulesByKeys(keys))
+            .Returns(CreateContentSchedules(entities[0].Key, entities[1].Key));
 
-        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object);
 
         var variant1 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "en-EN" };
         var variant2 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "da-DA" };
@@ -170,17 +147,24 @@ internal class HasScheduleFlagProviderTests
         Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
     }
 
-    private Dictionary<int, IEnumerable<ContentSchedule>> CreateContentSchedules()
+    private Dictionary<Guid, IEnumerable<ContentSchedule>> CreateContentSchedules(Guid key1, Guid key2)
     {
-        Dictionary<int, IEnumerable<ContentSchedule>> contentSchedules = new Dictionary<int, IEnumerable<ContentSchedule>>();
-
-        contentSchedules.Add(1, [
-            new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release), // Scheduled for release
-            new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release) // Not Scheduled for release
-        ]);
-        contentSchedules.Add(2, [
-            new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release) // Scheduled for release
-        ]);
+        Dictionary<Guid, IEnumerable<ContentSchedule>> contentSchedules = new Dictionary<Guid, IEnumerable<ContentSchedule>>
+        {
+            {
+                key1,
+                [
+                    new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release), // Scheduled for release
+                    new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release) // Not Scheduled for release
+                ]
+            },
+            {
+                key2,
+                [
+                    new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release) // Scheduled for release
+                ]
+            },
+        };
 
         return contentSchedules;
     }
