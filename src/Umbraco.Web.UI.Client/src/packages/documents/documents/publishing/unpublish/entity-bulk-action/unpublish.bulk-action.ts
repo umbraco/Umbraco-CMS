@@ -1,11 +1,12 @@
 import { UmbUnpublishDocumentEntityAction } from '../entity-action/index.js';
+import { processDocumentsInBatches, showBulkResultNotification } from '../../bulk-publish.utils.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
@@ -15,14 +16,23 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
-		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
-		if (!entityContext) {
-			throw new Error('Entity context not found');
-		}
+		// Fetch contexts in parallel
+		const [entityContext, notificationContext, eventContext, appLanguageContext] = await Promise.all([
+			this.getContext(UMB_ENTITY_CONTEXT),
+			this.getContext(UMB_NOTIFICATION_CONTEXT),
+			this.getContext(UMB_ACTION_EVENT_CONTEXT),
+			this.getContext(UMB_APP_LANGUAGE_CONTEXT),
+		]);
+
+		if (!entityContext) throw new Error('Entity context not found');
+		if (!eventContext) throw new Error('Event context not found');
+		if (!appLanguageContext) throw new Error('App language context not found');
+
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
 
 		const localize = new UmbLocalizationController(this);
+		const repository = new UmbDocumentPublishingRepository(this._host);
 
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
@@ -115,6 +125,28 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 
 			await this.#reloadChildren(entityType, unique);
 		}
+
+		// Unpublish documents
+		const { succeeded, failed } = await processDocumentsInBatches(
+			this.selection,
+			(unique) => repository.unpublish(unique, variantIds),
+			notificationContext,
+			localize.term('speechBubbles_contentUnpublished'),
+		);
+
+		// Show result notification
+		showBulkResultNotification(
+			notificationContext,
+			localize,
+			'unpublish',
+			succeeded,
+			failed,
+			this.selection.length,
+			variantIds,
+		);
+
+		// Reload children
+		eventContext.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
 	}
 
 	async #unpublishDocuments(uniques: Array<string>, variantIds: Array<UmbVariantId>): Promise<number> {

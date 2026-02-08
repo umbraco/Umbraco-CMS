@@ -1575,7 +1575,9 @@ export default {
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editMultiContentPublishedPartialText: '%0% of %1% documents published. %2% failed.',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
+		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished. %2% failed.',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editMultiVariantUnpublishedText:
