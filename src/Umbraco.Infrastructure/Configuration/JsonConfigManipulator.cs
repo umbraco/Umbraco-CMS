@@ -33,7 +33,8 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task RemoveConnectionStringAsync()
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath);
+        // attempt to get the Development configuration, fallback to default
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider("Development", UmbracoConnectionStringPath) ?? GetJsonConfigurationProvider(requiredKey: UmbracoConnectionStringPath);
 
         JsonNode? jsonNode = await GetJsonNodeAsync(provider);
 
@@ -52,7 +53,9 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
+        // attempt to get the Development configuration, fallback to default
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider("Development") ?? GetJsonConfigurationProvider();
+
         JsonNode? node = await GetJsonNodeAsync(provider);
 
         if (node is null)
@@ -237,7 +240,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         }
     }
 
-    private JsonConfigurationProvider? GetJsonConfigurationProvider(string? requiredKey = null)
+    private JsonConfigurationProvider? GetJsonConfigurationProvider(string? environment = null, string? requiredKey = null)
     {
         if (_configuration is not IConfigurationRoot configurationRoot)
         {
@@ -247,6 +250,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         foreach (IConfigurationProvider provider in configurationRoot.Providers)
         {
             if (provider is JsonConfigurationProvider jsonConfigurationProvider &&
+                (environment is null || jsonConfigurationProvider.Source.Path.EndsWith($"appsettings.{environment}.json")) &&
                 (requiredKey is null || provider.TryGet(requiredKey, out _)))
             {
                 return jsonConfigurationProvider;
