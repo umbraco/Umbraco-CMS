@@ -406,7 +406,7 @@ export class UmbPropertyEditorUIBlockListElement
 			${this.#renderSortModeToolbar()}
 			${repeat(
 				this._layouts,
-				(layout, index) => `${index}_${layout.contentKey}`,
+				(layout) => layout.contentKey,
 				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
