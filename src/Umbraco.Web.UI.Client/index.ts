@@ -17,9 +17,12 @@ async function bootstrap() {
 		appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;
 	}
 
-	// Example injector:
+	// Example injector - supports both relative and absolute paths
+	// For absolute paths, use Vite's /@fs/ prefix to access files outside the project
 	if (import.meta.env.VITE_EXAMPLE_PATH) {
-		import(/* @vite-ignore */ './' + import.meta.env.VITE_EXAMPLE_PATH + '/index.ts').then((js) => {
+		const examplePath = import.meta.env.VITE_EXAMPLE_PATH;
+		const importPath = examplePath.startsWith('/') ? '/@fs' + examplePath : './' + examplePath;
+		import(/* @vite-ignore */ importPath + '/src/index.ts').then((js) => {
 			if (js) {
 				Object.keys(js).forEach((key) => {
 					const value = js[key];
