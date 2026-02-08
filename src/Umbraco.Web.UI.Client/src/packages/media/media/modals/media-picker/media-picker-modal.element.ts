@@ -405,12 +405,14 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	#renderBody() {
 		return html`${this.#renderToolbar()}
-			<umb-dropzone-media
-				id="dropzone"
-				multiple
-				@change=${this.#onDropzoneChange}
-				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone-media>
-			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
+			<div id="media-content">
+				<umb-dropzone-media
+					id="dropzone"
+					multiple
+					@change=${this.#onDropzoneChange}
+					.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone-media>
+				${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()}
+			</div>`;
 	}
 
 	#renderSearchResult() {
@@ -583,6 +585,16 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			uui-pagination {
 				display: block;
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			#media-content {
+				position: relative;
+				min-height: 200px;
+			}
+
+			umb-dropzone-media {
+				/* Adjust bottom position to account for modal footer */
+				--umb-dropzone-uploader-bottom: 80px;
 			}
 		`,
 	];
