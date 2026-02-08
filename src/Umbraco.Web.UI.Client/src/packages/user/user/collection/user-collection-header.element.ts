@@ -242,6 +242,8 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
 				padding: var(--uui-size-space-3);
+				overflow-y: auto;
+    			max-height: 500px;
 			}
 		`,
 	];
