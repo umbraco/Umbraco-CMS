@@ -395,7 +395,7 @@ export class UmbBlockGridEntriesContext
 					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
 					hostEl.setAttribute('data-area-col-span', areaType?.columnSpan?.toString() ?? '');
 					hostEl.setAttribute('data-area-row-span', areaType?.rowSpan?.toString() ?? '');
-					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.columnSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--grid-columns', this.#layoutColumns.getValue()?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.columnSpan?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan?.toString() ?? '');
 					this.#setupAllowedBlockTypes();
