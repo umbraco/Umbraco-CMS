@@ -16,6 +16,14 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     private readonly IEntityService _entityService;
 
     [ActivatorUtilitiesConstructor]
+    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService)
+        : base(mapper, flagProviders, userService)
+    {
+        _publicAccessService = publicAccessService;
+        _entityService = entityService;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService)
         : base(mapper, flagProviders)
     {
@@ -23,7 +31,7 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         _entityService = entityService;
     }
 
-    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
         : base(mapper)
     {

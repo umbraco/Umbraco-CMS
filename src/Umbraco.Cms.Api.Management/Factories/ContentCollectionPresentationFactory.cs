@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -18,16 +19,30 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
 {
     private readonly FlagProviderCollection _flagProviderCollection;
     private readonly IUmbracoMapper _mapper;
+    private readonly IUserService _userService;
 
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
-        FlagProviderCollection flagProviderCollection)
+        FlagProviderCollection flagProviderCollection,
+        IUserService userService)
     {
         _mapper = mapper;
         _flagProviderCollection = flagProviderCollection;
+        _userService = userService;
     }
 
-    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    protected ContentCollectionPresentationFactory(
+        IUmbracoMapper mapper,
+        FlagProviderCollection flagProviderCollection)
+        : this(
+            mapper,
+            flagProviderCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+    {
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
         : this(
             mapper,
@@ -46,14 +61,17 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
             .WhereNotNull()
             .ToArray();
 
+        // Pre-resolve all unique creator/writer user names in a single batch call.
+        Dictionary<int, string?> userNameDictionary = ResolveUserNames(collectionItemsResult.Items);
+
         List<TCollectionResponseModel> collectionResponseModels =
             _mapper.MapEnumerable<TContent, TCollectionResponseModel>(collectionItemsResult.Items, context =>
             {
                 context.SetIncludedProperties(collectionPropertyAliases);
+                context.SetUserNameDictionary(userNameDictionary);
             });
 
         await SetUnmappedProperties(contentCollection, collectionResponseModels);
-
 
         await PopulateFlags(collectionResponseModels);
 
@@ -68,5 +86,18 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
         {
             await signProvider.PopulateFlagsAsync(models);
         }
+    }
+
+    private Dictionary<int, string?> ResolveUserNames(IEnumerable<TContent> items)
+    {
+        var uniqueUserIds = new HashSet<int>();
+        foreach (TContent item in items)
+        {
+            uniqueUserIds.Add(item.CreatorId);
+            uniqueUserIds.Add(item.WriterId);
+        }
+
+        return _userService.GetUsersById(uniqueUserIds.ToArray())
+            .ToDictionary(u => u.Id, u => u.Name);
     }
 }

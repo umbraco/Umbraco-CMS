@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 
@@ -17,6 +18,7 @@ public class DocumentCollectionPresentationFactoryTests
     private Mock<IUmbracoMapper> _mapper = null!;
     private Mock<IPublicAccessService> _publicAccessService = null!;
     private Mock<IEntityService> _entityService = null!;
+    private Mock<IUserService> _userService = null!;
     private DocumentCollectionPresentationFactory _factory = null!;
 
     [SetUp]
@@ -25,12 +27,18 @@ public class DocumentCollectionPresentationFactoryTests
         _mapper = new Mock<IUmbracoMapper>();
         _publicAccessService = new Mock<IPublicAccessService>();
         _entityService = new Mock<IEntityService>();
+        _userService = new Mock<IUserService>();
+
+        // Default: return empty user list for any batch call
+        _userService.Setup(x => x.GetUsersById(It.IsAny<int[]>()))
+            .Returns(Enumerable.Empty<IUser>());
 
         _factory = new DocumentCollectionPresentationFactory(
             _mapper.Object,
             new FlagProviderCollection(() => Enumerable.Empty<IFlagProvider>()),
             _publicAccessService.Object,
-            _entityService.Object);
+            _entityService.Object,
+            _userService.Object);
     }
 
     [Test]
@@ -252,12 +260,75 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.AreEqual(ancestorKey, result[2].Ancestors.First().Id);
     }
 
-    private static IContent CreateContentMock(Guid key, int id, string path)
+    [Test]
+    public async Task CreateCollectionModelAsync_Batch_Resolves_User_Names()
+    {
+        // Arrange - 3 content items with 2 unique creator/writer IDs
+        var contentKey1 = Guid.NewGuid();
+        var contentKey2 = Guid.NewGuid();
+        var contentKey3 = Guid.NewGuid();
+
+        var content1 = CreateContentMock(contentKey1, id: 10, path: "-1,100,10", creatorId: 1, writerId: 2);
+        var content2 = CreateContentMock(contentKey2, id: 20, path: "-1,100,20", creatorId: 1, writerId: 3);
+        var content3 = CreateContentMock(contentKey3, id: 30, path: "-1,100,30", creatorId: 2, writerId: 3);
+
+        var contentCollection = new ListViewPagedModel<IContent>
+        {
+            Items = new PagedModel<IContent>(3, new[] { content1, content2, content3 }),
+            ListViewConfiguration = new ListViewConfiguration(),
+        };
+
+        _mapper.Setup(m => m.MapEnumerable<IContent, DocumentCollectionResponseModel>(
+                It.IsAny<IEnumerable<IContent>>(),
+                It.IsAny<Action<MapperContext>>()))
+            .Returns([
+                new DocumentCollectionResponseModel { Id = contentKey1 },
+                new DocumentCollectionResponseModel { Id = contentKey2 },
+                new DocumentCollectionResponseModel { Id = contentKey3 },
+            ]);
+
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(Enumerable.Empty<PublicAccessEntry>());
+
+        _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
+            .Returns(Array.Empty<Guid>());
+
+        var user1 = new Mock<IUser>();
+        user1.Setup(u => u.Id).Returns(1);
+        user1.Setup(u => u.Name).Returns("Alice");
+
+        var user2 = new Mock<IUser>();
+        user2.Setup(u => u.Id).Returns(2);
+        user2.Setup(u => u.Name).Returns("Bob");
+
+        var user3 = new Mock<IUser>();
+        user3.Setup(u => u.Id).Returns(3);
+        user3.Setup(u => u.Name).Returns("Charlie");
+
+        _userService.Setup(x => x.GetUsersById(It.IsAny<int[]>()))
+            .Returns(new[] { user1.Object, user2.Object, user3.Object });
+
+        // Act
+        await _factory.CreateCollectionModelAsync(contentCollection);
+
+        // Assert - GetUsersById called exactly once with the 3 unique user IDs
+        _userService.Verify(
+            x => x.GetUsersById(It.Is<int[]>(ids =>
+                ids.Length == 3 && ids.Contains(1) && ids.Contains(2) && ids.Contains(3))),
+            Times.Once);
+
+        // Per-item profile resolution should never be called
+        _userService.Verify(x => x.GetProfileById(It.IsAny<int>()), Times.Never);
+    }
+
+    private static IContent CreateContentMock(Guid key, int id, string path, int creatorId = 0, int writerId = 0)
     {
         var mock = new Mock<IContent>();
         mock.Setup(c => c.Key).Returns(key);
         mock.Setup(c => c.Id).Returns(id);
         mock.Setup(c => c.Path).Returns(path);
+        mock.Setup(c => c.CreatorId).Returns(creatorId);
+        mock.Setup(c => c.WriterId).Returns(writerId);
         return mock.Object;
     }
 
