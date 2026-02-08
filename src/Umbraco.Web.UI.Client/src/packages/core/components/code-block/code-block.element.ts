@@ -1,5 +1,12 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import type { Ref } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import { createRef, css, customElement, html, property, ref, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
+//import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
+
+//import { jsonDefaults } from 'monaco-editor/esm/vs/language/json/monaco.contribution';
+//import { setupMode } from 'monaco-editor/esm/vs/language/json/jsonMode';
 
 //TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
 
@@ -18,6 +25,40 @@ export class UmbCodeBlockElement extends LitElement {
 	@state()
 	private _copyState: 'idle' | 'success' = 'idle';
 
+	private _lang = '';
+
+	private containerRef: Ref<HTMLElement> = createRef();
+
+	get container() {
+		if (!this.containerRef?.value) throw new Error('Container element not found');
+		return this.containerRef!.value;
+	}
+
+	get codeLang() {
+		this._lang = this.language.toLowerCase();
+
+		switch (this._lang) {
+			case 'c#':
+			case 'csharp':
+				this._lang = 'csharp';
+				break;
+			case 'ts':
+			case 'typescript':
+				monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+					noSemanticValidation: false,
+					noSyntaxValidation: false,
+				});
+				this._lang = 'typescript';
+				break;
+			case 'js':
+			case 'javascript':
+				this._lang = 'javascript';
+				break;
+		}
+
+		return this._lang;
+	}
+
 	async copyCode() {
 		const text = this.textContent;
 		if (text) {
@@ -29,11 +70,54 @@ export class UmbCodeBlockElement extends LitElement {
 		}
 	}
 
+	constructor() {
+		super();
+		//setupMode(jsonDefaults);
+	}
+
+	override firstUpdated(): void {
+		
+	}
+
 	override render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
+			<pre><uui-scroll-container><code id="code" ${ref(this.containerRef)} data-lang=${this.codeLang}><slot @slotchange=${this.#onSlotChanged}></slot></code></uui-scroll-container></pre>
 		`; // Avoid breaks between elements of <pre></pre>
+	}
+
+	#syntaxHighlight() {
+		if (!this.codeLang) return;
+
+		monaco.editor.colorizeElement(this.container, {});
+		//monaco.editor.colorizeElement(this.shadowRoot!.getElementById("code")!, {});
+
+		let mimeType = '';
+
+		if (this.codeLang === 'json') {
+			mimeType = 'application/json';
+		}
+		else if (this.codeLang === 'css') {
+			mimeType = 'text/css';
+		}
+
+		monaco.editor.colorize(this.textContent, this.codeLang, {
+			mimeType: mimeType,
+		})
+		.then(html => {
+			this.container.innerHTML = html;
+		});
+	}
+
+	#onSlotChanged(event: Event) {
+		const slot = event.target as HTMLSlotElement;
+		const name = slot.name;
+
+		console.log("onSlotChanged")
+
+		this.#syntaxHighlight();
+		
+		//this.requestUpdate();
 	}
 
 	#renderHeader() {
