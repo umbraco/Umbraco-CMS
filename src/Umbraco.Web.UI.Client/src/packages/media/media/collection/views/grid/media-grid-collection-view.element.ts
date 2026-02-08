@@ -1,12 +1,12 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbMediaCollectionItemModel } from '../../types.js';
-import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
+import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
+import type { UmbMediaCollectionItemModel } from '../../types.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '@umbraco-cms/backoffice/imaging';
 

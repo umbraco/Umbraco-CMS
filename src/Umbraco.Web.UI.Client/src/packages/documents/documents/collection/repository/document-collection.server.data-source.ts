@@ -52,6 +52,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					flags: item.flags,
 					values: item.values.map((item) => {
 						return {
+							editorAlias: item.editorAlias,
 							alias: item.alias,
 							culture: item.culture ?? undefined,
 							segment: item.segment ?? undefined,
