@@ -327,7 +327,7 @@ public static class HtmlHelperRenderExtensions
             area,
             additionalRouteVals);
 
-        return "<input name=\"ufprt\" type=\"hidden\" value=\"" + encryptedString + "\" />";
+        return "<input name=\"ufprt\" type=\"hidden\" value=\"" + encryptedString + "\" >";
     }
 
     /// <summary>
