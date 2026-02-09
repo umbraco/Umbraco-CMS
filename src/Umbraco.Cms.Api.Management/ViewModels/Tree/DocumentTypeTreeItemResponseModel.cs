@@ -4,5 +4,7 @@ public class DocumentTypeTreeItemResponseModel : FolderTreeItemResponseModel
 {
     public bool IsElement { get; set; }
 
+    public bool AllowedInLibrary { get; set; }
+
     public string Icon { get; set; } = string.Empty;
 }
