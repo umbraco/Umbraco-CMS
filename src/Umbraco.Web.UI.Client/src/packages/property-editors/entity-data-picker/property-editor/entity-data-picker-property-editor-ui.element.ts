@@ -36,6 +36,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	}
 	public set dataSourceAlias(value: string | undefined) {
 		this._dataSourceAlias = value;
+		this.#createDataSourceApi(this._dataSourceAlias);
 		this.#extractDataSourceConfig();
 	}
 
@@ -96,8 +97,6 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			throw new Error(`Data source with alias ${this._dataSourceAlias} not found`);
 		}
 
-		this.#createDataSourceApi(dataSourceExtension.alias);
-
 		const aliases = dataSourceExtension.meta?.settings?.properties.map((property) => property.alias);
 		const configAliasMatch = this.#propertyEditorConfigCollection.filter((configEntry) =>
 			aliases?.includes(configEntry.alias),
@@ -115,7 +114,9 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 
 	#createDataSourceApi(dataSourceAlias: string | undefined) {
 		if (!dataSourceAlias) {
+			this._dataSourceApi = undefined;
 			this.#dataSourceApiInitializer?.destroy();
+			this.#dataSourceApiInitializer = undefined;
 			return;
 		}
 
