@@ -6,6 +6,7 @@ import {
 	UmbExtensionsElementAndApiInitializer,
 	type UmbApiConstructorArgumentsMethodType,
 	type ApiLoaderProperty,
+	type ManifestBase,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -159,15 +160,15 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 * ```
 	 */
 	@property({ type: Object, attribute: false })
-	public get filter(): (manifest: unknown) => boolean {
+	public get filter(): (manifest: any) => boolean {
 		return this.#filter;
 	}
-	public set filter(value: (manifest: unknown) => boolean) {
+	public set filter(value: (manifest: any) => boolean) {
 		if (value === this.#filter) return;
 		this.#filter = value;
 		this.#observeExtensions();
 	}
-	#filter: (manifest: unknown) => boolean = () => true;
+	#filter: (manifest: ManifestBase) => boolean = () => true;
 
 	/**
 	 * Properties to pass to all rendered extension elements.

@@ -2,6 +2,7 @@ import { umbExtensionsRegistry } from '../../registry.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, repeat, customElement, property, state, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
+	type ManifestBase,
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
@@ -148,15 +149,15 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * ```
 	 */
 	@property({ type: Object, attribute: false })
-	public set filter(value: (manifest: unknown) => boolean) {
+	public set filter(value: (manifest: any) => boolean) {
 		if (value === this.#filter) return;
 		this.#filter = value;
 		this.#observeExtensions();
 	}
-	public get filter(): (manifest: unknown) => boolean {
+	public get filter(): (manifest: any) => boolean {
 		return this.#filter;
 	}
-	#filter: (manifest: unknown) => boolean = () => true;
+	#filter: (manifest: ManifestBase) => boolean = () => true;
 
 	/**
 	 * Properties to pass to all rendered extension elements.
