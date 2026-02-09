@@ -1,4 +1,3 @@
-import { UMB_EXTENSION_PICKER_DATA_SOURCE_ALIAS } from '../core/extension/index.js';
 import { UmbNewsDashboardRepository } from './repository/index.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -35,10 +34,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			return this.#renderDefaultContent();
 		}
 
-		return html`<umb-input-entity-data
-				.dataSourceAlias=${UMB_EXTENSION_PICKER_DATA_SOURCE_ALIAS}
-				.dataSourceConfig=${this.#dataSourceConfig}>
-			</umb-input-entity-data>
+		return html`<umb-input-extension></umb-input-extension>
 			<umb-news-container .items=${this._items}></umb-news-container>`;
 	}
 
