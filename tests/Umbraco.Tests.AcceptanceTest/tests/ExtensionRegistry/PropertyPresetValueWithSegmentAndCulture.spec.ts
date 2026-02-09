@@ -34,7 +34,6 @@ test.afterEach(async ({ umbracoApi }) => {
 });
 
 test('can insert preset value into textstring property that vary by culture and segment in default language', async ({umbracoApi, umbracoUi}) => {
-  test.slow();
   // Arrange
   const presetValue = initialPresetValue + varyByCultureText + ' en-US' + varyBySegmentText + ' default';
 
