@@ -20,7 +20,8 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
         : base(services)
         => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
-    public static string? SchemeForBackOffice(string scheme)
+    [return: NotNullIfNotNull(nameof(scheme))]
+    public static string? SchemeForBackOffice(string? scheme)
         => scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
 
     /// <summary>
