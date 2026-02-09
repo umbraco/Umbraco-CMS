@@ -210,7 +210,6 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     {
         var temps = new List<TempContent<TEntity>>();
         var contentTypes = new Dictionary<int, IContentType?>();
-        var templateIds = new List<int>();
 
         var content = new TEntity[dtos.Count];
 
