@@ -107,7 +107,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						data.originData as UmbBlockListWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
+						await this.insert(
 							created.layout,
 							created.content,
 							created.settings,
@@ -167,7 +167,27 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	getPathForCreateBlock(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
+		const pathBuilder = this._catalogueRouteBuilderState.getValue();
+		if (!pathBuilder) return undefined;
+
+		if (!this._manager) return undefined;
+		const blockTypes = this._manager.getBlockTypes();
+		if (blockTypes.length === 1) {
+			const elementKey = blockTypes[0].contentElementTypeKey;
+			if (this._manager.getInlineEditingMode()) {
+				return undefined;
+			}
+
+			// does the Block have any Content properties?
+			const contentTypeKey = this._manager.getContentTypeKeyOfContentKey(elementKey);
+			if (contentTypeKey && this._manager.getContentTypeHasProperties(contentTypeKey) === false) {
+				return undefined;
+			}
+
+			return pathBuilder?.({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		}
+
+		return pathBuilder?.({ view: 'create', index: index });
 	}
 
 	getPathForClipboard(index: number) {
