@@ -24,10 +24,12 @@ export class UmbDuplicateDocumentRepository extends UmbRepositoryBase {
 		return { error };
 	}
 
-	async getSelectableFilter(unique: string): Promise<(item: UmbDocumentTreeItemModel) => boolean> {
+	async getSelectableFilterByDocumentUnique(
+		documentUnique: string,
+	): Promise<(item: UmbDocumentTreeItemModel) => boolean> {
 		// 1. Get the document to find its type
 		const itemRepository = new UmbDocumentItemRepository(this);
-		const { data } = await itemRepository.requestItems([unique]);
+		const { data } = await itemRepository.requestItems([documentUnique]);
 		const item = data?.[0];
 
 		if (!item) {
