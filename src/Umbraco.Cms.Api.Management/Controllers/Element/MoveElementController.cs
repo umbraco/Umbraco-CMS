@@ -35,6 +35,8 @@ public class MoveElementController : ElementControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves an element.")]
+    [EndpointDescription("Moves an element identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveElementRequestModel moveElementRequestModel)
     {
         // Check Move permission on source element

@@ -27,6 +27,8 @@ public class RootMemberGroupTreeController : MemberGroupTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of member group items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of member group items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

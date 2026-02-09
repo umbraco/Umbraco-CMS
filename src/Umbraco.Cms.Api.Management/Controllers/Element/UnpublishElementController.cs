@@ -36,6 +36,8 @@ public class UnpublishElementController : ElementControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Unpublishes an element.")]
+    [EndpointDescription("Unpublishes an element identified by the provided Id.")]
     public async Task<IActionResult> Unpublish(CancellationToken cancellationToken, Guid id, UnpublishElementRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

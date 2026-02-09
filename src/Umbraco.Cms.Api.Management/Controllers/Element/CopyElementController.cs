@@ -36,6 +36,8 @@ public class CopyElementController : ElementControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Copies an element.")]
+    [EndpointDescription("Creates a duplicate of an existing element identified by the provided Id.")]
     public async Task<IActionResult> Copy(CancellationToken cancellationToken, Guid id, CopyElementRequestModel copyElementRequestModel)
     {
         // Check Copy permission on source element

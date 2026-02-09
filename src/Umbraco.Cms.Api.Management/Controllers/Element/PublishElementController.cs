@@ -42,6 +42,8 @@ public class PublishElementController : ElementControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Publishes an element.")]
+    [EndpointDescription("Publishes an element identified by the provided Id.")]
     public async Task<IActionResult> Publish(CancellationToken cancellationToken, Guid id, PublishElementRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

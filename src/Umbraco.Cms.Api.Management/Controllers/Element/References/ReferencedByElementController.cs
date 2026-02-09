@@ -36,6 +36,8 @@ public class ReferencedByElementController : ElementControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets items referencing an element.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the element identified by the provided Id.")]
     public async Task<IActionResult> ReferencedBy(
         CancellationToken cancellationToken,
         Guid id,

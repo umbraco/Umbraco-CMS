@@ -27,6 +27,8 @@ public class ByPathStylesheetController : StylesheetControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(StylesheetResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a stylesheet by path.")]
+    [EndpointDescription("Gets a stylesheet identified by the provided file path.")]
     public async Task<IActionResult> ByPath(CancellationToken cancellationToken, string path)
     {
         path = DecodePath(path).VirtualPathToSystemPath();
