@@ -32,7 +32,7 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Gets a paginated collection of document versions.")]
-    [EndpointDescription("Gets a paginated collection of document versions.")]
+    [EndpointDescription("Gets a paginated collection of document versions for the specified document, optionally filtered by culture.")]
     public async Task<IActionResult> All(
         CancellationToken cancellationToken,
         [Required] Guid documentId,

@@ -24,7 +24,7 @@ public class FolderMediaTypeItemController : MediaTypeItemControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of media type folder items.")]
-    [EndpointDescription("Gets a collection of media type folder items identified by the provided Ids.")]
+    [EndpointDescription("Gets a paginated collection of media type folder items.")]
     public async Task<IActionResult> Folders(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         PagedModel<IMediaType> mediaTypes = await _mediaTypeEditingService.GetFolderMediaTypes(skip, take);

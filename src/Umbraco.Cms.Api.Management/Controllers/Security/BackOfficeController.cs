@@ -305,8 +305,8 @@ public class BackOfficeController : SecurityControllerBase
     // Creates and retains a short lived secret to use in the link-login
     // endpoint because we can not protect that method with a bearer token for reasons explained there
     [HttpGet("link-login-key")]
-    [EndpointSummary("Authenticates a user.")]
-    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [EndpointSummary("Generates a link login key.")]
+    [EndpointDescription("Generates a short-lived secret key for use in the link login endpoint.")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> LinkLoginKey(string provider)
     {
@@ -334,8 +334,8 @@ public class BackOfficeController : SecurityControllerBase
     //   can't set a bearer token header.
     // we are forcing form usage here for the whole model so the secret does not end up in url logs.
     [HttpPost("link-login")]
-    [EndpointSummary("Authenticates a user.")]
-    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [EndpointSummary("Links an external login provider.")]
+    [EndpointDescription("Links an external login provider to the current user's account.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> LinkLogin([FromForm] LinkLoginRequestModel requestModel)
@@ -377,8 +377,8 @@ public class BackOfficeController : SecurityControllerBase
     ///     which this is based on
     /// </remarks>
     [HttpGet("ExternalLinkLoginCallback")]
-    [EndpointSummary("Authenticates a user.")]
-    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [EndpointSummary("Handles an external link login callback.")]
+    [EndpointDescription("Handles the callback from an external login provider after linking.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> ExternalLinkLoginCallback()
@@ -404,8 +404,8 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     [HttpPost("unlink-login")]
-    [EndpointSummary("Authenticates a user.")]
-    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [EndpointSummary("Unlinks an external login provider.")]
+    [EndpointDescription("Unlinks an external login provider from the current user's account.")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginRequestModel unlinkLoginRequestModel)
     {

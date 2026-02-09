@@ -20,7 +20,7 @@ public class ConfigurationMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaConfigurationResponseModel), StatusCodes.Status200OK)]
     [EndpointSummary("Gets the media configuration.")]
-    [EndpointDescription("Gets the configuration settings for medias.")]
+    [EndpointDescription("Gets the configuration settings for media.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         MediaConfigurationResponseModel responseModel = _configurationPresentationFactory.CreateMediaConfigurationResponseModel();

@@ -28,8 +28,8 @@ public class DeleteClientCredentialsUserController : ClientCredentialsUserContro
     [HttpDelete("{id:guid}/client-credentials/{clientId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [EndpointSummary("Deletes a user.")]
-    [EndpointDescription("Deletes a user identified by the provided Id.")]
+    [EndpointSummary("Deletes client credentials for a user.")]
+    [EndpointDescription("Deletes client credentials identified by the provided client Id for a user.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id, string clientId)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

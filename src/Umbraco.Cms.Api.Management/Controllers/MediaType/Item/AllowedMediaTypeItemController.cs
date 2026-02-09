@@ -24,7 +24,7 @@ public class AllowedMediaTypeItemController : MediaTypeItemControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of media type items.")]
-    [EndpointDescription("Gets a collection of media type items identified by the provided Ids.")]
+    [EndpointDescription("Gets a collection of allowed media type items for the specified file extension.")]
     public async Task<IActionResult> Item(CancellationToken cancellationToken, string fileExtension, int skip = 0, int take = 100)
     {
         PagedModel<IMediaType> mediaTypes = await _mediaTypeEditingService.GetMediaTypesForFileExtensionAsync(fileExtension, skip, take);

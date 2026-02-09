@@ -55,8 +55,8 @@ public class ReferencedByMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Gets a collection of items that reference medias.")]
-    [EndpointDescription("Gets a paginated collection of items that reference the medias identified by the provided Ids.")]
+    [EndpointSummary("Gets a collection of items that reference a media item.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the media item identified by the provided Id.")]
     public async Task<IActionResult> ReferencedBy2(
         CancellationToken cancellationToken,
         Guid id,
