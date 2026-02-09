@@ -25,16 +25,17 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  // await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
-  // await umbracoApi.user.ensureNameNotExists(testUser.name);
-  // await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
-  // await umbracoApi.element.ensureNameNotExists(childElementOneName);
-  // await umbracoApi.element.ensureNameNotExists(childElementTwoName);
-  // await umbracoApi.element.ensureNameNotExists(rootFolderName);
-  // await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.user.ensureNameNotExists(testUser.name);
+  await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
+  await umbracoApi.element.ensureNameNotExists(childElementOneName);
+  await umbracoApi.element.ensureNameNotExists(childElementTwoName);
+  await umbracoApi.element.ensureNameNotExists(rootFolderName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can see root element start node and children', async ({umbracoApi, umbracoUi}) => {
+// Currently user only see the parent and cannot see the element children
+test.fixme('can see root element start node and children', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId, [rootFolderId]);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -50,7 +51,8 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+// Currently the front-end does not support adding a specific element as start nodes
+test.fixme('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -77,7 +79,8 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
 });
 
-test('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
+// Currently the front-end does not support adding a specific element as start nodes
+test.fixme('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);

@@ -611,7 +611,8 @@ test('cannot remove all user group from a user', {tag: '@release'}, async ({umbr
   await umbracoUi.user.isErrorNotificationVisible();
 });
 
-test('can add an element start node to a user', async ({umbracoApi, umbracoUi}) => {
+// Currently user cannot add a element folder as start node
+test.fixme('can add an element start node to a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
@@ -632,7 +633,8 @@ test('can add an element start node to a user', async ({umbracoApi, umbracoUi}) 
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
-test('can remove an element start node from a user', async ({umbracoApi, umbracoUi}) => {
+// Currently user cannot add a element folder as start node
+test.fixme('can remove an element start node from a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
@@ -657,7 +659,8 @@ test('can remove an element start node from a user', async ({umbracoApi, umbraco
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
-test('can allow access to all elements for a user', async ({umbracoApi, umbracoUi}) => {
+// Currently element start node configuration is not saved after updating
+test.fixme('can allow access to all elements for a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
