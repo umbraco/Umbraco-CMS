@@ -50,13 +50,15 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	setDataSourceApi(api: UmbPickerDataSource | undefined) {
-		if (!api) return;
-
-		this.#dataSourceApi = api;
-		this.#dataSourceApi.setConfig?.(this.#dataSourceConfig);
-
-		this.#dataSourceApiContext.setDataSourceApi(api);
-		this.#setModalToken();
+		if (api) {
+			this.#dataSourceApi = api;
+			api.setConfig?.(this.#dataSourceConfig);
+			this.#dataSourceApiContext.setDataSourceApi(api);
+			this.#setModalToken();
+		} else {
+			this.#dataSourceApi = undefined;
+			this.#dataSourceApiContext.setDataSourceApi(undefined);
+		}
 	}
 
 	/**
