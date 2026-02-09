@@ -96,8 +96,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	#setupViewContexts() {
 		if (!this._tabs) return;
 
-		// Create view contexts for root groups
-		if (this._hasRootGroups) {
+		// Create view contexts for root groups/properties
+		if (this._hasRootGroups || this._hasRootProperties) {
 			this.#createViewContext(null, '#general_generic');
 		}
 
