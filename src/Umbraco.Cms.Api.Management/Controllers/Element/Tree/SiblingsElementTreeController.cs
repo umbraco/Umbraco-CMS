@@ -30,6 +30,8 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<ElementTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of element tree sibling items.")]
+    [EndpointDescription("Gets a collection of element tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<ElementTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,

@@ -26,6 +26,8 @@ public class ItemFolderItemController : FolderItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<FolderItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of element folder items.")]
+    [EndpointDescription("Gets a collection of element folder items identified by the provided Ids.")]
     public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

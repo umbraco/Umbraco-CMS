@@ -23,6 +23,8 @@ public class QuerySearcherController : SearcherControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearchResultResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Queries a searcher.")]
+    [EndpointDescription("Queries a named searcher with the provided search term and returns a paginated collection of search results.")]
     public Task<ActionResult<PagedViewModel<SearchResultResponseModel>>> Query(
         CancellationToken cancellationToken,
         string searcherName,
