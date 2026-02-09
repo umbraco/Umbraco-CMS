@@ -99,6 +99,17 @@ internal sealed class ElementEditingService
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
+        IContentType? contentType = await ContentTypeService.GetAsync(createModel.ContentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ElementCreateResult());
+        }
+
+        if (contentType.AllowedInLibrary is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ElementCreateResult());
+        }
+
         if (await ValidateCulturesAsync(createModel) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ElementCreateResult());
