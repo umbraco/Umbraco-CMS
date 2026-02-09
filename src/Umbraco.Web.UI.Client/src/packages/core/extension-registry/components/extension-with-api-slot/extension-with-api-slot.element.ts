@@ -215,15 +215,15 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 * ```
 	 */
 	@property({ attribute: false })
-	get apiArgs(): Array<unknown> | UmbApiConstructorArgumentsMethodType<unknown> | undefined {
+	get apiArgs(): Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined {
 		return this.#constructorArgs;
 	}
-	set apiArgs(newVal: Array<unknown> | UmbApiConstructorArgumentsMethodType<unknown> | undefined) {
+	set apiArgs(newVal: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined) {
 		if (newVal === this.#constructorArgs) return;
 		this.#constructorArgs = newVal;
 		this.#observeExtensions();
 	}
-	#constructorArgs?: Array<unknown> | UmbApiConstructorArgumentsMethodType<unknown> = [];
+	#constructorArgs?: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> = [];
 
 	/**
 	 * Properties to pass to all extension API instances after construction.
