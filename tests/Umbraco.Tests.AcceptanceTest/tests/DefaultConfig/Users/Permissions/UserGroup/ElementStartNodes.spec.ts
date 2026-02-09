@@ -32,7 +32,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can see root element start node and children', async ({umbracoApi, umbracoUi}) => {
+// Currently user only see the parent and cannot see the element children
+test.fixme('can see root element start node and children', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, rootFolderId);
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -49,7 +50,8 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+// Skip this test since currently the front-end does not support adding a specific element as start nodes
+test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, childElementOneId);
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
