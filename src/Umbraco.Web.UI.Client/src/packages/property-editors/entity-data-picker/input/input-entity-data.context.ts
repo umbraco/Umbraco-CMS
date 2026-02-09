@@ -11,10 +11,7 @@ import {
 	type UmbCollectionItemPickerModalData,
 	type UmbCollectionItemPickerModalValue,
 } from '@umbraco-cms/backoffice/collection';
-import type { ManifestDataSource } from '@umbraco-cms/backoffice/data-source';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
-
-type DataSourceManifest = ManifestPropertyEditorDataSource | ManifestDataSource;
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
@@ -42,7 +39,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	UmbItemModel | UmbTreeItemModel
 > {
 	#dataSourceAlias?: string;
-	#dataSourceApiInitializer?: UmbExtensionApiInitializer<DataSourceManifest>;
+	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerDataSource;
 	#dataSourceConfig?: UmbConfigCollectionModel | undefined;
 
@@ -108,8 +105,8 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 		}
 
 		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<
-			DataSourceManifest,
-			UmbExtensionApiInitializer<DataSourceManifest>,
+			ManifestPropertyEditorDataSource,
+			UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>,
 			UmbPickerDataSource
 		>(this, umbExtensionsRegistry, dataSourceAlias, [this._host], (permitted, ctrl) => {
 			if (!permitted) {
