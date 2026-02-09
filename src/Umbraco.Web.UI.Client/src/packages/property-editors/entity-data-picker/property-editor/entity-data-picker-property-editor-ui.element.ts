@@ -13,8 +13,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
-// import of local component
-import '../input/input-entity-data.element.js';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 @customElement('umb-entity-data-picker-property-editor-ui')
 export class UmbEntityDataPickerPropertyEditorUIElement
@@ -63,6 +63,9 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	@state()
 	private _dataSourceConfig?: UmbConfigCollectionModel;
 
+	@state()
+	private _dataSourceApi?: UmbPickerDataSource;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#propertyEditorConfigCollection = config;
 
@@ -77,6 +80,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	}
 
 	#propertyEditorConfigCollection?: UmbPropertyEditorConfigCollection;
+	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 
 	#extractDataSourceConfig() {
 		if (!this._dataSourceAlias || !this.#propertyEditorConfigCollection) {
@@ -92,6 +96,8 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			throw new Error(`Data source with alias ${this._dataSourceAlias} not found`);
 		}
 
+		this.#createDataSourceApi(dataSourceExtension.alias);
+
 		const aliases = dataSourceExtension.meta?.settings?.properties.map((property) => property.alias);
 		const configAliasMatch = this.#propertyEditorConfigCollection.filter((configEntry) =>
 			aliases?.includes(configEntry.alias),
@@ -105,6 +111,27 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		});
 
 		return dataSourceConfig;
+	}
+
+	#createDataSourceApi(dataSourceAlias: string | undefined) {
+		if (!dataSourceAlias) {
+			this.#dataSourceApiInitializer?.destroy();
+			return;
+		}
+
+		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<
+			ManifestPropertyEditorDataSource,
+			UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>,
+			UmbPickerDataSource
+		>(this, umbExtensionsRegistry, dataSourceAlias, [this], (permitted, ctrl) => {
+			if (!permitted) {
+				// TODO: clean up if not permitted
+				return;
+			}
+
+			// TODO: Check if it is a picker data source
+			this._dataSourceApi = ctrl.api as UmbPickerDataSource;
+		});
 	}
 
 	override focus() {
@@ -138,7 +165,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	override render() {
 		return html`<umb-input-entity-data
 			.selection=${this.value?.ids ?? []}
-			.dataSourceAlias="${this._dataSourceAlias}"
+			.dataSourceApi="${this._dataSourceApi}"
 			.dataSourceConfig=${this._dataSourceConfig}
 			.min=${this._min}
 			.min-message=${this._minMessage}
