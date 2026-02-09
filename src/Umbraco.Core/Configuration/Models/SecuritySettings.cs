@@ -250,4 +250,14 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticUserInviteEmailExpiry)]
     public TimeSpan UserInviteEmailExpiry { get; set; } = TimeSpan.Parse(StaticUserInviteEmailExpiry);
+
+    /// <summary>
+    ///     Gets or sets the password configuration settings for users.
+    /// </summary>
+    public UserPasswordConfigurationSettings UserPassword { get; set; } = new();
+
+    /// <summary>
+    ///     Gets or sets the password configuration settings for members.
+    /// </summary>
+    public MemberPasswordConfigurationSettings MemberPassword { get; set; } = new();
 }
