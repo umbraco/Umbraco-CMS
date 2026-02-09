@@ -289,7 +289,7 @@ public MyService(IDependencyA depA, IDependencyB depB)
 - `DocumentPresentationFactory` - added `FlagProviderCollection`
 
 **Rules**:
-- Old constructor marked `[Obsolete("... Scheduled for removal in Umbraco {next-major}.")]`
+- Old constructor marked `[Obsolete("... Scheduled for removal in Umbraco {current-major+2}.")]`
 - Old constructor calls new constructor via `: this(...)`
 - Uses `StaticServiceProvider.Instance.GetRequiredService<T>()` for new params only
 - DI registration must use the NEW constructor (old is for external consumers only)
@@ -301,7 +301,7 @@ When a public method signature needs to change, add the new method/overload and 
 ```csharp
 [Obsolete("Use the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
 public void DoThing(string name)
-    => DoThing(name, defaultValue: null);
+    => DoThing(name, extraParam: null);
 
 public void DoThing(string name, string? extraParam)
 {
@@ -527,6 +527,7 @@ dotnet pack -c Release
 For detailed information about individual projects, see their CLAUDE.md files:
 - **Core Architecture**: `/src/Umbraco.Core/CLAUDE.md` - Service contracts, notification patterns
 - **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
+
 ### Getting Help
 
 - **Official Docs**: https://docs.umbraco.com/
