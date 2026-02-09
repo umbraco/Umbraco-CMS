@@ -1409,7 +1409,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             sql.SelectCount()
                 .From<NodeDto>()
                 .InnerJoin<TEntityDto>()
-                .On<NodeDto, DocumentDto>(left => left.NodeId, right => right.NodeId)
+                .On<NodeDto, TEntityDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Trashed == false)
                 .Where<TEntityDto>(x => x.Published);
         }
