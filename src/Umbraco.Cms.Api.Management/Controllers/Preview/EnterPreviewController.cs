@@ -23,7 +23,7 @@ public class EnterPreviewController : PreviewControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [EndpointSummary("Enters preview mode.")]
-    [EndpointDescription("Enters preview mode for the specified document, allowing viewing of unpublished content.")]
+    [EndpointDescription("Enters preview mode for the current user session, allowing viewing of unpublished content.")]
     public async Task<IActionResult> Enter(CancellationToken cancellationToken)
     {
         return await _previewService.TryEnterPreviewAsync(CurrentUser(_backOfficeSecurityAccessor))

@@ -38,7 +38,7 @@ public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Empties the media recycle bin.")]
-    [EndpointDescription("Permanently deletes all medias in the recycle bin. This operation cannot be undone.")]
+    [EndpointDescription("Permanently deletes all media items in the recycle bin. This operation cannot be undone.")]
     public async Task<IActionResult> EmptyRecycleBin(CancellationToken cancellationToken)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

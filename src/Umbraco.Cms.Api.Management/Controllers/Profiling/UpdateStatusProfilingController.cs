@@ -18,8 +18,8 @@ public class UpdateStatusProfilingController : ProfilingControllerBase
     [HttpPut("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [EndpointSummary("Updates a profiling.")]
-    [EndpointDescription("Updates a profiling identified by the provided Id with the details from the request model.")]
+    [EndpointSummary("Updates the web profiling status.")]
+    [EndpointDescription("Enables or disables web profiling according to the values provided in the request model.")]
     public async Task<IActionResult> Status(
         CancellationToken cancellationToken,
         ProfilingStatusRequestModel model)

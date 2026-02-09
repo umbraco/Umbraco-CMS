@@ -39,8 +39,8 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     /// <param name="status">The redirect status to set.</param>
     /// <returns>An OK result if successful.</returns>
     [HttpPost("status")]
-    [EndpointSummary("Gets URLs for a document.")]
-    [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
+    [EndpointSummary("Sets the redirect URL tracking status.")]
+    [EndpointDescription("Updates the redirect URL tracking configuration according to the provided status.")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> SetStatus(CancellationToken cancellationToken, [FromQuery] RedirectStatus status)
     {
