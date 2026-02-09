@@ -37,6 +37,8 @@ public class AllMessageTemplateLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<LogTemplateResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of log message templates.")]
+    [EndpointDescription("Gets a paginated collection of unique message templates found in the logs.")]
     public async Task<IActionResult> AllMessageTemplates(
         CancellationToken cancellationToken,
         int skip = 0,

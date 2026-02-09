@@ -66,6 +66,8 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches document items.")]
+    [EndpointDescription("Searches document items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchWithTrashed(
         CancellationToken cancellationToken,
         string query,
