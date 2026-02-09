@@ -27,7 +27,7 @@ public class AllRelationTypeController : RelationTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationTypeResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a paginated collection of relation types.")]
-    [EndpointDescription("Gets a paginated collection of relation types.")]
+    [EndpointDescription("Gets a paginated collection of all relation types configured in the system.")]
     public async Task<ActionResult<PagedViewModel<RelationTypeResponseModel>>> Get(
         CancellationToken cancellationToken,
         int skip = 0,
