@@ -88,10 +88,12 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 }
 
                 return (user, password);
-            }, $"{username}:{isAdmin}");
+            },
+            $"{username}:{isAdmin}");
 
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, Guid userGroupKey) =>
-        await AuthenticateClientAsync(client,
+        await AuthenticateClientAsync(
+            client,
             async userService =>
             {
                 IUser user;
@@ -116,7 +118,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 }
 
                 return (user, password);
-            }, $"{username}:{userGroupKey}");
+            },
+            $"{username}:{userGroupKey}");
 
     protected async Task AuthenticateClientAsync(HttpClient client, Func<IUserService, Task<(IUser User, string Password)>> createUser, string cacheKey = null)
     {
@@ -204,6 +207,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     private class TokenModel
     {
-        [JsonPropertyName("access_token")] public string AccessToken { get; set; }
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; }
     }
 }

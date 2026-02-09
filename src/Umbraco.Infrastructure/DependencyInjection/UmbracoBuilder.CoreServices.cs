@@ -174,7 +174,7 @@ public static partial class UmbracoBuilderExtensions
             .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
-        builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
+        builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
@@ -321,7 +321,8 @@ public static partial class UmbracoBuilderExtensions
                 default:
                     return new FileSystemMainDomLock(
                         loggerFactory.CreateLogger<FileSystemMainDomLock>(),
-                        mainDomKeyGenerator, hostingEnvironment,
+                        mainDomKeyGenerator,
+                        hostingEnvironment,
                         factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
             }
         });
@@ -370,12 +371,16 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<ContentDeletedBlueprintNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaMovedToRecycleBinNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaMovedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<MediaMovedToRecycleBinNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<MediaMovedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>()
             .AddNotificationHandler<DataTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>();

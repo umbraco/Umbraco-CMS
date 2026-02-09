@@ -21,6 +21,7 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Downloads a package XML or ZIP file.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <returns>The XML or ZIP file of the package or not found result.</returns>
     [HttpGet("{id:guid}/download")]

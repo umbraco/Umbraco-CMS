@@ -4,7 +4,7 @@ import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -372,6 +372,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return html`<umb-dropzone-media
 			id="dropzone"
 			?multiple=${this.multiple}
+			.parentUnique=${this.startNode?.unique ?? null}
 			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 
@@ -388,6 +389,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
+		if (this.max === 1 && this._cards.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -408,18 +410,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	#renderItem(item: UmbRichMediaCardModel) {
 		if (!item.unique) return nothing;
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
+
 		return html`
 			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				${when(
-					item.isLoading,
-					() => html`<uui-loader-circle></uui-loader-circle>`,
-					() => html`
-						<umb-imaging-thumbnail
-							unique=${item.media}
-							alt=${item.name}
-							icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
-					`,
-				)}
+				<umb-imaging-thumbnail
+					.unique=${item.media}
+					.alt=${item.name}
+					.icon=${item.icon ?? 'icon-picture'}
+					.externalLoading=${item.isLoading ?? false}></umb-imaging-thumbnail>
+
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
 		`;
@@ -449,6 +448,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		css`
 			:host {
 				position: relative;
+				display: block;
+				width: 100%;
 			}
 			.container {
 				display: grid;

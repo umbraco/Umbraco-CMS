@@ -29,7 +29,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 	#observeErrorCount() {
 		this.observe(this._logViewerContext?.logCount, (logLevelCount) => {
-			this._errorCount = logLevelCount?.error;
+			this._errorCount = logLevelCount?.Error;
 		});
 	}
 
@@ -43,13 +43,13 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		return html`
 			<div id="logviewer-layout">
 				<div id="info">
-					<uui-box id="time-period" headline="Time Period">
+					<uui-box id="time-period" headline=${this.localize.term('logViewer_timePeriod')}>
 						<umb-log-viewer-date-range-selector></umb-log-viewer-date-range-selector>
 					</uui-box>
 
-					<uui-box id="errors" headline="Number of Errors">
+					<uui-box id="errors" headline=${this.localize.term('logViewer_numberOfErrors')}>
 						<uui-button
-							label="Show error logs"
+							label=${this.localize.term('logViewer_showErrorLogs')}
 							href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(
 								`@Level='Fatal' or @Level='Error' or Has(@Exception)`,
 							)}`}>
@@ -59,7 +59,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 						</uui-button>
 					</uui-box>
 
-					<uui-box id="level" headline="Log level">
+					<uui-box id="level" headline=${this.localize.term('logViewer_logLevels')}>
 						<h2 id="log-level"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h2>
 					</uui-box>
 

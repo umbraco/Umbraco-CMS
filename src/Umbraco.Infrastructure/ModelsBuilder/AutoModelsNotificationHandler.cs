@@ -122,7 +122,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
             catch (Exception e)
             {
                 _mbErrors.Report("Failed to build Live models.", e);
-                _logger.LogError("Failed to generate models.", e);
+                _logger.LogError(e, "Failed to generate models.");
             }
         }
         else

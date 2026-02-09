@@ -37,6 +37,8 @@ export class UmbMemberSearchServerDataSource
 				query: {
 					query: args.query,
 					allowedMemberTypes: args.allowedContentTypes?.map((memberReference) => memberReference.unique),
+					skip: args.paging?.skip,
+					take: args.paging?.take,
 				},
 			}),
 		);
@@ -44,7 +46,7 @@ export class UmbMemberSearchServerDataSource
 		if (data) {
 			const mappedItems: Array<UmbMemberSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/member-management/workspace/member/edit/' + item.id,
+					href: 'section/member-management/workspace/member/edit/' + item.id,
 					entityType: UMB_MEMBER_ENTITY_TYPE,
 					unique: item.id,
 					name: item.variants[0].name || '',

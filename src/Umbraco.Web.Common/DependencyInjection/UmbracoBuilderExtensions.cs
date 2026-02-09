@@ -270,6 +270,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();
         builder.Services.AddSingleton<UmbracoRequestMiddleware>();
         builder.Services.AddSingleton<BootFailedMiddleware>();
+        builder.Services.AddSingleton<ProtectRecycleBinMediaMiddleware>();
 
         builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
         builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();

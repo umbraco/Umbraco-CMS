@@ -1,14 +1,18 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using static Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -239,7 +243,10 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         var tokens = ExternalLoginService.GetExternalLoginTokens(user.Key).OrderBy(x => x.LoginProvider).ToList();
 
         tokens.RemoveAt(0); // remove the first one
-        tokens.Add(new IdentityUserToken(externalLogins[1].LoginProvider, "hello2b", "world2b",
+        tokens.Add(new IdentityUserToken(
+            externalLogins[1].LoginProvider,
+            "hello2b",
+            "world2b",
             user.Id.ToString())); // add a new one
         tokens[0].Value = "abcd123"; // update
 
@@ -271,5 +278,63 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         var logins = ExternalLoginService.GetExternalLogins(user.Key).ToList();
 
         Assert.AreEqual("hello world", logins[0].UserData);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Concurrent_Save_Same_Login_Should_Not_Throw_Duplicate_Key_Exception()
+    {
+        if (IsSqlite())
+        {
+            Assert.Ignore("This concurrency test requires SQL Server to reliably reproduce the race condition.");
+            return;
+        }
+
+        // Arrange
+        var user = new UserBuilder().Build();
+        UserService.Save(user);
+
+        const int NumberOfConcurrentOperations = 10;
+        var exceptions = new ConcurrentBag<Exception>();
+        var providerKey = Guid.NewGuid().ToString("N");
+
+        // Barrier ensures all threads start the Save operation at the same time,
+        // maximizing the chance of triggering the race condition where multiple
+        // concurrent requests try to insert the same login record.
+        using var barrier = new Barrier(NumberOfConcurrentOperations);
+
+        var tasks = new List<Task>();
+        for (var i = 0; i < NumberOfConcurrentOperations; i++)
+        {
+            // Must suppress execution context flow so each task gets its own scope context.
+            // Otherwise all tasks share the same ambient scope which isn't thread-safe.
+            using (ExecutionContext.SuppressFlow())
+            {
+                tasks.Add(Task.Run(() =>
+                {
+                    barrier.SignalAndWait();
+                    try
+                    {
+                        var login = new ExternalLogin("TestProvider", providerKey);
+                        ExternalLoginService.Save(user.Key, [login]);
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex);
+                    }
+                }));
+            }
+        }
+
+        // Act
+        await Task.WhenAll(tasks);
+
+        // Assert
+        var exceptionDetails = exceptions.Select(e =>
+            $"Type: {e.GetType().FullName}, Message: {e.Message}, Inner: {e.InnerException?.GetType().FullName}: {e.InnerException?.Message}");
+        Assert.IsEmpty(exceptions, $"Expected no duplicate key exceptions but got {exceptions.Count}:\n{string.Join("\n", exceptionDetails)}");
+
+        var logins = ExternalLoginService.GetExternalLogins(user.Key).ToList();
+        Assert.AreEqual(1, logins.Count, "Should have exactly one login");
     }
 }

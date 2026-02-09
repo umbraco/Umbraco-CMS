@@ -247,6 +247,10 @@ export class UmbAuthFlow {
 
 		// clear the internal state
 		this.#tokenResponse.setValue(undefined);
+
+		// Also cleanup any OAuth/PKCE artifacts that may still be in localStorage
+		// This is a defense-in-depth measure during logout
+		await this.#authorizationHandler.cleanupStaleAuthorizationData();
 	}
 
 	/**
@@ -361,6 +365,7 @@ export class UmbAuthFlow {
 		const token = await this.performWithFreshTokens();
 		const request = new Request(this.#unlink_endpoint, {
 			method: 'POST',
+			credentials: 'include',
 			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 			body: JSON.stringify({ loginProvider, providerKey }),
 		});
@@ -454,6 +459,7 @@ export class UmbAuthFlow {
 		const token = await this.performWithFreshTokens();
 
 		const request = await fetch(`${this.#link_key_endpoint}?provider=${provider}`, {
+			credentials: 'include',
 			headers: {
 				Authorization: `Bearer ${token}`,
 				'Content-Type': 'application/json',

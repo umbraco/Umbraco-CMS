@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Security;
@@ -36,7 +37,7 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
     {
     }
 
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public RootDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -55,6 +56,30 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
             appCaches,
             backofficeSecurityAccessor,
             documentPresentationFactory)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public RootDocumentTreeController(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        IPublicAccessService publicAccessService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentPermissionFilterService documentPermissionFilterService)
+        : base(
+            entityService,
+            flagProviders,
+            userStartNodeEntitiesService,
+            dataTypeService,
+            publicAccessService,
+            appCaches,
+            backofficeSecurityAccessor,
+            documentPresentationFactory,
+            documentPermissionFilterService)
     {
     }
 

@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   reconcile:
+    if: github.repository == 'umbraco/Umbraco-CMS'
     runs-on: ubuntu-latest
     steps:
       - name: Reconcile release/* labels → discussions

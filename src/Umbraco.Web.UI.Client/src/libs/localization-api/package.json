@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice-lib/localization-api",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

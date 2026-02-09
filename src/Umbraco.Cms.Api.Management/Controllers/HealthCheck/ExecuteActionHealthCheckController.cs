@@ -32,6 +32,7 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     /// <summary>
     ///     Executes a given action from a HealthCheck.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="action">The action to be executed.</param>
     /// <returns>The result of a health check after the health check action is performed.</returns>
     [HttpPost("execute-action")]

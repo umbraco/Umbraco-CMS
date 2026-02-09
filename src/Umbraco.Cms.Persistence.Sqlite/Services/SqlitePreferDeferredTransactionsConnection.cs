@@ -5,24 +5,36 @@ using Microsoft.Data.Sqlite;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
+/// <summary>
+/// A wrapper for SQLite connections that forces deferred transaction mode to prevent immediate write locks.
+/// </summary>
 public class SqlitePreferDeferredTransactionsConnection : DbConnection
 {
     private readonly SqliteConnection _inner;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlitePreferDeferredTransactionsConnection"/> class.
+    /// </summary>
+    /// <param name="inner">The inner SQLite connection to wrap.</param>
     public SqlitePreferDeferredTransactionsConnection(SqliteConnection inner) => _inner = inner;
 
+    /// <inheritdoc />
     public override string Database
         => _inner.Database;
 
+    /// <inheritdoc />
     public override ConnectionState State
         => _inner.State;
 
+    /// <inheritdoc />
     public override string DataSource
         => _inner.DataSource;
 
+    /// <inheritdoc />
     public override string ServerVersion
         => _inner.ServerVersion;
 
+    /// <inheritdoc />
     [AllowNull]
     public override string ConnectionString
     {
@@ -30,18 +42,23 @@ public class SqlitePreferDeferredTransactionsConnection : DbConnection
         set => _inner.ConnectionString = value;
     }
 
+    /// <inheritdoc />
     protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
         => _inner.BeginTransaction(isolationLevel, true); // <-- The important bit
 
+    /// <inheritdoc />
     public override void ChangeDatabase(string databaseName)
         => _inner.ChangeDatabase(databaseName);
 
+    /// <inheritdoc />
     public override void Close()
         => _inner.Close();
 
+    /// <inheritdoc />
     public override void Open()
         => _inner.Open();
 
+    /// <inheritdoc />
     protected override DbCommand CreateDbCommand()
         => new CommandWrapper(_inner.CreateCommand());
 

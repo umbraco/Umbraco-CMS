@@ -96,6 +96,14 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
 
+        // Ensure we have a long command timeout as this migration can take a while on large tables within the database.
+        // If the command timeout is already longer, applied via the connection string with "Connect Timeout={timeout}" we leave it as is.
+        const int CommandTimeoutInSeconds = 300;
+        if (scope.Database.CommandTimeout < CommandTimeoutInSeconds)
+        {
+            scope.Database.CommandTimeout = CommandTimeoutInSeconds;
+        }
+
         MigrateDateColumn(scope, "cmsMember", "emailConfirmedDate", timeZone);
         MigrateDateColumn(scope, "cmsMember", "lastLoginDate", timeZone);
         MigrateDateColumn(scope, "cmsMember", "lastLockoutDate", timeZone);

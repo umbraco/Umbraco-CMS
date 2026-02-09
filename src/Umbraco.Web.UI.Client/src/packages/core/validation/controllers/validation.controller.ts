@@ -30,8 +30,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	#parent?: UmbValidationController;
 	#sync?: boolean;
-	#parentMessages?: Array<UmbValidationMessage>;
-	#localMessages?: Array<UmbValidationMessage>;
+	#latestParentMessages?: Array<UmbValidationMessage>;
+	#latestLocalMessages?: Array<UmbValidationMessage>;
 	#baseDataPath?: string;
 
 	#variantId?: UmbVariantId;
@@ -45,11 +45,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	setVariantId(variantId: UmbVariantId): void {
 		this.#variantId = variantId;
-		// @.culture == null && @.segment == null
+		// Setup a filter that will run when messages are added:
 		this.messages?.filter((msg) => {
-			// Figure out how many times '@.culture ==' is present in the path:
-			//const cultureMatches = (msg.path.match(/@\.culture ==/g) || []);
-			// I like a Regex that finds all the @.culture == and @.segment == in the path. they are adjacent. and I like to know the value following '== '
+			// Regex that finds all the @.culture == and @.segment == in the path.
 			const variantMatches = [...msg.path.matchAll(Regex)];
 
 			// if not cultures, then we like to keep it:
@@ -157,13 +155,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param {string} dataPath - The data path to bind this validation context to.
 	 */
 	inheritFrom(parent: UmbValidationController | undefined, dataPath: string): void {
-		if (this.#parent) {
-			this.#parent.removeValidator(this);
-		}
+		if (this.#parent === parent && this.#baseDataPath === dataPath) return;
+		this.#stopInheritance();
 		this.#parent = parent;
-
-		this.messages.clear();
-		this.#localMessages = undefined;
 
 		this.#baseDataPath = dataPath;
 		this.#readyToSync();
@@ -176,12 +170,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					return;
 				}
 				this.messages.initiateChange();
-				if (this.#parentMessages) {
+				if (this.#latestParentMessages) {
 					// Remove the local messages that does not exist in the parent anymore:
-					const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+					const toRemove = this.#latestParentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
 					this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 				}
-				this.#parentMessages = msgs;
 				if (this.#baseDataPath === '$') {
 					this.messages.addMessageObjects(msgs);
 				} else {
@@ -196,8 +189,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
 				}
-
-				this.#localMessages = this.messages.getNotFilteredMessages();
+				this.#latestParentMessages = msgs;
+				this.#latestLocalMessages = this.messages.getNotFilteredMessages();
 				this.messages.finishChange();
 			},
 			'observeParentMessages',
@@ -205,14 +198,16 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	#stopInheritance(): void {
-		this.removeUmbControllerByAlias('observeTranslationData');
 		this.removeUmbControllerByAlias('observeParentMessages');
 
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
+		// If set to 'autoReport'/#sync, the call to `clear()` will trigger the sync observation and clean up its messages from the parent validation context. [NL]
 		this.messages.clear();
-		this.#localMessages = undefined;
+		this.#latestLocalMessages = undefined;
+		this.#latestParentMessages = undefined;
+		this.#parent = undefined;
 	}
 
 	#readyToSync() {
@@ -253,9 +248,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		this.#parent!.messages.initiateChange();
 
-		if (this.#localMessages) {
+		if (this.#latestLocalMessages) {
 			// Remove the parent messages that does not exist locally anymore:
-			const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+			const toRemove = this.#latestLocalMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
 			this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 		}
 
@@ -268,11 +263,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 				if (path === undefined) {
 					throw new Error('Path was not transformed correctly and can therefor not be synced with parent messages.');
 				}
-				// Notice, the parent message uses the same key. [NL]
 				this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 			});
 		}
 
+		this.#latestLocalMessages = msgs;
 		this.#parent!.messages.finishChange();
 	};
 
@@ -423,8 +418,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
-		this.#localMessages = undefined;
-		this.#parentMessages = undefined;
+		this.#latestLocalMessages = undefined;
+		this.#latestParentMessages = undefined;
 		this.#parent = undefined;
 	}
 }

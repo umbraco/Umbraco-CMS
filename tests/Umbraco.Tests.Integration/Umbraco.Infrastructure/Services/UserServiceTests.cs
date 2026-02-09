@@ -667,7 +667,12 @@ internal sealed class UserServiceTests : UmbracoIntegrationTest
 
         UserService.Save(users);
 
-        var found = UserService.GetAll(0, 2, out long totalRecs, "username", Direction.Ascending,
+        var found = UserService.GetAll(
+            0,
+            2,
+            out long totalRecs,
+            "username",
+            Direction.Ascending,
             includeUserGroups: new[] { userGroup.Alias });
 
         Assert.AreEqual(2, found.Count());
@@ -697,8 +702,14 @@ internal sealed class UserServiceTests : UmbracoIntegrationTest
 
         UserService.Save(users);
 
-        var found = UserService.GetAll(0, 2, out long totalRecs, "username", Direction.Ascending,
-            userGroups: new[] { userGroup.Alias }, filter: "blah");
+        var found = UserService.GetAll(
+            0,
+            2,
+            out long totalRecs,
+            "username",
+            Direction.Ascending,
+            userGroups: new[] { userGroup.Alias },
+            filter: "blah");
 
         Assert.AreEqual(2, found.Count());
         Assert.AreEqual(2, totalRecs);

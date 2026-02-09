@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -58,21 +59,48 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
 
                 await securityStampValidator.ValidateAsync(ctx);
             },
-            OnRedirectToAccessDenied = ctx =>
+            // retain the login redirect behavior in .NET 10
+            // - see https://learn.microsoft.com/en-us/dotnet/core/compatibility/aspnet-core/10/cookie-authentication-api-endpoints
+            OnRedirectToLogin = context =>
             {
-                // When the controller is an UmbracoAPIController, we want to return a StatusCode instead of a redirect.
-                // All other cases should use the default Redirect of the CookieAuthenticationEvent.
-                var controllerDescriptor = ctx.HttpContext.GetEndpoint()?.Metadata
-                    .OfType<ControllerActionDescriptor>()
-                    .FirstOrDefault();
-
-                if (!controllerDescriptor?.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApiController)) ?? false)
+                if (IsXhr(context.Request))
                 {
-                    new CookieAuthenticationEvents().OnRedirectToAccessDenied(ctx);
+                    context.Response.Headers.Location = context.RedirectUri;
+                    context.Response.StatusCode = 401;
+                }
+                else
+                {
+                    context.Response.Redirect(context.RedirectUri);
+                }
+
+                return Task.CompletedTask;
+            },
+            OnRedirectToAccessDenied = context =>
+            {
+                // TODO: rewrite this to match OnRedirectToLogin (with a 403 status code) when UmbracoApiController is removed
+                // When the controller is an UmbracoAPIController, or if the request is an XHR, we want to return a
+                // StatusCode instead of a redirect.
+                // All other cases should use the default Redirect of the CookieAuthenticationEvent.
+                if (IsXhr(context.Request) is false && IsUmbracoApiControllerRequest(context.HttpContext) is false)
+                {
+                    new CookieAuthenticationEvents().OnRedirectToAccessDenied(context);
                 }
 
                 return Task.CompletedTask;
             },
         };
+        return;
+
+        bool IsUmbracoApiControllerRequest(HttpContext context)
+            => context.GetEndpoint()
+                ?.Metadata
+                .OfType<ControllerActionDescriptor>()
+                .FirstOrDefault()
+                ?.ControllerTypeInfo
+                .IsSubclassOf(typeof(UmbracoApiController)) is true;
+
+        bool IsXhr(HttpRequest request) =>
+            string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
+            string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
     }
 }

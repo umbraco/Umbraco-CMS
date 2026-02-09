@@ -35,6 +35,7 @@ export class FetchRequestor extends Requestor {
 		const requestInit: RequestInit = {};
 		requestInit.method = settings.method;
 		requestInit.mode = 'cors';
+		requestInit.credentials = settings.credentials ?? 'include';
 
 		if (settings.data) {
 			if (settings.method && settings.method.toUpperCase() === 'POST') {

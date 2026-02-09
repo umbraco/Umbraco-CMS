@@ -28,8 +28,9 @@ public class RebuildIndexerController : IndexerControllerBase
     /// <summary>
     ///     Rebuilds the index.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="indexName">The name of the index to rebuild.</param>
-    /// <returns></returns>
+    /// <returns>The result of the rebuild operation.</returns>
     [HttpPost("{indexName}/rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

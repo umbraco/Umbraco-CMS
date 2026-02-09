@@ -30,6 +30,43 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		return this._progressItems;
 	}
 
+	#dragCounter = 0;
+
+	// Event handlers as arrow functions to maintain consistent references
+	#handleDragEnter = (e: DragEvent) => {
+		if (this.disabled) return;
+
+		// Normalize types for Safari
+		const types = Array.from(e.dataTransfer?.types || []).map((t) => t.toLowerCase());
+		if (!types.includes('files')) return;
+
+		this.#dragCounter++;
+		this.toggleAttribute('dragging', true);
+		e.preventDefault();
+	};
+
+	#handleDragOver = (e: DragEvent) => {
+		e.preventDefault();
+	};
+
+	#handleDragLeave = () => {
+		if (this.disabled) return;
+
+		this.#dragCounter--;
+		if (this.#dragCounter <= 0) {
+			this.toggleAttribute('dragging', false);
+			this.#dragCounter = 0;
+		}
+	};
+
+	#handleDrop = (event: DragEvent) => {
+		event.preventDefault();
+		if (this.disabled) return;
+
+		this.#dragCounter = 0;
+		this.toggleAttribute('dragging', false);
+	};
+
 	protected override _manager = new UmbMediaDropzoneManager(this);
 	public progressItems = () => this._manager.progressItems;
 	public progress = () => this._manager.progress;
@@ -37,9 +74,10 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	constructor() {
 		super();
 
-		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
-		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
-		document.addEventListener('drop', this.#handleDrop.bind(this));
+		document.addEventListener('dragenter', this.#handleDragEnter);
+		document.addEventListener('dragleave', this.#handleDragLeave);
+		document.addEventListener('dragover', this.#handleDragOver);
+		document.addEventListener('drop', this.#handleDrop);
 
 		// TODO: Revisit this. I am not sure why it is needed to call these methods here when they are already called in the constructor of the parent class.
 		// If we do not call them here, the observer will use the wrong instance of the dropzone manager (UmbDropZoneManager instead of UmbMediaDropzoneManager).
@@ -63,9 +101,10 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
-		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
-		document.removeEventListener('drop', this.#handleDrop.bind(this));
+		document.removeEventListener('dragenter', this.#handleDragEnter);
+		document.removeEventListener('dragleave', this.#handleDragLeave);
+		document.removeEventListener('dragover', this.#handleDragOver);
+		document.removeEventListener('drop', this.#handleDrop);
 	}
 
 	override async onUpload(event: UUIFileDropzoneEvent) {
@@ -74,26 +113,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 		const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
 		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
-	}
-
-	#handleDragEnter(e: DragEvent) {
-		if (this.disabled) return;
-		// Avoid collision with UmbSorterController
-		const types = e.dataTransfer?.types;
-		if (!types?.length || !types?.includes('Files')) return;
-
-		this.toggleAttribute('dragging', true);
-	}
-
-	#handleDragLeave() {
-		if (this.disabled) return;
-		this.toggleAttribute('dragging', false);
-	}
-
-	#handleDrop(event: DragEvent) {
-		event.preventDefault();
-		if (this.disabled) return;
-		this.toggleAttribute('dragging', false);
 	}
 
 	static override styles = [

@@ -530,4 +530,253 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         ContentService.Save(content);
         return content;
     }
+
+    [Test]
+    public async Task Publishing_After_Changing_Element_Property_From_Variant_To_Invariant_Does_Not_Keep_Old_Culture_Specific_Values()
+    {
+        // 1. Create element type WITH culture variation
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var areaKey = Guid.NewGuid();
+        var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
+        var contentType = CreateContentType(blockGridDataType);
+
+        // 2. Create a simple block grid value with a single block for clarity
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
+        var blockGridValue = new BlockGridValue([
+            new BlockGridLayoutItem(contentElementKey, settingsElementKey) { ColumnSpan = 12, RowSpan = 1 }
+        ])
+        {
+            ContentData =
+            [
+                new(contentElementKey, elementType.Key, elementType.Alias)
+                {
+                    Values =
+                    [
+                        new() { Alias = "invariantText", Value = "The invariant content value" },
+                        new() { Alias = "variantText", Value = "The content value in English", Culture = "en-US" },
+                        new() { Alias = "variantText", Value = "The content value in Danish", Culture = "da-DK" }
+                    ]
+                }
+            ],
+            SettingsData =
+            [
+                new(settingsElementKey, elementType.Key, elementType.Alias)
+                {
+                    Values =
+                    [
+                        new() { Alias = "invariantText", Value = "The invariant settings value" },
+                        new() { Alias = "variantText", Value = "The settings value in English", Culture = "en-US" },
+                        new() { Alias = "variantText", Value = "The settings value in Danish", Culture = "da-DK" }
+                    ]
+                }
+            ],
+            Expose =
+            [
+                new(contentElementKey, "en-US", null),
+                new(contentElementKey, "da-DK", null)
+            ]
+        };
+
+        var content = CreateContent(contentType, blockGridValue);
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // 3. Change element property type to invariant (remove culture variation)
+        elementType.PropertyTypes.Single(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
+
+        ContentTypeService.Save(elementType);
+
+        // 4. Update the content values to be invariant
+        blockGridValue = JsonSerializer.Deserialize<BlockGridValue>((string)content.Properties["blocks"]!.GetValue()!)!;
+
+        foreach (var blockPropertyValue in blockGridValue.ContentData[0].Values.Where(v => v.Alias == "variantText"))
+        {
+            blockPropertyValue.Value += " => to invariant";
+            blockPropertyValue.Culture = null;
+        }
+
+        foreach (var blockPropertyValue in blockGridValue.SettingsData[0].Values.Where(v => v.Alias == "variantText"))
+        {
+            blockPropertyValue.Value += " => to invariant";
+            blockPropertyValue.Culture = null;
+        }
+
+        blockGridValue.Expose = blockGridValue.Expose
+            .Select(e => new BlockItemVariation(e.ContentKey, null, null))
+            .DistinctBy(e => e.ContentKey)
+            .ToList();
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
+        ContentService.Save(content);
+
+        // 5. Publish
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // 6. Verify published JSON doesn't contain old culture-specific values
+        content = ContentService.GetById(content.Key)!;
+        var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
+        Assert.IsNotNull(publishedValue, "Published value should not be null");
+
+        var publishedBlockGridValue = JsonSerializer.Deserialize<BlockGridValue>(publishedValue);
+        Assert.IsNotNull(publishedBlockGridValue);
+
+        foreach (var contentData in publishedBlockGridValue!.ContentData)
+        {
+            var aliasGroups = contentData.Values.GroupBy(v => v.Alias);
+            foreach (var group in aliasGroups)
+            {
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
+                    $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+            }
+        }
+
+        foreach (var settingsData in publishedBlockGridValue.SettingsData)
+        {
+            var aliasGroups = settingsData.Values.GroupBy(v => v.Alias);
+            foreach (var group in aliasGroups)
+            {
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
+                    $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+            }
+        }
+    }
+
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values(bool republishEnglish, bool republishDanish)
+    {
+        // 1. Create element type WITHOUT culture variation (invariant)
+        var elementType = CreateElementType(ContentVariation.Nothing);
+        var areaKey = Guid.NewGuid();
+        var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
+        var contentType = CreateContentType(blockGridDataType);
+
+        // 2. Create a simple block grid value with a single block
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
+        var blockGridValue = new BlockGridValue([
+            new BlockGridLayoutItem(contentElementKey, settingsElementKey) { ColumnSpan = 12, RowSpan = 1 }
+        ])
+        {
+            ContentData =
+            [
+                new(contentElementKey, elementType.Key, elementType.Alias)
+                {
+                    Values =
+                    [
+                        new() { Alias = "invariantText", Value = "The invariant content value" },
+                        new() { Alias = "variantText", Value = "The original invariant value for content" }
+                    ]
+                }
+            ],
+            SettingsData =
+            [
+                new(settingsElementKey, elementType.Key, elementType.Alias)
+                {
+                    Values =
+                    [
+                        new() { Alias = "invariantText", Value = "The invariant settings value" },
+                        new() { Alias = "variantText", Value = "The original invariant value for settings" }
+                    ]
+                }
+            ],
+            Expose =
+            [
+                new(contentElementKey, null, null)
+            ]
+        };
+
+        var content = CreateContent(contentType, blockGridValue);
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // 3. Change element type to variant (add culture variation)
+        elementType.Variations = ContentVariation.Culture;
+        elementType.PropertyTypes.Single(pt => pt.Alias == "variantText").Variations = ContentVariation.Culture;
+
+        ContentTypeService.Save(elementType);
+
+        // 4. Update the content values to have culture-specific values
+        blockGridValue = JsonSerializer.Deserialize<BlockGridValue>((string)content.Properties["blocks"]!.GetValue()!)!;
+
+        // Add variant values for the property that is now variant
+        blockGridValue.ContentData[0].Values.RemoveAll(value => value.Alias == "variantText");
+        blockGridValue.ContentData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The content value in English",
+            Culture = "en-US"
+        });
+        blockGridValue.ContentData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The content value in Danish",
+            Culture = "da-DK"
+        });
+
+        blockGridValue.SettingsData[0].Values.RemoveAll(value => value.Alias == "variantText");
+        blockGridValue.SettingsData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The settings value in English",
+            Culture = "en-US"
+        });
+        blockGridValue.SettingsData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The settings value in Danish",
+            Culture = "da-DK"
+        });
+
+        blockGridValue.Expose =
+        [
+            new BlockItemVariation(contentElementKey, "en-US", null),
+            new BlockItemVariation(contentElementKey, "da-DK", null)
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
+        ContentService.Save(content);
+
+        // 5. Publish selected cultures
+        string[] culturesToPublish = republishEnglish && republishDanish
+            ? ["en-US", "da-DK"]
+            : republishEnglish
+                ? ["en-US"]
+                : republishDanish
+                    ? ["da-DK"]
+                    : throw new ArgumentException("Can't proceed without republishing at least one culture");
+        PublishContent(content, culturesToPublish);
+
+        // 6. Verify published JSON doesn't contain old invariant values for variantText
+        content = ContentService.GetById(content.Key)!;
+        var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
+        Assert.IsNotNull(publishedValue, "Published value should not be null");
+
+        var publishedBlockGridValue = JsonSerializer.Deserialize<BlockGridValue>(publishedValue);
+        Assert.IsNotNull(publishedBlockGridValue);
+
+        // Verify ContentData entries are not duplicated
+        Assert.AreEqual(1, publishedBlockGridValue!.ContentData.Count, "Should have exactly 1 content data entry");
+        Assert.AreEqual(1, publishedBlockGridValue.SettingsData.Count, "Should have exactly 1 settings data entry");
+
+        var variantTextValues = publishedBlockGridValue.ContentData[0].Values.Where(v => v.Alias == "variantText").ToList();
+        Assert.IsFalse(
+            variantTextValues.Any(v => v.Culture is null),
+            $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+
+        variantTextValues = publishedBlockGridValue.SettingsData[0].Values.Where(v => v.Alias == "variantText").ToList();
+        Assert.IsFalse(
+            variantTextValues.Any(v => v.Culture is null),
+            $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+
+        // Verify Expose entries are not duplicated
+        var exposeGroups = publishedBlockGridValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
+        Assert.IsTrue(
+            exposeGroups.All(g => g.Count() == 1),
+            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockGridValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
+    }
 }

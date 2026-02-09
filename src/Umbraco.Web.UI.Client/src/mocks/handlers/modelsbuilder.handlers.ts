@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type {
@@ -8,28 +8,20 @@ import type {
 import { OutOfDateTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
-	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {
+	http.post(umbracoPath('/models-builder/build'), async () => {
 		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 		model = modelAfterBuild;
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json({}),
-		);
+		return HttpResponse.json({});
 	}),
 
-	rest.get(umbracoPath('/models-builder/dashboard'), async (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<ModelsBuilderResponseModel>(model));
+	http.get(umbracoPath('/models-builder/dashboard'), async () => {
+		return HttpResponse.json<ModelsBuilderResponseModel>(model);
 	}),
 
-	rest.get(umbracoPath('/models-builder/status'), async (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<OutOfDateStatusResponseModel>({
-				status: OutOfDateTypeModel.CURRENT,
-			}),
-		);
+	http.get(umbracoPath('/models-builder/status'), async () => {
+		return HttpResponse.json<OutOfDateStatusResponseModel>({
+			status: OutOfDateTypeModel.CURRENT,
+		});
 	}),
 ];
 
@@ -49,6 +41,7 @@ at Context.resolveId (file:///C:/Users/Umbraco/Documents/Umbraco.CMS.Backoffice/
 at async Object.resolveId (file:///C:/Users/Umbraco/Documents/Umbraco.CMS.Backoffice/node_modules/vite/dist/node/chunks/dep-67e7f8ab.js:40156:32)
 at async TransformContext.resolve (file:///C:/Users/Umbraco/Documents/Umbraco.CMS.Backoffice/node_modules/vite/dist/node/chunks/dep-67e7f8ab.js:39921:23)
 at async normalizeUrl (file:///C:/Users/Umbraco/Documents/Umbraco.CMS.Backoffice/node_modules/vite/dist/node/chunks/dep-67e7f8ab.js:36831:34)
+at async TransformContext.transform (file:///C:/Users/Umbraco/Documents/Umbraco.CMS.Backoffice/node_modules/vite/dist/node/chunks/dep-67e7f8ab.js:36831:34)
 at async TransformContext.transform (file:///C:/Users/Umbraco/Documents/Umbraco.CMS.Backoffice/node_modules/vite`,
 	version: '13.0.0',
 	modelsNamespace: 'Umbraco.Cms.Web.Common.PublishedModels',

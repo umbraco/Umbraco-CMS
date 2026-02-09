@@ -268,6 +268,42 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
     }
 
+    [Test]
+    public async Task Can_Remove_Properties_Without_Container()
+    {
+        // Create a content type with a property that has no container (no tab/group).
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
+        var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty");
+        createModel.Properties = new[] { propertyType };
+
+        var contentTypeCreateAttempt = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeCreateAttempt.Success);
+        Assert.IsNotNull(contentTypeCreateAttempt.Result);
+
+        // Verify the property was created without a container (should be in NoGroupPropertyTypes).
+        var contentType = contentTypeCreateAttempt.Result;
+        Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
+        Assert.AreEqual("testProperty", contentType.NoGroupPropertyTypes.Single().Alias);
+        Assert.AreEqual(0, contentType.PropertyGroups.Count);
+
+        // Update the content type removing the property.
+        var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
+        updateModel.Properties = Array.Empty<ContentTypePropertyTypeModel>();
+
+        var contentTypeUpdateAttempt = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeUpdateAttempt.Success);
+        Assert.IsNotNull(contentTypeUpdateAttempt.Result);
+
+        // Ensure it's actually persisted - retrieve from database to verify deletion.
+        contentType = await ContentTypeService.GetAsync(contentTypeUpdateAttempt.Result.Key);
+
+        Assert.IsNotNull(contentType);
+        Assert.IsTrue(contentType.IsElement);
+        Assert.AreEqual(0, contentType.PropertyGroups.Count);
+        Assert.AreEqual(0, contentType.PropertyTypes.Count());
+        Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public async Task Can_Edit_Properties(bool isElement)
@@ -1022,6 +1058,82 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual("Child", childContentType.Name);
             Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Add_Composition_With_Conflicting_Property_Type_Alias()
+    {
+        var targetContentTypePropertyType = ContentTypePropertyTypeModel("Test Property", "testProperty");
+        var targetContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Target",
+                propertyTypes: [targetContentTypePropertyType]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Composition",
+                propertyTypes: [ContentTypePropertyTypeModel("Same Test Property Alias", "testProperty")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Target",
+            propertyTypes: [targetContentTypePropertyType],
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(targetContentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
+        });
+    }
+
+    [Test]
+    public async Task Can_Add_Composition_With_Conflicting_Property_Type_Alias_When_The_Property_Type_Is_Removed_From_Target()
+    {
+        var targetContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Target",
+                propertyTypes: [ContentTypePropertyTypeModel("Test Property", "testProperty")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Composition",
+                propertyTypes: [ContentTypePropertyTypeModel("Same Test Property Alias", "testProperty")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Target",
+            propertyTypes: [],
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(targetContentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
+        });
+
+        // Verify the composition was added and the property from the composition is accessible.
+        var updatedContentType = result.Result!;
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, updatedContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(compositionContentType.Key, updatedContentType.ContentTypeComposition.Single().Key);
+
+            // The property should come from the composition, not be a local property
+            Assert.AreEqual(0, updatedContentType.PropertyTypes.Count());
+
+            // The property from the composition should be accessible via CompositionPropertyTypes
+            Assert.AreEqual(1, updatedContentType.CompositionPropertyTypes.Count());
+            var compositionProperty = updatedContentType.CompositionPropertyTypes.Single();
+            Assert.AreEqual("testProperty", compositionProperty.Alias);
+            Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
         });
     }
 }

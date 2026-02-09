@@ -1,12 +1,12 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement
@@ -51,7 +51,7 @@ export class UmbPropertyEditorUINumberElement
 		this._min = this.#parseNumber(config.getValueByAlias('min'));
 		this._max = this.#parseNumber(config.getValueByAlias('max'));
 		this._step = this.#parseNumber(config.getValueByAlias('step'));
-		this._placeholder = config.getValueByAlias('placeholder');
+		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
 	}
 
 	constructor() {
@@ -110,12 +110,12 @@ export class UmbPropertyEditorUINumberElement
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
-				placeholder=${ifDefined(this._placeholder)}
 				value=${this.value?.toString() ?? ''}
-				@change=${this.#onChange}
-				?required=${this.mandatory}
+				.placeholder=${this._placeholder ?? ''}
 				.requiredMessage=${this.mandatoryMessage}
-				?readonly=${this.readonly}>
+				?required=${this.mandatory}
+				?readonly=${this.readonly}
+				@change=${this.#onChange}>
 			</uui-input>
 		`;
 	}

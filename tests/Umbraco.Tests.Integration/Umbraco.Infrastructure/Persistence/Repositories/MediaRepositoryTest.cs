@@ -87,7 +87,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CacheActiveForIntsAndGuids()
+    public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -95,43 +95,123 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             new IsolatedCaches(t => new ObjectCacheAppCache()));
 
         var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+        var scopeAccessor = ScopeAccessor;
 
-            var udb = ScopeAccessor.AmbientScope.Database;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
 
-            udb.EnableSqlCount = false;
+        var database = scopeAccessor.AmbientScope.Database;
 
-            var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");
-            mediaTypeRepository.Save(mediaType);
+        database.EnableSqlCount = false;
 
-            var media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
-            repository.Save(media);
+        var media = CreateMedia(repository, mediaTypeRepository);
 
-            udb.EnableSqlCount = true;
+        database.EnableSqlCount = true;
 
-            // go get it, this should already be cached since the default repository key is the INT
-            var found = repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // retrieve again, this should use cache
-            found = repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // reset counter
-            udb.EnableSqlCount = false;
-            udb.EnableSqlCount = true;
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // now get by GUID, this won't be cached yet because the default repo key is not a GUID
-            found = repository.Get(media.Key);
-            var sqlCount = udb.SqlCount;
-            Assert.Greater(sqlCount, 0);
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
 
-            // retrieve again, this should use cache now
-            found = repository.Get(media.Key);
-            Assert.AreEqual(sqlCount, udb.SqlCount);
-        }
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var media = CreateMedia(repository, mediaTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IMedia so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IMedia>();
+
+        // Initial request by ID should hit the database.
+        repository.Get(media.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var media = CreateMedia(repository, mediaTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IMedia so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IMedia>();
+
+        // Initial request by key should hit the database.
+        repository.Get(media.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
+    {
+        var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");
+        mediaTypeRepository.Save(mediaType);
+
+        var media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
+        repository.Save(media);
+        return media;
     }
 
     [Test]
@@ -362,7 +442,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -382,7 +462,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 1, 1, out var totalRecords, null, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 1, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -402,7 +482,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -422,7 +502,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("SortOrder", Direction.Descending)).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder", Direction.Descending)).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -442,7 +522,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -464,7 +544,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
 
             var filter = provider.CreateQuery<IMedia>().Where(x => x.Name.Contains("File"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.EqualTo(1));
@@ -486,7 +566,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
 
             var filter = provider.CreateQuery<IMedia>().Where(x => x.Name.Contains("Test"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.EqualTo(2));

@@ -10,6 +10,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class SliderConfigurationEditor : ConfigurationEditor<SliderConfiguration>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SliderConfigurationEditor"/> class.
+    /// </summary>
+    /// <param name="ioHelper">The IO helper.</param>
     public SliderConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Api.Common.Accessors;
 using Umbraco.Cms.Api.Common.Rendering;
 using Umbraco.Cms.Api.Management.Factories;
@@ -16,9 +16,10 @@ internal static class WebhooksBuilderExtensions
         builder.Services.AddUnique<IWebhookPresentationFactory, WebhookPresentationFactory>();
         builder.AddMapDefinition<WebhookEventMapDefinition>();
 
-        // deliveryApi will overwrite these more basic ones.
-        builder.Services.AddScoped<IOutputExpansionStrategy, ElementOnlyOutputExpansionStrategy>();
-        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
+        // We have to use TryAdd here, as if they are registered by the delivery API, we don't want to register them
+        // Delivery API will also overwrite these IF it is enabled.
+        builder.Services.TryAddScoped<IOutputExpansionStrategy, ElementOnlyOutputExpansionStrategy>();
+        builder.Services.TryAddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
 
         return builder;
     }

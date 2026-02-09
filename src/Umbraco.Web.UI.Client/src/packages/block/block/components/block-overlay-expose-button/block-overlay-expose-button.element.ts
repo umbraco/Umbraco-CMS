@@ -11,12 +11,13 @@ export class UmbBlockOverlayExposeButtonElement extends UmbLitElement {
 	contentTypeName?: string;
 
 	override render() {
-		return this.contentTypeName
-			? html`<uui-button look="secondary"
-					><uui-icon name="icon-add"></uui-icon>
-					<umb-localize key="blockEditor_createThisFor" .args=${[this.contentTypeName]}></umb-localize
-				></uui-button>`
-			: nothing;
+		if (!this.contentTypeName) return nothing;
+		return html`
+			<uui-button look="secondary">
+				<uui-icon name="icon-add"></uui-icon>
+				<umb-localize key="blockEditor_createThisFor" .args=${[this.contentTypeName]}></umb-localize>
+			</uui-button>
+		`;
 	}
 
 	static override styles = [

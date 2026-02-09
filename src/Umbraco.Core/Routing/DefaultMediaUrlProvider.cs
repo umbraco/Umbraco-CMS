@@ -11,6 +11,11 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
     private readonly MediaUrlGeneratorCollection _mediaPathGenerators;
     private readonly IUrlAssembler _urlAssembler;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DefaultMediaUrlProvider" /> class.
+    /// </summary>
+    /// <param name="mediaPathGenerators">The media path generators.</param>
+    /// <param name="urlAssembler">The URL assembler.</param>
     public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, IUrlAssembler urlAssembler)
     {
         _mediaPathGenerators = mediaPathGenerators;

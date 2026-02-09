@@ -23,10 +23,9 @@ test('can ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickIgnoreUserStartNodesToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'ignoreUserStartNodes', true)).toBeTruthy();
 });
 
@@ -45,10 +44,9 @@ test('can add start node', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickChooseButton();
   await umbracoUi.dataType.addContentStartNode(contentName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', contentId)).toBeTruthy();
 
   // Clean
@@ -70,10 +68,9 @@ test('can remove start node', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.removeContentStartNode(contentName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   const customDataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
   expect(customDataTypeData.values).toEqual([]);
 

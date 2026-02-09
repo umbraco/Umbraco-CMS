@@ -62,12 +62,29 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	#routeContext = new UmbRouteContext(this, this.#router, this.#modalRouter);
 
+	// Event handler as arrow function to maintain consistent reference
+	protected _updateRouterPath = () => {
+		const newAbsolutePath = this._constructAbsoluteRouterPath();
+		if (this._routerPath !== newAbsolutePath) {
+			this._routerPath = newAbsolutePath;
+			this.#routeContext._internal_routerGotBasePath(this._routerPath);
+			this.dispatchEvent(new UmbRouterSlotInitEvent());
+
+			const newActiveLocalPath = this._constructLocalRouterPath();
+			if (this._activeLocalPath !== newActiveLocalPath) {
+				this._activeLocalPath = newActiveLocalPath;
+				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
+				this.dispatchEvent(new UmbRouterSlotChangeEvent());
+			}
+		}
+	};
+
 	constructor() {
 		super();
 
 		this.#modalRouter.parent = this.#router;
 		this.#modalRouter.style.display = 'none';
-		this.#router.addEventListener('changestate', this._updateRouterPath.bind(this));
+		this.#router.addEventListener('changestate', this._updateRouterPath);
 		this.#router.appendChild(document.createElement('slot'));
 	}
 
@@ -95,6 +112,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	}
 
 	override disconnectedCallback() {
+		this.#router.removeEventListener('changestate', this._updateRouterPath);
 		window.removeEventListener('navigationsuccess', this._onNavigationChanged);
 		this.#listening = false;
 
@@ -107,22 +125,6 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 		this._updateRouterPath();
-	}
-
-	protected _updateRouterPath() {
-		const newAbsolutePath = this._constructAbsoluteRouterPath();
-		if (this._routerPath !== newAbsolutePath) {
-			this._routerPath = newAbsolutePath;
-			this.#routeContext._internal_routerGotBasePath(this._routerPath);
-			this.dispatchEvent(new UmbRouterSlotInitEvent());
-
-			const newActiveLocalPath = this._constructLocalRouterPath();
-			if (this._activeLocalPath !== newActiveLocalPath) {
-				this._activeLocalPath = newActiveLocalPath;
-				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
-				this.dispatchEvent(new UmbRouterSlotChangeEvent());
-			}
-		}
 	}
 
 	private _onNavigationChanged = (event?: any) => {

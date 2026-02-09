@@ -6,4 +6,5 @@ public interface IBlockEditorElementTypeCache
 {
     IEnumerable<IContentType> GetMany(IEnumerable<Guid> keys);
     IEnumerable<IContentType> GetAll();
+    void ClearAll() { }
 }

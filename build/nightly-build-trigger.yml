@@ -9,7 +9,7 @@ schedules:
   branches:
     include:
     - v13/dev
-    - v17/dev
+    - v16/dev
     - main
 
 steps:

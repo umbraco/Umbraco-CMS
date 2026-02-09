@@ -11,6 +11,9 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class MediaType : ContentTypeCompositionBase, IMediaType
 {
+    /// <summary>
+    ///     Constant indicating that media types do not support publishing.
+    /// </summary>
     public const bool SupportsPublishingConst = false;
     private bool _isCloning;
 

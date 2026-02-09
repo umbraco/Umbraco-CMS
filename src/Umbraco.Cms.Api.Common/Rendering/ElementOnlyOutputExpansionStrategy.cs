@@ -4,30 +4,64 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Rendering;
 
+/// <summary>
+///     Implements output expansion strategy for element-only rendering in the Delivery API.
+/// </summary>
+/// <remarks>
+///     This strategy handles the expansion and filtering of properties when rendering content
+///     through the Delivery API based on expand and fields query parameters.
+/// </remarks>
 public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
 {
+    /// <summary>
+    ///     The parameter value indicating all properties should be included.
+    /// </summary>
     protected const string All = "$all";
+
+    /// <summary>
+    ///     The parameter value indicating no properties should be included.
+    /// </summary>
     protected const string None = "";
+
+    /// <summary>
+    ///     The name of the expand query parameter.
+    /// </summary>
     protected const string ExpandParameterName = "expand";
+
+    /// <summary>
+    ///     The name of the fields query parameter.
+    /// </summary>
     protected const string FieldsParameterName = "fields";
 
     private readonly IApiPropertyRenderer _propertyRenderer;
 
+    /// <summary>
+    ///     Gets the stack of expand property nodes for tracking nested expansions.
+    /// </summary>
     protected Stack<Node?> ExpandProperties { get; } = new();
 
+    /// <summary>
+    ///     Gets the stack of include property nodes for tracking nested field selections.
+    /// </summary>
     protected Stack<Node?> IncludeProperties { get; } = new();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ElementOnlyOutputExpansionStrategy"/> class.
+    /// </summary>
+    /// <param name="propertyRenderer">The property renderer for converting property values.</param>
     public ElementOnlyOutputExpansionStrategy(
         IApiPropertyRenderer propertyRenderer)
     {
         _propertyRenderer = propertyRenderer;
     }
 
+    /// <inheritdoc/>
     public virtual IDictionary<string, object?> MapContentProperties(IPublishedContent content)
         => content.ItemType == PublishedItemType.Content
             ? MapProperties(content.Properties)
             : throw new ArgumentException($"Invalid item type. This method can only be used with item type {nameof(PublishedItemType.Content)}, got: {content.ItemType}");
 
+    /// <inheritdoc/>
     public virtual IDictionary<string, object?> MapMediaProperties(IPublishedContent media, bool skipUmbracoProperties = true)
     {
         if (media.ItemType != PublishedItemType.Media)
@@ -45,6 +79,7 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             : new Dictionary<string, object?>();
     }
 
+    /// <inheritdoc/>
     public virtual IDictionary<string, object?> MapElementProperties(IPublishedElement element)
         => MapProperties(element.Properties, true);
 
@@ -87,12 +122,27 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     private object? GetPropertyValue(IPublishedProperty property)
         => _propertyRenderer.GetPropertyValue(property, ExpandProperties.Peek() is not null);
 
+    /// <summary>
+    ///     Represents a node in the parsed expand/fields parameter tree structure.
+    /// </summary>
     protected sealed class Node
     {
+        /// <summary>
+        ///     Gets the key of this node.
+        /// </summary>
         public string Key { get; private set; } = string.Empty;
 
+        /// <summary>
+        ///     Gets the child nodes of this node.
+        /// </summary>
         public List<Node> Items { get; } = new();
 
+        /// <summary>
+        ///     Parses an expand/fields parameter value into a node tree structure.
+        /// </summary>
+        /// <param name="value">The parameter value to parse.</param>
+        /// <returns>The root node of the parsed tree.</returns>
+        /// <exception cref="ArgumentException">Thrown when the value has invalid syntax.</exception>
         public static Node Parse(string value)
         {
             // verify that there are as many start brackets as there are end brackets

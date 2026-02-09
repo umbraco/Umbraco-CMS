@@ -342,7 +342,7 @@ internal sealed class ScriptRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    protected Stream CreateStream(string contents = null)
+    private Stream CreateStream(string contents = null)
     {
         if (string.IsNullOrEmpty(contents))
         {

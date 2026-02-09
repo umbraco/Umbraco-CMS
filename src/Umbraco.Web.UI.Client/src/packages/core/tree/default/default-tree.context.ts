@@ -155,7 +155,9 @@ export class UmbDefaultTreeContext<
 	 */
 	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
 
-	#debouncedLoadTree(reload = false) {
+	async #debouncedLoadTree(reload = false) {
+		await this.#init;
+
 		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
 		if (hasStartNode || hideTreeRoot) {
@@ -333,6 +335,12 @@ export class UmbDefaultTreeContext<
 				this.#checkIfInitialized();
 			},
 		);
+	}
+
+	public override destroy(): void {
+		this.loadTree.cancel();
+		this.reloadTree.cancel();
+		super.destroy();
 	}
 }
 

@@ -30,10 +30,9 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentHaveLink(notPublishContentLink);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoUi.content.doesIdHaveText(contentData.id);
   const expectedCreatedDate = new Date(contentData.variants[0].createDate).toLocaleString("en-US", {
@@ -105,10 +104,9 @@ test('can change template', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.changeTemplate(firstTemplateName, secondTemplateName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.template.id).toBe(secondTemplateId);
 

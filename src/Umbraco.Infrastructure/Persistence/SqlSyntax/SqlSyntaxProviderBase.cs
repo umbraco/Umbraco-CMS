@@ -100,6 +100,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public string TimeColumnDefinition { get; protected set; } = "DATETIME";
 
+    public string DateOnlyColumnDefinition { get; protected set; } = "DATE";
+
+    public string TimeOnlyColumnDefinition { get; protected set; } = "TIME";
+
     protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
     protected DbTypes DbTypeMap => _dbTypes.Value;
@@ -153,6 +157,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
     public virtual string GetQuotedValue(string value) => $"'{value}'";
+
+    /// <inheritdoc />
+    public virtual string GetNullCastSuffix<T>() => string.Empty;
 
     public virtual string GetIndexType(IndexTypes indexTypes)
     {
@@ -252,6 +259,15 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual bool SupportsClustered() => true;
 
     public virtual bool SupportsIdentityInsert() => true;
+
+    /// <inheritdoc />
+    public virtual bool SupportsSequences() => false;
+
+    /// <inheritdoc />
+    public virtual void AlterSequences(IUmbracoDatabase database) => throw new NotSupportedException();
+
+    /// <inheritdoc />
+    public virtual void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotSupportedException();
 
     /// <summary>
     ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
@@ -531,6 +547,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         dbTypeMap.Set<TimeSpan?>(DbType.Time, TimeColumnDefinition);
         dbTypeMap.Set<DateTimeOffset>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
         dbTypeMap.Set<DateTimeOffset?>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
+        dbTypeMap.Set<DateOnly>(DbType.Date, DateOnlyColumnDefinition);
+        dbTypeMap.Set<DateOnly?>(DbType.Date, DateOnlyColumnDefinition);
+        dbTypeMap.Set<TimeOnly>(DbType.Time, TimeOnlyColumnDefinition);
+        dbTypeMap.Set<TimeOnly?>(DbType.Time, TimeOnlyColumnDefinition);
 
         dbTypeMap.Set<byte>(DbType.Byte, IntColumnDefinition);
         dbTypeMap.Set<byte?>(DbType.Byte, IntColumnDefinition);
@@ -676,4 +696,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     protected abstract string? FormatSystemMethods(SystemMethods systemMethod);
 
     protected abstract string FormatIdentity(ColumnDefinition column);
+
+    /// <inheritdoc />
+    public virtual string TruncateConstraintName<T>(string constraintName) => constraintName;
 }

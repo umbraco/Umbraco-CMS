@@ -33,14 +33,19 @@ export class UmbDocumentTypeSearchServerDataSource implements UmbSearchDataSourc
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.getItemDocumentTypeSearch({
-				query: { query: args.query, isElement: args.isElementType },
+				query: {
+					query: args.query,
+					isElement: args.isElementType,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
+				},
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbDocumentTypeSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/settings/workspace/document-type/edit/' + item.id,
+					href: 'section/settings/workspace/document-type/edit/' + item.id,
 					entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 					isElement: item.isElement,
 					icon: item.icon ?? undefined,

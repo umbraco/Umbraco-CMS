@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -17,7 +18,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [Category("Slow")]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
+[UmbracoTest(
+    Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+    PublishedRepositoryEvents = true,
     WithApplication = true)]
 internal sealed class MemberServiceTests : UmbracoIntegrationTest
 {
@@ -28,10 +31,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     private IPublishedContentFactory PublishedContentFactory => GetRequiredService<IPublishedContentFactory>();
 
     [Test]
-    public void Can_Update_Member_Property_Values()
+    public async Task Can_Update_Member_Property_Values()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member =
             MemberBuilder.CreateSimpleMember(memberType, "hello", "helloworld@test123.com", "hello", "hello");
         member.SetValue("title", "title of mine");
@@ -229,10 +232,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Create_Member()
+    public async Task Can_Create_Member()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -243,10 +246,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Create_Member_With_Long_TLD_In_Email()
+    public async Task Can_Create_Member_With_Long_TLD_In_Email()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.marketing", "pass", "test");
         MemberService.Save(member);
 
@@ -304,10 +307,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Replace_Roles()
+    public async Task Can_Replace_Roles()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -323,10 +326,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_All_Roles_By_Member_Id()
+    public async Task Can_Get_All_Roles_By_Member_Id()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -341,10 +344,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_All_Roles_Ids_By_Member_Id()
+    public async Task Can_Get_All_Roles_Ids_By_Member_Id()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -359,10 +362,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_All_Roles_By_Member_Username()
+    public async Task Can_Get_All_Roles_By_Member_Username()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -396,10 +399,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Throws_When_Deleting_Assigned_Role()
+    public async Task Throws_When_Deleting_Assigned_Role()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -410,7 +413,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Members_In_Role()
+    public async Task Can_Get_Members_In_Role()
     {
         MemberService.AddRole("MyTestRole1");
         int roleId;
@@ -422,7 +425,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         }
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -448,10 +451,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cannot_Save_Member_With_Empty_Name()
+    public async Task Cannot_Save_Member_With_Empty_Name()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, string.Empty, "test@test.com", "pass", "test");
 
         // Act & Assert
@@ -464,11 +467,14 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     [TestCase("MyTestRole1", "test", StringPropertyMatchType.Exact, 0)]
     [TestCase("MyTestRole1", "st2", StringPropertyMatchType.EndsWith, 1)]
     [TestCase("MyTestRole1", "test%", StringPropertyMatchType.Wildcard, 3)]
-    public void Find_Members_In_Role(string roleName1, string usernameToMatch, StringPropertyMatchType matchType,
+    public async Task Find_Members_In_Role(
+        string roleName1,
+        string usernameToMatch,
+        StringPropertyMatchType matchType,
         int resultCount)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -483,12 +489,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Associate_Members_To_Roles_With_Member_Id()
+    public async Task Associate_Members_To_Roles_With_Member_Id()
     {
         MemberService.AddRole("MyTestRole1");
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -506,12 +512,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Associate_Members_To_Roles_With_Member_Id_Casing()
+    public async Task Associate_Members_To_Roles_With_Member_Id_Casing()
     {
         MemberService.AddRole("MyTestRole1");
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -529,12 +535,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Associate_Members_To_Roles_With_Member_Username()
+    public async Task Associate_Members_To_Roles_With_Member_Username()
     {
         MemberService.AddRole("MyTestRole1");
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -548,12 +554,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Associate_Members_To_Roles_With_Member_Username_Containing_At_Symbols()
+    public async Task Associate_Members_To_Roles_With_Member_Username_Containing_At_Symbols()
     {
         MemberService.AddRole("MyTestRole1");
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1@test.com");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
@@ -567,10 +573,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Associate_Members_To_Roles_With_New_Role()
+    public async Task Associate_Members_To_Roles_With_New_Role()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -585,10 +591,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Remove_Members_From_Roles_With_Member_Id()
+    public async Task Remove_Members_From_Roles_With_Member_Id()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -606,10 +612,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Remove_Members_From_Roles_With_Member_Username()
+    public async Task Remove_Members_From_Roles_With_Member_Username()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
         MemberService.Save(member1);
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -627,10 +633,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Delete_member()
+    public async Task Can_Delete_Member()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -642,10 +648,44 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Exists_By_Username()
+    public async Task Can_Delete_Member_With_2_External_Logins()
+    {
+        // Arrange
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+        MemberService.Save(member);
+
+        // Inserting 2 external logins into the database.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var database = ScopeAccessor.AmbientScope.Database;
+            InsertLoginRecord(member, database, 1);
+            InsertLoginRecord(member, database, 2);
+            scope.Complete();
+        }
+
+        // Act
+        MemberService.Delete(member);
+
+        // Assert
+        var deleted = MemberService.GetById(member.Id);
+        Assert.That(deleted, Is.Null);
+
+        static void InsertLoginRecord(IMember member, IUmbracoDatabase database, int number) => database.Insert(new ExternalLoginDto
+        {
+            UserOrMemberKey = member.Key,
+            LoginProvider = $"Test{number}",
+            ProviderKey = $"test-{number}",
+            CreateDate = DateTime.UtcNow,
+        });
+    }
+
+    [Test]
+    public async Task Exists_By_Username()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
         IMember member2 =
@@ -658,10 +698,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Exists_By_Id()
+    public async Task Exists_By_Id()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -678,10 +718,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Email()
+    public async Task Get_By_Email()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -690,10 +730,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_Member_Name()
+    public async Task Get_Member_Name()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member =
             MemberBuilder.CreateSimpleMember(memberType, "Test Real Name", "test@test.com", "pass", "testUsername");
         MemberService.Save(member);
@@ -702,10 +742,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Username()
+    public async Task Get_By_Username()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -714,10 +754,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Object_Id()
+    public async Task Get_By_Object_Id()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
@@ -726,10 +766,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_All_Paged_Members()
+    public async Task Get_All_Paged_Members()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -742,14 +782,21 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_All_Paged_Members_With_Filter()
+    public async Task Get_All_Paged_Members_With_Filter()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
-        var found = MemberService.GetAll(0, 2, out var totalRecs, "username", Direction.Ascending, true, null,
+        var found = MemberService.GetAll(
+            0,
+            2,
+            out var totalRecs,
+            "username",
+            Direction.Ascending,
+            true,
+            null,
             "Member No-");
 
         Assert.AreEqual(2, found.Count());
@@ -765,10 +812,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Name_Starts_With()
+    public async Task Find_By_Name_Starts_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -781,10 +828,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Email_Starts_With()
+    public async Task Find_By_Email_Starts_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -798,10 +845,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Email_Ends_With()
+    public async Task Find_By_Email_Ends_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -815,10 +862,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Email_Contains()
+    public async Task Find_By_Email_Contains()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -832,10 +879,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Email_Exact()
+    public async Task Find_By_Email_Exact()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -843,17 +890,21 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
-        var found = MemberService.FindByEmail("hello@test.com", 0, 100, out var totalRecs,
+        var found = MemberService.FindByEmail(
+            "hello@test.com",
+            0,
+            100,
+            out var totalRecs,
             StringPropertyMatchType.Exact);
 
         Assert.AreEqual(1, found.Count());
     }
 
     [Test]
-    public void Find_By_Login_Starts_With()
+    public async Task Find_By_Login_Starts_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -867,10 +918,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Login_Ends_With()
+    public async Task Find_By_Login_Ends_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -884,10 +935,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Login_Contains()
+    public async Task Find_By_Login_Contains()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -902,10 +953,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Find_By_Login_Exact()
+    public async Task Find_By_Login_Exact()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
 
@@ -919,72 +970,80 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Property_String_Value_Exact()
+    public async Task Get_By_Property_String_Value_Exact()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "title", "hello member");
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(1, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_String_Value_Contains()
+    public async Task Get_By_Property_String_Value_Contains()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "title", " member", StringPropertyMatchType.Contains);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(11, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_String_Value_Starts_With()
+    public async Task Get_By_Property_String_Value_Starts_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "title", "Member No", StringPropertyMatchType.StartsWith);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(10, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_String_Value_Ends_With()
+    public async Task Get_By_Property_String_Value_Ends_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         customMember.SetValue("title", "title of mine");
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "title", "mine", StringPropertyMatchType.EndsWith);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(1, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Int_Value_Exact()
+    public async Task Get_By_Property_Int_Value_Exact()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -997,8 +1056,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
         MemberService.Save(members);
@@ -1007,14 +1068,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 2);
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "number", 2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(2, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Int_Value_Greater_Than()
+    public async Task Get_By_Property_Int_Value_Greater_Than()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1027,8 +1090,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
         MemberService.Save(members);
@@ -1037,14 +1102,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 10);
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "number", 3, ValuePropertyMatchType.GreaterThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(7, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Int_Value_Greater_Than_Equal_To()
+    public async Task Get_By_Property_Int_Value_Greater_Than_Equal_To()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1057,8 +1124,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
         MemberService.Save(members);
@@ -1067,14 +1136,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 10);
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "number", 3, ValuePropertyMatchType.GreaterThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(8, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Int_Value_Less_Than()
+    public async Task Get_By_Property_Int_Value_Less_Than()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1087,8 +1158,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
         MemberService.Save(members);
@@ -1097,14 +1170,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 1);
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "number", 5, ValuePropertyMatchType.LessThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(6, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Int_Value_Less_Than_Or_Equal()
+    public async Task Get_By_Property_Int_Value_Less_Than_Or_Equal()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1117,8 +1192,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Number",
                 DataTypeId =
                     -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
         MemberService.Save(members);
@@ -1127,14 +1204,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 1);
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "number", 5, ValuePropertyMatchType.LessThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(7, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Date_Value_Exact()
+    public async Task Get_By_Property_Date_Value_Exact()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1147,9 +1226,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1157,14 +1240,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 2, 0));
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "date", new DateTime(2013, 12, 20, 1, 2, 0));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(2, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Date_Value_Greater_Than()
+    public async Task Get_By_Property_Date_Value_Greater_Than()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1177,9 +1262,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1187,14 +1276,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(7, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Date_Value_Greater_Than_Equal_To()
+    public async Task Get_By_Property_Date_Value_Greater_Than_Equal_To()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1207,9 +1298,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1217,14 +1312,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(8, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Date_Value_Less_Than()
+    public async Task Get_By_Property_Date_Value_Less_Than()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1237,9 +1334,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1247,14 +1348,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
             "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(6, found.Count());
     }
 
     [Test]
-    public void Get_By_Property_Date_Value_Less_Than_Or_Equal()
+    public async Task Get_By_Property_Date_Value_Less_Than_Or_Equal()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.AddPropertyType(
@@ -1267,9 +1370,13 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
                 Name = "Date",
                 DataTypeId =
                     -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            }, "content", "Content");
-        MemberTypeService.Save(memberType);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10,
+            },
+            "content",
+            "Content");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(
+            memberType,
+            10,
             (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
         MemberService.Save(members);
 
@@ -1277,17 +1384,21 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
         MemberService.Save(customMember);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var found = MemberService.GetMembersByPropertyValue(
-            "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThanOrEqualTo);
+            "date",
+            new DateTime(2013, 12, 20, 1, 5, 0),
+            ValuePropertyMatchType.LessThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(7, found.Count());
     }
 
     [Test]
-    public void Count_All_Members()
+    public async Task Count_All_Members()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
         MemberService.Save(members);
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -1299,10 +1410,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Count_All_Locked_Members()
+    public async Task Count_All_Locked_Members()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
         MemberService.Save(members);
@@ -1317,10 +1428,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Count_All_Approved_Members()
+    public async Task Count_All_Approved_Members()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var members =
             MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsApproved = i % 2 == 0);
         MemberService.Save(members);
@@ -1335,12 +1446,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Setting_Property_On_Built_In_Member_Property_When_Property_Doesnt_Exist_On_Type_Is_Ok()
+    public async Task Setting_Property_On_Built_In_Member_Property_When_Property_Doesnt_Exist_On_Type_Is_Ok()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         memberType.RemovePropertyType(Constants.Conventions.Member.Comments);
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         Assert.IsFalse(memberType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Member.Comments));
 
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -1355,10 +1466,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void New_Member_Approved_By_Default()
+    public async Task New_Member_Approved_By_Default()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
 
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
@@ -1369,21 +1480,45 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_CreateWithIdentity()
+    public async Task Can_CreateWithIdentity()
     {
         // Arrange
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var username = Path.GetRandomFileName();
 
         // Act
-        var member = MemberService.CreateMemberWithIdentity(username, $"{username}@domain.email",
-            Path.GetFileNameWithoutExtension(username), memberType);
+        var member = MemberService.CreateMemberWithIdentity(
+            username,
+            $"{username}@domain.email",
+            Path.GetFileNameWithoutExtension(username),
+            memberType);
         var found = MemberService.GetById(member.Id);
 
         // Assert
         Assert.IsNotNull(member, "Verifying a member instance has been created");
         Assert.IsNotNull(found, "Verifying the created member instance has been retrieved");
         Assert.IsTrue(found?.Name == member?.Name, "Verifying the retrieved member instance has the expected name");
+    }
+
+    [Test]
+    public async Task Can_Get_Multiple_By_Key()
+    {
+        var memberType = MemberTypeService.Get("member");
+        IMember memberA = new Member("aname", "a@email", "ausername", "arawpassword", memberType, true);
+        MemberService.Save(memberA);
+
+        IMember memberB = new Member("bname", "b@email", "busername", "brawpassword", memberType, true);
+        MemberService.Save(memberB);
+
+        IMember memberC = new Member("cname", "c@email", "cusername", "crawpassword", memberType, true);
+        MemberService.Save(memberC);
+
+        var members = (await MemberService.GetByKeysAsync(memberA.Key, memberB.Key, memberC.Key)).ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, members.Length);
+            CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
+        });
     }
 }

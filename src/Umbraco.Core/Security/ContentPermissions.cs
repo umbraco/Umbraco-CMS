@@ -14,10 +14,24 @@ public class ContentPermissions
 {
     private readonly AppCaches _appCaches;
 
+    /// <summary>
+    ///     Represents the result of a content access check.
+    /// </summary>
     public enum ContentAccess
     {
+        /// <summary>
+        ///     Access to the content is granted.
+        /// </summary>
         Granted,
+
+        /// <summary>
+        ///     Access to the content is denied.
+        /// </summary>
         Denied,
+
+        /// <summary>
+        ///     The content was not found.
+        /// </summary>
         NotFound,
     }
 
@@ -25,6 +39,13 @@ public class ContentPermissions
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPermissions" /> class.
+    /// </summary>
+    /// <param name="userService">The user service.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
     public ContentPermissions(
         IUserService userService,
         IContentService contentService,
@@ -37,6 +58,13 @@ public class ContentPermissions
         _appCaches = appCaches;
     }
 
+    /// <summary>
+    ///     Checks if the user has path access to a content item.
+    /// </summary>
+    /// <param name="path">The path of the content item.</param>
+    /// <param name="startNodeIds">The user's start node IDs.</param>
+    /// <param name="recycleBinId">The recycle bin ID.</param>
+    /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
     public static bool HasPathAccess(string? path, int[]? startNodeIds, int recycleBinId)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -214,6 +242,14 @@ public class ContentPermissions
         return allowed;
     }
 
+    /// <summary>
+    ///     Determines if a path is within the branch of the user's start node.
+    /// </summary>
+    /// <param name="path">The path to check.</param>
+    /// <param name="startNodeIds">The user's start node IDs.</param>
+    /// <param name="startNodePaths">The user's start node paths.</param>
+    /// <param name="hasPathAccess">Outputs whether the user has direct path access.</param>
+    /// <returns><c>true</c> if the path is in the branch of the start node; otherwise, <c>false</c>.</returns>
     public static bool IsInBranchOfStartNode(string path, int[]? startNodeIds, string[]? startNodePaths, out bool hasPathAccess)
     {
         if (string.IsNullOrWhiteSpace(path))

@@ -1,4 +1,5 @@
 import { manifests as itemManifests } from './item/manifests.js';
+import { UmbPartialViewDetailStore } from './partial-view-detail.store.js';
 
 export const UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Detail';
 export const UMB_PARTIAL_VIEW_DETAIL_STORE_ALIAS = 'Umb.Store.PartialView.Detail';
@@ -14,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_PARTIAL_VIEW_DETAIL_STORE_ALIAS,
 		name: 'Partial View Detail Store',
-		api: () => import('./partial-view-detail.store.js'),
+		api: UmbPartialViewDetailStore,
 	},
 	...itemManifests,
 ];

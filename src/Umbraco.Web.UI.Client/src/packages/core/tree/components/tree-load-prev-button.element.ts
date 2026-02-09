@@ -1,5 +1,5 @@
-import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeLoadMoreButtonElement } from './tree-load-more-button.element.js';
+import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-tree-load-prev-button')
 export class UmbTreeLoadPrevButtonElement extends UmbTreeLoadMoreButtonElement {

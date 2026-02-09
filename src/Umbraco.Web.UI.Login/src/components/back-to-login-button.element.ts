@@ -17,7 +17,7 @@ export default class UmbBackToLoginButtonElement extends UmbLitElement {
 	}
 
 	#handleClick() {
-		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'login' } }));
+		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'login', status: null } }));
 	}
 
 	static styles: CSSResultGroup = [
@@ -39,7 +39,7 @@ export default class UmbBackToLoginButtonElement extends UmbLitElement {
 				display: inline-flex;
 				line-height: 1;
 				font-size: 14px;
-				font-family: var(--uui-font-family),sans-serif;
+				font-family: var(--uui-font-family), sans-serif;
 			}
 			button svg {
 				width: 1rem;

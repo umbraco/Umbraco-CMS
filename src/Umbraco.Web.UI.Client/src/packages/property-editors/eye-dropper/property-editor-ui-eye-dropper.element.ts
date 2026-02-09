@@ -6,18 +6,25 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-ui-eye-dropper
  */
 @customElement('umb-property-editor-ui-eye-dropper')
-export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
+export class UmbPropertyEditorUIEyeDropperElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+	@property({ type: Boolean })
+	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _opacity = false;
-
 	@state()
 	private _showPalette = false;
 
@@ -33,12 +40,19 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-eye-dropper')!);
+	}
+
 	override render() {
 		return html`
 			<umb-input-eye-dropper
 				.opacity=${this._opacity}
 				.showPalette=${this._showPalette}
-				value=${this.value}
+				.value=${this.value}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-eye-dropper>
 		`;
 	}

@@ -32,28 +32,14 @@
           "condition": "(!Docker)",
           "exclude": [
             "Dockerfile",
-            ".dockerignore"
+            ".dockerignore",
+            "entrypoint.sh"
           ]
         }
       ]
     }
   ],
   "symbols": {
-    "Framework": {
-      "displayName": "Framework",
-      "description": "The target framework for the project.",
-      "type": "parameter",
-      "datatype": "choice",
-      "choices": [
-        {
-          "displayName": ".NET 9.0",
-          "description": "Target net9.0",
-          "choice": "net9.0"
-        }
-      ],
-      "defaultValue": "net9.0",
-      "replaces": "net9.0"
-    },
     "UmbracoRelease": {
       "displayName": "Umbraco Version",
       "description": "The Umbraco release to use, either latest or latest long term supported",
@@ -73,15 +59,6 @@
       ],
       "isRequired": false
     },
-    "UmbracoVersion": {
-      "displayName": "Custom Version",
-      "description": "The selected custom version of Umbraco, this is obsoleted, and will be removed in a future version of the template.",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "null",
-      "replaces": "CUSTOM_VERSION",
-      "isRequired": false
-    },
     "FinalVersion": {
       "type": "generated",
       "generator": "switch",
@@ -98,7 +75,7 @@
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "17.0.0"
+            "value": "17.*"
           }
         ]
       }
@@ -107,7 +84,7 @@
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
-      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 9 and for LTS we want to use dotnet 8",
+      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 10 and for LTS we want to use dotnet 10",
       "replaces": "DOTNET_VERSION_FROM_TEMPLATE",
       "parameters": {
         "evaluator": "C++",

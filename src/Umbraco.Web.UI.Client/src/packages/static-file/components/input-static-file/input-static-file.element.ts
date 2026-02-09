@@ -2,9 +2,12 @@ import type { UmbStaticFileItemModel } from '../../repository/item/types.js';
 import { UmbStaticFilePickerInputContext } from './input-static-file.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+
+import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-static-file')
 export class UmbInputStaticFileElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -79,6 +82,9 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	@state()
 	private _items?: Array<UmbStaticFileItemModel>;
 
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
 	#pickerContext = new UmbStaticFilePickerInputContext(this);
 
 	constructor() {
@@ -98,6 +104,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses));
 	}
 
 	protected override getFormElement() {
@@ -105,13 +112,13 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	}
 
 	override render() {
-		if (!this._items) return nothing;
+		if (!this._statuses) return nothing;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this._renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => this.#renderItem(status),
 				)}
 			</uui-ref-list>
 			${this.#renderAddButton()}
@@ -137,17 +144,25 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		`;
 	}
 
-	private _renderItem(item: UmbStaticFileItemModel) {
-		if (!item.unique) return;
+	#renderItem(status: UmbRepositoryItemsStatus) {
+		const unique = status.unique;
+		const item = this._items?.find((x) => x.unique === unique);
+		const isError = status.state.type === 'error';
+
 		return html`
-			<uui-ref-node name=${item.name} .detail=${this.#serializer.toServerPath(item.unique) || ''}>
-				<!-- TODO: implement is trashed, if we cant retrieve the item on the server (but only ask the server if we need to anyway...). <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
+			<umb-entity-item-ref
+				id=${unique}
+				.item=${item}
+				?error=${isError}
+				.errorMessage=${status.state.error}
+				.errorDetail=${isError ? this.#serializer.toServerPath(unique) : undefined}
+				?standalone=${this.max === 1}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}></uui-button>
+						@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
 				</uui-action-bar>
-			</uui-ref-node>
+			</umb-entity-item-ref>
 		`;
 	}
 

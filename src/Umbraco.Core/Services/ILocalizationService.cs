@@ -218,6 +218,12 @@ public interface ILocalizationService : IService
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     Dictionary<string, Guid> GetDictionaryItemKeyMap();
 
+    /// <summary>
+    /// Gets all languages with paging support.
+    /// </summary>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    /// <returns>A paged model containing the languages.</returns>
     [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     PagedModel<ILanguage> GetAllLanguagesPaged(int skip, int take)
     {

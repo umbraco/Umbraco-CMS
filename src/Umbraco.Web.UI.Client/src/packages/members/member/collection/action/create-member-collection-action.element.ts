@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMemberTypeTreeRepository } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-create-member-collection-action')
-export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
+export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 	@state()
 	private _options: Array<{ label: string; unique: string; icon: string }> = [];
 
@@ -97,10 +97,10 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	];
 }
 
-export default UmbCreateDocumentCollectionActionElement;
+export default UmbCreateMemberCollectionActionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-create-member-collection-action': UmbCreateDocumentCollectionActionElement;
+		'umb-create-member-collection-action': UmbCreateMemberCollectionActionElement;
 	}
 }

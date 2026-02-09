@@ -6,24 +6,29 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class LogDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Log;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
+    private const string UserIdColumnName = "userId";
+    private const string NodeIdColumnName = "NodeId";
+    private const string DatestampColumnName = "Datestamp";
+    private const string HeaderColumnName = "logHeader";
     private int? _userId;
 
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("userId")]
+    [Column(UserIdColumnName)]
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } // return null if zero
 
-    [Column("NodeId")]
+    [Column(NodeIdColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoLog")]
     public int NodeId { get; set; }
 
@@ -35,14 +40,14 @@ internal sealed class LogDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? EntityType { get; set; }
 
-    [Column("Datestamp")]
+    [Column(DatestampColumnName)]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp", ForColumns = "Datestamp,userId,NodeId")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp", ForColumns = $"{DatestampColumnName},{UserIdColumnName},{NodeIdColumnName}")]
     public DateTime Datestamp { get; set; }
 
-    [Column("logHeader")]
+    [Column(HeaderColumnName)]
     [Length(50)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp_logheader", ForColumns = "Datestamp,logHeader")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp_logheader", ForColumns = $"{DatestampColumnName},{HeaderColumnName}")]
     public string Header { get; set; } = null!;
 
     [Column("logComment")]

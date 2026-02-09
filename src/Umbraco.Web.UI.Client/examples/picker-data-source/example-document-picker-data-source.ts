@@ -19,7 +19,9 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
-import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
+import { getConfigValue } from '@umbraco-cms/backoffice/utils';
+
+type ExampleDocumentPickerConfigCollectionModel = Array<{ alias: 'filter'; value: string }>;
 
 export class ExampleDocumentPickerPropertyEditorDataSource
 	extends UmbControllerBase
@@ -30,17 +32,17 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	#tree = new UmbDocumentTreeRepository(this);
 	#item = new UmbDocumentItemRepository(this);
 	#search = new UmbDocumentSearchRepository(this);
-	#config: UmbConfigCollectionModel = [];
+	#config: ExampleDocumentPickerConfigCollectionModel = [];
 
 	treePickableFilter: (treeItem: UmbDocumentTreeItemModel) => boolean = (treeItem) => !!treeItem.unique;
 
-	setConfig(config: UmbConfigCollectionModel) {
+	setConfig(config: ExampleDocumentPickerConfigCollectionModel) {
 		// TODO: add examples for all config options
 		this.#config = config;
 		this.#applyPickableFilterFromConfig();
 	}
 
-	getConfig(): UmbConfigCollectionModel {
+	getConfig(): ExampleDocumentPickerConfigCollectionModel {
 		return this.#config;
 	}
 
@@ -72,7 +74,7 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	}
 
 	#getAllowedDocumentTypesConfig() {
-		const filterString = getConfigValue<string>(this.#config, 'filter');
+		const filterString = getConfigValue(this.#config, 'filter');
 		const filterArray = filterString ? filterString.split(',') : [];
 		const allowedContentTypes: UmbDocumentSearchRequestArgs['allowedContentTypes'] = filterArray.map(
 			(unique: string) => ({

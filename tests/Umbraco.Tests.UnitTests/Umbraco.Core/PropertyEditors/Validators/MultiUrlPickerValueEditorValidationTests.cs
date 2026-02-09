@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -68,7 +69,8 @@ internal class MultiUrlPickerValueEditorValidationTests
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
             Mock.Of<IContentService>(),
-            Mock.Of<IMediaService>())
+            Mock.Of<IMediaService>(),
+            AppCaches.Disabled)
         {
             ConfigurationObject = new MultiUrlPickerConfiguration(),
         };

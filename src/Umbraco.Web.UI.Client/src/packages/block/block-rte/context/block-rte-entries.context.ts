@@ -1,14 +1,12 @@
+import { UMB_BLOCK_RTE_WORKSPACE_MODAL } from '../workspace/block-rte-workspace.modal-token.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel, UmbBlockRteValueModel } from '../types.js';
-import {
-	UMB_BLOCK_RTE_WORKSPACE_MODAL,
-	type UmbBlockRteWorkspaceOriginData,
-} from '../workspace/block-rte-workspace.modal-token.js';
+import type { UmbBlockRteWorkspaceOriginData } from '../workspace/block-rte-workspace.modal-token.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import { UmbBlockEntriesContext, UMB_BLOCK_CATALOGUE_MODAL } from '@umbraco-cms/backoffice/block';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Copied from the 'rte' package to avoid a circular dependency.
@@ -34,9 +32,18 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addAdditionalPath('_catalogue/:view')
 			.onSetup((routingInfo) => {
+				const blockTypes = this._manager?.getBlockTypes() ?? [];
+
+				/*
+				modal size logic:
+				If more than 8 block types, medium modal, more than 12 large modal:
+				*/
+				const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
+
 				return {
+					modal: { size: modalSize },
 					data: {
-						blocks: this._manager?.getBlockTypes() ?? [],
+						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						originData: {},
@@ -119,8 +126,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		return await this._manager?.createWithPresets(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
-	// insert Block?
-
 	async insert(
 		layoutEntry: UmbBlockRteLayoutModel,
 		content: UmbBlockDataModel,
@@ -131,10 +136,15 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
-	// create Block?
+	/**
+	 * Delete a block by requesting its removal through the pending deletion mechanism.
+	 * This enables undo support by removing the HTML element first via Tiptap,
+	 * which triggers _filterUnusedBlocks to store block data before removal.
+	 * @param {string} contentKey - The content key of the block to delete.
+	 */
 	override async delete(contentKey: string) {
-		await super.delete(contentKey);
-		this._manager?.deleteLayoutElement(contentKey);
+		await this._retrieveManager;
+		this._manager?.requestPendingDeletion(contentKey);
 	}
 
 	protected async _insertFromPropertyValue(value: UmbBlockRteValueModel, originData: UmbBlockRteWorkspaceOriginData) {

@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -11,96 +11,85 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
-	rest.get(umbracoPath('/package/configuration'), (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<GetPackageConfigurationResponse>({
-				marketplaceUrl: 'https://marketplace.umbraco.com',
-			}),
-		);
+	http.get(umbracoPath('/package/configuration'), () => {
+		return HttpResponse.json<GetPackageConfigurationResponse>({
+			marketplaceUrl: 'https://marketplace.umbraco.com',
+		});
 	}),
 
-	rest.get(umbracoPath('/package/migration-status'), (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<PagedPackageMigrationStatusResponseModel>({
-				total: 3,
-				items: [
-					{
-						hasPendingMigrations: true,
-						packageName: 'Named Package',
-					},
-					{
-						hasPendingMigrations: true,
-						packageName: 'My Custom Migration',
-					},
-					{
-						hasPendingMigrations: false,
-						packageName: 'Package with a view',
-					},
-				],
-			}),
-		);
+	http.get(umbracoPath('/package/migration-status'), () => {
+		return HttpResponse.json<PagedPackageMigrationStatusResponseModel>({
+			total: 3,
+			items: [
+				{
+					hasPendingMigrations: true,
+					packageName: 'Named Package',
+				},
+				{
+					hasPendingMigrations: true,
+					packageName: 'My Custom Migration',
+				},
+				{
+					hasPendingMigrations: false,
+					packageName: 'Package with a view',
+				},
+			],
+		});
 	}),
 
-	rest.post(umbracoPath('/package/:name/run-migration'), async (_req, res, ctx) => {
-		const name = _req.params.name as string;
-		if (!name) return res(ctx.status(404));
-		return res(ctx.status(200));
+	http.post(umbracoPath('/package/:name/run-migration'), async ({ params }) => {
+		const name = params.name as string;
+		if (!name) return new HttpResponse(null, { status: 404 });
+		return new HttpResponse(null, { status: 200 });
 	}),
 
-	rest.get(umbracoPath('/package/created'), async (_req, res, ctx) => {
+	http.get(umbracoPath('/package/created'), async () => {
 		// read all
-		return res(
-			ctx.status(200),
-			ctx.json<PagedPackageDefinitionResponseModel>({
-				total: packageArray.length,
-				items: packageArray,
-			}),
-		);
+		return HttpResponse.json<PagedPackageDefinitionResponseModel>({
+			total: packageArray.length,
+			items: packageArray,
+		});
 	}),
 
-	rest.post(umbracoPath('/package/created'), async (_req, res, ctx) => {
+	http.post<object, CreatePackageRequestModel>(umbracoPath('/package/created'), async ({ request }) => {
 		//save
-		const data: CreatePackageRequestModel = await _req.json();
+		const data = await request.json();
 		const newPackage: PackageDefinitionResponseModel = { ...data, id: UmbId.new(), packagePath: '' };
 		packageArray.push(newPackage);
-		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(newPackage));
+		return HttpResponse.json<PackageDefinitionResponseModel>(newPackage);
 	}),
 
-	rest.get(umbracoPath('/package/created/:id'), (_req, res, ctx) => {
+	http.get(umbracoPath('/package/created/:id'), ({ params }) => {
 		//read 1
-		const id = _req.params.id as string;
-		if (!id) return res(ctx.status(404));
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 404 });
 		const found = packageArray.find((p) => p.id == id);
-		if (!found) return res(ctx.status(404));
-		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(found));
+		if (!found) return new HttpResponse(null, { status: 404 });
+		return HttpResponse.json<PackageDefinitionResponseModel>(found);
 	}),
 
-	rest.put(umbracoPath('/package/created/:id'), async (_req, res, ctx) => {
+	http.put<object, PackageDefinitionResponseModel>(umbracoPath('/package/created/:id'), async ({ request }) => {
 		//update
-		const data: PackageDefinitionResponseModel = await _req.json();
+		const data = await request.json();
 		if (!data.id) return;
 		const index = packageArray.findIndex((x) => x.id === data.id);
 		packageArray[index] = data;
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 
-	rest.delete(umbracoPath('/package/created/:id'), (_req, res, ctx) => {
+	http.delete(umbracoPath('/package/created/:id'), ({ params }) => {
 		//delete
-		const id = _req.params.id as string;
-		if (!id) return res(ctx.status(404));
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 404 });
 		const index = packageArray.findIndex((p) => p.id == id);
-		if (index <= -1) return res(ctx.status(404));
+		if (index <= -1) return new HttpResponse(null, { status: 404 });
 		packageArray.splice(index, 1);
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 
-	rest.get(umbracoPath('/package/created/:id/download'), (_req, res, ctx) => {
+	http.get(umbracoPath('/package/created/:id/download'), () => {
 		//download
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 ];
 

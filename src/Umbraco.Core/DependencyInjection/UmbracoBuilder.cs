@@ -54,21 +54,29 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
+    /// <summary>
+    ///     The default implementation of <see cref="IUmbracoBuilder" /> used to configure Umbraco services and dependencies.
+    /// </summary>
     public class UmbracoBuilder : IUmbracoBuilder
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
+        /// <inheritdoc />
         public IServiceCollection Services { get; }
 
+        /// <inheritdoc />
         public IConfiguration Config { get; }
 
+        /// <inheritdoc />
         public TypeLoader TypeLoader { get; }
 
         /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
+        /// <inheritdoc />
         public IProfiler Profiler { get; }
 
+        /// <inheritdoc />
         public AppCaches AppCaches { get; }
 
         /// <summary>
@@ -133,6 +141,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             return builder;
         }
 
+        /// <inheritdoc />
         public void Build()
         {
             foreach (ICollectionBuilder builder in _builders.Values)
@@ -143,6 +152,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             _builders.Clear();
         }
 
+        /// <summary>
+        ///     Adds all core Umbraco services to the service collection.
+        /// </summary>
         private void AddCoreServices()
         {
             Services.AddSingleton(AppCaches);
@@ -284,6 +296,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
             Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
             Services.AddUnique<IContentTypeContainerService, ContentTypeContainerService>();
+            Services.AddUnique<IContentTypeSchemaService, ContentTypeSchemaService>();
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
@@ -430,6 +443,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
             Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
+            Services.AddUnique<IMemberTypeImportService, MemberTypeImportService>();
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
@@ -437,6 +451,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Routing
             Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
+            Services.AddUnique<IDocumentUrlAliasService, DocumentUrlAliasService>();
+            Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
         }
     }
 }

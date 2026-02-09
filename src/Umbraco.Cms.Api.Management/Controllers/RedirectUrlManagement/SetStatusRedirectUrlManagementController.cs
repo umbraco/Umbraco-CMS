@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Configuration;
@@ -7,12 +7,20 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
+/// <summary>
+/// Controller for setting the redirect URL tracking status.
+/// </summary>
 [ApiVersion("1.0")]
 public class SetStatusRedirectUrlManagementController : RedirectUrlManagementControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IConfigManipulator _configManipulator;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetStatusRedirectUrlManagementController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
+    /// <param name="configManipulator">The configuration manipulator.</param>
     public SetStatusRedirectUrlManagementController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IConfigManipulator configManipulator)
@@ -24,6 +32,12 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     // TODO: Consider if we should even allow this, or only allow using the appsettings
     // We generally don't want to edit the appsettings from our code.
     // But maybe there is a valid use case for doing it on the fly.
+    /// <summary>
+    /// Sets the redirect URL tracking status.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token for the HTTP request.</param>
+    /// <param name="status">The redirect status to set.</param>
+    /// <returns>An OK result if successful.</returns>
     [HttpPost("status")]
     [EndpointSummary("Gets URLs for a document.")]
     [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
@@ -40,7 +54,8 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
         var enable = status switch
         {
             RedirectStatus.Enabled => true,
-            RedirectStatus.Disabled => false
+            RedirectStatus.Disabled => false,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Unknown redirect status")
         };
 
         // For now I'm not gonna change this to limit breaking, but it's weird to have a "disabled" switch,

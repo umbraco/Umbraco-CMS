@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Defines methods for resolving user keys to user IDs and vice versa without retrieving full user details.
+/// </summary>
 public interface IUserIdKeyResolver
 {
     /// <summary>

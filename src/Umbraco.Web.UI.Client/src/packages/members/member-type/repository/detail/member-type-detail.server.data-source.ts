@@ -130,7 +130,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 	 * @returns {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async create(model: UmbMemberTypeDetailModel) {
+	async create(model: UmbMemberTypeDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Member Type is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -162,6 +162,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 			}),
 			containers: model.containers,
 			id: model.unique,
+			parent: parentUnique ? { id: parentUnique } : null,
 			compositions: model.compositions.map((composition) => {
 				return {
 					memberType: { id: composition.contentType.unique },

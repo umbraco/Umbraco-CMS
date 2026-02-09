@@ -104,7 +104,9 @@ internal static class PathValidationExtensions
         {
             logger.LogWarning(
                 "The content item {EntityId} has an invalid path: {EntityPath} with parentID: {EntityParentId}",
-                entity.Id, entity.Path, entity.ParentId);
+                entity.Id,
+                entity.Path,
+                entity.ParentId);
             if (entity.ParentId == -1)
             {
                 entity.Path = string.Concat("-1,", entity.Id);

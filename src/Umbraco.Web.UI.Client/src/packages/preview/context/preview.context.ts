@@ -200,18 +200,15 @@ export class UmbPreviewContext extends UmbContextBase {
 	async exitPreview() {
 		await this.#previewRepository.exit();
 
+		// Stop SignalR connection without waiting - window will close anyway
 		if (this.#connection) {
-			await this.#connection.stop();
+			this.#connection.stop();
 			this.#connection = undefined;
 		}
 
-		let url = await this.#getPublishedUrl();
-
-		if (!url) {
-			url = this.#previewUrl.getValue() as string;
-		}
-
-		window.location.replace(url);
+		// Close the preview window
+		// This ensures that subsequent "Save and Preview" actions will create a new preview session
+		window.close();
 	}
 
 	iframeLoaded(iframe: HTMLIFrameElement) {

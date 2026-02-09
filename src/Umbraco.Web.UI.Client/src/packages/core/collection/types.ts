@@ -1,15 +1,18 @@
 import type { ManifestCollection } from './extensions/types.js';
+import type { UmbCollectionItemModel } from './item/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export type * from './action/create/types.js';
+export type * from './collection-item-picker-modal/types.js';
 export type * from './conditions/types.js';
+export type * from './filter/types.js';
 export type * from './extensions/types.js';
 export type * from './item/types.js';
 export type * from './menu/types.js';
+export type * from './view/types.js';
 export type * from './workspace-view/types.js';
-export type * from './collection-item-picker-modal/types.js';
 
 export interface UmbCollectionConfiguration {
 	unique?: UmbEntityUnique;
@@ -20,6 +23,8 @@ export interface UmbCollectionConfiguration {
 	pageSize?: number;
 	noItemsLabel?: string;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+	selectionConfiguration?: UmbCollectionSelectionConfiguration;
+	bulkActionConfiguration?: UmbCollectionBulkActionConfiguration;
 }
 
 export interface UmbCollectionColumnConfiguration {
@@ -39,7 +44,13 @@ export interface UmbCollectionLayoutConfiguration {
 export type UmbCollectionSelectionConfiguration = {
 	multiple?: boolean;
 	selectable?: boolean;
-	selection?: Array<string | null>;
+	selectOnly?: boolean;
+	selection?: Array<UmbCollectionItemModel['unique']>;
+	selectableFilter?(item: UmbCollectionItemModel): boolean;
+};
+
+export type UmbCollectionBulkActionConfiguration = {
+	enabled?: boolean;
 };
 
 export interface UmbCollectionContext {
@@ -48,6 +59,7 @@ export interface UmbCollectionContext {
 	setManifest(manifest: ManifestCollection): void;
 	getManifest(): ManifestCollection | undefined;
 	requestCollection(): Promise<void>;
+	requestItemHref?(item: UmbCollectionItemModel): Promise<string | undefined>;
 	pagination: UmbPaginationManager;
 	items: Observable<any[]>;
 	totalItems: Observable<number>;

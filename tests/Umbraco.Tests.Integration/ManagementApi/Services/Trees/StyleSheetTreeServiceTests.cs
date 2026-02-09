@@ -14,7 +14,7 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
     protected override IFileSystem? GetStylesheetsFileSystem() => TestFileSystem;
 
     [Test]
-    public void Can_Get_Siblings_From_StyleSheet_Tree_Service()
+    public void Can_Get_Siblings()
     {
         var service = new StyleSheetTreeService(FileSystems);
 
@@ -30,20 +30,20 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
     }
 
     [Test]
-    public void Can_Get_Ancestors_From_StyleSheet_Tree_Service()
+    public void Can_Get_Ancestors()
     {
         var service = new StyleSheetTreeService(FileSystems);
 
         var path = Path.Join("tests", $"file5{FileExtension}");
-        FileSystemTreeItemPresentationModel[] treeModel = service.GetAncestorModels(path, true);
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(path, true);
 
-        Assert.IsNotEmpty(treeModel);
-        Assert.AreEqual(treeModel.Length, 2);
-        Assert.AreEqual(treeModel[0].Name, "tests");
+        Assert.IsNotEmpty(treeModels);
+        Assert.AreEqual(treeModels.Length, 2);
+        Assert.AreEqual(treeModels[0].Name, "tests");
     }
 
     [Test]
-    public void Can_Get_PathViewModels_From_StyleSheet_Tree_Service()
+    public void Can_Get_PathViewModels()
     {
         var service = new StyleSheetTreeService(FileSystems);
 
@@ -59,7 +59,7 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
         var service = new StyleSheetTreeService(FileSystems);
         for (int i = 0; i < 2; i++)
         {
-            using var stream = CreateStream(Path.Join("tests"));
+            using var stream = CreateStream();
             TestFileSystem.AddFile($"file{i}.invalid", stream);
         }
 

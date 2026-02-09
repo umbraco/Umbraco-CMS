@@ -267,6 +267,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	/**
 	 * @function replace
 	 * @param {Partial<T>} entires - data of entries to be replaced.
+	 * @param entries
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Replaces one or more entries, requires the ArrayState to be constructed with a getUnique method.
 	 * @example <caption>Example append some data.</caption>

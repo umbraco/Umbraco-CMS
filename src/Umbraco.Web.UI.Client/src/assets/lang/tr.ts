@@ -1093,8 +1093,8 @@ export default {
 	},
 	rollback: {
 		changes: 'Değişiklikler',
-		diffHelp:
-			'Bu, mevcut sürüm ile seçili sürüm arasındaki farkları gösterir <br /> <del> Kırmızı </del> metin seçili sürümde gösterilmeyecektir. , <ins> yeşil eklendi demektir </ins>',
+		diffHelp: '<del>Kırmızı metin</del> seçili sürümde kaldırılacak, <ins>yeşil metin</ins> eklenecektir.',
+		showDiff: 'Mevcut (taslak) sürüm ile seçili sürüm arasındaki farkları göster.',
 		documentRolledBack: 'Belge geri alındı ​​',
 		headline: 'Mevcut sürümle karşılaştırmak için bir sürüm seçin',
 		htmlHelp:
@@ -1858,14 +1858,10 @@ export default {
 		savedSearches: 'Kaydedilmiş Aramalar',
 		saveSearch: 'Aramayı Kaydet',
 		saveSearchDescription: 'Arama sorgunuz için kolay bir ad girin',
-		filterSearch: 'Aramayı Filtrele',
-		totalItems: 'Toplam Öğeler',
 		timestamp: 'Zaman damgası',
 		level: 'Seviye',
 		machine: 'Makine',
 		message: 'Mesaj',
-		exception: 'İstisna',
-		properties: 'Özellikler',
 		searchWithGoogle: 'Google ile Ara',
 		searchThisMessageWithGoogle: 'Bu mesajı Google ile ara',
 		searchWithBing: 'Bing ile Ara',
@@ -1879,10 +1875,6 @@ export default {
 		searchUmbracoIssues: 'Umbraco Sorunlarını Ara',
 		searchUmbracoIssuesOnGithub: "Github'da Umbraco Sorunlarını Ara",
 		deleteThisSearch: 'Bu aramayı sil',
-		findLogsWithRequestId: 'İstek Kimliği Olan Günlükleri Bul',
-		findLogsWithNamespace: 'Ad Alanına Sahip Günlükleri Bul',
-		findLogsWithMachineName: 'Makine Adına Sahip Günlükleri Bul',
-		open: 'Aç',
 	},
 	clipboard: {
 		labelForCopyAllEntries: '%0% Kopyala',

@@ -14,7 +14,9 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
+[UmbracoTest(
+    Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+    PublishedRepositoryEvents = true,
     WithApplication = true)]
 internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 {
@@ -621,7 +623,10 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
             Variations = ContentVariation.Nothing
         };
         iContentType.AddPropertyType(
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Nvarchar,
                 "ip")
             { Variations = ContentVariation.Nothing });
         ContentTypeService.Save(iContentType);
@@ -633,11 +638,17 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
             Variations = ContentVariation.Culture
         };
         vContentType.AddPropertyType(
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Nvarchar,
                 "ip")
             { Variations = ContentVariation.Nothing });
         vContentType.AddPropertyType(
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar,
+            new PropertyType(
+                ShortStringHelper,
+                Constants.PropertyEditors.Aliases.TextBox,
+                ValueStorageType.Nvarchar,
                 "vp")
             { Variations = ContentVariation.Culture });
         ContentTypeService.Save(vContentType);

@@ -22,7 +22,13 @@ internal static class UserFactory
             key = dto.Id.ToGuid();
         }
 
-        var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login, dto.Password,
+        var user = new User(
+            globalSettings,
+            dto.Id,
+            dto.UserName,
+            dto.Email,
+            dto.Login,
+            dto.Password,
             dto.PasswordConfig,
             dto.UserGroupDtos.Select(x => ToReadOnlyGroup(x, permissionMappers)).ToArray(),
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content)

@@ -1,24 +1,20 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
+import { expect, test } from './test.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
 	type ProblemDetails,
 	RuntimeLevelModel,
 	type ServerStatusResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { expect, test } from './test.js';
 
 test.describe('upgrader tests', () => {
 	test.beforeEach(async ({ page, worker }) => {
 		await worker.use(
 			// Override the server status to be "must-install"
-			rest.get(umbracoPath('/server/status'), (_req, res, ctx) => {
-				return res(
-					// Respond with a 200 status code
-					ctx.status(200),
-					ctx.json<ServerStatusResponseModel>({
-						serverStatus: RuntimeLevelModel.UPGRADE,
-					}),
-				);
+			http.get(umbracoPath('/server/status'), () => {
+				return HttpResponse.json<ServerStatusResponseModel>({
+					serverStatus: RuntimeLevelModel.UPGRADE,
+				});
 			}),
 		);
 
@@ -43,15 +39,14 @@ test.describe('upgrader tests', () => {
 	test('upgrader fails and shows error', async ({ page, worker }) => {
 		await worker.use(
 			// Override the server status to be "must-install"
-			rest.post(umbracoPath('/upgrade/authorize'), (_req, res, ctx) => {
-				return res(
-					// Respond with a 200 status code
-					ctx.status(400),
-					ctx.json<ProblemDetails>({
+			http.post(umbracoPath('/upgrade/authorize'), () => {
+				return HttpResponse.json<ProblemDetails>(
+					{
 						status: 400,
 						type: 'error',
 						detail: 'Something went wrong',
-					}),
+					},
+					{ status: 400 },
 				);
 			}),
 		);

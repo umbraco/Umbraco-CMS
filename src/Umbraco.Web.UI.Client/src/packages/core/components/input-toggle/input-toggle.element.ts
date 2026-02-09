@@ -1,8 +1,8 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-toggle')
 export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, '') {
@@ -46,9 +46,6 @@ export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, ''
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	@state()
-	private _currentLabel?: string;
-
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-toggle')!);
 	}
@@ -60,16 +57,18 @@ export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, ''
 	}
 
 	override render() {
-		const label = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : '';
-		return html`<uui-toggle
-			.checked=${this.#checked}
-			.label=${this.ariaLabel}
-			?required=${this.required}
-			.requiredMessage=${this.requiredMessage}
-			@change=${this.#onChange}
-			?readonly=${this.readonly}
-			><span>${label}</span>
-		</uui-toggle>`;
+		const label = this.checked ? this.labelOn : this.labelOff;
+		return html`
+			<uui-toggle
+				.checked=${this.#checked}
+				.label=${this.ariaLabel ?? label ?? ''}
+				.requiredMessage=${this.requiredMessage}
+				?readonly=${this.readonly}
+				?required=${this.required}
+				@change=${this.#onChange}>
+				${when(this.showLabels, () => html`<span>${label}</span>`)}
+			</uui-toggle>
+		`;
 	}
 }
 

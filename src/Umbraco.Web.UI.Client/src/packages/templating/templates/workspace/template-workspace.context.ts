@@ -123,9 +123,8 @@ export class UmbTemplateWorkspaceContext
 
 		if (updateLayoutBlock) {
 			this.#updateMasterTemplateLayoutBlock();
+			this._data.updateCurrent({ masterTemplate: unique ? { unique } : null });
 		}
-
-		this._data.updateCurrent({ masterTemplate: unique ? { unique } : null });
 
 		return unique;
 	}

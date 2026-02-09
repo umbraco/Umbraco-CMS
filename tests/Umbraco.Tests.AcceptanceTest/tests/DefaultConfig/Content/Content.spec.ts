@@ -29,10 +29,9 @@ test('can create empty content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -50,10 +49,9 @@ test('can save and publish empty content', {tag: '@smoke'}, async ({umbracoApi, 
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -72,10 +70,9 @@ test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.enterTextstring(contentText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toBe(contentText);
@@ -93,10 +90,9 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(wrongContentName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeRenamed();
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
 });
@@ -113,10 +109,9 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(contentText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
   expect(updatedContentData.values[0].value).toBe(contentText);
@@ -240,4 +235,30 @@ test('can duplicate a content node to other parent', async ({umbracoApi, umbraco
   // Clean
   await umbracoApi.document.ensureNameNotExists(parentContentName);
   await umbracoApi.document.ensureNameNotExists(parentDocumentTypeName);
+});
+
+// This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20520
+test('can restore a content item from the recycle bin', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const restoreMessage = 'Restore ' + contentName + ' to Root';
+  await umbracoApi.document.emptyRecycleBin();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.moveToRecycleBin(contentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickCaretButtonForName('Recycle Bin');
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickRestoreActionMenuOption();
+  await umbracoUi.content.isTextWithExactNameVisible(restoreMessage);
+  await umbracoUi.content.clickRestoreButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isItemVisibleInRecycleBin(contentName, false, false);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeFalsy();
 });

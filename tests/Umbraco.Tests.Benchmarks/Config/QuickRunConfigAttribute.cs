@@ -15,8 +15,8 @@ public class QuickRunConfigAttribute : Attribute, IConfigSource
     ///     Initializes a new instance of the <see cref="QuickRunConfigAttribute" /> class.
     /// </summary>
     public QuickRunConfigAttribute() =>
-        Config = (ManualConfig)ManualConfig.CreateEmpty()
-            .With(Job.Default.WithLaunchCount(1) // benchmark process will be launched only once
+        Config = ManualConfig.CreateEmpty()
+            .AddJob(Job.Default.WithLaunchCount(1) // benchmark process will be launched only once
                 .WithIterationTime(new TimeInterval(100, TimeUnit.Millisecond)) // 100ms per iteration
                 .WithWarmupCount(3) // 3 warmup iteration
                 .WithIterationCount(3)); // 3 target iteration

@@ -1,22 +1,24 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbStaticFileMockDb } from '../../data/static-file/static-file.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const treeHandlers = [
-	rest.get(umbracoPath(`/tree${UMB_SLUG}/root`), (req, res, ctx) => {
-		const skip = Number(req.url.searchParams.get('skip'));
-		const take = Number(req.url.searchParams.get('take'));
+	http.get(umbracoPath(`/tree${UMB_SLUG}/root`), ({ request }) => {
+		const url = new URL(request.url);
+		const skip = Number(url.searchParams.get('skip'));
+		const take = Number(url.searchParams.get('take'));
 		const response = umbStaticFileMockDb.tree.getRoot({ skip, take });
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.get(umbracoPath(`/tree${UMB_SLUG}/children`), (req, res, ctx) => {
-		const parentPath = req.url.searchParams.get('parentPath');
-		if (!parentPath) return res(ctx.status(400));
-		const skip = Number(req.url.searchParams.get('skip'));
-		const take = Number(req.url.searchParams.get('take'));
+	http.get(umbracoPath(`/tree${UMB_SLUG}/children`), ({ request }) => {
+		const url = new URL(request.url);
+		const parentPath = url.searchParams.get('parentPath');
+		if (!parentPath) return new HttpResponse(null, { status: 400 });
+		const skip = Number(url.searchParams.get('skip'));
+		const take = Number(url.searchParams.get('take'));
 		const response = umbStaticFileMockDb.tree.getChildrenOf({ parentPath, skip, take });
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 ];

@@ -110,15 +110,16 @@ public class RichTextPropertyEditorHelperTests
         Assert.IsNull(value.Blocks);
     }
 
-    [Test]
-    public void Can_Parse_Blocks_With_Both_Content_And_Settings()
+    [TestCase(Constants.PropertyEditors.Aliases.RichText)]
+    [TestCase("Umbraco.TinyMCE")]
+    public void Can_Parse_Blocks_With_Both_Content_And_Settings(string propertyEditorAlias)
     {
-        const string input = """
+        string input = """
                              {
                               "markup": "<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>",
                               "blocks": {
                                   "layout": {
-                                      "Umbraco.RichText": [{
+                                      "[PropertyEditorAlias]": [{
                                               "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02",
                                               "settingsKey": "d2eeef66-4111-42f4-a164-7a523eaffbc2"
                                           }
@@ -143,6 +144,7 @@ public class RichTextPropertyEditorHelperTests
                                 }
                              }
                              """;
+        input = input.Replace("[PropertyEditorAlias]", propertyEditorAlias);
 
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
         Assert.IsTrue(result);
@@ -180,6 +182,12 @@ public class RichTextPropertyEditorHelperTests
             Assert.AreEqual("settingsPropertyAlias", settingsProperties.First().Alias);
             Assert.AreEqual("A settings property value", settingsProperties.First().Value);
         });
+
+        Assert.IsTrue(value.Blocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.RichText));
+        var layout = value.Blocks.Layout[Constants.PropertyEditors.Aliases.RichText];
+        Assert.AreEqual(1, layout.Count());
+        Assert.AreEqual(Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02"), layout.First().ContentKey);
+        Assert.AreEqual(Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2"), layout.First().SettingsKey);
     }
 
     [Test]

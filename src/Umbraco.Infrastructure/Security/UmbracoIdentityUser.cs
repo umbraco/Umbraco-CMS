@@ -115,7 +115,9 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     public DateTime? LastPasswordChangeDate
     {
         get => _lastPasswordChangeDateUtc;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc,
+        set => BeingDirty.SetPropertyValueAndDetectChanges(
+            value,
+            ref _lastPasswordChangeDateUtc,
             nameof(LastPasswordChangeDate));
     }
 

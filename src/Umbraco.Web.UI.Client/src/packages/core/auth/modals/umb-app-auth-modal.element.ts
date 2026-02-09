@@ -169,7 +169,10 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				justify-content: center;
+				width: 100vw;
+
 				background: var(--uui-color-background, #f4f4f4);
 
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);

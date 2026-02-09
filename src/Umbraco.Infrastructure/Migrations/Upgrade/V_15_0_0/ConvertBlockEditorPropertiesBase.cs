@@ -122,7 +122,9 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     "- starting property type {propertyTypeIndex}/{propertyTypeCount} : {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...",
                     propertyTypeIndex + 1,
                     propertyTypeCount,
-                    propertyType.Name, propertyType.Id, propertyType.Alias);
+                    propertyType.Name,
+                    propertyType.Id,
+                    propertyType.Alias);
                 IDataType dataType = _dataTypeService.GetAsync(propertyType.DataTypeKey).GetAwaiter().GetResult()
                                      ?? throw new InvalidOperationException("The data type could not be fetched.");
 

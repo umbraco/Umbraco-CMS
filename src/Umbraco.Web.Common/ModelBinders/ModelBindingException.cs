@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Web.Common.ModelBinders;
 ///     The exception that is thrown when an error occurs while binding a source to a model.
 /// </summary>
 /// <seealso cref="Exception" />
-/// Migrated to .NET Core
 [Serializable]
 public class ModelBindingException : Exception
 {
@@ -50,6 +49,7 @@ public class ModelBindingException : Exception
     ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
     ///     information about the source or destination.
     /// </param>
+    [Obsolete("Constructors taking a signature of SerializationInfo info, StreamingContext context are deprecated and not used within Umbraco. Scheduled for removal in Umbraco 19.", DiagnosticId = "SYSLIB0051")]
     protected ModelBindingException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {

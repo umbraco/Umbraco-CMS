@@ -83,7 +83,7 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 	#renderPropertyEditorReference() {
 		if (!this.propertyEditorUiAlias || !this.propertyEditorSchemaAlias) return nothing;
 
-		let name = this.propertyEditorUiName;
+		let name = this.localize.string(this.propertyEditorUiName);
 		let alias = this.propertyEditorUiAlias;
 		let error = false;
 

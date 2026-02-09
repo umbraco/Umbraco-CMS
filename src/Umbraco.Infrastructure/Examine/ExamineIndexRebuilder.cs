@@ -49,7 +49,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             throw new InvalidOperationException("No index found by name " + indexName);
         }
 
-        return _populators.Any(x => x.IsRegistered(index));
+        return HasRegisteredPopulator(index);
     }
 
     /// <inheritdoc/>
@@ -166,9 +166,13 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         }
 
         // If an index exists but it has zero docs we'll consider it empty and rebuild
+        // Only include indexes that have at least one populator registered, this is to avoid emptying out indexes
+        // that we have no chance of repopulating, for example our own search package
         IIndex[] indexes = (onlyEmptyIndexes
             ? _examineManager.Indexes.Where(ShouldRebuild)
-            : _examineManager.Indexes).ToArray();
+            : _examineManager.Indexes)
+            .Where(HasRegisteredPopulator)
+            .ToArray();
 
         if (indexes.Length == 0)
         {
@@ -211,4 +215,6 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return false;
         }
     }
+
+    private bool HasRegisteredPopulator(IIndex index) => _populators.Any(x => x.IsRegistered(index));
 }

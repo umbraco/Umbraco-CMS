@@ -4,6 +4,7 @@ import type { UmbMediaItemModel } from '../../repository/item/types.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from '../../modals/index.js';
 import { UMB_MEDIA_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
 import type { UmbMediaTreeItemModel } from '../../tree/types.js';
+import { isMediaTreeItem } from '../../tree/utils.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
@@ -55,9 +56,13 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	}
 
 	#pickableFilter = (
-		item: UmbMediaItemModel,
+		item: UmbMediaItemModel | UmbMediaTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
 	): boolean => {
+		// Check if the user has no access to this item (tree items only)
+		if (isMediaTreeItem(item) && item.noAccess) {
+			return false;
+		}
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
 			return allowedContentTypes
 				.map((contentTypeReference) => contentTypeReference.unique)

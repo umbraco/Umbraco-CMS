@@ -306,7 +306,10 @@ export class UmbViewController extends UmbControllerBase {
 			return;
 		}
 		const localTitle = this.getComputedTitle();
-		document.title = (localTitle ? localTitle + ' | ' : '') + 'Umbraco';
+		if (!localTitle) {
+			return;
+		}
+		document.title = localTitle + ' | Umbraco';
 	}
 
 	#computeTitle() {
@@ -339,8 +342,14 @@ export class UmbViewController extends UmbControllerBase {
 			this.#children.splice(index, 1);
 		}
 		// update title?
-		if (this.#active && !this.#hasActiveChildren()) {
-			this.#updateTitle();
+		if (!this.#hasActiveChildren()) {
+			if (this.#active) {
+				this.#updateTitle();
+			} else if (this.#providerCtrl && this.#attached) {
+				// If we're not active but should be (no active children, attached, and provided),
+				// reactivate to restore the title
+				this._internal_activate();
+			}
 		}
 	}
 	#hasActiveChildren() {

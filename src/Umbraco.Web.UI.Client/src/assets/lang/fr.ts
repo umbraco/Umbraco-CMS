@@ -1104,7 +1104,8 @@ export default {
 	rollback: {
 		headline: 'Sélectionnez une version à comparer avec la version actuelle',
 		diffHelp:
-			"Ceci affiche les différences entre la version actuelle et la version choisie<br />Le texte en <del>Rouge</del> signifie qu'il a été supprimé de la version choisie, <ins>vert signifie ajouté</ins>",
+			'<del>Le texte rouge</del> sera supprimé dans la version sélectionnée, <ins>le texte vert</ins> sera ajouté.',
+		showDiff: 'Afficher les différences entre la version actuelle (brouillon) et la version sélectionnée.',
 		documentRolledBack: 'Le document a été restauré à une version antérieure',
 		htmlHelp:
 			'Ceci affiche la version choisie en tant que HTML, si vous souhaitez voir les différences entre les deux versions en même temps, utilisez la vue différentielle',
@@ -1887,13 +1888,10 @@ export default {
 		selectAllLogLevelFilters: 'Tout sélectionner',
 		deselectAllLogLevelFilters: 'Tout déselectionner',
 		savedSearches: 'Recherches sauvegardées',
-		totalItems: "Nombre total d'éléments",
 		timestamp: 'Date',
 		level: 'Niveau',
 		machine: 'Machine',
 		message: 'Message',
-		exception: 'Exception',
-		properties: 'Propriétés',
 		searchWithGoogle: 'Chercher avec Google',
 		searchThisMessageWithGoogle: 'Chercher ce message avec Google',
 		searchWithBing: 'Chercher avec Bing',
@@ -1907,10 +1905,6 @@ export default {
 		searchUmbracoIssues: 'Chercher dans les Umbraco Issues',
 		searchUmbracoIssuesOnGithub: 'Chercher dans les Umbraco Issues sur Github',
 		deleteThisSearch: 'Supprimer cette recherche',
-		findLogsWithRequestId: 'Trouver les Logs avec la Request ID',
-		findLogsWithNamespace: 'Trouver les Logs avec le Namespace',
-		findLogsWithMachineName: 'Trouver les logs avec le Nom de Machine',
-		open: 'Ouvrir',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copier %0%',

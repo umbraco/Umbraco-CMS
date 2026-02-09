@@ -77,5 +77,17 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         return databaseVersion;
     }
 
+
+    /// <inheritdoc />
+    public void VersionChanged(string cacheKey)
+    {
+        var removed = _requestCache.Remove(cacheKey);
+        if (removed is false)
+        {
+            _logger.LogDebug("Cache version for key {CacheKey} wasn't removed from request cache, possibly missing HTTP context", cacheKey);
+        }
+    }
+
+    /// <inheritdoc />
     public void CachesSynced() => _requestCache.ClearOfType<RepositoryCacheVersion>();
 }

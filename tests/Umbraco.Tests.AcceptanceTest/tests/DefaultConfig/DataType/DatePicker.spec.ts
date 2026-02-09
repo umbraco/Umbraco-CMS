@@ -27,10 +27,9 @@ test('can update date format', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterDateFormatValue(dateFormatValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'format', dateFormatValue)).toBeTruthy();
 });
 

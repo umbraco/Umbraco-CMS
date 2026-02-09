@@ -135,7 +135,7 @@ test('can publish variant content with descendants without unpublished content i
   await umbracoUi.content.clickPublishWithDescendantsModalButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants, true, false, 10000);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');

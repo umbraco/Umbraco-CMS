@@ -5,7 +5,7 @@ import { css, customElement, html, nothing, property, repeat, state } from '@umb
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UMB_ANCESTORS_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
@@ -17,6 +17,7 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 // import of local component
 import './components/input-content/index.js';
@@ -39,6 +40,10 @@ export class UmbPropertyEditorUIContentPickerElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	@property({ type: Boolean })
+	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _type: UmbContentPickerSource['type'] = 'content';
@@ -117,11 +122,6 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
-
-		// NOTE: Run validation immediately, to notify if the value is outside of min/max range. [LK]
-		if (this._min > 0 || this._max < Infinity) {
-			this.checkValidity();
-		}
 	}
 
 	#parseInt(value: unknown, fallback: number): number {
@@ -151,9 +151,12 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
+		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
+		const unique = workspaceContext?.getUnique() ?? null;
+
 		const ancestorsContext = await this.getContext(UMB_ANCESTORS_ENTITY_CONTEXT);
-		const ancestors = ancestorsContext?.getAncestors();
-		const [parentUnique, unique] = ancestors?.slice(-2).map((x) => x.unique) ?? [];
+		const ancestors = ancestorsContext?.getAncestors() ?? [];
+		const parentUnique = ancestors.at(-1)?.unique ?? null;
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
@@ -207,6 +210,8 @@ export class UmbPropertyEditorUIContentPickerElement
 				.startNode=${startNode}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
 				?readonly=${this.readonly}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				@change=${this.#onChange}
 				.interactionMemories=${this._interactionMemories}
 				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>

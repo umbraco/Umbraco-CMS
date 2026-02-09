@@ -13,6 +13,7 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     /// Adds the document type webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -44,6 +45,7 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     /// Adds the media type webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -76,6 +78,7 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     /// Adds the member type webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>

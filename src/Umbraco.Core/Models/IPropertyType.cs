@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a property type definition on a content type.
+/// </summary>
 public interface IPropertyType : IEntity, IRememberBeingDirty
 {
     /// <summary>
@@ -65,6 +68,9 @@ public interface IPropertyType : IEntity, IRememberBeingDirty
     /// </summary>
     string? ValidationRegExp { get; set; }
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether this property type supports publishing.
+    /// </summary>
     bool SupportsPublishing { get; set; }
 
     /// <summary>

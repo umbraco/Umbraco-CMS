@@ -73,6 +73,8 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	}
 }
 
+export { UmbPropertyEditorUIStaticFilePickerElement as element };
+
 export default UmbPropertyEditorUIStaticFilePickerElement;
 
 declare global {

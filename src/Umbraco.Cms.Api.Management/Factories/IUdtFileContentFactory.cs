@@ -8,4 +8,6 @@ public interface IUdtFileContentFactory
     FileContentResult Create(IContentType contentType);
 
     FileContentResult Create(IMediaType mediaType);
+
+    FileContentResult Create(IMemberType mediaType) => throw new NotImplementedException();
 }

@@ -57,8 +57,8 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
         var before = GetReport();
 
-        Debug.Assert(before.ContentVersions == 12); // 10 historic + current draft + current published
-        Debug.Assert(before.PropertyData == 12 * 3); // CreateSimpleContentType = 3 props
+        Debug.Assert(before.ContentVersions == 12, "Expected 12 content versions (10 historic + current draft + current published).");
+        Debug.Assert(before.PropertyData == 12 * 3, "Expected property data count to be 36 (12 versions * 3 props).");
 
         ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
 
@@ -93,7 +93,10 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         }
     }
 
-    private void InsertCleanupPolicy(IContentType contentType, int daysToKeepAll, int daysToRollupAll,
+    private void InsertCleanupPolicy(
+        IContentType contentType,
+        int daysToKeepAll,
+        int daysToRollupAll,
         bool preventCleanup = false)
     {
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))

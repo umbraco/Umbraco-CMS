@@ -14,6 +14,14 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    ///     Adds Umbraco options of type <typeparamref name="TOptions" /> to the builder.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options to add. Must have the <see cref="UmbracoOptionsAttribute" />.</typeparam>
+    /// <param name="builder">The builder.</param>
+    /// <param name="configure">Optional action to configure the <see cref="OptionsBuilder{TOptions}" />.</param>
+    /// <returns>The <see cref="IUmbracoBuilder" />.</returns>
+    /// <exception cref="ArgumentException">Thrown when <typeparamref name="TOptions" /> does not have the <see cref="UmbracoOptionsAttribute" />.</exception>
     private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
@@ -41,6 +49,7 @@ public static partial class UmbracoBuilderExtensions
     {
         // Register configuration validators.
         builder.Services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<DeliveryApiSettings>, DeliveryApiSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
@@ -56,6 +65,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
+            .AddUmbracoOptions<DictionarySettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
             {
@@ -88,7 +98,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
-            .AddUmbracoOptions<DistributedJobSettings>();
+            .AddUmbracoOptions<DistributedJobSettings>()
+            .AddUmbracoOptions<BackOfficeTokenCookieSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

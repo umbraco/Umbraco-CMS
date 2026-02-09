@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides the default implementation of <see cref="IPublishedUrlInfoProvider" />.
+/// </summary>
 public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 {
     private const string UrlProviderAlias = Constants.UrlProviders.Content;
@@ -21,6 +24,17 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     private readonly UriUtility _uriUtility;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedUrlInfoProvider" /> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="publishedRouter">The published router.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="localizedTextService">The localized text service.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="uriUtility">The URI utility.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     public PublishedUrlInfoProvider(
         IPublishedUrlProvider publishedUrlProvider,
         ILanguageService languageService,
@@ -45,7 +59,12 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     public async Task<ISet<UrlInfo>> GetAllAsync(IContent content)
     {
         HashSet<UrlInfo> urlInfos = [];
-        IEnumerable<string> cultures = await _languageService.GetAllIsoCodesAsync();
+
+        // For invariant content, only return the URL for the default language.
+        // Invariant content doesn't vary by culture, so it only has one URL.
+        IEnumerable<string> cultures = content.ContentType.VariesByCulture()
+            ? await _languageService.GetAllIsoCodesAsync()
+            : [(await _languageService.GetDefaultIsoCodeAsync())];
 
         // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
         foreach (var culture in cultures)

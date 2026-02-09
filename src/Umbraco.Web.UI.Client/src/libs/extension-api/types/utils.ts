@@ -47,14 +47,19 @@ export type ElementAndApiLoaderPromise<
 // Property Types:
 
 export type CssLoaderProperty<CssType extends string = string> = string | CssLoaderPromise<CssType>;
-export type JsLoaderProperty<JsExportType> = string | JsLoaderPromise<JsExportType>;
+export type JsLoaderProperty<JsExportType> =
+	| string
+	| JsLoaderPromise<JsExportType>
+	| (JsExportType extends object ? JsExportType : never);
 export type ElementLoaderProperty<ElementType extends HTMLElement = HTMLElement> =
 	| string
 	| ElementLoaderPromise<ElementType>
+	| ElementLoaderExports<ElementType>
 	| ClassConstructor<ElementType>;
 export type ApiLoaderProperty<ApiType extends UmbApi = UmbApi> =
 	| string
 	| ApiLoaderPromise<ApiType>
+	| ApiLoaderExports<ApiType>
 	| ClassConstructor<ApiType>;
 export type ElementAndApiLoaderProperty<
 	ElementType extends HTMLElement = HTMLElement,
@@ -62,5 +67,8 @@ export type ElementAndApiLoaderProperty<
 > =
 	| string
 	| ElementAndApiLoaderPromise<ElementType, ApiType>
+	| ElementAndApiLoaderExports<ElementType, ApiType>
 	| ElementLoaderPromise<ElementType>
-	| ApiLoaderPromise<ApiType>;
+	| ElementLoaderExports<ElementType>
+	| ApiLoaderPromise<ApiType>
+	| ApiLoaderExports<ApiType>;

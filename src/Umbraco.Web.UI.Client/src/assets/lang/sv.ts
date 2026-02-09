@@ -824,7 +824,8 @@ export default {
 	},
 	rollback: {
 		diffHelp:
-			'Här visas skillnaderna mellan nuvarande version och vald version<br /><del>Röd</del> text kommer inte att synas i den valda versionen. , <ins>Grön betyder att den har tillkommit</ins>',
+			'<del>Röd text</del> kommer att tas bort i den valda versionen, <ins>grön text</ins> kommer att läggas till.',
+		showDiff: 'Visa skillnader mellan nuvarande (utkast) version och vald version.',
 		documentRolledBack: 'Dokumentet har återgått till en tidigare version',
 		htmlHelp:
 			'Här visas den valda sidversionen i HTML. Om du vill se skillnaden mellan två versioner samtidigt, välj istället "Diff".',

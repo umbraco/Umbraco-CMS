@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -7,7 +7,19 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.Routing;
 
-// TODO: Kill this, but we need to port all of it's functionality
+/// <summary>
+///     Represents a legacy published content request.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This class is deprecated and scheduled for removal. Its functionality is being
+///         migrated to the newer <see cref="IPublishedRequest"/> implementations.
+///     </para>
+///     <para>
+///         TODO: Kill this, but we need to port all of its functionality.
+///     </para>
+/// </remarks>
+[Obsolete("This class is deprecated and will be removed in a future version. Use IPublishedRequest instead. Scheduled for removal in Umbraco 19.")]
 public class PublishedRequestOld // : IPublishedRequest
 {
     private readonly IPublishedRouter _publishedRouter;
@@ -15,13 +27,14 @@ public class PublishedRequestOld // : IPublishedRequest
     private CultureInfo? _culture;
     private DomainAndUri? _domain;
     private bool _is404;
-    private IPublishedContent? _publishedContent;
-
-    private bool _readonly; // after prepared
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
+    ///     Initializes a new instance of the <see cref="PublishedRequestOld" /> class.
     /// </summary>
+    /// <param name="publishedRouter">The published router.</param>
+    /// <param name="umbracoContext">The Umbraco context.</param>
+    /// <param name="webRoutingSettings">The web routing settings.</param>
+    /// <param name="uri">The optional URI for this request. If not provided, uses the cleaned Umbraco URL from the context.</param>
     public PublishedRequestOld(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptions<WebRoutingSettings> webRoutingSettings, Uri? uri = null)
     {
         UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
@@ -41,6 +54,9 @@ public class PublishedRequestOld // : IPublishedRequest
     /// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
     public Uri Uri { get; }
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether caching should be disabled for this request.
+    /// </summary>
     public bool CacheabilityNoCache { get; set; }
 
     ///// <summary>
@@ -102,13 +118,15 @@ public class PublishedRequestOld // : IPublishedRequest
         }
     }
 
-    // utility for ensuring it is ok to set some properties
+    /// <summary>
+    ///     Ensures the request is in a writeable state.
+    /// </summary>
+    /// <remarks>
+    ///     This method is a no-op. The readonly check was removed because the backing field
+    ///     was never set to true, making the check unnecessary. Retained for API compatibility.
+    /// </remarks>
     public void EnsureWriteable()
     {
-        if (_readonly)
-        {
-            throw new InvalidOperationException("Cannot modify a PublishedRequest once it is read-only.");
-        }
     }
 
     // #region Events
@@ -226,18 +244,19 @@ public class PublishedRequestOld // : IPublishedRequest
     /// <summary>
     ///     Gets value indicating whether the current published content is the initial one.
     /// </summary>
-    public bool IsInitialPublishedContent =>
-        InitialPublishedContent != null && InitialPublishedContent == _publishedContent;
+    /// <remarks>Always returns false as _publishedContent field was removed (never assigned).</remarks>
+    public bool IsInitialPublishedContent => false;
 
     /// <summary>
     ///     Indicates that the current PublishedContent is the initial one.
     /// </summary>
+    /// <remarks>Note: _publishedContent field was removed (never assigned), so this sets InitialPublishedContent to null.</remarks>
     public void SetIsInitialPublishedContent()
     {
         EnsureWriteable();
 
         // note: it can very well be null if the initial content was not found
-        InitialPublishedContent = _publishedContent;
+        InitialPublishedContent = null;
         IsInternalRedirectPublishedContent = false;
     }
 

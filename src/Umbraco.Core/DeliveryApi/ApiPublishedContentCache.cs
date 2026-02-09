@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Default implementation of <see cref="IApiPublishedContentCache"/> that provides access to published content for the Delivery API.
+/// </summary>
 public sealed class ApiPublishedContentCache : IApiPublishedContentCache
 {
     private readonly IRequestPreviewService _requestPreviewService;
@@ -17,6 +17,14 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
     private readonly IVariationContextAccessor _variationContextAccessor;
     private DeliveryApiSettings _deliveryApiSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiPublishedContentCache"/> class.
+    /// </summary>
+    /// <param name="requestPreviewService">The request preview service.</param>
+    /// <param name="deliveryApiSettings">The Delivery API settings.</param>
+    /// <param name="apiDocumentUrlService">The API document URL service.</param>
+    /// <param name="publishedContentCache">The published content cache.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     public ApiPublishedContentCache(
         IRequestPreviewService requestPreviewService,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
@@ -32,6 +40,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByRouteAsync(string route)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
@@ -48,6 +57,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public IPublishedContent? GetByRoute(string route)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
@@ -89,18 +99,21 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(Guid contentId)
     {
         IPublishedContent? content = await _publishedContentCache.GetByIdAsync(contentId, _requestPreviewService.IsPreview()).ConfigureAwait(false);
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public IPublishedContent? GetById(Guid contentId)
     {
         IPublishedContent? content = _publishedContentCache.GetById(_requestPreviewService.IsPreview(), contentId);
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<IPublishedContent>> GetByIdsAsync(IEnumerable<Guid> contentIds)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
@@ -116,6 +129,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
             .ToArray();
     }
 
+    /// <inheritdoc />
     public IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> contentIds)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
@@ -132,5 +146,5 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
             : null;
 
     private bool IsAllowedContentType(IPublishedContent content)
-        => _deliveryApiSettings.IsAllowedContentType(content);
+        => _deliveryApiSettings.IsAllowedContentType(content.ContentType.Alias);
 }

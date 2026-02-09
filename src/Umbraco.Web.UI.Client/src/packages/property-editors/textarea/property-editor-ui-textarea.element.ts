@@ -90,6 +90,10 @@ export class UmbPropertyEditorUITextareaElement
 				@input=${this.#onInput}
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
+				.maxlengthMessage=${() => {
+					const exceeded = (this.value?.length ?? 0) - (this._maxChars ?? 0);
+					return this.localize.term('textbox_characters_exceed', this._maxChars, exceeded);
+				}}
 				?readonly=${this.readonly}></uui-textarea>
 		`;
 	}

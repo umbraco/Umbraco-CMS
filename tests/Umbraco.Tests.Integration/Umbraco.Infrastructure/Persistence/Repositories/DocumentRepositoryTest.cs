@@ -156,12 +156,14 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             dataValueReferences,
             DataTypeService,
             ConfigurationEditorJsonSerializer,
-            Mock.Of<IEventAggregator>());
+            Mock.Of<IEventAggregator>(),
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
         return repository;
     }
 
     [Test]
-    public void CacheActiveForIntsAndGuids()
+    public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -171,46 +173,124 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
 
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
 
-            var udb = scopeAccessor.AmbientScope.Database;
+        var database = scopeAccessor.AmbientScope.Database;
 
-            udb.EnableSqlCount = false;
+        database.EnableSqlCount = false;
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
-            var contentType =
-                ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
+        var content = CreateContent(repository, contentTypeRepository);
 
-            contentTypeRepository.Save(contentType);
-            var content = ContentBuilder.CreateSimpleContent(contentType);
-            repository.Save(content);
+        database.EnableSqlCount = true;
 
-            udb.EnableSqlCount = true;
+        // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
+        repository.Get(content.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // go get it, this should already be cached since the default repository key is the INT
-            repository.Get(content.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        repository.Get(content.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // retrieve again, this should use cache
-            repository.Get(content.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        repository.Get(content.Key);
+        Assert.AreEqual(0, database.SqlCount);
 
-            // reset counter
-            udb.EnableSqlCount = false;
-            udb.EnableSqlCount = true;
+        repository.Get(content.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
 
-            // now get by GUID, this won't be cached yet because the default repo key is not a GUID
-            repository.Get(content.Key);
-            var sqlCount = udb.SqlCount;
-            Assert.Greater(sqlCount, 0);
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
 
-            // retrieve again, this should use cache now
-            repository.Get(content.Key);
-            Assert.AreEqual(sqlCount, udb.SqlCount);
-        }
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var content = CreateContent(repository, contentTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContent so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContent>();
+
+        // Initial request by ID should hit the database.
+        repository.Get(content.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(content.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(content.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var content = CreateContent(repository, contentTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContent so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContent>();
+
+        // Initial request by key should hit the database.
+        repository.Get(content.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(content.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(content.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    private Content CreateContent(DocumentRepository repository, ContentTypeRepository contentTypeRepository)
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+        var contentType =
+            ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
+
+        contentTypeRepository.Save(contentType);
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        repository.Save(content);
+        return content;
     }
 
     [Test]
@@ -892,7 +972,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                 var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.ParentId == root.Id);
-                var result = repository.GetPage(query, 0, 20, out var totalRecords, null, Ordering.By("UpdateDate"));
+                var result = repository.GetPage(query, 0, 20, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("UpdateDate"));
 
                 Assert.AreEqual(25, totalRecords);
                 foreach (var r in result)
@@ -935,12 +1015,12 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("title", isCustomField: true));
+                var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true));
 
                 Assert.AreEqual(3, totalRecords);
                 Assert.AreEqual(2, result.Count());
 
-                result = repository.GetPage(query, 1, 2, out totalRecords, null, Ordering.By("title", isCustomField: true));
+                result = repository.GetPage(query, 1, 2, out totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true));
 
                 Assert.AreEqual(1, result.Count());
             }
@@ -967,7 +1047,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name"));
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -990,7 +1070,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 1, 1, out var totalRecords, null, Ordering.By("Name")).ToArray();
+            var result = repository.GetPage(query, 1, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -1007,7 +1087,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("Name")).ToArray();
+            var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(2));
@@ -1024,7 +1104,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name", Direction.Descending)).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name", Direction.Descending)).ToArray();
 
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -1043,7 +1123,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
 
             var filterQuery = ScopeProvider.CreateQuery<IContent>().Where(x => x.Name.Contains("Page 2"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filterQuery, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.EqualTo(1));
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -1062,7 +1142,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
 
             var filterQuery = ScopeProvider.CreateQuery<IContent>().Where(x => x.Name.Contains("text"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filterQuery, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.EqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(1));

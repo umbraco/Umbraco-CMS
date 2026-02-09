@@ -6,24 +6,31 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class AccessRuleDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.AccessRule;
-    [Column("id")]
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    internal const string AccessIdColumnName = "accessId";
+
+    private const string RuleValueColumnName = "ruleValue";
+    private const string RuleTypeColumnName = "ruleType";
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]
     public Guid Id { get; set; }
 
-    [Column("accessId")]
+    [Column(AccessIdColumnName)]
     [ForeignKey(typeof(AccessDto), Name = "FK_umbracoAccessRule_umbracoAccess_id")]
     public Guid AccessId { get; set; }
 
-    [Column("ruleValue")]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "ruleValue,ruleType,accessId", Name = "IX_umbracoAccessRule")]
+    [Column(RuleValueColumnName)]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{RuleValueColumnName},{RuleTypeColumnName},{AccessIdColumnName}", Name = "IX_umbracoAccessRule")]
     public string? RuleValue { get; set; }
 
-    [Column("ruleType")]
+    [Column(RuleTypeColumnName)]
     public string? RuleType { get; set; }
 
     [Column("createDate")]

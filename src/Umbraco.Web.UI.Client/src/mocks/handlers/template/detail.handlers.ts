@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { createProblemDetails } from '../../data/utils.js';
 import { umbTemplateMockDb } from '../../data/template/template.db.js';
 import { UMB_SLUG } from './slug.js';
@@ -9,75 +9,73 @@ import type {
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [
-	rest.post(umbracoPath(`${UMB_SLUG}`), async (req, res, ctx) => {
-		const requestBody = (await req.json()) as CreateTemplateRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
+	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {
+		const requestBody = (await request.json()) as CreateTemplateRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400 });
 
 		// Validate name and alias
 		if (!requestBody.name || !requestBody.alias) {
-			return res(
-				ctx.status(400, 'name and alias are required'),
-				ctx.json(createProblemDetails({ title: 'Validation', detail: 'name and alias are required' })),
-			);
+			return HttpResponse.json(createProblemDetails({ title: 'Validation', detail: 'name and alias are required' }), {
+				status: 400,
+			});
 		}
 
 		const id = umbTemplateMockDb.detail.create(requestBody);
 
-		return res(
-			ctx.status(201),
-			ctx.set({
-				Location: req.url.href + '/' + id,
+		return new HttpResponse(null, {
+			status: 201,
+			headers: {
+				Location: request.url + '/' + id,
 				'Umb-Generated-Resource': id,
-			}),
-		);
+			},
+		});
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/scaffold`), (req, res, ctx) => {
+	http.get(umbracoPath(`${UMB_SLUG}/scaffold`), () => {
 		const response = umbTemplateMockDb.detail.createScaffold();
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 		const response = umbTemplateMockDb.detail.read(id);
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
-		const requestBody = (await req.json()) as UpdateTemplateRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		const requestBody = (await request.json()) as UpdateTemplateRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400 });
 
 		// Validate name and alias
 		if (!requestBody.name || !requestBody.alias) {
-			return res(
-				ctx.status(400, 'name and alias are required'),
-				ctx.json(createProblemDetails({ title: 'Validation', detail: 'name and alias are required' })),
-			);
+			return HttpResponse.json(createProblemDetails({ title: 'Validation', detail: 'name and alias are required' }), {
+				status: 400,
+			});
 		}
 
 		umbTemplateMockDb.detail.update(id, requestBody);
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 
-	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.delete(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 		umbTemplateMockDb.detail.delete(id);
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 ];

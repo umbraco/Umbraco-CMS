@@ -1,7 +1,7 @@
 import { UmbSorterController } from './sorter.controller.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '../lit-element/lit-element.element.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('test-my-sorter')
 class UmbSorterTestElement extends UmbLitElement {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Extensions;
@@ -30,7 +30,9 @@ public class UnhandledExceptionLoggerMiddleware : IMiddleware
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Unhandled controller exception occurred for request '{RequestUrl}'",
+                _logger.LogError(
+                    e,
+                    "Unhandled controller exception occurred for request '{RequestUrl}'",
                     context.Request.GetEncodedPathAndQuery());
                 // Throw the error again, just in case it gets handled
                 throw;

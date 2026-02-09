@@ -1,9 +1,5 @@
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
@@ -17,11 +13,18 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.TestData;
 
+/// <summary>
+/// Controller for load testing Umbraco CMS.
+/// Provides endpoints for creating, managing, and stress-testing content operations.
+/// </summary>
+/// <remarks>
+/// This controller is intended for testing purposes only and should not be used in production environments.
+/// See <see href="https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting"/> for more information.
+/// </remarks>
 public class LoadTestController : Controller
 {
     private const string ContainerAlias = "LoadTestContainer";
     private const string ContentAlias = "LoadTestContent";
-    private const int TextboxDefinitionId = -88;
     private const int MaxCreate = 1000;
 
     private const string FootHtml = @"</body>
@@ -95,19 +98,28 @@ public class LoadTestController : Controller
 " + FootHtml;
 
     private readonly IContentService _contentService;
-
     private readonly IContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IShortStringHelper _shortStringHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LoadTestController"/> class.
+    /// </summary>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="hostEnvironment">The host environment.</param>
+    /// <param name="hostApplicationLifetime">The host application lifetime.</param>
     public LoadTestController(
         IContentTypeService contentTypeService,
         IContentService contentService,
         IDataTypeService dataTypeService,
-        IFileService fileService,
+        ITemplateService templateService,
         IShortStringHelper shortStringHelper,
         IHostEnvironment hostEnvironment,
         IHostApplicationLifetime hostApplicationLifetime)
@@ -115,13 +127,17 @@ public class LoadTestController : Controller
         _contentTypeService = contentTypeService;
         _contentService = contentService;
         _dataTypeService = dataTypeService;
-        _fileService = fileService;
+        _templateService = templateService;
         _shortStringHelper = shortStringHelper;
         _hostEnvironment = hostEnvironment;
         _hostApplicationLifetime = hostApplicationLifetime;
     }
 
 
+    /// <summary>
+    /// Displays the load test index page with available actions.
+    /// </summary>
+    /// <returns>An HTML page listing available load test operations.</returns>
     public IActionResult Index()
     {
         var res = EnsureInitialize();
@@ -184,7 +200,11 @@ public class LoadTestController : Controller
 
     private IActionResult ContentHtml(string s) => Content(_headHtml + s + FootHtml, "text/html");
 
-    public IActionResult Install()
+    /// <summary>
+    /// Installs the load test content types, templates, and initial container content.
+    /// </summary>
+    /// <returns>An HTML response indicating the installation status.</returns>
+    public async Task<IActionResult> Install()
     {
         var contentType = new ContentType(_shortStringHelper, -1)
         {
@@ -193,16 +213,16 @@ public class LoadTestController : Controller
             Description = "Content for LoadTest",
             Icon = "icon-document"
         };
-        var def = _dataTypeService.GetDataType(TextboxDefinitionId);
+        var def = await _dataTypeService.GetAsync(Constants.DataTypes.Guids.TextstringGuid);
         contentType.AddPropertyType(new PropertyType(_shortStringHelper, def)
         {
             Name = "Origin",
             Alias = "origin",
             Description = "The origin of the content."
         });
-        _contentTypeService.Save(contentType);
+        await _contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var containerTemplate = ImportTemplate(
+        var containerTemplate = await ImportTemplateAsync(
             "LoadTestContainer",
             "LoadTestContainer",
             _containerTemplateText);
@@ -222,7 +242,7 @@ public class LoadTestController : Controller
         });
         containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] { containerTemplate });
         containerType.SetDefaultTemplate(containerTemplate);
-        _contentTypeService.Save(containerType);
+        await _contentTypeService.CreateAsync(containerType, Constants.Security.SuperUserKey);
 
         var content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
         _contentService.Save(content);
@@ -231,18 +251,30 @@ public class LoadTestController : Controller
         return ContentHtml("Installed.");
     }
 
-    private Template ImportTemplate(string name, string alias, string text, ITemplate master = null)
+    /// <summary>
+    /// Creates and imports a template asynchronously.
+    /// </summary>
+    /// <param name="name">The name of the template.</param>
+    /// <param name="alias">The alias of the template.</param>
+    /// <param name="text">The template content.</param>
+    /// <returns>The created template.</returns>
+    private async Task<ITemplate> ImportTemplateAsync(string name, string alias, string text)
     {
-        var t = new Template(_shortStringHelper, name, alias) { Content = text };
-        if (master != null)
+        var result = await _templateService.CreateAsync(name, alias, text, Constants.Security.SuperUserKey);
+        if (result.Success is false)
         {
-            t.SetMasterTemplate(master);
+            throw new InvalidOperationException($"Failed to create template '{name}' with alias '{alias}'.");
         }
-
-        _fileService.SaveTemplate(t);
-        return t;
+        return result.Result;
     }
 
+    /// <summary>
+    /// Creates one or more content items for load testing.
+    /// </summary>
+    /// <param name="n">The number of content items to create (default: 1, max: 1000).</param>
+    /// <param name="r">The restart probability percentage (0-100). If triggered, the application will restart after creating content.</param>
+    /// <param name="o">The origin identifier to tag created content with.</param>
+    /// <returns>An HTML response indicating the number of items created.</returns>
     public IActionResult Create(int n = 1, int r = 0, string o = null)
     {
         var res = EnsureInitialize();
@@ -300,6 +332,10 @@ public class LoadTestController : Controller
         }
     }
 
+    /// <summary>
+    /// Clears all load test content items from the container.
+    /// </summary>
+    /// <returns>An HTML response indicating the content has been cleared.</returns>
     public IActionResult Clear()
     {
         var res = EnsureInitialize();
@@ -321,6 +357,10 @@ public class LoadTestController : Controller
         _hostApplicationLifetime.StopApplication();
     }
 
+    /// <summary>
+    /// Performs a cold boot restart by clearing the distributed cache and restarting the application.
+    /// </summary>
+    /// <returns>A text response indicating the application has been cold boot restarted.</returns>
     public IActionResult ColdBootRestart()
     {
         Directory.Delete(
@@ -332,6 +372,10 @@ public class LoadTestController : Controller
         return Content("Cold Boot Restarted.");
     }
 
+    /// <summary>
+    /// Restarts the application.
+    /// </summary>
+    /// <returns>An HTML response indicating the application has been restarted.</returns>
     public IActionResult Restart()
     {
         DoRestart();
@@ -339,6 +383,14 @@ public class LoadTestController : Controller
         return ContentHtml("Restarted.");
     }
 
+    /// <summary>
+    /// Causes the application to crash by throwing an unhandled exception.
+    /// </summary>
+    /// <returns>An HTML response indicating the application is dying.</returns>
+    /// <remarks>
+    /// WARNING: This action will cause the worker process to terminate unexpectedly.
+    /// Use with caution and only in controlled testing environments.
+    /// </remarks>
     public IActionResult Die()
     {
         var timer = new Timer(_ => throw new Exception("die!"));
@@ -347,6 +399,10 @@ public class LoadTestController : Controller
         return ContentHtml("Dying.");
     }
 
+    /// <summary>
+    /// Lists information about the current process and application domains.
+    /// </summary>
+    /// <returns>An HTML response containing process and domain information.</returns>
     public IActionResult Domains()
     {
         var currentDomain = AppDomain.CurrentDomain;

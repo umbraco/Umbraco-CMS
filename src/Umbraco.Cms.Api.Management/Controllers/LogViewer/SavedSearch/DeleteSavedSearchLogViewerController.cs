@@ -18,6 +18,7 @@ public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <summary>
     ///     Deletes a saved log search with a given name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the saved log search.</param>
     /// <returns>The result of the deletion.</returns>
     [HttpDelete("{name}")]

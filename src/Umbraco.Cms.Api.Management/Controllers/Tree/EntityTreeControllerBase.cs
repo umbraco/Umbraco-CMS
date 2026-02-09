@@ -36,11 +36,13 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
 
-    protected virtual Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
+    protected virtual Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.TextColumnName);
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(skip, take, out var totalItems);
+
+        (rootEntities, totalItems) = await FilterTreeEntities(rootEntities, totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
 
@@ -54,6 +56,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentId, int skip, int take)
     {
         IEntitySlim[] children = GetPagedChildEntities(parentId, skip, take, out var totalItems);
+
+        (children, totalItems) = await FilterTreeEntities(children, totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
 
@@ -72,6 +76,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             return NotFound();
         }
 
+        (siblings, totalBefore, totalAfter) = await FilterTreeEntities(target, siblings, totalBefore, totalAfter);
+
         IEntitySlim? entity = siblings.FirstOrDefault();
         Guid? parentKey = GetParentKey(entity);
 
@@ -83,6 +89,34 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Filters the specified collection of tree entities and returns the filtered results asynchronously.
+    /// </summary>
+    /// <param name="entities">An array of entities to be filtered.</param>
+    /// <param name="totalItems">The total number of items before filtering.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a tuple of the filtered entities and the adjusted total items count.</returns>
+    /// <remarks>
+    /// Override this method to implement custom filtering logic for tree entities. The default
+    /// implementation returns the input array and total items unchanged.
+    /// </remarks>
+    protected virtual Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities, long totalItems)
+        => Task.FromResult((entities, totalItems));
+
+    /// <summary>
+    /// Filters the specified collection of tree entities for sibling queries and returns the filtered results asynchronously.
+    /// </summary>
+    /// <param name="targetKey">The key of the target entity around which siblings are being retrieved.</param>
+    /// <param name="entities">An array of entities to be filtered.</param>
+    /// <param name="totalBefore">The total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">The total number of siblings after the target entity.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a tuple of the filtered entities and the adjusted before/after counts.</returns>
+    /// <remarks>
+    /// Override this method to implement custom filtering logic for sibling tree entities. The default
+    /// implementation returns the input array and totals unchanged.
+    /// </remarks>
+    protected virtual Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(Guid targetKey, IEntitySlim[] entities, long totalBefore, long totalAfter)
+        => Task.FromResult((entities, totalBefore, totalAfter));
 
     /// <summary>
     /// Gets the parent key for an entity, or root if null or no parent.

@@ -1,4 +1,3 @@
-import type { UmbLogViewerDateRange } from '../workspace/logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../workspace/logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -32,9 +31,9 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	#observeStuff() {
 		this.observe(
 			this._logViewerContext?.dateRange,
-			(dateRange: UmbLogViewerDateRange) => {
-				this._startDate = dateRange.startDate;
-				this._endDate = dateRange.endDate;
+			(dateRange) => {
+				this._startDate = dateRange?.startDate ?? '';
+				this._endDate = dateRange?.endDate ?? '';
 			},
 			'_observeDateRange',
 		);
@@ -66,22 +65,22 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div class="input-container">
-				<uui-label for="start-date">From:</uui-label>
+				<uui-label for="start-date"><umb-localize key="logViewer_from">From</umb-localize>:</uui-label>
 				<umb-input-date
 					@change=${this.#setStartDate}
 					id="start-date"
 					type="date"
-					label="From"
+					label=${this.localize.term('logViewer_from')}
 					.max=${this._logViewerContext?.today ?? ''}
 					.value=${this._startDate}></umb-input-date>
 			</div>
 			<div class="input-container">
-				<uui-label for="end-date">To: </uui-label>
+				<uui-label for="end-date"><umb-localize key="logViewer_to">To</umb-localize>: </uui-label>
 				<umb-input-date
 					@change=${this.#setEndDate}
 					id="end-date"
 					type="date"
-					label="To"
+					label=${this.localize.term('logViewer_to')}
 					.min=${this._startDate}
 					.max=${this._logViewerContext?.today ?? ''}
 					.value=${this._endDate}></umb-input-date>

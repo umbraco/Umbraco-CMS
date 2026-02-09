@@ -1,4 +1,4 @@
-import { getMimeTypeFromExtension } from '../../components/index.js';
+import { getMimeTypeFromExtension } from './utils.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import type { UmbFileUploadPreviewElement as UmbFileUploadPreviewElementInterface } from './file-upload-preview.interface.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';

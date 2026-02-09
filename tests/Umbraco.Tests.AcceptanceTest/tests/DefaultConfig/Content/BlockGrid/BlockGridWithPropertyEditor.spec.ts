@@ -52,10 +52,11 @@ test('cannot publish a block grid with a mandatory radiobox without a value', as
   await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 });
 
 test('cannot publish a block grid with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
@@ -80,10 +81,11 @@ test('cannot publish a block grid with a mandatory checkbox list without a value
   await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 });
 
 test('cannot publish a block grid with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
@@ -108,10 +110,11 @@ test('cannot publish a block grid with a mandatory dropdown without a value', as
   await umbracoUi.content.chooseDropdownOption([optionValues[0]]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 });
 
 test('cannot update a variant block grid with invalid text', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -151,7 +154,7 @@ test('cannot update a variant block grid with invalid text', {tag: '@release'}, 
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
   await umbracoUi.content.clickUpdateButton();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickContainerSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);

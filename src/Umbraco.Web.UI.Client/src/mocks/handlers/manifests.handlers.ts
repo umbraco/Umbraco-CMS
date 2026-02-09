@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 
 import type { UmbPackageManifestResponse } from '../../packages/packages/types.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -144,29 +144,25 @@ const publicManifests: UmbPackageManifestResponse = [
 ];
 
 export const manifestDevelopmentHandlers = [
-	rest.get(umbracoPath('/manifest/manifest/private'), (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<UmbPackageManifestResponse>(privateManifests),
-		);
+	http.get(umbracoPath('/manifest/manifest/private'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>(privateManifests);
 	}),
-	rest.get(umbracoPath('/manifest/manifest/public'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<UmbPackageManifestResponse>(publicManifests));
+	http.get(umbracoPath('/manifest/manifest/public'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>(publicManifests);
 	}),
-	rest.get(umbracoPath('/manifest/manifest'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<UmbPackageManifestResponse>([...privateManifests, ...publicManifests]));
+	http.get(umbracoPath('/manifest/manifest'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([...privateManifests, ...publicManifests]);
 	}),
 ];
 
 export const manifestEmptyHandlers = [
-	rest.get(umbracoPath('/manifest/manifest/private'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<UmbPackageManifestResponse>([]));
+	http.get(umbracoPath('/manifest/manifest/private'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([]);
 	}),
-	rest.get(umbracoPath('/manifest/manifest/public'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<UmbPackageManifestResponse>([]));
+	http.get(umbracoPath('/manifest/manifest/public'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([]);
 	}),
-	rest.get(umbracoPath('/manifest/manifest'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<UmbPackageManifestResponse>([]));
+	http.get(umbracoPath('/manifest/manifest'), () => {
+		return HttpResponse.json<UmbPackageManifestResponse>([]);
 	}),
 ];

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.MemberType;
+using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
@@ -24,6 +24,7 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
 
         createModel.Key = requestModel.Id;
         createModel.Compositions = MapCompositions(requestModel.Compositions);
+        createModel.ContainerKey = requestModel.Parent?.Id;
 
         MapPropertyTypeSensitivityAndVisibility(createModel.Properties, requestModel.Properties);
 

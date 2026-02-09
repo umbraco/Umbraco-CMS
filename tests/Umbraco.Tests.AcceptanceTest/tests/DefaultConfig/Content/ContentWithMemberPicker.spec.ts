@@ -41,10 +41,9 @@ test('can create content with the member picker data type', {tag: '@smoke'}, asy
   await umbracoUi.content.clickChooseMemberPickerButton();
   await umbracoUi.content.selectMemberByName(memberName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -65,10 +64,9 @@ test('can publish content with the member picker data type', async ({umbracoApi,
   await umbracoUi.content.clickChooseMemberPickerButton();
   await umbracoUi.content.selectMemberByName(memberName);
   await umbracoUi.content.clickChooseContainerButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -86,6 +84,25 @@ test('can remove a member picker in the content', async ({umbracoApi, umbracoUi}
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeMemberPickerByName(memberName);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
+});
+
+test('can remove a not-found member picker in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
+  await umbracoApi.member.delete(memberId); // Delete the member to simulate not-found member
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.removeNotFoundItem(memberId);
   await umbracoUi.content.clickSaveButton();
 
   // Assert

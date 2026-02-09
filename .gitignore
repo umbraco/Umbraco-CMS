@@ -51,6 +51,10 @@ tools/docfx/
 /build/csharp-docs/api/
 /build/csharp-docs/_site/
 
+# Local config
+.claude/settings.local.json
+.env.local
+
 # Build
 /build.out/
 /build.tmp/
@@ -95,6 +99,10 @@ tools/docfx/
 /tests/Umbraco.Tests.Integration/[Uu]mbraco/[Ll]ogs/
 /tests/Umbraco.Tests.Integration/Views/
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
+/BenchmarkDotNet.Artifacts/
+playwright-report
+trace.zip
+/tests/Umbraco.Tests.AcceptanceTest/results
 
 # Ignore auto-generated schema
 /src/Umbraco.Cms.Targets/tasks/
@@ -103,9 +111,8 @@ tools/docfx/
 /src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.*.json
 /src/Umbraco.Web.UI/umbraco-package-schema.json
+/src/Umbraco.Web.UI.Client/umbraco-package-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /tests/Umbraco.Tests.Integration/umbraco-package-schema.json
 /src/Umbraco.Cms/appsettings-schema.json
-playwright-report
-trace.zip

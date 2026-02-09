@@ -1,12 +1,13 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaMockDb } from '../../data/media/media.db.js';
 import type { GetImagingResizeUrlsResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const imagingHandlers = [
-	rest.get(umbracoPath('/imaging/resize/urls'), (req, res, ctx) => {
-		const ids = req.url.searchParams.getAll('id');
-		if (!ids) return res(ctx.status(404));
+	http.get(umbracoPath('/imaging/resize/urls'), ({ request }) => {
+		const url = new URL(request.url);
+		const ids = url.searchParams.getAll('id');
+		if (!ids) return new HttpResponse(null, { status: 404 });
 
 		const media = umbMediaMockDb.getAll().filter((item) => ids.includes(item.id));
 
@@ -16,10 +17,6 @@ export const imagingHandlers = [
 			urlInfos: [], // item.urls,
 		}));
 
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json(response),
-		);
+		return HttpResponse.json(response);
 	}),
 ];

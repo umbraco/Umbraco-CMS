@@ -109,7 +109,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	@state()
 	private _compositionRepositoryAlias?: string;
-	//private _hasRootProperties = false;
+
+	@state()
+	private _hasRootProperties = false;
 
 	@state()
 	private _hasRootGroups = false;
@@ -155,7 +157,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			this.#createRoutes();
 		});
 
-		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
+		this.observe(
+			this.#tabsStructureHelper.hasProperties,
+			(hasRootProperties) => {
+				this._hasRootProperties = hasRootProperties;
+				this.#createRoutes();
+			},
+			'observeRootProperties',
+		);
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
@@ -207,15 +216,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 		}
 
-		if (this._hasRootGroups || this._tabs.length === 0) {
-			routes.push({
-				path: 'root',
-				component: () => import('./content-type-design-editor-tab.element.js'),
-				setup: (component) => {
-					this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
-					this.#currentTabComponent.containerId = null;
-				},
-			});
+		routes.push({
+			path: 'root',
+			component: () => import('./content-type-design-editor-tab.element.js'),
+			setup: (component) => {
+				this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
+				this.#currentTabComponent.containerId = null;
+			},
+		});
+
+		if (this._hasRootGroups || this._hasRootProperties || this._tabs.length === 0) {
 			routes.push({
 				path: '',
 				pathMatch: 'full',
@@ -535,15 +545,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderRootTab() {
 		const path = this._routerPath + '/root';
 		const rootTabActive = path === this._activePath;
-		if (!this._hasRootGroups && !this._sortModeActive) {
-			// If we don't have any root groups and we are not in sort mode, then we don't want to render the root tab.
+		if (!this._hasRootGroups && !this._hasRootProperties && !this._sortModeActive) {
+			// If we don't have any root groups/properties and we are not in sort mode, then we don't want to render the root tab.
 			return nothing;
 		}
 		return html`
 			<uui-tab
 				id="root-tab"
 				data-mark="root-tab"
-				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
+				class=${this._hasRootGroups || this._hasRootProperties || rootTabActive ? '' : 'content-tab-is-empty'}
 				label=${this.localize.term('general_generic')}
 				.active=${rootTabActive}
 				href=${path}
@@ -603,7 +613,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					auto-width
 					minlength="1"
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@blur=${(e: FocusEvent) => this.#tabNameBlur(e, tab)}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>

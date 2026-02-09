@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.0-rc.2.25502.107" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.0" />
     <!--
     Added the following direct dependency due to Microsoft.EntityFrameworkCore.Design having a dependency on an insecure version.
     Review for removal when Microsoft.EntityFrameworkCore.Design is updated to a newer version.
@@ -55,6 +55,11 @@
     <_ContentIncludedByDefault Remove="umbraco\UmbracoInstall\Index.cshtml" />
     <_ContentIncludedByDefault Remove="umbraco\UmbracoLogin\Index.cshtml" />
     <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Default.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Hide the content files that come from the Microsoft.CodeAnalysis.Workspaces.MSBuild package. -->
+    <Content Update="$(NuGetPackageRoot)\microsoft.codeanalysis.workspaces.msbuild\**\**" Visible="false" />
   </ItemGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">

@@ -62,8 +62,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// Remove .skip when the front-end is ready. Currently the content name is read-only so cannot remane it.
-test.skip('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
+test('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedContentName = 'UpdatedContentName';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
@@ -76,11 +75,10 @@ test.skip('can rename content with language set in userGroup', async ({umbracoAp
   // Act
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedContentName);
-  await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.isContentInTreeVisible(updatedContentName);
 });
 

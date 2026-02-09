@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { skip } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
@@ -50,6 +51,17 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		this.observe(this._logViewerContext?.sortingDirection, (direction) => {
 			this._sortingDirection = direction ?? this._sortingDirection;
 		});
+
+		// Observe filter expression changes to trigger search
+		// Only observes when this component is mounted (when logs are visible)
+		this.observe(
+			this._logViewerContext?.filterExpression.pipe(
+				skip(1), // Skip initial value to avoid duplicate search on page load
+			),
+			() => {
+				this._logViewerContext?.getLogs();
+			},
+		);
 	}
 
 	#sortLogs() {
@@ -97,7 +109,8 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				)}`
 			: html`
 					<span id="empty">
-						<uui-icon name="icon-search"></uui-icon>Sorry, we cannot find what you are looking for.
+						<uui-icon name="icon-search"></uui-icon
+						><umb-localize key="logViewer_noResults">Sorry, we cannot find what you are looking for.</umb-localize>
 					</span>
 				`}`;
 	}
@@ -107,20 +120,25 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		return html`<uui-box>
 				<div id="header" slot="header">
 					<div id="timestamp">
-						Timestamp
-						<uui-button compact @click=${this.#sortLogs} label="Sort logs">
+						<umb-localize key="logViewer_timestamp">Timestamp</umb-localize>
+						<uui-button compact @click=${this.#sortLogs} label=${this.localize.term('logViewer_sortLogs')}>
 							<uui-symbol-sort
 								?descending=${this._sortingDirection === DirectionModel.DESCENDING}
 								active></uui-symbol-sort>
 						</uui-button>
 					</div>
-					<div id="level">Level</div>
-					<div id="machine">Machine name</div>
-					<div id="message">Message</div>
+					<div id="level"><umb-localize key="logViewer_level">Level</umb-localize></div>
+					<div id="machine"><umb-localize key="logViewer_machine">Machine name</umb-localize></div>
+					<div id="message"><umb-localize key="logViewer_message">Message</umb-localize></div>
 				</div>
 				<div id="main">
 					${this._isLoading
-						? html` <span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span> `
+						? html`
+								<span id="empty">
+									<uui-loader-circle></uui-loader-circle
+									><umb-localize key="logViewer_loadingLogs">Loading log messages...</umb-localize>
+								</span>
+							`
 						: html`${this.#renderLogs()}`}
 				</div>
 			</uui-box>

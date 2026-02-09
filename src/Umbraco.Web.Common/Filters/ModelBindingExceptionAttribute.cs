@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -56,7 +57,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
                 && (filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)
                 && IsMessageAboutTheSameModelType(filterContext.Exception.Message))
             {
-                filterContext.HttpContext.Response.Headers.Add(HttpResponseHeader.RetryAfter.ToString(), "1");
+                filterContext.HttpContext.Response.Headers.Append(HttpResponseHeader.RetryAfter.ToString(), "1");
                 filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.GetEncodedUrl(), false);
 
                 filterContext.ExceptionHandled = true;

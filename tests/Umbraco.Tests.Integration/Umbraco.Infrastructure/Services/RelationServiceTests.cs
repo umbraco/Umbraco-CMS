@@ -162,8 +162,13 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     public void Can_Create_RelationType_Without_Name()
     {
         var rs = RelationService;
-        IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Media, false);
+        IRelationType rt = new RelationType(
+            "Test",
+            "repeatedEventOccurence",
+            false,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Media,
+            false);
 
         Assert.DoesNotThrow(() => rs.Save(rt));
 
