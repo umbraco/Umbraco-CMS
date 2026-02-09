@@ -77,7 +77,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
 
-		this._dataSourceConfig = this.#extractDataSourceConfig();
+		this.#extractDataSourceConfig();
 	}
 
 	#propertyEditorConfigCollection?: UmbPropertyEditorConfigCollection;
@@ -102,14 +102,12 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			aliases?.includes(configEntry.alias),
 		);
 
-		const dataSourceConfig: UmbConfigCollectionModel | undefined = configAliasMatch?.map((configEntry) => {
+		this._dataSourceConfig = configAliasMatch?.map((configEntry) => {
 			return {
 				alias: configEntry.alias,
 				value: configEntry.value,
 			};
 		});
-
-		return dataSourceConfig;
 	}
 
 	#createDataSourceApi(dataSourceAlias: string | undefined) {
