@@ -22,11 +22,11 @@ const vipMemberSegment = 'VIP members';
 const vipMemberSegmentAlias = 'vip-members';
 
 test.afterEach(async ({ umbracoApi }) => {
-    await umbracoApi.document.ensureNameNotExists(contentName);
-    await umbracoApi.document.ensureNameNotExists(secondContentName);
-    await umbracoApi.document.ensureNameNotExists(vipMemberSegment);
-    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-    await umbracoApi.language.ensureNameNotExists(secondLanguageName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.document.ensureNameNotExists(secondContentName);
+  await umbracoApi.document.ensureNameNotExists(vipMemberSegment);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.language.ensureNameNotExists(secondLanguageName);
 });
 
 test('can insert specific preset values into text box and text area properties', async ({umbracoApi, umbracoUi}) => {
@@ -126,6 +126,7 @@ test('can insert preset value in textstring property that vary by segment in con
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
+  
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(expectedString);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
