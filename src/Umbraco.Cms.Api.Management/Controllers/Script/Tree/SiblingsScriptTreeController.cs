@@ -31,6 +31,8 @@ public class SiblingsScriptTreeController : ScriptTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of script tree sibling items.")]
+    [EndpointDescription("Gets a collection of script tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<FileSystemTreeItemPresentationModel>>> Siblings(
         CancellationToken cancellationToken,
         string path,

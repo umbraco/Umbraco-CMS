@@ -32,6 +32,8 @@ public class GetUserDataController : UserDataControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserDataResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets user data.")]
+    [EndpointDescription("Gets user-specific data stored for the current authenticated user.")]
     public async Task<IActionResult> GetUserData(CancellationToken cancellationToken, [FromQuery]string[]? groups, [FromQuery]string[]? identifiers, [FromQuery]int skip = 0, [FromQuery]int take = 100)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
