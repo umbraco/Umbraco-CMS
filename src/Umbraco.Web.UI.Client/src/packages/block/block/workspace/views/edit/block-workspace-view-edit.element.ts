@@ -173,7 +173,14 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 			if (viewAlias === null) {
 				// for the root tab, we need to filter hints, so in this case we do accept everything that is not in a tab: [NL]
-				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
+				view.hints.setPathFilter((paths) => {
+					const firstPath = paths[0];
+					// Root-property validation hints can have an empty path (no container), so treat them as root/non-tab hints.
+					if (!firstPath) {
+						return true;
+					}
+					return firstPath.includes('tab/') === false;
+				});
 			}
 
 			view.setTitle(tabName);
