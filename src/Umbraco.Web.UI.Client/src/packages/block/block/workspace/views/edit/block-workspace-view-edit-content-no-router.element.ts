@@ -118,7 +118,14 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 			if (viewAlias === null) {
 				// for the root tab, we need to filter hints
-				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
+				view.hints.setPathFilter((paths) => {
+					const firstPath = paths[0];
+					// Treat empty paths as "not in a tab", so they belong to the root tab
+					if (!firstPath) {
+						return true;
+					}
+					return firstPath.includes('tab/') === false;
+				});
 			}
 
 			view.setTitle(tabName);
