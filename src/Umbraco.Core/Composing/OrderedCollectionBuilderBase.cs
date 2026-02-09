@@ -10,6 +10,9 @@ public abstract class OrderedCollectionBuilderBase<TBuilder, TCollection, TItem>
     where TBuilder : OrderedCollectionBuilderBase<TBuilder, TCollection, TItem>
     where TCollection : class, IBuilderCollection<TItem>
 {
+    /// <summary>
+    /// Gets the current builder instance.
+    /// </summary>
     protected abstract TBuilder This { get; }
 
     /// <summary>

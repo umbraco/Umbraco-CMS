@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -60,6 +60,11 @@ public interface IUserGroupService
     /// </returns>
     Task<IUserGroup?> GetAsync(Guid key);
 
+    /// <summary>
+    ///     Gets all UserGroups matching the specified keys.
+    /// </summary>
+    /// <param name="keys">The keys of the UserGroups to retrieve.</param>
+    /// <returns>An enumerable list of <see cref="IUserGroup"/>.</returns>
     Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys);
 
     /// <summary>
@@ -99,6 +104,11 @@ public interface IUserGroupService
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> userGroupKeys);
 
+    /// <summary>
+    ///     Deletes a UserGroup.
+    /// </summary>
+    /// <param name="userGroupKey">The key of the user group to delete.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid> { userGroupKey });
 
     /// <summary>
@@ -109,6 +119,19 @@ public interface IUserGroupService
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
 
+    /// <summary>
+    ///     Adds users to a user group.
+    /// </summary>
+    /// <param name="addUsersModel">The model containing the user group and users to add.</param>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey);
+
+    /// <summary>
+    ///     Removes users from a user group.
+    /// </summary>
+    /// <param name="removeUsersModel">The model containing the user group and users to remove.</param>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey);
 }

@@ -244,7 +244,8 @@ public class ContentPermissionResource : IPermissionResource
     public Guid? ParentKeyForBranch { get; }
 
     /// <summary>
-    /// All the cultures need to be accessible when evaluating
+    ///     Gets the cultures to check for access.
     /// </summary>
+    /// <remarks>All the cultures need to be accessible when evaluating.</remarks>
     public ISet<string>? CulturesToCheck { get; }
 }

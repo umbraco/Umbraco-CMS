@@ -1,17 +1,17 @@
 import type { UmbBlockRteLayoutModel, UmbBlockRteValueModel } from '../../types.js';
 import { UMB_BLOCK_RTE, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, property, state, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
-import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import { UMB_PROPERTY_DATASET_CONTEXT, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -338,7 +338,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		if (!this._showActions) return nothing;
 		return html`
 			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}
 			</uui-action-bar>
 		`;
 	}
@@ -409,6 +409,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				look="secondary"
 				@click=${() => this.#copyToClipboard()}>
 				<uui-icon name="icon-clipboard-copy"></uui-icon>
+			</uui-button>
+		`;
+	}
+
+	#renderDeleteAction() {
+		return html`
+			<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
+				<uui-icon name="icon-remove"></uui-icon>
 			</uui-button>
 		`;
 	}

@@ -48,11 +48,21 @@ public abstract class BlockValue
     /// </value>
     public abstract string PropertyEditorAlias { get; }
 
+    /// <summary>
+    ///     Determines whether the specified block layout alias is supported.
+    /// </summary>
+    /// <param name="alias">The block layout alias.</param>
+    /// <returns>
+    ///     <c>true</c> if the specified block layout alias is supported; otherwise, <c>false</c>.
+    /// </returns>
     [Obsolete("Will be removed in V18.")]
     public virtual bool SupportsBlockLayoutAlias(string alias) => alias.Equals(PropertyEditorAlias);
 }
 
-/// <inheritdoc />
+/// <summary>
+///     Represents a block value with a specific layout type.
+/// </summary>
+/// <typeparam name="TLayout">The type of the layout item.</typeparam>
 public abstract class BlockValue<TLayout> : BlockValue
     where TLayout : IBlockLayoutItem
 {

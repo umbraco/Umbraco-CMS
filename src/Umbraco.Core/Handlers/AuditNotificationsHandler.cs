@@ -16,6 +16,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Handlers;
 
+/// <summary>
+///     Handles audit logging for member and user related notifications.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This handler creates audit trail entries for various member and user operations including
+///         saving, deleting, role assignments, exports, and permission changes.
+///     </para>
+///     <para>
+///         The audit entries record the performing user, affected entity, IP address, and event details
+///         to provide a comprehensive audit trail for security and compliance purposes.
+///     </para>
+/// </remarks>
 public sealed class AuditNotificationsHandler :
     INotificationHandler<MemberSavedNotification>,
     INotificationAsyncHandler<MemberSavedNotification>,
@@ -44,6 +57,16 @@ public sealed class AuditNotificationsHandler :
     private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
+    /// </summary>
+    /// <param name="auditEntryService">The audit entry service for writing audit records.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="ipResolver">The IP address resolver.</param>
+    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="userGroupService">The user group service.</param>
     public AuditNotificationsHandler(
         IAuditEntryService auditEntryService,
         IUserService userService,
@@ -62,6 +85,17 @@ public sealed class AuditNotificationsHandler :
         _userGroupService = userGroupService;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
+    /// </summary>
+    /// <param name="auditService">The audit service (no longer used).</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="ipResolver">The IP address resolver.</param>
+    /// <param name="globalSettings">The global settings (no longer used).</param>
+    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="userGroupService">The user group service.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
     public AuditNotificationsHandler(
         IAuditService auditService,
@@ -83,6 +117,18 @@ public sealed class AuditNotificationsHandler :
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
+    /// </summary>
+    /// <param name="auditEntryService">The audit entry service for writing audit records.</param>
+    /// <param name="auditService">The audit service (no longer used).</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="ipResolver">The IP address resolver.</param>
+    /// <param name="globalSettings">The global settings (no longer used).</param>
+    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="userGroupService">The user group service.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
     public AuditNotificationsHandler(
         IAuditEntryService auditEntryService,
@@ -105,11 +151,18 @@ public sealed class AuditNotificationsHandler :
     {
     }
 
+    /// <summary>
+    ///     Gets the current user performing the action from the back office security context.
+    /// </summary>
+    /// <returns>The current user, or <c>null</c> if no user is authenticated.</returns>
     private async Task<IUser?> GetCurrentPerformingUser() =>
         _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is { } identity
             ? await _userService.GetAsync(identity.Key)
             : null;
 
+    /// <summary>
+    ///     Gets the IP address of the current request.
+    /// </summary>
     private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
     /// <inheritdoc />
@@ -131,6 +184,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(AssignedMemberRolesNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
@@ -157,6 +211,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(AssignedUserGroupPermissionsNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
@@ -175,10 +230,12 @@ public sealed class AuditNotificationsHandler :
             "exported member data");
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(ExportedMemberNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken)
     {
         IUser? performingUser = await GetCurrentPerformingUser();
@@ -194,6 +251,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(MemberDeletedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
@@ -216,6 +274,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(MemberSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
@@ -239,6 +298,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(RemovedMemberRolesNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
@@ -259,10 +319,12 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(UserDeletedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public async Task HandleAsync(UserGroupWithUsersSavedNotification notification, CancellationToken cancellationToken)
     {
         IUser? performingUser = await GetCurrentPerformingUser();
@@ -325,6 +387,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(UserGroupWithUsersSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
@@ -351,10 +414,20 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    /// <inheritdoc />
     [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(UserSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
+    /// <summary>
+    ///     Writes an audit entry for the specified action.
+    /// </summary>
+    /// <param name="performingUser">The user performing the action.</param>
+    /// <param name="affectedUser">The user affected by the action, if applicable.</param>
+    /// <param name="affectedDetails">Details about the affected entity.</param>
+    /// <param name="eventType">The type of event being audited.</param>
+    /// <param name="eventDetails">Additional details about the event.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     private async Task Audit(
         IUser? performingUser,
         IUser? affectedUser,
@@ -374,6 +447,12 @@ public sealed class AuditNotificationsHandler :
             eventDetails);
     }
 
+    /// <summary>
+    ///     Formats user details for audit logging.
+    /// </summary>
+    /// <param name="user">The user to format details for.</param>
+    /// <param name="appendType">If <c>true</c>, prepends "User" to the output.</param>
+    /// <returns>A formatted string containing user details.</returns>
     private static string FormatDetails(IUser? user, bool appendType = false)
     {
         var userName = user?.Name ?? Constants.Security.UnknownUserName;
@@ -385,9 +464,22 @@ public sealed class AuditNotificationsHandler :
             : details;
     }
 
+    /// <summary>
+    ///     Formats member details for audit logging.
+    /// </summary>
+    /// <param name="member">The member to format details for.</param>
+    /// <param name="appendType">If <c>true</c>, prepends "Member" to the output.</param>
+    /// <returns>A formatted string containing member details.</returns>
     private static string FormatDetails(IMember member, bool appendType = false)
         => FormatDetails(member.Id, member, appendType);
 
+    /// <summary>
+    ///     Formats member details for audit logging using the member ID and optional member instance.
+    /// </summary>
+    /// <param name="id">The member ID.</param>
+    /// <param name="member">The member instance, or <c>null</c> if not available.</param>
+    /// <param name="appendType">If <c>true</c>, prepends "Member" to the output.</param>
+    /// <returns>A formatted string containing member details.</returns>
     private static string FormatDetails(int id, IMember? member, bool appendType = false)
     {
         var userName = member?.Name ?? "(unknown)";
@@ -399,7 +491,17 @@ public sealed class AuditNotificationsHandler :
             : details;
     }
 
+    /// <summary>
+    ///     Formats user group details for audit logging.
+    /// </summary>
+    /// <param name="group">The user group to format details for.</param>
+    /// <returns>A formatted string containing user group details.</returns>
     private static string FormatDetails(IUserGroup group) => $"{group.Id} \"{group.Name}\" ({group.Alias})";
 
+    /// <summary>
+    ///     Formats an email address for display in audit logs.
+    /// </summary>
+    /// <param name="email">The email address to format.</param>
+    /// <returns>The email wrapped in angle brackets, or <c>null</c> if the email is empty.</returns>
     private static string? FormatEmail(string? email) => !email.IsNullOrWhiteSpace() ? $"<{email}>" : null;
 }

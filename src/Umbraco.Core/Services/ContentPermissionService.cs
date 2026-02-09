@@ -17,6 +17,14 @@ internal sealed class ContentPermissionService : IContentPermissionService
     private readonly AppCaches _appCaches;
     private readonly ILanguageService _languageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentPermissionService"/> class.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="languageService">The language service.</param>
     public ContentPermissionService(
         IContentService contentService,
         IEntityService entityService,

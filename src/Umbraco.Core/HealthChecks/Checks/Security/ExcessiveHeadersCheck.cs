@@ -32,15 +32,11 @@ public class ExcessiveHeadersCheck : HealthCheck
 
     private static HttpClient HttpClient => httpClient ??= new HttpClient();
 
-    /// <summary>
-    ///     Get the status for this health check
-    /// </summary>
+    /// <inheritdoc />
     public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
         => [await CheckForHeaders()];
 
-    /// <summary>
-    ///     Executes the action and returns it's status
-    /// </summary>
+    /// <inheritdoc />
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         => throw new InvalidOperationException("ExcessiveHeadersCheck has no executable actions");
 

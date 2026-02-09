@@ -14,20 +14,39 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
     private List<IContentTypeComposition> _contentTypeComposition = new();
     private List<int> _removedContentTypeKeyTracker = new();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeCompositionBase" /> class with the specified parent ID.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="parentId">The identifier of the parent content type.</param>
     protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, int parentId)
         : base(shortStringHelper, parentId)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeCompositionBase" /> class with a parent content type.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="parent">The parent content type composition.</param>
     protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, IContentTypeComposition parent)
         : this(shortStringHelper, parent, string.Empty)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeCompositionBase" /> class with a parent content type and alias.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="parent">The parent content type composition.</param>
+    /// <param name="alias">The alias for the content type.</param>
     protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, IContentTypeComposition parent, string alias)
         : base(shortStringHelper, parent, alias) =>
         AddContentType(parent);
 
+    /// <summary>
+    ///     Gets the collection of removed content type identifiers.
+    /// </summary>
     public IEnumerable<int> RemovedContentTypes => _removedContentTypeKeyTracker;
 
     /// <summary>
@@ -295,6 +314,7 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
             .Union(ContentTypeComposition.SelectMany(x => x.CompositionKeys()));
 
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);

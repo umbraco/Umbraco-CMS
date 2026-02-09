@@ -14,8 +14,17 @@ public static class PublishedElementExtensions
 {
     #region OfTypes
 
-    // the .OfType<T>() filter is nice when there's only one type
-    // this is to support filtering with multiple types
+    /// <summary>
+    /// Filters published elements by their content type alias.
+    /// </summary>
+    /// <typeparam name="T">The type of published elements.</typeparam>
+    /// <param name="contents">The elements to filter.</param>
+    /// <param name="types">The content type aliases to include.</param>
+    /// <returns>Elements whose content type alias matches any of the specified types.</returns>
+    /// <remarks>
+    /// The .OfType&lt;T&gt;() filter is nice when there's only one type.
+    /// This method supports filtering with multiple types.
+    /// </remarks>
     public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params string[] types)
         where T : IPublishedElement
     {
@@ -195,6 +204,12 @@ public static class PublishedElementExtensions
 
     #region ToIndexedArray
 
+    /// <summary>
+    /// Converts an enumerable of published elements to an indexed array with positional information.
+    /// </summary>
+    /// <typeparam name="TContent">The type of published elements.</typeparam>
+    /// <param name="source">The source enumerable.</param>
+    /// <returns>An array of indexed items containing positional information.</returns>
     public static IndexedArrayItem<TContent>[] ToIndexedArray<TContent>(this IEnumerable<TContent> source)
         where TContent : class, IPublishedElement
     {
