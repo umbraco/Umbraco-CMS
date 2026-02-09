@@ -30,6 +30,8 @@ public class ImportDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Imports a dictionary.")]
+    [EndpointDescription("Imports a dictionary from the provided file upload.")]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         ImportDictionaryRequestModel importDictionaryRequestModel)

@@ -32,6 +32,8 @@ public class ImportExistingDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Imports a document type.")]
+    [EndpointDescription("Imports a document type from the provided file upload.")]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         Guid id,

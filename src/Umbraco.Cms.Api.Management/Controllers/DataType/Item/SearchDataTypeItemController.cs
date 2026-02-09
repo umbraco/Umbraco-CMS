@@ -26,8 +26,8 @@ public class SearchDataTypeItemController : DatatypeItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
-    [EndpointSummary("Search data types by query.")]
-    [EndpointDescription("Gets a paged collection of data type items identified by provided query.")]
+    [EndpointSummary("Searches data type items.")]
+    [EndpointDescription("Searches data type items by the provided query with pagination support.")]
     public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.DataType, query, skip, take);
