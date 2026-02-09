@@ -26,6 +26,8 @@ public class PrivateManifestManifestController : ManifestControllerBase
     [HttpGet("manifest/private")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ManifestResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets private manifests.")]
+    [EndpointDescription("Gets a collection of private package manifests specific to the current user.")]
     public async Task<IActionResult> PrivateManifests()
     {
         IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetPrivatePackageManifestsAsync();

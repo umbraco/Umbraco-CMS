@@ -33,6 +33,8 @@ public class GetHelpController : HelpControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<HelpPageResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets help information.")]
+    [EndpointDescription("Gets help information and documentation resources for the Umbraco back office.")]
     public async Task<IActionResult> Get(
         CancellationToken cancellationToken,
         string section,

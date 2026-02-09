@@ -1,5 +1,6 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } from '../types.js';
+import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -513,6 +514,17 @@ export abstract class UmbBlockManagerContext<
 
 		// Expose inserted block:
 		this.#setInitialBlockExpose(content);
+	}
+
+	protected async notifyBlockInserted(layoutEntry: BlockLayoutType, originData: BlockOriginDataType) {
+		// Await one rendering frame, to make sure new Block has been rendered at the time of the Event firing. [NL]
+		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		this.dispatchEvent(
+			new UmbBlockInsertedEvent({
+				originData,
+				layout: layoutEntry,
+			}),
+		);
 	}
 
 	async #setInitialBlockExpose(content: UmbBlockDataModel) {

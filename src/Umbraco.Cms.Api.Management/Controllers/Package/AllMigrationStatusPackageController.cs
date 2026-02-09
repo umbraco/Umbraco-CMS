@@ -48,6 +48,8 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     [HttpGet("migration-status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PackageMigrationStatusResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets all package migration statuses.")]
+    [EndpointDescription("Gets a paginated collection of migration status for all installed packages.")]
     public async Task<ActionResult<PagedViewModel<PackageMigrationStatusResponseModel>>> AllMigrationStatuses(
         CancellationToken cancellationToken,
         int skip = 0,

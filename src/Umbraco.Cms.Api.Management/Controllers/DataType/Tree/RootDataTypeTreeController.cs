@@ -27,6 +27,8 @@ public class RootDataTypeTreeController : DataTypeTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DataTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of data type items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of data type items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<DataTypeTreeItemResponseModel>>> Root(CancellationToken cancellationToken, int skip = 0, int take = 100, bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);

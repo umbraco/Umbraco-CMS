@@ -20,6 +20,7 @@ export default {
 		chooseWhereToCopy: 'Choose where to copy',
 		chooseWhereToImport: 'Choose where to import',
 		chooseWhereToMove: 'Choose where to move',
+		clear: 'Clear',
 		copy: 'Duplicate',
 		copyTo: 'Duplicate to',
 		create: 'Create',
