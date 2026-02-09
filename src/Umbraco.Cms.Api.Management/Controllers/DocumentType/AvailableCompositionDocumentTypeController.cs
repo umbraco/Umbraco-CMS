@@ -26,6 +26,8 @@ public class AvailableCompositionDocumentTypeController : DocumentTypeController
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<AvailableDocumentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets available compositions.")]
+    [EndpointDescription("Gets a collection of document types that are available to use as compositions for the specified document type.")]
     public async Task<IActionResult> AvailableCompositions(
         CancellationToken cancellationToken,
         DocumentTypeCompositionRequestModel compositionModel)
