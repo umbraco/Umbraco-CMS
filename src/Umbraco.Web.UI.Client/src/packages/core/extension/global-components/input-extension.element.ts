@@ -28,6 +28,7 @@ export class UmbInputExtensionElement extends UmbFormControlMixin<string | undef
 
 	#onChange(event: Event) {
 		event.stopPropagation();
+		// TODO: import correct type for UmbInputEntityDataElement when exported
 		const target = event.target as HTMLElement & { selection: Array<string>; value: string | undefined };
 		this.selection = target.selection;
 		this.value = target.value;
