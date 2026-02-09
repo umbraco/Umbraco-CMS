@@ -33,6 +33,8 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(LogLevelCountsReponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets log level counts.")]
+    [EndpointDescription("Gets the count of log entries for each log level within the specified date range.")]
     public async Task<IActionResult> LogLevelCounts(
         CancellationToken cancellationToken,
         DateTimeOffset? startDate = null,

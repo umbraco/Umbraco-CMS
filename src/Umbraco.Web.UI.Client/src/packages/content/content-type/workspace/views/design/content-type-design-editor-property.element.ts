@@ -349,13 +349,18 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				container-type: inline-size;
 			}
 
-			:host > div {
+			:host > * {
 				grid-column: span 2;
 			}
 
 			@container (width > 700px) {
-				:host(:not([orientation='vertical'])) > div {
+				:host(:not([orientation='vertical'])) > * {
 					grid-column: span 1;
+				}
+				#header {
+					position: sticky;
+					top: var(--uui-size-space-4);
+					height: min-content;
 				}
 			}
 
@@ -418,12 +423,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				margin-bottom: 0;
 			}
 
-			#header {
-				position: sticky;
-				top: var(--uui-size-space-4);
-				height: min-content;
-			}
-
 			#header i {
 				opacity: 0.55;
 				float: right;
@@ -443,6 +442,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#editor {
 				position: relative;
+				min-height: 80px;
 				--uui-button-background-color: var(--uui-color-background);
 				--uui-button-background-color-hover: var(--uui-color-background);
 			}

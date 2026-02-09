@@ -36,6 +36,8 @@ public class RollbackElementVersionController : ElementVersionControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Rolls back an element to a specific version.")]
+    [EndpointDescription("Rolls back an element to the version indicated by the provided Id. This will archive the current version of the element and publish the provided one.")]
     public async Task<IActionResult> Rollback(CancellationToken cancellationToken, Guid id, string? culture)
     {
         Attempt<IElement?, ContentVersionOperationStatus> getContentAttempt = await _elementVersionService.GetAsync(id);

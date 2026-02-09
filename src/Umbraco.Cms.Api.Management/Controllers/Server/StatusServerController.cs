@@ -19,6 +19,8 @@ public class StatusServerController : ServerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ServerStatusResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets server status.")]
+    [EndpointDescription("Gets the current operational status of the Umbraco server.")]
     public Task<ActionResult<ServerStatusResponseModel>> Get(CancellationToken cancellationToken)
         => Task.FromResult<ActionResult<ServerStatusResponseModel>>(new ServerStatusResponseModel { ServerStatus = _runtimeState.Level });
 }
