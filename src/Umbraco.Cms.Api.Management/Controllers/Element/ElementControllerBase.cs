@@ -16,6 +16,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessElements)]
 public class ElementControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "element";
+
     protected IActionResult ElementEditingOperationStatusResult<TContentModelBase>(
         ContentEditingOperationStatus status,
         TContentModelBase requestModel,

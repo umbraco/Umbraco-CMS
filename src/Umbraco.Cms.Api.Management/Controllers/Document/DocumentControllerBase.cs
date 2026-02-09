@@ -17,6 +17,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "document";
+
     protected IActionResult DocumentNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder
