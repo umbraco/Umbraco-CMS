@@ -22,7 +22,7 @@ public class IsUsedDataTypeController : DataTypeControllerBase
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Checks if a data type is used.")]
-    [EndpointDescription("Checks if the data type identified by the provided Id is used in any content, media, or members.")]
+    [EndpointDescription("Checks if the data type identified by the provided Id is used in any content, media, or member types.")]
     public async Task<IActionResult> IsUsed(CancellationToken cancellationToken, Guid id)
     {
         Attempt<bool, DataTypeOperationStatus> result = await _dataTypeUsageService.HasSavedValuesAsync(id);

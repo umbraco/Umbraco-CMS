@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
@@ -23,7 +23,7 @@ public class UpdateDataTypeFolderController : DataTypeFolderControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Updates a data type folder.")]
-    [EndpointDescription("Updates a data type folder identified by the provided Id with the details from the request model.")]
+    [EndpointDescription("Updates a data type folder identified by the provided Id with the details provided in the request model.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
         Guid id,
