@@ -32,6 +32,8 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupPresentationModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a health check group by name.")]
+    [EndpointDescription("Gets a health check group and all its associated health checks identified by the provided group name.")]
     public Task<IActionResult> ByName(
         CancellationToken cancellationToken,
         string name)

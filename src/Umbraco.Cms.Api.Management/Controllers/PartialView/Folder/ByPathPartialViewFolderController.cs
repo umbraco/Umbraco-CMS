@@ -26,6 +26,8 @@ public class ByPathPartialViewFolderController : PartialViewFolderControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PartialViewFolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a partial view folder by path.")]
+    [EndpointDescription("Gets a partial view folder identified by the provided file path.")]
     public async Task<IActionResult> ByPath(CancellationToken cancellationToken, string path)
     {
         path = DecodePath(path).VirtualPathToSystemPath();

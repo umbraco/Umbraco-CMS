@@ -38,6 +38,8 @@ public class AvailableSegmentsController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SegmentResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets available segments.")]
+    [EndpointDescription("Gets a collection of available content segments for the system.")]
     public async Task<IActionResult> GetAvailableSegmentOptions(
         Guid id,
         CancellationToken cancellationToken,

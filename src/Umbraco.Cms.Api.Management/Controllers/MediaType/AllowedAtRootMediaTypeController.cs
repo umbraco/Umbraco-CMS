@@ -24,6 +24,8 @@ public class AllowedAtRootMediaTypeController : MediaTypeControllerBase
     [HttpGet("allowed-at-root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedMediaType>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets media types allowed at root.")]
+    [EndpointDescription("Gets a collection of media types that are allowed to be created at the root level.")]
     public async Task<IActionResult> AllowedAtRoot(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         PagedModel<IMediaType> result = await _mediaTypeService.GetAllAllowedAsRootAsync(skip, take);

@@ -23,6 +23,8 @@ public class EventsWebhookController : WebhookControllerBase
     [HttpGet("events")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<WebhookEventViewModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of webhook events.")]
+    [EndpointDescription("Gets a paginated collection of available webhook events that can be subscribed to.")]
     public Task<ActionResult<PagedViewModel<WebhookEventViewModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
