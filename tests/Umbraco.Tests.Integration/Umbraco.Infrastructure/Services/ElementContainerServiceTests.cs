@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -147,6 +149,10 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
 
         Assert.AreEqual(container.Key, recycleBinItems[0].Key);
     }
+
+    public static void ConfigureDisableDeleteWhenReferenced(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableDeleteWhenReferenced = true);
 
     private struct FolderWithElementsStructureInfo
     {

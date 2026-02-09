@@ -164,10 +164,6 @@ public partial class ElementContainerServiceTests
             $"Should have {referencedElements.Count} referenced elements plus the container remaining in recycle bin");
     }
 
-    public static void ConfigureDisableDeleteWhenReferenced(IUmbracoBuilder builder)
-        => builder.Services.Configure<ContentSettings>(config =>
-            config.DisableDeleteWhenReferenced = true);
-
     private void RelateElements(IElement parent, IElement child)
     {
         var relatedContentRelType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
