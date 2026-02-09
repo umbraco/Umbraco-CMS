@@ -18,22 +18,19 @@ const vipMemberSegmentAlias = 'vip-members';
 let languageData: any = null;
 
 test.beforeEach(async ({ umbracoApi, umbracoUi }) => {
-    const languageId = await umbracoApi.language.createDanishLanguage();
-    languageData = await umbracoApi.language.get(languageId);
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const documentTypeVaryByCulture = true;
-    const propertyVaryByCulture = true;
-    const documentTypeVaryBySegment = true;
-    const propertyVaryBySegment = true;
-    await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test group', documentTypeVaryByCulture, propertyVaryByCulture, false, documentTypeVaryBySegment, propertyVaryBySegment);
-    await umbracoUi.goToBackOffice();
-    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  const languageId = await umbracoApi.language.createDanishLanguage();
+  languageData = await umbracoApi.language.get(languageId);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test group', true, true, false, true, true);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 });
 
 test.afterEach(async ({ umbracoApi }) => {
-    await umbracoApi.document.ensureNameNotExists(contentName);
-    await umbracoApi.document.ensureNameNotExists(vipMemberSegment);
-    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.document.ensureNameNotExists(vipMemberSegment);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.language.ensureNameNotExists(languageData.name);
 });
 
 test('can insert preset value into textstring property that vary by culture and segment in default language', async ({umbracoApi, umbracoUi}) => {
