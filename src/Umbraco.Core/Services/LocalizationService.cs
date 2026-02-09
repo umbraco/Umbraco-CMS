@@ -23,6 +23,14 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LocalizationService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="dictionaryRepository">The dictionary repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
     [Obsolete("Please use constructor with language, dictionary and user services. Will be removed in V15")]
     public LocalizationService(
         ICoreScopeProvider provider,
@@ -42,6 +50,17 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LocalizationService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="dictionaryRepository">The dictionary repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="dictionaryItemService">The dictionary item service.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     [Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Will be removed in V15.")]
     public LocalizationService(
         ICoreScopeProvider provider,
@@ -340,6 +359,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         _languageService.DeleteAsync(language.IsoCode, currentUserKey).GetAwaiter().GetResult();
     }
 
+    /// <summary>
+    /// Gets the dictionary item key map containing all dictionary item keys and their corresponding GUIDs.
+    /// </summary>
+    /// <returns>A dictionary mapping dictionary item keys to their GUIDs.</returns>
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {

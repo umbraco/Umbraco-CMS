@@ -8,9 +8,17 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IFileService : IService
 {
+    /// <summary>
+    ///     Creates a folder for partial views.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder to create.</param>
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     void CreatePartialViewFolder(string folderPath);
 
+    /// <summary>
+    ///     Deletes a folder for partial views.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder to delete.</param>
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     void DeletePartialViewFolder(string folderPath);
 
@@ -21,15 +29,39 @@ public interface IFileService : IService
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     IEnumerable<IPartialView> GetPartialViews(params string[] names);
 
+    /// <summary>
+    ///     Gets a <see cref="IPartialView" /> object by its path.
+    /// </summary>
+    /// <param name="path">The path of the partial view.</param>
+    /// <returns>The <see cref="IPartialView" /> object matching the path, or null.</returns>
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     IPartialView? GetPartialView(string path);
 
+    /// <summary>
+    ///     Creates a new <see cref="IPartialView" />.
+    /// </summary>
+    /// <param name="partialView">The <see cref="IPartialView" /> to create.</param>
+    /// <param name="snippetName">Optional name of a snippet to use as template content.</param>
+    /// <param name="userId">Optional id of the user creating the partial view.</param>
+    /// <returns>An <see cref="Attempt{T}" /> indicating success or failure with the created partial view.</returns>
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
 
+    /// <summary>
+    ///     Deletes a partial view by its path.
+    /// </summary>
+    /// <param name="path">The path of the partial view to delete.</param>
+    /// <param name="userId">Optional id of the user deleting the partial view.</param>
+    /// <returns>True if the partial view was deleted; otherwise, false.</returns>
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     bool DeletePartialView(string path, int? userId = null);
 
+    /// <summary>
+    ///     Saves a <see cref="IPartialView" />.
+    /// </summary>
+    /// <param name="partialView">The <see cref="IPartialView" /> to save.</param>
+    /// <param name="userId">Optional id of the user saving the partial view.</param>
+    /// <returns>An <see cref="Attempt{T}" /> indicating success or failure with the saved partial view.</returns>
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null);
 
@@ -266,6 +298,15 @@ public interface IFileService : IService
         string? contentTypeName,
         int userId = Constants.Security.SuperUserId);
 
+    /// <summary>
+    ///     Creates a new template with identity, setting the content if a view exists in the filesystem.
+    /// </summary>
+    /// <param name="name">The name of the template.</param>
+    /// <param name="alias">The alias of the template.</param>
+    /// <param name="content">The content/markup of the template.</param>
+    /// <param name="masterTemplate">Optional master template.</param>
+    /// <param name="userId">Optional id of the user creating the template.</param>
+    /// <returns>The created <see cref="ITemplate" />.</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
 

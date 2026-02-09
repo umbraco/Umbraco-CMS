@@ -119,8 +119,14 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
         }
     }
 
+    /// <summary>
+    ///     Represents the data transfer object for entity data picker values.
+    /// </summary>
     internal sealed class EntityDataPickerDto
     {
+        /// <summary>
+        ///     Gets or sets the array of selected entity identifiers.
+        /// </summary>
         public string[] Ids { get; set; } = [];
     }
 }

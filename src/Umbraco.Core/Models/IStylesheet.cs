@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a stylesheet file with support for backoffice-enabled properties.
+/// </summary>
 public interface IStylesheet : IFile
 {
     /// <summary>

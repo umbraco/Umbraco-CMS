@@ -8,19 +8,30 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+///     Represents a property editor for selecting member groups.
+/// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MemberGroupPicker,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
 public class MemberGroupPickerPropertyEditor : DataEditor
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberGroupPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
     public MemberGroupPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
 
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MemberGroupPickerPropertyValueEditor>(Attribute!);
 
+    /// <summary>
+    ///     Provides the value editor for the member group picker property editor.
+    /// </summary>
     private sealed class MemberGroupPickerPropertyValueEditor : DataValueEditor
     {
         private readonly IMemberGroupService _memberGroupService;

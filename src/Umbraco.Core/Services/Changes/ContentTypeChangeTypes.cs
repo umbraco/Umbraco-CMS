@@ -1,8 +1,14 @@
 namespace Umbraco.Cms.Core.Services.Changes;
 
+/// <summary>
+///     Represents the types of changes that can occur on a content type.
+/// </summary>
 [Flags]
 public enum ContentTypeChangeTypes : byte
 {
+    /// <summary>
+    ///     No change has occurred.
+    /// </summary>
     None = 0,
 
     /// <summary>
