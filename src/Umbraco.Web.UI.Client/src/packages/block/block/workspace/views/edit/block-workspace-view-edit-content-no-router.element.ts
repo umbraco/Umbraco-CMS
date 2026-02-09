@@ -57,7 +57,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
 			this._tabs = tabs;
-			this.#checkDefaultTabName();
 			this.#setupViewContexts();
 		});
 
@@ -65,7 +64,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			this.#tabsStructureHelper.hasProperties,
 			(hasRootProperties) => {
 				this._hasRootProperties = hasRootProperties;
-				this.#checkDefaultTabName();
+				this.#setupViewContexts();
 			},
 			'observeRootProperties',
 		);
@@ -80,13 +79,12 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	}
 
 	async #observeRootGroups() {
-		if (!this.#blockWorkspace || !this.#blockManager) return;
+		if (!this.#blockWorkspace) return;
 
 		this.observe(
-			await this.#blockManager.structure.hasRootContainers('Group'),
+			await this.#blockManager?.structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
-				this._hasRootGroups = hasRootGroups;
-				this.#checkDefaultTabName();
+				this._hasRootGroups = hasRootGroups ?? false;
 				this.#setupViewContexts();
 			},
 			'observeGroups',
@@ -94,7 +92,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	}
 
 	#setupViewContexts() {
-		if (!this._tabs) return;
+		if (!this._tabs || !this.#blockManager) return;
 
 		// Create view contexts for root groups/properties
 		if (this._hasRootGroups || this._hasRootProperties) {
@@ -106,6 +104,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			const viewAlias = getViewAliasForTab(tab);
 			this.#createViewContext(viewAlias, tab.name ?? '');
 		});
+
+		this.#checkDefaultTabName();
 	}
 
 	#createViewContext(viewAlias: string | null, tabName: string) {
