@@ -150,8 +150,8 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             parentLevel,
             false,
             userKey,
-            cont => parentPath.StartsWith(cont.Path) ?
-                EntityContainerOperationStatus.InvalidParent // cannot move to descendant of self
+            cont => parentPath.StartsWith(cont.Path)
+                ? EntityContainerOperationStatus.InvalidParent // cannot move to descendant of self
                 : EntityContainerOperationStatus.Success,
             (cont, eventMessages) =>
             {
