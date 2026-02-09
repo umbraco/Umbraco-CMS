@@ -15,6 +15,7 @@ export default {
 		auditTrail: 'Historial',
 		browse: 'Nodo de Exploración',
 		changeDocType: 'Cambiar tipo de documento',
+		clear: 'Eliminar todo',
 		copy: 'Copiar',
 		create: 'Crear',
 		createPackage: 'Crear Paquete',

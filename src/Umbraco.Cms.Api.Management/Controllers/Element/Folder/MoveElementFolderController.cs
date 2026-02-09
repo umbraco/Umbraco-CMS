@@ -37,6 +37,8 @@ public class MoveElementFolderController : ElementFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves an element folder.")]
+    [EndpointDescription("Moves an element folder identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveFolderRequestModel moveFolderRequestModel)
     {
         // Check Move permission on source folder

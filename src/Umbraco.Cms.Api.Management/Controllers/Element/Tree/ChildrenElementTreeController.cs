@@ -30,6 +30,8 @@ public class ChildrenElementTreeController : ElementTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ElementTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of element tree child items.")]
+    [EndpointDescription("Gets a paginated collection of element tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<ElementTreeItemResponseModel>>> Children(CancellationToken cancellationToken, Guid parentId, int skip = 0, int take = 100, bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);

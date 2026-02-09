@@ -57,6 +57,8 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     [ProducesResponseType(typeof(PagedViewModel<DocumentCollectionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a document collection.")]
+    [EndpointDescription("Gets a document collection identified by the provided Id.")]
     public async Task<IActionResult> ByKey(
         CancellationToken cancellationToken,
         Guid id,

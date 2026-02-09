@@ -18,6 +18,8 @@ public class ConfigurationTemporaryFileController : TemporaryFileControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemporaryFileConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the temporary file configuration.")]
+    [EndpointDescription("Gets the configuration settings for temporary files.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         TemporaryFileConfigurationResponseModel responseModel = _temporaryFileConfigurationPresentationFactory.Create();

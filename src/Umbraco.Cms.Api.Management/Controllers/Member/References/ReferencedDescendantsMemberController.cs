@@ -55,6 +55,8 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a paginated collection of referenced descendant members.")]
+    [EndpointDescription("Gets a paginated collection of descendant members that are referenced in relations for the member identified by the provided Id.")]
     public async Task<IActionResult> ReferencedDescendants2(
         CancellationToken cancellationToken,
         Guid id,

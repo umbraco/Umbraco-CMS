@@ -26,6 +26,8 @@ public class ItemElementItemController : ElementItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ElementItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of element items.")]
+    [EndpointDescription("Gets a collection of element items identified by the provided Ids.")]
     public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

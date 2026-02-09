@@ -17,6 +17,8 @@ public class ConfigurationElementController : ElementControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ElementConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the element configuration.")]
+    [EndpointDescription("Gets the configuration settings for elements.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         ElementConfigurationResponseModel responseModel = _configurationPresentationFactory.CreateElementConfigurationResponseModel();

@@ -40,6 +40,8 @@ public class DeleteElementFolderRecycleBinController : ElementRecycleBinControll
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Deletes an element folder from the recycle bin.")]
+    [EndpointDescription("Permanently deletes an element folder identified by the provided Id from the recycle bin.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
