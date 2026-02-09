@@ -97,7 +97,17 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
             uniqueUserIds.Add(item.WriterId);
         }
 
-        return _userService.GetUsersById(uniqueUserIds.ToArray())
+        // Filter out the default 0 ID (unset CreatorId/WriterId from TreeEntityBase) that won't
+        // resolve to a user. Seed it as null so CommonMapper won't fall back to per-item GetProfileById.
+        Dictionary<int, string?> result = _userService
+            .GetUsersById(uniqueUserIds.Where(id => id != 0).ToArray())
             .ToDictionary(u => u.Id, u => u.Name);
+
+        if (uniqueUserIds.Contains(0))
+        {
+            result[0] = null;
+        }
+
+        return result;
     }
 }
