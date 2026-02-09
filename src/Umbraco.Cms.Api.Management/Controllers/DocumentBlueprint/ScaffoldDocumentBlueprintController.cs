@@ -27,6 +27,8 @@ public class ScaffoldDocumentBlueprintController : DocumentBlueprintControllerBa
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentBlueprintResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Scaffolds a document blueprint.")]
+    [EndpointDescription("Creates a scaffold for a new document blueprint with default values.")]
     public async Task<IActionResult> Scaffold(CancellationToken cancellationToken, Guid id)
     {
         IContent? blueprint = await _contentBlueprintEditingService.GetScaffoldedAsync(id);

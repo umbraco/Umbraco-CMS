@@ -35,6 +35,8 @@ public class EnableUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Enables users.")]
+    [EndpointDescription("Enables the user accounts identified by the provided Ids.")]
     public async Task<IActionResult> EnableUsers(CancellationToken cancellationToken, EnableUserRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

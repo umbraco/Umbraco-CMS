@@ -27,6 +27,8 @@ public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedDocumentType>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets allowed child document types.")]
+    [EndpointDescription("Gets a collection of document types that are allowed as children of the specified parent document type.")]
     public async Task<IActionResult> AllowedChildrenByKey(
         CancellationToken cancellationToken,
         Guid id,

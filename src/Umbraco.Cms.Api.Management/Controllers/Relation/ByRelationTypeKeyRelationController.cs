@@ -33,6 +33,8 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(PagedViewModel<ProblemDetails>), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets relations by relation type.")]
+    [EndpointDescription("Gets a collection of relations filtered by the specified relation type key.")]
     public async Task<IActionResult> ByRelationTypeKey(
         CancellationToken cancellationToken,
         Guid id,

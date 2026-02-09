@@ -34,6 +34,8 @@ public class CalculatedStartNodesUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(CalculatedUserStartNodesResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Calculates start nodes for users.")]
+    [EndpointDescription("Calculates the start nodes for the users identified by the provided Ids based on their permissions.")]
     public async Task<IActionResult> CalculatedStartNodes(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

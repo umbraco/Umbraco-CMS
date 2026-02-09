@@ -23,6 +23,8 @@ public class AllowedParentsDocumentTypeController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentTypeAllowedParentsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets allowed parent document types.")]
+    [EndpointDescription("Gets a collection of document types that are allowed as parents of the specified document type.")]
     public async Task<IActionResult> AllowedParentsByKey(
         CancellationToken cancellationToken,
         Guid id)
