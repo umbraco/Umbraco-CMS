@@ -3,7 +3,6 @@ import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel
 import { UmbExtensionItemRepository } from '../item/data/item.repository.js';
 import type { UmbExtensionPickerConfigCollectionModel } from './types.js';
 import type { UmbPickerCollectionDataSource } from '@umbraco-cms/backoffice/picker-data-source';
-import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
@@ -23,26 +22,25 @@ export class UmbExtensionPickerDataSource
 		return this.#config;
 	}
 
-	async requestCollection(args: UmbCollectionFilterModel) {
+	async requestCollection(args: UmbExtensionCollectionFilterModel) {
 		const configAllowedExtensionTypes = getConfigValue(this.#config, 'allowedExtensionTypes');
-		const requestedType = (args as UmbExtensionCollectionFilterModel).type;
+		const requestedTypes = args.extensionTypes;
 
-		let type: string | Array<string> | undefined;
+		let extensionTypes: Array<string> | undefined;
 
 		if (configAllowedExtensionTypes?.length) {
-			if (requestedType) {
-				// If the UI requests a specific type, only use it if it's in the allowed list
-				const requested = Array.isArray(requestedType) ? requestedType : [requestedType];
-				type = requested.filter((t) => configAllowedExtensionTypes.includes(t));
+			if (requestedTypes?.length) {
+				// If the UI requests specific types, only use those that are in the allowed list
+				extensionTypes = requestedTypes.filter((t) => configAllowedExtensionTypes.includes(t));
 			} else {
-				// No specific type requested — use all allowed types
-				type = configAllowedExtensionTypes;
+				// No specific types requested — use all allowed types
+				extensionTypes = configAllowedExtensionTypes;
 			}
 		}
 
 		const extendedArgs: UmbExtensionCollectionFilterModel = {
 			...args,
-			type,
+			extensionTypes,
 		};
 
 		return this.#collectionRepository.requestCollection(extendedArgs);
