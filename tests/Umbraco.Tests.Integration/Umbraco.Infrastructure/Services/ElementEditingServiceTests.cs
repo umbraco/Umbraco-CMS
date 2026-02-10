@@ -55,7 +55,7 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
     private async Task<IContentType> CreateInvariantElementType(bool allowedAtRoot = true)
     {
         var elementType = new ContentTypeBuilder()
-            .WithAlias("invariantTest")
+            .WithAlias(Guid.NewGuid().ToString())
             .WithName("Invariant Test")
             .WithAllowAsRoot(allowedAtRoot)
             .WithIsElement(true)

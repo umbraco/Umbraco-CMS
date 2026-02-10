@@ -51,7 +51,8 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     // temp - so we don't have to implement GetByQuery
     public EntityContainer? Get(Guid id)
     {
-        Sql<ISqlContext> sql = GetBaseQuery(false).Where<NodeDto>(c => c.UniqueId == id);
+        Sql<ISqlContext> sql = GetBaseQuery(false)
+            .Where<NodeDto>(c => c.UniqueId == id && c.NodeObjectType == NodeObjectTypeId);
 
         NodeDto? nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
         return nodeDto == null ? null : CreateEntity(nodeDto);

@@ -18,7 +18,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(0, GetAtRoot().Length);
@@ -43,7 +43,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(1, GetAtRoot().Length);
@@ -73,7 +73,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(0, GetAtRoot().Length);
@@ -109,7 +109,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(1, GetAtRoot().Length);
@@ -132,7 +132,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         await AssertContainerIsInRecycleBin(setup.ChildContainerKey);
@@ -183,7 +183,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         await AssertContainerIsInRecycleBin(setup.RootContainerKey);
@@ -261,7 +261,7 @@ public partial class ElementContainerServiceTests
 
             var result = await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
 
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Result);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(movingWasCalled);
             Assert.IsTrue(movedWasCalled);
@@ -299,7 +299,7 @@ public partial class ElementContainerServiceTests
 
             var result = await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
 
-            Assert.AreEqual(EntityContainerOperationStatus.CancelledByNotification, result.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.CancelledByNotification, result.Result);
             Assert.IsFalse(result.Success);
             Assert.IsTrue(movingWasCalled);
             Assert.IsFalse(movedWasCalled);
@@ -327,7 +327,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Result);
         });
 
         var rootContainer = await ElementContainerService.GetAsync(rootContainerKey);
@@ -353,7 +353,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Result);
         });
 
         var firstContainer = await ElementContainerService.GetAsync(firstContainerKey);

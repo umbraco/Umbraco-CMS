@@ -39,7 +39,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreNotEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
