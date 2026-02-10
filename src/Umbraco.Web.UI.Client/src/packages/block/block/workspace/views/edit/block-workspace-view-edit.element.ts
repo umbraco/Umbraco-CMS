@@ -177,16 +177,21 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 	}
 
 	#renderTab(path: string | null, name: string, index = 0) {
+		const isRootTab = path === null;
 		const hasRootItems = this._hasRootGroups || this._hasRootProperties;
-		const fullPath = this._routerPath + '/' + (path ? path : 'root');
+		const basePath = this._routerPath + '/';
+		const fullPath = basePath + (path ? path : 'root');
+
 		const active =
 			fullPath === this._activePath ||
-			(!hasRootItems && index === 0 && this._routerPath + '/' === this._activePath) ||
-			(hasRootItems && path === null && this._routerPath + '/' === this._activePath);
+			// When there are no root items, the first tab should be active on the alias path.
+			(!hasRootItems && index === 0 && basePath === this._activePath) ||
+			// When there are root items, the root tab should be active on both the canonical `/root` and alias `/` paths.
+			(hasRootItems && isRootTab && basePath === this._activePath);
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
-			href=${fullPath}
+			href=${isRootTab ? basePath : fullPath}
 			data-mark="content-tab:${path ?? 'root'}"></uui-tab>`;
 	}
 
