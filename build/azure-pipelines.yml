@@ -113,12 +113,10 @@ stages:
               dotnet tool install -g docfx
               docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
             displayName: Generate DocFX metadata
-            condition: succeeded()
-#            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
+            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
           - task: PublishPipelineArtifact@1
             displayName: Publish DocFX metadata
-            condition: succeeded()
-#            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
+            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
             inputs:
               targetPath: $(Build.SourcesDirectory)/build/csharp-docs/api
               artifactName: docfx-metadata
@@ -209,10 +207,7 @@ stages:
           displayName: 'Publish E2E BOM'
 
   - stage: Build_Docs
-    # CHANGE BACK TO
-    #     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
-    # AFTER TESTING
-    condition: succeeded()
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
     displayName: Prepare API Documentation
     dependsOn: Build
     variables:
