@@ -19,7 +19,7 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     private readonly FlagProviderCollection _flagProviderCollection;
     private readonly IUmbracoMapper _mapper;
 
-    [Obsolete("Please use the controller with all parameters, will be removed in Umbraco 18")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
         : this(
             mapper,

@@ -96,7 +96,7 @@ public sealed class AuditNotificationsHandler :
     /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
     /// <param name="memberService">The member service.</param>
     /// <param name="userGroupService">The user group service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public AuditNotificationsHandler(
         IAuditService auditService,
         IUserService userService,
@@ -129,7 +129,7 @@ public sealed class AuditNotificationsHandler :
     /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
     /// <param name="memberService">The member service.</param>
     /// <param name="userGroupService">The user group service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public AuditNotificationsHandler(
         IAuditEntryService auditEntryService,
         IAuditService auditService,
@@ -185,7 +185,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(AssignedMemberRolesNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -212,7 +212,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(AssignedUserGroupPermissionsNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -231,7 +231,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(ExportedMemberNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -252,7 +252,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(MemberDeletedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -275,7 +275,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(MemberSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -299,7 +299,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(RemovedMemberRolesNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -320,7 +320,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(UserDeletedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -388,7 +388,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(UserGroupWithUsersSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -415,7 +415,7 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(UserSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
