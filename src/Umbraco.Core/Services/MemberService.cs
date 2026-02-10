@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="memberGroupRepository">The repository for member group data access.</param>
         /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
         /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
         public MemberService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
         /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
         /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
         public MemberService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
