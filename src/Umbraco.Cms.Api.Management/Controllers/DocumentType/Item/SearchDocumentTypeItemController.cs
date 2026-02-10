@@ -29,7 +29,7 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     [EndpointDescription("Searches document type items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchDocumentType(
         CancellationToken cancellationToken,
-        string query,
+        string? query,
         bool? isElement = null,
         bool? allowedInLibrary = null,
         int skip = 0,
