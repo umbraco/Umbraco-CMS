@@ -1,10 +1,11 @@
 import { UmbExtensionCollectionRepository } from '../collection/repository/extension-collection.repository.js';
 import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from '../collection/types.js';
 import { UmbExtensionItemRepository } from '../item/data/item.repository.js';
+import type { UmbExtensionPickerConfigCollectionModel } from './types.js';
 import type { UmbPickerCollectionDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
+import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
 export class UmbExtensionPickerDataSource
 	extends UmbControllerBase
@@ -12,9 +13,9 @@ export class UmbExtensionPickerDataSource
 {
 	#collectionRepository = new UmbExtensionCollectionRepository(this);
 	#itemRepository = new UmbExtensionItemRepository(this);
-	#config: UmbConfigCollectionModel | undefined;
+	#config: UmbExtensionPickerConfigCollectionModel | undefined;
 
-	setConfig(config: UmbConfigCollectionModel | undefined): void {
+	setConfig(config: UmbExtensionPickerConfigCollectionModel | undefined): void {
 		this.#config = config;
 	}
 
@@ -23,9 +24,7 @@ export class UmbExtensionPickerDataSource
 	}
 
 	async requestCollection(filter: UmbCollectionFilterModel) {
-		const allowedExtensionTypes = this.#config?.find((c) => c.alias === 'allowedExtensionTypes')?.value as
-			| Array<string>
-			| undefined;
+		const allowedExtensionTypes = getConfigValue(this.#config, 'allowedExtensionTypes');
 
 		const extendedFilter: UmbExtensionCollectionFilterModel = {
 			...filter,
