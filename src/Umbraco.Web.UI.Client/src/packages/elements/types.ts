@@ -4,6 +4,7 @@ import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/b
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 export type * from './tree/types.js';
+export type * from './audit-log/types.js';
 export type * from './entity.js';
 
 export { UmbElementVariantState };
