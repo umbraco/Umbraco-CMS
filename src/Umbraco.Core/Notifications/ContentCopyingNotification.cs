@@ -36,7 +36,7 @@ public sealed class ContentCopyingNotification : CopyingNotification<IContent>
     /// <param name="copy">The copy of the content item.</param>
     /// <param name="parentId">The ID of the new parent.</param>
     /// <param name="messages">The event messages collection.</param>
-    [Obsolete("Please use constructor that takes a parent key as well, scheduled for removal in v15")]
+    [Obsolete("Please use constructor that takes a parent key as well. Scheduled for removal in Umbraco 18.")]
     public ContentCopyingNotification(IContent original, IContent copy, int parentId, EventMessages messages)
         : this(original, copy, parentId, null, messages)
     {
