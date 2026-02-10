@@ -6787,6 +6787,13 @@
             }
           },
           {
+            "name": "allowedInLibrary",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -42806,6 +42813,7 @@
           "alias",
           "allowedAsRoot",
           "allowedDocumentTypes",
+          "allowedInLibrary",
           "allowedTemplates",
           "cleanup",
           "compositions",
@@ -42853,6 +42861,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -43252,6 +43263,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "allowedMediaTypes",
           "compositions",
           "containers",
@@ -43290,6 +43302,9 @@
             "type": "boolean"
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -43563,6 +43578,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "compositions",
           "containers",
           "icon",
@@ -43608,6 +43624,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -45747,6 +45766,7 @@
       },
       "DocumentTypeItemResponseModel": {
         "required": [
+          "allowedInLibrary",
           "flags",
           "id",
           "isElement",
@@ -45772,6 +45792,9 @@
             "type": "string"
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "icon": {
@@ -45961,6 +45984,7 @@
           "alias",
           "allowedAsRoot",
           "allowedDocumentTypes",
+          "allowedInLibrary",
           "allowedTemplates",
           "cleanup",
           "compositions",
@@ -46009,6 +46033,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -46106,6 +46133,7 @@
       },
       "DocumentTypeTreeItemResponseModel": {
         "required": [
+          "allowedInLibrary",
           "flags",
           "hasChildren",
           "icon",
@@ -46152,6 +46180,9 @@
             "type": "boolean"
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "icon": {
@@ -48896,6 +48927,7 @@
           "alias",
           "aliasCanBeChanged",
           "allowedAsRoot",
+          "allowedInLibrary",
           "allowedMediaTypes",
           "compositions",
           "containers",
@@ -48944,6 +48976,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -49787,6 +49822,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "compositions",
           "containers",
           "icon",
@@ -49833,6 +49869,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -54528,6 +54567,7 @@
           "alias",
           "allowedAsRoot",
           "allowedDocumentTypes",
+          "allowedInLibrary",
           "allowedTemplates",
           "cleanup",
           "compositions",
@@ -54575,6 +54615,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -54877,6 +54920,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "allowedMediaTypes",
           "compositions",
           "containers",
@@ -54923,6 +54967,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -55169,6 +55216,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "compositions",
           "containers",
           "icon",
@@ -55214,6 +55262,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
