@@ -36,6 +36,9 @@ export class UmbExtensionPickerDataSource
 				// No specific types requested — use all allowed types
 				extensionTypes = configAllowedExtensionTypes;
 			}
+		} else {
+			// No config restriction — pass through whatever the caller requested
+			extensionTypes = requestedTypes;
 		}
 
 		const extendedArgs: UmbExtensionCollectionFilterModel = {
