@@ -195,11 +195,15 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
             }
         }
 
-        // When path-specific errors exist, pathless errors provide no actionable information.
-        // Similarly, generic parent errors (keyword=null) are noise when child errors pinpoint the issue.
+        // Determine if there are errors at deeper levels (non-root paths). Root path is "" in JSON Pointer.
+        var hasDeepErrors = allPaths.Any(p => p.Length > 0);
+
+        // Only filter pathless errors (Path is null) when more specific path errors exist.
+        // Don't filter empty paths ("") as this represents the root location which is valid.
+        // Similarly, filter generic parent errors (keyword=null) only when specific child errors exist.
         errors.RemoveAll(e =>
-            string.IsNullOrEmpty(e.Path) ||
-            (e.Keyword is null && parentPathsWithChildren.Contains(e.Path)));
+            (e.Path is null && hasDeepErrors) ||
+            (e.Keyword is null && parentPathsWithChildren.Contains(e.Path ?? string.Empty)));
 
         return errors;
     }
