@@ -40,7 +40,7 @@ internal class HasScheduleFlagProvider : IFlagProvider
         IDictionary<Guid, IEnumerable<ContentSchedule>> schedules = _contentService.GetContentSchedulesByKeys(items.Select(x => x.Id).ToArray());
         foreach (TItem item in items)
         {
-            if (!schedules.TryGetValue(item.Id, out IEnumerable<ContentSchedule>? contentSchedules))
+            if (schedules.TryGetValue(item.Id, out IEnumerable<ContentSchedule>? contentSchedules) is false)
             {
                 continue;
             }
