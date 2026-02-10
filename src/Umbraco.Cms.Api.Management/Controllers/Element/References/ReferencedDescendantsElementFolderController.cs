@@ -35,6 +35,8 @@ public class ReferencedDescendantsElementFolderController : ElementControllerBas
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets element folder descendants that are referenced.")]
+    [EndpointDescription("Gets a paginated collection of descendant elements in a folder that are referenced by other content.")]
     public async Task<IActionResult> ReferencedDescendants(
         CancellationToken cancellationToken,
         Guid id,

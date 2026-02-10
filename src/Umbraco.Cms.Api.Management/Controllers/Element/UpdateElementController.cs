@@ -36,6 +36,8 @@ public class UpdateElementController : UpdateElementControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Updates an element.")]
+    [EndpointDescription("Updates an element identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, UpdateElementRequestModel requestModel)
         => await HandleRequest(id, requestModel, async () =>
         {

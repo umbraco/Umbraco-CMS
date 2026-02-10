@@ -35,6 +35,8 @@ public class ByKeyElementController : ElementControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ElementResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets an element.")]
+    [EndpointDescription("Gets an element identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
