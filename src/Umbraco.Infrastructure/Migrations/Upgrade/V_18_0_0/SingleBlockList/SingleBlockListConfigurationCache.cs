@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 /// Used by the SingleBlockList Migration and its processors to avoid having to fetch (and thus lock)
 /// data from the db multiple times during the migration.
 /// </summary>
-[Obsolete("Will be removed in V22")] // Available in v17, activated in v18. Migration needs to work on LTS to LTS 17=>21
+[Obsolete("Scheduled for removal in Umbraco 22.")] // Available in v17, activated in v18. Migration needs to work on LTS to LTS 17=>21
 public class SingleBlockListConfigurationCache
 {
     private readonly IDataTypeService _dataTypeService;

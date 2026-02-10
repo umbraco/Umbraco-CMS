@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <summary>
 ///     Provides urls.
 /// </summary>
-[Obsolete("Use NewDefaultUrlProvider instead. Scheduled for removal in V18.")]
+[Obsolete("Use NewDefaultUrlProvider instead. Scheduled for removal in Umbraco 18.")]
 public class DefaultUrlProvider : IUrlProvider
 {
     private readonly ILocalizationService _localizationService;
@@ -76,7 +76,7 @@ public class DefaultUrlProvider : IUrlProvider
     /// <param name="localizationService">The localization service.</param>
     /// <param name="navigationQueryService">The document navigation query service.</param>
     /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
-    [Obsolete("Use the other constructor - Scheduled for removal in V18")]
+    [Obsolete("Use the other constructor - Scheduled for removal in Umbraco 18.")]
     public DefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         ILogger<DefaultUrlProvider> logger,

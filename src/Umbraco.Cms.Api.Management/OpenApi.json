@@ -11,6 +11,8 @@
         "tags": [
           "Culture"
         ],
+        "summary": "Gets a paginated collection of cultures available for creating languages.",
+        "description": "Gets a paginated collection containing the English and localized names of all available cultures.",
         "operationId": "GetCulture",
         "parameters": [
           {
@@ -63,6 +65,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Creates a new data type.",
+        "description": "Creates a new data type with the configuration specified in the request model.",
         "operationId": "PostDataType",
         "requestBody": {
           "content": {
@@ -209,6 +213,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a data type.",
+        "description": "Gets a data type identified by the provided Id.",
         "operationId": "GetDataTypeById",
         "parameters": [
           {
@@ -267,6 +273,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Deletes a data type.",
+        "description": "Deletes a data type identified by the provided Id.",
         "operationId": "DeleteDataTypeById",
         "parameters": [
           {
@@ -376,6 +384,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Updates a data type.",
+        "description": "Updates a data type identified by the provided Id with the details from the request model.",
         "operationId": "PutDataTypeById",
         "parameters": [
           {
@@ -518,6 +528,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Copies a data type.",
+        "description": "Creates a duplicate of an existing data type identified by the provided unique Id. The copied data type will be given a new Id and have ' (copy)' appended to its name. Optionally, the copy can be placed in a specific container by providing a target container Id.",
         "operationId": "PostDataTypeByIdCopy",
         "parameters": [
           {
@@ -649,6 +661,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Checks if a data type is used.",
+        "description": "Checks if the data type identified by the provided Id is used in any content, media, or member types.",
         "operationId": "GetDataTypeByIdIsUsed",
         "parameters": [
           {
@@ -705,6 +719,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Moves a data type.",
+        "description": "Moves an existing data type identified by Id to a different container. The target container Id must be provided in the request model.",
         "operationId": "PutDataTypeByIdMove",
         "parameters": [
           {
@@ -821,6 +837,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a paged collection of entities that are referenced by a data type.",
+        "description": "Gets a paged collection of entities that are referenced by the data type with the provided Id, so you can see where it is being used.",
         "operationId": "GetDataTypeByIdReferencedBy",
         "parameters": [
           {
@@ -885,6 +903,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets the data type configuration.",
+        "description": "Gets the configuration settings for data types.",
         "operationId": "GetDataTypeConfiguration",
         "responses": {
           "200": {
@@ -920,6 +940,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Creates a data type folder.",
+        "description": "Creates a new data type folder with the provided name and parent location.",
         "operationId": "PostDataTypeFolder",
         "requestBody": {
           "content": {
@@ -1066,6 +1088,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a data type folder.",
+        "description": "Gets a data type folder identified by the provided Id.",
         "operationId": "GetDataTypeFolderById",
         "parameters": [
           {
@@ -1124,6 +1148,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Deletes a data type folder.",
+        "description": "Deletes a data type folder identified by the provided Id.",
         "operationId": "DeleteDataTypeFolderById",
         "parameters": [
           {
@@ -1233,6 +1259,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Updates a data type folder.",
+        "description": "Updates a data type folder identified by the provided Id with the details provided in the request model.",
         "operationId": "PutDataTypeFolderById",
         "parameters": [
           {
@@ -1375,6 +1403,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a filtered collection of data types.",
+        "description": "Filters data types based on the provided criteria with support for pagination.",
         "operationId": "GetFilterDataType",
         "parameters": [
           {
@@ -1452,6 +1482,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a collection of data type items.",
+        "description": "Gets a collection of data type items identified by the provided Ids.",
         "operationId": "GetItemDataType",
         "parameters": [
           {
@@ -1501,6 +1533,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Searches data type items.",
+        "description": "Searches data type items by the provided query with pagination support.",
         "operationId": "GetItemDataTypeSearch",
         "parameters": [
           {
@@ -1560,6 +1594,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a collection of ancestor data type folders.",
+        "description": "Gets a collection of data type folders that are ancestors to the provided Id.",
         "operationId": "GetTreeDataTypeAncestors",
         "parameters": [
           {
@@ -1608,6 +1644,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a collection of data type tree child items.",
+        "description": "Gets a paginated collection of data type tree items that are children of the provided parent Id.",
         "operationId": "GetTreeDataTypeChildren",
         "parameters": [
           {
@@ -1679,6 +1717,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a collection of data type items from the root of the tree.",
+        "description": "Gets a paginated collection of data type items from the root of the tree with optional filtering.",
         "operationId": "GetTreeDataTypeRoot",
         "parameters": [
           {
@@ -1742,6 +1782,8 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets a collection of data type tree sibling items.",
+        "description": "Gets a paged collection of data type tree items that are siblings of the provided Id. The collection can be optionally filtered to return only folder, or folders and data types.",
         "operationId": "GetTreeDataTypeSiblings",
         "parameters": [
           {
@@ -1811,6 +1853,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Gets a paginated collection of dictionary items.",
+        "description": "Gets a paginated collection of dictionary items with optional filtering by name.",
         "operationId": "GetDictionary",
         "parameters": [
           {
@@ -1871,6 +1915,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Creates a new dictionary.",
+        "description": "Creates a new dictionary with the configuration specified in the request model.",
         "operationId": "PostDictionary",
         "requestBody": {
           "content": {
@@ -2043,6 +2089,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Gets a dictionary.",
+        "description": "Gets a dictionary identified by the provided Id.",
         "operationId": "GetDictionaryById",
         "parameters": [
           {
@@ -2101,6 +2149,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Deletes a dictionary.",
+        "description": "Deletes a dictionary identified by the provided Id.",
         "operationId": "DeleteDictionaryById",
         "parameters": [
           {
@@ -2210,6 +2260,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Updates a dictionary.",
+        "description": "Updates a dictionary identified by the provided Id with the details from the request model.",
         "operationId": "PutDictionaryById",
         "parameters": [
           {
@@ -2352,6 +2404,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Exports a dictionary.",
+        "description": "Exports the dictionary identified by the provided Id to a downloadable format.",
         "operationId": "GetDictionaryByIdExport",
         "parameters": [
           {
@@ -2421,6 +2475,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Moves a dictionary.",
+        "description": "Moves a dictionary identified by the provided Id to a different location.",
         "operationId": "PutDictionaryByIdMove",
         "parameters": [
           {
@@ -2563,6 +2619,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Imports a dictionary.",
+        "description": "Imports a dictionary from the provided file upload.",
         "operationId": "PostDictionaryImport",
         "requestBody": {
           "content": {
@@ -2709,6 +2767,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Gets a collection of dictionary items.",
+        "description": "Gets a collection of dictionary items identified by the provided Ids.",
         "operationId": "GetItemDictionary",
         "parameters": [
           {
@@ -2758,6 +2818,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Gets a collection of ancestor dictionary items.",
+        "description": "Gets a collection of dictionary items that are ancestors to the provided Id.",
         "operationId": "GetTreeDictionaryAncestors",
         "parameters": [
           {
@@ -2806,6 +2868,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Gets a collection of dictionary tree child items.",
+        "description": "Gets a paginated collection of dictionary tree items that are children of the provided parent Id.",
         "operationId": "GetTreeDictionaryChildren",
         "parameters": [
           {
@@ -2869,6 +2933,8 @@
         "tags": [
           "Dictionary"
         ],
+        "summary": "Gets a collection of dictionary items from the root of the tree.",
+        "description": "Gets a paginated collection of dictionary items from the root of the tree with optional filtering.",
         "operationId": "GetTreeDictionaryRoot",
         "parameters": [
           {
@@ -2924,6 +2990,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Creates a new document blueprint.",
+        "description": "Creates a new document blueprint with the configuration specified in the request model.",
         "operationId": "PostDocumentBlueprint",
         "requestBody": {
           "content": {
@@ -3070,6 +3138,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Gets a document blueprint.",
+        "description": "Gets a document blueprint identified by the provided Id.",
         "operationId": "GetDocumentBlueprintById",
         "parameters": [
           {
@@ -3128,6 +3198,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Deletes a document blueprint.",
+        "description": "Deletes a document blueprint identified by the provided Id.",
         "operationId": "DeleteDocumentBlueprintById",
         "parameters": [
           {
@@ -3237,6 +3309,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Updates a document blueprint.",
+        "description": "Updates a document blueprint identified by the provided Id with the details from the request model.",
         "operationId": "PutDocumentBlueprintById",
         "parameters": [
           {
@@ -3379,6 +3453,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Moves a document blueprint.",
+        "description": "Moves a document blueprint identified by the provided Id to a different location.",
         "operationId": "PutDocumentBlueprintByIdMove",
         "parameters": [
           {
@@ -3495,6 +3571,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Scaffolds a document blueprint.",
+        "description": "Creates a scaffold for a new document blueprint with default values.",
         "operationId": "GetDocumentBlueprintByIdScaffold",
         "parameters": [
           {
@@ -3555,6 +3633,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Creates a document blueprint folder.",
+        "description": "Creates a new document blueprint folder with the provided name and parent location.",
         "operationId": "PostDocumentBlueprintFolder",
         "requestBody": {
           "content": {
@@ -3701,6 +3781,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Gets a document blueprint folder.",
+        "description": "Gets a document blueprint folder identified by the provided Id.",
         "operationId": "GetDocumentBlueprintFolderById",
         "parameters": [
           {
@@ -3759,6 +3841,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Deletes a document blueprint folder.",
+        "description": "Deletes a document blueprint folder identified by the provided Id.",
         "operationId": "DeleteDocumentBlueprintFolderById",
         "parameters": [
           {
@@ -3868,6 +3952,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Updates a document blueprint folder.",
+        "description": "Updates a document blueprint folder identified by the provided Id with the details from the request model.",
         "operationId": "PutDocumentBlueprintFolderById",
         "parameters": [
           {
@@ -4010,6 +4096,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Creates a document blueprint from an existing document.",
+        "description": "Creates a new document blueprint based on an existing document identified by the provided Id.",
         "operationId": "PostDocumentBlueprintFromDocument",
         "requestBody": {
           "content": {
@@ -4130,6 +4218,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Gets a collection of document blueprint items.",
+        "description": "Gets a collection of document blueprint items identified by the provided Ids.",
         "operationId": "GetItemDocumentBlueprint",
         "parameters": [
           {
@@ -4179,6 +4269,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Gets a collection of ancestor document blueprint items.",
+        "description": "Gets a collection of document blueprint items that are ancestors to the provided Id.",
         "operationId": "GetTreeDocumentBlueprintAncestors",
         "parameters": [
           {
@@ -4227,6 +4319,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Gets a collection of document blueprint tree child items.",
+        "description": "Gets a paginated collection of document blueprint tree items that are children of the provided parent Id.",
         "operationId": "GetTreeDocumentBlueprintChildren",
         "parameters": [
           {
@@ -4298,6 +4392,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Gets a collection of document blueprint items from the root of the tree.",
+        "description": "Gets a paginated collection of document blueprint items from the root of the tree with optional filtering.",
         "operationId": "GetTreeDocumentBlueprintRoot",
         "parameters": [
           {
@@ -4361,6 +4457,8 @@
         "tags": [
           "Document Blueprint"
         ],
+        "summary": "Gets a collection of document blueprint tree sibling items.",
+        "description": "Gets a collection of document blueprint tree items that are siblings of the provided Id.",
         "operationId": "GetTreeDocumentBlueprintSiblings",
         "parameters": [
           {
@@ -4430,6 +4528,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Creates a new document type.",
+        "description": "Creates a new document type with the configuration specified in the request model.",
         "operationId": "PostDocumentType",
         "requestBody": {
           "content": {
@@ -4576,6 +4676,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets a document type.",
+        "description": "Gets a document type identified by the provided Id.",
         "operationId": "GetDocumentTypeById",
         "parameters": [
           {
@@ -4634,6 +4736,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Deletes a document type.",
+        "description": "Deletes a document type identified by the provided Id.",
         "operationId": "DeleteDocumentTypeById",
         "parameters": [
           {
@@ -4717,6 +4821,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Updates a document type.",
+        "description": "Updates a document type identified by the provided Id with the details from the request model.",
         "operationId": "PutDocumentTypeById",
         "parameters": [
           {
@@ -4859,6 +4965,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets allowed child document types.",
+        "description": "Gets a collection of document types that are allowed as children of the specified parent document type.",
         "operationId": "GetDocumentTypeByIdAllowedChildren",
         "parameters": [
           {
@@ -4945,6 +5053,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets allowed parent document types.",
+        "description": "Gets a collection of document types that are allowed as parents of the specified document type.",
         "operationId": "GetDocumentTypeByIdAllowedParents",
         "parameters": [
           {
@@ -5005,6 +5115,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets document blueprints for a document type.",
+        "description": "Gets a collection of document blueprints available for the specified document type.",
         "operationId": "GetDocumentTypeByIdBlueprint",
         "parameters": [
           {
@@ -5083,6 +5195,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets composition references.",
+        "description": "Gets a collection of document types that reference the specified document type as a composition.",
         "operationId": "GetDocumentTypeByIdCompositionReferences",
         "parameters": [
           {
@@ -5160,6 +5274,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Copies a document type.",
+        "description": "Creates a duplicate of an existing document type identified by the provided Id.",
         "operationId": "PostDocumentTypeByIdCopy",
         "parameters": [
           {
@@ -5317,6 +5433,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Exports a document type.",
+        "description": "Exports the document type identified by the provided Id to a downloadable format.",
         "operationId": "GetDocumentTypeByIdExport",
         "parameters": [
           {
@@ -5378,6 +5496,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Imports a document type.",
+        "description": "Imports a document type from the provided file upload.",
         "operationId": "PutDocumentTypeByIdImport",
         "parameters": [
           {
@@ -5520,6 +5640,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Moves a document type.",
+        "description": "Moves a document type identified by the provided Id to a different location.",
         "operationId": "PutDocumentTypeByIdMove",
         "parameters": [
           {
@@ -5662,6 +5784,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Creates a template for a document type.",
+        "description": "Creates a new template associated with the document type identified by the provided Id.",
         "operationId": "PostDocumentTypeByIdTemplate",
         "parameters": [
           {
@@ -5793,6 +5917,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets document types allowed at root.",
+        "description": "Gets a collection of document types that are allowed to be created at the root level.",
         "operationId": "GetDocumentTypeAllowedAtRoot",
         "parameters": [
           {
@@ -5848,6 +5974,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets available compositions.",
+        "description": "Gets a collection of document types that are available to use as compositions for the specified document type.",
         "operationId": "PostDocumentTypeAvailableCompositions",
         "requestBody": {
           "content": {
@@ -5941,6 +6069,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets the document type configuration.",
+        "description": "Gets the configuration settings for document types.",
         "operationId": "GetDocumentTypeConfiguration",
         "responses": {
           "200": {
@@ -5976,6 +6106,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Creates a document type folder.",
+        "description": "Creates a new document type folder with the provided name and parent location.",
         "operationId": "PostDocumentTypeFolder",
         "requestBody": {
           "content": {
@@ -6122,6 +6254,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets a document type folder.",
+        "description": "Gets a document type folder identified by the provided Id.",
         "operationId": "GetDocumentTypeFolderById",
         "parameters": [
           {
@@ -6180,6 +6314,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Deletes a document type folder.",
+        "description": "Deletes a document type folder identified by the provided Id.",
         "operationId": "DeleteDocumentTypeFolderById",
         "parameters": [
           {
@@ -6289,6 +6425,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Updates a document type folder.",
+        "description": "Updates a document type folder identified by the provided Id with the details from the request model.",
         "operationId": "PutDocumentTypeFolderById",
         "parameters": [
           {
@@ -6431,6 +6569,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Imports a document type.",
+        "description": "Imports a document type from the provided file upload.",
         "operationId": "PostDocumentTypeImport",
         "requestBody": {
           "content": {
@@ -6577,6 +6717,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets a collection of document type items.",
+        "description": "Gets a collection of document type items identified by the provided Ids.",
         "operationId": "GetItemDocumentType",
         "parameters": [
           {
@@ -6626,6 +6768,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Searches document type items.",
+        "description": "Searches document type items by the provided query with pagination support.",
         "operationId": "GetItemDocumentTypeSearch",
         "parameters": [
           {
@@ -6692,6 +6836,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets a collection of ancestor document type items.",
+        "description": "Gets a collection of document type items that are ancestors to the provided Id.",
         "operationId": "GetTreeDocumentTypeAncestors",
         "parameters": [
           {
@@ -6740,6 +6886,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets a collection of document type tree child items.",
+        "description": "Gets a paginated collection of document type tree items that are children of the provided parent Id.",
         "operationId": "GetTreeDocumentTypeChildren",
         "parameters": [
           {
@@ -6811,6 +6959,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets a collection of document type items from the root of the tree.",
+        "description": "Gets a paginated collection of document type items from the root of the tree with optional filtering.",
         "operationId": "GetTreeDocumentTypeRoot",
         "parameters": [
           {
@@ -6874,6 +7024,8 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets a collection of document type tree sibling items.",
+        "description": "Gets a collection of document type tree items that are siblings of the provided Id.",
         "operationId": "GetTreeDocumentTypeSiblings",
         "parameters": [
           {
@@ -6943,6 +7095,8 @@
         "tags": [
           "Document Version"
         ],
+        "summary": "Gets a paginated collection of versions for a specific document.",
+        "description": "Gets a paginated collection of versions for a specific document and optional culture. Each result describes the version and includes details of the document type, editor, version date, and published status.",
         "operationId": "GetDocumentVersion",
         "parameters": [
           {
@@ -7042,6 +7196,8 @@
         "tags": [
           "Document Version"
         ],
+        "summary": "Gets a specific document version.",
+        "description": "Gets a specific document version by its Id. If found, the result describes the version and includes details of the document type, editor, version date, and published status.",
         "operationId": "GetDocumentVersionById",
         "parameters": [
           {
@@ -7116,6 +7272,8 @@
         "tags": [
           "Document Version"
         ],
+        "summary": "Sets the prevent clean up status for a document version.",
+        "description": "Sets the prevent clean up boolean status for a document version to the provided value. This controls whether the version will be a candidate for removal in content history clean up.",
         "operationId": "PutDocumentVersionByIdPreventCleanup",
         "parameters": [
           {
@@ -7234,6 +7392,8 @@
         "tags": [
           "Document Version"
         ],
+        "summary": "Rolls back a document to a specific version.",
+        "description": "Rolls back a document to the version indicated by the provided Id. This will archive the current version of the document and publish the provided one.",
         "operationId": "PostDocumentVersionByIdRollback",
         "parameters": [
           {
@@ -7352,6 +7512,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a document collection.",
+        "description": "Gets a document collection identified by the provided Id.",
         "operationId": "GetCollectionDocumentById",
         "parameters": [
           {
@@ -7481,6 +7643,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Creates a new document.",
+        "description": "Creates a new document with the configuration specified in the request model.",
         "operationId": "PostDocument",
         "requestBody": {
           "content": {
@@ -7627,6 +7791,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a document.",
+        "description": "Gets a document identified by the provided Id.",
         "operationId": "GetDocumentById",
         "parameters": [
           {
@@ -7685,6 +7851,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Deletes a document.",
+        "description": "Deletes a document identified by the provided Id.",
         "operationId": "DeleteDocumentById",
         "parameters": [
           {
@@ -7794,6 +7962,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Updates a document.",
+        "description": "Updates a document identified by the provided Id with the details from the request model.",
         "operationId": "PutDocumentById",
         "parameters": [
           {
@@ -7936,6 +8106,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets the audit log for a document.",
+        "description": "Gets a paginated collection of audit log entries for the document identified by the provided Id.",
         "operationId": "GetDocumentByIdAuditLog",
         "parameters": [
           {
@@ -8015,6 +8187,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets available segments.",
+        "description": "Gets a collection of available content segments for the system.",
         "operationId": "GetDocumentByIdAvailableSegmentOptions",
         "parameters": [
           {
@@ -8094,6 +8268,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Copies a document.",
+        "description": "Creates a duplicate of an existing document identified by the provided Id.",
         "operationId": "PostDocumentByIdCopy",
         "parameters": [
           {
@@ -8225,6 +8401,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets domains for a document.",
+        "description": "Gets the domains and culture settings assigned to the document identified by the provided Id.",
         "operationId": "GetDocumentByIdDomains",
         "parameters": [
           {
@@ -8283,6 +8461,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Updates the domains for a document.",
+        "description": "Updates the domains for the document identified by the provided Id with the details from the request model.",
         "operationId": "PutDocumentByIdDomains",
         "parameters": [
           {
@@ -8451,6 +8631,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Moves a document.",
+        "description": "Moves a document identified by the provided Id to a different location.",
         "operationId": "PutDocumentByIdMove",
         "parameters": [
           {
@@ -8567,6 +8749,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Moves a document to the recycle bin.",
+        "description": "Moves a document identified by the provided Id to the recycle bin.",
         "operationId": "PutDocumentByIdMoveToRecycleBin",
         "parameters": [
           {
@@ -8678,6 +8862,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets notifications for a document.",
+        "description": "Gets the notifications for the document identified by the provided Id.",
         "operationId": "GetDocumentByIdNotifications",
         "parameters": [
           {
@@ -8739,6 +8925,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Updates notification subscriptions for a document.",
+        "description": "Updates which actions the current user is subscribed to receive notifications for on the specified document.",
         "operationId": "PutDocumentByIdNotifications",
         "parameters": [
           {
@@ -8855,6 +9043,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets the preview URL for a document.",
+        "description": "Gets the preview URL for the document identified by the provided Id.",
         "operationId": "GetDocumentByIdPreviewUrl",
         "parameters": [
           {
@@ -8950,6 +9140,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Creates public access rules for a document.",
+        "description": "Creates public access protection for the document identified by the provided Id.",
         "operationId": "PostDocumentByIdPublicAccess",
         "parameters": [
           {
@@ -9079,6 +9271,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Removes public access settings for a document.",
+        "description": "Removes public access protection/rules for the document identified by the provided Id.",
         "operationId": "DeleteDocumentByIdPublicAccess",
         "parameters": [
           {
@@ -9162,6 +9356,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets public access rules for a document.",
+        "description": "Gets the public access protection settings for the document identified by the provided Id.",
         "operationId": "GetDocumentByIdPublicAccess",
         "parameters": [
           {
@@ -9220,6 +9416,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Updates public access protection for a document.",
+        "description": "Updates the member protection settings for a document, controlling which members or member groups can access it.",
         "operationId": "PutDocumentByIdPublicAccess",
         "parameters": [
           {
@@ -9336,6 +9534,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Publishes a document.",
+        "description": "Publishes a document identified by the provided Id.",
         "operationId": "PutDocumentByIdPublish",
         "parameters": [
           {
@@ -9478,6 +9678,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Publishes a document with its descendants.",
+        "description": "Publishes a document and its descendants identified by the provided Id.",
         "operationId": "PutDocumentByIdPublishWithDescendants",
         "parameters": [
           {
@@ -9631,6 +9833,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets the result of publishing a document with descendants.",
+        "description": "Gets the status and result of a publish with descendants operation.",
         "operationId": "GetDocumentByIdPublishWithDescendantsResultByTaskId",
         "parameters": [
           {
@@ -9714,6 +9918,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a document.",
+        "description": "Gets a document identified by the provided Id.",
         "operationId": "GetDocumentByIdPublished",
         "parameters": [
           {
@@ -9774,6 +9980,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of items that reference documents.",
+        "description": "Gets a paginated collection of items that reference the documents identified by the provided Ids.",
         "operationId": "GetDocumentByIdReferencedBy",
         "parameters": [
           {
@@ -9852,6 +10060,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets document descendants that are referenced.",
+        "description": "Gets a paginated collection of descendant documents that are referenced by other content.",
         "operationId": "GetDocumentByIdReferencedDescendants",
         "parameters": [
           {
@@ -9930,6 +10140,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Unpublishes a document.",
+        "description": "Unpublishes a document identified by the provided Id.",
         "operationId": "PutDocumentByIdUnpublish",
         "parameters": [
           {
@@ -10072,6 +10284,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Validates updating a document.",
+        "description": "Validates the request model for updating a document without actually updating it.",
         "operationId": "PutUmbracoManagementApiV1.1DocumentByIdValidate1.1",
         "parameters": [
           {
@@ -10214,6 +10428,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of items that reference documents.",
+        "description": "Gets a paginated collection of items that reference the documents identified by the provided Ids.",
         "operationId": "GetDocumentAreReferenced",
         "parameters": [
           {
@@ -10281,6 +10497,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets the document configuration.",
+        "description": "Gets the configuration settings for documents.",
         "operationId": "GetDocumentConfiguration",
         "responses": {
           "200": {
@@ -10316,6 +10534,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Sorts documents.",
+        "description": "Sorts documents in the specified parent container according to the provided sort order.",
         "operationId": "PutDocumentSort",
         "requestBody": {
           "content": {
@@ -10447,6 +10667,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets URLs for a document.",
+        "description": "Gets the URLs for the document identified by the provided Id.",
         "operationId": "GetDocumentUrls",
         "parameters": [
           {
@@ -10499,6 +10721,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Validates creating a document.",
+        "description": "Validates the request model for creating a new document without actually creating it.",
         "operationId": "PostDocumentValidate",
         "requestBody": {
           "content": {
@@ -10630,6 +10854,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of document items.",
+        "description": "Gets a collection of document items identified by the provided Ids.",
         "operationId": "GetItemDocument",
         "parameters": [
           {
@@ -10679,6 +10905,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Searches document items.",
+        "description": "Searches document items by the provided query with pagination support.",
         "operationId": "GetItemDocumentSearch",
         "parameters": [
           {
@@ -10779,6 +11007,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Empties the document recycle bin.",
+        "description": "Permanently deletes all documents in the recycle bin. This operation cannot be undone.",
         "operationId": "DeleteRecycleBinDocument",
         "responses": {
           "200": {
@@ -10853,6 +11083,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Deletes a document.",
+        "description": "Deletes a document identified by the provided Id.",
         "operationId": "DeleteRecycleBinDocumentById",
         "parameters": [
           {
@@ -10964,6 +11196,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets the original parent of a document in the recycle bin.",
+        "description": "Gets the original parent location of a document before it was moved to the recycle bin.",
         "operationId": "GetRecycleBinDocumentByIdOriginalParent",
         "parameters": [
           {
@@ -11038,6 +11272,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Restores a document from the recycle bin.",
+        "description": "Restores a document from the recycle bin to its original location or a specified parent.",
         "operationId": "PutRecycleBinDocumentByIdRestore",
         "parameters": [
           {
@@ -11180,6 +11416,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of documents in the recycle bin.",
+        "description": "Gets a paginated collection of documents that are children of the provided parent in the recycle bin.",
         "operationId": "GetRecycleBinDocumentChildren",
         "parameters": [
           {
@@ -11243,6 +11481,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets items referencing a document in the recycle bin.",
+        "description": "Gets a paginated collection of items that reference the document in the recycle bin.",
         "operationId": "GetRecycleBinDocumentReferencedBy",
         "parameters": [
           {
@@ -11298,6 +11538,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets documents at the root of the recycle bin.",
+        "description": "Gets a paginated collection of documents at the root level of the recycle bin.",
         "operationId": "GetRecycleBinDocumentRoot",
         "parameters": [
           {
@@ -11353,6 +11595,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets sibling documents in the recycle bin.",
+        "description": "Gets a collection of sibling documents in the recycle bin at the same level as the provided Id.",
         "operationId": "GetRecycleBinDocumentSiblings",
         "parameters": [
           {
@@ -11422,6 +11666,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of ancestor document items.",
+        "description": "Gets a collection of document items that are ancestors to the provided Id.",
         "operationId": "GetTreeDocumentAncestors",
         "parameters": [
           {
@@ -11470,6 +11716,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of document tree child items.",
+        "description": "Gets a paginated collection of document tree items that are children of the provided parent Id.",
         "operationId": "GetTreeDocumentChildren",
         "parameters": [
           {
@@ -11541,6 +11789,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of document items from the root of the tree.",
+        "description": "Gets a paginated collection of document items from the root of the tree with optional filtering.",
         "operationId": "GetTreeDocumentRoot",
         "parameters": [
           {
@@ -11604,6 +11854,8 @@
         "tags": [
           "Document"
         ],
+        "summary": "Gets a collection of document tree sibling items.",
+        "description": "Gets a collection of document tree items that are siblings of the provided Id.",
         "operationId": "GetTreeDocumentSiblings",
         "parameters": [
           {
@@ -11673,6 +11925,8 @@
         "tags": [
           "Dynamic Root"
         ],
+        "summary": "Gets dynamic roots.",
+        "description": "Gets a collection of dynamic root items based on the provided query configuration.",
         "operationId": "PostDynamicRootQuery",
         "requestBody": {
           "content": {
@@ -11763,6 +12017,8 @@
         "tags": [
           "Dynamic Root"
         ],
+        "summary": "Gets dynamic root query steps.",
+        "description": "Gets a collection of available query steps for configuring dynamic root queries.",
         "operationId": "GetDynamicRootSteps",
         "responses": {
           "200": {
@@ -15115,6 +15371,8 @@
         "tags": [
           "Health Check"
         ],
+        "summary": "Gets a collection of health check groups.",
+        "description": "Gets a collection of health check groups with their associated health checks.",
         "operationId": "GetHealthCheckGroup",
         "parameters": [
           {
@@ -15170,6 +15428,8 @@
         "tags": [
           "Health Check"
         ],
+        "summary": "Gets a health check group by name.",
+        "description": "Gets a health check group and all its associated health checks identified by the provided group name.",
         "operationId": "GetHealthCheckGroupByName",
         "parameters": [
           {
@@ -15229,6 +15489,8 @@
         "tags": [
           "Health Check"
         ],
+        "summary": "Executes all health checks in a group.",
+        "description": "Runs all health checks in the group identified by the provided name and returns the results.",
         "operationId": "PostHealthCheckGroupByNameCheck",
         "parameters": [
           {
@@ -15324,6 +15586,8 @@
         "tags": [
           "Health Check"
         ],
+        "summary": "Executes a health check action.",
+        "description": "Executes a specific action to fix or address a health check issue.",
         "operationId": "PostHealthCheckExecuteAction",
         "requestBody": {
           "content": {
@@ -15440,6 +15704,8 @@
         "tags": [
           "Help"
         ],
+        "summary": "Gets help information.",
+        "description": "Gets help information and documentation resources for the Umbraco back office.",
         "operationId": "GetHelp",
         "parameters": [
           {
@@ -15529,6 +15795,8 @@
         "tags": [
           "Imaging"
         ],
+        "summary": "Gets URLs for image resizing.",
+        "description": "Gets a collection of URLs for resizing images with the provided dimensions and options.",
         "operationId": "GetImagingResizeUrls",
         "parameters": [
           {
@@ -15606,6 +15874,8 @@
         "tags": [
           "Import"
         ],
+        "summary": "Analyzes an import file.",
+        "description": "Analyzes the uploaded import file and returns an analysis of the imported entities.",
         "operationId": "GetImportAnalyze",
         "parameters": [
           {
@@ -15676,6 +15946,8 @@
         "tags": [
           "Indexer"
         ],
+        "summary": "Gets a collection of indexers.",
+        "description": "Gets a collection of configured search indexers in the Umbraco installation.",
         "operationId": "GetIndexer",
         "parameters": [
           {
@@ -15728,6 +16000,8 @@
         "tags": [
           "Indexer"
         ],
+        "summary": "Gets indexer details.",
+        "description": "Gets detailed information about the indexer identified by the provided name.",
         "operationId": "GetIndexerByIndexName",
         "parameters": [
           {
@@ -15784,6 +16058,8 @@
         "tags": [
           "Indexer"
         ],
+        "summary": "Rebuilds an indexer.",
+        "description": "Rebuilds the search index for the indexer identified by the provided name.",
         "operationId": "PostIndexerByIndexNameRebuild",
         "parameters": [
           {
@@ -15905,6 +16181,8 @@
         "tags": [
           "Install"
         ],
+        "summary": "Gets install settings.",
+        "description": "Gets the current installation settings and status.",
         "operationId": "GetInstallSettings",
         "responses": {
           "428": {
@@ -15943,6 +16221,8 @@
         "tags": [
           "Install"
         ],
+        "summary": "Performs installation setup.",
+        "description": "Performs the initial setup and installation of Umbraco.",
         "operationId": "PostInstallSetup",
         "requestBody": {
           "content": {
@@ -16025,6 +16305,8 @@
         "tags": [
           "Install"
         ],
+        "summary": "Validates database connection.",
+        "description": "Validates the database connection settings provided during installation.",
         "operationId": "PostInstallValidateDatabase",
         "requestBody": {
           "content": {
@@ -16107,6 +16389,8 @@
         "tags": [
           "Language"
         ],
+        "summary": "Gets a collection of language items.",
+        "description": "Gets a collection of language items identified by the provided Ids.",
         "operationId": "GetItemLanguage",
         "parameters": [
           {
@@ -16155,6 +16439,8 @@
         "tags": [
           "Language"
         ],
+        "summary": "Gets the default language.",
+        "description": "Gets the default language configured for the Umbraco installation.",
         "operationId": "GetItemLanguageDefault",
         "responses": {
           "200": {
@@ -16187,6 +16473,8 @@
         "tags": [
           "Language"
         ],
+        "summary": "Gets a paginated collection of languages.",
+        "description": "Gets a paginated collection of all configured languages.",
         "operationId": "GetLanguage",
         "parameters": [
           {
@@ -16237,6 +16525,8 @@
         "tags": [
           "Language"
         ],
+        "summary": "Creates a new language.",
+        "description": "Creates a new language with the configuration specified in the request model.",
         "operationId": "PostLanguage",
         "requestBody": {
           "content": {
@@ -16383,6 +16673,8 @@
         "tags": [
           "Language"
         ],
+        "summary": "Gets a language by ISO code.",
+        "description": "Gets a language identified by the provided ISO code.",
         "operationId": "GetLanguageByIsoCode",
         "parameters": [
           {
@@ -16437,6 +16729,8 @@
         "tags": [
           "Language"
         ],
+        "summary": "Deletes a language.",
+        "description": "Deletes a language identified by the provided Id.",
         "operationId": "DeleteLanguageByIsoCode",
         "parameters": [
           {
@@ -16545,6 +16839,8 @@
         "tags": [
           "Language"
         ],
+        "summary": "Updates a language.",
+        "description": "Updates a language identified by the provided Id with the details from the request model.",
         "operationId": "PutLanguageByIsoCode",
         "parameters": [
           {
@@ -16686,6 +16982,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Gets a collection of log sink levels.",
+        "description": "Gets a collection of configured log sinks with their minimum log levels.",
         "operationId": "GetLogViewerLevel",
         "parameters": [
           {
@@ -16741,6 +17039,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Gets log level counts.",
+        "description": "Gets the count of log entries for each log level within the specified date range.",
         "operationId": "GetLogViewerLevelCount",
         "parameters": [
           {
@@ -16808,6 +17108,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Gets a paginated collection of log entries.",
+        "description": "Gets a paginated collection of log entries with optional filtering and date range.",
         "operationId": "GetLogViewerLog",
         "parameters": [
           {
@@ -16903,6 +17205,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Gets a collection of log message templates.",
+        "description": "Gets a paginated collection of unique message templates found in the logs.",
         "operationId": "GetLogViewerMessageTemplate",
         "parameters": [
           {
@@ -16988,6 +17292,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Gets a collection of saved log searches.",
+        "description": "Gets a collection of saved log searches defined in the Umbraco installation.",
         "operationId": "GetLogViewerSavedSearch",
         "parameters": [
           {
@@ -17041,6 +17347,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Creates a saved log search.",
+        "description": "Creates a new saved log search with the provided name and query configuration.",
         "operationId": "PostLogViewerSavedSearch",
         "requestBody": {
           "content": {
@@ -17161,6 +17469,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Gets a saved log search by name.",
+        "description": "Gets a saved log search identified by the provided name.",
         "operationId": "GetLogViewerSavedSearchByName",
         "parameters": [
           {
@@ -17218,6 +17528,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Deletes a saved log search.",
+        "description": "Deletes a saved log search identified by the provided name.",
         "operationId": "DeleteLogViewerSavedSearchByName",
         "parameters": [
           {
@@ -17302,6 +17614,8 @@
         "tags": [
           "Log Viewer"
         ],
+        "summary": "Validates if logs can be viewed.",
+        "description": "Checks if the log files are within the size limit and can be viewed.",
         "operationId": "GetLogViewerValidateLogsSize",
         "parameters": [
           {
@@ -17358,6 +17672,8 @@
         "tags": [
           "Manifest"
         ],
+        "summary": "Gets all manifests.",
+        "description": "Gets a collection of all package manifests including both public and private manifests.",
         "operationId": "GetManifestManifest",
         "responses": {
           "200": {
@@ -17396,6 +17712,8 @@
         "tags": [
           "Manifest"
         ],
+        "summary": "Gets private manifests.",
+        "description": "Gets a collection of private package manifests specific to the current user.",
         "operationId": "GetManifestManifestPrivate",
         "responses": {
           "200": {
@@ -17434,6 +17752,8 @@
         "tags": [
           "Manifest"
         ],
+        "summary": "Gets public manifests.",
+        "description": "Gets a collection of public package manifests available to all users.",
         "operationId": "GetManifestManifestPublic",
         "responses": {
           "200": {
@@ -17461,6 +17781,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a collection of media type items.",
+        "description": "Gets a collection of media type items identified by the provided Ids.",
         "operationId": "GetItemMediaType",
         "parameters": [
           {
@@ -17510,6 +17832,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a collection of media type items.",
+        "description": "Gets a collection of allowed media type items for the specified file extension.",
         "operationId": "GetItemMediaTypeAllowed",
         "parameters": [
           {
@@ -17569,6 +17893,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a collection of media type folder items.",
+        "description": "Gets a paginated collection of media type folder items.",
         "operationId": "GetItemMediaTypeFolders",
         "parameters": [
           {
@@ -17621,6 +17947,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Searches media type items.",
+        "description": "Searches media type items by the provided query with pagination support.",
         "operationId": "GetItemMediaTypeSearch",
         "parameters": [
           {
@@ -17680,6 +18008,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Creates a new media type.",
+        "description": "Creates a new media type with the configuration specified in the request model.",
         "operationId": "PostMediaType",
         "requestBody": {
           "content": {
@@ -17826,6 +18156,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a media type.",
+        "description": "Gets a media type identified by the provided Id.",
         "operationId": "GetMediaTypeById",
         "parameters": [
           {
@@ -17884,6 +18216,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Deletes a media type.",
+        "description": "Deletes a media type identified by the provided Id.",
         "operationId": "DeleteMediaTypeById",
         "parameters": [
           {
@@ -17967,6 +18301,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Updates a media type.",
+        "description": "Updates a media type identified by the provided Id with the details from the request model.",
         "operationId": "PutMediaTypeById",
         "parameters": [
           {
@@ -18109,6 +18445,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets allowed child media types.",
+        "description": "Gets a collection of media types that are allowed as children of the specified parent media type.",
         "operationId": "GetMediaTypeByIdAllowedChildren",
         "parameters": [
           {
@@ -18195,6 +18533,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets allowed parent media types.",
+        "description": "Gets a collection of media types that are allowed as parents of the specified media type.",
         "operationId": "GetMediaTypeByIdAllowedParents",
         "parameters": [
           {
@@ -18255,6 +18595,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets composition references.",
+        "description": "Gets a collection of media types that reference the specified media type as a composition.",
         "operationId": "GetMediaTypeByIdCompositionReferences",
         "parameters": [
           {
@@ -18332,6 +18674,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Copies a media type.",
+        "description": "Creates a duplicate of an existing media type identified by the provided Id.",
         "operationId": "PostMediaTypeByIdCopy",
         "parameters": [
           {
@@ -18489,6 +18833,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Exports a media type.",
+        "description": "Exports the media type identified by the provided Id to a downloadable format.",
         "operationId": "GetMediaTypeByIdExport",
         "parameters": [
           {
@@ -18550,6 +18896,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Imports a media type.",
+        "description": "Imports a media type from the provided file upload.",
         "operationId": "PutMediaTypeByIdImport",
         "parameters": [
           {
@@ -18692,6 +19040,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Moves a media type.",
+        "description": "Moves a media type identified by the provided Id to a different location.",
         "operationId": "PutMediaTypeByIdMove",
         "parameters": [
           {
@@ -18834,6 +19184,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets media types allowed at root.",
+        "description": "Gets a collection of media types that are allowed to be created at the root level.",
         "operationId": "GetMediaTypeAllowedAtRoot",
         "parameters": [
           {
@@ -18889,6 +19241,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets available compositions.",
+        "description": "Gets a collection of media types that are available to use as compositions for the specified media type.",
         "operationId": "PostMediaTypeAvailableCompositions",
         "requestBody": {
           "content": {
@@ -18982,6 +19336,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets the media type configuration.",
+        "description": "Gets the configuration settings for media types.",
         "operationId": "GetMediaTypeConfiguration",
         "responses": {
           "200": {
@@ -19017,6 +19373,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Creates a media type folder.",
+        "description": "Creates a new media type folder with the provided name and parent location.",
         "operationId": "PostMediaTypeFolder",
         "requestBody": {
           "content": {
@@ -19163,6 +19521,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a media type folder.",
+        "description": "Gets a media type folder identified by the provided Id.",
         "operationId": "GetMediaTypeFolderById",
         "parameters": [
           {
@@ -19221,6 +19581,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Deletes a media type folder.",
+        "description": "Deletes a media type folder identified by the provided Id.",
         "operationId": "DeleteMediaTypeFolderById",
         "parameters": [
           {
@@ -19330,6 +19692,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Updates a media type folder.",
+        "description": "Updates a media type folder identified by the provided Id with the details from the request model.",
         "operationId": "PutMediaTypeFolderById",
         "parameters": [
           {
@@ -19472,6 +19836,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Imports a media type.",
+        "description": "Imports a media type from the provided file upload.",
         "operationId": "PostMediaTypeImport",
         "requestBody": {
           "content": {
@@ -19618,6 +19984,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a collection of ancestor media type items.",
+        "description": "Gets a collection of media type items that are ancestors to the provided Id.",
         "operationId": "GetTreeMediaTypeAncestors",
         "parameters": [
           {
@@ -19666,6 +20034,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a collection of media type tree child items.",
+        "description": "Gets a paginated collection of media type tree items that are children of the provided parent Id.",
         "operationId": "GetTreeMediaTypeChildren",
         "parameters": [
           {
@@ -19737,6 +20107,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a collection of media type items from the root of the tree.",
+        "description": "Gets a paginated collection of media type items from the root of the tree with optional filtering.",
         "operationId": "GetTreeMediaTypeRoot",
         "parameters": [
           {
@@ -19800,6 +20172,8 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets a collection of media type tree sibling items.",
+        "description": "Gets a collection of media type tree items that are siblings of the provided Id.",
         "operationId": "GetTreeMediaTypeSiblings",
         "parameters": [
           {
@@ -19869,6 +20243,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of media items.",
+        "description": "Gets a paginated collection of media items, optionally filtered and sorted.",
         "operationId": "GetCollectionMedia",
         "parameters": [
           {
@@ -19990,6 +20366,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of media items.",
+        "description": "Gets a collection of media items identified by the provided Ids.",
         "operationId": "GetItemMedia",
         "parameters": [
           {
@@ -20039,6 +20417,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Searches media items.",
+        "description": "Searches media items by the provided query with pagination support.",
         "operationId": "GetItemMediaSearch",
         "parameters": [
           {
@@ -20139,6 +20519,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Creates a new media.",
+        "description": "Creates a new media with the configuration specified in the request model.",
         "operationId": "PostMedia",
         "requestBody": {
           "content": {
@@ -20285,6 +20667,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a media item.",
+        "description": "Gets a media item identified by the provided Id.",
         "operationId": "GetMediaById",
         "parameters": [
           {
@@ -20343,6 +20727,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Deletes a media item.",
+        "description": "Deletes a media item identified by the provided Id.",
         "operationId": "DeleteMediaById",
         "parameters": [
           {
@@ -20452,6 +20838,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Updates a media item.",
+        "description": "Updates a media item identified by the provided Id with the details from the request model.",
         "operationId": "PutMediaById",
         "parameters": [
           {
@@ -20594,6 +20982,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets the audit log for a media item.",
+        "description": "Gets a paginated collection of audit log entries for the media identified by the provided Id.",
         "operationId": "GetMediaByIdAuditLog",
         "parameters": [
           {
@@ -20673,6 +21063,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Moves a media item.",
+        "description": "Moves a media item identified by the provided Id to a different location.",
         "operationId": "PutMediaByIdMove",
         "parameters": [
           {
@@ -20789,6 +21181,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Moves a media item to the recycle bin.",
+        "description": "Moves a media item identified by the provided Id to the recycle bin.",
         "operationId": "PutMediaByIdMoveToRecycleBin",
         "parameters": [
           {
@@ -20900,6 +21294,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of items that reference a media item.",
+        "description": "Gets a paginated collection of items that reference the media item identified by the provided Id.",
         "operationId": "GetMediaByIdReferencedBy",
         "parameters": [
           {
@@ -20978,6 +21374,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets media descendants that are referenced.",
+        "description": "Gets a paginated collection of descendant media items that are referenced by other content.",
         "operationId": "GetMediaByIdReferencedDescendants",
         "parameters": [
           {
@@ -21056,6 +21454,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Validates updating a media item.",
+        "description": "Validates the request model for updating a media item without actually updating it.",
         "operationId": "PutMediaByIdValidate",
         "parameters": [
           {
@@ -21198,6 +21598,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of referenced media items.",
+        "description": "Gets a paginated collection of media items that are referenced, identified by the provided Ids.",
         "operationId": "GetMediaAreReferenced",
         "parameters": [
           {
@@ -21265,6 +21667,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets the media configuration.",
+        "description": "Gets the configuration settings for media.",
         "operationId": "GetMediaConfiguration",
         "responses": {
           "200": {
@@ -21301,6 +21705,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Sorts media items.",
+        "description": "Sorts media items in the specified parent container according to the provided sort order.",
         "operationId": "PutMediaSort",
         "requestBody": {
           "content": {
@@ -21432,6 +21838,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets URLs for media items.",
+        "description": "Gets the URLs for the media items identified by the provided Ids.",
         "operationId": "GetMediaUrls",
         "parameters": [
           {
@@ -21484,6 +21892,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Validates creating a media item.",
+        "description": "Validates the request model for creating a new media item without actually creating it.",
         "operationId": "PostMediaValidate",
         "requestBody": {
           "content": {
@@ -21615,6 +22025,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Empties the media recycle bin.",
+        "description": "Permanently deletes all media items in the recycle bin. This operation cannot be undone.",
         "operationId": "DeleteRecycleBinMedia",
         "responses": {
           "200": {
@@ -21689,6 +22101,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Deletes a media item from the recycle bin.",
+        "description": "Permanently deletes a media item from the recycle bin identified by the provided Id.",
         "operationId": "DeleteRecycleBinMediaById",
         "parameters": [
           {
@@ -21800,6 +22214,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets the original parent of a media item in the recycle bin.",
+        "description": "Gets the original parent location of a media item before it was moved to the recycle bin.",
         "operationId": "GetRecycleBinMediaByIdOriginalParent",
         "parameters": [
           {
@@ -21874,6 +22290,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Restores a media item from the recycle bin.",
+        "description": "Restores a media item from the recycle bin to its original location or a specified parent.",
         "operationId": "PutRecycleBinMediaByIdRestore",
         "parameters": [
           {
@@ -22016,6 +22434,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of media items in the recycle bin.",
+        "description": "Gets a paginated collection of media items that are children of the provided parent in the recycle bin.",
         "operationId": "GetRecycleBinMediaChildren",
         "parameters": [
           {
@@ -22079,6 +22499,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets items referencing media in the recycle bin.",
+        "description": "Gets a paginated collection of items that reference the media in the recycle bin.",
         "operationId": "GetRecycleBinMediaReferencedBy",
         "parameters": [
           {
@@ -22134,6 +22556,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets media at the root of the recycle bin.",
+        "description": "Gets a paginated collection of media items at the root level of the recycle bin.",
         "operationId": "GetRecycleBinMediaRoot",
         "parameters": [
           {
@@ -22189,6 +22613,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets sibling media in the recycle bin.",
+        "description": "Gets a collection of sibling media items in the recycle bin at the same level as the provided Id.",
         "operationId": "GetRecycleBinMediaSiblings",
         "parameters": [
           {
@@ -22258,6 +22684,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of ancestor media items.",
+        "description": "Gets a collection of media items that are ancestors to the provided Id.",
         "operationId": "GetTreeMediaAncestors",
         "parameters": [
           {
@@ -22306,6 +22734,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of media tree child items.",
+        "description": "Gets a paginated collection of media tree items that are children of the provided parent Id.",
         "operationId": "GetTreeMediaChildren",
         "parameters": [
           {
@@ -22377,6 +22807,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of media items from the root of the tree.",
+        "description": "Gets a paginated collection of media items from the root of the tree with optional filtering.",
         "operationId": "GetTreeMediaRoot",
         "parameters": [
           {
@@ -22440,6 +22872,8 @@
         "tags": [
           "Media"
         ],
+        "summary": "Gets a collection of media tree sibling items.",
+        "description": "Gets a collection of media tree items that are siblings of the provided Id.",
         "operationId": "GetTreeMediaSiblings",
         "parameters": [
           {
@@ -22509,6 +22943,8 @@
         "tags": [
           "Member Group"
         ],
+        "summary": "Gets a collection of member group items.",
+        "description": "Gets a collection of member group items identified by the provided Ids.",
         "operationId": "GetItemMemberGroup",
         "parameters": [
           {
@@ -22558,6 +22994,8 @@
         "tags": [
           "Member Group"
         ],
+        "summary": "Gets a paginated collection of member groups.",
+        "description": "Gets a paginated collection of all member groups.",
         "operationId": "GetMemberGroup",
         "parameters": [
           {
@@ -22611,6 +23049,8 @@
         "tags": [
           "Member Group"
         ],
+        "summary": "Creates a new member group.",
+        "description": "Creates a new member group with the configuration specified in the request model.",
         "operationId": "PostMemberGroup",
         "requestBody": {
           "content": {
@@ -22731,6 +23171,8 @@
         "tags": [
           "Member Group"
         ],
+        "summary": "Gets a member group.",
+        "description": "Gets a member group identified by the provided Id.",
         "operationId": "GetMemberGroupById",
         "parameters": [
           {
@@ -22778,6 +23220,8 @@
         "tags": [
           "Member Group"
         ],
+        "summary": "Deletes a member group.",
+        "description": "Deletes a member group identified by the provided Id.",
         "operationId": "DeleteMemberGroupById",
         "parameters": [
           {
@@ -22887,6 +23331,8 @@
         "tags": [
           "Member Group"
         ],
+        "summary": "Updates a member group.",
+        "description": "Updates a member group identified by the provided Id with the details from the request model.",
         "operationId": "PutMemberGroupById",
         "parameters": [
           {
@@ -23029,6 +23475,8 @@
         "tags": [
           "Member Group"
         ],
+        "summary": "Gets a collection of member group items from the root of the tree.",
+        "description": "Gets a paginated collection of member group items from the root of the tree with optional filtering.",
         "operationId": "GetTreeMemberGroupRoot",
         "parameters": [
           {
@@ -23084,6 +23532,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets a collection of member type items.",
+        "description": "Gets a collection of member type items identified by the provided Ids.",
         "operationId": "GetItemMemberType",
         "parameters": [
           {
@@ -23133,6 +23583,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Searches member type items.",
+        "description": "Searches member type items by the provided query with pagination support.",
         "operationId": "GetItemMemberTypeSearch",
         "parameters": [
           {
@@ -23192,6 +23644,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Creates a new member type.",
+        "description": "Creates a new member type with the configuration specified in the request model.",
         "operationId": "PostMemberType",
         "requestBody": {
           "content": {
@@ -23338,6 +23792,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets a member type.",
+        "description": "Gets a member type identified by the provided Id.",
         "operationId": "GetMemberTypeById",
         "parameters": [
           {
@@ -23396,6 +23852,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Deletes a member type.",
+        "description": "Deletes a member type identified by the provided Id.",
         "operationId": "DeleteMemberTypeById",
         "parameters": [
           {
@@ -23479,6 +23937,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Updates a member type.",
+        "description": "Updates a member type identified by the provided Id with the details from the request model.",
         "operationId": "PutMemberTypeById",
         "parameters": [
           {
@@ -23621,6 +24081,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets composition references.",
+        "description": "Gets a collection of member types that reference the specified member type as a composition.",
         "operationId": "GetMemberTypeByIdCompositionReferences",
         "parameters": [
           {
@@ -23698,6 +24160,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Copies a member type.",
+        "description": "Creates a duplicate of an existing member type identified by the provided Id.",
         "operationId": "PostMemberTypeByIdCopy",
         "parameters": [
           {
@@ -23855,6 +24319,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Exports a member type.",
+        "description": "Exports the member type identified by the provided Id to a downloadable format.",
         "operationId": "GetMemberTypeByIdExport",
         "parameters": [
           {
@@ -23916,6 +24382,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Imports a member type.",
+        "description": "Imports a member type from the provided file upload.",
         "operationId": "PutMemberTypeByIdImport",
         "parameters": [
           {
@@ -24058,6 +24526,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Moves a member type.",
+        "description": "Moves a member type identified by the provided Id to a different location.",
         "operationId": "PutMemberTypeByIdMove",
         "parameters": [
           {
@@ -24200,6 +24670,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets available compositions.",
+        "description": "Gets a collection of member types that are available to use as compositions for the specified member type.",
         "operationId": "PostMemberTypeAvailableCompositions",
         "requestBody": {
           "content": {
@@ -24293,6 +24765,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets the member type configuration.",
+        "description": "Gets the configuration settings for member types.",
         "operationId": "GetMemberTypeConfiguration",
         "responses": {
           "200": {
@@ -24328,6 +24802,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Creates a member type folder.",
+        "description": "Creates a new member type folder with the provided name and parent location.",
         "operationId": "PostMemberTypeFolder",
         "requestBody": {
           "content": {
@@ -24474,6 +24950,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets a member type folder.",
+        "description": "Gets a member type folder identified by the provided Id.",
         "operationId": "GetMemberTypeFolderById",
         "parameters": [
           {
@@ -24532,6 +25010,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Deletes a member type folder.",
+        "description": "Deletes a member type folder identified by the provided Id.",
         "operationId": "DeleteMemberTypeFolderById",
         "parameters": [
           {
@@ -24641,6 +25121,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Updates a member type folder.",
+        "description": "Updates a member type folder identified by the provided Id with the details from the request model.",
         "operationId": "PutMemberTypeFolderById",
         "parameters": [
           {
@@ -24783,6 +25265,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Imports a member type.",
+        "description": "Imports a member type from the provided file upload.",
         "operationId": "PostMemberTypeImport",
         "requestBody": {
           "content": {
@@ -24929,6 +25413,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets a collection of ancestor member type items.",
+        "description": "Gets a collection of member type items that are ancestors to the provided Id.",
         "operationId": "GetTreeMemberTypeAncestors",
         "parameters": [
           {
@@ -24977,6 +25463,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets a collection of member type tree child items.",
+        "description": "Gets a paginated collection of member type tree items that are children of the provided parent Id.",
         "operationId": "GetTreeMemberTypeChildren",
         "parameters": [
           {
@@ -25048,6 +25536,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets a collection of member type items from the root of the tree.",
+        "description": "Gets a paginated collection of member type items from the root of the tree with optional filtering.",
         "operationId": "GetTreeMemberTypeRoot",
         "parameters": [
           {
@@ -25111,6 +25601,8 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets sibling member types in the tree.",
+        "description": "Gets a collection of member type tree items that are siblings of the provided Id.",
         "operationId": "GetTreeMemberTypeSiblings",
         "parameters": [
           {
@@ -25180,6 +25672,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Gets a filtered collection of members.",
+        "description": "Filters members based on the provided criteria with support for pagination.",
         "operationId": "GetFilterMember",
         "parameters": [
           {
@@ -25300,6 +25794,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Gets a collection of member items.",
+        "description": "Gets a collection of member items identified by the provided Ids.",
         "operationId": "GetItemMember",
         "parameters": [
           {
@@ -25349,6 +25845,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Searches member items.",
+        "description": "Searches member items by the provided query with pagination support.",
         "operationId": "GetItemMemberSearch",
         "parameters": [
           {
@@ -25419,6 +25917,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Creates a new member.",
+        "description": "Creates a new member with the configuration specified in the request model.",
         "operationId": "PostMember",
         "requestBody": {
           "content": {
@@ -25565,6 +26065,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Gets a member.",
+        "description": "Gets a member identified by the provided Id.",
         "operationId": "GetMemberById",
         "parameters": [
           {
@@ -25623,6 +26125,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Deletes a member.",
+        "description": "Deletes a member identified by the provided Id.",
         "operationId": "DeleteMemberById",
         "parameters": [
           {
@@ -25732,6 +26236,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Updates a member.",
+        "description": "Updates a member identified by the provided Id with the details from the request model.",
         "operationId": "PutMemberById",
         "parameters": [
           {
@@ -25874,6 +26380,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Gets a collection of items that reference members.",
+        "description": "Gets a paginated collection of items that reference the members identified by the provided Ids.",
         "operationId": "GetMemberByIdReferencedBy",
         "parameters": [
           {
@@ -25952,6 +26460,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Gets a paginated collection of referenced descendant members.",
+        "description": "Gets a paginated collection of descendant members that are referenced in relations for the member identified by the provided Id.",
         "operationId": "GetMemberByIdReferencedDescendants",
         "parameters": [
           {
@@ -26030,6 +26540,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Validates updating a member.",
+        "description": "Validates the request model for updating a member without actually updating it.",
         "operationId": "PutMemberByIdValidate",
         "parameters": [
           {
@@ -26172,6 +26684,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Gets a collection of items that reference members.",
+        "description": "Gets a paginated collection of items that reference the members identified by the provided Ids.",
         "operationId": "GetMemberAreReferenced",
         "parameters": [
           {
@@ -26239,6 +26753,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Gets the member configuration.",
+        "description": "Gets the configuration settings for members.",
         "operationId": "GetMemberConfiguration",
         "responses": {
           "200": {
@@ -26274,6 +26790,8 @@
         "tags": [
           "Member"
         ],
+        "summary": "Validates creating a member.",
+        "description": "Validates the request model for creating a new member without actually creating it.",
         "operationId": "PostMemberValidate",
         "requestBody": {
           "content": {
@@ -26405,6 +26923,8 @@
         "tags": [
           "Models Builder"
         ],
+        "summary": "Builds models.",
+        "description": "Triggers the models builder to generate strongly-typed models for content types.",
         "operationId": "PostModelsBuilderBuild",
         "responses": {
           "200": {
@@ -26479,6 +26999,8 @@
         "tags": [
           "Models Builder"
         ],
+        "summary": "Gets models builder dashboard data.",
+        "description": "Gets the dashboard data and current state of the models builder.",
         "operationId": "GetModelsBuilderDashboard",
         "responses": {
           "200": {
@@ -26514,6 +27036,8 @@
         "tags": [
           "Models Builder"
         ],
+        "summary": "Gets models builder status.",
+        "description": "Gets the current status and configuration of the models builder.",
         "operationId": "GetModelsBuilderStatus",
         "responses": {
           "200": {
@@ -26549,6 +27073,8 @@
         "tags": [
           "News Dashboard"
         ],
+        "summary": "Gets news dashboard content.",
+        "description": "Gets the news dashboard content including recent news items and updates for the Umbraco back office.",
         "operationId": "GetNewsDashboard",
         "responses": {
           "200": {
@@ -26581,6 +27107,8 @@
         "tags": [
           "Object Types"
         ],
+        "summary": "Gets a paginated collection of allowed object types.",
+        "description": "Gets a paginated collection of object types that are allowed as relation type targets.",
         "operationId": "GetObjectTypes",
         "parameters": [
           {
@@ -26633,6 +27161,8 @@
         "tags": [
           "oEmbed"
         ],
+        "summary": "Queries OEmbed information.",
+        "description": "Queries OEmbed information for the specified URL.",
         "operationId": "GetOembedQuery",
         "parameters": [
           {
@@ -26694,6 +27224,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Runs pending package migrations.",
+        "description": "Executes all pending package migrations to update the database schema.",
         "operationId": "PostPackageByNameRunMigration",
         "parameters": [
           {
@@ -26804,6 +27336,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Gets the package configuration.",
+        "description": "Gets the configuration settings for packages.",
         "operationId": "GetPackageConfiguration",
         "responses": {
           "200": {
@@ -26839,6 +27373,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Gets a paginated collection of created packages.",
+        "description": "Gets a paginated collection of all created packages.",
         "operationId": "GetPackageCreated",
         "parameters": [
           {
@@ -26892,6 +27428,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Creates a new package.",
+        "description": "Creates a new package with the configuration specified in the request model.",
         "operationId": "PostPackageCreated",
         "requestBody": {
           "content": {
@@ -27038,6 +27576,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Gets a package.",
+        "description": "Gets a package identified by the provided Id.",
         "operationId": "GetPackageCreatedById",
         "parameters": [
           {
@@ -27096,6 +27636,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Deletes a package.",
+        "description": "Deletes a package identified by the provided Id.",
         "operationId": "DeletePackageCreatedById",
         "parameters": [
           {
@@ -27179,6 +27721,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Updates a package.",
+        "description": "Updates a package identified by the provided Id with the details from the request model.",
         "operationId": "PutPackageCreatedById",
         "parameters": [
           {
@@ -27295,6 +27839,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Downloads a created package.",
+        "description": "Downloads the package file for the created package identified by the provided Id.",
         "operationId": "GetPackageCreatedByIdDownload",
         "parameters": [
           {
@@ -27356,6 +27902,8 @@
         "tags": [
           "Package"
         ],
+        "summary": "Gets all package migration statuses.",
+        "description": "Gets a paginated collection of migration status for all installed packages.",
         "operationId": "GetPackageMigrationStatus",
         "parameters": [
           {
@@ -27411,6 +27959,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a collection of partial view items.",
+        "description": "Gets a collection of partial view items identified by the provided Ids.",
         "operationId": "GetItemPartialView",
         "parameters": [
           {
@@ -27459,6 +28009,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Creates a new partial view.",
+        "description": "Creates a new partial view with the configuration specified in the request model.",
         "operationId": "PostPartialView",
         "requestBody": {
           "content": {
@@ -27605,6 +28157,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a partial view by path.",
+        "description": "Gets a partial view identified by the provided file path.",
         "operationId": "GetPartialViewByPath",
         "parameters": [
           {
@@ -27662,6 +28216,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Deletes a partial view.",
+        "description": "Deletes a partial view identified by the provided Id.",
         "operationId": "DeletePartialViewByPath",
         "parameters": [
           {
@@ -27770,6 +28326,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Updates a partial view.",
+        "description": "Updates a partial view identified by the provided Id with the details from the request model.",
         "operationId": "PutPartialViewByPath",
         "parameters": [
           {
@@ -27911,6 +28469,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Renames a partial view.",
+        "description": "Renames a partial view file to the specified new name.",
         "operationId": "PutPartialViewByPathRename",
         "parameters": [
           {
@@ -28067,6 +28627,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Creates a partial view folder.",
+        "description": "Creates a new partial view folder with the provided name and parent location.",
         "operationId": "PostPartialViewFolder",
         "requestBody": {
           "content": {
@@ -28213,6 +28775,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a partial view folder by path.",
+        "description": "Gets a partial view folder identified by the provided file path.",
         "operationId": "GetPartialViewFolderByPath",
         "parameters": [
           {
@@ -28270,6 +28834,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Deletes a partial view folder.",
+        "description": "Deletes a partial view folder identified by the provided Id.",
         "operationId": "DeletePartialViewFolderByPath",
         "parameters": [
           {
@@ -28380,6 +28946,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a paginated collection of partial view snippets.",
+        "description": "Gets a paginated collection of available partial view code snippets that can be used when creating new partial views.",
         "operationId": "GetPartialViewSnippet",
         "parameters": [
           {
@@ -28435,6 +29003,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a partial view snippet.",
+        "description": "Gets a partial view snippet identified by the provided Id.",
         "operationId": "GetPartialViewSnippetById",
         "parameters": [
           {
@@ -28494,6 +29064,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a collection of ancestor partial view items.",
+        "description": "Gets a collection of partial view items that are ancestors to the provided Id.",
         "operationId": "GetTreePartialViewAncestors",
         "parameters": [
           {
@@ -28541,6 +29113,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a collection of partial view tree child items.",
+        "description": "Gets a paginated collection of partial view tree items that are children of the provided parent Id.",
         "operationId": "GetTreePartialViewChildren",
         "parameters": [
           {
@@ -28603,6 +29177,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a collection of partial view items from the root of the tree.",
+        "description": "Gets a paginated collection of partial view items from the root of the tree with optional filtering.",
         "operationId": "GetTreePartialViewRoot",
         "parameters": [
           {
@@ -28658,6 +29234,8 @@
         "tags": [
           "Partial View"
         ],
+        "summary": "Gets a collection of partial view tree sibling items.",
+        "description": "Gets a collection of partial view tree items that are siblings of the provided Id.",
         "operationId": "GetTreePartialViewSiblings",
         "parameters": [
           {
@@ -28718,6 +29296,8 @@
         "tags": [
           "Preview"
         ],
+        "summary": "Exits preview mode.",
+        "description": "Exits preview mode and returns to the normal back office viewing experience.",
         "operationId": "DeletePreview",
         "responses": {
           "200": {
@@ -28741,6 +29321,8 @@
         "tags": [
           "Preview"
         ],
+        "summary": "Enters preview mode.",
+        "description": "Enters preview mode for the current user session, allowing viewing of unpublished content.",
         "operationId": "PostPreview",
         "responses": {
           "200": {
@@ -28775,6 +29357,8 @@
         "tags": [
           "Profiling"
         ],
+        "summary": "Gets profiling status.",
+        "description": "Gets the current status of the MiniProfiler profiling tool.",
         "operationId": "GetProfilingStatus",
         "responses": {
           "200": {
@@ -28808,6 +29392,8 @@
         "tags": [
           "Profiling"
         ],
+        "summary": "Updates the web profiling status.",
+        "description": "Enables or disables web profiling according to the values provided in the request model.",
         "operationId": "PutProfilingStatus",
         "requestBody": {
           "content": {
@@ -28887,6 +29473,8 @@
         "tags": [
           "Property Type"
         ],
+        "summary": "Checks if a property type is used.",
+        "description": "Checks if the property type identified by the provided content type id and property alias is used in any content, media, or members.",
         "operationId": "GetPropertyTypeIsUsed",
         "parameters": [
           {
@@ -28949,6 +29537,8 @@
         "tags": [
           "Published Cache"
         ],
+        "summary": "Rebuilds the published content cache.",
+        "description": "Rebuilds the entire published content cache from scratch.",
         "operationId": "PostPublishedCacheRebuild",
         "responses": {
           "200": {
@@ -28982,6 +29572,8 @@
         "tags": [
           "Published Cache"
         ],
+        "summary": "Gets the rebuild cache status.",
+        "description": "Gets the current status of the published content cache rebuild operation.",
         "operationId": "GetPublishedCacheRebuildStatus",
         "responses": {
           "200": {
@@ -29014,6 +29606,8 @@
         "tags": [
           "Published Cache"
         ],
+        "summary": "Reloads the published content cache.",
+        "description": "Reloads the published content cache from the database.",
         "operationId": "PostPublishedCacheReload",
         "responses": {
           "200": {
@@ -29047,6 +29641,8 @@
         "tags": [
           "Redirect Management"
         ],
+        "summary": "Gets a paginated collection of redirect URLs.",
+        "description": "Gets a paginated collection of redirect URLs with support for filtering and sorting.",
         "operationId": "GetRedirectManagement",
         "parameters": [
           {
@@ -29123,6 +29719,8 @@
         "tags": [
           "Redirect Management"
         ],
+        "summary": "Gets a redirect URL.",
+        "description": "Gets a redirect URL identified by the provided Id.",
         "operationId": "GetRedirectManagementById",
         "parameters": [
           {
@@ -29185,6 +29783,8 @@
         "tags": [
           "Redirect Management"
         ],
+        "summary": "Deletes a redirect URL.",
+        "description": "Deletes a redirect URL identified by the provided Id.",
         "operationId": "DeleteRedirectManagementById",
         "parameters": [
           {
@@ -29244,6 +29844,8 @@
         "tags": [
           "Redirect Management"
         ],
+        "summary": "Gets the current redirect URL management status.",
+        "description": "Retrieves the current status and configuration for redirect URL management.",
         "operationId": "GetRedirectManagementStatus",
         "responses": {
           "200": {
@@ -29277,6 +29879,8 @@
         "tags": [
           "Redirect Management"
         ],
+        "summary": "Sets the redirect URL tracking status.",
+        "description": "Updates the redirect URL tracking configuration according to the provided status.",
         "operationId": "PostRedirectManagementStatus",
         "parameters": [
           {
@@ -29334,6 +29938,8 @@
         "tags": [
           "Relation Type"
         ],
+        "summary": "Gets a collection of relation type items.",
+        "description": "Gets a collection of relation type items identified by the provided Ids.",
         "operationId": "GetItemRelationType",
         "parameters": [
           {
@@ -29383,6 +29989,8 @@
         "tags": [
           "Relation Type"
         ],
+        "summary": "Gets a paginated collection of relation types.",
+        "description": "Gets a paginated collection of all relation types configured in the system.",
         "operationId": "GetRelationType",
         "parameters": [
           {
@@ -29438,6 +30046,8 @@
         "tags": [
           "Relation Type"
         ],
+        "summary": "Gets a relation type.",
+        "description": "Gets a relation type identified by the provided Id.",
         "operationId": "GetRelationTypeById",
         "parameters": [
           {
@@ -29498,6 +30108,8 @@
         "tags": [
           "Relation"
         ],
+        "summary": "Gets relations by relation type.",
+        "description": "Gets a collection of relations filtered by the specified relation type key.",
         "operationId": "GetRelationByRelationTypeId",
         "parameters": [
           {
@@ -29576,6 +30188,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Gets a collection of script items.",
+        "description": "Gets a collection of script items identified by the provided Ids.",
         "operationId": "GetItemScript",
         "parameters": [
           {
@@ -29624,6 +30238,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Creates a new script.",
+        "description": "Creates a new script with the configuration specified in the request model.",
         "operationId": "PostScript",
         "requestBody": {
           "content": {
@@ -29770,6 +30386,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Gets a script by path.",
+        "description": "Gets a script identified by the provided file path.",
         "operationId": "GetScriptByPath",
         "parameters": [
           {
@@ -29827,6 +30445,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Deletes a script.",
+        "description": "Deletes a script identified by the provided file path.",
         "operationId": "DeleteScriptByPath",
         "parameters": [
           {
@@ -29935,6 +30555,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Updates a script.",
+        "description": "Updates a script identified by the provided Id with the details from the request model.",
         "operationId": "PutScriptByPath",
         "parameters": [
           {
@@ -30076,6 +30698,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Renames a script.",
+        "description": "Renames a script file to the specified new name.",
         "operationId": "PutScriptByPathRename",
         "parameters": [
           {
@@ -30232,6 +30856,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Creates a script folder.",
+        "description": "Creates a new script folder with the provided name and parent location.",
         "operationId": "PostScriptFolder",
         "requestBody": {
           "content": {
@@ -30378,6 +31004,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Gets a script folder by path.",
+        "description": "Gets a script folder identified by the provided file path.",
         "operationId": "GetScriptFolderByPath",
         "parameters": [
           {
@@ -30435,6 +31063,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Deletes a script folder.",
+        "description": "Deletes a script folder identified by the provided Id.",
         "operationId": "DeleteScriptFolderByPath",
         "parameters": [
           {
@@ -30545,6 +31175,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Gets a collection of ancestor script items.",
+        "description": "Gets a collection of script items that are ancestors to the provided Id.",
         "operationId": "GetTreeScriptAncestors",
         "parameters": [
           {
@@ -30592,6 +31224,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Gets a collection of script tree child items.",
+        "description": "Gets a paginated collection of script tree items that are children of the provided parent Id.",
         "operationId": "GetTreeScriptChildren",
         "parameters": [
           {
@@ -30654,6 +31288,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Gets a collection of script items from the root of the tree.",
+        "description": "Gets a paginated collection of script items from the root of the tree with optional filtering.",
         "operationId": "GetTreeScriptRoot",
         "parameters": [
           {
@@ -30709,6 +31345,8 @@
         "tags": [
           "Script"
         ],
+        "summary": "Gets a collection of script tree sibling items.",
+        "description": "Gets a collection of script tree items that are siblings of the provided Id.",
         "operationId": "GetTreeScriptSiblings",
         "parameters": [
           {
@@ -30769,6 +31407,8 @@
         "tags": [
           "Searcher"
         ],
+        "summary": "Gets a collection of searchers.",
+        "description": "Gets a collection of configured searchers in the Umbraco installation.",
         "operationId": "GetSearcher",
         "parameters": [
           {
@@ -30902,6 +31542,8 @@
         "tags": [
           "Security"
         ],
+        "summary": "Gets the security configuration.",
+        "description": "Gets the configuration settings for security.",
         "operationId": "GetSecurityConfiguration",
         "responses": {
           "200": {
@@ -30937,6 +31579,8 @@
         "tags": [
           "Security"
         ],
+        "summary": "Requests a password reset.",
+        "description": "Initiates a password reset process by sending a reset link to the specified email address.",
         "operationId": "PostSecurityForgotPassword",
         "requestBody": {
           "content": {
@@ -31042,6 +31686,8 @@
         "tags": [
           "Security"
         ],
+        "summary": "Initiates password reset.",
+        "description": "Initiates a password reset process for the user with the provided email.",
         "operationId": "PostSecurityForgotPasswordReset",
         "requestBody": {
           "content": {
@@ -31173,6 +31819,8 @@
         "tags": [
           "Security"
         ],
+        "summary": "Verifies a password reset token.",
+        "description": "Verifies the provided password reset token for the specified user.",
         "operationId": "PostSecurityForgotPasswordVerify",
         "requestBody": {
           "content": {
@@ -31292,6 +31940,8 @@
         "tags": [
           "Segment"
         ],
+        "summary": "Gets a paginated collection of segments.",
+        "description": "Gets a paginated collection of segments with support for filtering and pagination.",
         "operationId": "GetSegment",
         "parameters": [
           {
@@ -31358,6 +32008,8 @@
         "tags": [
           "Server"
         ],
+        "summary": "Gets the server configuration.",
+        "description": "Gets the configuration settings for servers.",
         "operationId": "GetServerConfiguration",
         "responses": {
           "200": {
@@ -31382,6 +32034,8 @@
         "tags": [
           "Server"
         ],
+        "summary": "Gets server information.",
+        "description": "Gets detailed information about the server environment and configuration.",
         "operationId": "GetServerInformation",
         "responses": {
           "200": {
@@ -31414,6 +32068,8 @@
         "tags": [
           "Server"
         ],
+        "summary": "Gets server status.",
+        "description": "Gets the current operational status of the Umbraco server.",
         "operationId": "GetServerStatus",
         "responses": {
           "400": {
@@ -31452,6 +32108,8 @@
         "tags": [
           "Server"
         ],
+        "summary": "Gets server troubleshooting information.",
+        "description": "Gets troubleshooting information and diagnostics for the server.",
         "operationId": "GetServerTroubleshooting",
         "responses": {
           "200": {
@@ -31484,6 +32142,8 @@
         "tags": [
           "Server"
         ],
+        "summary": "Checks for available upgrades.",
+        "description": "Checks if there are any available upgrades for the Umbraco installation.",
         "operationId": "GetServerUpgradeCheck",
         "responses": {
           "200": {
@@ -31520,6 +32180,8 @@
         "tags": [
           "Static File"
         ],
+        "summary": "Gets a collection of static file items.",
+        "description": "Gets a collection of static file items identified by the provided Ids.",
         "operationId": "GetItemStaticFile",
         "parameters": [
           {
@@ -31568,6 +32230,8 @@
         "tags": [
           "Static File"
         ],
+        "summary": "Gets a collection of ancestor static file items.",
+        "description": "Gets a collection of static file items that are ancestors to the provided Id.",
         "operationId": "GetTreeStaticFileAncestors",
         "parameters": [
           {
@@ -31612,6 +32276,8 @@
         "tags": [
           "Static File"
         ],
+        "summary": "Gets a collection of static file tree child items.",
+        "description": "Gets a paginated collection of static file tree items that are children of the provided parent Id.",
         "operationId": "GetTreeStaticFileChildren",
         "parameters": [
           {
@@ -31671,6 +32337,8 @@
         "tags": [
           "Static File"
         ],
+        "summary": "Gets a collection of static file items from the root of the tree.",
+        "description": "Gets a paginated collection of static file items from the root of the tree with optional filtering.",
         "operationId": "GetTreeStaticFileRoot",
         "parameters": [
           {
@@ -31723,6 +32391,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Gets a collection of stylesheet items.",
+        "description": "Gets a collection of stylesheet items identified by the provided Ids.",
         "operationId": "GetItemStylesheet",
         "parameters": [
           {
@@ -31771,6 +32441,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Creates a new stylesheet.",
+        "description": "Creates a new stylesheet with the configuration specified in the request model.",
         "operationId": "PostStylesheet",
         "requestBody": {
           "content": {
@@ -31917,6 +32589,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Gets a stylesheet by path.",
+        "description": "Gets a stylesheet identified by the provided file path.",
         "operationId": "GetStylesheetByPath",
         "parameters": [
           {
@@ -31974,6 +32648,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Deletes a stylesheet.",
+        "description": "Deletes a stylesheet identified by the provided Id.",
         "operationId": "DeleteStylesheetByPath",
         "parameters": [
           {
@@ -32082,6 +32758,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Updates a stylesheet.",
+        "description": "Updates a stylesheet identified by the provided Id with the details from the request model.",
         "operationId": "PutStylesheetByPath",
         "parameters": [
           {
@@ -32223,6 +32901,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Renames a stylesheet.",
+        "description": "Renames a stylesheet file to the specified new name.",
         "operationId": "PutStylesheetByPathRename",
         "parameters": [
           {
@@ -32379,6 +33059,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Creates a stylesheet folder.",
+        "description": "Creates a new stylesheet folder with the provided name and parent location.",
         "operationId": "PostStylesheetFolder",
         "requestBody": {
           "content": {
@@ -32525,6 +33207,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Gets a stylesheet folder by path.",
+        "description": "Gets a stylesheet folder identified by the provided file path.",
         "operationId": "GetStylesheetFolderByPath",
         "parameters": [
           {
@@ -32582,6 +33266,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Deletes a stylesheet folder.",
+        "description": "Deletes a stylesheet folder identified by the provided Id.",
         "operationId": "DeleteStylesheetFolderByPath",
         "parameters": [
           {
@@ -32692,6 +33378,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Gets a collection of ancestor stylesheet items.",
+        "description": "Gets a collection of stylesheet items that are ancestors to the provided Id.",
         "operationId": "GetTreeStylesheetAncestors",
         "parameters": [
           {
@@ -32739,6 +33427,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Gets a collection of stylesheet tree child items.",
+        "description": "Gets a paginated collection of stylesheet tree items that are children of the provided parent Id.",
         "operationId": "GetTreeStylesheetChildren",
         "parameters": [
           {
@@ -32801,6 +33491,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Gets a collection of stylesheet items from the root of the tree.",
+        "description": "Gets a paginated collection of stylesheet items from the root of the tree with optional filtering.",
         "operationId": "GetTreeStylesheetRoot",
         "parameters": [
           {
@@ -32856,6 +33548,8 @@
         "tags": [
           "Stylesheet"
         ],
+        "summary": "Gets a collection of stylesheet tree sibling items.",
+        "description": "Gets a collection of stylesheet tree items that are siblings of the provided Id.",
         "operationId": "GetTreeStylesheetSiblings",
         "parameters": [
           {
@@ -32916,6 +33610,8 @@
         "tags": [
           "Tag"
         ],
+        "summary": "Gets a collection of tags.",
+        "description": "Gets a collection of tags filtered by the provided query string.",
         "operationId": "GetTag",
         "parameters": [
           {
@@ -32989,6 +33685,8 @@
         "tags": [
           "Telemetry"
         ],
+        "summary": "Gets telemetry data.",
+        "description": "Gets telemetry data and statistics for the Umbraco installation.",
         "operationId": "GetTelemetry",
         "parameters": [
           {
@@ -33044,6 +33742,8 @@
         "tags": [
           "Telemetry"
         ],
+        "summary": "Gets telemetry information.",
+        "description": "Gets the current telemetry configuration and consent level.",
         "operationId": "GetTelemetryLevel",
         "responses": {
           "200": {
@@ -33077,6 +33777,8 @@
         "tags": [
           "Telemetry"
         ],
+        "summary": "Sets telemetry consent level.",
+        "description": "Sets the telemetry consent level for anonymous usage data collection.",
         "operationId": "PostTelemetryLevel",
         "requestBody": {
           "content": {
@@ -33182,6 +33884,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets a collection of template items.",
+        "description": "Gets a collection of template items identified by the provided Ids.",
         "operationId": "GetItemTemplate",
         "parameters": [
           {
@@ -33231,6 +33935,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Searches template items.",
+        "description": "Searches template items by the provided query with pagination support.",
         "operationId": "GetItemTemplateSearch",
         "parameters": [
           {
@@ -33290,6 +33996,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Creates a new template.",
+        "description": "Creates a new template with the configuration specified in the request model.",
         "operationId": "PostTemplate",
         "requestBody": {
           "content": {
@@ -33436,6 +34144,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets a template.",
+        "description": "Gets a template identified by the provided Id.",
         "operationId": "GetTemplateById",
         "parameters": [
           {
@@ -33494,6 +34204,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Deletes a template.",
+        "description": "Deletes a template identified by the provided Id.",
         "operationId": "DeleteTemplateById",
         "parameters": [
           {
@@ -33603,6 +34315,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Updates a template.",
+        "description": "Updates a template identified by the provided Id with the details from the request model.",
         "operationId": "PutTemplateById",
         "parameters": [
           {
@@ -33745,6 +34459,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets the template configuration.",
+        "description": "Gets the configuration settings for templates.",
         "operationId": "GetTemplateConfiguration",
         "responses": {
           "200": {
@@ -33780,6 +34496,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Executes a template query.",
+        "description": "Executes a template query with the provided parameters and returns the matching content results with execution metrics.",
         "operationId": "PostTemplateQueryExecute",
         "requestBody": {
           "content": {
@@ -33870,6 +34588,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets template query settings.",
+        "description": "Gets the available configuration settings for template queries including document type aliases, properties, and operators.",
         "operationId": "GetTemplateQuerySettings",
         "responses": {
           "200": {
@@ -33905,6 +34625,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets a collection of ancestor template items.",
+        "description": "Gets a collection of template items that are ancestors to the provided Id.",
         "operationId": "GetTreeTemplateAncestors",
         "parameters": [
           {
@@ -33953,6 +34675,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets a collection of template tree child items.",
+        "description": "Gets a paginated collection of template tree items that are children of the provided parent Id.",
         "operationId": "GetTreeTemplateChildren",
         "parameters": [
           {
@@ -34016,6 +34740,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets a collection of template items from the root of the tree.",
+        "description": "Gets a paginated collection of template items from the root of the tree with optional filtering.",
         "operationId": "GetTreeTemplateRoot",
         "parameters": [
           {
@@ -34071,6 +34797,8 @@
         "tags": [
           "Template"
         ],
+        "summary": "Gets a collection of template tree sibling items.",
+        "description": "Gets a collection of template tree items that are siblings of the provided Id.",
         "operationId": "GetTreeTemplateSiblings",
         "parameters": [
           {
@@ -34132,6 +34860,8 @@
         "tags": [
           "Temporary File"
         ],
+        "summary": "Creates a temporary file.",
+        "description": "Uploads and creates a temporary file that can be used in subsequent operations.",
         "operationId": "PostTemporaryFile",
         "requestBody": {
           "content": {
@@ -34237,6 +34967,8 @@
         "tags": [
           "Temporary File"
         ],
+        "summary": "Gets a temporary file.",
+        "description": "Gets a temporary file identified by the provided Id.",
         "operationId": "GetTemporaryFileById",
         "parameters": [
           {
@@ -34306,6 +35038,8 @@
         "tags": [
           "Temporary File"
         ],
+        "summary": "Deletes a temporary file.",
+        "description": "Deletes a temporary file identified by the provided Id.",
         "operationId": "DeleteTemporaryFileById",
         "parameters": [
           {
@@ -34402,6 +35136,8 @@
         "tags": [
           "Temporary File"
         ],
+        "summary": "Gets the temporary file configuration.",
+        "description": "Gets the configuration settings for temporary files.",
         "operationId": "GetTemporaryFileConfiguration",
         "responses": {
           "200": {
@@ -34434,6 +35170,8 @@
         "tags": [
           "Upgrade"
         ],
+        "summary": "Authorizes the upgrade.",
+        "description": "Authorizes the currently authenticated user to perform the upgrade.",
         "operationId": "PostUpgradeAuthorize",
         "responses": {
           "200": {
@@ -34534,6 +35272,8 @@
         "tags": [
           "Upgrade"
         ],
+        "summary": "Gets upgrade settings.",
+        "description": "Gets the current upgrade settings and status for the Umbraco installation.",
         "operationId": "GetUpgradeSettings",
         "responses": {
           "200": {
@@ -34583,6 +35323,8 @@
         "tags": [
           "User Data"
         ],
+        "summary": "Creates user data.",
+        "description": "Creates user-specific data for the current authenticated user with the provided key and value.",
         "operationId": "PostUserData",
         "requestBody": {
           "content": {
@@ -34704,6 +35446,8 @@
         "tags": [
           "User Data"
         ],
+        "summary": "Gets user data.",
+        "description": "Gets user-specific data stored for the current authenticated user.",
         "operationId": "GetUserData",
         "parameters": [
           {
@@ -34774,6 +35518,8 @@
         "tags": [
           "User Data"
         ],
+        "summary": "Updates user data.",
+        "description": "Updates user-specific data for the current authenticated user.",
         "operationId": "PutUserData",
         "requestBody": {
           "content": {
@@ -34882,6 +35628,8 @@
         "tags": [
           "User Data"
         ],
+        "summary": "Gets user data.",
+        "description": "Gets user data identified by the provided Id.",
         "operationId": "GetUserDataById",
         "parameters": [
           {
@@ -34926,6 +35674,8 @@
         "tags": [
           "User Data"
         ],
+        "summary": "Deletes user data.",
+        "description": "Deletes user data identified by the provided Id.",
         "operationId": "DeleteUserDataById",
         "parameters": [
           {
@@ -35014,6 +35764,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Gets a filtered collection of user groups.",
+        "description": "Filters user groups based on the provided criteria with support for pagination.",
         "operationId": "GetFilterUserGroup",
         "parameters": [
           {
@@ -35105,6 +35857,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Gets a collection of user group items.",
+        "description": "Gets a collection of user group items identified by the provided Ids.",
         "operationId": "GetItemUserGroup",
         "parameters": [
           {
@@ -35154,6 +35908,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Deletes multiple user groups.",
+        "description": "Deletes multiple user groups identified by the provided Ids. This operation cannot be undone.",
         "operationId": "DeleteUserGroup",
         "requestBody": {
           "content": {
@@ -35257,6 +36013,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Creates a new user group.",
+        "description": "Creates a new user group with the configuration specified in the request model.",
         "operationId": "PostUserGroup",
         "requestBody": {
           "content": {
@@ -35375,6 +36133,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Gets a paginated collection of user groups.",
+        "description": "Gets a paginated collection of all user groups.",
         "operationId": "GetUserGroup",
         "parameters": [
           {
@@ -35430,6 +36190,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Gets a user group.",
+        "description": "Gets a user group identified by the provided Id.",
         "operationId": "GetUserGroupById",
         "parameters": [
           {
@@ -35488,6 +36250,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Deletes a user group.",
+        "description": "Deletes a user group identified by the provided Id.",
         "operationId": "DeleteUserGroupById",
         "parameters": [
           {
@@ -35571,6 +36335,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Updates a user group.",
+        "description": "Updates a user group identified by the provided Id with the details from the request model.",
         "operationId": "PutUserGroupById",
         "parameters": [
           {
@@ -35687,6 +36453,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Removes users from a user group.",
+        "description": "Removes the specified users from the user group identified by the provided Id.",
         "operationId": "DeleteUserGroupByIdUsers",
         "parameters": [
           {
@@ -35810,6 +36578,8 @@
         "tags": [
           "User Group"
         ],
+        "summary": "Adds users to a user group.",
+        "description": "Adds the specified users to the user group identified by the provided Id.",
         "operationId": "PostUserGroupByIdUsers",
         "parameters": [
           {
@@ -35935,6 +36705,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets a filtered collection of users.",
+        "description": "Filters users based on the provided criteria with support for pagination.",
         "operationId": "GetFilterUser",
         "parameters": [
           {
@@ -36063,6 +36835,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets a collection of user items.",
+        "description": "Gets a collection of user items identified by the provided Ids.",
         "operationId": "GetItemUser",
         "parameters": [
           {
@@ -36112,6 +36886,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Creates a new user.",
+        "description": "Creates a new user with the configuration specified in the request model.",
         "operationId": "PostUser",
         "requestBody": {
           "content": {
@@ -36256,6 +37032,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Deletes multiple users.",
+        "description": "Deletes multiple users identified by the provided Ids. This operation cannot be undone.",
         "operationId": "DeleteUser",
         "requestBody": {
           "content": {
@@ -36359,6 +37137,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets a paginated collection of users.",
+        "description": "Gets a paginated collection of all users.",
         "operationId": "GetUser",
         "parameters": [
           {
@@ -36428,6 +37208,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets a user.",
+        "description": "Gets a user identified by the provided Id.",
         "operationId": "GetUserById",
         "parameters": [
           {
@@ -36486,6 +37268,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Deletes a user.",
+        "description": "Deletes a user identified by the provided Id.",
         "operationId": "DeleteUserById",
         "parameters": [
           {
@@ -36595,6 +37379,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Updates a user.",
+        "description": "Updates a user identified by the provided Id with the details from the request model.",
         "operationId": "PutUserById",
         "parameters": [
           {
@@ -36737,6 +37523,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Lists two-factor providers for a user.",
+        "description": "Gets a list of available two-factor authentication providers for the specified user.",
         "operationId": "GetUserById2fa",
         "parameters": [
           {
@@ -36800,6 +37588,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Disables two-factor authentication for a user.",
+        "description": "Disables the specified two-factor authentication provider for a user.",
         "operationId": "DeleteUserById2faByProviderName",
         "parameters": [
           {
@@ -36919,6 +37709,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Calculates start nodes for users.",
+        "description": "Calculates the start nodes for the users identified by the provided Ids based on their permissions.",
         "operationId": "GetUserByIdCalculateStartNodes",
         "parameters": [
           {
@@ -36979,6 +37771,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Changes a user's password.",
+        "description": "Changes the password for the user identified by the provided Id.",
         "operationId": "PostUserByIdChangePassword",
         "parameters": [
           {
@@ -37121,6 +37915,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Creates client credentials for a user.",
+        "description": "Creates OAuth client credentials for the user identified by the provided Id.",
         "operationId": "PostUserByIdClientCredentials",
         "parameters": [
           {
@@ -37235,6 +38031,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets all client credentials for a user.",
+        "description": "Gets a collection of OAuth client credentials for the user identified by the provided Id.",
         "operationId": "GetUserByIdClientCredentials",
         "parameters": [
           {
@@ -37280,6 +38078,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Deletes client credentials for a user.",
+        "description": "Deletes client credentials identified by the provided client Id for a user.",
         "operationId": "DeleteUserByIdClientCredentialsByClientId",
         "parameters": [
           {
@@ -37373,6 +38173,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Resets a user's password.",
+        "description": "Resets the password for the user using the provided reset token.",
         "operationId": "PostUserByIdResetPassword",
         "parameters": [
           {
@@ -37495,6 +38297,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Clears a user's avatar.",
+        "description": "Removes the avatar image for the user identified by the provided Id.",
         "operationId": "DeleteUserAvatarById",
         "parameters": [
           {
@@ -37604,6 +38408,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Sets a user's avatar.",
+        "description": "Sets or updates the avatar image for the user identified by the provided Id.",
         "operationId": "PostUserAvatarById",
         "parameters": [
           {
@@ -37746,6 +38552,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets the user configuration.",
+        "description": "Gets the configuration settings for users.",
         "operationId": "GetUserConfiguration",
         "responses": {
           "200": {
@@ -37781,6 +38589,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets the current user.",
+        "description": "Gets the currently authenticated back office user's information and permissions.",
         "operationId": "GetUserCurrent",
         "responses": {
           "200": {
@@ -37813,6 +38623,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Lists two-factor providers for the current user.",
+        "description": "Gets a list of available two-factor authentication providers for the current user.",
         "operationId": "GetUserCurrent2fa",
         "responses": {
           "200": {
@@ -37848,6 +38660,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Disables two-factor authentication for the current user.",
+        "description": "Disables the specified two-factor authentication provider for the currently authenticated user.",
         "operationId": "DeleteUserCurrent2faByProviderName",
         "parameters": [
           {
@@ -37948,6 +38762,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Enables two-factor authentication for the current user.",
+        "description": "Enables the specified two-factor authentication provider for the currently authenticated user.",
         "operationId": "PostUserCurrent2faByProviderName",
         "parameters": [
           {
@@ -38083,6 +38899,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets two-factor setup information.",
+        "description": "Gets the setup information for configuring a two-factor authentication provider.",
         "operationId": "GetUserCurrent2faByProviderName",
         "parameters": [
           {
@@ -38153,6 +38971,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Sets the current user's avatar.",
+        "description": "Sets or updates the avatar image for the currently authenticated user.",
         "operationId": "PostUserCurrentAvatar",
         "requestBody": {
           "content": {
@@ -38243,6 +39063,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Changes the current user's password.",
+        "description": "Changes the password for the currently authenticated user.",
         "operationId": "PostUserCurrentChangePassword",
         "requestBody": {
           "content": {
@@ -38333,6 +39155,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets the current user's configuration.",
+        "description": "Gets the configuration settings for the current user.",
         "operationId": "GetUserCurrentConfiguration",
         "responses": {
           "200": {
@@ -38368,6 +39192,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Lists external login providers.",
+        "description": "Gets a list of configured external login providers for authentication.",
         "operationId": "GetUserCurrentLoginProviders",
         "responses": {
           "200": {
@@ -38403,6 +39229,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets permissions for the current user.",
+        "description": "Gets the permissions for the currently authenticated user.",
         "operationId": "GetUserCurrentPermissions",
         "parameters": [
           {
@@ -38463,6 +39291,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets document permissions for the current user.",
+        "description": "Gets the document permissions for the currently authenticated user.",
         "operationId": "GetUserCurrentPermissionsDocument",
         "parameters": [
           {
@@ -38589,6 +39419,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets media permissions for the current user.",
+        "description": "Gets the media permissions for the currently authenticated user.",
         "operationId": "GetUserCurrentPermissionsMedia",
         "parameters": [
           {
@@ -38649,6 +39481,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Disables users.",
+        "description": "Disables the user accounts identified by the provided Ids.",
         "operationId": "PostUserDisable",
         "requestBody": {
           "content": {
@@ -38780,6 +39614,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Enables users.",
+        "description": "Enables the user accounts identified by the provided Ids.",
         "operationId": "PostUserEnable",
         "requestBody": {
           "content": {
@@ -38911,6 +39747,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Invites new users.",
+        "description": "Sends invitation emails to create new user accounts with the specified details.",
         "operationId": "PostUserInvite",
         "requestBody": {
           "content": {
@@ -39057,6 +39895,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Creates an initial password for a user.",
+        "description": "Creates an initial password for a newly invited user using the provided token.",
         "operationId": "PostUserInviteCreatePassword",
         "requestBody": {
           "content": {
@@ -39180,6 +40020,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Resends a user invitation.",
+        "description": "Resends the invitation email for the users identified by the provided Ids.",
         "operationId": "PostUserInviteResend",
         "requestBody": {
           "content": {
@@ -39311,6 +40153,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Verifies a user invitation.",
+        "description": "Verifies that the invitation token is valid for creating a new user account.",
         "operationId": "PostUserInviteVerify",
         "requestBody": {
           "content": {
@@ -39445,6 +40289,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Updates user group assignments.",
+        "description": "Updates the user group assignments for the specified users.",
         "operationId": "PostUserSetUserGroups",
         "requestBody": {
           "content": {
@@ -39524,6 +40370,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Unlocks users.",
+        "description": "Unlocks the user accounts identified by the provided Ids.",
         "operationId": "PostUserUnlock",
         "requestBody": {
           "content": {
@@ -39629,6 +40477,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Gets a collection of webhook items.",
+        "description": "Gets a collection of webhook items identified by the provided Ids.",
         "operationId": "GetItemWebhook",
         "parameters": [
           {
@@ -39678,6 +40528,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Gets a paginated collection of webhooks.",
+        "description": "Gets a paginated collection of all webhooks.",
         "operationId": "GetWebhook",
         "parameters": [
           {
@@ -39731,6 +40583,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Creates a new webhook.",
+        "description": "Creates a new webhook with the configuration specified in the request model.",
         "operationId": "PostWebhook",
         "requestBody": {
           "content": {
@@ -39877,6 +40731,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Gets a webhook.",
+        "description": "Gets a webhook identified by the provided Id.",
         "operationId": "GetWebhookById",
         "parameters": [
           {
@@ -39935,6 +40791,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Deletes a webhook.",
+        "description": "Deletes a webhook identified by the provided Id.",
         "operationId": "DeleteWebhookById",
         "parameters": [
           {
@@ -40044,6 +40902,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Updates a webhook.",
+        "description": "Updates a webhook identified by the provided Id with the details from the request model.",
         "operationId": "PutWebhookById",
         "parameters": [
           {
@@ -40186,6 +41046,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Gets a paginated collection of webhook logs for a specific webhook.",
+        "description": "Gets a paginated collection of webhook logs for the webhook identified by the provided Id.",
         "operationId": "GetWebhookByIdLogs",
         "parameters": [
           {
@@ -40250,6 +41112,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Gets a paginated collection of webhook events.",
+        "description": "Gets a paginated collection of available webhook events that can be subscribed to.",
         "operationId": "GetWebhookEvents",
         "parameters": [
           {
@@ -40305,6 +41169,8 @@
         "tags": [
           "Webhook"
         ],
+        "summary": "Gets a paginated collection of webhook logs.",
+        "description": "Gets a paginated collection of webhook logs for all webhooks.",
         "operationId": "GetWebhookLogs",
         "parameters": [
           {

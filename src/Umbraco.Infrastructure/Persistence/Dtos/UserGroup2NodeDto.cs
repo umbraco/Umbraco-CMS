@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[Obsolete("Will be removed in Umbraco 18.")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 [TableName(TableName)]
 [ExplicitColumns]
 internal sealed class UserGroup2NodeDto
