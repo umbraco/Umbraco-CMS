@@ -3,7 +3,6 @@ import { css, customElement, html, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
 import './components/umb-news-container.element.js';
 
@@ -16,8 +15,6 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	private _loaded: boolean = false;
 
 	#repo = new UmbNewsDashboardRepository(this);
-
-	#dataSourceConfig: UmbConfigCollectionModel = [{ alias: 'allowedExtensionTypes', value: ['collectionView'] }];
 
 	override async firstUpdated() {
 		const res = await this.#repo.getNewsDashboard();
