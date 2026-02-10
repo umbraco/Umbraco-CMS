@@ -218,13 +218,12 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				${when(
 					this._elementRootAccess === false,
 					() => html`
-						<umb-input-entity-data
+						<umb-input-element
 							slot="editor"
 							.selection=${this._elementStartNodeUniques.map((reference) => reference.unique)}
-							.dataSourceAlias=${'Umb.PropertyEditorDataSource.ElementFolder'}
-							.dataSourceConfig=${[]}
+							?folderOnly=${true}
 							@change=${this.#onElementStartNodeChange}>
-						</umb-input-entity-data>
+						</umb-input-element>
 					`,
 				)}
 			</umb-property-layout>
