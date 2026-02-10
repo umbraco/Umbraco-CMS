@@ -15,7 +15,7 @@ export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButto
 				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,
-					() => html`<umb-icon name=${this.manifest!.meta.icon}></umb-icon>`,
+					(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 					() => html`<span>${label}</span>`,
 				)}
 			</uui-button>
