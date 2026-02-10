@@ -144,7 +144,7 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
-  await umbracoUi.content.isAddBlockElementButtonVisible(false);
+  await umbracoUi.content.isAddBlockElementButtonWithLabelVisible(customDataTypeName, 'Add', false);
 });
 
 test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {
