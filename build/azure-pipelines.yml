@@ -212,6 +212,12 @@ stages:
         pool:
           vmImage: "windows-latest"
         steps:
+          # Reuse build output so docfx can skip restoring packages
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -230,7 +236,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json" --no-restore
                 if ($lastexitcode -ne 0){
                     throw ("Error generating metadata.")
                 }
