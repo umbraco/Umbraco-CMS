@@ -236,7 +236,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json" --noRestore
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
                 if ($lastexitcode -ne 0){
                     throw ("Error generating metadata.")
                 }
