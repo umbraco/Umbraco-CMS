@@ -275,7 +275,7 @@ public interface IDataTypeService : IService
     /// <param name="copying">The data type to copy.</param>
     /// <param name="containerId">The ID of the target container.</param>
     /// <returns>An operation result containing the copied data type.</returns>
-    [Obsolete("Please use CopyASync instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Please use CopyAsync instead. Scheduled for removal in Umbraco 18.")]
     Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) =>
         Copy(copying, containerId, Constants.Security.SuperUserId);
 
@@ -286,7 +286,7 @@ public interface IDataTypeService : IService
     /// <param name="containerId">The ID of the target container.</param>
     /// <param name="userId">The ID of the user performing the action.</param>
     /// <returns>An operation result containing the copied data type.</returns>
-    [Obsolete("Please use CopyASync instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Please use CopyAsync instead. Scheduled for removal in Umbraco 18.")]
     Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(
         IDataType copying,
         int containerId,
