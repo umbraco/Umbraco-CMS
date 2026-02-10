@@ -20,7 +20,7 @@ public static partial class Constants
         /// <summary>
         ///     The installer cookie name (obsolete).
         /// </summary>
-        [Obsolete("InstallerCookieName is no longer used and will be removed in Umbraco 19.")]
+        [Obsolete("InstallerCookieName is no longer used. Scheduled for removal in Umbraco 19.")]
         public const string InstallerCookieName = "umb_installId";
 
         /// <summary>

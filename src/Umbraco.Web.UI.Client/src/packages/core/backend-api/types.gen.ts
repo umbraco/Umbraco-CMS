@@ -752,6 +752,10 @@ export type DocumentTreeItemResponseModel = {
     variants: Array<DocumentVariantItemResponseModel>;
 };
 
+export type DocumentTypeAllowedParentsResponseModel = {
+    allowedParentIds: Array<ReferenceByIdModel>;
+};
+
 export type DocumentTypeBlueprintItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
@@ -1427,6 +1431,10 @@ export type MediaTreeItemResponseModel = {
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
+};
+
+export type MediaTypeAllowedParentsResponseModel = {
+    allowedParentIds: Array<ReferenceByIdModel>;
 };
 
 export type MediaTypeCollectionReferenceResponseModel = {
@@ -5185,6 +5193,41 @@ export type GetDocumentTypeByIdAllowedChildrenResponses = {
 };
 
 export type GetDocumentTypeByIdAllowedChildrenResponse = GetDocumentTypeByIdAllowedChildrenResponses[keyof GetDocumentTypeByIdAllowedChildrenResponses];
+
+export type GetDocumentTypeByIdAllowedParentsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/{id}/allowed-parents';
+};
+
+export type GetDocumentTypeByIdAllowedParentsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetDocumentTypeByIdAllowedParentsError = GetDocumentTypeByIdAllowedParentsErrors[keyof GetDocumentTypeByIdAllowedParentsErrors];
+
+export type GetDocumentTypeByIdAllowedParentsResponses = {
+    /**
+     * OK
+     */
+    200: DocumentTypeAllowedParentsResponseModel;
+};
+
+export type GetDocumentTypeByIdAllowedParentsResponse = GetDocumentTypeByIdAllowedParentsResponses[keyof GetDocumentTypeByIdAllowedParentsResponses];
 
 export type GetDocumentTypeByIdBlueprintData = {
     body?: never;
@@ -10110,6 +10153,41 @@ export type GetMediaTypeByIdAllowedChildrenResponses = {
 };
 
 export type GetMediaTypeByIdAllowedChildrenResponse = GetMediaTypeByIdAllowedChildrenResponses[keyof GetMediaTypeByIdAllowedChildrenResponses];
+
+export type GetMediaTypeByIdAllowedParentsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media-type/{id}/allowed-parents';
+};
+
+export type GetMediaTypeByIdAllowedParentsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMediaTypeByIdAllowedParentsError = GetMediaTypeByIdAllowedParentsErrors[keyof GetMediaTypeByIdAllowedParentsErrors];
+
+export type GetMediaTypeByIdAllowedParentsResponses = {
+    /**
+     * OK
+     */
+    200: MediaTypeAllowedParentsResponseModel;
+};
+
+export type GetMediaTypeByIdAllowedParentsResponse = GetMediaTypeByIdAllowedParentsResponses[keyof GetMediaTypeByIdAllowedParentsResponses];
 
 export type GetMediaTypeByIdCompositionReferencesData = {
     body?: never;

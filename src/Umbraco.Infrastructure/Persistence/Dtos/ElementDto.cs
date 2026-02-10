@@ -5,22 +5,22 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[PrimaryKey(IPublishableContentDto<ElementVersionDto>.Columns.NodeId, AutoIncrement = false)]
 [ExplicitColumns]
-public sealed class ElementDto : INodeDto
+public sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.Element;
 
-    [Column("nodeId")]
+    [Column(IPublishableContentDto<ElementVersionDto>.Columns.NodeId)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
 
-    [Column("published")]
+    [Column(IPublishableContentDto<ElementVersionDto>.Columns.Published)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 
-    [Column("edited")]
+    [Column(IPublishableContentDto<ElementVersionDto>.Columns.Edited)]
     public bool Edited { get; set; }
 
     [ResultColumn]
@@ -32,7 +32,7 @@ public sealed class ElementDto : INodeDto
     // so this here is a OneToOne reference
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]
-    public ElementVersionDto ElementVersionDto { get; set; } = null!;
+    public ElementVersionDto ContentVersionDto { get; set; } = null!;
 
     // same
     [ResultColumn]
