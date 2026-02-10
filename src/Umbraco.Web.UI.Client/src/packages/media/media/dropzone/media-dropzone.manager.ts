@@ -11,6 +11,7 @@ import {
 	type UmbUploadableFolder,
 	type UmbUploadableItem,
 } from '@umbraco-cms/backoffice/dropzone';
+import { getFileExtension } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbMediaTypeStructureRepository,
 	type UmbAllowedChildrenOfMediaType,
@@ -133,7 +134,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 	}
 
 	#getDisallowedMessage(item: UmbUploadableItem, availableMediaTypes: Array<UmbAllowedMediaTypeModel>): string {
-		const extension = item.temporaryFile?.file.name.split('.').pop();
+		const extension = item.temporaryFile ? getFileExtension(item.temporaryFile.file.name) : undefined;
 		if (!extension) {
 			return this.#localization.term('media_disallowedFileType');
 		}
@@ -153,7 +154,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		const parent = item.parentUnique ? await this.#mediaDetailRepository.requestByUnique(item.parentUnique) : null;
 		const allowedChildren = await this.#getAllowedChildrenOf(parent?.data?.mediaType.unique ?? null, item.parentUnique);
 
-		const extension = item.temporaryFile?.file.name.split('.').pop() ?? null;
+		const extension = item.temporaryFile ? getFileExtension(item.temporaryFile.file.name) ?? null : null;
 
 		// Check which media types allow the file's extension
 		const availableMediaTypes = await this.#getAvailableMediaTypesOf(extension);
@@ -229,9 +230,10 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		const { options, availableMediaTypes } = await this.#getMediaTypeOptions(item);
 		if (!options.length) {
 			const message = this.#getDisallowedMessage(item, availableMediaTypes);
+			const itemName = item.temporaryFile?.file.name ?? item.folder?.name;
 			this.#notificationContext?.peek('warning', {
 				data: {
-					message: `${message} (${item.temporaryFile?.file.name}).`,
+					message: itemName ? `${message} (${itemName}).` : `${message}.`,
 				},
 			});
 			return this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED, message);
