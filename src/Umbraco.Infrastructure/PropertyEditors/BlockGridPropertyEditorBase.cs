@@ -62,18 +62,11 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
         var layoutItemSchema = new JsonObject
         {
             ["type"] = "object",
-            ["required"] = new JsonArray("contentUdi"),
+            ["required"] = new JsonArray("contentKey"),
             ["properties"] = new JsonObject
             {
-                ["contentUdi"] = new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
-                ["settingsUdi"] = new JsonObject
-                {
-                    ["oneOf"] = new JsonArray
-                    {
-                        new JsonObject { ["type"] = "null" },
-                        new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
-                    },
-                },
+                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["settingsKey"] = new JsonObject { ["type"] = new JsonArray("string", "null"), ["format"] = "uuid" },
                 ["columnSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 },
                 ["rowSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 },
                 ["areas"] = new JsonObject

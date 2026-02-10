@@ -153,10 +153,62 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
     private static List<SchemaValidationResult> ExtractValidationErrors(EvaluationResults results)
     {
         var errors = new List<SchemaValidationResult>();
+        CollectValidationErrors(results, errors);
 
+        // JSON Schema validators report the same logical error multiple times through different
+        // schema evaluation paths. Deduplicate while collecting paths in a single pass.
+        var seen = new HashSet<(string, string?, string?)>();
+        var allPaths = new HashSet<string>();
+        errors.RemoveAll(e =>
+        {
+            var isDuplicate = !seen.Add((e.Message, e.Path, e.Keyword));
+            if (!isDuplicate && e.Path is not null)
+            {
+                allPaths.Add(e.Path);
+            }
+
+            return isDuplicate;
+        });
+
+        // When all errors lack paths, there's nothing to filter
+        if (allPaths.Count == 0)
+        {
+            return errors;
+        }
+
+        // Schema validators bubble up failures to parent paths with generic "does not conform"
+        // messages. These add noise when we already have the specific child error. Identify
+        // which paths are parents of other paths so we can filter out their generic errors.
+        var parentPathsWithChildren = new HashSet<string>();
+        foreach (var path in allPaths)
+        {
+            var lastSlash = path.LastIndexOf('/');
+            while (lastSlash > 0)
+            {
+                var parentPath = path[..lastSlash];
+                if (allPaths.Contains(parentPath))
+                {
+                    parentPathsWithChildren.Add(parentPath);
+                }
+
+                lastSlash = parentPath.LastIndexOf('/');
+            }
+        }
+
+        // When path-specific errors exist, pathless errors provide no actionable information.
+        // Similarly, generic parent errors (keyword=null) are noise when child errors pinpoint the issue.
+        errors.RemoveAll(e =>
+            string.IsNullOrEmpty(e.Path) ||
+            (e.Keyword is null && parentPathsWithChildren.Contains(e.Path)));
+
+        return errors;
+    }
+
+    private static void CollectValidationErrors(EvaluationResults results, List<SchemaValidationResult> errors)
+    {
         if (results.Details is null || results.Details.Count == 0)
         {
-            // No details, create a generic error from the top-level result
+            // No details, create an error from the current result
             if (!results.IsValid && results.Errors is not null)
             {
                 foreach (var error in results.Errors)
@@ -169,10 +221,12 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
             }
             else if (!results.IsValid)
             {
-                errors.Add(new SchemaValidationResult("Value does not conform to schema"));
+                errors.Add(new SchemaValidationResult(
+                    "Value does not conform to schema",
+                    results.InstanceLocation?.ToString()));
             }
 
-            return errors;
+            return;
         }
 
         // Process nested results
@@ -193,14 +247,10 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
                         error.Key));
                 }
             }
-            else
-            {
-                // Recursively check nested details
-                errors.AddRange(ExtractValidationErrors(detail));
-            }
-        }
 
-        return errors;
+            // Always recurse to find more specific errors
+            CollectValidationErrors(detail, errors);
+        }
     }
 
     private IValueSchemaProvider? GetSchemaProvider(string propertyEditorAlias)

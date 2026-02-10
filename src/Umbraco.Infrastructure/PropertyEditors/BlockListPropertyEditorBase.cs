@@ -49,18 +49,11 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
         var layoutItemSchema = new JsonObject
         {
             ["type"] = "object",
-            ["required"] = new JsonArray("contentUdi"),
+            ["required"] = new JsonArray("contentKey"),
             ["properties"] = new JsonObject
             {
-                ["contentUdi"] = new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
-                ["settingsUdi"] = new JsonObject
-                {
-                    ["oneOf"] = new JsonArray
-                    {
-                        new JsonObject { ["type"] = "null" },
-                        new JsonObject { ["type"] = "string", ["pattern"] = "^umb:\\/\\/element\\/[a-f0-9-]+$" },
-                    },
-                },
+                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["settingsKey"] = new JsonObject { ["type"] = new JsonArray("string", "null"), ["format"] = "uuid" },
             },
         };
 
@@ -91,15 +84,15 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
             },
         };
 
-        // Build expose schema
+        // Build expose schema (BlockItemVariation)
         var exposeItemSchema = new JsonObject
         {
             ["type"] = "object",
             ["properties"] = new JsonObject
             {
-                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
-                ["cultures"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = "string" } },
-                ["segments"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = new JsonArray("string", "null") } },
+                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["culture"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
+                ["segment"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
             },
         };
 
