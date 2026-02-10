@@ -1,4 +1,4 @@
-      _       _              _                                                          
+_       _              _                                                          
      | |     | |            | |                                                         
    __| | ___ | |_ _ __   ___| |_   _ __   _____      __                                 
   / _` |/ _ \| __| '_ \ / _ \ __| | '_ \ / _ \ \ /\ / /                                 
@@ -25,6 +25,16 @@
 * Run `npm run build` to build the project
 * The build output is copied to `wwwroot\App_Plugins\UmbracoExtension\umbraco-extension.js`
 
+== Package Management Options ==
+Choose the approach that fits your scenario:
+=== Traditional (Default) ===
+* Package versions in `.csproj` file.
+
+=== Central Package Management ===
+* All package versions are defined in `Directory.Packages.props` at the solution/project root
+* The `.csproj` file contains `<PackageReference>` elements WITHOUT Version attributes
+* To update a package version, edit `Directory.Packages.props` only
+
 == File Watching ==
 * Add this Razor Class Library Project as a project reference to an Umbraco Website project
 * From the `\Client` folder run the command `npm run watch` this will monitor the changes to the *.ts files and rebuild the project
@@ -35,3 +45,4 @@
 
 == Other Resources ==
 * Umbraco Docs - https://docs.umbraco.com/umbraco-cms/customizing/overview
+* Central Package Management - https://learn.microsoft.com/nuget/consume-packages/central-package-management

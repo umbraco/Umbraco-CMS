@@ -35,6 +35,12 @@
             ".dockerignore",
             "entrypoint.sh"
           ]
+        },
+        {
+          "condition": "(!UseCPM)",
+          "exclude": [
+            "Directory.Packages.props"
+          ]
         }
       ]
     }
@@ -415,6 +421,27 @@
         "defaultFormat": "d"
       },
       "replaces": "TELEMETRYID_FROM_TEMPLATE"
+    },
+    "PackageManagement": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Traditional",
+      "displayName": "Package Version Management",
+      "description": "Choose how to manage Nuget package versions",
+      "choices": [
+        {
+          "choice": "Traditional",
+          "description": "Versions in .csproj (recommended when adding to existing projects)"
+        },
+        {
+          "choice": "Central",
+          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
+        }
+      ]
+    },
+    "UseCPM": {
+      "type": "computed",
+      "value": "(PackageManagement == \"Central\")"
     }
   },
   "primaryOutputs": [

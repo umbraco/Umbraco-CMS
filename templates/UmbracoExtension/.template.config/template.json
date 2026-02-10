@@ -90,6 +90,27 @@
       "datatype": "string",
       "defaultValue": "https://localhost:5000",
       "replaces": "https://localhost:44339"
+    },
+    "PackageManagement": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Traditional",
+      "displayName": "Package Version Management",
+      "description": "Choose how to manage Nuget package versions",
+      "choices": [
+        {
+          "choice": "Traditional",
+          "description": "Versions in .csproj (recommended when adding to existing projects)"
+        },
+        {
+          "choice": "Central",
+          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
+        }
+      ]
+    },
+    "UseCPM": {
+      "type": "computed",
+      "value": "(PackageManagement == \"Central\")"
     }
   },
   "forms": {
@@ -130,6 +151,12 @@
           "condition": "(!IncludeExample)",
           "exclude": [
             "[Cc]lient/src/dashboards/**"
+          ]
+        },
+        {
+          "condition": "(!UseCPM)",
+          "exclude": [
+            "Directory.Packages.props"
           ]
         }
       ]

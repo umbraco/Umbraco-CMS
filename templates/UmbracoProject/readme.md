@@ -1,8 +1,15 @@
-## Central Package Management
+# Central Package Management
 
-This project uses [Central Package Management (CPM)](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management) to manage NuGet package versions.
+This project supports [Central Package Management (CPM)](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management) as an optional feature when creating from the template.
 
-### How it works
+## Without CPM (default)
+When you create a project without CPM (default, or -P Traditional):
+- Package versions are specified directly in the .csproj file
+- No Directory.Packages.props file is created
+- This is the traditional NuGet package management approach
+
+## With CPM enabled
+When you create a project with CPM enabled (-P Central):
 
 - Package versions are defined in `Directory.Packages.props`
 - The `.csproj` file references packages without specifying versions
