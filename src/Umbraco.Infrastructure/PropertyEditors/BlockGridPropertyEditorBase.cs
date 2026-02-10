@@ -142,7 +142,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
                 ["settingsData"] = new JsonObject
                 {
                     ["type"] = "array",
-                    ["items"] = blockItemDataSchema,
+                    ["items"] = blockItemDataSchema.DeepClone(),
                 },
             },
         };

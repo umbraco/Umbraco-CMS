@@ -146,7 +146,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
                 ["settingsData"] = new JsonObject
                 {
                     ["type"] = "array",
-                    ["items"] = blockItemDataSchema,
+                    ["items"] = blockItemDataSchema.DeepClone(),
                 },
                 ["expose"] = new JsonObject
                 {
