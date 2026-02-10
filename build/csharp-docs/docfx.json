@@ -3,13 +3,13 @@
     {
       "src": [
         {
-          "src": "../../src/Umbraco.Cms/bin/Release/net10.0",
+          "src": "../../src/Umbraco.Cms/bin/Release",
           "files": [
-            "Umbraco.*.dll"
+            "**/Umbraco.*.dll"
           ],
           "exclude": [
-            "Umbraco.Cms.StaticAssets.dll",
-            "Umbraco.Cms.Targets.dll"
+            "**/Umbraco.Cms.StaticAssets.dll",
+            "**/Umbraco.Cms.Targets.dll"
           ]
         }
       ],
