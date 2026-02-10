@@ -24,6 +24,8 @@ public class SiblingsMediaTypeTreeController : MediaTypeTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<MediaTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of media type tree sibling items.")]
+    [EndpointDescription("Gets a collection of media type tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<MediaTypeTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,

@@ -1,4 +1,4 @@
-import type { UmbExtensionCollectionFilterModel, UmbExtensionDetailModel } from './types.js';
+import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from './types.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -8,7 +8,7 @@ import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-extension-collection')
 export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
-	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionDetailModel, UmbExtensionCollectionFilterModel>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionCollectionItemModel, UmbExtensionCollectionFilterModel>;
 
 	#options: Array<Option> = [];
 

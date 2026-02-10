@@ -1,7 +1,18 @@
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
-import type { UmbBlockGridLayoutModel } from '../../types.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../../types.js';
+import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
 import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -174,7 +185,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _areaKey?: string | null;
 
 	@state()
-	private _canCreate?: boolean;
+	private _allowedBlockTypes?: UmbBlockGridTypeModel[];
 
 	@state()
 	private _configCreateLabel?: string;
@@ -208,10 +219,10 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			null,
 		);
 		this.observe(
-			this.#context.amountOfAllowedBlockTypes,
-			(length) => {
-				this._canCreate = length > 0;
-				if (length === 1) {
+			this.#context.allowedBlockTypes,
+			(allowedBlockTypes) => {
+				this._allowedBlockTypes = allowedBlockTypes;
+				if (allowedBlockTypes.length === 1) {
 					this.observe(
 						this.#context.firstAllowedBlockTypeName(),
 						(firstAllowedName) => {
@@ -400,7 +411,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					`,
 				)}
 			</div>
-			${when(this._canCreate, () => this.#renderCreateButtonGroup())}
+			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}
 			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
 		`;
 	}
@@ -426,13 +437,43 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	#renderCreateButton() {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+		const createPath = this.#context.getPathForCreateBlock(-1);
 
 		return html`
 			<uui-button
 				look="placeholder"
 				color=${this.pristine === false && this.validity.valid === false ? 'invalid' : 'default'}
 				label=${this._configCreateLabel ?? this._createLabel ?? ''}
-				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				href=${ifDefined(createPath)}
+				@click=${async () => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						if (!this._allowedBlockTypes || this._allowedBlockTypes.length === 0) {
+							throw new Error('No block types are configured for this Block List property editor');
+						}
+						const areaKey = this._areaKey;
+						const parentUnique = this.#context.getParentUnique();
+						if (areaKey === undefined || parentUnique === undefined) {
+							throw new Error('Cannot create block without a defined areaKey and parentUnique');
+						}
+						const originData: UmbBlockGridWorkspaceOriginData = {
+							index: -1,
+							areaKey: areaKey ?? undefined,
+							parentUnique: parentUnique,
+						};
+						const created = await this.#context.create(
+							this._allowedBlockTypes[0].contentElementTypeKey,
+							// We can parse an empty object, cause the rest will be filled in by others.
+							{} as any,
+							originData,
+						);
+						if (created) {
+							this.#context.insert(created.layout, created.content, created.settings, originData);
+						} else {
+							throw new Error('Failed to create block');
+						}
+					}
+				}}
 				?disabled=${this._isReadOnly}></uui-button>
 		`;
 	}
