@@ -101,17 +101,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		if (!this._tabs || !this.#blockWorkspace) return;
 		const routes: UmbRoute[] = [];
 
-		if (this._hasRootGroups || this._hasRootProperties) {
-			routes.push({
-				path: 'root',
-				component: () => import('./block-workspace-view-edit-tab.element.js'),
-				setup: (component) => {
-					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
-				},
-			});
-		}
-
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
@@ -126,13 +115,24 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			});
 		}
 
-		if (routes.length !== 0) {
+		if (this._hasRootGroups || this._hasRootProperties) {
+			routes.push({
+				path: '',
+				component: () => import('./block-workspace-view-edit-tab.element.js'),
+				setup: (component) => {
+					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
+					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
+				},
+			});
+		} else if (routes.length > 0) {
 			routes.push({
 				...routes[0],
 				unique: routes[0].path,
 				path: '',
 			});
+		}
 
+		if (routes.length !== 0) {
 			routes.push({
 				path: `**`,
 				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
