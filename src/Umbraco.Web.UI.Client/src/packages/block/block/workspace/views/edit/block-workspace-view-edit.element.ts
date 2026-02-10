@@ -257,11 +257,12 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 	#renderTab(path: string | null, name: string, index = 0) {
 		const hint = this._hintMap.get(path);
+		const hasRootItems = this._hasRootGroups || this._hasRootProperties;
 		const fullPath = this._routerPath + '/' + (path ? path : '');
 		const active =
 			fullPath === this._activePath ||
-			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath) ||
-			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === this._activePath);
+			(!hasRootItems && index === 0 && this._routerPath + '/' === this._activePath) ||
+			(hasRootItems && path === null && this._routerPath + '/' === this._activePath);
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
