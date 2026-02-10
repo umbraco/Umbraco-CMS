@@ -19,6 +19,8 @@ public class ChildrenMediaRecycleBinController : MediaRecycleBinControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of media items in the recycle bin.")]
+    [EndpointDescription("Gets a paginated collection of media items that are children of the provided parent in the recycle bin.")]
     public async Task<ActionResult<PagedViewModel<MediaRecycleBinItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

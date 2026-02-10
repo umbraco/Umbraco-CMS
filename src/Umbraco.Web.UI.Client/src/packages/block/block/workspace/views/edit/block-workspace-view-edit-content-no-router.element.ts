@@ -97,9 +97,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 							? html`<uui-tab
 									label=${this.localize.term('general_generic')}
 									.active=${this._activeTabKey === null}
-									@click=${() => this.#setTabKey(null)}
-									>Content</uui-tab
-								>`
+									@click=${() => this.#setTabKey(null)}></uui-tab>`
 							: nothing}
 						${repeat(
 							this._tabs,

@@ -80,9 +80,19 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
 			this.#parentUnique = entriesContext?.getParentUnique();
 			this.#areaKey = entriesContext?.getAreaKey();
-		});
 
-		new UmbExtensionApiInitializer(
+			this.#initExtension();
+		});
+	}
+
+	#extensionInitializer?: UmbExtensionApiInitializer;
+	#initExtension() {
+		this.#extensionInitializer?.destroy();
+		if (this.#parentUnique === undefined || this.#areaKey === undefined) {
+			return;
+		}
+
+		this.#extensionInitializer = new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			UMB_BLOCK_WORKSPACE_ALIAS,
@@ -226,9 +236,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			umb-block-grid-areas-container {
-				margin-top: calc(var(--uui-size-2) + 1px);
-			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
 			}
@@ -329,10 +336,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			#name {
-				font-weight: 700;
 			}
 
 			uui-tag {

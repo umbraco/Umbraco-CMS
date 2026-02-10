@@ -153,11 +153,9 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 							${(this._hasRootGroups || this._hasRootProperties) && this._tabs.length > 0
 								? html`
 										<uui-tab
-											label="Content"
+											label=${this.localize.term('general_generic')}
 											.active=${this._routerPath + '/' === this._activePath}
-											href=${this._routerPath + '/'}>
-											<umb-localize key="general_content">Content</umb-localize>
-										</uui-tab>
+											href=${this._routerPath + '/'}></uui-tab>
 									`
 								: ''}
 							${repeat(
