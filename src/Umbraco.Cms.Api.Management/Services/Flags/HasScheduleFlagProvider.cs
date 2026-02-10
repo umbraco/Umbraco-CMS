@@ -37,8 +37,9 @@ internal class HasScheduleFlagProvider : IFlagProvider
     public Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
         where TItem : IHasFlags
     {
-        IDictionary<Guid, IEnumerable<ContentSchedule>> schedules = _contentService.GetContentSchedulesByKeys(items.Select(x => x.Id).ToArray());
-        foreach (TItem item in items)
+        TItem[] itemsArray = items.ToArray();
+        IDictionary<Guid, IEnumerable<ContentSchedule>> schedules = _contentService.GetContentSchedulesByKeys(itemsArray.Select(x => x.Id).ToArray());
+        foreach (TItem item in itemsArray)
         {
             if (schedules.TryGetValue(item.Id, out IEnumerable<ContentSchedule>? contentSchedules) is false)
             {

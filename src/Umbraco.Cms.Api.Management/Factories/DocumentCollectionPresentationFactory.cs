@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+using Lucene.Net.Util;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -15,7 +15,6 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     private readonly IPublicAccessService _publicAccessService;
     private readonly IEntityService _entityService;
 
-    [ActivatorUtilitiesConstructor]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService)
         : base(mapper, flagProviders, userService)
     {
@@ -86,7 +85,7 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         int[] pathIds = content.Path.EnsureEndsWith("," + content.Id).GetIdsFromPathReversed();
         foreach (var id in pathIds)
         {
-            if (id != -1 && protectedNodeIds.Contains(id))
+            if (id != Core.Constants.System.Root && protectedNodeIds.Contains(id))
             {
                 return true;
             }
