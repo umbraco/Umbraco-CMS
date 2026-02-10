@@ -107,19 +107,14 @@ stages:
               command: build
               projects: $(solution)
               arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
-          # Generate C# API docs metadata here since the solution is already compiled, avoiding a second build in the docs stage
-          # Only runs on release builds to avoid slowing down regular builds
-          - powershell: |
-              dotnet tool install -g docfx
-              docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-            displayName: Generate DocFX metadata
-            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
+          # Publish compiled DLLs for C# API documentation generation
+          # Separate artifact to avoid increasing build_output size for all builds
           - task: PublishPipelineArtifact@1
-            displayName: Publish DocFX metadata
+            displayName: Publish DocFX DLLs
             condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
             inputs:
-              targetPath: $(Build.SourcesDirectory)/build/csharp-docs/api
-              artifactName: docfx-metadata
+              targetPath: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
+              artifactName: csharp-docs-dlls
           - powershell: |
               dotnet tool install --global CycloneDX
               dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
@@ -213,7 +208,7 @@ stages:
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
-      # C# API Reference - metadata is generated in the Build stage, this job just converts to HTML
+      # C# API Reference - uses pre-compiled DLLs for faster generation (csproj approach caused timeouts)
       - job:
         displayName: Build C# API Reference
         pool:
@@ -225,10 +220,10 @@ stages:
             fetchDepth: 1
             fetchFilter: tree:0
           - task: DownloadPipelineArtifact@2
-            displayName: Download DocFX metadata
+            displayName: Download DocFX DLLs
             inputs:
-              artifact: docfx-metadata
-              path: $(Build.SourcesDirectory)/build/csharp-docs/api
+              artifact: csharp-docs-dlls
+              path: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -241,6 +236,15 @@ stages:
                 dotnet tool install -g docfx
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
+                }
+          - task: PowerShell@2
+            displayName: Generate metadata
+            inputs:
+              targetType: inline
+              script: |
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                    throw ("Error generating metadata.")
                 }
           - task: PowerShell@2
             displayName: Generate documentation
