@@ -106,7 +106,7 @@ public class ContentPermissions
     /// <param name="entity">The <see cref="IUmbracoEntity" /> item resolved if one was found for the id</param>
     /// <param name="permissionsToCheck"></param>
     /// <returns></returns>
-    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead. Scheduled for removal in Umbraco 18.")]
     public ContentAccess CheckPermissions(
         int nodeId,
         IUser user,
@@ -166,7 +166,7 @@ public class ContentPermissions
     /// <param name="contentItem">The <see cref="IContent" /> item resolved if one was found for the id</param>
     /// <param name="permissionsToCheck"></param>
     /// <returns></returns>
-    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead. Scheduled for removal in Umbraco 18.")]
     public ContentAccess CheckPermissions(
         int nodeId,
         IUser? user,
@@ -218,7 +218,7 @@ public class ContentPermissions
             : ContentAccess.Denied;
     }
 
-    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead. Scheduled for removal in Umbraco 18.")]
     private bool CheckPermissionsPath(string? path, IUser user, IReadOnlySet<string>? permissionsToCheck = null)
     {
         if (permissionsToCheck == null)

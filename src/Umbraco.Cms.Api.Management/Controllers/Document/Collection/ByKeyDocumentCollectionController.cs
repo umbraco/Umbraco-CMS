@@ -37,7 +37,7 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
         _documentCollectionPresentationFactory = documentCollectionPresentationFactory;
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

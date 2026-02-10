@@ -25,7 +25,7 @@ public class BlockListItem : IBlockReference<IPublishedElement, IPublishedElemen
     ///     or
     ///     content
     /// </exception>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     public BlockListItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
         : this(
             (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
@@ -69,7 +69,7 @@ public class BlockListItem : IBlockReference<IPublishedElement, IPublishedElemen
     /// <value>
     ///     The settings UDI.
     /// </value>
-    [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? SettingsUdi { get; }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class BlockListItem : IBlockReference<IPublishedElement, IPublishedElemen
     /// <value>
     ///     The content UDI.
     /// </value>
-    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi ContentUdi { get; }
 
     /// <summary>
@@ -115,7 +115,7 @@ public class BlockListItem<T> : BlockListItem
     /// <param name="content">The content.</param>
     /// <param name="settingsUdi">The settings UDI.</param>
     /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     public BlockListItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
         : base(contentUdi, content, settingsUdi, settings) =>
         Content = content;
@@ -157,7 +157,7 @@ public class BlockListItem<TContent, TSettings> : BlockListItem<TContent>
     /// <param name="content">The content.</param>
     /// <param name="settingsUdi">The settings udi.</param>
     /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     public BlockListItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
         : base(contentUdi, content, settingsUdi, settings) =>
         Settings = settings;

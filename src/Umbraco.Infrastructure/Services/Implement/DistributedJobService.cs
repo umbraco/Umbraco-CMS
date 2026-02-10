@@ -23,7 +23,7 @@ public class DistributedJobService : IDistributedJobService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
-    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in V18.")]
+    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in Umbraco 18.")]
     public DistributedJobService(
         ICoreScopeProvider coreScopeProvider,
         IDistributedJobRepository distributedJobRepository,

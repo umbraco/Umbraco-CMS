@@ -58,7 +58,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
     /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
     /// <param name="snippetCollection">The collection of available partial view snippets.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -92,7 +92,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <param name="auditService">The service for audit logging.</param>
     /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
     /// <param name="snippetCollection">The collection of available partial view snippets.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
