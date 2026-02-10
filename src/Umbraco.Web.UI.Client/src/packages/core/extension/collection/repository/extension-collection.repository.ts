@@ -44,7 +44,8 @@ export class UmbExtensionCollectionRepository
 		}
 
 		if (query.type) {
-			extensions = extensions.filter((x) => x.manifest.type === query.type);
+			const types = Array.isArray(query.type) ? query.type : [query.type];
+			extensions = extensions.filter((x) => types.includes(x.manifest.type));
 		}
 
 		extensions.sort(

@@ -4,7 +4,7 @@ import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbWithDescriptionModel } from '@umbraco-cms/backoffice/models';
 
 export interface UmbExtensionCollectionFilterModel extends UmbCollectionFilterModel {
-	type?: string;
+	type?: string | Array<string>;
 }
 
 export interface UmbExtensionCollectionItemModel extends UmbCollectionItemModel, UmbWithDescriptionModel {

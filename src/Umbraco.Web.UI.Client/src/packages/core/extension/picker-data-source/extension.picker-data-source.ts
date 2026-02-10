@@ -23,15 +23,29 @@ export class UmbExtensionPickerDataSource
 		return this.#config;
 	}
 
-	async requestCollection(filter: UmbCollectionFilterModel) {
-		const allowedExtensionTypes = getConfigValue(this.#config, 'allowedExtensionTypes');
+	async requestCollection(args: UmbCollectionFilterModel) {
+		const configAllowedExtensionTypes = getConfigValue(this.#config, 'allowedExtensionTypes');
+		const requestedType = (args as UmbExtensionCollectionFilterModel).type;
 
-		const extendedFilter: UmbExtensionCollectionFilterModel = {
-			...filter,
-			type: allowedExtensionTypes?.[0],
+		let type: string | Array<string> | undefined;
+
+		if (configAllowedExtensionTypes?.length) {
+			if (requestedType) {
+				// If the UI requests a specific type, only use it if it's in the allowed list
+				const requested = Array.isArray(requestedType) ? requestedType : [requestedType];
+				type = requested.filter((t) => configAllowedExtensionTypes.includes(t));
+			} else {
+				// No specific type requested — use all allowed types
+				type = configAllowedExtensionTypes;
+			}
+		}
+
+		const extendedArgs: UmbExtensionCollectionFilterModel = {
+			...args,
+			type,
 		};
 
-		return this.#collectionRepository.requestCollection(extendedFilter);
+		return this.#collectionRepository.requestCollection(extendedArgs);
 	}
 
 	async requestItems(uniques: Array<string>) {
