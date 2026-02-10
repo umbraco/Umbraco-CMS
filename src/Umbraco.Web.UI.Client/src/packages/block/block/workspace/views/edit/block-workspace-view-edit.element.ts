@@ -178,7 +178,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 	#renderTab(path: string | null, name: string, index = 0) {
 		const hasRootItems = this._hasRootGroups || this._hasRootProperties;
-		const fullPath = this._routerPath + '/' + (path ? path : '');
+		const fullPath = this._routerPath + '/' + (path ? path : 'root');
 		const active =
 			fullPath === this._activePath ||
 			(!hasRootItems && index === 0 && this._routerPath + '/' === this._activePath) ||
