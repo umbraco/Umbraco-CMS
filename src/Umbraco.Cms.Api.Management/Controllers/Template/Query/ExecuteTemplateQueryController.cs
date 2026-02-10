@@ -46,6 +46,8 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Executes a template query.")]
+    [EndpointDescription("Executes a template query with the provided parameters and returns the matching content results with execution metrics.")]
     public Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
         CancellationToken cancellationToken,
         TemplateQueryExecuteModel query)

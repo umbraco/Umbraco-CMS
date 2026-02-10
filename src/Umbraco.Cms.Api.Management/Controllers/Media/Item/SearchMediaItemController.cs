@@ -67,6 +67,8 @@ public class SearchMediaItemController : MediaItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches media items.")]
+    [EndpointDescription("Searches media items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchFromParentWithAllowedTypes(
         CancellationToken cancellationToken,
         string query,

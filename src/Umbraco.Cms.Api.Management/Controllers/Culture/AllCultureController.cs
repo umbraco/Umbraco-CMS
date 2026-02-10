@@ -21,10 +21,6 @@ public class AllCultureController : CultureControllerBase
         _cultureService = cultureService;
     }
 
-    /// <summary>
-    ///     Returns all cultures available for creating languages.
-    /// </summary>
-    /// <returns></returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<CultureReponseModel>), StatusCodes.Status200OK)]

@@ -29,6 +29,8 @@ public class ValidateCreateMemberController : MemberControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates creating a member.")]
+    [EndpointDescription("Validates the request model for creating a new member without actually creating it.")]
     public async Task<IActionResult> Validate(
         CancellationToken cancellationToken,
         CreateMemberRequestModel requestModel)
