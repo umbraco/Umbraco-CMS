@@ -101,6 +101,17 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		if (!this._tabs || !this.#blockWorkspace) return;
 		const routes: UmbRoute[] = [];
 
+		if (this._hasRootGroups || this._hasRootProperties) {
+			routes.push({
+				path: '',
+				component: () => import('./block-workspace-view-edit-tab.element.js'),
+				setup: (component) => {
+					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
+					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
+				},
+			});
+		}
+
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
@@ -115,25 +126,13 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			});
 		}
 
-		if (this._hasRootGroups || this._hasRootProperties) {
-			routes.push({
-				path: '',
-				component: () => import('./block-workspace-view-edit-tab.element.js'),
-				setup: (component) => {
-					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
-				},
-			});
-		}
-
 		if (routes.length !== 0) {
-			if (!this._hasRootGroups) {
-				routes.push({
-					path: '',
-					pathMatch: 'full',
-					redirectTo: routes[0]?.path,
-				});
-			}
+			routes.push({
+				...routes[0],
+				unique: routes[0].path,
+				path: '',
+			});
+
 			routes.push({
 				path: `**`,
 				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
@@ -147,7 +146,8 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
-				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && (this._hasRootGroups || this._hasRootProperties)))
+				${this._routerPath &&
+				(this._tabs.length > 1 || (this._tabs.length === 1 && (this._hasRootGroups || this._hasRootProperties)))
 					? html` <uui-tab-group slot="header">
 							${(this._hasRootGroups || this._hasRootProperties) && this._tabs.length > 0
 								? html`
