@@ -24,6 +24,8 @@ public class DefaultLanguageEntityController : LanguageItemControllerBase
     [HttpGet("default")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(LanguageItemResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the default language.")]
+    [EndpointDescription("Gets the default language configured for the Umbraco installation.")]
     public async Task<IActionResult> Default(CancellationToken cancellationToken)
     {
         ILanguage? language = await _languageService.GetDefaultLanguageAsync();

@@ -37,6 +37,8 @@ public class RebuildIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Rebuilds an indexer.")]
+    [EndpointDescription("Rebuilds the search index for the indexer identified by the provided name.")]
     public async Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
     {
         if (!_examineManager.TryGetIndex(indexName, out IIndex? index))

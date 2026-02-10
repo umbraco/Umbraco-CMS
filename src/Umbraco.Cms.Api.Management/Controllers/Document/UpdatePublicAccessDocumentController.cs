@@ -37,6 +37,8 @@ public class UpdatePublicAccessDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Updates public access protection for a document.")]
+    [EndpointDescription("Updates the member protection settings for a document, controlling which members or member groups can access it.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, PublicAccessRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

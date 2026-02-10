@@ -34,6 +34,8 @@ public class ChildrenStylesheetTreeController : StylesheetTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of stylesheet tree child items.")]
+    [EndpointDescription("Gets a paginated collection of stylesheet tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> Children(
         CancellationToken cancellationToken,
         string parentPath,
