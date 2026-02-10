@@ -1,9 +1,9 @@
+import type { ManifestTiptapToolbarExtensionActionButtonKind } from '../../extensions/tiptap-toolbar.extension.js';
 import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
 import { customElement, html, when } from '@umbraco-cms/backoffice/external/lit';
 
-/** @deprecated No longer used internally. Please use `UmbTiptapToolbarButtonActionElement` (`umb-tiptap-toolbar-button-action`) instead. This will be removed in Umbraco 19. [LK] */
-@customElement('umb-tiptap-toolbar-button-disabled')
-export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButtonElement {
+@customElement('umb-tiptap-toolbar-button-action')
+export class UmbTiptapToolbarButtonActionElement extends UmbTiptapToolbarButtonElement<ManifestTiptapToolbarExtensionActionButtonKind> {
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
 		return html`
@@ -12,7 +12,7 @@ export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButto
 				look="default"
 				label=${label}
 				title=${label}
-				?disabled=${!this.isActive}
+				?disabled=${this.api?.isDisabled(this.editor)}
 				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,
@@ -24,10 +24,10 @@ export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButto
 	}
 }
 
-export { UmbTiptapToolbarButtonDisabledElement as element };
+export { UmbTiptapToolbarButtonActionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tiptap-toolbar-button-disabled': UmbTiptapToolbarButtonDisabledElement;
+		'umb-tiptap-toolbar-button-action': UmbTiptapToolbarButtonActionElement;
 	}
 }
