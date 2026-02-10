@@ -122,7 +122,7 @@ test('can trash element with delete permission enabled', {tag: '@smoke'}, async 
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(elementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(elementName);
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementToBeTrashed();
 
   // Assert
@@ -186,7 +186,7 @@ test('can publish element with publish permission enabled', {tag: '@smoke'}, asy
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(elementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(elementName);
   await umbracoUi.library.clickConfirmToPublishButton();
 
   // Assert
@@ -219,7 +219,7 @@ test('can unpublish element with unpublish permission enabled', {tag: '@smoke'},
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(elementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(elementName);
   await umbracoUi.library.clickConfirmToUnpublishButton();
 
   // Assert
@@ -288,7 +288,7 @@ test('can duplicate element with duplicate permission enabled', {tag: '@smoke'},
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(elementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(elementName);
   await umbracoUi.library.clickLabelWithName('Elements');
   await umbracoUi.library.clickDuplicateButton();
 
@@ -331,7 +331,7 @@ test('can move element with move to permission enabled', {tag: '@smoke'}, async 
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(elementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(elementName);
   await umbracoUi.library.moveToElementWithName([], elementFolderName);
 
   // Assert

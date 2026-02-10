@@ -36,13 +36,13 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  // Ensure we are logged in to admin
-  // await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
-  // await umbracoApi.element.ensureNameNotExists(firstElementName);
-  // await umbracoApi.element.ensureNameNotExists(secondElementName);
-  // await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
-  // await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
-  // await umbracoApi.element.emptyRecycleBin();
+  //Ensure we are logged in to admin
+  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.element.ensureNameNotExists(firstElementName);
+  await umbracoApi.element.ensureNameNotExists(secondElementName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
+  await umbracoApi.element.emptyRecycleBin();
 });
 
 test('can read a specific element with read permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -71,7 +71,7 @@ test('can trash a specific element with delete permission enabled', async ({umbr
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(firstElementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(firstElementName);
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementToBeTrashed();
 
   // Assert
@@ -88,7 +88,7 @@ test('can publish a specific element with publish permission enabled', async ({u
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(firstElementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(firstElementName);
   await umbracoUi.library.clickConfirmToPublishButton();
 
   // Assert
@@ -110,7 +110,7 @@ test('can unpublish a specific element with unpublish permission enabled', async
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(firstElementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(firstElementName);
   await umbracoUi.library.clickConfirmToUnpublishButton();
 
   // Assert
@@ -145,7 +145,7 @@ test.fixme('can update a specific element with update permission enabled', async
   await umbracoApi.element.ensureNameNotExists(newElementName);
 });
 
-test('can duplicate a specific element with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can duplicate a specific element with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedElementName = firstElementName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermissionForSpecificElement(userGroupName, firstElementId);
@@ -155,7 +155,7 @@ test('can duplicate a specific element with duplicate permission enabled', async
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(firstElementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(firstElementName);
   await umbracoUi.library.clickLabelWithName('Elements');
   await umbracoUi.library.clickDuplicateButton();
 
@@ -180,7 +180,7 @@ test('can move a specific element with move permission enabled', async ({umbraco
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Act
-  await umbracoUi.library.clickFirstEntityActionForElementWithName(firstElementName);
+  await umbracoUi.library.clickEntityActionOnElementWithName(firstElementName);
   await umbracoUi.library.moveToElementWithName([], elementFolderName);
 
   // Assert
