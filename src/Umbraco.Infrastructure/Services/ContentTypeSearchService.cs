@@ -17,21 +17,28 @@ internal sealed class ContentTypeSearchService : IContentTypeSearchService
         _contentTypeService = contentTypeService;
     }
 
-    public async Task<PagedModel<IContentType>> SearchAsync(string query, bool? isElement, CancellationToken cancellationToken, int skip = 0, int take = 100)
+    public async Task<PagedModel<IContentType>> SearchAsync(string query, bool? isElement, bool? allowedInLibrary, CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         // if the query is a GUID, search for that explicitly
         Guid.TryParse(query, out Guid guidQuery);
 
-        IQuery<IContentType> nameQuery = isElement is not null ?
-            _sqlContext.Query<IContentType>().Where(x => (x.Name!.Contains(query) || x.Key == guidQuery) && x.IsElement == isElement) :
-            _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery);
+        IQuery<IContentType> nameQuery = _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery);
+
+        if (isElement is not null)
+        {
+            nameQuery = nameQuery.Where(x => x.IsElement == isElement);
+        }
+
+        if (allowedInLibrary is not null)
+        {
+            nameQuery = nameQuery.Where(x => x.AllowedInLibrary == allowedInLibrary);
+        }
 
         IContentType[] contentTypes = (await _contentTypeService.GetByQueryAsync(nameQuery, cancellationToken)).ToArray();
-
         return new PagedModel<IContentType>
         {
             Items = contentTypes.Skip(skip).Take(take),
-            Total = contentTypes.Count()
+            Total = contentTypes.Length,
         };
     }
 }
