@@ -135,7 +135,7 @@ internal class PublishedContent : PublishedContentBase
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
 
-    [Obsolete("Use the INavigationQueryService instead, scheduled for removal in v17")]
+    [Obsolete("Use the INavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override int Level
     {
         get
@@ -163,7 +163,7 @@ internal class PublishedContent : PublishedContentBase
         }
     }
 
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override IPublishedContent? Parent => GetParent();
 
     /// <inheritdoc />
