@@ -18,7 +18,7 @@ public class BlockListLayoutItem : BlockLayoutItemBase
     ///     Initializes a new instance of the <see cref="BlockListLayoutItem" /> class.
     /// </summary>
     /// <param name="contentUdi">The content UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     public BlockListLayoutItem(Udi contentUdi)
         : base(contentUdi)
     {
@@ -29,7 +29,7 @@ public class BlockListLayoutItem : BlockLayoutItemBase
     /// </summary>
     /// <param name="contentUdi">The content UDI.</param>
     /// <param name="settingsUdi">The settings UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     public BlockListLayoutItem(Udi contentUdi, Udi settingsUdi)
         : base(contentUdi, settingsUdi)
     {

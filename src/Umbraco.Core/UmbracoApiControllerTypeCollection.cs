@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core;
 /// <summary>
 ///     A collection of types representing Umbraco API controllers.
 /// </summary>
-[Obsolete("This will be removed in Umbraco 15.")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class UmbracoApiControllerTypeCollection : BuilderCollectionBase<Type>
 {
     /// <summary>

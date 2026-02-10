@@ -53,7 +53,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in v19.")]
+    [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in Umbraco 19.")]
     public virtual void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
         => RebuildIndexAsync(indexName, delay, useBackgroundThread).GetAwaiter().GetResult();
 
@@ -90,7 +90,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in v19.")]
+    [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
     public virtual void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
         => RebuildIndexesAsync(onlyEmptyIndexes, delay, useBackgroundThread).GetAwaiter().GetResult();
 
