@@ -11,10 +11,15 @@ export class UmbInputExtensionElement extends UmbFormControlMixin<string | undef
 ) {
 	#dataSource = new UmbExtensionPickerDataSource(this);
 	#dataSourceConfig: UmbExtensionPickerDataSourceConfigCollectionModel = [];
+	#allowedExtensionTypes: Array<string> | undefined;
 
 	@property({ type: Array, attribute: false })
 	set allowedExtensionTypes(value: Array<string> | undefined) {
+		this.#allowedExtensionTypes = value;
 		this.#dataSourceConfig = value?.length ? [{ alias: 'allowedExtensionTypes', value }] : [];
+	}
+	get allowedExtensionTypes(): Array<string> | undefined {
+		return this.#allowedExtensionTypes;
 	}
 
 	@property({ type: Number })
