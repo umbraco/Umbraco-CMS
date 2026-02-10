@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Represents the result of routing an Umbraco request.
+/// </summary>
 public enum UmbracoRouteResult
 {
     /// <summary>

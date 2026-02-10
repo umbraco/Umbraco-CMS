@@ -19,6 +19,13 @@ public static class ContentServiceExtensions
     private static readonly Regex AnchorRegex = new(@"<a id=\\*""(.*?)\\*"">", RegexOptions.Compiled);
     private static readonly string[] _propertyTypesWithRte = new[] { Constants.PropertyEditors.Aliases.RichText, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
 
+    /// <summary>
+    /// Gets content items by their UDI identifiers.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="ids">The UDI identifiers of the content items to retrieve.</param>
+    /// <returns>A collection of content items matching the specified UDIs.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when any UDI is not a <see cref="GuidUdi"/>.</exception>
     public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
     {
         var guids = new List<GuidUdi>();
@@ -65,6 +72,13 @@ public static class ContentServiceExtensions
     public static void RemoveContentPermissions(this IContentService contentService, int contentId) =>
         contentService.SetPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
 
+    /// <summary>
+    /// Gets all anchor values from Rich Text Editor properties of a content item.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="id">The content item identifier.</param>
+    /// <param name="culture">The culture to use, or "*" for all cultures. Defaults to "*".</param>
+    /// <returns>A collection of anchor values found in the RTE properties.</returns>
     public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string? culture = "*")
     {
         var result = new List<string>();
@@ -90,6 +104,12 @@ public static class ContentServiceExtensions
         return result;
     }
 
+    /// <summary>
+    /// Extracts anchor values from Rich Text Editor content.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="rteContent">The RTE content to extract anchors from.</param>
+    /// <returns>A collection of anchor values found in the content.</returns>
     public static IEnumerable<string> GetAnchorValuesFromRTEContent(
         this IContentService contentService,
         string rteContent)

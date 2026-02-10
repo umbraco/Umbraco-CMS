@@ -84,6 +84,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 
+		this.content.view.inheritFrom(this.view);
+		this.settings.view.inheritFrom(this.view);
+
 		this.addValidationContext(this.content.validation);
 		this.addValidationContext(this.settings.validation);
 
@@ -91,7 +94,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#modalContext = context;
 			this.#originData = context?.data.originData;
 			context?.onSubmit().catch(this.#modalRejected);
-		}).asPromise({ preventTimeout: true });
+		});
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;
@@ -610,6 +613,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#reportValidation() {
 		this.content.validation.report();
 		this.settings.validation.report();
+	}
+
+	/**
+	 * Used by Inline Editing Modes as they are inline we want the validation state to be reported instantly, as well they do not have a submit action.
+	 */
+	autoReportValidation() {
+		this.content.validation.autoReport();
+		this.settings.validation.autoReport();
 	}
 
 	expose() {

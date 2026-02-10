@@ -59,16 +59,28 @@ public class ContentSchedule : IDeepCloneable
     [DataMember]
     public ContentScheduleAction Action { get; }
 
+    /// <inheritdoc />
     public object DeepClone() => new ContentSchedule(Id, Culture, Date, Action);
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
         => obj is ContentSchedule other && Equals(other);
 
+    /// <summary>
+    ///     Determines whether this schedule is equal to another schedule.
+    /// </summary>
+    /// <param name="other">The other schedule to compare.</param>
+    /// <returns><c>true</c> if the schedules are equal; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Two ContentSchedule instances are equal if they are for the same action,
+    ///     for the same culture, on the same date. The Id is not compared.
+    /// </remarks>
     public bool Equals(ContentSchedule other) =>
 
         // don't compare Ids, two ContentSchedule are equal if they are for the same change
         // for the same culture, on the same date - and the collection deals w/duplicates
         Culture.InvariantEquals(other.Culture) && Date == other.Date && Action == other.Action;
 
+    /// <inheritdoc />
     public override int GetHashCode() => throw new NotImplementedException();
 }

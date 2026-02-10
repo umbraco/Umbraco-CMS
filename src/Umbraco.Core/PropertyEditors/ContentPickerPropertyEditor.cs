@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Content property editor that stores UDI
+///     Content property editor that stores UDI.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.ContentPicker,
@@ -24,6 +24,11 @@ public class ContentPickerPropertyEditor : DataEditor
 {
     private readonly IIOHelper _ioHelper;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+    /// <param name="ioHelper">The IO helper.</param>
     public ContentPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
@@ -31,15 +36,26 @@ public class ContentPickerPropertyEditor : DataEditor
         SupportsReadOnly = true;
     }
 
+    /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new ContentPickerConfigurationEditor(_ioHelper);
 
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<ContentPickerPropertyValueEditor>(Attribute!);
 
+    /// <summary>
+    ///     Provides the value editor for the content picker property editor.
+    /// </summary>
     internal sealed class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
-
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ContentPickerPropertyValueEditor" /> class.
+        /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
         public ContentPickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -49,6 +65,7 @@ public class ContentPickerPropertyEditor : DataEditor
         {
         }
 
+        /// <inheritdoc />
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             var asString = value is string str ? str : value?.ToString();
@@ -64,13 +81,17 @@ public class ContentPickerPropertyEditor : DataEditor
             }
         }
 
-        // starting in v14 the passed in value is always a guid, we store it as a document Udi string. Else it's an invalid value
+        /// <inheritdoc />
+        /// <remarks>
+        /// Starting in v14, the passed in value is always a GUID. The value is stored as a document UDI string.
+        /// </remarks>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue) =>
             editorValue.Value is not null
             && Guid.TryParse(editorValue.Value.ToString(), out Guid guidValue)
                 ? GuidUdi.Create(Constants.UdiEntityType.Document, guidValue).ToString()
                 : null;
 
+        /// <inheritdoc />
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             // since our storage type is a string, we can expect the base to return a string

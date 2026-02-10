@@ -9,6 +9,11 @@ namespace Umbraco.Cms.Core.Models.Editors;
 /// </remarks>
 public class ContentPropertyData
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPropertyData" /> class.
+    /// </summary>
+    /// <param name="value">The value submitted for the property.</param>
+    /// <param name="dataTypeConfiguration">The data type configuration for the property.</param>
     public ContentPropertyData(object? value, object? dataTypeConfiguration)
     {
         Value = value;

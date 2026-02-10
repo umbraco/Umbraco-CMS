@@ -10,6 +10,9 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class CoreCacheHelperExtensions
 {
+    /// <summary>
+    ///     The cache key used for partial view caching.
+    /// </summary>
     public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
 
     /// <summary>

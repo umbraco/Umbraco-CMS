@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a partial view is deleted.
+/// </summary>
 [WebhookEvent("Partial View Deleted")]
 public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PartialViewDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public PartialViewDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDelete
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.PartialViewDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

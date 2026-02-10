@@ -8,12 +8,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+///     Provides property value conversion for member picker properties.
+/// </summary>
 [DefaultPropertyValueConverter]
 public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IMemberService _memberService;
     private readonly IPublishedMemberCache _memberCache;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberPickerValueConverter" /> class.
+    /// </summary>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="memberCache">The published member cache.</param>
     public MemberPickerValueConverter(
         IMemberService memberService,
         IPublishedMemberCache memberCache)
@@ -22,15 +30,19 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
         _memberCache = memberCache;
     }
 
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.MemberPicker);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Snapshot;
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IPublishedContent);
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
@@ -53,6 +65,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
         return null;
     }
 
+    /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
         if (source == null)
@@ -99,11 +112,16 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
         return source;
     }
 
+    /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
+    /// <inheritdoc />
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
-    // member picker is unsupported for Delivery API output to avoid leaking member data by accident.
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Member picker is unsupported for Delivery API output to avoid leaking member data by accident.
+    /// </remarks>
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         => "(unsupported)";
 }

@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides the default implementation of <see cref="IPublishedUrlInfoProvider" />.
+/// </summary>
 public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 {
     private const string UrlProviderAlias = Constants.UrlProviders.Content;
@@ -21,6 +24,17 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     private readonly UriUtility _uriUtility;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedUrlInfoProvider" /> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="publishedRouter">The published router.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="localizedTextService">The localized text service.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="uriUtility">The URI utility.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     public PublishedUrlInfoProvider(
         IPublishedUrlProvider publishedUrlProvider,
         ILanguageService languageService,

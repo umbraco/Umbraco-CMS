@@ -9,14 +9,26 @@ using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
-using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
+/// <summary>
+///     Extension methods for <see cref="IUmbracoBuilder"/> to configure authentication services.
+/// </summary>
 public static class UmbracoBuilderAuthExtensions
 {
+    /// <summary>
+    ///     Adds OpenIddict authentication services for Umbraco APIs.
+    /// </summary>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder for method chaining.</returns>
+    /// <remarks>
+    ///     Configures OpenIddict with authorization code flow (with PKCE), client credentials flow,
+    ///     reference tokens, and ASP.NET Core Data Protection for token encryption.
+    /// </remarks>
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
         if (builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)

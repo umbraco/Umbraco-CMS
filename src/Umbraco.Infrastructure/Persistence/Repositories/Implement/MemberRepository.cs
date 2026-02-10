@@ -224,13 +224,15 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             return Enumerable.Empty<IMember>();
         }
 
-        Sql<ISqlContext> subQuery = Sql().Select("Member").From<Member2MemberGroupDto>()
+        Sql<ISqlContext> subQuery = Sql()
+            .Select<Member2MemberGroupDto>(c => c.Member)
+            .From<Member2MemberGroupDto>()
             .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
 
         Sql<ISqlContext> sql = GetBaseQuery(false)
             // TODO: An inner join would be better, though I've read that the query optimizer will always turn a
             // subquery with an IN clause into an inner join anyways.
-            .Append("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments)
+            .Append($"WHERE {QuoteTableName("umbracoNode")}.id IN ({subQuery.SQL})", subQuery.Arguments)
             .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
             .OrderBy<NodeDto>(x => x.SortOrder);
 
@@ -255,7 +257,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         //get the COUNT base query
         Sql<ISqlContext> fullSql = GetBaseQuery(true)
-            .Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments));
+            .Append(new Sql($"WHERE {QuoteTableName("umbracoNode")}.id IN ({sql.SQL})", sql.Arguments));
 
         return Database.ExecuteScalar<int>(fullSql);
     }
@@ -318,7 +320,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         }
 
         var pageIndex = skip / take;
-        Page<MemberDto>? pageResult = await Database.PageAsync<MemberDto>(pageIndex+1, take, sql);
+        Page<MemberDto>? pageResult = await Database.PageAsync<MemberDto>(pageIndex + 1, take, sql);
 
         // shortcut so our join is not too big, but we also hope these are cached, so we don't have to map them again.
         var nodeIds = pageResult.Items.Select(x => x.NodeId).ToArray();
@@ -357,6 +359,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     /// <summary>
     ///     Gets paged member results.
     /// </summary>
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public override IEnumerable<IMember> GetPage(
         IQuery<IMember>? query,
         long pageIndex,
@@ -364,7 +367,21 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         out long totalRecords,
         IQuery<IMember>? filter,
         Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <summary>
+    ///     Gets paged member results.
+    /// </summary>
+    public override IEnumerable<IMember> GetPage(
+        IQuery<IMember>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IMember>? filter,
+        Ordering? ordering)
     {
+
         Sql<ISqlContext>? filterSql = null;
 
         if (filter != null)
@@ -381,7 +398,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             pageIndex,
             pageSize,
             out totalRecords,
-            x => MapDtosToContent(x),
+            x => MapDtosToContent(x, propertyAliases: propertyAliases),
             filterSql,
             ordering);
     }
@@ -394,16 +411,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
         Sql<ISqlContext> memberSql = Sql()
-            .Select("umbracoNode.id")
+            .Select<NodeDto>(n => n.NodeId)
             .From<NodeDto>()
             .InnerJoin<MemberDto>()
             .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
             .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-            .Where("cmsMember.LoginName in (@usernames)", new
-            {
-                /*usernames =*/
-                usernames
-            });
+            .WhereIn<MemberDto>(m => m.LoginName, usernames);
         return Database.Fetch<int>(memberSql).ToArray();
     }
 
@@ -472,7 +485,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         return base.ApplySystemOrdering(ref sql, ordering);
     }
 
-    private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false)
+    private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false, string[]? propertyAliases = null)
     {
         var temps = new List<TempContent<Member>>();
         var contentTypes = new Dictionary<int, IMemberType?>();
@@ -512,7 +525,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         }
 
         // load all properties for all documents from database in 1 query - indexed by version id
-        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps);
+        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps, propertyAliases);
 
         // assign properties
         foreach (TempContent<Member> temp in temps)
@@ -538,7 +551,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         var versionId = dto.ContentVersionDto.Id;
         var temp = new TempContent<Member>(dto.ContentDto.NodeId, versionId, 0, memberType);
         IDictionary<int, PropertyCollection> properties =
-            GetPropertyCollections(new List<TempContent<Member>> {temp});
+            GetPropertyCollections(new List<TempContent<Member>> { temp });
         member.Properties = properties[versionId];
 
         // reset dirty initial properties (U4-1946)
@@ -601,7 +614,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             var translator = new SqlTranslator<IMember>(sqlWithProps, query);
             Sql<ISqlContext> sql = translator.Translate();
 
-            baseQuery.Append("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments)
+            baseQuery.Append($"WHERE {QuoteTableName("umbracoNode")}.id IN (" + sql.SQL + ")", sql.Arguments)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
             return MapDtosToContent(Database.Fetch<MemberDto>(baseQuery));
@@ -713,7 +726,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             $"DELETE FROM {QuoteTableName("cmsTagRelationship")} WHERE {QuoteColumnName("nodeId")} = @id",
             $"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName("versionId")}" +
                 $" IN (SELECT id FROM {QuoteTableName(ContentVersionDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id)",
-            $"DELETE FROM {QuoteTableName(ExternalLoginToken.TableName)} WHERE {QuoteColumnName("externalLoginId")} =" +
+            $"DELETE FROM {QuoteTableName(ExternalLoginToken.TableName)} WHERE {QuoteColumnName("externalLoginId")} IN" +
                 $" (SELECT id FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
                 $" (SELECT {QuoteColumnName("uniqueId")} from {QuoteTableName(NodeDto.TableName)} where id = @id))",
             $"DELETE FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
@@ -751,8 +764,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Database.Delete<PropertyDataDto>("WHERE versionId = @VersionId", new {versionId});
-        Database.Delete<ContentVersionDto>("WHERE versionId = @VersionId", new {versionId});
+        Sql<ISqlContext> sql = Sql().Delete<PropertyDataDto>(x => x.VersionId == versionId);
+        Database.Execute(sql);
+
+        sql = Sql().Delete<ContentVersionDto>(x => x.Id == versionId);
+        Database.Execute(sql);
     }
 
     #endregion
