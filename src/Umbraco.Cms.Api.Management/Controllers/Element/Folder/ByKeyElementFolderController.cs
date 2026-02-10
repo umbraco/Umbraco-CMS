@@ -28,6 +28,8 @@ public class ByKeyElementFolderController : ElementFolderControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets an element folder.")]
+    [EndpointDescription("Gets an element folder identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

@@ -36,6 +36,8 @@ public class ValidateCreateElementController : CreateElementControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates creating an element.")]
+    [EndpointDescription("Validates the request model for creating a new element without actually creating it.")]
     public async Task<IActionResult> Validate(CancellationToken cancellationToken, CreateElementRequestModel requestModel)
         => await HandleRequest(requestModel, async () =>
         {
@@ -45,6 +47,6 @@ public class ValidateCreateElementController : CreateElementControllerBase
 
             return result.Success
                 ? Ok()
-                : ContentEditingOperationStatusResult(result.Status);
+                : ElementEditingOperationStatusResult(result.Status, requestModel, result.Result);
         });
 }

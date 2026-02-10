@@ -42,9 +42,6 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			umb-block-grid-areas-container {
-				margin-top: calc(var(--uui-size-2) + 1px);
-			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
 			}

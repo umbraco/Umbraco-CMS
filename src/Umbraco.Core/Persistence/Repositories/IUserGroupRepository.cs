@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="IUserGroup" /> entities.
+/// </summary>
 public interface IUserGroupRepository : IReadWriteQueryRepository<int, IUserGroup>
 {
     /// <summary>

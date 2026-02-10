@@ -1706,6 +1706,29 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             ?? Array.Empty<(TEntity, int)>();
     }
 
+
+    /// <summary>
+    /// Retrieves a collection of allowed parent keys for the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the key for which to retrieve allowed parent keys.</param>
+    /// <returns>An enumerable collection of GUIDs representing the allowed parent keys.</returns>
+    public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
+    {
+        Sql<ISqlContext> childNodeIdQuery = Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key);
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<ContentTypeAllowedContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeAllowedContentTypeDto, NodeDto>((allowed, node) => allowed.Id == node.NodeId)
+            .WhereIn<ContentTypeAllowedContentTypeDto>(x => x.AllowedId, childNodeIdQuery);
+
+        return Database.Fetch<Guid>(sql);
+    }
+
     private sealed class NameCompareDto
     {
         public int NodeId { get; set; }

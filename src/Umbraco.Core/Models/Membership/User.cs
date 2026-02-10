@@ -69,11 +69,11 @@ public class User : EntityBase, IUser, IProfile
     /// <summary>
     /// Initializes a new instance of the <see cref="User"/> class for a new/empty user.
     /// </summary>
-    /// <param name="globalSettings">The global settings.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="email">The email.</param>
-    /// <param name="username">The username.</param>
-    /// <param name="rawPasswordValue">The raw password value.</param>
+    /// <param name="globalSettings">The global settings for default values.</param>
+    /// <param name="name">The display name of the user.</param>
+    /// <param name="email">The email address of the user.</param>
+    /// <param name="username">The username for the user.</param>
+    /// <param name="rawPasswordValue">The raw password value for the user.</param>
     public User(GlobalSettings globalSettings, string? name, string email, string username, string rawPasswordValue)
         : this(globalSettings)
     {
@@ -112,16 +112,16 @@ public class User : EntityBase, IUser, IProfile
     /// <summary>
     /// Initializes a new instance of the <see cref="User"/> class for an existing user.
     /// </summary>
-    /// <param name="globalSettings">The global settings.</param>
-    /// <param name="id">The identifier.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="email">The email.</param>
-    /// <param name="username">The username.</param>
-    /// <param name="rawPasswordValue">The raw password value.</param>
-    /// <param name="passwordConfig">The password configuration.</param>
-    /// <param name="userGroups">The user groups.</param>
-    /// <param name="startContentIds">The start content identifiers.</param>
-    /// <param name="startMediaIds">The start media identifiers.</param>
+    /// <param name="globalSettings">The global settings for default values.</param>
+    /// <param name="id">The unique identifier for the user.</param>
+    /// <param name="name">The display name of the user.</param>
+    /// <param name="email">The email address of the user.</param>
+    /// <param name="username">The username for the user.</param>
+    /// <param name="rawPasswordValue">The raw password value for the user.</param>
+    /// <param name="passwordConfig">The password configuration for the user.</param>
+    /// <param name="userGroups">The user groups the user belongs to.</param>
+    /// <param name="startContentIds">The starting content node identifiers.</param>
+    /// <param name="startMediaIds">The starting media node identifiers.</param>
     [Obsolete("Use the constructor that includes startElementIds. Scheduled for removal in Umbraco 19.")]
     public User(
         GlobalSettings globalSettings,
@@ -201,6 +201,7 @@ public class User : EntityBase, IUser, IProfile
         _startElementIds = startElementIds ?? throw new ArgumentNullException(nameof(startElementIds));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public DateTime? EmailConfirmedDate
     {
@@ -208,6 +209,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, nameof(EmailConfirmedDate));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public DateTime? InvitedDate
     {
@@ -215,6 +217,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _invitedDate, nameof(InvitedDate));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string Username
     {
@@ -222,6 +225,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _username!, nameof(Username));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string Email
     {
@@ -229,6 +233,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public string? RawPasswordValue
     {
@@ -236,6 +241,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public string? PasswordConfiguration
     {
@@ -243,6 +249,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public bool IsApproved
     {
@@ -250,6 +257,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _isApproved, nameof(IsApproved));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public bool IsLockedOut
     {
@@ -257,6 +265,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _isLockedOut, nameof(IsLockedOut));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public DateTime? LastLoginDate
     {
@@ -264,6 +273,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _lastLoginDate, nameof(LastLoginDate));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public DateTime? LastPasswordChangeDate
     {
@@ -271,6 +281,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangedDate, nameof(LastPasswordChangeDate));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public DateTime? LastLockoutDate
     {
@@ -278,6 +289,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _lastLockoutDate, nameof(LastLockoutDate));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public int FailedPasswordAttempts
     {
@@ -285,9 +297,11 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, nameof(FailedPasswordAttempts));
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public string? Comments { get; set; }
 
+    /// <inheritdoc />
     public UserState UserState
     {
         get
@@ -317,6 +331,7 @@ public class User : EntityBase, IUser, IProfile
         }
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string? Name
     {
@@ -324,9 +339,11 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
     }
 
+    /// <inheritdoc />
     public IEnumerable<string> AllowedSections => _allowedSections ??= new List<string>(_userGroups
                                                       .SelectMany(x => x.AllowedSections).Distinct());
 
+    /// <inheritdoc />
     public IProfile ProfileData => new WrappedUserProfile(this);
 
     /// <summary>
@@ -339,6 +356,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _securityStamp, nameof(SecurityStamp));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string? Avatar
     {
@@ -401,6 +419,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _startElementIds, nameof(StartElementIds), IntegerEnumerableComparer);
     }
 
+    /// <inheritdoc />
     [DataMember]
     public string? Language
     {
@@ -408,6 +427,7 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public UserKind Kind
     {
@@ -421,6 +441,7 @@ public class User : EntityBase, IUser, IProfile
     [DataMember]
     public IEnumerable<IReadOnlyUserGroup> Groups => _userGroups;
 
+    /// <inheritdoc />
     public void RemoveGroup(string group)
     {
         foreach (IReadOnlyUserGroup userGroup in _userGroups.ToArray())
@@ -436,6 +457,7 @@ public class User : EntityBase, IUser, IProfile
         }
     }
 
+    /// <inheritdoc />
     public void ClearGroups()
     {
         if (_userGroups.Count > 0)
@@ -448,6 +470,7 @@ public class User : EntityBase, IUser, IProfile
         }
     }
 
+    /// <inheritdoc />
     public void AddGroup(IReadOnlyUserGroup group)
     {
         if (_userGroups.Add(group))
@@ -458,6 +481,7 @@ public class User : EntityBase, IUser, IProfile
         }
     }
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);
@@ -481,12 +505,19 @@ public class User : EntityBase, IUser, IProfile
     {
         private readonly IUser _user;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WrappedUserProfile" /> class.
+        /// </summary>
+        /// <param name="user">The user to wrap.</param>
         public WrappedUserProfile(IUser user) => _user = user;
 
+        /// <inheritdoc />
         public int Id => _user.Id;
 
+        /// <inheritdoc />
         public string? Name => _user.Name;
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
@@ -509,6 +540,7 @@ public class User : EntityBase, IUser, IProfile
 
         private bool Equals(WrappedUserProfile other) => _user.Equals(other._user);
 
+        /// <inheritdoc />
         public override int GetHashCode() => _user.GetHashCode();
     }
 }

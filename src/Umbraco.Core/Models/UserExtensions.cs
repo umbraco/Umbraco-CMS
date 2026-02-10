@@ -10,6 +10,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Provides extension methods for the <see cref="IUser" /> interface related to
+///     content/media access, avatar URLs, and start node calculations.
+/// </summary>
 public static class UserExtensions
 {
     /// <summary>
@@ -56,6 +60,15 @@ public static class UserExtensions
         }.WhereNotNull().ToArray();
     }
 
+    /// <summary>
+    ///     Determines whether the user has path access to the specified content item.
+    /// </summary>
+    /// <param name="user">The user to check.</param>
+    /// <param name="content">The content item to check access for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns><c>true</c> if the user has access to the content path; otherwise, <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="content" /> is null.</exception>
     public static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService, AppCaches appCaches)
     {
         if (content == null)
@@ -69,42 +82,69 @@ public static class UserExtensions
             Constants.System.RecycleBinContent);
     }
 
+    /// <summary>
+    ///     Determines whether the user has access to the content root.
+    /// </summary>
     internal static bool HasContentRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
         ContentPermissions.HasPathAccess(
             Constants.System.RootString,
             user.CalculateContentStartNodeIds(entityService, appCaches),
             Constants.System.RecycleBinContent);
 
+    /// <summary>
+    ///     Determines whether the user has access to the content recycle bin.
+    /// </summary>
     internal static bool HasContentBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
         ContentPermissions.HasPathAccess(
             Constants.System.RecycleBinContentString,
             user.CalculateContentStartNodeIds(entityService, appCaches),
             Constants.System.RecycleBinContent);
 
+    /// <summary>
+    ///     Determines whether the user has access to the media root.
+    /// </summary>
     internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
         ContentPermissions.HasPathAccess(
             Constants.System.RootString,
             user.CalculateMediaStartNodeIds(entityService, appCaches),
             Constants.System.RecycleBinMedia);
 
+    /// <summary>
+    ///     Determines whether the user has access to the media recycle bin.
+    /// </summary>
     internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
         ContentPermissions.HasPathAccess(
             Constants.System.RecycleBinMediaString,
             user.CalculateMediaStartNodeIds(entityService, appCaches),
             Constants.System.RecycleBinMedia);
 
+    /// <summary>
+    ///     Determines whether the user has access to the elements root.
+    /// </summary>
     internal static bool HasElementRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
         ContentPermissions.HasPathAccess(
             Constants.System.RootString,
             user.CalculateElementStartNodeIds(entityService, appCaches),
             Constants.System.RecycleBinElement);
 
+    /// <summary>
+    ///     Determines whether the user has access to the elements recycle bin.
+    /// </summary>
     internal static bool HasElementBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
         ContentPermissions.HasPathAccess(
             Constants.System.RecycleBinElementString,
             user.CalculateElementStartNodeIds(entityService, appCaches),
             Constants.System.RecycleBinElement);
 
+    /// <summary>
+    ///     Determines whether the user has content path access to the specified entity.
+    /// </summary>
+    /// <param name="user">The user to check.</param>
+    /// <param name="entity">The entity to check access for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns><c>true</c> if the user has access to the content path; otherwise, <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="entity" /> is null.</exception>
     public static bool HasPathAccess(this IUser user, IMedia? media, IEntityService entityService, AppCaches appCaches)
     {
         if (media == null)
@@ -115,6 +155,15 @@ public static class UserExtensions
         return ContentPermissions.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
     }
 
+    /// <summary>
+    ///     Determines whether the user has content path access to the specified entity.
+    /// </summary>
+    /// <param name="user">The user to check.</param>
+    /// <param name="entity">The entity to check access for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns><c>true</c> if the user has access to the content path; otherwise, <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="entity" /> is null.</exception>
     public static bool HasContentPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
     {
         if (entity == null)
@@ -128,6 +177,15 @@ public static class UserExtensions
             Constants.System.RecycleBinContent);
     }
 
+    /// <summary>
+    ///     Determines whether the user has media path access to the specified entity.
+    /// </summary>
+    /// <param name="user">The user to check.</param>
+    /// <param name="entity">The entity to check access for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns><c>true</c> if the user has access to the media path; otherwise, <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="entity" /> is null.</exception>
     public static bool HasMediaPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
     {
         if (entity == null)
@@ -177,6 +235,13 @@ public static class UserExtensions
             : user.Groups.SelectMany(x => x.AllowedLanguages).Distinct().ToArray();
     }
 
+    /// <summary>
+    ///     Calculates the content start node IDs for the user, combining user and group start nodes.
+    /// </summary>
+    /// <param name="user">The user to calculate start nodes for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of content start node IDs, or <c>null</c> if no start nodes are defined.</returns>
     public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = user.UserCacheKey(CacheKeys.UserAllContentStartNodesPrefix);
@@ -237,12 +302,12 @@ public static class UserExtensions
     }
 
     /// <summary>
-    ///     Calculate start nodes, combining groups' and user's, and excluding what's in the bin
+    ///     Gets the element start node paths for the user.
     /// </summary>
-    /// <param name="user"></param>
-    /// <param name="entityService"></param>
-    /// <param name="appCaches"></param>
-    /// <returns></returns>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of element start node paths, or <c>null</c> if no start nodes are defined.</returns>
     public static int[]? CalculateElementStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = user.UserCacheKey(CacheKeys.UserAllElementStartNodesPrefix);
@@ -268,6 +333,13 @@ public static class UserExtensions
         return result;
     }
 
+    /// <summary>
+    ///     Gets the media start node paths for the user.
+    /// </summary>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of media start node paths, or <c>null</c> if no start nodes are defined.</returns>
     public static string[]? GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = user.UserCacheKey(CacheKeys.UserMediaStartNodePathsPrefix);
@@ -286,6 +358,13 @@ public static class UserExtensions
         return result;
     }
 
+    /// <summary>
+    ///     Gets the content start node paths for the user.
+    /// </summary>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of content start node paths, or <c>null</c> if no start nodes are defined.</returns>
     public static string[]? GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = user.UserCacheKey(CacheKeys.UserContentStartNodePathsPrefix);
@@ -305,6 +384,13 @@ public static class UserExtensions
         return result;
     }
 
+    /// <summary>
+    ///     Gets the element start node paths for the user.
+    /// </summary>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of content start node paths, or <c>null</c> if no start nodes are defined.</returns>
     public static string[]? GetElementStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = user.UserCacheKey(CacheKeys.UserElementStartNodePathsPrefix);
@@ -323,6 +409,14 @@ public static class UserExtensions
         return result;
     }
 
+    /// <summary>
+    ///     Combines group and user start nodes, excluding nodes in the recycle bin.
+    /// </summary>
+    /// <param name="objectType">The Umbraco object type (Document or Media).</param>
+    /// <param name="groupSn">The start nodes from user groups.</param>
+    /// <param name="userSn">The start nodes from the user.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <returns>An array of combined start node IDs.</returns>
     internal static int[] CombineStartNodes(UmbracoObjectTypes objectType, int[] groupSn, int[] userSn, IEntityService entityService)
     {
         // assume groupSn and userSn each don't contain duplicates
@@ -391,15 +485,27 @@ public static class UserExtensions
         return lsn.ToArray();
     }
 
+    /// <summary>
+    ///     Gets the isolated user cache from the application caches.
+    /// </summary>
     private static IAppPolicyCache GetUserCache(AppCaches appCaches)
         => appCaches.IsolatedCaches.GetOrCreate<IUser>();
 
+    /// <summary>
+    ///     Generates a cache key for the user.
+    /// </summary>
     private static string UserCacheKey(this IUser user, string cacheKey)
         => $"{cacheKey}{user.Key}";
 
+    /// <summary>
+    ///     Determines whether a path starts with another path (as a parent).
+    /// </summary>
     private static bool StartsWithPath(string test, string path) =>
         test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
 
+    /// <summary>
+    ///     Gets the recycle bin path for the specified object type.
+    /// </summary>
     private static string GetBinPath(UmbracoObjectTypes objectType)
     {
         var binPath = Constants.System.RootString + ",";

@@ -21,6 +21,31 @@ public static partial class StringExtensions
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
+    /// Extracts the parent ID from a path string.
+    /// </summary>
+    /// <param name="path">The path string, expected as a comma-delimited collection of integers (e.g., "-1,1234,5678").</param>
+    /// <returns>The parent ID (second-to-last segment), or <see cref="Constants.System.Root"/> if the path has no commas.</returns>
+    public static int GetParentIdFromPath(this string path)
+    {
+        ReadOnlySpan<char> pathSpan = path.AsSpan();
+        var lastCommaIndex = pathSpan.LastIndexOf(',');
+
+        if (lastCommaIndex <= 0)
+        {
+            return Constants.System.Root;
+        }
+
+        ReadOnlySpan<char> beforeLastSegment = pathSpan[..lastCommaIndex];
+        var secondLastCommaIndex = beforeLastSegment.LastIndexOf(',');
+
+        ReadOnlySpan<char> parentIdSpan = secondLastCommaIndex < 0
+            ? beforeLastSegment
+            : beforeLastSegment[(secondLastCommaIndex + 1)..];
+
+        return int.Parse(parentIdSpan, NumberStyles.Integer, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
     /// Converts a path string to an array of node IDs in reverse order (deepest to shallowest).
     /// </summary>
     /// <param name="path">The path string, expected as a comma-delimited collection of integers.</param>

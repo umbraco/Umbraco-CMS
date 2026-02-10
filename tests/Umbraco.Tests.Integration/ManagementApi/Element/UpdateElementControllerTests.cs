@@ -37,6 +37,7 @@ public class UpdateElementControllerTests : ManagementApiUserGroupTestBase<Updat
             Variants = [new VariantModel { Name = "Test Element" }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
     }
 

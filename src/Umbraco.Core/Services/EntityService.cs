@@ -11,6 +11,13 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides entity-related operations for retrieving lightweight entity representations and managing entity identifiers.
+/// </summary>
+/// <remarks>
+///     This service provides efficient access to entity metadata without loading full entity objects,
+///     supporting operations like getting parent/child relationships, pagination, and ID/Key mapping.
+/// </remarks>
 public class EntityService : RepositoryService, IEntityService
 {
     private readonly IEntityRepository _entityRepository;
@@ -18,6 +25,14 @@ public class EntityService : RepositoryService, IEntityService
     private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;
     private IQuery<IUmbracoEntity>? _queryRootEntity;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EntityService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider for database operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="idKeyMap">The ID/Key mapping service for converting between integer IDs and GUIDs.</param>
+    /// <param name="entityRepository">The repository for entity data access.</param>
     public EntityService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -126,6 +141,7 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    /// <inheritdoc />
     public bool Exists(IEnumerable<Guid> keys)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -327,6 +343,7 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetChildren(Guid? key, UmbracoObjectTypes objectType)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -464,6 +481,7 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, false, filter, ordering, out totalRecords);
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         UmbracoObjectTypes childObjectType,
@@ -482,6 +500,7 @@ public class EntityService : RepositoryService, IEntityService
             filter,
             ordering);
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         IEnumerable<UmbracoObjectTypes> parentObjectTypes,
@@ -534,6 +553,7 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, true, filter, ordering, out totalRecords);
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedTrashedChildren(
         Guid? key,
         UmbracoObjectTypes objectType,
@@ -866,6 +886,7 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         IEnumerable<UmbracoObjectTypes> parentObjectTypes,

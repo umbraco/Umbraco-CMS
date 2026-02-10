@@ -21,6 +21,8 @@ public class ChildrenElementRecycleBinController : ElementRecycleBinControllerBa
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ElementRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of elements in the recycle bin.")]
+    [EndpointDescription("Gets a paginated collection of elements that are children of the provided parent in the recycle bin.")]
     public async Task<ActionResult<PagedViewModel<ElementRecycleBinItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

@@ -107,12 +107,17 @@ public class Content : PublishableContentBase, IContent
     }
 
     /// <inheritdoc />
+    /// <inheritdoc />
     [IgnoreDataMember]
     public int? PublishTemplateId { get; set; } // set by persistence
 
+    /// <inheritdoc />
+    /// <inheritdoc />
     [DataMember]
     public bool Blueprint { get; set; }
 
+    /// <inheritdoc />
+    /// <inheritdoc />
     /// <summary>
     ///     Creates a deep clone of the current entity with its identity and it's property identities reset
     /// </summary>
@@ -130,4 +135,5 @@ public class Content : PublishableContentBase, IContent
 
         return clone;
     }
+    /// <inheritdoc />
 }

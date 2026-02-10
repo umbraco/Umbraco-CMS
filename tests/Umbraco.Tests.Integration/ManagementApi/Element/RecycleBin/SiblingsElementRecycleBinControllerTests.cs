@@ -37,6 +37,7 @@ public class SiblingsElementRecycleBinControllerTests : ElementRecycleBinControl
             Variants = [new VariantModel { Name = Guid.NewGuid().ToString() }],
         };
         var response1 = await ElementEditingService.CreateAsync(createModel1, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response1.Success, $"Failed to create element 1: {response1.Status}");
         _elementKey = response1.Result!.Content!.Key;
 
         var createModel2 = new ElementCreateModel
@@ -46,10 +47,13 @@ public class SiblingsElementRecycleBinControllerTests : ElementRecycleBinControl
             Variants = [new VariantModel { Name = Guid.NewGuid().ToString() }],
         };
         var response2 = await ElementEditingService.CreateAsync(createModel2, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response2.Success, $"Failed to create element 2: {response2.Status}");
 
         // Move both to recycle bin
-        await ElementEditingService.MoveToRecycleBinAsync(_elementKey, Constants.Security.SuperUserKey);
-        await ElementEditingService.MoveToRecycleBinAsync(response2.Result!.Content!.Key, Constants.Security.SuperUserKey);
+        var moveResult1 = await ElementEditingService.MoveToRecycleBinAsync(_elementKey, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult1.Success, $"Failed to move element 1 to recycle bin: {moveResult1.Result}");
+        var moveResult2 = await ElementEditingService.MoveToRecycleBinAsync(response2.Result!.Content!.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult2.Success, $"Failed to move element 2 to recycle bin: {moveResult2.Result}");
     }
 
     protected override Expression<Func<SiblingsElementRecycleBinController, object>> MethodSelector =>

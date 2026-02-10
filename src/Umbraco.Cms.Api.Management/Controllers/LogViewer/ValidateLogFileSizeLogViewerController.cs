@@ -25,6 +25,8 @@ public class ValidateLogFileSizeLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Validates if logs can be viewed.")]
+    [EndpointDescription("Checks if the log files are within the size limit and can be viewed.")]
     public async Task<IActionResult> CanViewLogs(
         CancellationToken cancellationToken,
         DateTimeOffset? startDate = null,

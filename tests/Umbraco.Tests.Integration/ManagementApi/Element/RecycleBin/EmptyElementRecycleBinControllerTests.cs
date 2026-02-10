@@ -33,9 +33,11 @@ public class EmptyElementRecycleBinControllerTests : ElementRecycleBinController
             Variants = [new VariantModel { Name = Guid.NewGuid().ToString() }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
         var elementKey = response.Result!.Content!.Key;
 
-        await ElementEditingService.MoveToRecycleBinAsync(elementKey, Constants.Security.SuperUserKey);
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(elementKey, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success, $"Failed to move element to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<EmptyElementRecycleBinController, object>> MethodSelector =>

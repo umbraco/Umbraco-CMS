@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
@@ -179,6 +180,17 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             // So we do not want to add this to the query string
             methodParams.Remove(methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key);
             methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions[0].MajorVersion.ToString();
+
+            // Rename keys if [FromQuery(Name = "...")] specifies a different name
+            var parameters = method?.GetParameters() ?? [];
+            foreach (var (paramName, queryName) in parameters
+                .Select(p => (ParamName: p.Name, QueryName: p.GetCustomAttribute<FromQueryAttribute>()?.Name))
+                .Where(x => x is { ParamName: not null, QueryName: not null } && methodParams.ContainsKey(x.ParamName)))
+            {
+                methodParams[queryName!] = methodParams[paramName!];
+                methodParams.Remove(paramName!);
+            }
+
             return LinkGenerator.GetUmbracoControllerUrl(method.Name, ControllerExtensions.GetControllerName<T>(), null, methodParams);
         }
 

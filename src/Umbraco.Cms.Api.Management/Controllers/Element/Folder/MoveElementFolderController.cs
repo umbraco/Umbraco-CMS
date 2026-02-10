@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -38,6 +37,8 @@ public class MoveElementFolderController : ElementFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves an element folder.")]
+    [EndpointDescription("Moves an element folder identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveFolderRequestModel moveFolderRequestModel)
     {
         // Check Move permission on source folder
@@ -62,11 +63,11 @@ public class MoveElementFolderController : ElementFolderControllerBase
             return Forbidden();
         }
 
-        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _elementContainerService
+        Attempt<EntityContainerOperationStatus> result = await _elementContainerService
             .MoveAsync(id, moveFolderRequestModel.Target?.Id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
-            : OperationStatusResult(result.Status);
+            : OperationStatusResult(result.Result);
     }
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,17 +11,20 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
 internal sealed class ElementEditingService
     : ContentEditingServiceBase<IElement, IContentType, IElementService, IContentTypeService>, IElementEditingService
 {
+    private readonly IElementService _elementService;
     private readonly ILogger<ElementEditingService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IAuditService _auditService;
 
     public ElementEditingService(
         IElementService elementService,
@@ -36,7 +40,11 @@ internal sealed class ElementEditingService
         IElementContainerService containerService,
         ContentTypeFilterCollection contentTypeFilters,
         IEventMessagesFactory eventMessagesFactory,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        ILanguageService languageService,
+        IUserService userService,
+        ILocalizationService localizationService,
+        IAuditService auditService)
         : base(
             elementService,
             contentTypeService,
@@ -48,13 +56,18 @@ internal sealed class ElementEditingService
             validationService,
             optionsMonitor,
             relationService,
-            contentTypeFilters)
+            contentTypeFilters,
+            languageService,
+            userService,
+            localizationService)
     {
+        _elementService = elementService;
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
+        _auditService = auditService;
     }
 
     public Task<IElement?> GetAsync(Guid key)
@@ -63,13 +76,26 @@ internal sealed class ElementEditingService
         return Task.FromResult(element);
     }
 
-    // TODO ELEMENTS: implement validation here
-    public Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
-        => Task.FromResult(Attempt<ContentValidationResult, ContentEditingOperationStatus>.Succeed(ContentEditingOperationStatus.Success, new ()));
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
+    {
+        IElement? content = _elementService.GetById(key);
+        return content is not null
+            ? await ValidateCulturesAndPropertiesAsync(
+                updateModel,
+                content.ContentType.Key,
+                updateModel.Cultures,
+                userKey)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
 
-    // TODO ELEMENTS: implement validation here
-    public Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
-        => Task.FromResult(Attempt<ContentValidationResult, ContentEditingOperationStatus>.Succeed(ContentEditingOperationStatus.Success, new ()));
+    /// <inheritdoc />
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
+        => await ValidateCulturesAndPropertiesAsync(
+            createModel,
+            createModel.ContentTypeKey,
+            createModel.Variants.Select(variant => variant.Culture),
+            userKey);
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
@@ -154,50 +180,13 @@ internal sealed class ElementEditingService
             : (null, ContentEditingOperationStatus.ParentNotFound);
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
-    {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ElementTree);
+        => await HandleElementMoveAsync(key, containerKey, userKey);
 
-        var parentId = Constants.System.Root;
-        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
-        {
-            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
-            if (container is null)
-            {
-                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
-            }
-
-            if (container.Trashed)
-            {
-                // cannot move to a trashed container
-                return Attempt.Fail(ContentEditingOperationStatus.InTrash);
-            }
-
-            parentId = container.Id;
-        }
-
-        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
-            scope,
-            key,
-            parentId,
-            false,
-            userKey,
-            (element, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
-                return new ElementMovingNotification(moveEventInfo, eventMessages);
-            },
-            (element, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
-                return new ElementMovedNotification(moveEventInfo, eventMessages);
-            });
-
-        scope.Complete();
-
-        return moveResult;
-    }
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? containerKey, Guid userKey)
+        => await HandleElementMoveAsync(key, containerKey, userKey, mustBeInRecycleBin: true);
 
     public async Task<Attempt<ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
     {
@@ -226,6 +215,70 @@ internal sealed class ElementEditingService
         scope.Complete();
 
         return moveResult;
+    }
+
+    private async Task<Attempt<ContentEditingOperationStatus>> HandleElementMoveAsync(
+        Guid key,
+        Guid? containerKey,
+        Guid userKey,
+        bool mustBeInRecycleBin = false)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        IElement? element = await GetAsync(key);
+        if (element is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        if (mustBeInRecycleBin && element.Trashed is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotInTrash);
+        }
+
+        var parentId = Constants.System.Root;
+        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        {
+            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
+            if (container is null)
+            {
+                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
+            }
+
+            if (container.Trashed)
+            {
+                return Attempt.Fail(ContentEditingOperationStatus.InTrash);
+            }
+
+            parentId = container.Id;
+        }
+
+        var originalPath = element.Path;
+        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
+            scope,
+            key,
+            parentId,
+            false,
+            userKey,
+            (elem, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                return new ElementMovingNotification(moveEventInfo, eventMessages);
+            },
+            (elem, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                return new ElementMovedNotification(moveEventInfo, eventMessages);
+            });
+
+        if (!moveResult.Success)
+        {
+            return moveResult;
+        }
+
+        scope.Complete();
+        return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
@@ -269,6 +322,9 @@ internal sealed class ElementEditingService
             return Attempt.Fail(ContentEditingOperationStatus.NotFound);
         }
 
+        // Capture original path before any modifications (needed for audit message when trashing)
+        var originalPath = toMove.Path;
+
         if (toMove.ParentId == parentId)
         {
             return Attempt.Succeed(ContentEditingOperationStatus.Success);
@@ -301,6 +357,11 @@ internal sealed class ElementEditingService
         {
             return Attempt.Fail(saveResult);
         }
+
+        string? auditMessage = trash
+            ? $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}"
+            : null;
+        await _auditService.AddAsync(AuditType.Move, userKey, toMove.Id, UmbracoObjectTypes.Element.GetName(), auditMessage);
 
         IStatefulNotification movedNotification = movedNotificationFactory(toMove, eventMessages);
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));

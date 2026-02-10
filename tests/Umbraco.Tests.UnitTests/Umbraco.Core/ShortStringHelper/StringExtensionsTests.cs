@@ -399,6 +399,18 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, string.Join(",", ids));
     }
 
+    [TestCase("-1,1234,5678", 1234)]
+    [TestCase("-1,100,200,300", 200)]
+    [TestCase("-1,1234", -1)]
+    [TestCase("100,1234", 100)]
+    [TestCase("1234", -1)]
+    [TestCase("", -1)]
+    public void GetParentIdFromPath_ReturnsExpectedResult(string input, int expected)
+    {
+        var parentId = input.GetParentIdFromPath();
+        Assert.AreEqual(expected, parentId);
+    }
+
     [TestCase(null, null)]
     [TestCase("", "")]
     [TestCase("*", "*")]

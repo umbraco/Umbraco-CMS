@@ -10,12 +10,24 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when content is saved, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Content Saved", Constants.WebhookEvents.Types.Content)]
 public class LegacyContentSavedWebhookEvent : WebhookEventContentBase<ContentSavedNotification, IContent>
 {
     private readonly IApiContentBuilder _apiContentBuilder;
     private readonly IPublishedContentCache _contentCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyContentSavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="apiContentBuilder">The API content builder.</param>
+    /// <param name="contentCache">The published content cache.</param>
     public LegacyContentSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -33,11 +45,14 @@ public class LegacyContentSavedWebhookEvent : WebhookEventContentBase<ContentSav
         _contentCache = contentCache;
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.ContentSaved;
 
+    /// <inheritdoc />
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentSavedNotification notification) =>
         notification.SavedEntities;
 
+    /// <inheritdoc />
     protected override object? ConvertEntityToRequestPayload(IContent entity)
     {
         // Get preview/saved version of content

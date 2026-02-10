@@ -43,10 +43,12 @@ public class CopyElementControllerTests : ManagementApiUserGroupTestBase<CopyEle
             Variants = [new VariantModel { Name = "Element to Copy" }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
 
         // Create target container
         var targetResult = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(targetResult.Success, $"Failed to create target container: {targetResult.Status}");
         _targetContainerKey = targetResult.Result!.Key;
     }
 

@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a user login requires verification (e.g., two-factor authentication).
+/// </summary>
 [WebhookEvent("User Login Requires Verification")]
 public class UserLoginRequiresVerificationWebhookEvent : WebhookEventBase<UserLoginRequiresVerificationNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserLoginRequiresVerificationWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public UserLoginRequiresVerificationWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class UserLoginRequiresVerificationWebhookEvent : WebhookEventBase<UserLo
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserLoginRequiresVerification;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(UserLoginRequiresVerificationNotification notification)
         => new DefaultPayloadModel
         {

@@ -1,7 +1,11 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for creating <see cref="CultureImpact"/> instances that represent
+///     the impact of culture variations on content operations.
+/// </summary>
 public interface ICultureImpactFactory
 {
     /// <summary>

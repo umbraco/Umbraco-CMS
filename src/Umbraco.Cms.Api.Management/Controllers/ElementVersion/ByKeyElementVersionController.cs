@@ -29,6 +29,8 @@ public class ByKeyElementVersionController : ElementVersionControllerBase
     [ProducesResponseType(typeof(ElementVersionResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets a specific element version.")]
+    [EndpointDescription("Gets a specific element version by its Id. If found, the result describes the version and includes details of the element type, editor, version date, and published status.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IElement?, ContentVersionOperationStatus> attempt =

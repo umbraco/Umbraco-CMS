@@ -3,8 +3,16 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IUserGroup" /> and <see cref="IReadOnlyUserGroup" />.
+/// </summary>
 public static class UserGroupExtensions
 {
+    /// <summary>
+    ///     Converts an <see cref="IUserGroup" /> to an <see cref="IReadOnlyUserGroup" />.
+    /// </summary>
+    /// <param name="group">The user group to convert.</param>
+    /// <returns>A read-only representation of the user group.</returns>
     public static IReadOnlyUserGroup ToReadOnlyGroup(this IUserGroup group)
     {
         // this will generally always be the case
@@ -31,9 +39,19 @@ public static class UserGroupExtensions
             group.HasAccessToAllLanguages);
     }
 
+    /// <summary>
+    ///     Determines whether the specified user group is a system user group.
+    /// </summary>
+    /// <param name="group">The user group to check.</param>
+    /// <returns><c>true</c> if the user group is a system user group; otherwise, <c>false</c>.</returns>
     public static bool IsSystemUserGroup(this IUserGroup group) =>
         IsSystemUserGroup(group.Key);
 
+    /// <summary>
+    ///     Determines whether the specified read-only user group is a system user group.
+    /// </summary>
+    /// <param name="group">The user group to check.</param>
+    /// <returns><c>true</c> if the user group is a system user group; otherwise, <c>false</c>.</returns>
     public static bool IsSystemUserGroup(this IReadOnlyUserGroup group) =>
         IsSystemUserGroup(group.Key);
 

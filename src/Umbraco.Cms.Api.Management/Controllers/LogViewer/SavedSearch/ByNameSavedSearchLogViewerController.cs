@@ -30,6 +30,8 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(SavedLogSearchResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a saved log search by name.")]
+    [EndpointDescription("Gets a saved log search identified by the provided name.")]
     public async Task<IActionResult> ByName(
         CancellationToken cancellationToken,
         string name)

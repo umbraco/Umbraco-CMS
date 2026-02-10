@@ -37,6 +37,7 @@ public class MoveToRecycleBinElementControllerTests : ManagementApiUserGroupTest
             Variants = [new VariantModel { Name = Guid.NewGuid().ToString() }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
     }
 
