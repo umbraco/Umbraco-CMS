@@ -117,6 +117,17 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		if (!this._tabs || !this.#blockWorkspace) return;
 		const routes: UmbRoute[] = [];
 
+		if (this._hasRootGroups || this._hasRootProperties) {
+			routes.push({
+				path: 'root',
+				component: () => import('./block-workspace-view-edit-tab.element.js'),
+				setup: (component) => {
+					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
+					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
+				},
+			});
+		}
+
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
@@ -134,26 +145,13 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			});
 		}
 
-		if (this._hasRootGroups || this._hasRootProperties) {
-			routes.push({
-				path: '',
-				component: () => import('./block-workspace-view-edit-tab.element.js'),
-				setup: (component) => {
-					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
-					this.#provideViewContext(null, component);
-				},
-			});
-			this.#createViewContext(null, '#general_generic');
-		} else if (routes.length > 0) {
+		if (routes.length !== 0) {
 			routes.push({
 				...routes[0],
-				unique: routes[0].path,
+				unique: 'emptyPathFor_' + routes[0].path,
 				path: '',
 			});
-		}
 
-		if (routes.length !== 0) {
 			routes.push({
 				path: `**`,
 				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
@@ -257,16 +255,21 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 	#renderTab(path: string | null, name: string, index = 0) {
 		const hint = this._hintMap.get(path);
+		const isRootTab = path === null;
 		const hasRootItems = this._hasRootGroups || this._hasRootProperties;
-		const fullPath = this._routerPath + '/' + (path ? path : '');
+		const basePath = this._routerPath + '/';
+		const fullPath = basePath + (path ? path : 'root');
+
 		const active =
 			fullPath === this._activePath ||
-			(!hasRootItems && index === 0 && this._routerPath + '/' === this._activePath) ||
-			(hasRootItems && path === null && this._routerPath + '/' === this._activePath);
+			// When there are no root items, the first tab should be active on the alias path.
+			(!hasRootItems && index === 0 && basePath === this._activePath) ||
+			// When there are root items, the root tab should be active on both the canonical `/root` and alias `/` paths.
+			(hasRootItems && isRootTab && basePath === this._activePath);
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
-			href=${fullPath}
+			href=${isRootTab ? basePath : fullPath}
 			data-mark="content-tab:${path ?? 'root'}"
 			>${hint && !active
 				? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
