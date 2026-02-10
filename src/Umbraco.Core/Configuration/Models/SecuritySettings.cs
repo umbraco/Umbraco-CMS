@@ -254,10 +254,35 @@ public class SecuritySettings
     /// <summary>
     ///     Gets or sets the password configuration settings for users.
     /// </summary>
+    /// <remarks>
+    ///     This property exists to enable IntelliSense/autocomplete in appsettings.json
+    ///     for the <c>Umbraco:CMS:Security:UserPassword</c> configuration section.
+    ///     <para>
+    ///         Do not use this property to read password configuration at runtime.
+    ///         Inject <see cref="IOptions{UserPasswordConfigurationSettings}"/> directly instead,
+    ///         as that is the canonical registration used by all consumers.
+    ///     </para>
+    ///     <para>
+    ///         TODO (V18): Remove the standalone <see cref="UserPasswordConfigurationSettings"/>
+    ///         registration and consolidate all consumers to use this property.
+    ///     </para>
+    /// </remarks>
     public UserPasswordConfigurationSettings UserPassword { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets the password configuration settings for members.
     /// </summary>
+    /// <remarks>
+    ///     This property exists to enable IntelliSense/autocomplete in appsettings.json
+    ///     for the <c>Umbraco:CMS:Security:MemberPassword</c> configuration section.
+    ///     <para>
+    ///         Do not use this property to read password configuration at runtime.
+    ///         Inject <see cref="IOptions{MemberPasswordConfigurationSettings}"/> directly instead,
+    ///         as that is the canonical registration used by all consumers.
+    ///     </para>
+    ///     <para>
+    ///         TODO (V18): Remove the standalone <see cref="MemberPasswordConfigurationSettings"/>
+    ///         registration and consolidate all consumers to use this property.
+    ///     </para>
     public MemberPasswordConfigurationSettings MemberPassword { get; set; } = new();
 }
