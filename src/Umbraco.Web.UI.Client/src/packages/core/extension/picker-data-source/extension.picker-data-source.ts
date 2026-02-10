@@ -1,7 +1,7 @@
 import { UmbExtensionCollectionRepository } from '../collection/repository/extension-collection.repository.js';
 import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from '../collection/types.js';
 import { UmbExtensionItemRepository } from '../item/data/item.repository.js';
-import type { UmbExtensionPickerConfigCollectionModel } from './types.js';
+import type { UmbExtensionPickerDataSourceConfigCollectionModel } from './types.js';
 import type { UmbPickerCollectionDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
@@ -12,9 +12,9 @@ export class UmbExtensionPickerDataSource
 {
 	#collectionRepository = new UmbExtensionCollectionRepository(this);
 	#itemRepository = new UmbExtensionItemRepository(this);
-	#config: UmbExtensionPickerConfigCollectionModel | undefined;
+	#config: UmbExtensionPickerDataSourceConfigCollectionModel | undefined;
 
-	setConfig(config: UmbExtensionPickerConfigCollectionModel | undefined): void {
+	setConfig(config: UmbExtensionPickerDataSourceConfigCollectionModel | undefined): void {
 		this.#config = config;
 	}
 

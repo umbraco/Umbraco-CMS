@@ -1,5 +1,5 @@
 import { UmbExtensionPickerDataSource } from '../picker-data-source/extension.picker-data-source.js';
-import type { UmbExtensionPickerConfigCollectionModel } from '../picker-data-source/types.js';
+import type { UmbExtensionPickerDataSourceConfigCollectionModel } from '../picker-data-source/types.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -10,7 +10,7 @@ export class UmbInputExtensionElement extends UmbFormControlMixin<string | undef
 	UmbLitElement,
 ) {
 	#dataSource = new UmbExtensionPickerDataSource(this);
-	#dataSourceConfig: UmbExtensionPickerConfigCollectionModel = [
+	#dataSourceConfig: UmbExtensionPickerDataSourceConfigCollectionModel = [
 		{
 			alias: 'allowedExtensionTypes',
 			value: ['collectionView'],
