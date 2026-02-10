@@ -3,17 +3,12 @@ import { UMB_EXTENSION_ENTITY_TYPE } from '../../entity.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 
 export class UmbExtensionCollectionRepository
 	extends UmbRepositoryBase
 	implements UmbCollectionRepository<UmbExtensionCollectionItemModel, UmbExtensionCollectionFilterModel>
 {
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-
 	async requestCollection(query: UmbExtensionCollectionFilterModel) {
 		let extensions: Array<UmbExtensionCollectionItemModel> = umbExtensionsRegistry
 			.getAllExtensions()
