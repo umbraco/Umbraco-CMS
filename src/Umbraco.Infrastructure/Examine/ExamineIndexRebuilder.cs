@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -131,11 +132,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         => (await _longRunningOperationService.GetByTypeAsync(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
 
     private static string GetRebuildOperationTypeName(string indexName)
-    {
-        // Truncate to 200 characters or less to ensure the type name doesn't overflow the database field.
-        var typeName = $"RebuildExamineIndex-{indexName}";
-        return typeName.Length > 200 ? typeName[..200] : typeName;
-    }
+        => $"RebuildExamineIndex-{indexName}".TruncateWithUniqueHash(200);
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 

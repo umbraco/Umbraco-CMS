@@ -27,6 +27,9 @@ public class ChangeLongRunningOperationTypeColumnTo200 : AsyncMigrationBase
             return Task.CompletedTask;
         }
 
+        const string ColumnName = "type";
+        const int ColumnLength = 200;
+
         // Check if column is already 200 or larger
         // Skip migration if already migrated to prevent re-running
         var maxLength = Database.ExecuteScalar<int?>(
@@ -36,16 +39,16 @@ public class ChangeLongRunningOperationTypeColumnTo200 : AsyncMigrationBase
               AND COLUMN_NAME = @1
               AND TABLE_SCHEMA = SCHEMA_NAME()",
             Constants.DatabaseSchema.Tables.LongRunningOperation,
-            "type");
+            ColumnName);
 
-        if (maxLength >= 200)
+        if (maxLength >= ColumnLength)
         {
             return Task.CompletedTask;
         }
 
         Alter.Table(Constants.DatabaseSchema.Tables.LongRunningOperation)
-            .AlterColumn("type")
-            .AsString(200)
+            .AlterColumn(ColumnName)
+            .AsString(ColumnLength)
             .NotNullable()
             .Do();
 
