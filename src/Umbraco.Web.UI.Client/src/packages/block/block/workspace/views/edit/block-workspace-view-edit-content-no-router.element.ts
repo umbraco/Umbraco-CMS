@@ -6,7 +6,6 @@ import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { observationAsPromise } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * @element umb-block-workspace-view-edit-content-no-router
