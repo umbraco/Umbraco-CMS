@@ -128,7 +128,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -189,7 +189,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -3924,7 +3924,7 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
     public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
         => CreateBlueprintFromContent(blueprint, name, userId);
 

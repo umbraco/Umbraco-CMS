@@ -14,7 +14,7 @@ public interface IBlockLayoutItem
     /// <value>
     ///     The content UDI.
     /// </value>
-    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? ContentUdi { get; set; }
 
     /// <summary>
@@ -23,7 +23,7 @@ public interface IBlockLayoutItem
     /// <value>
     ///     The settings UDI.
     /// </value>
-    [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? SettingsUdi { get; set; }
 
     /// <summary>

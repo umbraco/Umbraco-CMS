@@ -359,7 +359,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start content nodes</returns>
-    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
+    [Obsolete("Please use the UserExtensions class to access user start node info. Scheduled for removal in Umbraco 18.")]
     public static int[] GetStartContentNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -372,7 +372,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start media nodes</returns>
-    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
+    [Obsolete("Please use the UserExtensions class to access user start node info. Scheduled for removal in Umbraco 18.")]
     public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -385,7 +385,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns></returns>
-    [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
+    [Obsolete("Please use IUser.AllowedSections instead. Scheduled for removal in Umbraco 18.")]
     public static string[] GetAllowedApplications(this ClaimsIdentity identity) => identity
         .FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray();
 
