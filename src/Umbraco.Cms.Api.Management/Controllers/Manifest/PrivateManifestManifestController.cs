@@ -1,9 +1,9 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Manifest;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.ViewModels.Manifest;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
