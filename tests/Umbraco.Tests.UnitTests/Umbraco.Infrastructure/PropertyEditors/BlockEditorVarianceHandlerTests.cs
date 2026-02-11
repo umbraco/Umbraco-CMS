@@ -91,7 +91,7 @@ public class BlockEditorVarianceHandlerTests
         var subject = BlockEditorVarianceHandler("da-DK", PublishedElement(ContentVariation.Nothing));
         var result = await subject.AlignPropertyVarianceAsync(propertyValues, null);
         Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("da-DK", result.First().Culture);
+        Assert.IsNull(result.First().Culture);
     }
 
     [Test]
