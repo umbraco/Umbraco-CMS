@@ -62,7 +62,7 @@ export class UmbElementValidationServerDataSource {
 	}
 
 	/**
-	 * Validate a existing Element
+	 * Validate an existing Element
 	 * @param {UmbElementDetailModel} model - Element Model
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
 	 * @returns {*}

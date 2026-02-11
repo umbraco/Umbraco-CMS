@@ -20,11 +20,10 @@ export class UmbElementValidationRepository
 	}
 
 	/**
-	 * Returns a promise with an observable of the detail for the given unique
-	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique]
-	 * @returns {*}
-	 * @memberof UmbDetailRepositoryBase
+	 * Performs server-side validation before creating an element.
+	 * @param {DetailModelType} model The element model to validate.
+	 * @param {string | null} [parentUnique] Optional unique identifier of the parent element.
+	 * @returns {*} A promise resolving to the server-side validation result/response.
 	 */
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');
@@ -33,11 +32,10 @@ export class UmbElementValidationRepository
 	}
 
 	/**
-	 * Saves the given data
+	 * Validates the given data for saving; does not persist any changes.
 	 * @param {DetailModelType} model
 	 * @param variantIds
 	 * @returns {*}
-	 * @memberof UmbDetailRepositoryBase
 	 */
 	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {
 		if (!model) throw new Error('Data is missing');
