@@ -120,7 +120,7 @@ export class UmbContentTypeStructureManager<
 	readonly contentTypeLoaded = mergeObservables(
 		[this.contentTypeCompositions, this.contentTypeUniques],
 		([comps, uniques]) => {
-			return comps.every((x) => uniques.includes(x.contentType.unique));
+			return comps && comps.every((x) => uniques.includes(x.contentType.unique));
 		},
 	);
 
