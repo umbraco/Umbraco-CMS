@@ -1157,4 +1157,16 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagComparedToParent, result.Status);
     }
+
+    [Test]
+    public async Task Cannot_Create_Element_Type_With_Segment_Variation()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
+        createModel.VariesBySegment = true;
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+    }
 }
