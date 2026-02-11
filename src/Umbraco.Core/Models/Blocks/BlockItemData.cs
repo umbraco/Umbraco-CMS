@@ -23,7 +23,7 @@ public class BlockItemData
     /// <param name="udi">The UDI.</param>
     /// <param name="contentTypeKey">The content type key.</param>
     /// <param name="contentTypeAlias">The content type alias.</param>
-    [Obsolete("Use constructor that accepts GUID key instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUID key instead. Scheduled for removal in Umbraco 18.")]
     public BlockItemData(Udi udi, Guid contentTypeKey, string contentTypeAlias)
         : this(
             (udi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(udi)),
@@ -69,7 +69,7 @@ public class BlockItemData
     /// <value>
     ///     The UDI.
     /// </value>
-    [Obsolete("Use Key instead. Will be removed in V18.")]
+    [Obsolete("Use Key instead. Scheduled for removal in Umbraco 18.")]
     [JsonIgnore]
     public Udi? Udi { get; set; }
 
@@ -95,7 +95,7 @@ public class BlockItemData
     /// <value>
     ///     The raw property values.
     /// </value>
-    [Obsolete("Use Properties instead. Will be removed in V18.")]
+    [Obsolete("Use Properties instead. Scheduled for removal in Umbraco 18.")]
     [JsonExtensionData]
     public Dictionary<string, object?> RawPropertyValues { get; set; } = new();
 }
