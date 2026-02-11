@@ -132,6 +132,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
 
     private static string GetRebuildOperationTypeName(string indexName)
     {
+        // Truncate to 200 characters or less to ensure the type name doesn't overflow the database field.
         var typeName = $"RebuildExamineIndex-{indexName}";
         return typeName.Length > 200 ? typeName[..200] : typeName;
     }
