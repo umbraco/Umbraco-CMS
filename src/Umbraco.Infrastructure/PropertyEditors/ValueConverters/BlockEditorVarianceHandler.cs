@@ -164,6 +164,7 @@ public sealed class BlockEditorVarianceHandler
     public void AlignExposeVariance(BlockValue blockValue)
     {
         var contentDataToAlign = new List<BlockItemData>();
+        var validContentKeys = blockValue.ContentData.Select(cd => cd.Key).ToHashSet();
         var elementTypesByKey = blockValue
             .ContentData
             .Select(cd => cd.ContentTypeKey)
@@ -196,6 +197,9 @@ public sealed class BlockEditorVarianceHandler
                 contentDataToAlign.Add(contentData);
             }
         }
+
+        // Remove expose entries that don't have matching ContentData
+        blockValue.Expose.RemoveAll(v => !validContentKeys.Contains(v.ContentKey));
 
         if (contentDataToAlign.Any())
         {
