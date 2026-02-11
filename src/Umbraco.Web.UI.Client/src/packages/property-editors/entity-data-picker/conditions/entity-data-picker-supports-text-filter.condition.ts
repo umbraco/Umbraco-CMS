@@ -32,5 +32,3 @@ export class UmbEntityDataPickerSupportsTextFilterCondition
 		});
 	}
 }
-
-export default UmbEntityDataPickerSupportsTextFilterCondition;
