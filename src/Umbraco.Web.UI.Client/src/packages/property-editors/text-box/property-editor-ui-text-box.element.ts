@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -89,9 +89,30 @@ export class UmbPropertyEditorUITextBoxElement
 		const newValue = (e.target as HTMLInputElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
+
+		// Show exceed validation instantly when limit is reached
+		if (this._maxChars && newValue.length > this._maxChars) {
+			const input = this.shadowRoot?.querySelector('uui-input');
+			if (input) {
+				input.pristine = false;
+			}
+			this.pristine = false;
+		}
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	#renderCharacterCount() {
+		if (!this._maxChars || this.readonly) return nothing;
+
+		const currentLength = this.value?.length ?? 0;
+		const remaining = this._maxChars - currentLength;
+
+		// Only show when within 20% of the limit
+		const threshold = Math.round(this._maxChars * 0.2);
+		if (remaining > threshold || remaining < 0) return nothing;
+
+		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
+	}
 	override render() {
 		return html`
 			<uui-input
@@ -107,6 +128,7 @@ export class UmbPropertyEditorUITextBoxElement
 				?required=${this.mandatory}
 				@input=${this.#onInput}>
 			</uui-input>
+			${this.#renderCharacterCount()}
 		`;
 	}
 
@@ -114,6 +136,14 @@ export class UmbPropertyEditorUITextBoxElement
 		css`
 			uui-input {
 				width: 100%;
+			}
+
+			.char-count {
+				color: var(--uui-color-text-alt);
+			}
+
+			:host(:not(:focus-within)) .char-count {
+				display: none;
 			}
 		`,
 	];
