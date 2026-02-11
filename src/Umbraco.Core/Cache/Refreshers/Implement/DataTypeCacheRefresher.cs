@@ -75,7 +75,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     /// <param name="publishedContentTypeCache">The published content type cache.</param>
     /// <param name="documentCacheService">The document cache service.</param>
     /// <param name="mediaCacheService">The media cache service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V18.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public DataTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,

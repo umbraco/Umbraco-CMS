@@ -51,7 +51,7 @@ public class StylesheetService : FileServiceOperationBase<IStylesheetRepository,
     /// <param name="logger">The logger instance for logging operations.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
     /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public StylesheetService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -82,7 +82,7 @@ public class StylesheetService : FileServiceOperationBase<IStylesheetRepository,
     /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
     /// <param name="auditService">The service for audit logging.</param>
     /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public StylesheetService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

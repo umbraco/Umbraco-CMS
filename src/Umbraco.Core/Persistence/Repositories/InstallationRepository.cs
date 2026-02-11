@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Provides an implementation of <see cref="IInstallationRepository" /> for installation logging.
 /// </summary>
-[Obsolete("Installation logging is no longer supported and this class will be removed in Umbraco 19.")]
+[Obsolete("Installation logging is no longer supported. Scheduled for removal in Umbraco 19.")]
 public class InstallationRepository : IInstallationRepository
 {
     /// <summary>
@@ -19,6 +19,6 @@ public class InstallationRepository : IInstallationRepository
     }
 
     /// <inheritdoc />
-    [Obsolete("This method no longer has any function and will be removed in Umbraco 19.")]
+    [Obsolete("This method no longer has any function. Scheduled for removal in Umbraco 19.")]
     public Task SaveInstallLogAsync(InstallLog installLog) => Task.CompletedTask;
 }

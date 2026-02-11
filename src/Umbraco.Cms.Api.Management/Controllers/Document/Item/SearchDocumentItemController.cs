@@ -30,7 +30,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _dataTypeService = dataTypeService;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead, will be removed in v18")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public SearchDocumentItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IDocumentPresentationFactory documentPresentationFactory)

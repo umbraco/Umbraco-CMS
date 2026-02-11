@@ -39,7 +39,7 @@ public abstract class CopyingNotification<T> : CancelableObjectNotification<T>
     /// <param name="copy">The copy of the entity.</param>
     /// <param name="parentId">The ID of the new parent.</param>
     /// <param name="messages">The event messages collection.</param>
-    [Obsolete("Please use constructor that takes a parent key, scheduled for removal in V15")]
+    [Obsolete("Please use constructor that takes a parent key. Scheduled for removal in Umbraco 18.")]
     protected CopyingNotification(T original, T copy, int parentId, EventMessages messages)
         : this(original, copy, parentId, null, messages)
     {
@@ -58,7 +58,7 @@ public abstract class CopyingNotification<T> : CancelableObjectNotification<T>
     /// <summary>
     ///     Gets the ID of the new parent.
     /// </summary>
-    [Obsolete("Please use parent key instead, scheduled for removal in V15")]
+    [Obsolete("Please use parent key instead. Scheduled for removal in Umbraco 18.")]
     public int ParentId { get; }
 
     /// <summary>

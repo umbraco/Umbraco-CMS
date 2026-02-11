@@ -287,7 +287,6 @@ export type CreateMediaTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
@@ -295,6 +294,7 @@ export type CreateMediaTypeRequestModel = {
     parent?: ReferenceByIdModel | null;
     allowedMediaTypes: Array<MediaTypeSortModel>;
     compositions: Array<MediaTypeCompositionModel>;
+    collection?: ReferenceByIdModel | null;
 };
 
 export type CreateMemberGroupRequestModel = {
@@ -752,6 +752,10 @@ export type DocumentTreeItemResponseModel = {
     variants: Array<DocumentVariantItemResponseModel>;
 };
 
+export type DocumentTypeAllowedParentsResponseModel = {
+    allowedParentIds: Array<ReferenceByIdModel>;
+};
+
 export type DocumentTypeBlueprintItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
@@ -1012,6 +1016,12 @@ export type ElementConfigurationResponseModel = {
     allowNonExistingSegmentsCreation: boolean;
 };
 
+export type ElementContainerReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: string | null;
+};
+
 export type ElementItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
@@ -1036,6 +1046,15 @@ export type ElementRecycleBinItemResponseModel = {
     variants: Array<ElementVariantItemResponseModel>;
     isFolder: boolean;
     name: string;
+};
+
+export type ElementReferenceResponseModel = {
+    $type: string;
+    id: string;
+    name?: string | null;
+    published?: boolean | null;
+    documentType: TrackedReferenceDocumentTypeModel;
+    variants: Array<ElementVariantItemResponseModel>;
 };
 
 export type ElementResponseModel = {
@@ -1427,6 +1446,10 @@ export type MediaTreeItemResponseModel = {
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
+};
+
+export type MediaTypeAllowedParentsResponseModel = {
+    allowedParentIds: Array<ReferenceByIdModel>;
 };
 
 export type MediaTypeCollectionReferenceResponseModel = {
@@ -1998,7 +2021,7 @@ export type PagedHelpPageResponseModel = {
 
 export type PagedIReferenceResponseModel = {
     total: number;
-    items: Array<DefaultReferenceResponseModel | DocumentReferenceResponseModel | DocumentTypePropertyTypeReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyTypeReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyTypeReferenceResponseModel>;
+    items: Array<DefaultReferenceResponseModel | DocumentReferenceResponseModel | DocumentTypePropertyTypeReferenceResponseModel | ElementContainerReferenceResponseModel | ElementReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyTypeReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyTypeReferenceResponseModel>;
 };
 
 export type PagedIndexResponseModel = {
@@ -5186,6 +5209,41 @@ export type GetDocumentTypeByIdAllowedChildrenResponses = {
 
 export type GetDocumentTypeByIdAllowedChildrenResponse = GetDocumentTypeByIdAllowedChildrenResponses[keyof GetDocumentTypeByIdAllowedChildrenResponses];
 
+export type GetDocumentTypeByIdAllowedParentsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/{id}/allowed-parents';
+};
+
+export type GetDocumentTypeByIdAllowedParentsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetDocumentTypeByIdAllowedParentsError = GetDocumentTypeByIdAllowedParentsErrors[keyof GetDocumentTypeByIdAllowedParentsErrors];
+
+export type GetDocumentTypeByIdAllowedParentsResponses = {
+    /**
+     * OK
+     */
+    200: DocumentTypeAllowedParentsResponseModel;
+};
+
+export type GetDocumentTypeByIdAllowedParentsResponse = GetDocumentTypeByIdAllowedParentsResponses[keyof GetDocumentTypeByIdAllowedParentsResponses];
+
 export type GetDocumentTypeByIdBlueprintData = {
     body?: never;
     path: {
@@ -7710,6 +7768,10 @@ export type GetElementVersionErrors = {
      */
     401: unknown;
     /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
      * Not Found
      */
     404: ProblemDetails;
@@ -7744,6 +7806,10 @@ export type GetElementVersionByIdErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -7782,6 +7848,10 @@ export type PutElementVersionByIdPreventCleanupErrors = {
      */
     401: unknown;
     /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
      * Not Found
      */
     404: ProblemDetails;
@@ -7816,6 +7886,10 @@ export type PostElementVersionByIdRollbackErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -8115,6 +8189,44 @@ export type PutElementByIdPublishResponses = {
     200: unknown;
 };
 
+export type GetElementByIdReferencedByData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/element/{id}/referenced-by';
+};
+
+export type GetElementByIdReferencedByErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetElementByIdReferencedByError = GetElementByIdReferencedByErrors[keyof GetElementByIdReferencedByErrors];
+
+export type GetElementByIdReferencedByResponses = {
+    /**
+     * OK
+     */
+    200: PagedIReferenceResponseModel;
+};
+
+export type GetElementByIdReferencedByResponse = GetElementByIdReferencedByResponses[keyof GetElementByIdReferencedByResponses];
+
 export type PutElementByIdUnpublishData = {
     body?: UnpublishElementRequestModel;
     path: {
@@ -8188,6 +8300,37 @@ export type PutElementByIdValidateResponses = {
      */
     200: unknown;
 };
+
+export type GetElementAreReferencedData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/element/are-referenced';
+};
+
+export type GetElementAreReferencedErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetElementAreReferencedResponses = {
+    /**
+     * OK
+     */
+    200: PagedReferenceByIdModel;
+};
+
+export type GetElementAreReferencedResponse = GetElementAreReferencedResponses[keyof GetElementAreReferencedResponses];
 
 export type GetElementConfigurationData = {
     body?: never;
@@ -8434,6 +8577,44 @@ export type PutElementFolderByIdMoveToRecycleBinResponses = {
     200: unknown;
 };
 
+export type GetElementFolderByIdReferencedDescendantsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/element/folder/{id}/referenced-descendants';
+};
+
+export type GetElementFolderByIdReferencedDescendantsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetElementFolderByIdReferencedDescendantsError = GetElementFolderByIdReferencedDescendantsErrors[keyof GetElementFolderByIdReferencedDescendantsErrors];
+
+export type GetElementFolderByIdReferencedDescendantsResponses = {
+    /**
+     * OK
+     */
+    200: PagedReferenceByIdModel;
+};
+
+export type GetElementFolderByIdReferencedDescendantsResponse = GetElementFolderByIdReferencedDescendantsResponses[keyof GetElementFolderByIdReferencedDescendantsResponses];
+
 export type PostElementValidateData = {
     body?: CreateElementRequestModel;
     path?: never;
@@ -8587,6 +8768,82 @@ export type DeleteRecycleBinElementByIdResponses = {
     200: unknown;
 };
 
+export type GetRecycleBinElementByIdOriginalParentData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/recycle-bin/element/{id}/original-parent';
+};
+
+export type GetRecycleBinElementByIdOriginalParentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetRecycleBinElementByIdOriginalParentError = GetRecycleBinElementByIdOriginalParentErrors[keyof GetRecycleBinElementByIdOriginalParentErrors];
+
+export type GetRecycleBinElementByIdOriginalParentResponses = {
+    /**
+     * OK
+     */
+    200: ReferenceByIdModel;
+};
+
+export type GetRecycleBinElementByIdOriginalParentResponse = GetRecycleBinElementByIdOriginalParentResponses[keyof GetRecycleBinElementByIdOriginalParentResponses];
+
+export type PutRecycleBinElementByIdRestoreData = {
+    body?: MoveElementRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/recycle-bin/element/{id}/restore';
+};
+
+export type PutRecycleBinElementByIdRestoreErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutRecycleBinElementByIdRestoreError = PutRecycleBinElementByIdRestoreErrors[keyof PutRecycleBinElementByIdRestoreErrors];
+
+export type PutRecycleBinElementByIdRestoreResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetRecycleBinElementChildrenData = {
     body?: never;
     path?: never;
@@ -8654,6 +8911,112 @@ export type DeleteRecycleBinElementFolderByIdResponses = {
      */
     200: unknown;
 };
+
+export type GetRecycleBinElementFolderByIdOriginalParentData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/recycle-bin/element/folder/{id}/original-parent';
+};
+
+export type GetRecycleBinElementFolderByIdOriginalParentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetRecycleBinElementFolderByIdOriginalParentError = GetRecycleBinElementFolderByIdOriginalParentErrors[keyof GetRecycleBinElementFolderByIdOriginalParentErrors];
+
+export type GetRecycleBinElementFolderByIdOriginalParentResponses = {
+    /**
+     * OK
+     */
+    200: ReferenceByIdModel;
+};
+
+export type GetRecycleBinElementFolderByIdOriginalParentResponse = GetRecycleBinElementFolderByIdOriginalParentResponses[keyof GetRecycleBinElementFolderByIdOriginalParentResponses];
+
+export type PutRecycleBinElementFolderByIdRestoreData = {
+    body?: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/recycle-bin/element/folder/{id}/restore';
+};
+
+export type PutRecycleBinElementFolderByIdRestoreErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutRecycleBinElementFolderByIdRestoreError = PutRecycleBinElementFolderByIdRestoreErrors[keyof PutRecycleBinElementFolderByIdRestoreErrors];
+
+export type PutRecycleBinElementFolderByIdRestoreResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetRecycleBinElementReferencedByData = {
+    body?: never;
+    path?: never;
+    query?: {
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/recycle-bin/element/referenced-by';
+};
+
+export type GetRecycleBinElementReferencedByErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetRecycleBinElementReferencedByResponses = {
+    /**
+     * OK
+     */
+    200: PagedIReferenceResponseModel;
+};
+
+export type GetRecycleBinElementReferencedByResponse = GetRecycleBinElementReferencedByResponses[keyof GetRecycleBinElementReferencedByResponses];
 
 export type GetRecycleBinElementRootData = {
     body?: never;
@@ -10110,6 +10473,41 @@ export type GetMediaTypeByIdAllowedChildrenResponses = {
 };
 
 export type GetMediaTypeByIdAllowedChildrenResponse = GetMediaTypeByIdAllowedChildrenResponses[keyof GetMediaTypeByIdAllowedChildrenResponses];
+
+export type GetMediaTypeByIdAllowedParentsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media-type/{id}/allowed-parents';
+};
+
+export type GetMediaTypeByIdAllowedParentsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMediaTypeByIdAllowedParentsError = GetMediaTypeByIdAllowedParentsErrors[keyof GetMediaTypeByIdAllowedParentsErrors];
+
+export type GetMediaTypeByIdAllowedParentsResponses = {
+    /**
+     * OK
+     */
+    200: MediaTypeAllowedParentsResponseModel;
+};
+
+export type GetMediaTypeByIdAllowedParentsResponse = GetMediaTypeByIdAllowedParentsResponses[keyof GetMediaTypeByIdAllowedParentsResponses];
 
 export type GetMediaTypeByIdCompositionReferencesData = {
     body?: never;

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public abstract class LocalLinkBlocksProcessor
 {
     public bool ProcessBlocks(
@@ -33,7 +33,7 @@ public abstract class LocalLinkBlocksProcessor
     }
 }
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkBlockListProcessor : LocalLinkBlocksProcessor, ITypedLocalLinkProcessor
 {
     public Type PropertyEditorValueType => typeof(BlockListValue);
@@ -43,7 +43,7 @@ public class LocalLinkBlockListProcessor : LocalLinkBlocksProcessor, ITypedLocal
     public Func<object?, Func<object?, bool>, Func<string, string>, bool> Process => ProcessBlocks;
 }
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkBlockGridProcessor : LocalLinkBlocksProcessor, ITypedLocalLinkProcessor
 {
     public Type PropertyEditorValueType => typeof(BlockGridValue);
