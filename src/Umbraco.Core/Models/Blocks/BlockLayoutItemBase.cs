@@ -12,7 +12,7 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     private Udi? _settingsUdi;
 
     /// <inheritdoc />
-    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? ContentUdi
     {
         get => _contentUdi;
@@ -29,7 +29,7 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     }
 
     /// <inheritdoc />
-    [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? SettingsUdi
     {
         get => _settingsUdi;
@@ -69,7 +69,7 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
     /// </summary>
     /// <param name="contentUdi">The content UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     protected BlockLayoutItemBase(Udi contentUdi)
         : this((contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)))
     {
@@ -80,7 +80,7 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     /// </summary>
     /// <param name="contentUdi">The content UDI.</param>
     /// <param name="settingsUdi">The settings UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     protected BlockLayoutItemBase(Udi contentUdi, Udi settingsUdi)
         : this(
             (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
