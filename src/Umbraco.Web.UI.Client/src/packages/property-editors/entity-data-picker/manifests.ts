@@ -3,7 +3,6 @@ import { manifests as pickerCollectionMenuManifests } from './picker-collection/
 import { manifests as pickerItemManifests } from './picker-item/manifests.js';
 import { manifests as pickerSearchManifests } from './picker-search/manifests.js';
 import { manifests as pickerTreeManifests } from './picker-tree/manifests.js';
-import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...conditionManifests,
@@ -11,5 +10,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...pickerItemManifests,
 	...pickerSearchManifests,
 	...pickerTreeManifests,
-	...propertyEditorManifests,
 ];
