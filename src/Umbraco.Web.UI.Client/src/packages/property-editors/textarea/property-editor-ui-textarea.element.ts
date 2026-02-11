@@ -1,4 +1,14 @@
-import { css, customElement, html, ifDefined, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	state,
+	styleMap,
+	unsafeHTML,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type {
@@ -75,7 +85,27 @@ export class UmbPropertyEditorUITextareaElement
 		const newValue = (event.target as HTMLTextAreaElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
+
+		if (this._maxChars && newValue.length > this._maxChars) {
+			const textarea = this.shadowRoot?.querySelector<UUITextareaElement>('uui-textarea');
+			if (textarea) {
+				textarea.pristine = false;
+			}
+			this.pristine = false;
+		}
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#renderCharacterCount() {
+		if (!this._maxChars || this.readonly) return nothing;
+
+		const currentLength = this.value?.length ?? 0;
+		const remaining = this._maxChars - currentLength;
+
+		const threshold = Math.round(this._maxChars * 0.2);
+		if (remaining > threshold || remaining < 0) return nothing;
+
+		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
 	}
 
 	override render() {
@@ -90,11 +120,12 @@ export class UmbPropertyEditorUITextareaElement
 				@input=${this.#onInput}
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
-				.maxlengthMessage=${() => {
-					const exceeded = (this.value?.length ?? 0) - (this._maxChars ?? 0);
-					return this.localize.term('textbox_characters_exceed', this._maxChars, exceeded);
+				.maxlengthMessage=${(max: number, current: number) => {
+					const exceeded = current - max;
+					return this.localize.term('textbox_characters_exceed', max, exceeded);
 				}}
 				?readonly=${this.readonly}></uui-textarea>
+			${this.#renderCharacterCount()}
 		`;
 	}
 
@@ -103,6 +134,14 @@ export class UmbPropertyEditorUITextareaElement
 		css`
 			uui-textarea {
 				width: 100%;
+			}
+
+			.char-count {
+				color: var(--uui-color-text-alt);
+			}
+
+			:host(:not(:focus-within)) .char-count {
+				display: none;
 			}
 		`,
 	];
