@@ -293,7 +293,7 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="moving">The content type to move.</param>
     /// <param name="containerId">The identifier of the target container.</param>
     /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
+    [Obsolete("Please use MoveAsync. Scheduled for removal in Umbraco 18.")]
     Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId);
 
     /// <summary>
@@ -302,7 +302,7 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="copying">The content type to copy.</param>
     /// <param name="containerId">The identifier of the target container.</param>
     /// <returns>An attempt containing the operation result with the copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId);
 
     /// <summary>
@@ -313,7 +313,7 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="name">The name for the copy.</param>
     /// <param name="parentId">The identifier of the parent container.</param>
     /// <returns>The copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     TItem Copy(TItem original, string alias, string name, int parentId = -1);
 
     /// <summary>
@@ -324,7 +324,7 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="name">The name for the copy.</param>
     /// <param name="parent">The parent content type.</param>
     /// <returns>The copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     TItem Copy(TItem original, string alias, string name, TItem parent);
 
     /// <summary>

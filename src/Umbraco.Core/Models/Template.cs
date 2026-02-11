@@ -103,7 +103,7 @@ public class Template : File, ITemplate
     ///     Sets the master template for this template.
     /// </summary>
     /// <param name="masterTemplate">The master template to set, or <c>null</c> to remove the master template.</param>
-    [Obsolete("MasterTemplate is now calculated from the content. This will be removed in Umbraco 15.")]
+    [Obsolete("MasterTemplate is now calculated from the content. Scheduled for removal in Umbraco 18.")]
     public void SetMasterTemplate(ITemplate? masterTemplate)
     {
         if (masterTemplate == null)

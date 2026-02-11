@@ -15,7 +15,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 {
     private readonly ILogger<ConvertBlockEditorPropertiesBase> _logger;

@@ -67,7 +67,7 @@ internal class PublishedContent : PublishedElement, IPublishedContent
 
     public int? TemplateId => ContentData.TemplateId;
 
-    [Obsolete("Use the INavigationQueryService instead, scheduled for removal in v17")]
+    [Obsolete("Use the INavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public int Level
     {
         get
@@ -95,7 +95,7 @@ internal class PublishedContent : PublishedElement, IPublishedContent
         }
     }
 
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public IPublishedContent? Parent => GetParent();
 
     /// <inheritdoc />

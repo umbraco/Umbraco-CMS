@@ -41,7 +41,7 @@ public class RelateOnCopyNotificationHandler :
     /// </summary>
     /// <param name="relationService">The relation service.</param>
     /// <param name="auditService">The audit service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelateOnCopyNotificationHandler(
         IRelationService relationService,
         IAuditService auditService)
@@ -89,7 +89,7 @@ public class RelateOnCopyNotificationHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(ContentCopiedNotification notification) =>
         HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 }

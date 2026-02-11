@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Provides functionality for checking for available Umbraco upgrades.
 /// </summary>
-[Obsolete("Upgrade checks are no longer supported and this service will be removed in Umbraco 19.")]
+[Obsolete("Upgrade checks are no longer supported. Scheduled for removal in Umbraco 19.")]
 public class UpgradeService : IUpgradeService
 {
     private readonly IUpgradeCheckRepository _upgradeCheckRepository;
