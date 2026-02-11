@@ -3,15 +3,11 @@ import type { UmbUserDetailModel } from '../../../../types.js';
 import { css, customElement, html, when, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbInputEntityDataElement } from '@umbraco-cms/backoffice/entity-data-picker';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
-import '@umbraco-cms/backoffice/entity-data-picker';
-
-const elementName = 'umb-user-workspace-assign-access';
-@customElement(elementName)
+@customElement('umb-user-workspace-assign-access')
 export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	@state()
 	private _userGroupUniques: UmbUserDetailModel['userGroupUniques'] = [];
@@ -124,7 +120,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('elementStartNodeUniques', []);
 	}
 
-	#onElementStartNodeChange(event: CustomEvent & { target: UmbInputEntityDataElement }) {
+	#onElementStartNodeChange(event: CustomEvent & { target: { selection: Array<string> } }) {
 		event.stopPropagation();
 		// TODO: get back to this when media have been decoupled from users.
 		// The event target is deliberately set to any to avoid an import cycle with media.
@@ -273,6 +269,6 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUserWorkspaceAssignAccessElement;
+		'umb-user-workspace-assign-access': UmbUserWorkspaceAssignAccessElement;
 	}
 }
