@@ -33,7 +33,7 @@ namespace Umbraco.Cms
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
 
-            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in V18.")]
+            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in Umbraco 18.")]
             public CacheInstructionService(
                 ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
@@ -147,7 +147,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            [Obsolete("Use non obsolete version instead, scheduled for removal in V18.")]
+            [Obsolete("Use the non-obsolete version instead. Scheduled for removal in Umbraco 18.")]
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,

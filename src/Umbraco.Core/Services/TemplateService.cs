@@ -62,7 +62,7 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <param name="templateContentParserService">The service for parsing template content.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys (unused, kept for backward compatibility).</param>
     /// <param name="defaultViewContentProvider">The provider for default view content (unused, kept for backward compatibility).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public TemplateService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -97,7 +97,7 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <param name="templateContentParserService">The service for parsing template content.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys (unused, kept for backward compatibility).</param>
     /// <param name="defaultViewContentProvider">The provider for default view content (unused, kept for backward compatibility).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public TemplateService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -121,7 +121,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
+    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,
