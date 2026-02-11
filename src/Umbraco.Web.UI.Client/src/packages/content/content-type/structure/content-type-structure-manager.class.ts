@@ -85,6 +85,7 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentTypeName = createObservablePart(this.ownerContentType, (x) => x?.name);
 	readonly ownerContentTypeCompositions = createObservablePart(this.ownerContentType, (x) => x?.compositions);
 
+	// TODO: for v.18 make it pausable for this to be undefined when no content-type are present. [NL]
 	readonly contentTypeCompositions = this.#contentTypes.asObservablePart((contentTypes) => {
 		return contentTypes.flatMap((x) => x.compositions ?? []);
 	});
@@ -120,7 +121,7 @@ export class UmbContentTypeStructureManager<
 	readonly contentTypeLoaded = mergeObservables(
 		[this.contentTypeCompositions, this.contentTypeUniques],
 		([comps, uniques]) => {
-			return comps && comps.every((x) => uniques.includes(x.contentType.unique));
+			return comps.every((x) => uniques.includes(x.contentType.unique));
 		},
 	);
 
