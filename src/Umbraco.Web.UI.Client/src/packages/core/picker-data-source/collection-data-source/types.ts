@@ -2,6 +2,7 @@ import type { UmbPickerDataSource } from '../data-source/types.js';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbPickerCollectionDataSourceTextFilterFeature {
 	/** Whether text filtering is enabled for this collection data source. */
@@ -9,8 +10,8 @@ export interface UmbPickerCollectionDataSourceTextFilterFeature {
 }
 
 export interface UmbPickerCollectionDataSourceFeatures {
-	/** Configuration for text filter support. */
-	supportsTextFilter?: UmbPickerCollectionDataSourceTextFilterFeature;
+	/** Observable configuration for text filter support. */
+	supportsTextFilter: Observable<UmbPickerCollectionDataSourceTextFilterFeature>;
 }
 
 export interface UmbPickerCollectionDataSource<CollectionItemType extends UmbItemModel = UmbItemModel>
@@ -18,6 +19,6 @@ export interface UmbPickerCollectionDataSource<CollectionItemType extends UmbIte
 		UmbCollectionRepository<CollectionItemType>,
 		UmbApi {
 	collectionPickableFilter?: (item: CollectionItemType) => boolean;
-	/** Optional feature toggles for the collection data source. */
-	features?: UmbPickerCollectionDataSourceFeatures;
+	/** Feature toggles for the collection data source. Each feature is individually observable. */
+	features: UmbPickerCollectionDataSourceFeatures;
 }

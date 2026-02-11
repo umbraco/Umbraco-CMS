@@ -18,7 +18,13 @@ export class UmbEntityDataPickerSupportsTextFilterCondition
 		this.consumeContext(UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT, (context) => {
 			this.observe(context?.dataSourceApi, (dataSourceApi) => {
 				if (dataSourceApi && isPickerCollectionDataSource(dataSourceApi)) {
-					this.permitted = dataSourceApi.features?.supportsTextFilter?.enabled ?? false;
+					this.observe(
+						dataSourceApi.features.supportsTextFilter,
+						(supportsTextFilter) => {
+							this.permitted = supportsTextFilter.enabled;
+						},
+						'_observeSupportsTextFilter',
+					);
 				} else {
 					this.permitted = false;
 				}

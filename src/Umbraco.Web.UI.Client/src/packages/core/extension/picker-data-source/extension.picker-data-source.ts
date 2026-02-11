@@ -4,9 +4,10 @@ import { UmbExtensionItemRepository } from '../item/data/item.repository.js';
 import type { UmbExtensionPickerDataSourceConfigCollectionModel } from './types.js';
 import type {
 	UmbPickerCollectionDataSource,
-	UmbPickerCollectionDataSourceFeatures,
+	UmbPickerCollectionDataSourceTextFilterFeature,
 } from '@umbraco-cms/backoffice/picker-data-source';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
 export class UmbExtensionPickerDataSource
@@ -17,8 +18,10 @@ export class UmbExtensionPickerDataSource
 	#itemRepository = new UmbExtensionItemRepository(this);
 	#config: UmbExtensionPickerDataSourceConfigCollectionModel | undefined;
 
-	features: UmbPickerCollectionDataSourceFeatures = {
-		supportsTextFilter: { enabled: true },
+	#supportsTextFilter = new UmbObjectState<UmbPickerCollectionDataSourceTextFilterFeature>({ enabled: true });
+
+	public readonly features = {
+		supportsTextFilter: this.#supportsTextFilter.asObservable(),
 	};
 
 	setConfig(config: UmbExtensionPickerDataSourceConfigCollectionModel | undefined): void {
