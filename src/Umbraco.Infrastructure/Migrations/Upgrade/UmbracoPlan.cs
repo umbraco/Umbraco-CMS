@@ -152,7 +152,7 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_2_0.AddDocumentUrlAlias>("{A7B8C9D0-E1F2-4A5B-8C7D-9E0F1A2B3C4D}");
 
         // To 17.3.0
-        To<V_17_3_0.ChangeLongRunningOperationTypeColumnTo200>("{B2F4A1C3-8D5E-4F6A-9B7C-3E1D2A4F5B6C}");
+        To<V_17_3_0.IncreaseSizeOfLongRunningOperationTypeColumn>("{B2F4A1C3-8D5E-4F6A-9B7C-3E1D2A4F5B6C}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch

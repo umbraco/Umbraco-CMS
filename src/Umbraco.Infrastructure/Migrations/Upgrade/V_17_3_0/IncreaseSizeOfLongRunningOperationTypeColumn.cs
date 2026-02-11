@@ -7,13 +7,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 /// Increases the <c>type</c> column length in the <c>umbracoLongRunningOperation</c> table from 50 to 200
 /// to accommodate longer operation type names (e.g. Examine index rebuild operations with custom index names).
 /// </summary>
-public class ChangeLongRunningOperationTypeColumnTo200 : AsyncMigrationBase
+public class IncreaseSizeOfLongRunningOperationTypeColumn : AsyncMigrationBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChangeLongRunningOperationTypeColumnTo200"/> class.
+    /// Initializes a new instance of the <see cref="IncreaseSizeOfLongRunningOperationTypeColumn"/> class.
     /// </summary>
     /// <param name="context">The migration context.</param>
-    public ChangeLongRunningOperationTypeColumnTo200(IMigrationContext context)
+    public IncreaseSizeOfLongRunningOperationTypeColumn(IMigrationContext context)
         : base(context)
     {
     }
