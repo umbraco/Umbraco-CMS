@@ -835,9 +835,7 @@ stages:
 
   - stage: Deploy_NuGet
     displayName: NuGet release
-    dependsOn:
-      - Deploy_MyGet
-      - Build_Docs
+    dependsOn: Deploy_MyGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
