@@ -70,6 +70,9 @@
     </Compile>
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Update="Umbraco.Infrastructure\Services\ContentTypeServiceTests.GetAllAllowedInLibrary.cs">
+      <DependentUpon>ContentTypeServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
