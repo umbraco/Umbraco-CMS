@@ -97,7 +97,7 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	@state()
-	private _createButtonLabel = this.localize.term('content_createEmpty');
+	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
