@@ -45,7 +45,7 @@ public class WebhookRepository : IWebhookRepository
         return new PagedModel<IWebhook>
         {
             Items = webhookDtos.Select(WebhookFactory.BuildEntity),
-            Total = webhookDtos.Count,
+            Total = await scope.ExecuteWithContextAsync(async db => await db.Webhooks.CountAsync()),
         };
     }
 
@@ -160,7 +160,7 @@ public class WebhookRepository : IWebhookRepository
 
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
-            db.Webhooks.Remove(WebhookFactory.BuildDto(webhook));
+            await db.Webhooks.Where(x => x.Key == webhook.Key).ExecuteDeleteAsync();
             await db.SaveChangesAsync();
         });
     }
