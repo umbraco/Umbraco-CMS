@@ -1,4 +1,4 @@
-import type { UmbElementTreeItemModel } from '../../tree/index.js';
+import type { UmbElementTreeItemModel } from '../../tree/types.js';
 import type { UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -107,6 +107,14 @@ stages:
               command: build
               projects: $(solution)
               arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
+          # Publish compiled DLLs for C# API documentation generation
+          # Separate artifact to avoid increasing build_output size for all builds
+          - task: PublishPipelineArtifact@1
+            displayName: Publish DocFX DLLs
+            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
+            inputs:
+              targetPath: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
+              artifactName: csharp-docs-dlls
           - powershell: |
               dotnet tool install --global CycloneDX
               dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
@@ -200,57 +208,64 @@ stages:
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
-      # C# API Reference
-      # This job is disabled due to failures in correct generation of the docs when running on the pipeline.
-      # API docs are currently manually generated locally and uploaded to blob storage.
-      # TODO: Investigate and resolve this issue such that doc generation and upload can be restored to the pipeline.
-      # - job:
-        # displayName: Build C# API Reference
-        # pool:
-          # vmImage: "windows-latest"
-        # steps:
-          # - task: UseDotNet@2
-            # displayName: Use .NET SDK from global.json
-            # inputs:
-              # useGlobalJson: true
-          # - task: PowerShell@2
-            # displayName: Install DocFX
-            # inputs:
-              # targetType: inline
-              # script: |
-                # choco install docfx --version=2.59.4 -y
-                # if ($lastexitcode -ne 0){
-                    # throw ("Error installing DocFX")
-                # }
-          # - task: PowerShell@2
-            # displayName: Generate metadata
-            # inputs:
-              # targetType: inline
-              # script: |
-                # docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                # if ($lastexitcode -ne 0){
-                    # throw ("Error generating metadata.")
-                # }
-          # - task: PowerShell@2
-            # displayName: Generate documentation
-            # inputs:
-              # targetType: inline
-              # script: |
-                # docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                # if ($lastexitcode -ne 0){
-                      # throw ("Error generating documentation.")
-                # }
-          # - task: ArchiveFiles@2
-            # displayName: Archive C# Docs
-            # inputs:
-              # rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
-              # includeRootFolder: false
-              # archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-          # - task: PublishPipelineArtifact@1
-            # displayName: Publish C# Docs
-            # inputs:
-              # targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-              # artifact: csharp-docs
+      # C# API Reference - uses pre-compiled DLLs for faster generation (csproj approach caused timeouts)
+      - job:
+        displayName: Build C# API Reference
+        pool:
+          vmImage: "windows-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - task: DownloadPipelineArtifact@2
+            displayName: Download DocFX DLLs
+            inputs:
+              artifact: csharp-docs-dlls
+              path: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - task: PowerShell@2
+            displayName: Install DocFX
+            inputs:
+              targetType: inline
+              script: |
+                dotnet tool install -g docfx --version 2.78.4
+                if ($lastexitcode -ne 0){
+                    throw ("Error installing DocFX")
+                }
+          - task: PowerShell@2
+            displayName: Generate metadata
+            inputs:
+              targetType: inline
+              script: |
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                    throw ("Error generating metadata.")
+                }
+          - task: PowerShell@2
+            displayName: Generate documentation
+            inputs:
+              targetType: inline
+              script: |
+                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                      throw ("Error generating documentation.")
+                }
+          - task: ArchiveFiles@2
+            displayName: Archive C# Docs
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+          - task: PublishPipelineArtifact@1
+            displayName: Publish C# Docs
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              artifact: csharp-docs
 
       # js API Reference
       - job:
@@ -820,9 +835,7 @@ stages:
 
   - stage: Deploy_NuGet
     displayName: NuGet release
-    dependsOn:
-      - Deploy_MyGet
-      - Build_Docs
+    dependsOn: Deploy_MyGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
@@ -882,36 +895,34 @@ stages:
     displayName: Upload API Documentation
     dependsOn:
       - Build
+      - Build_Docs
       - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
-      # This job is disabled due to failures in correct generation of the docs when running on the pipeline.
-      # API docs are currently manually generated locally and uploaded to blob storage.
-      # TODO: Investigate and resolve this issue such that doc generation and upload can be restored to the pipeline.
-      # - job:
-        # displayName: Upload C# Docs
-        # steps:
-          # - checkout: none
-          # - task: DownloadPipelineArtifact@2
-            # displayName: Download artifact
-            # inputs:
-              # artifact: csharp-docs
-              # path: $(Build.SourcesDirectory)
-          # - task: ExtractFiles@1
-            # inputs:
-              # archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
-              # destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
-              # overwriteExistingFiles: true
-          # - task: AzureFileCopy@4
-            # displayName: "Copy C# Docs to blob storage"
-            # inputs:
-              # SourcePath: "$(Build.ArtifactStagingDirectory)/csharp-docs/*"
-              # azureSubscription: umbraco-storage
-              # Destination: AzureBlob
-              # storage: umbracoapidocs
-              # ContainerName: "$web"
-              # BlobPrefix: v$(umbracoMajorVersion)/csharp
-              # CleanTargetBeforeCopy: true
+      - job:
+        displayName: Upload C# Docs
+        steps:
+          - checkout: none
+          - task: DownloadPipelineArtifact@2
+            displayName: Download artifact
+            inputs:
+              artifact: csharp-docs
+              path: $(Build.SourcesDirectory)
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
+              destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
+              overwriteExistingFiles: true
+          - task: AzureFileCopy@4
+            displayName: "Copy C# Docs to blob storage"
+            inputs:
+              SourcePath: "$(Build.ArtifactStagingDirectory)/csharp-docs/*"
+              azureSubscription: umbraco-storage
+              Destination: AzureBlob
+              storage: umbracoapidocs
+              ContainerName: "$web"
+              BlobPrefix: v$(umbracoMajorVersion)/csharp
+              CleanTargetBeforeCopy: true
       - job:
         displayName: Upload Storybook
         steps:
