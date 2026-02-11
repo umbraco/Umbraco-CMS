@@ -48,6 +48,7 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
             .WithName("Test")
             .WithAllowAsRoot(true)
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .Build();
 
         var result = await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
