@@ -15,7 +15,6 @@ export default defineConfig({
 			'umbraco-package': 'umbraco-package.ts',
 			manifests: 'manifests.ts',
 			'content-picker/index': './content-picker/index.ts',
-			'entity-data-picker/index': './entity-data-picker/index.ts',
 		},
 	}),
 });
