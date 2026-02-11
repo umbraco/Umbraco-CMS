@@ -895,6 +895,7 @@ stages:
     displayName: Upload API Documentation
     dependsOn:
       - Build
+      - Build_Docs
       - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
