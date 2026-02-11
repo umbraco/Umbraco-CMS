@@ -30,9 +30,7 @@ export class UmbElementValidationServerDataSource {
 		model: UmbElementDetailModel,
 		parentUnique: UmbEntityUnique = null,
 	): Promise<UmbDataSourceResponse<string>> {
-		if (!model) throw new Error('Element is missing');
 		if (!model.unique) throw new Error('Element unique is missing');
-		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const body: CreateElementRequestModel = {
