@@ -130,7 +130,11 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     public async Task<bool> IsRebuildingAsync(string indexName)
         => (await _longRunningOperationService.GetByTypeAsync(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
 
-    private static string GetRebuildOperationTypeName(string indexName) => $"RebuildExamineIndex-{indexName}";
+    private static string GetRebuildOperationTypeName(string indexName)
+    {
+        var typeName = $"RebuildExamineIndex-{indexName}";
+        return typeName.Length > 200 ? typeName[..200] : typeName;
+    }
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
