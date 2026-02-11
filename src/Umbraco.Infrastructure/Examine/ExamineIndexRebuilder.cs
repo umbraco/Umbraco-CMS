@@ -132,7 +132,11 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         => (await _longRunningOperationService.GetByTypeAsync(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
 
     private static string GetRebuildOperationTypeName(string indexName)
-        => $"RebuildExamineIndex-{indexName}".TruncateWithUniqueHash(200);
+    {
+        // Truncate to a maximum of 200 characters to ensure the type name doesn't overflow the database field.
+        const int TypeFieldSize = 200;
+        return $"RebuildExamineIndex-{indexName}".TruncateWithUniqueHash(TypeFieldSize);
+    }
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
