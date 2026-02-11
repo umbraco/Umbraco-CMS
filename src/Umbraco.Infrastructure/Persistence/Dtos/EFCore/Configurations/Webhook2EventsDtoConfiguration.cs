@@ -16,7 +16,6 @@ public class Webhook2EventsDtoConfiguration : IEntityTypeConfiguration<Webhook2E
             .HasColumnName(Webhook2EventsDto.WebhookIdColumnName)
             .IsRequired();
 
-        // TODO: Does this currently have a max length of 255?
         builder.Property(x => x.Event)
             .HasColumnName(Webhook2EventsDto.EventColumnName)
             .HasMaxLength(255)
