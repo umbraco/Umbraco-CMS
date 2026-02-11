@@ -27,7 +27,7 @@ public class FilterDataTypeFilterController : DataTypeFilterControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a filtered collection of data types.")]
-    [EndpointDescription("Filters data types by name, editor UI alias, and editor alias with pagination support.")]
+    [EndpointDescription("Filters data types based on the provided criteria with support for pagination.")]
     public async Task<IActionResult> Filter(
         CancellationToken cancellationToken,
         int skip = 0,

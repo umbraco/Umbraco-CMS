@@ -38,6 +38,8 @@ public class ConfigurationServerController : ServerControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ServerConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the server configuration.")]
+    [EndpointDescription("Gets the configuration settings for servers.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var responseModel = new ServerConfigurationResponseModel

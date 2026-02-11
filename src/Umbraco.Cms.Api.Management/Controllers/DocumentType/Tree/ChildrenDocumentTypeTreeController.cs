@@ -27,6 +27,8 @@ public class ChildrenDocumentTypeTreeController : DocumentTypeTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of document type tree child items.")]
+    [EndpointDescription("Gets a paginated collection of document type tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<DocumentTypeTreeItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

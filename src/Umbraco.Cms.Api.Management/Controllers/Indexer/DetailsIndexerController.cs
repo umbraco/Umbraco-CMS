@@ -35,6 +35,8 @@ public class DetailsIndexerController : IndexerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(IndexResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets indexer details.")]
+    [EndpointDescription("Gets detailed information about the indexer identified by the provided name.")]
     public Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))

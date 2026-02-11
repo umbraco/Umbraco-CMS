@@ -33,7 +33,7 @@ public class PackageManifest
     /// <summary>
     ///     Gets or sets a value indicating whether the package allows telemetry collection.
     /// </summary>
-    [Obsolete("Use AllowTelemetry instead. This property will be removed in future versions.")]
+    [Obsolete("Use AllowTelemetry instead. Scheduled for removal in Umbraco 18.")]
     public bool AllowPackageTelemetry { get; set; } = true;
 
     /// <summary>

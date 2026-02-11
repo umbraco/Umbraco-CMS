@@ -19,6 +19,8 @@ public class SiblingsDocumentRecycleBinController : DocumentRecycleBinController
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<DocumentRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets sibling documents in the recycle bin.")]
+    [EndpointDescription("Gets a collection of sibling documents in the recycle bin at the same level as the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<DocumentRecycleBinItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
         => await GetSiblings(target, before, after);
 }
