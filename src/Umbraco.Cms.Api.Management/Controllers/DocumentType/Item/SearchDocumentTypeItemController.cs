@@ -27,25 +27,13 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     [ProducesResponseType(typeof(PagedModel<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Searches document type items.")]
     [EndpointDescription("Searches document type items by the provided query with pagination support.")]
-    public async Task<IActionResult> SearchDocumentType(
-        CancellationToken cancellationToken,
-        string? query,
-        bool? isElement = null,
-        bool? allowedInLibrary = null,
-        int skip = 0,
-        int take = 100)
+    public async Task<IActionResult> SearchDocumentType(CancellationToken cancellationToken, string query, bool? isElement = null, int skip = 0, int take = 100)
     {
-        PagedModel<IContentType> contentTypes = await _contentTypeSearchService.SearchAsync(
-            query,
-            isElement,
-            allowedInLibrary,
-            cancellationToken,
-            skip,
-            take);
+        PagedModel<IContentType> contentTypes = await _contentTypeSearchService.SearchAsync(query, isElement, cancellationToken, skip, take);
         var result = new PagedModel<DocumentTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IContentType, DocumentTypeItemResponseModel>(contentTypes.Items),
-            Total = contentTypes.Total,
+            Total = contentTypes.Total
         };
 
         return Ok(result);

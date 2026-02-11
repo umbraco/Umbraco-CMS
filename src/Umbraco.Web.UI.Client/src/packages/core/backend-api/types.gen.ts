@@ -5541,6 +5541,36 @@ export type GetDocumentTypeAllowedAtRootResponses = {
 
 export type GetDocumentTypeAllowedAtRootResponse = GetDocumentTypeAllowedAtRootResponses[keyof GetDocumentTypeAllowedAtRootResponses];
 
+export type GetDocumentTypeAllowedInLibraryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-type/allowed-in-library';
+};
+
+export type GetDocumentTypeAllowedInLibraryErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentTypeAllowedInLibraryResponses = {
+    /**
+     * OK
+     */
+    200: PagedAllowedDocumentTypeModel;
+};
+
+export type GetDocumentTypeAllowedInLibraryResponse = GetDocumentTypeAllowedInLibraryResponses[keyof GetDocumentTypeAllowedInLibraryResponses];
+
 export type PostDocumentTypeAvailableCompositionsData = {
     body?: DocumentTypeCompositionRequestModel;
     path?: never;
@@ -5805,7 +5835,6 @@ export type GetItemDocumentTypeSearchData = {
     query?: {
         query?: string;
         isElement?: boolean;
-        allowedInLibrary?: boolean;
         skip?: number;
         take?: number;
     };

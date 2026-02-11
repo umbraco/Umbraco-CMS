@@ -5969,6 +5969,63 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-type/allowed-in-library": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets document types allowed in library.",
+        "description": "Gets a collection of document types that are allowed in the library.",
+        "operationId": "GetDocumentTypeAllowedInLibrary",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document-type/available-compositions": {
       "post": {
         "tags": [
@@ -6781,13 +6838,6 @@
           },
           {
             "name": "isElement",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "allowedInLibrary",
             "in": "query",
             "schema": {
               "type": "boolean"
