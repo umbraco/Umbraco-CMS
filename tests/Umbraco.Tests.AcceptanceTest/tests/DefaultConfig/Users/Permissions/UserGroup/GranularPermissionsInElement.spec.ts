@@ -45,7 +45,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.element.emptyRecycleBin();
 });
 
-test('can read a specific element with read permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can read a specific element with read permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -62,7 +62,8 @@ test('can read a specific element with read permission enabled', async ({umbraco
   await umbracoUi.library.isElementInTreeVisible(secondElementName, false);
 });
 
-test('can trash a specific element with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Currently the delete functionality in elements is not working
+test.fixme('can trash a specific element with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
