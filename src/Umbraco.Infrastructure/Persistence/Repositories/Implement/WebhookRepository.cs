@@ -134,7 +134,6 @@ public class WebhookRepository : IWebhookRepository
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
             await db.Webhooks.Where(x => x.Key == webhook.Key).ExecuteDeleteAsync();
-            await db.SaveChangesAsync();
         });
     }
 
