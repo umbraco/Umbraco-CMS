@@ -13,7 +13,7 @@ public interface IReziseImageUrlFactory
     /// <param name="width">The width of the resized image.</param>
     /// <param name="mode">The crop mode.</param>
     /// <returns>A collection of media URL info response models.</returns>
-    [Obsolete("Use the overload that accepts ImageResizeOptions instead. This method will be removed in v19.")]
+    [Obsolete("Use the overload that accepts ImageResizeOptions instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode);
 
     /// <summary>

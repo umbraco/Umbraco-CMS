@@ -13,7 +13,7 @@ public class TemporaryFileConfigurationPresentationFactory : ITemporaryFileConfi
     private readonly ContentSettings _contentSettings;
     private readonly ContentImagingSettings _imagingSettings;
 
-    [Obsolete("Use the constructor that accepts IOptionsSnapshot<ContentImagingSettings> and does not accept IImageUrlGenerator instead. This constructor will be removed in v19.")]
+    [Obsolete("Use the constructor that accepts IOptionsSnapshot<ContentImagingSettings> and does not accept IImageUrlGenerator instead. Scheduled for removal in Umbraco 19.")]
     public TemporaryFileConfigurationPresentationFactory(
         IOptionsSnapshot<ContentSettings> contentSettings,
         IOptionsSnapshot<RuntimeSettings> runtimeSettings,
