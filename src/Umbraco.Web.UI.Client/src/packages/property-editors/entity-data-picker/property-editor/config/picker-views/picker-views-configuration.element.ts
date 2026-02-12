@@ -1,3 +1,7 @@
+import {
+	UMB_ENTITY_DATA_PICKER_CARD_COLLECTION_VIEW_ALIAS,
+	UMB_ENTITY_DATA_PICKER_REF_COLLECTION_VIEW_ALIAS,
+} from '../../../picker-collection/views/constants.js';
 import type { UmbEntityDataPickerPickerViewsConfigurationPropertyValue } from './types.js';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -19,12 +23,20 @@ export class UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement
 	implements UmbPropertyEditorUiElement
 {
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
+	#isNew = false;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (context) => {
 			if (!context) return;
+			this.observe(
+				context.isNew,
+				(isNew) => {
+					this.#isNew = isNew ?? false;
+				},
+				'observeIsNew',
+			);
 			this.observe(
 				context.propertyEditorDataSourceAlias,
 				(alias) => {
@@ -78,6 +90,19 @@ export class UmbEntityDataPickerPickerViewsConfigurationPropertyEditorUIElement
 
 			const api = ctrl.api as UmbPickerDataSource;
 			this._isCollectionDataSource = isPickerCollectionDataSource(api);
+
+			if (!this._isCollectionDataSource && this.#value.length > 0) {
+				this.#value = [];
+				this.dispatchEvent(new UmbChangeEvent());
+			}
+
+			if (this._isCollectionDataSource && this.#isNew && this.#value.length === 0) {
+				this.#value = [
+					{ alias: UMB_ENTITY_DATA_PICKER_REF_COLLECTION_VIEW_ALIAS },
+					{ alias: UMB_ENTITY_DATA_PICKER_CARD_COLLECTION_VIEW_ALIAS },
+				];
+				this.dispatchEvent(new UmbChangeEvent());
+			}
 		});
 	}
 
