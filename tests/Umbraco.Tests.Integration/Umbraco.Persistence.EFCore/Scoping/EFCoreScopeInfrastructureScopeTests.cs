@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
