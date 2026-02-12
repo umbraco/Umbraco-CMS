@@ -1,4 +1,3 @@
-import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
@@ -11,7 +10,7 @@ export interface UmbCollectionItemPickerModalCollectionConfig<FilterArgsType = R
 	alias?: string;
 	menuAlias?: string;
 	filterArgs?: FilterArgsType;
-	views?: Array<UmbCollectionLayoutConfiguration>;
+	views?: Array<{ alias: string }>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

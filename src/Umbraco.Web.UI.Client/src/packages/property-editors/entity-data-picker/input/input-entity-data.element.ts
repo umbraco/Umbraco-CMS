@@ -53,10 +53,10 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		return this.#pickerInputContext.getDataSourceConfig();
 	}
 
-	public set pickerViews(value: Array<UmbCollectionLayoutConfiguration> | undefined) {
+	public set pickerViews(value: Array<{ alias: string }> | undefined) {
 		this.#pickerInputContext.setPickerViews(value);
 	}
-	public get pickerViews(): Array<UmbCollectionLayoutConfiguration> | undefined {
+	public get pickerViews(): Array<{ alias: string }> | undefined {
 		return this.#pickerInputContext.getPickerViews();
 	}
 

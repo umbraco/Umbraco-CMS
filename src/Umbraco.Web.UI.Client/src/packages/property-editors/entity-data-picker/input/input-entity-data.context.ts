@@ -43,7 +43,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerDataSource;
 	#dataSourceConfig?: UmbConfigCollectionModel | undefined;
-	#pickerViews?: Array<UmbCollectionLayoutConfiguration>;
+	#pickerViews?: Array<{ alias: string }> | undefined;
 
 	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
 
@@ -94,19 +94,19 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 
 	/**
 	 * Sets the picker views configuration for the input context.
-	 * @param {(Array<UmbCollectionLayoutConfiguration> | undefined)} views The picker views configuration.
+	 * @param {(Array<{ alias: string }> | undefined)} views The picker views configuration.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	setPickerViews(views: Array<UmbCollectionLayoutConfiguration> | undefined) {
+	setPickerViews(views: Array<{ alias: string }> | undefined) {
 		this.#pickerViews = views;
 	}
 
 	/**
 	 * Gets the picker views configuration for the input context.
-	 * @returns {(Array<UmbCollectionLayoutConfiguration> | undefined)} The picker views configuration.
+	 * @returns {(Array<{ alias: string }> | undefined)} The picker views configuration.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	getPickerViews(): Array<UmbCollectionLayoutConfiguration> | undefined {
+	getPickerViews(): Array<{ alias: string }> | undefined {
 		return this.#pickerViews;
 	}
 

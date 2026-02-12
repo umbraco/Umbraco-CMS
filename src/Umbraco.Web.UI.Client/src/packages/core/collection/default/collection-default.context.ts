@@ -215,15 +215,7 @@ export class UmbDefaultCollectionContext<
 
 		this.#userDefinedProperties.setValue(this.#config?.userDefinedProperties ?? []);
 
-		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
-
-		if (this.#config.layouts && this.#config.layouts.length > 0) {
-			this.#viewLayouts.setValue(this.#config.layouts);
-			const aliases = this.#config.layouts.map((layout) => layout.collectionView);
-			viewManagerConfig.manifestFilter = (manifest) => aliases.includes(manifest.alias);
-		}
-
-		this.view.setConfig(viewManagerConfig);
+		this.#configureViews();
 
 		this._configured = true;
 	}
@@ -451,5 +443,18 @@ export class UmbDefaultCollectionContext<
 				this._selectOnly.setValue(selection.length > 0);
 			}
 		});
+	}
+
+	#configureViews() {
+		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
+		const layouts = this.#config?.layouts;
+		debugger;
+		if (layouts && layouts.length > 0) {
+			this.#viewLayouts.setValue(layouts);
+			const aliases = layouts.map((layout) => layout.collectionView);
+			viewManagerConfig.manifestFilter = (manifest) => aliases.includes(manifest.alias);
+		}
+
+		this.view.setConfig(viewManagerConfig);
 	}
 }
