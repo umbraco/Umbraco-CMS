@@ -22,5 +22,9 @@ public interface IReziseImageUrlFactory
     /// <param name="mediaItems">The media items to create URLs for.</param>
     /// <param name="options">The resize options including optional format conversion.</param>
     /// <returns>A collection of media URL info response models.</returns>
-    IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options);
+    // TODO (V18): Remove this default implementation.
+    IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => CreateUrlSets(mediaItems, options.Height, options.Width, options.Mode);
+#pragma warning restore CS0618 // Type or member is obsolete
 }
