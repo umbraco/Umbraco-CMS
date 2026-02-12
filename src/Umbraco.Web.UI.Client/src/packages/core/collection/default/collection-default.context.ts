@@ -448,10 +448,8 @@ export class UmbDefaultCollectionContext<
 		const layouts = this.#config?.layouts;
 		if (layouts && layouts.length > 0) {
 			this.#viewLayouts.setValue(layouts);
-			const aliases = layouts.map((layout) => layout.collectionView);
-			viewManagerConfig.manifestFilter = (manifest) => aliases.includes(manifest.alias);
+			viewManagerConfig.viewsOverride = layouts;
 		}
-
 		this.view.setConfig(viewManagerConfig);
 	}
 }
