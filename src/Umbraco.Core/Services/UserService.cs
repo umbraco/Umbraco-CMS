@@ -2069,7 +2069,8 @@ internal partial class UserService : RepositoryService, IUserService
             {
                 EntityPermissionSet permissionSet = GetPermissionsForPath(user, entity.Path);
                 return new NodePermissions { NodeKey = entity.Key, Permissions = permissionSet.GetAllPermissions() };
-            });
+            })
+            .ToArray();
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, results);
     }
