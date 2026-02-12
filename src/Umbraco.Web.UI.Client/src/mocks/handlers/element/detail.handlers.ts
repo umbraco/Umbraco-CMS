@@ -45,7 +45,7 @@ export const detailHandlers = [
 
 		let data: Array<DefaultReferenceResponseModel> = [];
 
-		if (id === 'all-property-editors-document-id') {
+		if (id === 'simple-element-id') {
 			data = referenceData;
 		}
 
