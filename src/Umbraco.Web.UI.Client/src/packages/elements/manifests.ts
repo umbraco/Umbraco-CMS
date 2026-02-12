@@ -15,6 +15,9 @@ import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as userPermissionsManifests } from './user-permissions/manifests.js';
 
+// Ensure global components are registered (if needed, this could be moved to a `backofficeEntryPoint` [LK])
+import './global-components/index.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	...auditLogManifests,
 	...collectionManifests,

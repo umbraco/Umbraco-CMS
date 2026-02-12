@@ -10,8 +10,6 @@ export class UmbElementPickerPropertyEditorUIElement
 	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	#dataSourceAlias = 'Umb.PropertyEditorDataSource.Element';
-
 	@property({ type: Boolean })
 	mandatory?: boolean;
 
@@ -48,13 +46,13 @@ export class UmbElementPickerPropertyEditorUIElement
 	private _maxMessage = '';
 
 	override focus() {
-		return this.shadowRoot?.querySelector('umb-input-entity-data')?.focus();
+		return this.shadowRoot?.querySelector('umb-input-element')?.focus();
 	}
 
 	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.firstUpdated(changedProperties);
 
-		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-entity-data')!);
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-element')!);
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(
@@ -71,17 +69,15 @@ export class UmbElementPickerPropertyEditorUIElement
 
 	override render() {
 		return html`
-			<umb-input-entity-data
+			<umb-input-element
 				.selection=${this.value ?? []}
-				.dataSourceAlias=${this.#dataSourceAlias}
-				.dataSourceConfig=${[]}
 				.min=${this._min}
 				.min-message=${this._minMessage}
 				.max=${this._max}
 				.max-message=${this._maxMessage}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}>
-			</umb-input-entity-data>
+			</umb-input-element>
 		`;
 	}
 }
