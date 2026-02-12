@@ -212,6 +212,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						<uui-textarea
 							label="description"
 							name="description"
+							data-mark="input:description"
 							id="description-input"
 							placeholder=${this.localize.term('placeholders_enterDescription')}
 							.value=${this.property.description}
@@ -225,11 +226,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					id="editor"
 					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
+					data-mark="action:editor-settings"
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.unique })}>
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
 					<uui-action-bar>
-						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+						<uui-button label="${this.localize.term('actions_delete')}" data-mark="action:delete" @click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
@@ -253,6 +255,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				type="number"
 				?disabled=${this._inherited}
 				label="sort order"
+				data-mark="input:sort-order"
 				@change=${this.#onPropertyOrderChanged}
 				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
 		`;

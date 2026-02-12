@@ -2,11 +2,8 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin, UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
-import type { UmbInputEntityDataElement } from '@umbraco-cms/backoffice/entity-data-picker';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-
-import '@umbraco-cms/backoffice/entity-data-picker';
 
 @customElement('umb-element-picker-property-editor-ui')
 export class UmbElementPickerPropertyEditorUIElement
@@ -67,7 +64,7 @@ export class UmbElementPickerPropertyEditorUIElement
 		}
 	}
 
-	#onChange(event: CustomEvent & { target: UmbInputEntityDataElement }) {
+	#onChange(event: CustomEvent & { target: { selection: Array<string> } }) {
 		this.value = event.target.selection;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
