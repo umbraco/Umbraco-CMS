@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -378,6 +379,52 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Act & Assert - should not throw, just return gracefully
         Assert.DoesNotThrowAsync(async () =>
             await DocumentUrlService.CreateOrUpdateUrlSegmentsAsync(nonExistentKey));
+    }
+
+    [Test]
+    public async Task GetUrlSegment_CultureVariantContent_WithInvariantUrlName_UsesUrlName()
+    {
+        // Arrange - create a culture-variant content type with an invariant umbracoUrlName property
+        // (simulates umbracoUrlName coming from a composition that does not vary by culture)
+        var template = TemplateBuilder.CreateTextPageTemplate("variantWithUrlNameTemplate", "Variant With UrlName Template");
+        FileService.SaveTemplate(template);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantWithUrlName")
+            .WithName("Variant With UrlName")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Nothing)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        ContentTypeService.Save(contentType);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My English Page")
+            .Build();
+
+        content.SetValue(Constants.Conventions.Content.UrlName, "custom-url");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US"]);
+
+        // Act
+        var isoCode = "en-US";
+        var urlSegment = DocumentUrlService.GetUrlSegment(content.Key, isoCode, false);
+
+        // Assert - should use the invariant umbracoUrlName, not the culture name
+        Assert.That(urlSegment, Is.EqualTo("custom-url"));
     }
 
     //TODO test cases:
