@@ -227,6 +227,48 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         Assert.IsTrue(notificationPublished);
     }
 
+    private class TwoStepTestPackageMigrationPlan : PackageMigrationPlan
+    {
+        public const string TestPlanName = "TestPackagePlan";
+
+        public TwoStepTestPackageMigrationPlan()
+            : base(TestPlanName)
+        {
+        }
+
+        protected override void DefinePlan()
+        {
+            To<NoOpMigration>("a");
+            To<NoOpMigration>("b");
+        }
+    }
+
+    private class ThreeStepTestPackageMigrationPlan : PackageMigrationPlan
+    {
+        public ThreeStepTestPackageMigrationPlan()
+            : base(TwoStepTestPackageMigrationPlan.TestPlanName)
+        {
+        }
+
+        protected override void DefinePlan()
+        {
+            To<NoOpMigration>("a");
+            To<NoOpMigration>("b");
+            To<NoOpMigration>("c");
+        }
+    }
+
+    private class NoOpMigration : MigrationBase
+    {
+        public NoOpMigration(IMigrationContext context) : base(context)
+        {
+        }
+
+        protected override void Migrate()
+        {
+        }
+    }
+
     private bool ColumnExists(string tableName, string columnName, IScope scope) =>
         scope.Database.SqlContext.SqlSyntax.GetColumnsInSchema(scope.Database)
             .Any(x => x.TableName.Equals(tableName) && x.ColumnName.Equals(columnName));
@@ -366,47 +408,6 @@ internal class TestUmbracoPlan : UmbracoPlan
     }
 }
 
-internal class TwoStepTestPackageMigrationPlan : PackageMigrationPlan
-{
-    public const string TestPlanName = "TestPackagePlan";
-
-    public TwoStepTestPackageMigrationPlan()
-        : base(TestPlanName)
-    {
-    }
-
-    protected override void DefinePlan()
-    {
-        To<NoOpMigration>("a");
-        To<NoOpMigration>("b");
-    }
-}
-
-internal class ThreeStepTestPackageMigrationPlan : PackageMigrationPlan
-{
-    public ThreeStepTestPackageMigrationPlan()
-        : base(TwoStepTestPackageMigrationPlan.TestPlanName)
-    {
-    }
-
-    protected override void DefinePlan()
-    {
-        To<NoOpMigration>("a");
-        To<NoOpMigration>("b");
-        To<NoOpMigration>("c");
-    }
-}
-
-internal class NoOpMigration : MigrationBase
-{
-    public NoOpMigration(IMigrationContext context) : base(context)
-    {
-    }
-
-    protected override void Migrate()
-    {
-    }
-}
 
 internal class SimpleMigrationPlan : MigrationPlan
 {
