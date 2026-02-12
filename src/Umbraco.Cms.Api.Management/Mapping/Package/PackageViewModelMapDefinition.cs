@@ -58,7 +58,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    [Obsolete("Please use the IPackagePresentationFactory instead. Scheduled for removal in V18.")]
+    [Obsolete("Please use the IPackagePresentationFactory instead. Scheduled for removal in Umbraco 18.")]
     private static void Map(InstalledPackage source, PackageMigrationStatusResponseModel target, MapperContext context)
     {
         if (source.PackageName is not null)
