@@ -82,6 +82,11 @@ export class UmbPropertyEditorUITextareaElement
 		return this.shadowRoot?.querySelector<UUITextareaElement>('uui-textarea')?.focus();
 	}
 
+	#getMaxLengthMessage(max: number, current: number) {
+		const exceeded = current - max;
+		return this.localize.term('textbox_characters_exceed', max, exceeded);
+	}
+
 	#onInput(event: InputEvent) {
 		const newValue = (event.target as HTMLTextAreaElement).value;
 		if (newValue === this.value) return;
@@ -118,10 +123,7 @@ export class UmbPropertyEditorUITextareaElement
 				@input=${this.#onInput}
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
-				.maxlengthMessage=${(max: number, current: number) => {
-					const exceeded = current - max;
-					return this.localize.term('textbox_characters_exceed', max, exceeded);
-				}}
+				.maxlengthMessage=${this.#getMaxLengthMessage.bind(this)}
 				?readonly=${this.readonly}></uui-textarea>
 			${this.#renderCharacterCount()}
 		`;
