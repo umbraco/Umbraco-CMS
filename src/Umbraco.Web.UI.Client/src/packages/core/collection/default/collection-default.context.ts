@@ -446,7 +446,6 @@ export class UmbDefaultCollectionContext<
 	#configureViews() {
 		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
 		const layouts = this.#config?.layouts;
-		debugger;
 		if (layouts && layouts.length > 0) {
 			this.#viewLayouts.setValue(layouts);
 			const aliases = layouts.map((layout) => layout.collectionView);
