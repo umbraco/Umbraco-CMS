@@ -28,8 +28,14 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	@property({ type: Number })
 	min = 0;
 
+	@property({ type: String, attribute: 'min-message' })
+	minMessage?: string;
+
 	@property({ type: Number })
 	max = Infinity;
+
+	@property({ type: String, attribute: 'max-message' })
+	maxMessage?: string;
 
 	@property({ type: Array })
 	selection: Array<string> = [];
@@ -55,7 +61,9 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 				.value=${this.value}
 				.selection=${this.selection}
 				.min=${this.min}
+				.minMessage=${this.minMessage}
 				.max=${this.max}
+				.maxMessage=${this.maxMessage}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}>
 			</umb-input-entity-data>

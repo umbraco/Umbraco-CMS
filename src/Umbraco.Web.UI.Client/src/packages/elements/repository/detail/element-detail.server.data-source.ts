@@ -72,7 +72,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	*/
 
 	/**
-	 * Fetches a Element with the given id from the server
+	 * Fetches an Element with the given id from the server
 	 * @param {string} unique
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
@@ -92,7 +92,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Inserts a new Element on the server
+	 * Inserts a new element on the server
 	 * @param {UmbElementDetailModel} model
 	 * @param parentUnique
 	 * @returns {*}
@@ -126,9 +126,8 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Updates a Element on the server
-	 * @param {UmbElementDetailModel} Element
-	 * @param model
+	 * Updates an Element on the server
+	 * @param {UmbElementDetailModel} model
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
 	 */
@@ -157,7 +156,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Deletes a Element on the server
+	 * Deletes an Element on the server
 	 * @param {string} unique
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource

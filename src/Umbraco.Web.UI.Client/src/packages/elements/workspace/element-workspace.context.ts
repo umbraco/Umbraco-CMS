@@ -57,7 +57,7 @@ export class UmbElementWorkspaceContext
 			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
-			//saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
+			// TODO: Add a save modal token for Element workspace [LK]
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {

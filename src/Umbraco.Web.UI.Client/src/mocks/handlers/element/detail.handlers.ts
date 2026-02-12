@@ -49,12 +49,12 @@ export const detailHandlers = [
 			data = referenceData;
 		}
 
-		const PagedTrackedReference: PagedIReferenceResponseModel = {
+		const pagedTrackedReference: PagedIReferenceResponseModel = {
 			total: data.length,
 			items: data.slice(skip, skip + take),
 		};
 
-		return HttpResponse.json(PagedTrackedReference);
+		return HttpResponse.json(pagedTrackedReference);
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
