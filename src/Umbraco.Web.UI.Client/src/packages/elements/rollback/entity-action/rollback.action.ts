@@ -8,14 +8,18 @@ export class UmbRollbackElementEntityAction extends UmbEntityActionBase<never> {
 	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
-		await umbOpenModal(this, UMB_ELEMENT_ROLLBACK_MODAL, {});
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		if (!notificationContext) {
-			throw new Error('Notification context not found');
-		}
-		notificationContext.peek('positive', {
-			data: { message: this.#localize.term('rollback_elementRolledBack') },
-		});
+		try {
+		    await umbOpenModal(this, UMB_ELEMENT_ROLLBACK_MODAL, {});
+		    const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		    if (!notificationContext) {
+			    throw new Error('Notification context not found');
+		    }
+		    notificationContext.peek('positive', {
+			    data: { message: this.#localize.term('rollback_elementRolledBack') },
+		    });
+		} catch {
+  		    // User cancelled the modal
+  		}
 	}
 }
 
