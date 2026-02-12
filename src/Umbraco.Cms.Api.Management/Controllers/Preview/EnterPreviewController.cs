@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Preview;
 
 [ApiVersion("1.0")]
-[Obsolete("Do not use this. Preview state is initiated implicitly by the preview URL generation. Scheduled for removal in V18.")]
+[Obsolete("Do not use this. Preview state is initiated implicitly by the preview URL generation. Scheduled for removal in Umbraco 18.")]
 public class EnterPreviewController : PreviewControllerBase
 {
     private readonly IPreviewService _previewService;

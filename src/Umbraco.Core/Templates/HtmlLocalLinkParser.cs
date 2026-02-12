@@ -146,7 +146,7 @@ public sealed class HtmlLocalLinkParser
     /// </summary>
     /// <param name="text">The text to search for legacy local links.</param>
     /// <returns>An enumerable of <see cref="LocalLinkTag"/> objects representing legacy links.</returns>
-    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migrated. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
@@ -179,7 +179,7 @@ public sealed class HtmlLocalLinkParser
     /// <summary>
     ///     Represents a local link tag extracted from HTML content.
     /// </summary>
-    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migrated. Scheduled for removal in Umbraco 18.")]
     public class LocalLinkTag
     {
         /// <summary>

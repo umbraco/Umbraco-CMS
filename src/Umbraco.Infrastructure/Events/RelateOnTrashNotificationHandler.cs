@@ -38,7 +38,7 @@ public sealed class RelateOnTrashNotificationHandler :
         _scopeProvider = scopeProvider;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,
         IEntityService entityService,
@@ -52,7 +52,7 @@ public sealed class RelateOnTrashNotificationHandler :
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,
         IEntityService entityService,
@@ -73,7 +73,7 @@ public sealed class RelateOnTrashNotificationHandler :
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,
         IEntityService entityService,

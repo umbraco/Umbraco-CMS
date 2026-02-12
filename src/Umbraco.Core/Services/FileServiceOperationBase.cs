@@ -65,7 +65,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
     /// <param name="logger">The logger.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="auditRepository">The audit repository.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     protected FileServiceOperationBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

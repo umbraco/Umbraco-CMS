@@ -259,7 +259,108 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 5. Project-Specific Notes
+## 5. Avoiding Breaking Changes
+
+No binary breaking changes are allowed within a major version. Three patterns are used:
+
+### 5.1 Obsolete Constructor + StaticServiceProvider
+
+When a public class needs new dependencies, obsolete the existing constructor and add a new one. The old constructor delegates to the new one, resolving missing deps via `StaticServiceProvider`.
+
+```csharp
+[Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+public MyService(IDependencyA depA)
+    : this(
+        depA,
+        StaticServiceProvider.Instance.GetRequiredService<IDependencyB>())
+{
+}
+
+public MyService(IDependencyA depA, IDependencyB depB)
+{
+    _depA = depA;
+    _depB = depB;
+}
+```
+
+**Examples**:
+- `ContentCollectionPresentationFactory` - added `FlagProviderCollection`
+- `CacheInstructionService` - added `ILastSyncedManager`, `IRepositoryCacheVersionService`
+- `DocumentPresentationFactory` - added `FlagProviderCollection`
+
+**Rules**:
+- Old constructor marked `[Obsolete("... Scheduled for removal in Umbraco {current-major+2}.")]`
+- Old constructor calls new constructor via `: this(...)`
+- Uses `StaticServiceProvider.Instance.GetRequiredService<T>()` for new params only
+- DI registration must use the NEW constructor (old is for external consumers only)
+
+### 5.2 Obsolete Method + New Overload
+
+When a public method signature needs to change, add the new method/overload and obsolete the old. The obsolete method should call the new one with suitable defaults.
+
+```csharp
+[Obsolete("Use the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+public void DoThing(string name)
+    => DoThing(name, extraParam: null);
+
+public void DoThing(string name, string? extraParam)
+{
+    // Real implementation here
+}
+```
+
+**Rules**:
+- Old method marked `[Obsolete]` with removal schedule
+- DRY: old method calls new method, providing defaults for new parameters
+- All internal callers must be updated to use the new method
+- No callers should remain on the obsolete method within the codebase
+
+### 5.3 Default Interface Implementation
+
+When adding methods to a public interface, provide a default implementation so existing external implementations don't break.
+
+```csharp
+public interface IMyService
+{
+    // Existing method
+    void ExistingMethod();
+
+    // New method with default implementation
+    void NewMethod(string param)
+        => ExistingMethod(); // delegate to existing if possible
+}
+```
+
+**Strategies for the default** (in order of preference):
+1. **Use existing interface methods** to satisfy the contract (even if not optimal)
+2. **Return a sensible default** like empty collection, null, etc.
+3. **Throw `NotImplementedException`** if no reasonable default exists
+
+**Example**: `IContentService.SaveBlueprint` - new overload with `IContent? createdFromContent` has a default impl that calls the old method (ignoring the new param).
+
+**Example**: `IDocumentPresentationFactory.CreateCulturePublishScheduleModels` - full default implementation with logic, uses `StaticServiceProvider` for dependency resolution within the interface.
+
+**Rules**:
+- Add `// TODO (V{next-major}): Remove the default implementation when {obsolete method} is removed.` comment
+- Default impl should be functionally correct even if not optimal
+- If using `StaticServiceProvider` in a default impl, note this is temporary
+
+### 5.4 General Rules
+
+- **Removal policy**: Obsoleted members must remain for at least one full major version before removal. If obsoleted in version N, the earliest removal is version N+2. For example, something obsoleted in v17 is scheduled for removal in v19 (giving the whole of v18 as a deprecation period).
+- All `[Obsolete]` attributes must include **"Scheduled for removal in Umbraco {current+2}"**
+- Read `version.json` to determine the current major version
+- Suppress `CS0618` warnings where obsolete members must call each other:
+  ```csharp
+  #pragma warning disable CS0618 // Type or member is obsolete
+      => OldMethod(param);
+  #pragma warning restore CS0618 // Type or member is obsolete
+  ```
+- Update ALL internal callers to use the new API - no internal code should use obsolete members
+
+---
+
+## 6. Project-Specific Notes
 
 ### Centralized Package Management
 
