@@ -2748,6 +2748,8 @@ export type TemplateResponseModel = {
     alias: string;
     content?: string | null;
     id: string;
+    layoutTemplate?: ReferenceByIdModel | null;
+    /** @deprecated Use layoutTemplate instead. Scheduled for removal in Umbraco 20. */
     masterTemplate?: ReferenceByIdModel | null;
 };
 

@@ -342,13 +342,13 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XElement("Alias", template.Alias));
         xml.Add(new XElement("Design", new XCData(template.Content!)));
 
-        if (template is Template concreteTemplate && concreteTemplate.MasterTemplateId != null)
+        if (template is Template concreteTemplate && concreteTemplate.LayoutTemplateId != null)
         {
-            if (concreteTemplate.MasterTemplateId.IsValueCreated &&
-                concreteTemplate.MasterTemplateId.Value != default)
+            if (concreteTemplate.LayoutTemplateId.IsValueCreated &&
+                concreteTemplate.LayoutTemplateId.Value != default)
             {
-                xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
-                xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
+                xml.Add(new XElement("Master", concreteTemplate.LayoutTemplateId.ToString()));
+                xml.Add(new XElement("MasterAlias", concreteTemplate.LayoutTemplateAlias));
             }
         }
 

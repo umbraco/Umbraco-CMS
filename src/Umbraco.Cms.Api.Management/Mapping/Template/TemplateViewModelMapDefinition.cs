@@ -18,7 +18,8 @@ public class TemplateViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll -Id -Key -CreateDate -UpdateDate -DeleteDate
-    // Umbraco.Code.MapAll -Path -VirtualPath -MasterTemplateId -IsMasterTemplate
+    // Umbraco.Code.MapAll -Path -VirtualPath -LayoutTemplateId -IsLayoutTemplate
+    // Umbraco.Code.MapAll -MasterTemplateId -IsMasterTemplate -MasterTemplateAlias
     private void Map(UpdateTemplateRequestModel source, ITemplate target, MapperContext context)
     {
         target.Name = source.Name;

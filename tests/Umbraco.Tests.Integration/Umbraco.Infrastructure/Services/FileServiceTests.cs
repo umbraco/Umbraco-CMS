@@ -38,7 +38,7 @@ internal sealed class FileServiceTests : UmbracoIntegrationTest
 
         child = FileService.GetTemplate(child.Id);
 
-        Assert.AreEqual(parent.Alias, child.MasterTemplateAlias);
+        Assert.AreEqual(parent.Alias, child.LayoutTemplateAlias);
     }
 
     [Test]
@@ -49,14 +49,14 @@ internal sealed class FileServiceTests : UmbracoIntegrationTest
 
         child = FileService.GetTemplate(child.Id);
         Assert.NotNull(child);
-        Assert.AreEqual("parent", child.MasterTemplateAlias);
+        Assert.AreEqual("parent", child.LayoutTemplateAlias);
 
         child.Content = "test";
         FileService.SaveTemplate(child);
 
         child = FileService.GetTemplate(child.Id);
         Assert.NotNull(child);
-        Assert.AreEqual(null, child.MasterTemplateAlias);
+        Assert.AreEqual(null, child.LayoutTemplateAlias);
     }
 
     [Test]
@@ -68,14 +68,14 @@ internal sealed class FileServiceTests : UmbracoIntegrationTest
 
         child = FileService.GetTemplate(child.Id);
         Assert.NotNull(child);
-        Assert.AreEqual("parent", child.MasterTemplateAlias);
+        Assert.AreEqual("parent", child.LayoutTemplateAlias);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
         FileService.SaveTemplate(child);
 
         child = FileService.GetTemplate(child.Id);
         Assert.NotNull(child);
-        Assert.AreEqual("parent2", child.MasterTemplateAlias);
+        Assert.AreEqual("parent2", child.LayoutTemplateAlias);
     }
 
     [Test]
@@ -87,9 +87,9 @@ internal sealed class FileServiceTests : UmbracoIntegrationTest
         var childOfChild1 = FileService.CreateTemplateWithIdentity("Child1", "child1", "Layout = \"Child.cshtml\";");
         var childOfChild2 = FileService.CreateTemplateWithIdentity("Child2", "child2", "Layout = \"Child.cshtml\";");
 
-        Assert.AreEqual($"child", childOfChild1.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild1.LayoutTemplateAlias);
         Assert.AreEqual($"{parent.Path},{child.Id},{childOfChild1.Id}", childOfChild1.Path);
-        Assert.AreEqual($"child", childOfChild2.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild2.LayoutTemplateAlias);
         Assert.AreEqual($"{parent.Path},{child.Id},{childOfChild2.Id}", childOfChild2.Path);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
@@ -101,9 +101,9 @@ internal sealed class FileServiceTests : UmbracoIntegrationTest
         childOfChild2 = FileService.GetTemplate(childOfChild2.Id);
         Assert.NotNull(childOfChild2);
 
-        Assert.AreEqual($"child", childOfChild1.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild1.LayoutTemplateAlias);
         Assert.AreEqual($"{parent2.Path},{child.Id},{childOfChild1.Id}", childOfChild1.Path);
-        Assert.AreEqual($"child", childOfChild2.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild2.LayoutTemplateAlias);
         Assert.AreEqual($"{parent2.Path},{child.Id},{childOfChild2.Id}", childOfChild2.Path);
     }
 

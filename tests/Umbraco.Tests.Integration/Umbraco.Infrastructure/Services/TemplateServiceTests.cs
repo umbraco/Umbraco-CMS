@@ -41,7 +41,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         child = await TemplateService.GetAsync(child.Key);
         Assert.NotNull(child);
 
-        Assert.AreEqual(parent.Alias, child.MasterTemplateAlias);
+        Assert.AreEqual(parent.Alias, child.LayoutTemplateAlias);
     }
 
     [Test]
@@ -57,7 +57,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         child = await TemplateService.GetAsync(child.Key);
         Assert.NotNull(child);
-        Assert.AreEqual("parent", child.MasterTemplateAlias);
+        Assert.AreEqual("parent", child.LayoutTemplateAlias);
 
         child.Content = "test";
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
@@ -65,7 +65,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         child = await TemplateService.GetAsync(child.Key);
         Assert.NotNull(child);
-        Assert.AreEqual(null, child.MasterTemplateAlias);
+        Assert.AreEqual(null, child.LayoutTemplateAlias);
     }
 
     [Test]
@@ -83,7 +83,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         child = await TemplateService.GetAsync(child.Key);
         Assert.NotNull(child);
-        Assert.AreEqual("parent", child.MasterTemplateAlias);
+        Assert.AreEqual("parent", child.LayoutTemplateAlias);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
@@ -91,7 +91,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         child = await TemplateService.GetAsync(child.Key);
         Assert.NotNull(child);
-        Assert.AreEqual("parent2", child.MasterTemplateAlias);
+        Assert.AreEqual("parent2", child.LayoutTemplateAlias);
     }
 
     [Test]
@@ -117,9 +117,9 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
         var childOfChild2 = result.Result;
 
-        Assert.AreEqual($"child", childOfChild1.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild1.LayoutTemplateAlias);
         Assert.AreEqual($"{parent.Path},{child.Id},{childOfChild1.Id}", childOfChild1.Path);
-        Assert.AreEqual($"child", childOfChild2.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild2.LayoutTemplateAlias);
         Assert.AreEqual($"{parent.Path},{child.Id},{childOfChild2.Id}", childOfChild2.Path);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
@@ -132,9 +132,9 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         childOfChild2 = await TemplateService.GetAsync(childOfChild2.Key);
         Assert.NotNull(childOfChild2);
 
-        Assert.AreEqual($"child", childOfChild1.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild1.LayoutTemplateAlias);
         Assert.AreEqual($"{parent2.Path},{child.Id},{childOfChild1.Id}", childOfChild1.Path);
-        Assert.AreEqual($"child", childOfChild2.MasterTemplateAlias);
+        Assert.AreEqual($"child", childOfChild2.LayoutTemplateAlias);
         Assert.AreEqual($"{parent2.Path},{child.Id},{childOfChild2.Id}", childOfChild2.Path);
     }
 
@@ -204,11 +204,11 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var child = result.Result;
-        Assert.AreEqual("parent", child.MasterTemplateAlias);
+        Assert.AreEqual("parent", child.LayoutTemplateAlias);
 
         result = await TemplateService.DeleteAsync(parent.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.That(result.Status, Is.EqualTo(TemplateOperationStatus.MasterTemplateCannotBeDeleted));
+        Assert.That(result.Status, Is.EqualTo(TemplateOperationStatus.LayoutTemplateCannotBeDeleted));
     }
 
     [Test]
@@ -234,7 +234,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     {
         var result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(TemplateOperationStatus.MasterTemplateNotFound, result.Status);
+        Assert.AreEqual(TemplateOperationStatus.LayoutTemplateNotFound, result.Status);
     }
 
     [Test]
@@ -248,7 +248,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(TemplateOperationStatus.MasterTemplateNotFound, result.Status);
+        Assert.AreEqual(TemplateOperationStatus.LayoutTemplateNotFound, result.Status);
     }
 
     [Test]

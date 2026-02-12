@@ -13,8 +13,8 @@ public class Template : File, ITemplate
 {
     private readonly IShortStringHelper _shortStringHelper;
     private string _alias;
-    private string? _masterTemplateAlias;
-    private Lazy<int>? _masterTemplateId;
+    private string? _layoutTemplateAlias;
+    private Lazy<int>? _layoutTemplateId;
     private string? _name;
 
     /// <summary>
@@ -41,32 +41,32 @@ public class Template : File, ITemplate
         _shortStringHelper = shortStringHelper;
         _name = name;
         _alias = alias?.ToCleanString(shortStringHelper, CleanStringType.UnderscoreAlias) ?? string.Empty;
-        _masterTemplateId = new Lazy<int>(() => -1);
+        _layoutTemplateId = new Lazy<int>(() => -1);
     }
 
     /// <summary>
-    ///     Gets or sets the master template identifier as a lazy-loaded value.
+    ///     Gets or sets the layout template identifier as a lazy-loaded value.
     /// </summary>
     /// <value>
-    ///     A <see cref="Lazy{T}" /> containing the master template's ID, or -1 if there is no master template.
+    ///     A <see cref="Lazy{T}" /> containing the layout template's ID, or -1 if there is no layout template.
     /// </value>
     [DataMember]
-    public Lazy<int>? MasterTemplateId
+    public Lazy<int>? LayoutTemplateId
     {
-        get => _masterTemplateId;
-        set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateId, nameof(MasterTemplateId));
+        get => _layoutTemplateId;
+        set => SetPropertyValueAndDetectChanges(value, ref _layoutTemplateId, nameof(LayoutTemplateId));
     }
 
     /// <summary>
-    ///     Gets or sets the alias of the master (parent) template.
+    ///     Gets or sets the alias of the layout (parent) template.
     /// </summary>
     /// <value>
-    ///     The alias of the master template, or <c>null</c> if this template has no master.
+    ///     The alias of the layout template, or <c>null</c> if this template has no layout.
     /// </value>
-    public string? MasterTemplateAlias
+    public string? LayoutTemplateAlias
     {
-        get => _masterTemplateAlias;
-        set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateAlias, nameof(MasterTemplateAlias));
+        get => _layoutTemplateAlias;
+        set => SetPropertyValueAndDetectChanges(value, ref _layoutTemplateAlias, nameof(LayoutTemplateAlias));
     }
 
     /// <summary>
@@ -96,26 +96,30 @@ public class Template : File, ITemplate
     /// <summary>
     ///     Returns true if the template is used as a layout for other templates (i.e. it has 'children')
     /// </summary>
-    public bool IsMasterTemplate { get; set; }
+    public bool IsLayoutTemplate { get; set; }
 
-    // FIXME: moving forward the master template is calculated from the actual template content; figure out how to get rid of this method, or at least *only* use it from TemplateService
-    /// <summary>
-    ///     Sets the master template for this template.
-    /// </summary>
-    /// <param name="masterTemplate">The master template to set, or <c>null</c> to remove the master template.</param>
-    [Obsolete("MasterTemplate is now calculated from the content. Scheduled for removal in Umbraco 18.")]
-    public void SetMasterTemplate(ITemplate? masterTemplate)
+    /// <inheritdoc cref="LayoutTemplateId" />
+    [Obsolete("Use LayoutTemplateId instead. Scheduled for removal in Umbraco 20.")]
+    public Lazy<int>? MasterTemplateId
     {
-        if (masterTemplate == null)
-        {
-            MasterTemplateId = new Lazy<int>(() => -1);
-            MasterTemplateAlias = null;
-        }
-        else
-        {
-            MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
-            MasterTemplateAlias = masterTemplate.Alias;
-        }
+        get => LayoutTemplateId;
+        set => LayoutTemplateId = value;
+    }
+
+    /// <inheritdoc cref="LayoutTemplateAlias" />
+    [Obsolete("Use LayoutTemplateAlias instead. Scheduled for removal in Umbraco 20.")]
+    public new string? MasterTemplateAlias
+    {
+        get => LayoutTemplateAlias;
+        set => LayoutTemplateAlias = value;
+    }
+
+    /// <inheritdoc cref="IsLayoutTemplate" />
+    [Obsolete("Use IsLayoutTemplate instead. Scheduled for removal in Umbraco 20.")]
+    public bool IsMasterTemplate
+    {
+        get => IsLayoutTemplate;
+        set => IsLayoutTemplate = value;
     }
 
     /// <summary>
