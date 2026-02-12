@@ -2105,7 +2105,7 @@ export default {
 		emptyDictionaryTree: 'Dim eitemau Geiriadur i ddewis ohonynt',
 	},
 	textbox: {
-		characters_left: 'o nodau ar ôl',
+		characters_left: '<strong>%0%</strong> o nodau ar ôl.',
 		characters_exceed: 'Uchafswm o %0% nodau cyfrannol, <strong>%1%</strong> gormod.',
 	},
 	recycleBin: {
