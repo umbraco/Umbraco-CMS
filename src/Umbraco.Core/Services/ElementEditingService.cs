@@ -105,7 +105,7 @@ internal sealed class ElementEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ElementCreateResult());
         }
 
-        if (contentType.AllowedInLibrary is false)
+        if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ElementCreateResult());
         }
