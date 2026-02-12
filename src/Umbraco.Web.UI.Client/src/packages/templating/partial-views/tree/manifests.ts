@@ -5,13 +5,8 @@ import {
 } from '../entity.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
-import { UmbPartialViewTreeStore } from './partial-view-tree.store.js';
 
 export const UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Tree';
-/**
- * @deprecated Use {@link UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
- */
-export const UMB_PARTIAL_VIEW_TREE_STORE_ALIAS = 'Umb.Store.PartialView.Tree';
 export const UMB_PARTIAL_VIEW_TREE_ALIAS = 'Umb.Tree.PartialView';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -20,12 +15,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS,
 		name: 'Partial View Tree Repository',
 		api: () => import('./partial-view-tree.repository.js'),
-	},
-	{
-		type: 'treeStore',
-		alias: UMB_PARTIAL_VIEW_TREE_STORE_ALIAS,
-		name: 'Partial View Tree Store',
-		api: UmbPartialViewTreeStore,
 	},
 	{
 		type: 'tree',

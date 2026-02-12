@@ -1,12 +1,7 @@
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
-import { UmbTemplateTreeStore } from './template-tree.store.js';
 
 export const UMB_TEMPLATE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Template.Tree';
-/**
- * @deprecated Use {@link UMB_TEMPLATE_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
- */
-export const UMB_TEMPLATE_TREE_STORE_ALIAS = 'Umb.Store.Template.Tree';
 export const UMB_TEMPLATE_TREE_ALIAS = 'Umb.Tree.Template';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -15,12 +10,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_TEMPLATE_TREE_REPOSITORY_ALIAS,
 		name: 'Template Tree Repository',
 		api: () => import('./template-tree.repository.js'),
-	},
-	{
-		type: 'treeStore',
-		alias: UMB_TEMPLATE_TREE_STORE_ALIAS,
-		name: 'Template Tree Store',
-		api: UmbTemplateTreeStore,
 	},
 	{
 		type: 'tree',

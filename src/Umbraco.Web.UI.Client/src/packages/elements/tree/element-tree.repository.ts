@@ -14,7 +14,7 @@ export class UmbElementTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ paging: { skip: 0, take: 0 } });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data: UmbElementTreeRootModel = {

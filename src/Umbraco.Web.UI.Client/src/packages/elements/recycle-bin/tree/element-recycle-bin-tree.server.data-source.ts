@@ -11,6 +11,7 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the Element Recycle Bin tree that fetches data from the server
@@ -36,18 +37,25 @@ export class UmbElementRecycleBinTreeServerDataSource extends UmbTreeServerDataS
 	}
 }
 
-const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
+	const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	ElementService.getRecycleBinElementRoot({ query: { skip: args.skip, take: args.take } });
+	const { data, ...rest } = await ElementService.getRecycleBinElementRoot({
+		query: { skip, take },
+	});
+	return { data: { ...data, totalBefore: 0, totalAfter: Math.max(data.total - data.items.length, 0) }, ...rest };
+};
 
-const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
+		const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return ElementService.getRecycleBinElementChildren({
-			query: { parentId: args.parent.unique, skip: args.skip, take: args.take },
+		const { data, ...rest } = await ElementService.getRecycleBinElementChildren({
+			query: { parentId: args.parent.unique, skip, take },
 		});
+		return { data: { ...data, totalBefore: 0, totalAfter: Math.max(data.total - data.items.length, 0) }, ...rest };
 	}
 };
 
