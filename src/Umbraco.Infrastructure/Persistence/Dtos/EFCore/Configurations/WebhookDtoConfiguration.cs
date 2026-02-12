@@ -23,12 +23,10 @@ internal class WebhookDtoConfiguration : IEntityTypeConfiguration<WebhookDto>
             .HasColumnName("name");
 
         builder.Property(x => x.Description)
-            .HasColumnName("description")
-            .HasColumnType("nvarchar(max)");
+            .HasColumnName("description");
 
         builder.Property(x => x.Url)
             .HasColumnName("url")
-            .HasColumnType("nvarchar(max)")
             .IsRequired();
 
         builder.Property(x => x.Enabled)
