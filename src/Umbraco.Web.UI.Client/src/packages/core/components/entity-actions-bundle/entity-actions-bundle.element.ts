@@ -133,7 +133,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			<uui-button
 				label=${label}
 				title=${label}
-				data-mark=${'entity-action:' + this._firstActionManifest.alias}
+				data-mark=${`entity-action:${this._firstActionManifest.alias}`}
 				href=${ifDefined(this._firstActionHref)}
 				@click=${this.#onFirstActionClick}>
 				<umb-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></umb-icon>
