@@ -128,10 +128,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#renderFirstAction() {
 		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
+		const label = this.localize.string(this._firstActionManifest.meta.label, this.label);
 		return html`
 			<uui-button
-				label=${this.localize.string(this._firstActionManifest.meta.label, this.label)}
-				title=${this.localize.string(this._firstActionManifest.meta.label, this.label)}
+				label=${label}
+				title=${label}
 				data-mark=${'entity-action:' + this._firstActionManifest.alias}
 				href=${ifDefined(this._firstActionHref)}
 				@click=${this.#onFirstActionClick}>
