@@ -19,6 +19,7 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement
@@ -86,7 +87,7 @@ export class UmbPropertyEditorUITextareaElement
 		if (newValue === this.value) return;
 		this.value = newValue;
 
-		if (this._maxChars && newValue.length > this._maxChars) {
+		if (isCharacterLimitExceeded(this._maxChars, newValue.length)) {
 			const textarea = this.shadowRoot?.querySelector<UUITextareaElement>('uui-textarea');
 			if (textarea) {
 				textarea.pristine = false;
@@ -99,11 +100,8 @@ export class UmbPropertyEditorUITextareaElement
 	#renderCharacterCount() {
 		if (!this._maxChars || this.readonly) return nothing;
 
-		const currentLength = this.value?.length ?? 0;
-		const remaining = this._maxChars - currentLength;
-
-		const threshold = Math.round(this._maxChars * 0.2);
-		if (remaining > threshold || remaining < 0) return nothing;
+		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
+		if (!visible) return nothing;
 
 		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
 	}

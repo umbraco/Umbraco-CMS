@@ -11,6 +11,7 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement
@@ -91,7 +92,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this.value = newValue;
 
 		// Show exceed validation instantly when limit is reached
-		if (this._maxChars && newValue.length > this._maxChars) {
+		if (isCharacterLimitExceeded(this._maxChars, newValue.length)) {
 			const input = this.shadowRoot?.querySelector('uui-input');
 			if (input) {
 				input.pristine = false;
@@ -104,12 +105,8 @@ export class UmbPropertyEditorUITextBoxElement
 	#renderCharacterCount() {
 		if (!this._maxChars || this.readonly) return nothing;
 
-		const currentLength = this.value?.length ?? 0;
-		const remaining = this._maxChars - currentLength;
-
-		// Only show when within 20% of the limit
-		const threshold = Math.round(this._maxChars * 0.2);
-		if (remaining > threshold || remaining < 0) return nothing;
+		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
+		if (!visible) return nothing;
 
 		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
 	}
