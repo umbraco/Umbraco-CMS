@@ -5,6 +5,7 @@ import {
 	html,
 	ifDefined,
 	property,
+	ref,
 	repeat,
 	state,
 	when,
@@ -19,6 +20,7 @@ export interface UmbTableItem {
 	entityType?: string;
 	data: Array<UmbTableItemData>;
 	selectable?: boolean;
+	onRowElement?: (element: HTMLElement) => void;
 }
 
 export interface UmbTableItemData {
@@ -334,6 +336,9 @@ export class UmbTableElement extends UmbLitElement {
 		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
+				${ref((el) => {
+					if (el) item.onRowElement?.(el as HTMLElement);
+				})}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
 				?select-only=${this._selectionMode || this.config.selectOnly}

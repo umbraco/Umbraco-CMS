@@ -1,11 +1,12 @@
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -59,6 +60,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	private _selection: Array<string> = [];
 
 	#collectionContext?: typeof UMB_DOCUMENT_COLLECTION_CONTEXT.TYPE;
+	#rowHosts = new Map<string, UmbElementControllerHost>();
 
 	constructor() {
 		super();
@@ -121,6 +123,15 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
+		// Clean up hosts for items no longer present
+		const currentIds = new Set(items.map((i) => i.unique));
+		for (const [id, host] of this.#rowHosts) {
+			if (!currentIds.has(id)) {
+				host.destroy();
+				this.#rowHosts.delete(id);
+			}
+		}
+
 		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 
@@ -147,8 +158,18 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			return {
 				id: item.unique,
 				icon: item.documentType.icon,
-				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+				entityType: item.entityType,
 				data: data,
+				onRowElement: (element: HTMLElement) => {
+					if (!this.#rowHosts.has(item.unique)) {
+						const host = new UmbElementControllerHost(element);
+						const context = new UmbEntityContext(host);
+						context.setEntityType(item.entityType);
+						context.setUnique(item.unique);
+						host.hostConnected();
+						this.#rowHosts.set(item.unique, host);
+					}
+				},
 			};
 		});
 	}
@@ -175,6 +196,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			orderBy: orderingColumn,
 			orderDirection: orderingDesc ? 'desc' : 'asc',
 		});
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		for (const [, host] of this.#rowHosts) {
+			host.destroy();
+		}
+		this.#rowHosts.clear();
 	}
 
 	override render() {
