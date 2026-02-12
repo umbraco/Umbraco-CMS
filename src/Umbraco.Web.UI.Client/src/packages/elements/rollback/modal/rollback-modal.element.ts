@@ -312,6 +312,8 @@ export class UmbElementRollbackModalElement extends UmbModalBaseElement<
 					return html`
 						<div
 							@click=${() => this.#onVersionClicked(item.id)}
+							role="button"
+							tabindex="0"
 							@keydown=${() => {}}
 							class="rollback-item ${this._selectedVersion?.id === item.id ? 'active' : ''}">
 							<div>
