@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Manifest;
 [ApiExplorerSettings(GroupName = "Manifest")]
 public abstract class ManifestControllerBase : ManagementApiControllerBase
 {
-    protected static IEnumerable<ManifestResponseModel> ReplaceCacheBusterTokens(
+    protected static void ReplaceCacheBusterTokens(
         IEnumerable<ManifestResponseModel> models, string cacheBustHash)
     {
         foreach (ManifestResponseModel model in models)
@@ -29,7 +29,5 @@ public abstract class ManifestControllerBase : ManagementApiControllerBase
             json = json.Replace(Constants.Web.CacheBusterToken, cacheBustHash);
             model.Extensions = JsonSerializer.Deserialize<object[]>(json) ?? model.Extensions;
         }
-
-        return models;
     }
 }

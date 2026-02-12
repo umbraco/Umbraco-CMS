@@ -49,6 +49,7 @@ public class PublicManifestManifestController : ManifestControllerBase
     {
         IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetPublicPackageManifestsAsync();
         IEnumerable<ManifestResponseModel> models = _umbracoMapper.MapEnumerable<PackageManifest, ManifestResponseModel>(packageManifests);
-        return Ok(ReplaceCacheBusterTokens(models, _backOfficePathGenerator.BackOfficeCacheBustHash));
+        ReplaceCacheBusterTokens(models, _backOfficePathGenerator.BackOfficeCacheBustHash);
+        return Ok(models);
     }
 }

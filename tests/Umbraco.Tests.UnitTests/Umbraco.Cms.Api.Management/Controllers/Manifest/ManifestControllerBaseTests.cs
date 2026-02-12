@@ -20,9 +20,10 @@ public class ManifestControllerBaseTests
                     """{"type":"js","js":"/App_Plugins/Foo/bundle.js?v=%CACHE_BUSTER%"}"""),
             ]);
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens([model], CacheBustHash).ToList();
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
-        var json = JsonSerializer.Serialize(result[0].Extensions);
+        var json = JsonSerializer.Serialize(models[0].Extensions);
         Assert.That(json, Does.Contain(CacheBustHash));
         Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
     }
@@ -36,9 +37,10 @@ public class ManifestControllerBaseTests
                     """{"type":"js","js":"/App_Plugins/Foo/bundle.js?v=%CACHE_BUSTER%","element":"/App_Plugins/Foo/element.js?v=%CACHE_BUSTER%"}"""),
             ]);
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens([model], CacheBustHash).ToList();
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
-        var json = JsonSerializer.Serialize(result[0].Extensions);
+        var json = JsonSerializer.Serialize(models[0].Extensions);
         Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={CacheBustHash}"));
         Assert.That(json, Does.Contain($"/App_Plugins/Foo/element.js?v={CacheBustHash}"));
         Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
@@ -53,9 +55,10 @@ public class ManifestControllerBaseTests
                     """{"type":"js","js":"/App_Plugins/Foo/bundle.js"}"""),
             ]);
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens([model], CacheBustHash).ToList();
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
-        var json = JsonSerializer.Serialize(result[0].Extensions);
+        var json = JsonSerializer.Serialize(models[0].Extensions);
         Assert.That(json, Does.Contain("/App_Plugins/Foo/bundle.js"));
         Assert.That(json, Does.Not.Contain(CacheBustHash));
     }
@@ -65,9 +68,10 @@ public class ManifestControllerBaseTests
     {
         var model = CreateModel(Array.Empty<object>());
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens([model], CacheBustHash).ToList();
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
-        Assert.That(result[0].Extensions, Is.Empty);
+        Assert.That(models[0].Extensions, Is.Empty);
     }
 
     [Test]
@@ -89,20 +93,20 @@ public class ManifestControllerBaseTests
 
         var modelEmpty = CreateModel(Array.Empty<object>(), "PackageC");
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens(
-            [modelWithToken, modelWithoutToken, modelEmpty], CacheBustHash).ToList();
+        List<ManifestResponseModel> models = [modelWithToken, modelWithoutToken, modelEmpty];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
         Assert.Multiple(() =>
         {
-            var jsonA = JsonSerializer.Serialize(result[0].Extensions);
+            var jsonA = JsonSerializer.Serialize(models[0].Extensions);
             Assert.That(jsonA, Does.Contain(CacheBustHash));
             Assert.That(jsonA, Does.Not.Contain(Constants.Web.CacheBusterToken));
 
-            var jsonB = JsonSerializer.Serialize(result[1].Extensions);
+            var jsonB = JsonSerializer.Serialize(models[1].Extensions);
             Assert.That(jsonB, Does.Contain("/App_Plugins/B/b.js"));
             Assert.That(jsonB, Does.Not.Contain(CacheBustHash));
 
-            Assert.That(result[2].Extensions, Is.Empty);
+            Assert.That(models[2].Extensions, Is.Empty);
         });
     }
 
@@ -115,9 +119,10 @@ public class ManifestControllerBaseTests
                     """{"type":"bundle","meta":{"loader":"/App_Plugins/Foo/loader.js?v=%CACHE_BUSTER%"}}"""),
             ]);
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens([model], CacheBustHash).ToList();
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
-        var json = JsonSerializer.Serialize(result[0].Extensions);
+        var json = JsonSerializer.Serialize(models[0].Extensions);
         Assert.That(json, Does.Contain($"/App_Plugins/Foo/loader.js?v={CacheBustHash}"));
         Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
     }
@@ -125,16 +130,16 @@ public class ManifestControllerBaseTests
     [Test]
     public void ReplaceCacheBusterTokens_Preserves_All_Models_In_Output()
     {
-        var models = Enumerable.Range(0, 5)
+        List<ManifestResponseModel> models = Enumerable.Range(0, 5)
             .Select(i => CreateModel(Array.Empty<object>(), $"Package{i}"))
-            .ToArray();
+            .ToList();
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash).ToList();
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
-        Assert.That(result, Has.Count.EqualTo(5));
+        Assert.That(models, Has.Count.EqualTo(5));
         for (var i = 0; i < 5; i++)
         {
-            Assert.That(result[i].Name, Is.EqualTo($"Package{i}"));
+            Assert.That(models[i].Name, Is.EqualTo($"Package{i}"));
         }
     }
 
@@ -151,9 +156,10 @@ public class ManifestControllerBaseTests
                     """{"js":"/App_Plugins/Foo/three.js"}"""),
             ]);
 
-        var result = TestableManifestControllerBase.TestReplaceCacheBusterTokens([model], CacheBustHash).ToList();
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
-        var json = JsonSerializer.Serialize(result[0].Extensions);
+        var json = JsonSerializer.Serialize(models[0].Extensions);
         Assert.Multiple(() =>
         {
             Assert.That(json, Does.Contain($"/App_Plugins/Foo/one.js?v={CacheBustHash}"));
@@ -171,7 +177,7 @@ public class ManifestControllerBaseTests
     /// </summary>
     private class TestableManifestControllerBase : ManifestControllerBase
     {
-        public static IEnumerable<ManifestResponseModel> TestReplaceCacheBusterTokens(
+        public static void TestReplaceCacheBusterTokens(
             IEnumerable<ManifestResponseModel> models, string cacheBustHash)
             => ReplaceCacheBusterTokens(models, cacheBustHash);
     }
