@@ -52,8 +52,8 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
             ["required"] = new JsonArray("contentKey"),
             ["properties"] = new JsonObject
             {
-                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
-                ["settingsKey"] = new JsonObject { ["type"] = new JsonArray("string", "null"), ["format"] = "uuid" },
+                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
+                ["settingsKey"] = new JsonObject { ["type"] = new JsonArray("string", "null"), ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
             },
         };
 
@@ -64,8 +64,8 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
             ["required"] = new JsonArray("key", "contentTypeKey"),
             ["properties"] = new JsonObject
             {
-                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
-                ["contentTypeKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
+                ["contentTypeKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
                 ["values"] = new JsonObject
                 {
                     ["type"] = "array",
@@ -90,7 +90,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
             ["type"] = "object",
             ["properties"] = new JsonObject
             {
-                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
                 ["culture"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
                 ["segment"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
             },

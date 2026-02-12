@@ -28,15 +28,14 @@ public class TrueFalsePropertyEditor : DataEditor, IValueSchemaProvider
         => SupportsReadOnly = true;
 
     /// <inheritdoc />
-    public Type? GetValueType(object? configuration) => typeof(int);
+    public Type? GetValueType(object? configuration) => typeof(bool);
 
     /// <inheritdoc />
     public JsonObject? GetValueSchema(object? configuration) => new()
     {
         ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
-        ["type"] = "integer",
-        ["enum"] = new JsonArray(0, 1),
-        ["description"] = "Boolean value stored as integer: 0 = false, 1 = true",
+        ["type"] = "boolean",
+        ["description"] = "Boolean value (true or false)",
     };
 
     /// <inheritdoc />

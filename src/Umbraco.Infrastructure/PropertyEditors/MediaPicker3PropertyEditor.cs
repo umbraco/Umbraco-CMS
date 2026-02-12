@@ -57,8 +57,8 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
             ["required"] = new JsonArray("key", "mediaKey"),
             ["properties"] = new JsonObject
             {
-                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
-                ["mediaKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
+                ["mediaKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
                 ["mediaTypeAlias"] = new JsonObject { ["type"] = "string" },
                 ["crops"] = BuildCropsSchema(config),
                 ["focalPoint"] = BuildFocalPointSchema(config),

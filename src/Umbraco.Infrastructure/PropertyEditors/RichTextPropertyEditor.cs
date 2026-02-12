@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -28,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.RichText,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class RichTextPropertyEditor : DataEditor
+public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
     private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
@@ -54,6 +55,31 @@ public class RichTextPropertyEditor : DataEditor
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _richTextPropertyIndexValueFactory;
 
     public override bool SupportsConfigurableElements => true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(RichTextEditorValue);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("object", "null"),
+        ["properties"] = new JsonObject
+        {
+            ["markup"] = new JsonObject
+            {
+                ["type"] = "string",
+                ["description"] = "HTML markup content",
+            },
+            ["blocks"] = new JsonObject
+            {
+                ["type"] = new JsonArray("object", "null"),
+                ["description"] = "Block editor data (configuration-dependent structure)",
+            },
+        },
+        ["required"] = new JsonArray("markup"),
+        ["description"] = "Rich text editor value with HTML markup and optional blocks",
+    };
 
     /// <inheritdoc />
     public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;

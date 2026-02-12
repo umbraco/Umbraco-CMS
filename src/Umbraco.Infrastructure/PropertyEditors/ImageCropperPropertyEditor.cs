@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -26,6 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class ImageCropperPropertyEditor : DataEditor,
     IMediaUrlGenerator,
+    IValueSchemaProvider,
     INotificationHandler<ContentCopiedNotification>,
     INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>,
@@ -71,6 +73,68 @@ public class ImageCropperPropertyEditor : DataEditor,
     }
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(ImageCropperValue);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("object", "null"),
+        ["properties"] = new JsonObject
+        {
+            ["src"] = new JsonObject
+            {
+                ["type"] = new JsonArray("string", "null"),
+                ["description"] = "Source image path",
+            },
+            ["temporaryFileId"] = new JsonObject
+            {
+                ["type"] = new JsonArray("string", "null"),
+                ["format"] = "uuid",
+                ["pattern"] = ValueSchemaPatterns.Uuid,
+                ["description"] = "Temporary file ID for new uploads",
+            },
+            ["focalPoint"] = new JsonObject
+            {
+                ["type"] = new JsonArray("object", "null"),
+                ["properties"] = new JsonObject
+                {
+                    ["left"] = new JsonObject { ["type"] = "number" },
+                    ["top"] = new JsonObject { ["type"] = "number" },
+                },
+                ["description"] = "Focal point coordinates (0-1 range)",
+            },
+            ["crops"] = new JsonObject
+            {
+                ["type"] = new JsonArray("array", "null"),
+                ["items"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        ["alias"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
+                        ["width"] = new JsonObject { ["type"] = "integer" },
+                        ["height"] = new JsonObject { ["type"] = "integer" },
+                        ["coordinates"] = new JsonObject
+                        {
+                            ["type"] = new JsonArray("object", "null"),
+                            ["properties"] = new JsonObject
+                            {
+                                ["x1"] = new JsonObject { ["type"] = "number" },
+                                ["y1"] = new JsonObject { ["type"] = "number" },
+                                ["x2"] = new JsonObject { ["type"] = "number" },
+                                ["y2"] = new JsonObject { ["type"] = "number" },
+                            },
+                        },
+                    },
+                },
+                ["description"] = "Image crop definitions",
+            },
+        },
+        ["description"] = "Image cropper value with source, focal point, and crop definitions",
+    };
 
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
     {

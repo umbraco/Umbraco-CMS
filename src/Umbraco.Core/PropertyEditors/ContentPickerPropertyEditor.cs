@@ -45,8 +45,9 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     {
         ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
         ["type"] = new JsonArray("string", "null"),
-        ["pattern"] = "^umb:\\/\\/document\\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
-        ["description"] = "UDI reference to a document (e.g., umb://document/a1b2c3d4-e5f6-7890-1234-567890abcdef)",
+        ["format"] = "uuid",
+        ["pattern"] = ValueSchemaPatterns.Uuid,
+        ["description"] = "GUID of the selected document",
     };
 
     /// <inheritdoc />
