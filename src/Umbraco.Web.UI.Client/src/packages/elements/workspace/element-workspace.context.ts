@@ -4,6 +4,7 @@ import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/consta
 import type { UmbElementDetailRepository } from '../repository/index.js';
 import type { UmbElementDetailModel, UmbElementVariantModel } from '../types.js';
 import { UMB_ELEMENT_COLLECTION_ALIAS } from '../collection/constants.js';
+import { UmbElementValidationRepository } from '../repository/validation/index.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from './constants.js';
 import { UmbElementWorkspacePropertyDatasetContext } from './property-dataset-context/element-workspace-property-dataset-context.js';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
@@ -53,6 +54,7 @@ export class UmbElementWorkspaceContext
 			collectionAlias: UMB_ELEMENT_COLLECTION_ALIAS,
 			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
+			contentValidationRepository: UmbElementValidationRepository,
 			skipValidationOnSubmit: false,
 			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
