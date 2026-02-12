@@ -1297,7 +1297,8 @@ export default {
 		emptyDictionaryTree: 'Brak elementów słownika do wyboru',
 	},
 	textbox: {
-		characters_left: 'pozostało znaków',
+		characters_left: 'Pozostało <strong>%0%</strong> znaków.',
+		characters_exceed: 'Maksymalnie %0% znaków, <strong>%1%</strong> za dużo.',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Zaznacz wszystko',
