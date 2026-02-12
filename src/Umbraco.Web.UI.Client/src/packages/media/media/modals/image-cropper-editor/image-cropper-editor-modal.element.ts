@@ -277,9 +277,6 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	];
 }
 
-/** @deprecated Should be exported as `element` only; to be removed in Umbraco 18. */
-export default UmbImageCropperEditorModalElement;
-
 export { UmbImageCropperEditorModalElement as element };
 
 declare global {

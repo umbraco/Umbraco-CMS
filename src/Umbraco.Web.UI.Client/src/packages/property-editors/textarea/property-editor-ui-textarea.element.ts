@@ -52,14 +52,10 @@ export class UmbPropertyEditorUITextareaElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
-		// min/max height where for a short period present in the config, but we do not want this complexity of our configuration.
-		// @deprecated remove config option in v.18, leave good default.
-		const _minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
-		const _maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
 
 		this._css = {
-			'--uui-textarea-min-height': _minHeight ? `${_minHeight}px` : 'reset',
-			'--uui-textarea-max-height': _maxHeight ? `${_maxHeight}px` : '33vh',
+			'--uui-textarea-min-height': 'reset',
+			'--uui-textarea-max-height': '33vh',
 		};
 	}
 
