@@ -110,6 +110,7 @@ export class UmbPropertyEditorUITextBoxElement
 
 		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
 	}
+
 	override render() {
 		return html`
 			<uui-input
