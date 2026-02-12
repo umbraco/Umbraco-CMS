@@ -92,7 +92,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                 Height = options.Height,
                 Width = options.Width,
                 ImageCropMode = options.Mode,
-                Format = DetermineOutputFormat(url, options.Format),
+                Format = DetermineOutputFormat(extension, options.Format),
             };
 
             var relativeUrl = _imageUrlGenerator.GetImageUrl(imageOptions);
@@ -110,9 +110,9 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     }
 
     /// <summary>
-    /// Determines the appropriate output format for an image based on the source URL and requested format.
+    /// Determines the appropriate output format for an image based on the file extension and requested format.
     /// </summary>
-    /// <param name="imageUrl">The source image URL.</param>
+    /// <param name="extension">The source file extension (without leading dot, lowercase).</param>
     /// <param name="requestedFormat">The explicitly requested format (from API request), or null to use automatic determination.</param>
     /// <returns>The format to use for the output image, or null to keep the original format.</returns>
     /// <remarks>
@@ -121,15 +121,13 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     /// 2. If the source file is not a native image format (e.g., PDF), convert to WebP
     /// 3. For native image formats (JPG, PNG, etc.), keep original format (null = no conversion)
     /// </remarks>
-    private string? DetermineOutputFormat(string imageUrl, string? requestedFormat)
+    private string? DetermineOutputFormat(string extension, string? requestedFormat)
     {
         // If user explicitly requested a format, honor it
         if (!string.IsNullOrWhiteSpace(requestedFormat))
         {
             return requestedFormat;
         }
-
-        var extension = new Uri(imageUrl, UriKind.RelativeOrAbsolute).GetFileExtension();
 
         if (string.IsNullOrEmpty(extension))
         {
