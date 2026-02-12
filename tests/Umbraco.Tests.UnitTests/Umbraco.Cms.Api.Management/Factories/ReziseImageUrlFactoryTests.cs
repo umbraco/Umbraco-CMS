@@ -252,24 +252,6 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo!.Url, Does.Contain("mode=crop"));
     }
 
-    [Test]
-    public void CreateUrlSets_ObsoleteOverload_StillWorks()
-    {
-        // Arrange
-        var factory = CreateFactory();
-        var media = CreateMediaWithUrl("/media/document.pdf");
-        var options = new ImageResizeOptions(Height: 200, Width: 200, Mode: ImageCropMode.Crop);
-
-        // Act
-        var result = factory.CreateUrlSets([media], options).ToList();
-
-        // Assert
-        Assert.That(result, Has.Count.EqualTo(1));
-        var urlInfo = result[0].UrlInfos.FirstOrDefault();
-        Assert.That(urlInfo, Is.Not.Null);
-        Assert.That(urlInfo!.Url, Does.Contain("format=webp"));
-    }
-
     private static ReziseImageUrlFactory CreateFactory(ISet<string>? trueImageFormats = null)
     {
         var contentSettings = CreateContentSettings();

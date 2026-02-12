@@ -13,7 +13,7 @@ public interface IReziseImageUrlFactory
     /// <param name="width">The width of the resized image.</param>
     /// <param name="mode">The crop mode.</param>
     /// <returns>A collection of media URL info response models.</returns>
-    [Obsolete("Use the overload that accepts ImageResizeOptions instead. This method will be removed in v19.")]
+    [Obsolete("Use the overload that accepts ImageResizeOptions instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode);
 
     /// <summary>
@@ -22,5 +22,9 @@ public interface IReziseImageUrlFactory
     /// <param name="mediaItems">The media items to create URLs for.</param>
     /// <param name="options">The resize options including optional format conversion.</param>
     /// <returns>A collection of media URL info response models.</returns>
-    IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options);
+    // TODO (V18): Remove this default implementation.
+    IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => CreateUrlSets(mediaItems, options.Height, options.Width, options.Mode);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

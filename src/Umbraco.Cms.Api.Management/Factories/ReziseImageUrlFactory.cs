@@ -11,6 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+// TODO (V18): Fix the typo by renaming this class to ResizeImageUrlFactory (and also the corresponding test class).
 public class ReziseImageUrlFactory : IReziseImageUrlFactory
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -19,7 +20,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
-    [Obsolete("Use the constructor with IOptions<ContentImagingSettings> parameter. This constructor will be removed in v19.")]
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReziseImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,
@@ -49,7 +50,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     }
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that accepts ImageResizeOptions instead. This method will be removed in v19.")]
+    [Obsolete("Use the overload that accepts ImageResizeOptions instead. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode)
         => CreateUrlSets(mediaItems, new ImageResizeOptions(height, width, mode));
 
@@ -70,8 +71,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     {
         foreach (var url in urls)
         {
-            var path = url.Split('?')[0];
-            var extension = Path.GetExtension(path).TrimStart('.');
+            var extension = new Uri(url, UriKind.RelativeOrAbsolute).GetFileExtension();
             if (_imageUrlGenerator.SupportedImageFileTypes.InvariantContains(extension) is false)
             {
                 // It's okay to return just the image URL for SVGs, as they are always scalable.
@@ -129,30 +129,16 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
             return requestedFormat;
         }
 
-        // Extract extension from URL
-        try
+        var extension = new Uri(imageUrl, UriKind.RelativeOrAbsolute).GetFileExtension();
+
+        if (string.IsNullOrEmpty(extension))
         {
-            var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
-            var path = uri.IsAbsoluteUri ? uri.LocalPath : imageUrl.Split('?')[0];
-            var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
-
-            if (string.IsNullOrEmpty(extension))
-            {
-                return null;
-            }
-
-            // Check if this is a native image format
-            var isNativeImageFormat = _imagingSettings.ImageFileTypes
-                .Any(format => format.Equals(extension, StringComparison.OrdinalIgnoreCase));
-
-            // If not a native image format (e.g., PDF), convert to WebP
-            // For native image formats, return null to keep original
-            return isNativeImageFormat ? null : "webp";
-        }
-        catch (UriFormatException)
-        {
-            // If URL parsing fails, treat as a native image and don't convert
             return null;
         }
+
+        var isNativeImageFormat = _imagingSettings.ImageFileTypes
+            .Any(format => format.Equals(extension, StringComparison.OrdinalIgnoreCase));
+
+        return isNativeImageFormat ? null : "webp";
     }
 }
