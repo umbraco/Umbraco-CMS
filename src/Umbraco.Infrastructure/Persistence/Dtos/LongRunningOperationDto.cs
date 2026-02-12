@@ -18,7 +18,7 @@ internal class LongRunningOperationDto
     public Guid Id { get; set; }
 
     [Column("type")]
-    [Length(50)]
+    [Length(200)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Type { get; set; } = null!;
 

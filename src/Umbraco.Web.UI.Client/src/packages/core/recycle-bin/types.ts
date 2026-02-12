@@ -1,3 +1,4 @@
+export type * from './collection-action/index.js';
 export type * from './conditions/types.js';
 export type * from './entity-action/types.js';
 export type * from './entity-bulk-action/types.js';
