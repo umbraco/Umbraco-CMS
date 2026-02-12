@@ -29,22 +29,12 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IScopeAccessor>(sp => sp.GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>());
         builder.Services.AddUnique<IScopeProvider>(sp => sp.GetRequiredService<IEFCoreScopeProvider<UmbracoDbContext>>());
 
-        // OpenIddictDbContext — runtime context for OpenIddict with change tracking enabled.
-        builder.Services.AddPooledDbContextFactory<OpenIddictDbContext>((sp, options) =>
-        {
-            options.UseUmbracoDatabaseProvider(sp);
-            options.UseOpenIddict();
-        });
-        builder.Services.AddTransient(sp =>
-            sp.GetRequiredService<IDbContextFactory<OpenIddictDbContext>>().CreateDbContext());
-
-        // Point OpenIddict runtime to the dedicated context.
         builder.Services.AddOpenIddict()
             .AddCore(options =>
             {
                 options
                     .UseEntityFrameworkCore()
-                    .UseDbContext<OpenIddictDbContext>();
+                    .UseDbContext<UmbracoDbContext>();
             });
         return builder;
     }
