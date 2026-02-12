@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;
 /// Implements distributed locking for SQL Server databases using EF Core.
 /// </summary>
 /// <typeparam name="T">The type of DbContext.</typeparam>
-internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
+public sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
     private ConnectionStrings _connectionStrings;
