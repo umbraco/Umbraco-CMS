@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
@@ -28,7 +29,40 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+    private readonly TemplateByGuidReadRepository _templateByGuidReadRepository;
 
+    public TemplateRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<TemplateRepository> logger,
+        ILoggerFactory loggerFactory,
+        FileSystems fileSystems,
+        IShortStringHelper shortStringHelper,
+        IViewHelper viewHelper,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
+    {
+        _shortStringHelper = shortStringHelper;
+        _viewsFileSystem = fileSystems.MvcViewsFileSystem;
+        _viewHelper = viewHelper;
+        _runtimeSettings = runtimeSettings;
+        _templateByGuidReadRepository = new TemplateByGuidReadRepository(
+            this,
+            scopeAccessor,
+            cache,
+            loggerFactory.CreateLogger<TemplateByGuidReadRepository>(),
+            repositoryCacheVersionService,
+            cacheSyncService);
+    }
+
+    [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -36,13 +70,47 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         FileSystems fileSystems,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
-        : base(scopeAccessor, cache, logger)
+        IOptionsMonitor<RuntimeSettings> runtimeSettings,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            cache,
+            logger,
+            Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance,
+            fileSystems,
+            shortStringHelper,
+            viewHelper,
+            runtimeSettings,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
-        _shortStringHelper = shortStringHelper;
-        _viewsFileSystem = fileSystems.MvcViewsFileSystem;
-        _viewHelper = viewHelper;
-        _runtimeSettings = runtimeSettings;
+    }
+
+    public ITemplate? Get(Guid key) => _templateByGuidReadRepository.Get(key);
+
+    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys) => _templateByGuidReadRepository.GetMany(keys);
+
+    public bool Exists(Guid id) => _templateByGuidReadRepository.Exists(id);
+
+    public override void Save(ITemplate entity)
+    {
+        base.Save(entity);
+
+        // Force population of the full dataset cache so subsequent lookups don't hit the database.
+        // TemplateRepository uses FullDataSetRepositoryCachePolicy which caches all templates together.
+        GetMany();
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+        _templateByGuidReadRepository.PopulateCacheByKey(entity);
+    }
+
+    public override void Delete(ITemplate entity)
+    {
+        base.Delete(entity);
+
+        // Also clear the GUID cache so subsequent lookups by GUID don't return stale data.
+        _templateByGuidReadRepository.ClearCacheByKey(entity.Key);
     }
 
     public Stream GetFileContentStream(string filepath)
@@ -85,30 +153,34 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ITemplate, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ITemplate, int>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            RepositoryCacheVersionService,
+            CacheSyncService,
+            GetEntityId,
+            /*expires:*/ false);
 
     private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
     {
-        //look up the simple template definitions that have a master template assigned, this is used
+        // look up the simple template definitions that have a master template assigned, this is used
         // later to populate the template item's properties
         Sql<ISqlContext> childIdsSql = SqlContext.Sql()
-            .Select("nodeId,alias,parentID")
+            .Select<TemplateDto>(t => t.NodeId, t => t.Alias)
+            .AndSelect<NodeDto>(n => n.ParentId)
             .From<TemplateDto>()
             .InnerJoin<NodeDto>()
-            .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-            //lookup axis's
-            .Where(
-                "umbracoNode." + SqlContext.SqlSyntax.GetQuotedColumnName("id") +
-                " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
-                new
-                {
-                    parentIds = templates.Select(x => x.NodeDto.ParentId),
-                    childIds = templates.Select(x => x.NodeId)
-                });
+            .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+
+            // lookup axis's
+            .WhereInOr<NodeDto, NodeDto>(
+                n => n.NodeId,
+                n2 => n2.ParentId,
+                templates.Select(x => x.NodeDto.ParentId),
+                templates.Select(x => x.NodeId));
 
         IEnumerable<EntitySlim> childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
-            .Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias});
+            .Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias });
 
         return childIds;
     }
@@ -124,7 +196,10 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     /// <returns></returns>
     private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
     {
-        Template template = TemplateFactory.BuildEntity(_shortStringHelper, dto, axisDefinitions,
+        Template template = TemplateFactory.BuildEntity(
+            _shortStringHelper,
+            dto,
+            axisDefinitions,
             file => GetFileContent((Template)file, false));
 
         if (dto.NodeDto.ParentId > 0)
@@ -298,9 +373,19 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     #region Overrides of RepositoryBase<int,ITemplate>
 
-    protected override ITemplate? PerformGet(int id) =>
+    protected override ITemplate? PerformGet(int id)
+    {
         //use the underlying GetAll which will force cache all templates
-        GetMany().FirstOrDefault(x => x.Id == id);
+        ITemplate? template = GetMany().FirstOrDefault(x => x.Id == id);
+
+        if (template != null)
+        {
+            // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+            _templateByGuidReadRepository.PopulateCacheByKey(template);
+        }
+
+        return template;
+    }
 
     protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
     {
@@ -308,7 +393,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         if (ids?.Any() ?? false)
         {
-            sql.Where("umbracoNode.id in (@ids)", new {ids});
+            sql.Where($"{QuoteTableName("umbracoNode")}.id in (@ids)", new { ids });
         }
         else
         {
@@ -326,10 +411,15 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = (ids?.Any() ?? false
                 ? GetAxisDefinitions(dtos.ToArray())
-                : dtos.Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias}))
+                : dtos.Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias }))
             .ToArray();
 
-        return dtos.Select(d => MapFromDto(d, childIds));
+        ITemplate[] templates = dtos.Select(d => MapFromDto(d, childIds)).ToArray();
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+        _templateByGuidReadRepository.PopulateCacheByKey(templates);
+
+        return templates;
     }
 
     protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query)
@@ -373,23 +463,25 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var nodeId = QuoteColumnName("nodeId");
+        var umbracoNode = QuoteTableName(NodeDto.TableName);
         var list = new List<string>
         {
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "UPDATE " + Constants.DatabaseSchema.Tables.DocumentVersion +
-            " SET templateId = NULL WHERE templateId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Template + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {nodeId} = @id",
+            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentVersion)}
+                SET {QuoteColumnName("templateId")} = NULL WHERE {QuoteColumnName("templateId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentType)} WHERE {QuoteColumnName("templateNodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Template)} WHERE {nodeId} = @id",
+            $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;
     }
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
+    private Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
 
     protected override void PersistNewItem(ITemplate entity)
     {
@@ -474,10 +566,10 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
 
         //Get TemplateDto from db to get the Primary key of the entity
-        TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new {entity.Id});
+        TemplateDto templateDto = Database.Single<TemplateDto>($"WHERE {QuoteColumnName("nodeId")} = @Id", new { entity.Id });
 
         //Save updated entity to db
-        template.UpdateDate = DateTime.Now;
+        template.UpdateDate = DateTime.UtcNow;
         TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
         Database.Update(dto.NodeDto);
         Database.Update(dto);
@@ -538,20 +630,20 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         {
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new {id = GetEntityId(descendant)});
+                Database.Execute(delete, new { id = GetEntityId(descendant) });
             }
         }
 
         //now we can delete this one
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new {id = GetEntityId(entity)});
+            Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
         var viewName = string.Concat(entity.Alias, ".cshtml");
         _viewsFileSystem?.DeleteFile(viewName);
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     #endregion
@@ -639,6 +731,108 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         {
             AddChildren(all, descendants, child.Alias);
         }
+    }
+
+    #endregion
+
+    #region Read Repository implementation for Guid keys
+
+    // Reading repository purely for looking up by GUID.
+    // This leverages the outer repository's GetMany() which uses FullDataSetRepositoryCachePolicy
+    // to cache all templates together, ensuring efficient lookups by both ID and GUID.
+    private sealed class TemplateByGuidReadRepository : EntityRepositoryBase<Guid, ITemplate>
+    {
+        private readonly TemplateRepository _outerRepo;
+
+        public TemplateByGuidReadRepository(
+            TemplateRepository outerRepo,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<TemplateByGuidReadRepository> logger,
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService,
+                cacheSyncService) =>
+            _outerRepo = outerRepo;
+
+        protected override ITemplate? PerformGet(Guid id)
+        {
+            // Use the outer repository's GetMany() which benefits from FullDataSetRepositoryCachePolicy.
+            // This ensures all templates are cached together for efficient lookups.
+            return _outerRepo.GetMany().FirstOrDefault(x => x.Key == id);
+        }
+
+        protected override IEnumerable<ITemplate> PerformGetAll(params Guid[]? ids)
+        {
+            // Use the outer repository's GetMany() which benefits from FullDataSetRepositoryCachePolicy.
+            IEnumerable<ITemplate> all = _outerRepo.GetMany();
+
+            if (ids?.Length > 0)
+            {
+                return all.Where(x => ids.Contains(x.Key)).ToArray();
+            }
+
+            return all;
+        }
+
+        protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override IEnumerable<string> GetDeleteClauses() =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override void PersistNewItem(ITemplate entity) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override void PersistUpdatedItem(ITemplate entity) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        protected override string GetBaseWhereClause() =>
+            throw new InvalidOperationException("This method won't be implemented.");
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entity.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(ITemplate entity)
+        {
+            if (entity.HasIdentity)
+            {
+                var cacheKey = GetCacheKey(entity.Key);
+                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            }
+        }
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entities.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(IEnumerable<ITemplate> entities)
+        {
+            foreach (ITemplate entity in entities)
+            {
+                PopulateCacheByKey(entity);
+            }
+        }
+
+        /// <summary>
+        /// Clears the GUID-keyed cache entry for the given key.
+        /// This ensures deleted entities are not returned from the cache.
+        /// </summary>
+        public void ClearCacheByKey(Guid key)
+        {
+            var cacheKey = GetCacheKey(key);
+            IsolatedCache.Clear(cacheKey);
+        }
+
+        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<ITemplate>() + key;
     }
 
     #endregion

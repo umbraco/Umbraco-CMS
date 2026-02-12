@@ -19,13 +19,13 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     private readonly IPackagingService _packagingService;
     private readonly IPackagePresentationFactory _packagePresentationFactory;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V18.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper)
         : this(packagingService, StaticServiceProvider.Instance.GetRequiredService<IPackagePresentationFactory>())
     {
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V18.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper, IPackagePresentationFactory packagePresentationFactory)
         : this(packagingService, packagePresentationFactory)
     {
@@ -41,12 +41,15 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     /// <summary>
     ///     Gets a paginated list of the migration status of each installed package.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the installed packages migration status.</returns>
     [HttpGet("migration-status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PackageMigrationStatusResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets all package migration statuses.")]
+    [EndpointDescription("Gets a paginated collection of migration status for all installed packages.")]
     public async Task<ActionResult<PagedViewModel<PackageMigrationStatusResponseModel>>> AllMigrationStatuses(
         CancellationToken cancellationToken,
         int skip = 0,

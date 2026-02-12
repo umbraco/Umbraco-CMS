@@ -31,17 +31,16 @@ test('can create content with one tag', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickPlusIconButton();
   await umbracoUi.content.enterTag(tagsName[0]);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value).toEqual([tagsName[0]]);
 });
 
-test('can publish content with multiple tags', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with multiple tags', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -54,10 +53,9 @@ test('can publish content with multiple tags', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickPlusIconButton();
   await umbracoUi.content.enterTag(tagsName[0]);
   await umbracoUi.content.enterTag(tagsName[1]);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -74,10 +72,9 @@ test('can remove a tag in the content', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeTagByName(tagsName[0]);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);

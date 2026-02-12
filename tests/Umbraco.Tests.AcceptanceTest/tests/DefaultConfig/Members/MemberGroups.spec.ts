@@ -17,16 +17,15 @@ test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
-  await umbracoUi.memberGroup.clickSaveButton();
+  await umbracoUi.memberGroup.clickSaveButtonAndWaitForMemberGroupToBeCreated();
 
   // Assert
-  await umbracoUi.memberGroup.waitForMemberGroupToBeCreated();
   await umbracoUi.memberGroup.clickMemberGroupsSidebarButton();
   await umbracoUi.memberGroup.isMemberGroupNameVisible(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 });
 
-test('cannot create member group with empty name', async ({umbracoApi, umbracoUi}) => {
+test('cannot create member group with empty name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.clickSaveButton();
@@ -36,7 +35,7 @@ test('cannot create member group with empty name', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
 });
 
-test('cannot create member group with duplicate name', async ({umbracoApi, umbracoUi}) => {
+test('cannot create member group with duplicate name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.memberGroup.create(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
@@ -58,12 +57,14 @@ test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.memberGroup.clickMemberGroupLinkByName(memberGroupName);
+  // This wait is currently necessary as the action button is clicked before it is "ready"
+  // TODO: Remove the wait and fix the 'clickActionButton'
+  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.memberGroup.clickActionButton();
   await umbracoUi.memberGroup.clickDeleteButton();
-  await umbracoUi.memberGroup.clickConfirmToDeleteButton();
+  await umbracoUi.memberGroup.clickConfirmToDeleteButtonAndWaitForMemberGroupToBeDeleted();
 
   // Assert
-  await umbracoUi.memberGroup.waitForMemberGroupToBeDeleted();
   await umbracoUi.memberGroup.clickMemberGroupsSidebarButton();
   await umbracoUi.memberGroup.isMemberGroupNameVisible(memberGroupName, false);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();

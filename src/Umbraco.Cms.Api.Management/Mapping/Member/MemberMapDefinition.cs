@@ -1,6 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -9,15 +11,26 @@ namespace Umbraco.Cms.Api.Management.Mapping.Member;
 
 public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueResponseModel, MemberVariantResponseModel>, IMapDefinition
 {
-    public MemberMapDefinition(PropertyEditorCollection propertyEditorCollection)
-        : base(propertyEditorCollection)
+    public MemberMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : base(propertyEditorCollection, dataValueEditorFactory)
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    public MemberMapDefinition(
+        PropertyEditorCollection propertyEditorCollection)
+        : this(
+            propertyEditorCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
     {
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMember, MemberResponseModel>((_, _) => new MemberResponseModel(), Map);
 
-    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind
+    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind -Flags
     private void Map(IMember source, MemberResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

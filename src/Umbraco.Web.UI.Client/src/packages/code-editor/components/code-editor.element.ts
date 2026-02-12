@@ -38,11 +38,11 @@ const elementName = 'umb-code-editor';
  */
 @customElement(elementName)
 export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditorHost {
-	private containerRef: Ref<HTMLElement> = createRef();
+	#containerRef: Ref<HTMLElement> = createRef();
 
 	get container() {
-		if (!this.containerRef?.value) throw new Error('Container not found');
-		return this.containerRef!.value;
+		if (!this.#containerRef?.value) throw new Error('Container not found');
+		return this.#containerRef!.value;
 	}
 
 	#editor?: UmbCodeEditorController;
@@ -231,7 +231,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		return html`
 			${this.#renderStyles()}
 			${when(this._loading, () => html`<div id="loader-container"><uui-loader></uui-loader></div>`)}
-			<div id="editor-container" ${ref(this.containerRef)}></div>
+			<div id="editor-container" ${ref(this.#containerRef)}></div>
 		`;
 	}
 

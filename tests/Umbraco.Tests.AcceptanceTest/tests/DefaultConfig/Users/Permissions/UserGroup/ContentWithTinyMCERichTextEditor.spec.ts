@@ -29,7 +29,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with a rich text editor that has a stylesheet', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a rich text editor that has a stylesheet', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -42,9 +42,8 @@ test('can create content with a rich text editor that has a stylesheet', async (
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(documentName);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(documentName)).toBeTruthy();
 });

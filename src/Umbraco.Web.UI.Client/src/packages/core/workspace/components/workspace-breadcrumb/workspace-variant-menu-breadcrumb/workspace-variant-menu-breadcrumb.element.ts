@@ -6,28 +6,26 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/menu';
-import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-variant-menu-breadcrumb')
 export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
-	_name: string = '';
+	private _name: string = '';
 
 	@state()
-	_structure: Array<UmbVariantStructureItemModel> = [];
+	private _structure: Array<UmbVariantStructureItemModel> = [];
 
 	@state()
-	_workspaceActiveVariantId?: UmbVariantId;
+	private _workspaceActiveVariantId?: UmbVariantId;
 
 	@state()
-	_appDefaultCulture?: string;
+	private _appDefaultCulture?: string;
 
-	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
 	#appLanguageContext?: UmbAppLanguageContext;
-	#structureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
+	#menuStructureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -35,10 +33,6 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguageContext = instance;
 			this.#observeDefaultCulture();
-		});
-
-		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
-			this.#sectionContext = instance;
 		});
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
@@ -50,15 +44,15 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
-			this.#structureContext = instance;
+			this.#menuStructureContext = instance;
 			this.#observeStructure();
 		});
 	}
 
 	#observeStructure() {
-		if (!this.#structureContext || !this.#workspaceContext) return;
+		if (!this.#menuStructureContext || !this.#workspaceContext) return;
 
-		this.observe(this.#structureContext.structure, (value) => {
+		this.observe(this.#menuStructureContext.structure, (value) => {
 			if (!this.#workspaceContext) return;
 			const unique = this.#workspaceContext.getUnique();
 			// exclude the current unique from the structure. We append this with an observer of the name
@@ -113,10 +107,8 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		return structureItem.variants?.[0]?.name ?? '(#general_unknown)';
 	}
 
-	#getHref(structureItem: any) {
-		if (structureItem.isFolder) return undefined;
-		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
-		return `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
+	#getHref(structureItem: UmbVariantStructureItemModel) {
+		return this.#menuStructureContext?.getItemHref(structureItem);
 	}
 
 	override render() {

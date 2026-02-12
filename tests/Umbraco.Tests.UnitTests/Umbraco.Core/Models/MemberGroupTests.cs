@@ -60,7 +60,7 @@ public class MemberGroupTests
             .WithKey(Guid.NewGuid())
             .WithName("Test Group")
             .WithCreatorId(4)
-            .WithCreateDate(DateTime.Now)
-            .WithUpdateDate(DateTime.Now)
+            .WithCreateDate(DateTime.UtcNow)
+            .WithUpdateDate(DateTime.UtcNow)
             .Build();
 }

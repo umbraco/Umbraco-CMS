@@ -235,7 +235,7 @@ public class BlockListEditorPropertyValueEditorTests
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
 
-        var jsonSerializer = new SystemTextJsonSerializer();
+        var jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var languageService = Mock.Of<ILanguageService>();
 
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
@@ -248,7 +248,7 @@ public class BlockListEditorPropertyValueEditorTests
                     .Setup(x => x.Create<ConcatenatingTextValueEditor>(It.IsAny<object[]>()))
                     .Returns(new ConcatenatingTextValueEditor(
                         Mock.Of<IShortStringHelper>(),
-                        new SystemTextJsonSerializer()));
+                        new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory())));
                 textBoxEditor = new ConcatenatingTextboxPropertyEditor(
                     dataValueEditorFactoryMock.Object);
 
@@ -260,7 +260,7 @@ public class BlockListEditorPropertyValueEditorTests
                         new DataEditorAttribute("a"),
                         Mock.Of<ILocalizedTextService>(),
                         Mock.Of<IShortStringHelper>(),
-                        new SystemTextJsonSerializer(),
+                        new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                         Mock.Of<IIOHelper>()));
                 textBoxEditor = new TextboxPropertyEditor(
                     dataValueEditorFactoryMock.Object,

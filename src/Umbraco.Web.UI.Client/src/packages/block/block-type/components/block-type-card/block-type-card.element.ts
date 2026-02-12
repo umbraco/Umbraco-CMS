@@ -65,13 +65,13 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	private _elementTypeKey?: string;
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	@state()
-	_description?: string;
+	private _description?: string;
 
 	@state()
-	_fallbackIcon?: string | null;
+	private _fallbackIcon?: string | null;
 
 	constructor() {
 		super();

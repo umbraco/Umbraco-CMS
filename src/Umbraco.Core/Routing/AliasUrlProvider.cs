@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -23,6 +21,16 @@ public class AliasUrlProvider : IUrlProvider
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestConfig;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AliasUrlProvider" /> class.
+    /// </summary>
+    /// <param name="requestConfig">The request handler settings.</param>
+    /// <param name="siteDomainMapper">The site domain mapper.</param>
+    /// <param name="uriUtility">The URI utility.</param>
+    /// <param name="publishedValueFallback">The published value fallback.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
     public AliasUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestConfig,
         ISiteDomainMapper siteDomainMapper,
@@ -43,64 +51,8 @@ public class AliasUrlProvider : IUrlProvider
         requestConfig.OnChange(x => _requestConfig = x);
     }
 
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public AliasUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestConfig,
-        ISiteDomainMapper siteDomainMapper,
-        UriUtility uriUtility,
-        IPublishedValueFallback publishedValueFallback,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-        : this(
-            requestConfig,
-            siteDomainMapper,
-            uriUtility,
-            publishedValueFallback,
-            umbracoContextAccessor,
-            navigationQueryService,
-            publishedContentStatusFilteringService)
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public AliasUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestConfig,
-        ISiteDomainMapper siteDomainMapper,
-        UriUtility uriUtility,
-        IPublishedValueFallback publishedValueFallback,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
-        : this(
-            requestConfig,
-            siteDomainMapper,
-            uriUtility,
-            publishedValueFallback,
-            umbracoContextAccessor,
-            navigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public AliasUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestConfig,
-        ISiteDomainMapper siteDomainMapper,
-        UriUtility uriUtility,
-        IPublishedValueFallback publishedValueFallback,
-        IUmbracoContextAccessor umbracoContextAccessor)
-        : this(
-            requestConfig,
-            siteDomainMapper,
-            uriUtility,
-            publishedValueFallback,
-            umbracoContextAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
-    }
+    /// <inheritdoc />
+    public string Alias => $"{Constants.UrlProviders.Content}ByAlias";
 
     // note - at the moment we seem to accept pretty much anything as an alias
     // without any form of validation ... could even prob. kill the XPath ...
@@ -182,7 +134,7 @@ public class AliasUrlProvider : IUrlProvider
             {
                 var path = "/" + alias;
                 var uri = new Uri(path, UriKind.Relative);
-                yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString());
+                yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Alias);
             }
         }
         else
@@ -214,13 +166,19 @@ public class AliasUrlProvider : IUrlProvider
                 {
                     var path = "/" + alias;
                     var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Authority), path));
-                    yield return UrlInfo.Url(
-                        _uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(),
-                        domainUri.Culture);
+                    yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Alias, domainUri.Culture);
                 }
             }
         }
     }
+
+    #endregion
+
+    #region GetPreviewUrl
+
+    /// <inheritdoc />
+    public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
+        => Task.FromResult<UrlInfo?>(null);
 
     #endregion
 

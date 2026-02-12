@@ -7,10 +7,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-collection-pagination')
 export class UmbCollectionPaginationElement extends UmbLitElement {
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
-	_currentPage = 1;
+	private _currentPage = 1;
+
+	@state()
+	private _totalItems = 0;
+
+	@state()
+	private _currentItemsCount = 0;
 
 	private _collectionContext?: UmbDefaultCollectionContext<any, any>;
 
@@ -20,6 +26,8 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			this._collectionContext = instance;
 			this.#observeCurrentPage();
 			this.#observerTotalPages();
+			this.#observeTotalItems();
+			this.#observeItems();
 		});
 	}
 
@@ -43,12 +51,32 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		);
 	}
 
+	#observeTotalItems() {
+		this.observe(
+			this._collectionContext?.totalItems,
+			(totalItems) => {
+				this._totalItems = totalItems ?? 0;
+			},
+			'umbTotalItemsObserver',
+		);
+	}
+
+	#observeItems() {
+		this.observe(
+			this._collectionContext?.items,
+			(items) => {
+				this._currentItemsCount = items?.length ?? 0;
+			},
+			'umbItemsObserver',
+		);
+	}
+
 	#onChange(event: UUIPaginationEvent) {
 		this._collectionContext?.pagination.setCurrentPageNumber(event.target.current);
 	}
 
 	override render() {
-		if (this._totalPages <= 1) {
+		if (this._currentItemsCount === this._totalItems || this._totalPages <= 1) {
 			return nothing;
 		}
 
@@ -56,9 +84,9 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			.current=${this._currentPage}
 			.total=${this._totalPages}
 			firstlabel=${this.localize.term('general_first')}
-            previouslabel=${this.localize.term('general_previous')}
-            nextlabel=${this.localize.term('general_next')}
-            lastlabel=${this.localize.term('general_last')}
+			previouslabel=${this.localize.term('general_previous')}
+			nextlabel=${this.localize.term('general_next')}
+			lastlabel=${this.localize.term('general_last')}
 			@change=${this.#onChange}></uui-pagination>`;
 	}
 

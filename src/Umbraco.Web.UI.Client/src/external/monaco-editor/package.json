@@ -6,6 +6,6 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"monaco-editor": "^0.52.2"
+		"monaco-editor": "^0.55.1"
 	}
 }

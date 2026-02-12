@@ -18,9 +18,9 @@ public class RelationTypeBuilderTests
         const string alias = "test";
         const string name = "Test";
         var key = Guid.NewGuid();
-        var createDate = DateTime.Now.AddHours(-2);
-        var updateDate = DateTime.Now.AddHours(-1);
-        var deleteDate = DateTime.Now;
+        var createDate = DateTime.UtcNow.AddHours(-2);
+        var updateDate = DateTime.UtcNow.AddHours(-1);
+        var deleteDate = DateTime.UtcNow;
         var parentObjectType = Guid.NewGuid();
         var childObjectType = Guid.NewGuid();
         const bool isBidirectional = true;

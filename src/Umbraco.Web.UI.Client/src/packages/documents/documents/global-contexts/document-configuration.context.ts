@@ -14,7 +14,7 @@ export class UmbDocumentConfigurationContext extends UmbContextBase implements U
 	/**
 	 * The cached document configuration.
 	 */
-	static #DocumentConfiguration: Promise<DocumentConfigurationResponseModel | null>;
+	static #documentConfiguration: Promise<DocumentConfigurationResponseModel | null>;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_CONFIGURATION_CONTEXT);
@@ -25,7 +25,7 @@ export class UmbDocumentConfigurationContext extends UmbContextBase implements U
 	 * @returns A promise that resolves to the document configuration, or null if the configuration could not be fetched.
 	 */
 	getDocumentConfiguration(): Promise<DocumentConfigurationResponseModel | null> {
-		return (UmbDocumentConfigurationContext.#DocumentConfiguration ??= this.fetchDocumentConfiguration());
+		return (UmbDocumentConfigurationContext.#documentConfiguration ??= this.fetchDocumentConfiguration());
 	}
 
 	/**

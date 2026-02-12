@@ -1,5 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Strings;
@@ -149,8 +150,8 @@ internal static class ContentTypeFactory
         entity.Thumbnail = dto.Thumbnail;
         entity.SortOrder = dto.NodeDto.SortOrder;
         entity.Description = dto.Description;
-        entity.CreateDate = dto.NodeDto.CreateDate;
-        entity.UpdateDate = dto.NodeDto.CreateDate;
+        entity.CreateDate = dto.NodeDto.CreateDate.EnsureUtc();
+        entity.UpdateDate = dto.NodeDto.CreateDate.EnsureUtc();
         entity.Path = dto.NodeDto.Path;
         entity.Level = dto.NodeDto.Level;
         entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;

@@ -837,7 +837,8 @@ export default {
 	},
 	rollback: {
 		diffHelp:
-			'Tu pokazane są różnice pomiędzy bieżącą oraz wybraną wersją <br/><del>Czerwony</del> tekst nie będzie pokazany w wybranej wersji, <ins>zielony tekst został dodany</ins>',
+			'<del>Czerwony tekst</del> zostanie usunięty w wybranej wersji, <ins>zielony tekst</ins> zostanie dodany.',
+		showDiff: 'Pokaż różnice między bieżącą (wersją roboczą) a wybraną wersją.',
 		documentRolledBack: 'Dokument został przywrócony',
 		htmlHelp:
 			'Tu widać wybraną wersję jako html, jeżeli chcesz zobaczyć różnicę pomiędzy 2 wersjami w tym samym czasie, użyj podglądu różnic',
@@ -863,9 +864,6 @@ export default {
 		users: 'Użytkownicy',
 		help: 'Pomoc',
 		forms: 'Formularze',
-	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Najlepsze filmy-samouczki Umbraco',
 	},
 	settings: {
 		defaulttemplate: 'Domyślny szablon',
@@ -1299,7 +1297,8 @@ export default {
 		emptyDictionaryTree: 'Brak elementów słownika do wyboru',
 	},
 	textbox: {
-		characters_left: 'pozostało znaków',
+		characters_left: 'Pozostało <strong>%0%</strong> znaków.',
+		characters_exceed: 'Maksymalnie %0% znaków, <strong>%1%</strong> za dużo.',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Zaznacz wszystko',

@@ -132,7 +132,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                 throw new PanicException("Could not find a database");
             }
 
-            if (!db.InTransaction)
+            if (db.InTransaction is false || db.Transaction is null)
             {
                 throw new InvalidOperationException(
                     "SqlServerDistributedLockingMechanism requires a transaction to function.");
@@ -167,7 +167,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                 throw new PanicException("Could not find a database");
             }
 
-            if (!db.InTransaction)
+            if (db.InTransaction is false || db.Transaction is null)
             {
                 throw new InvalidOperationException(
                     "SqlServerDistributedLockingMechanism requires a transaction to function.");

@@ -21,12 +21,15 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Downloads a package XML or ZIP file.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <returns>The XML or ZIP file of the package or not found result.</returns>
     [HttpGet("{id:guid}/download")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [EndpointSummary("Downloads a created package.")]
+    [EndpointDescription("Downloads the package file for the created package identified by the provided Id.")]
     public async Task<IActionResult> Download(CancellationToken cancellationToken, Guid id)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);

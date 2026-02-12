@@ -1,4 +1,5 @@
 import { UMB_PACKAGE_REPOSITORY_ALIAS, UMB_PACKAGE_STORE_ALIAS } from './constants.js';
+import { UmbPackageStore } from './package.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,6 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_PACKAGE_STORE_ALIAS,
 		name: 'Package Store',
-		api: () => import('./package.store.js'),
+		api: UmbPackageStore,
 	},
 ];

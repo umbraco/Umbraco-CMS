@@ -3,13 +3,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Check if the user is an admin
- * @param {UmbControllerHost} host - The controller host
- * @param {string} userUnique - The user unique identifier
- * @returns {Promise<boolean>} - The result
+ * @param host - The controller host
+ * @param userUnique - The user unique identifier
+ * @returns Promise resolving to true if user is admin
  */
-export const isUserAdmin = async (host: UmbControllerHost, userUnique: string) => {
+export async function isUserAdmin(host: UmbControllerHost, userUnique: string): Promise<boolean> {
 	const repository = new UmbUserDetailRepository(host);
 	const { data: user } = await repository.requestByUnique(userUnique);
 
 	return user?.isAdmin ?? false;
-};
+}

@@ -21,12 +21,6 @@ public class ActionUnpublish : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-
-    /// <inheritdoc />
-    public string Icon => "icon-circle-dotted";
-
-    /// <inheritdoc />
     public bool ShowInNotifier => false;
 
     /// <inheritdoc />

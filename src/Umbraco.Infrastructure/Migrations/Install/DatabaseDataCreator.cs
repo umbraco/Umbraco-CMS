@@ -82,8 +82,6 @@ internal sealed class DatabaseDataCreator
         }
     ];
 
-    private const string ImageMediaTypeKey = "cc07b313-0843-4aa8-bbda-871c8da728c8";
-
     private readonly IDatabase _database;
 
     private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>
@@ -98,7 +96,17 @@ internal sealed class DatabaseDataCreator
     private readonly ILogger<DatabaseDataCreator> _logger;
     private readonly IUmbracoVersion _umbracoVersion;
 
-    public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IUmbracoVersion umbracoVersion,
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DatabaseDataCreator" /> class.
+    /// </summary>
+    /// <param name="database">The database.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="umbracoVersion">The Umbraco version.</param>
+    /// <param name="installDefaultDataSettings">The install default data settings.</param>
+    public DatabaseDataCreator(
+        IDatabase database,
+        ILogger<DatabaseDataCreator> logger,
+        IUmbracoVersion umbracoVersion,
         IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
     {
         _database = database;
@@ -205,7 +213,7 @@ internal sealed class DatabaseDataCreator
         {
             [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
             [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":" , ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
             [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
         };
 
@@ -253,7 +261,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = new Guid(uniqueId),
                 Text = text,
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             };
 
             ConditionalInsert(
@@ -264,7 +272,10 @@ internal sealed class DatabaseDataCreator
                 "id");
         }
 
-        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.Node,
+            "id",
+            false,
             new NodeDto
             {
                 NodeId = -1,
@@ -274,12 +285,15 @@ internal sealed class DatabaseDataCreator
                 Level = 0,
                 Path = "-1",
                 SortOrder = 0,
-                UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"),
+                UniqueId = Constants.System.RootSystemKey,
                 Text = "SYSTEM DATA: umbraco master root",
                 NodeObjectType = Constants.ObjectTypes.SystemRoot,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.Node,
+            "id",
+            false,
             new NodeDto
             {
                 NodeId = Constants.System.RecycleBinContent,
@@ -292,9 +306,12 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinContentKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.ContentRecycleBin,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.Node,
+            "id",
+            false,
             new NodeDto
             {
                 NodeId = Constants.System.RecycleBinMedia,
@@ -307,19 +324,49 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             });
 
-        InsertDataTypeNodeDto(Constants.DataTypes.LabelString, 35, Constants.DataTypes.Guids.LabelString,
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelString,
+            35,
+            Constants.DataTypes.Guids.LabelString,
             "Label (string)");
-        InsertDataTypeNodeDto(Constants.DataTypes.LabelInt, 36, Constants.DataTypes.Guids.LabelInt, "Label (integer)");
-        InsertDataTypeNodeDto(Constants.DataTypes.LabelBigint, 36, Constants.DataTypes.Guids.LabelBigInt,
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelInt,
+            36,
+            Constants.DataTypes.Guids.LabelInt,
+            "Label (integer)");
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelBigint,
+            36,
+            Constants.DataTypes.Guids.LabelBigInt,
             "Label (bigint)");
-        InsertDataTypeNodeDto(Constants.DataTypes.LabelDateTime, 37, Constants.DataTypes.Guids.LabelDateTime,
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelDateTime,
+            37,
+            Constants.DataTypes.Guids.LabelDateTime,
             "Label (datetime)");
-        InsertDataTypeNodeDto(Constants.DataTypes.LabelTime, 38, Constants.DataTypes.Guids.LabelTime, "Label (time)");
-        InsertDataTypeNodeDto(Constants.DataTypes.LabelDecimal, 39, Constants.DataTypes.Guids.LabelDecimal,
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelTime,
+            38,
+            Constants.DataTypes.Guids.LabelTime,
+            "Label (time)");
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelDecimal,
+            39,
+            Constants.DataTypes.Guids.LabelDecimal,
             "Label (decimal)");
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelBytes,
+            40,
+            Constants.DataTypes.Guids.LabelBytes,
+            "Label (bytes)");
+        InsertDataTypeNodeDto(
+            Constants.DataTypes.LabelPixels,
+            41,
+            Constants.DataTypes.Guids.LabelPixels,
+            "Label (pixels)");
 
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
@@ -336,7 +383,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadGuid,
                 Text = "Upload File",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -355,7 +402,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadVideoGuid,
                 Text = "Upload Video",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -374,7 +421,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadAudioGuid,
                 Text = "Upload Audio",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -393,7 +440,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadArticleGuid,
                 Text = "Upload Article",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -412,7 +459,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadVectorGraphicsGuid,
                 Text = "Upload Vector Graphics",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -431,7 +478,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.TextareaGuid,
                 Text = "Textarea",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -450,7 +497,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.TextstringGuid,
                 Text = "Textstring",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -469,7 +516,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.RichtextEditorGuid,
                 Text = "Richtext editor",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -488,7 +535,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.NumericGuid,
                 Text = "Numeric",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -507,7 +554,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.CheckboxGuid,
                 Text = "True/false",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -526,7 +573,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.CheckboxListGuid,
                 Text = "Checkbox list",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -545,7 +592,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DropdownGuid,
                 Text = "Dropdown",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -564,7 +611,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DatePickerGuid,
                 Text = "Date Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -583,7 +630,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.RadioboxGuid,
                 Text = "Radiobox",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -602,7 +649,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DropdownMultipleGuid,
                 Text = "Dropdown multiple",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -621,7 +668,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ApprovedColorGuid,
                 Text = "Approved Color",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -640,7 +687,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DatePickerWithTimeGuid,
                 Text = "Date Picker with time",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -659,7 +706,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ListViewContentGuid,
                 Text = Constants.Conventions.DataTypes.ListViewPrefix + "Content",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -678,7 +725,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ListViewMediaGuid,
                 Text = Constants.Conventions.DataTypes.ListViewPrefix + "Media",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -697,7 +744,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.TagsGuid,
                 Text = "Tags",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -716,7 +763,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ImageCropperGuid,
                 Text = "Image Cropper",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -737,7 +784,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ContentPickerGuid,
                 Text = "Content Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -756,7 +803,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MemberPickerGuid,
                 Text = "Member Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -776,7 +823,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.RelatedLinksGuid,
                 Text = "Multi URL Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -796,7 +843,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3Guid,
                 Text = "Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -815,7 +862,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleGuid,
                 Text = "Multiple Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -834,7 +881,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3SingleImageGuid,
                 Text = "Image Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -853,7 +900,26 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleImagesGuid,
                 Text = "Multiple Image Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
+            },
+            Constants.DatabaseSchema.Tables.Node,
+            "id");
+        ConditionalInsert(
+            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+            Constants.DataTypes.Guids.DateTimePickerWithTimeZone,
+            new NodeDto
+            {
+                NodeId = 1055,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 1,
+                Path = "-1,1055",
+                SortOrder = 2,
+                UniqueId = Constants.DataTypes.Guids.DateTimePickerWithTimeZoneGuid,
+                Text = "Date Time Picker (with time zone)",
+                NodeObjectType = Constants.ObjectTypes.DataType,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -861,10 +927,9 @@ internal sealed class DatabaseDataCreator
 
     private void CreateNodeDataForMediaTypes()
     {
-        var folderUniqueId = new Guid("f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            folderUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Folder,
             new NodeDto
             {
                 NodeId = 1031,
@@ -874,18 +939,17 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1031",
                 SortOrder = 2,
-                UniqueId = folderUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.FolderGuid,
                 Text = Constants.Conventions.MediaTypes.Folder,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var imageUniqueId = new Guid(ImageMediaTypeKey);
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            imageUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Image,
             new NodeDto
             {
                 NodeId = 1032,
@@ -895,18 +959,17 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1032",
                 SortOrder = 2,
-                UniqueId = imageUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.ImageGuid,
                 Text = Constants.Conventions.MediaTypes.Image,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var fileUniqueId = new Guid("4c52d8ab-54e6-40cd-999c-7a5f24903e4d");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            fileUniqueId.ToString(),
+            Constants.MediaTypes.Guids.File,
             new NodeDto
             {
                 NodeId = 1033,
@@ -916,18 +979,17 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1033",
                 SortOrder = 2,
-                UniqueId = fileUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.FileGuid,
                 Text = Constants.Conventions.MediaTypes.File,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var videoUniqueId = new Guid("f6c515bb-653c-4bdc-821c-987729ebe327");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            videoUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Video,
             new NodeDto
             {
                 NodeId = 1034,
@@ -937,18 +999,17 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1034",
                 SortOrder = 2,
-                UniqueId = videoUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.VideoGuid,
                 Text = Constants.Conventions.MediaTypes.Video,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var audioUniqueId = new Guid("a5ddeee0-8fd8-4cee-a658-6f1fcdb00de3");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            audioUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Audio,
             new NodeDto
             {
                 NodeId = 1035,
@@ -958,18 +1019,17 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1035",
                 SortOrder = 2,
-                UniqueId = audioUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.AudioGuid,
                 Text = Constants.Conventions.MediaTypes.Audio,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var articleUniqueId = new Guid("a43e3414-9599-4230-a7d3-943a21b20122");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            articleUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Article,
             new NodeDto
             {
                 NodeId = 1036,
@@ -979,18 +1039,17 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1036",
                 SortOrder = 2,
-                UniqueId = articleUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.ArticleGuid,
                 Text = Constants.Conventions.MediaTypes.Article,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var svgUniqueId = new Guid("c4b1efcf-a9d5-41c4-9621-e9d273b52a9c");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            svgUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Svg,
             new NodeDto
             {
                 NodeId = 1037,
@@ -1000,10 +1059,10 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1037",
                 SortOrder = 2,
-                UniqueId = svgUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.SvgGuid,
                 Text = "Vector Graphics (SVG)",
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -1011,10 +1070,9 @@ internal sealed class DatabaseDataCreator
 
     private void CreateNodeDataForMemberTypes()
     {
-        var memberUniqueId = new Guid("d59be02f-1df9-4228-aa1e-01917d806cda");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
-            memberUniqueId.ToString(),
+            Constants.MemberTypes.Guids.Member,
             new NodeDto
             {
                 NodeId = 1044,
@@ -1024,10 +1082,10 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1044",
                 SortOrder = 0,
-                UniqueId = memberUniqueId,
+                UniqueId = Constants.MemberTypes.Guids.MemberGuid,
                 Text = Constants.Conventions.MemberTypes.DefaultAlias,
                 NodeObjectType = Constants.ObjectTypes.MemberType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -1052,6 +1110,9 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
     }
 
     private void CreateContentTypeData()
@@ -1062,7 +1123,10 @@ internal sealed class DatabaseDataCreator
         // Media types.
         if (_database.Exists<NodeDto>(1031))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 532,
@@ -1078,7 +1142,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1032))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 533,
@@ -1093,7 +1160,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1033))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 534,
@@ -1108,7 +1178,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1034))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 540,
@@ -1123,7 +1196,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1035))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 541,
@@ -1138,7 +1214,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1036))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 542,
@@ -1153,7 +1232,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1037))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 543,
@@ -1169,7 +1251,10 @@ internal sealed class DatabaseDataCreator
         // Member type.
         if (_database.Exists<NodeDto>(1044))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.ContentType,
+                "pk",
+                false,
                 new ContentTypeDto
                 {
                     PrimaryKey = 531,
@@ -1182,7 +1267,10 @@ internal sealed class DatabaseDataCreator
         }
     }
 
-    private void CreateUserData() => _database.Insert(Constants.DatabaseSchema.Tables.User, "id", false,
+    private void CreateUserData() => _database.Insert(
+        Constants.DatabaseSchema.Tables.User,
+        "id",
+        false,
         new UserDto
         {
             Id = Constants.Security.SuperUserId,
@@ -1194,8 +1282,8 @@ internal sealed class DatabaseDataCreator
             Password = "default",
             Email = string.Empty,
             UserLanguage = "en-US",
-            CreateDate = DateTime.Now,
-            UpdateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
+            UpdateDate = DateTime.UtcNow,
         });
 
     private void CreateUserGroupData()
@@ -1212,8 +1300,9 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                Description = "Users with full access to all sections and functionality",
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-medal",
                 HasAccessToAllLanguages = true,
             });
@@ -1229,8 +1318,9 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = WriterGroupAlias,
                 Name = "Writers",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                Description = "Users with permission to create and update but not publish content",
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-edit",
                 HasAccessToAllLanguages = true,
             });
@@ -1246,8 +1336,9 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                Description = "Users with full permission to create, update and publish content",
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-tools",
                 HasAccessToAllLanguages = true,
             });
@@ -1263,8 +1354,9 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = TranslatorGroupAlias,
                 Name = "Translators",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                Description = "Users with permission to manage dictionary entries",
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-globe",
                 HasAccessToAllLanguages = true,
             });
@@ -1278,8 +1370,9 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.SensitiveDataGroupKey,
                 Alias = SensitiveDataGroupAlias,
                 Name = "Sensitive data",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                Description = "Users with the specific permission to be able to manage properties and data marked as sensitive",
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-lock",
                 HasAccessToAllLanguages = false,
             });
@@ -1327,7 +1420,10 @@ internal sealed class DatabaseDataCreator
         // Media property groups.
         if (_database.Exists<NodeDto>(1032))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyTypeGroup,
+                "id",
+                false,
                 new PropertyTypeGroupDto
                 {
                     Id = 3,
@@ -1341,7 +1437,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1033))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyTypeGroup,
+                "id",
+                false,
                 new PropertyTypeGroupDto
                 {
                     Id = 4,
@@ -1355,7 +1454,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1034))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyTypeGroup,
+                "id",
+                false,
                 new PropertyTypeGroupDto
                 {
                     Id = 52,
@@ -1369,7 +1471,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1035))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyTypeGroup,
+                "id",
+                false,
                 new PropertyTypeGroupDto
                 {
                     Id = 53,
@@ -1383,7 +1488,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1036))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyTypeGroup,
+                "id",
+                false,
                 new PropertyTypeGroupDto
                 {
                     Id = 54,
@@ -1397,7 +1505,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1037))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyTypeGroup,
+                "id",
+                false,
                 new PropertyTypeGroupDto
                 {
                     Id = 55,
@@ -1412,7 +1523,10 @@ internal sealed class DatabaseDataCreator
         // Membership property group.
         if (_database.Exists<NodeDto>(1044))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyTypeGroup,
+                "id",
+                false,
                 new PropertyTypeGroupDto
                 {
                     Id = 11,
@@ -1433,7 +1547,10 @@ internal sealed class DatabaseDataCreator
         // Media property types.
         if (_database.Exists<PropertyTypeGroupDto>(3))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 6,
@@ -1449,12 +1566,15 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 7,
                     UniqueId = new Guid("A68D453B-1F62-44F4-9F71-0B6BBD43C355"),
-                    DataTypeId = Constants.DataTypes.LabelInt,
+                    DataTypeId = Constants.DataTypes.LabelPixels,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Width,
@@ -1462,15 +1582,18 @@ internal sealed class DatabaseDataCreator
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in pixels",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 8,
                     UniqueId = new Guid("854087F6-648B-40ED-BC98-B8A9789E80B9"),
-                    DataTypeId = Constants.DataTypes.LabelInt,
+                    DataTypeId = Constants.DataTypes.LabelPixels,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Height,
@@ -1478,35 +1601,41 @@ internal sealed class DatabaseDataCreator
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in pixels",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 9,
                     UniqueId = new Guid("BD4C5ACE-26E3-4A8B-AF1A-E8206A35FA07"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 10,
                     UniqueId = new Guid("F7786FE8-724A-4ED0-B244-72546DB32A92"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
@@ -1517,7 +1646,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<PropertyTypeGroupDto>(4))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 24,
@@ -1533,43 +1665,52 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 25,
                     UniqueId = new Guid("3531C0A3-4E0A-4324-A621-B9D3822B071F"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1033,
                     PropertyTypeGroupId = 4,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 26,
                     UniqueId = new Guid("F9527050-59BC-43E4-8FA8-1658D1319FF5"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1033,
                     PropertyTypeGroupId = 4,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(52))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 40,
@@ -1585,43 +1726,52 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 41,
                     UniqueId = new Guid("EDD2B3FD-1E57-4E57-935E-096DEFCCDC9B"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 42,
                     UniqueId = new Guid("180EEECF-1F00-409E-8234-BBA967E08B0A"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(53))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 43,
@@ -1637,43 +1787,52 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 44,
                     UniqueId = new Guid("1BEE433F-A21A-4031-8E03-AF01BB8D2DE9"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1035,
                     PropertyTypeGroupId = 53,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 45,
                     UniqueId = new Guid("3CBF538A-29AB-4317-A9EB-BBCDF1A54260"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1035,
                     PropertyTypeGroupId = 53,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(54))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 46,
@@ -1689,43 +1848,52 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 47,
                     UniqueId = new Guid("EF1B4AF7-36DE-45EB-8C18-A2DE07319227"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1036,
                     PropertyTypeGroupId = 54,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 48,
                     UniqueId = new Guid("AAB7D00C-7209-4337-BE3F-A4421C8D79A0"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1036,
                     PropertyTypeGroupId = 54,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
 
         if (_database.Exists<PropertyTypeGroupDto>(55))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 49,
@@ -1741,36 +1909,42 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 50,
                     UniqueId = new Guid("0F25A89E-2EB7-49BC-A7B4-759A7E4C69F2"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1037,
                     PropertyTypeGroupId = 55,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 51,
                     UniqueId = new Guid("09A07AFF-861D-4769-A2B0-C165EBD43D39"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1037,
                     PropertyTypeGroupId = 55,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
@@ -1778,7 +1952,10 @@ internal sealed class DatabaseDataCreator
         // Membership property types.
         if (_database.Exists<PropertyTypeGroupDto>(11))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
                 new PropertyTypeDto
                 {
                     Id = 28,
@@ -1824,7 +2001,7 @@ internal sealed class DatabaseDataCreator
                 };
                 _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
                 isDefault = false;
-                id++;
+                id += 1;
             }
         }
         else
@@ -1866,14 +2043,20 @@ internal sealed class DatabaseDataCreator
             return;
         }
 
-        _database.Insert(Constants.DatabaseSchema.Tables.ContentChildType, "Id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.ContentChildType,
+            "Id",
+            false,
             new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1031 });
 
         for (var i = 1032; i <= 1037; i++)
         {
             if (_database.Exists<NodeDto>(i))
             {
-                _database.Insert(Constants.DatabaseSchema.Tables.ContentChildType, "Id", false,
+                _database.Insert(
+                    Constants.DatabaseSchema.Tables.ContentChildType,
+                    "Id",
+                    false,
                     new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = i });
             }
         }
@@ -1909,7 +2092,10 @@ internal sealed class DatabaseDataCreator
         // of data types to create).
         if (_database.Exists<NodeDto>(Constants.DataTypes.Boolean))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.Boolean,
@@ -1921,7 +2107,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(-51))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = -51,
@@ -1943,13 +2132,16 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
                     EditorUiAlias = "Umb.PropertyEditorUi.Tiptap",
                     DbType = "Ntext",
-                    Configuration = "{\"extensions\": [\"Umb.Tiptap.Embed\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.Underline\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.MediaUpload\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]]}",
+                    Configuration = "{\"extensions\": [\"Umb.Tiptap.RichTextEssentials\", \"Umb.Tiptap.Anchor\", \"Umb.Tiptap.Block\", \"Umb.Tiptap.Blockquote\", \"Umb.Tiptap.Bold\", \"Umb.Tiptap.BulletList\", \"Umb.Tiptap.CodeBlock\", \"Umb.Tiptap.Embed\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Heading\", \"Umb.Tiptap.HorizontalRule\", \"Umb.Tiptap.HtmlAttributeClass\", \"Umb.Tiptap.HtmlAttributeDataset\", \"Umb.Tiptap.HtmlAttributeId\", \"Umb.Tiptap.HtmlAttributeStyle\", \"Umb.Tiptap.HtmlTagDiv\", \"Umb.Tiptap.HtmlTagSpan\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Italic\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.MediaUpload\", \"Umb.Tiptap.OrderedList\", \"Umb.Tiptap.Strike\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.TextDirection\", \"Umb.Tiptap.TextIndent\", \"Umb.Tiptap.TrailingNode\", \"Umb.Tiptap.Underline\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]]}",
                 });
         }
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.Textbox))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.Textbox,
@@ -1961,7 +2153,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.Textarea))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.Textarea,
@@ -1973,7 +2168,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.Upload))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.Upload,
@@ -1983,22 +2181,61 @@ internal sealed class DatabaseDataCreator
                 });
         }
 
-        InsertDataTypeDto(Constants.DataTypes.LabelString, Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label", "Nvarchar", "{\"umbracoDataValueType\":\"STRING\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelInt, Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label", "Integer", "{\"umbracoDataValueType\":\"INT\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelBigint, Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label", "Nvarchar", "{\"umbracoDataValueType\":\"BIGINT\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelDateTime, Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label", "Date", "{\"umbracoDataValueType\":\"DATETIME\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelDecimal, Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label", "Decimal", "{\"umbracoDataValueType\":\"DECIMAL\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label", "Date", "{\"umbracoDataValueType\":\"TIME\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelString,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Nvarchar",
+            "{\"umbracoDataValueType\":\"STRING\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelInt,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Integer",
+            "{\"umbracoDataValueType\":\"INT\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelBigint,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Nvarchar",
+            "{\"umbracoDataValueType\":\"BIGINT\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelDateTime,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Date",
+            "{\"umbracoDataValueType\":\"DATETIME\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelDecimal,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Decimal",
+            "{\"umbracoDataValueType\":\"DECIMAL\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelTime,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Date",
+            "{\"umbracoDataValueType\":\"TIME\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelBytes,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Nvarchar",
+            "{\"umbracoDataValueType\":\"BIGINT\", \"labelTemplate\":\"{=value | bytes}\"}");
+        InsertDataTypeDto(
+            Constants.DataTypes.LabelPixels,
+            Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label",
+            "Integer",
+            "{\"umbracoDataValueType\":\"INT\", \"labelTemplate\":\"{=value}px\"}");
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.DateTime))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.DateTime,
@@ -2011,7 +2248,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(-37))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = -37,
@@ -2021,12 +2261,19 @@ internal sealed class DatabaseDataCreator
                 });
         }
 
-        InsertDataTypeDto(Constants.DataTypes.DropDownSingle, Constants.PropertyEditors.Aliases.DropDownListFlexible,
-            "Umb.PropertyEditorUi.Dropdown", "Nvarchar", "{\"multiple\":false}");
+        InsertDataTypeDto(
+            Constants.DataTypes.DropDownSingle,
+            Constants.PropertyEditors.Aliases.DropDownListFlexible,
+            "Umb.PropertyEditorUi.Dropdown",
+            "Nvarchar",
+            "{\"multiple\":false}");
 
         if (_database.Exists<NodeDto>(-40))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = -40,
@@ -2038,7 +2285,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(-41))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = -41,
@@ -2049,18 +2299,25 @@ internal sealed class DatabaseDataCreator
                 });
         }
 
-        InsertDataTypeDto(Constants.DataTypes.DropDownMultiple, Constants.PropertyEditors.Aliases.DropDownListFlexible,
-            "Umb.PropertyEditorUi.Dropdown", "Nvarchar", "{\"multiple\":true}");
+        InsertDataTypeDto(
+            Constants.DataTypes.DropDownMultiple,
+            Constants.PropertyEditors.Aliases.DropDownListFlexible,
+            "Umb.PropertyEditorUi.Dropdown",
+            "Nvarchar",
+            "{\"multiple\":true}");
 
         if (_database.Exists<NodeDto>(-43))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = -43,
                     EditorAlias = Constants.PropertyEditors.Aliases.CheckBoxList,
                     EditorUiAlias = "Umb.PropertyEditorUi.CheckBoxList",
-                    DbType = "Nvarchar",
+                    DbType = "Ntext",
                 });
         }
 
@@ -2082,7 +2339,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.ImageCropper))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.ImageCropper,
@@ -2150,7 +2410,10 @@ internal sealed class DatabaseDataCreator
         // New UDI pickers with newer Ids
         if (_database.Exists<NodeDto>(1046))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = 1046,
@@ -2162,7 +2425,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1047))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = 1047,
@@ -2174,7 +2440,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1050))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = 1050,
@@ -2186,7 +2455,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.UploadVideo))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.UploadVideo,
@@ -2200,7 +2472,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.UploadAudio))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.UploadAudio,
@@ -2214,7 +2489,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.UploadArticle))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.UploadArticle,
@@ -2228,7 +2506,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.UploadVectorGraphics))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = Constants.DataTypes.UploadVectorGraphics,
@@ -2241,7 +2522,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1051))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = 1051,
@@ -2254,7 +2538,10 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1052))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = 1052,
@@ -2267,55 +2554,116 @@ internal sealed class DatabaseDataCreator
 
         if (_database.Exists<NodeDto>(1053))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = 1053,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
                                     "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
                 });
         }
 
         if (_database.Exists<NodeDto>(1054))
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
                 new DataTypeDto
                 {
                     NodeId = 1054,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
                                     "\", \"multiple\": true}",
+                });
+        }
+
+        if (_database.Exists<NodeDto>(1055))
+        {
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
+                new DataTypeDto
+                {
+                    NodeId = 1055,
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DateTimeWithTimeZonePicker",
+                    DbType = "Ntext",
+                    Configuration = "{\"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
                 });
         }
     }
 
     private void CreateRelationTypeData()
     {
-        CreateRelationTypeData(1, Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-            Constants.Conventions.RelationTypes.RelateDocumentOnCopyName, Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Document, true, false);
-        CreateRelationTypeData(2, Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
-            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName, Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Document, false, false);
-        CreateRelationTypeData(3, Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
-            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName, Constants.ObjectTypes.Media,
-            Constants.ObjectTypes.Media, false, false);
-        CreateRelationTypeData(4, Constants.Conventions.RelationTypes.RelatedMediaAlias,
-            Constants.Conventions.RelationTypes.RelatedMediaName, null, null, false, true);
-        CreateRelationTypeData(5, Constants.Conventions.RelationTypes.RelatedDocumentAlias,
-            Constants.Conventions.RelationTypes.RelatedDocumentName, null, null, false, true);
-        CreateRelationTypeData(6, Constants.Conventions.RelationTypes.RelatedMemberAlias,
-            Constants.Conventions.RelationTypes.RelatedMemberName, null, null, false, true);
+        CreateRelationTypeData(
+            1,
+            Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
+            Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Document,
+            true,
+            false);
+        CreateRelationTypeData(
+            2,
+            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Document,
+            false,
+            false);
+        CreateRelationTypeData(
+            3,
+            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
+            Constants.ObjectTypes.Media,
+            Constants.ObjectTypes.Media,
+            false,
+            false);
+        CreateRelationTypeData(
+            4,
+            Constants.Conventions.RelationTypes.RelatedMediaAlias,
+            Constants.Conventions.RelationTypes.RelatedMediaName,
+            null,
+            null,
+            false,
+            true);
+        CreateRelationTypeData(
+            5,
+            Constants.Conventions.RelationTypes.RelatedDocumentAlias,
+            Constants.Conventions.RelationTypes.RelatedDocumentName,
+            null,
+            null,
+            false,
+            true);
+        CreateRelationTypeData(
+            6,
+            Constants.Conventions.RelationTypes.RelatedMemberAlias,
+            Constants.Conventions.RelationTypes.RelatedMemberName,
+            null,
+            null,
+            false,
+            true);
 
     }
 
-    private void CreateRelationTypeData(int id, string alias, string name, Guid? parentObjectType,
-        Guid? childObjectType, bool dual, bool isDependency)
+    private void CreateRelationTypeData(
+        int id,
+        string alias,
+        string name,
+        Guid? parentObjectType,
+        Guid? childObjectType,
+        bool dual,
+        bool isDependency)
     {
         var relationType = new RelationTypeDto
         {
@@ -2339,16 +2687,22 @@ internal sealed class DatabaseDataCreator
         var stateValueKey = upgrader.StateValueKey;
         var finalState = upgrader.Plan.FinalState;
 
-        _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
-            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.KeyValue,
+            "key",
+            false,
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.UtcNow });
 
 
         upgrader = new Upgrader(new UmbracoPremigrationPlan());
         stateValueKey = upgrader.StateValueKey;
         finalState = upgrader.Plan.FinalState;
 
-        _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
-            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.KeyValue,
+            "key",
+            false,
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.UtcNow });
     }
 
     private void CreateLogViewerQueryData()

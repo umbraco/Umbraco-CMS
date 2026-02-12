@@ -1,7 +1,17 @@
 namespace Umbraco.Cms.Core.Hosting;
 
+/// <summary>
+/// Provides information about the hosting environment in which the application is running.
+/// </summary>
+/// <remarks>
+/// This interface abstracts the hosting environment details, enabling access to paths,
+/// URLs, and environment-specific settings without direct dependency on the web host.
+/// </remarks>
 public interface IHostingEnvironment
 {
+    /// <summary>
+    /// Gets the name of the site.
+    /// </summary>
     string? SiteName { get; }
 
     /// <summary>
@@ -40,10 +50,18 @@ public interface IHostingEnvironment
     /// </summary>
     string ApplicationPhysicalPath { get; }
 
+    /// <summary>
+    /// Gets the local temporary path for the application.
+    /// </summary>
     string LocalTempPath { get; }
 
     /// <summary>
-    ///     The web application's hosted path
+    /// Gets the location of temporary file uploads.
+    /// </summary>
+    public string TemporaryFileUploadPath => Path.Combine(LocalTempPath, "TemporaryFile");
+
+    /// <summary>
+    ///     The web application's hosted path.
     /// </summary>
     /// <remarks>
     ///     In most cases this will return "/" but if the site is hosted in a virtual directory then this will return the
@@ -52,6 +70,9 @@ public interface IHostingEnvironment
     /// </remarks>
     string ApplicationVirtualPath { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether the application is running in debug mode.
+    /// </summary>
     bool IsDebugMode { get; }
 
     /// <summary>

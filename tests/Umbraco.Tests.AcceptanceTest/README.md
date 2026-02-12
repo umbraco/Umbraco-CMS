@@ -1,71 +1,317 @@
 # Umbraco Acceptance Tests
 
-You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.  Alternatively, follow along the instructions below.
+End-to-end acceptance tests for Umbraco CMS using [Playwright](https://playwright.dev/).
 
-### Prerequisites
-- NodeJS 22+
-- A running installed Umbraco on url: [https://localhost:44339](https://localhost:44339) (Default development port)
-   - Install using a `SqlServer`/`LocalDb` as the tests execute too fast for `Sqlite` to handle.
+You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.
 
-### Getting started
-The tests are located in the project/folder as `Umbraco.Tests.AcceptanceTests`. Make sure you run `npm ci` & `npx playwright install` in that folder, or let your IDE do that.
+---
 
-The script will ask you to enter the username and password for a superadmin user of your Umbraco CMS.
+## Prerequisites
 
-### Executing tests
-There are two npm scripts that can be used to execute the test:
+- **Node.js 22+**
+- **A running installed Umbraco instance** on URL: [https://localhost:44339](https://localhost:44339) (default development port)
+  - Install using `SqlServer`/`LocalDb` as the tests execute too fast for `SQLite` to handle
 
-1. `npm run test`
-   - Executes the tests headless.
-1. `npm run ui`
-   - Executes the tests in a browser handled by a playwright application.
+---
 
- In case of errors it is recommended to use `await page.pause()` so you can step through your test.
+## Getting Started
 
-### Executing single tests
+1. Navigate to the test project folder:
+   ```bash
+   cd tests/Umbraco.Tests.AcceptanceTest
+   ```
 
-If you wish to run a single set of tests, which may be helpful when writing tests you can use the following command. As before, you need to run these tests in the 'tests/Umbraco.Tests.AcceptanceTest' folder.
+2. Install dependencies and Playwright browsers:
+   ```bash
+   npm ci
+   npx playwright install
+   ```
 
-    npx playwright test <testname.ts>
+3. The setup script will prompt you to enter credentials for a superadmin user of your Umbraco CMS.
 
-For example to run the Login Test:
+---
 
-    npx playwright test tests/DefaultConfig/Login/Login.spec.ts
+## Executing Tests
 
-To run a single test (if you have several in a file), you can use this syntax.
+### Available NPM Scripts
 
-    npx playwright test -g "<name of test>"
+| Command | Description |
+|---------|-------------|
+| `npm run test` | Execute DefaultConfig tests headlessly |
+| `npm run ui` | Open Playwright UI mode with browser |
+| `npm run smokeTest` | Run quick smoke tests (`@smoke` tagged) |
+| `npm run releaseTest` | Run comprehensive release tests (`@release` tagged) |
+| `npm run all` | Run all test suites |
+| `npm run testSqlite` | Run tests excluding User tests (SQLite limitation) |
+| `npm run testWindows` | Run tests excluding RelationType tests |
+| `npm run createTest <name>` | Generate a new test file template |
+| `npm run config` | Reconfigure environment settings |
 
-For example:
+### Running Single Tests
 
-    npx playwright test -g "can create content with the document link"
-
-### Executing tests in UI Mode
-
-If you would like to have an overview of all your test, to be able to see all the steps in the tests being executed and you would like to be able to run all of your tests one after another, and maybe only just one test. Then you should use UI Mode. As before, you need to run these commands in the 'tests/Umbraco.Tests.AcceptanceTest' folder.
-
-    npx playwright test --ui
-
-You can also specify which tests you want to run
-
-    npx playwright test --ui tests/DefaultConfig
-
-When entering UI Mode, you might only able to see the authenticate test. To fix this you will need to click on the 'Projects' in UI mode and select 'Chromium'. After you've done this. You should be able to see all your tests for the location you specified when running the command.
-
-### Environment Configuration
-
-The environment configuration is begin setup by the npm installation script.
-This results in the creation of this file: `.env`.
-This file is already added to `.gitignore` and can contain values that are different for each developer machine.
-
-The file has the following content:
+Run a specific test file:
+```bash
+npx playwright test tests/DefaultConfig/Content/Content.spec.ts
 ```
-UMBRACO_USER_LOGIN=email for superadmin
-UMBRACO_USER_PASSWORD=password for superadmin
+
+Run a single test by name:
+```bash
+npx playwright test -g "can create content with the document link"
+```
+
+Run tests with visible browser:
+```bash
+npx playwright test --headed tests/DefaultConfig/Content/Content.spec.ts
+```
+
+### UI Mode
+
+For an interactive testing experience with step-by-step visualization:
+
+```bash
+npx playwright test --ui
+```
+
+Or specify a test directory:
+```bash
+npx playwright test --ui tests/DefaultConfig
+```
+
+> **Note**: In UI mode, if you only see the authenticate test, click on 'Projects' and select 'defaultConfig' to see all tests.
+
+---
+
+## Test Helpers and Fixtures
+
+Tests use the `@umbraco/playwright-testhelpers` package which provides three main fixtures:
+
+### `umbracoUi` - UI Interaction Helper
+
+For browser interactions organized by section:
+
+```typescript
+// Navigation
+await umbracoUi.goToBackOffice();
+await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+// Interactions
+await umbracoUi.content.enterContentName('My Content');
+await umbracoUi.content.clickSaveButton();
+await umbracoUi.content.clickSaveAndPublishButton();
+
+// Assertions
+await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+await umbracoUi.content.doesSuccessNotificationHaveText('Content saved');
+```
+
+### `umbracoApi` - REST API Helper
+
+For server-side operations (setup/teardown):
+
+```typescript
+// Create test data
+const docTypeId = await umbracoApi.documentType.createDefaultDocumentType('TestType');
+const dataTypeId = await umbracoApi.dataType.createTextstringDataType('TestDataType');
+
+// Query data
+const exists = await umbracoApi.document.doesNameExist('MyContent');
+const data = await umbracoApi.document.getByName('MyContent');
+
+// Cleanup (idempotent - won't fail if not exists)
+await umbracoApi.documentType.ensureNameNotExists('TestType');
+
+// Publishing
+await umbracoApi.document.publish(documentId);
+```
+
+### `page` - Raw Playwright Page
+
+Direct access to Playwright's Page object for custom interactions:
+
+```typescript
+await page.pause();  // Pause for debugging
+await page.screenshot({ path: 'debug.png' });
+```
+
+### Helper Constants
+
+```typescript
+import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco/playwright-testhelpers';
+
+// Section names
+ConstantHelper.sections.content
+ConstantHelper.sections.media
+ConstantHelper.sections.settings
+
+// Notification messages
+NotificationConstantHelper.success.published
+NotificationConstantHelper.success.saved
+
+// String utilities
+AliasHelper.toAlias('Test Document Type')  // → 'testDocumentType'
+```
+
+---
+
+## Writing Tests
+
+### Test Structure (AAA Pattern)
+
+All tests follow the Arrange-Act-Assert pattern:
+
+```typescript
+import { ConstantHelper, test } from '@umbraco/playwright-testhelpers';
+import { expect } from '@playwright/test';
+
+const documentTypeName = 'TestDocumentType';
+const contentName = 'TestContent';
+
+test.beforeEach(async ({ umbracoApi, umbracoUi }) => {
+  // Clean up any existing test data (idempotent)
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+
+  // Navigate to backoffice
+  await umbracoUi.goToBackOffice();
+});
+
+test.afterEach(async ({ umbracoApi }) => {
+  // Always clean up after tests
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+});
+
+test('can create content', { tag: '@smoke' }, async ({ umbracoApi, umbracoUi }) => {
+  // Arrange - Setup test data via API
+  const documentTypeId = await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+
+  // Act - Perform UI actions
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert - Verify results
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+});
+```
+
+### Test Tags
+
+Tag tests for selective execution:
+
+```typescript
+test('critical path test', { tag: '@smoke' }, async ({ umbracoApi, umbracoUi }) => {
+  // Quick smoke test
+});
+
+test('comprehensive test', { tag: '@release' }, async ({ umbracoApi, umbracoUi }) => {
+  // Full release validation
+});
+```
+
+### Creating a New Test
+
+Use the generator script:
+```bash
+npm run createTest MyFeatureName
+```
+
+This creates `tests/MyFeatureName.spec.ts` with a template.
+
+### Test Conventions
+
+1. **Idempotent cleanup**: Use `ensureNameNotExists()` instead of `delete()` - won't fail if item doesn't exist
+2. **API for setup**: Create test data via API (faster than UI)
+3. **UI for validation**: Test actual user workflows through the UI
+4. **Test independence**: Each test should run standalone without depending on other tests
+5. **Descriptive names**: Use clear, descriptive test and variable names
+6. **Clean up**: Always clean up test data in `afterEach`
+
+---
+
+## Environment Configuration
+
+The environment configuration is set up by the npm installation script, creating a `.env` file (git-ignored):
+
+```bash
+UMBRACO_USER_LOGIN=email@example.com
+UMBRACO_USER_PASSWORD=yourpassword
 URL=https://localhost:44339
 ```
-You can change this if you like or run the config script to reset the values, type "npm run config" in your terminal.
 
-### Documentation
+To reconfigure:
+```bash
+npm run config
+```
 
-For further documentation on Playwright, see the [Playwright documentation](https://playwright.dev/docs/intro).
+---
+
+## Debugging Tests
+
+### Pause Execution
+
+```typescript
+await page.pause();  // Opens Playwright Inspector
+```
+
+### Take Screenshots
+
+```typescript
+await page.screenshot({ path: 'debug.png' });
+```
+
+### View Traces
+
+Failed tests automatically save traces. View them with:
+```bash
+npx playwright show-trace results/trace.zip
+```
+
+### Run in Debug Mode
+
+```bash
+PWDEBUG=1 npx playwright test tests/DefaultConfig/Content/Content.spec.ts
+```
+
+---
+
+## Test Projects
+
+The test suite is organized into multiple Playwright projects (see `playwright.config.ts`):
+
+| Project | Description |
+|---------|-------------|
+| `setup` | Authentication setup (runs first) |
+| `defaultConfig` | Main test suite (depends on setup) |
+| `extensionRegistry` | Extension registry tests |
+| `entityDataPicker` | Entity data picker tests |
+| `deliveryApi` | Delivery API tests |
+| `externalLoginAzureADB2C` | Azure AD B2C authentication tests |
+| `unattendedInstallConfig` | Installation tests (no auth required) |
+| `smtp` | Email/SMTP tests |
+
+---
+
+## Configuration Details
+
+Key settings in `playwright.config.ts`:
+
+- **Test timeout**: 30 seconds per test
+- **Expect timeout**: 5 seconds for assertions
+- **Retries**: 2 retries on CI (0 locally)
+- **Workers**: 1 (sequential execution for state consistency)
+- **Browser**: Desktop Chrome with HTTPS
+- **Test identifier**: `data-mark` attribute
+
+---
+
+## Documentation
+
+- [Playwright Documentation](https://playwright.dev/docs/intro)
+- [Umbraco Documentation](https://docs.umbraco.com/)
+- [@umbraco/playwright-testhelpers](https://www.npmjs.com/package/@umbraco/playwright-testhelpers)
+- [@umbraco/json-models-builders](https://www.npmjs.com/package/@umbraco/json-models-builders)

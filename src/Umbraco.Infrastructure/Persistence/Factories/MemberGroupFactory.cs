@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -20,7 +21,7 @@ internal static class MemberGroupFactory
         {
             group.DisableChangeTracking();
 
-            group.CreateDate = dto.CreateDate;
+            group.CreateDate = dto.CreateDate.EnsureUtc();
             group.Id = dto.NodeId;
             group.Key = dto.UniqueId;
             group.Name = dto.Text;

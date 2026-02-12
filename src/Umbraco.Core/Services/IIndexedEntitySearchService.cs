@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Services;
@@ -12,31 +12,19 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 public interface IIndexedEntitySearchService
 {
-    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
-    PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false);
-
-    // default implementation to avoid breaking changes falls back to old behaviour
-    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
-    PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, Guid? parentId, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
-        => Search(objectType,query, skip, take, ignoreUserStartNodes);
-
-    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
-    PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, Guid? parentId, IEnumerable<Guid>? contentTypeIds, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
-        => Search(objectType,query, skip, take, ignoreUserStartNodes);
-
-    // default implementation to avoid breaking changes falls back to old behaviour
-    [Obsolete("Please use the async version of this method, SearchAsync. Scheduled for removal in V17.")]
-    PagedModel<IEntitySlim> Search(
-        UmbracoObjectTypes objectType,
-        string query,
-        Guid? parentId,
-        IEnumerable<Guid>? contentTypeIds,
-        bool? trashed,
-        int skip = 0,
-        int take = 100,
-        bool ignoreUserStartNodes = false)
-        => Search(objectType, query, skip, take, ignoreUserStartNodes);
-
+    /// <summary>
+    /// Searches for entities using the search index with support for filtering and pagination.
+    /// </summary>
+    /// <param name="objectType">The type of entities to search for.</param>
+    /// <param name="query">The search query string.</param>
+    /// <param name="parentId">Optional parent ID to restrict the search to descendants of a specific node.</param>
+    /// <param name="contentTypeIds">Optional collection of content type IDs to filter results by.</param>
+    /// <param name="trashed">Optional filter for trashed state. If null, all items are included.</param>
+    /// <param name="culture">Optional culture code to filter results by language variant.</param>
+    /// <param name="skip">The number of results to skip for pagination.</param>
+    /// <param name="take">The maximum number of results to return.</param>
+    /// <param name="ignoreUserStartNodes">If true, ignores user start node restrictions when searching.</param>
+    /// <returns>A paged model containing the matching entities.</returns>
     Task<PagedModel<IEntitySlim>> SearchAsync(
         UmbracoObjectTypes objectType,
         string query,

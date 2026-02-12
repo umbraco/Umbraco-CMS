@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
@@ -7,8 +8,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 public abstract class NamedEntityTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : NamedEntityTreeItemResponseModel, new()
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected NamedEntityTreeControllerBase(IEntityService entityService)
         : base(entityService)
+    {
+    }
+
+    protected NamedEntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 

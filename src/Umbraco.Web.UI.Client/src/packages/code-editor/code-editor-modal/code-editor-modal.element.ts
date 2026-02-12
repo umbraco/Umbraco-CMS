@@ -6,7 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 @customElement('umb-code-editor-modal')
 export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditorModalData, UmbCodeEditorModalValue> {
 	@query('umb-code-editor')
-	_codeEditor?: UmbCodeEditorElement;
+	private _codeEditor?: UmbCodeEditorElement;
 
 	#handleConfirm() {
 		this.value = { content: this._codeEditor?.editor?.monacoEditor?.getValue() ?? '' };

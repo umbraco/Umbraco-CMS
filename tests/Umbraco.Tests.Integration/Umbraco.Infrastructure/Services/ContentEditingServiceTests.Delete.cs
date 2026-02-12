@@ -36,6 +36,24 @@ public partial class ContentEditingServiceTests
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
+    public async Task Can_Delete_When_Content_Is_Related_To_Parent_For_Restore_And_Configured_To_Disable_When_Related()
+    {
+        var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveAttempt.Success);
+
+        // Setup a relation where the page being deleted is related to it's parent (created as the location to restore to).
+        Relate(Subpage2, Subpage, Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+        var result = await ContentEditingService.DeleteFromRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+
+        // re-get and verify is deleted
+        var subpage = await ContentEditingService.GetAsync(Subpage.Key);
+        Assert.IsNull(subpage);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Can_Delete_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
     {
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);

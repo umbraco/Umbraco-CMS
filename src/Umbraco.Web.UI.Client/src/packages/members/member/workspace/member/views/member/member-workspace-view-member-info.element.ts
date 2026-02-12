@@ -15,7 +15,7 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 @customElement('umb-member-workspace-view-member-info')
 export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	private _memberTypeUnique = '';
+	private _memberTypeUnique?: string;
 
 	@state()
 	private _memberTypeName = '';
@@ -58,16 +58,21 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, async (context) => {
 			this.#workspaceContext = context;
-			this.observe(this.#workspaceContext?.contentTypeUnique, (unique) => (this._memberTypeUnique = unique || ''));
+			this.observe(this.#workspaceContext?.contentTypeUnique, async (unique) => {
+				if (unique === this._memberTypeUnique) return;
+				this._memberTypeUnique = unique;
+
+				if (this._memberTypeUnique) {
+					const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
+					if (!memberType) return;
+					this._memberTypeName = memberType.name;
+					this._memberTypeIcon = memberType.icon;
+				}
+			});
 			this.observe(this.#workspaceContext?.createDate, (date) => (this._createDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext?.updateDate, (date) => (this._updateDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext?.unique, (unique) => (this._unique = unique || ''));
 			this.observe(this.#workspaceContext?.kind, (kind) => (this._memberKind = kind));
-
-			const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
-			if (!memberType) return;
-			this._memberTypeName = memberType.name;
-			this._memberTypeIcon = memberType.icon;
 		});
 
 		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [

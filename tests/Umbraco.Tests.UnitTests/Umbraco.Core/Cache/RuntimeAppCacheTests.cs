@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Extensions;
@@ -13,18 +12,21 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
     internal abstract IAppPolicyCache AppPolicyCache { get; }
 
     [Test]
-    [Explicit("Testing for timeouts cannot work on VSTS.")]
     public void Can_Add_And_Expire_Struct_Strongly_Typed_With_Null()
     {
         var now = DateTime.Now;
-        AppPolicyCache.Insert("DateTimeTest", () => now, new TimeSpan(0, 0, 0, 0, 200));
-        Assert.AreEqual(now, AppCache.GetCacheItem<DateTime>("DateTimeTest"));
-        Assert.AreEqual(now, AppCache.GetCacheItem<DateTime?>("DateTimeTest"));
+        AppPolicyCache.Insert("DateTimeTest", () => now, new TimeSpan(0, 0, 0, 0, 20));
+        var cachedDateTime = AppCache.GetCacheItem<DateTime>("DateTimeTest");
+        var cachedDateTimeNullable = AppCache.GetCacheItem<DateTime?>("DateTimeTest");
+        Assert.AreEqual(now, cachedDateTime);
+        Assert.AreEqual(now, cachedDateTimeNullable);
 
-        Thread.Sleep(300); // sleep longer than the cache expiration
+        Thread.Sleep(30); // sleep longer than the cache expiration
 
-        Assert.AreEqual(default(DateTime), AppCache.GetCacheItem<DateTime>("DateTimeTest"));
-        Assert.AreEqual(null, AppCache.GetCacheItem<DateTime?>("DateTimeTest"));
+        cachedDateTime = AppCache.GetCacheItem<DateTime>("DateTimeTest");
+        cachedDateTimeNullable = AppCache.GetCacheItem<DateTime?>("DateTimeTest");
+        Assert.AreEqual(default(DateTime), cachedDateTime);
+        Assert.AreEqual(null, cachedDateTimeNullable);
     }
 
     [Test]

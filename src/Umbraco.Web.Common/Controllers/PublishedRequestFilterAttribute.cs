@@ -48,7 +48,7 @@ internal sealed class PublishedRequestFilterAttribute : ResultFilterAttribute
     /// <summary>
     ///     Gets the <see cref="UmbracoRouteValues" />
     /// </summary>
-    protected static UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
+    private static UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
     {
         UmbracoRouteValues? routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
         if (routeVals == null)

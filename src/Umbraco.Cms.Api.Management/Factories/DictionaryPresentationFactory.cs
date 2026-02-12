@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Models;
@@ -23,8 +24,7 @@ public class DictionaryPresentationFactory : IDictionaryPresentationFactory
     {
         DictionaryItemResponseModel dictionaryResponseModel = _umbracoMapper.Map<DictionaryItemResponseModel>(dictionaryItem)!;
 
-        var validLanguageIsoCodes = (await _languageService.GetAllAsync())
-            .Select(language => language.IsoCode)
+        var validLanguageIsoCodes = (await _languageService.GetAllIsoCodesAsync())
             .ToArray();
         IDictionaryTranslation[] validTranslations = dictionaryItem.Translations
             .Where(t => validLanguageIsoCodes.Contains(t.LanguageIsoCode))

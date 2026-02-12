@@ -4,5 +4,5 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbItemRepository<ItemType> extends UmbApi {
 	requestItems: (uniques: string[]) => Promise<UmbRepositoryResponseWithAsObservable<ItemType[] | undefined>>;
-	items: (uniques: string[]) => Promise<Observable<Array<ItemType>> | undefined>;
+	items?: (uniques: string[]) => Promise<Observable<Array<ItemType>> | undefined>;
 }

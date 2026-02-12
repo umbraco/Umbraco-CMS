@@ -87,10 +87,12 @@ export class UmbDocumentValidationServerDataSource {
 		// Maybe use: tryExecuteAndNotify
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putUmbracoManagementApiV11DocumentByIdValidate11({
-				path: { id: model.unique },
-				body,
-			}),
+			DocumentService.putUmbracoManagementApiV1Service.documentByIdValidate1Service.putUmbracoManagementApiV11DocumentByIdValidate11(
+				{
+					path: { id: model.unique },
+					body,
+				},
+			),
 			{
 				disableNotifications: true,
 			},

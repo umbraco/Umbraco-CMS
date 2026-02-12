@@ -9,6 +9,7 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
@@ -19,13 +20,13 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	item?: UmbSearchResultItemModel & UmbDocumentItemModel;
 
 	@state()
-	_currentCulture?: string;
+	private _currentCulture?: string;
 
 	@state()
-	_defaultCulture?: string;
+	private _defaultCulture?: string;
 
 	@state()
-	_variant?: UmbDocumentItemVariantModel;
+	private _variant?: UmbDocumentItemVariantModel;
 
 	constructor() {
 		super();
@@ -64,7 +65,10 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 
 	#getDraftState(): boolean {
 		if (this.item?.isTrashed) return false;
-		return this._variant?.state === 'Draft' || this.item?.variants[0]?.state === 'Draft';
+		return (
+			this._variant?.state === DocumentVariantStateModel.DRAFT ||
+			this.item?.variants[0]?.state === DocumentVariantStateModel.DRAFT
+		);
 	}
 
 	override render() {

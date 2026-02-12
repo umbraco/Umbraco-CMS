@@ -1,0 +1,105 @@
+﻿parameters:
+  - name: ASPNETCORE_URLS
+    type: string
+    default: ''
+
+  - name: testCommand
+    type: string
+    default: ''
+
+  - name: port
+    type: string
+    default: ''
+
+  - name: AZUREB2CTESTUSEREMAIL
+    type: string
+    default: ''
+
+  - name: AZUREB2CTESTUSERPASSWORD
+    type: string
+    default: ''
+
+  - name: DatabaseType
+    type: string
+    default: ''
+
+steps:
+  # Ensures we have the package wait-on installed
+  - pwsh: npm install wait-on
+    displayName: Install wait-on package
+
+  # Wait for either the port of the aspnetcore url
+  - pwsh: |
+      $Port = "${{ parameters.port }}"
+      $Url  = "${{ parameters.ASPNETCORE_URLS }}"
+
+      if ($Port -ne "") {
+          Write-Host "Waiting on TCP port $Port"
+          npx wait-on -v --interval 1000 --timeout 120000 "tcp:$Port"
+      } else {
+          Write-Host "Waiting on URL $Url"
+          npx wait-on -v --interval 1000 --timeout 120000 "$Url"
+      }
+    displayName: Wait for application
+    workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+
+  # Install Playwright and dependencies
+  - pwsh: npx playwright install chromium
+    displayName: Install Playwright only with Chromium browser
+    workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+
+  # Test
+  - pwsh: ${{ parameters.testCommand }}
+    displayName: Run Playwright tests
+    workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+    env:
+      CI: true
+      CommitId: $(Build.SourceVersion)
+      AgentOs: $(Agent.OS)
+      AZUREADB2CTESTUSEREMAIL: ${{ parameters.AZUREB2CTESTUSEREMAIL }}
+      AZUREADB2CTESTUSERPASSWORD: ${{ parameters.AZUREB2CTESTUSERPASSWORD }}
+
+  # Stop application
+  - bash: kill -15 $(AcceptanceTestProcessId)
+    displayName: Stop application (Linux)
+    condition: and(succeededOrFailed(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+
+  - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
+    displayName: Stop application (Windows)
+    condition: and(succeededOrFailed(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
+
+  - ${{ if eq(parameters.DatabaseType, 'SQLServer') }}:
+      # Stop SQL Server
+      - pwsh: docker stop mssql
+        displayName: Stop SQL Server Docker image (Linux)
+        condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Linux'))
+
+      - pwsh: SqlLocalDB stop MSSQLLocalDB
+        displayName: Stop SQL Server LocalDB (Windows)
+        condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
+
+  # Copy artifacts
+  - pwsh: |
+      if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
+        Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
+      }
+    displayName: Copy Playwright results
+    condition: succeededOrFailed()
+
+  # Publish
+  - task: PublishPipelineArtifact@1
+    displayName: Publish test artifacts
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(Build.ArtifactStagingDirectory)
+      artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+
+  # Publish test results
+  - task: PublishTestResults@2
+    displayName: "Publish test results"
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '*.xml'
+      searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
+      testRunTitle: "$(Agent.JobName)"

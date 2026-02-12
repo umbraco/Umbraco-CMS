@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -19,6 +21,25 @@ public class ContentFinderByUrlNew : IContentFinder
     private readonly ILogger<ContentFinderByUrlNew> _logger;
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentUrlService _documentUrlService;
+    private WebRoutingSettings _webRoutingSettings;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    public ContentFinderByUrlNew(
+        ILogger<ContentFinderByUrlNew> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentUrlService documentUrlService,
+        IPublishedContentCache publishedContentCache)
+        : this(
+              logger,
+              umbracoContextAccessor,
+              documentUrlService,
+              publishedContentCache,
+              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<WebRoutingSettings>>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
@@ -27,17 +48,20 @@ public class ContentFinderByUrlNew : IContentFinder
         ILogger<ContentFinderByUrlNew> logger,
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentUrlService documentUrlService,
-        IPublishedContentCache publishedContentCache)
+        IPublishedContentCache publishedContentCache,
+        IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger;
         _publishedContentCache = publishedContentCache;
         _documentUrlService = documentUrlService;
-        UmbracoContextAccessor =
-            umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+        UmbracoContextAccessor = umbracoContextAccessor;
+
+        _webRoutingSettings = webRoutingSettings.CurrentValue;
+        webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
     /// <summary>
-    ///     Gets the <see cref="IUmbracoContextAccessor" />
+    ///     Gets the <see cref="IUmbracoContextAccessor" />.
     /// </summary>
     protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
@@ -61,6 +85,14 @@ public class ContentFinderByUrlNew : IContentFinder
         }
         else
         {
+            // If we have configured strict domain matching, and a domain has not been found for the request configured on an ancestor node,
+            // do not route the content by URL.
+            if (_webRoutingSettings.UseStrictDomainMatching)
+            {
+                return Task.FromResult(false);
+            }
+
+            // Default behaviour if strict domain matching is not enabled will be to route under the to the first root node found.
             route = frequest.AbsolutePathDecoded;
         }
 
@@ -79,29 +111,24 @@ public class ContentFinderByUrlNew : IContentFinder
             return null;
         }
 
-        if (docreq == null)
-        {
-            throw new ArgumentNullException(nameof(docreq));
-        }
+        ArgumentNullException.ThrowIfNull(docreq);
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Test route {Route}", route);
         }
 
-        var documentKey = _documentUrlService.GetDocumentKeyByRoute(
-            docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length),
+        Guid? documentKey = _documentUrlService.GetDocumentKeyByRoute(
+            docreq.Domain is null ? route : route[docreq.Domain.ContentId.ToString().Length..],
             docreq.Culture,
             docreq.Domain?.ContentId,
-            umbracoContext.InPreviewMode
-            );
+            umbracoContext.InPreviewMode);
 
 
         IPublishedContent? node = null;
         if (documentKey.HasValue)
         {
             node = _publishedContentCache.GetById(umbracoContext.InPreviewMode, documentKey.Value);
-            //node = umbracoContext.Content?.GetById(umbracoContext.InPreviewMode, documentKey.Value);
         }
 
         if (node != null)

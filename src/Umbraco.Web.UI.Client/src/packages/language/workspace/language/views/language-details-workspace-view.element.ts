@@ -14,13 +14,13 @@ import '@umbraco-cms/backoffice/culture';
 @customElement('umb-language-details-workspace-view')
 export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_language?: UmbLanguageDetailModel;
+	private _language?: UmbLanguageDetailModel;
 
 	@state()
-	_isDefaultLanguage = false;
+	private _isDefaultLanguage = false;
 
 	@state()
-	_isNew?: boolean;
+	private _isNew?: boolean;
 
 	#languageWorkspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 

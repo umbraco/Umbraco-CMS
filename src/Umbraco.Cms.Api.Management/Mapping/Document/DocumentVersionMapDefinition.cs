@@ -1,7 +1,9 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -11,8 +13,19 @@ namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
 public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, DocumentValueResponseModel, DocumentVariantResponseModel>, IMapDefinition
 {
-    public DocumentVersionMapDefinition(PropertyEditorCollection propertyEditorCollection)
-        : base(propertyEditorCollection)
+    public DocumentVersionMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : base(propertyEditorCollection, dataValueEditorFactory)
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    public DocumentVersionMapDefinition(
+        PropertyEditorCollection propertyEditorCollection)
+        : this(
+            propertyEditorCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
     {
     }
 

@@ -1,4 +1,5 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {expect} from '@playwright/test';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 // Content Name
 const contentName = 'ContentName';
@@ -29,7 +30,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridName);
 });
 
-test('can not publish a block grid with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
+test('cannot publish a block grid with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   propertyEditorId = await umbracoApi.dataType.createRadioboxDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
@@ -51,13 +52,14 @@ test('can not publish a block grid with a mandatory radiobox without a value', a
   await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 });
 
-test('can not publish a block grid with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
+test('cannot publish a block grid with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   propertyEditorId = await umbracoApi.dataType.createCheckboxListDataType(propertyEditorName, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
@@ -79,13 +81,14 @@ test('can not publish a block grid with a mandatory checkbox list without a valu
   await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 });
 
-test('can not publish a block grid with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
+test('cannot publish a block grid with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   propertyEditorId = await umbracoApi.dataType.createDropdownDataType(propertyEditorName, false, optionValues);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
@@ -107,8 +110,57 @@ test('can not publish a block grid with a mandatory dropdown without a value', a
   await umbracoUi.content.chooseDropdownOption([optionValues[0]]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+});
+
+test('cannot update a variant block grid with invalid text', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringElementDataTypeName = 'Textstring';
+  const textStringElementRegex = '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+';
+  const wrongPropertyValue = 'This is an invalid email';
+  const correctPropertyValue = 'validemail@test.com';
+  // Create a new language
+  await umbracoApi.language.createDanishLanguage();
+  // ElementType with textstring and regex only accept an email address
+  const textStringElementDataType = await umbracoApi.dataType.getByName(textStringElementDataTypeName);
+  elementTypeId = await umbracoApi.documentType.createElementTypeWithRegexValidation(blockName, elementGroupName, textStringElementDataTypeName, textStringElementDataType.id, textStringElementRegex);
+  // Block Grid Editor with textstring
+  blockGridId = await umbracoApi.dataType.createBlockGridWithABlock(blockGridName, elementTypeId);
+  // Document Type with Block Grid Editor
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridName, blockGridId, documentTypeGroupName, true, true);
+  // Creates content
+  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(blockName);
+  // Enter text in the textstring block that won't match regex
+  await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, wrongPropertyValue);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickSaveButton();
+  // Verify that the Block Grid entry has an invalid badge
+  await umbracoUi.content.doesPropertyHaveInvalidBadge(blockGridName);
+  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.doesModalFormValidationMessageContainText(ConstantHelper.validationMessages.invalidValue);
+  // Update the textstring block with a valid email address
+  await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
+  await umbracoUi.content.clickUpdateButton();
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickContainerSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.contentData[0].values[0].value).toContain(correctPropertyValue);
+  const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
+  expect(blockListValue).toBeTruthy();
+  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.doesPropertyContainValue(textStringElementDataTypeName, correctPropertyValue);
 });

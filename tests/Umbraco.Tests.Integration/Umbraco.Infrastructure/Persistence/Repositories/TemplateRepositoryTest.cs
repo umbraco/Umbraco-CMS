@@ -1,9 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -24,10 +21,10 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -62,8 +59,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
     private IOptionsMonitor<RuntimeSettings> RuntimeSettings => GetRequiredService<IOptionsMonitor<RuntimeSettings>>();
 
-    private ITemplateRepository CreateRepository(IScopeProvider provider) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, ShortStringHelper, ViewHelper, RuntimeSettings);
+    private ITemplateRepository CreateRepository(IScopeProvider provider, AppCaches? appCaches = null) =>
+        new TemplateRepository((IScopeAccessor)provider, appCaches ?? AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, RuntimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     [Test]
     public void Can_Instantiate_Repository()
@@ -78,6 +75,224 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(repository, Is.Not.Null);
         }
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var template = CreateTemplate(repository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for ITemplate so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<ITemplate>();
+
+        // Initial request by Id should hit the database.
+        repository.Get(template.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache.
+        repository.Get(template.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var template = CreateTemplate(repository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for ITemplate so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<ITemplate>();
+
+        // Initial request by key should hit the database.
+        repository.Get(template.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache.
+        repository.Get(template.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var template = CreateTemplate(repository);
+
+        database.EnableSqlCount = true;
+
+        // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
+        repository.Get(template.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(template.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(template.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(template.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var template = CreateTemplate(repository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for ITemplate so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<ITemplate>();
+
+        // Initial request by ID should hit the database.
+        repository.Get(template.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(template.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(template.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var template = CreateTemplate(repository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for ITemplate so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<ITemplate>();
+
+        // Initial request by key should hit the database.
+        repository.Get(template.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(template.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(template.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Deletion_Returns_Null()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        var template = CreateTemplate(repository);
+        var retrievedTemplate = repository.Get(template.Key);
+        Assert.IsNotNull(retrievedTemplate);
+
+        repository.Delete(template);
+
+        retrievedTemplate = repository.Get(template.Key);
+        Assert.IsNull(retrievedTemplate);
+    }
+
+    private static AppCaches CreateAppCaches() =>
+        new(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+    private static ITemplate CreateTemplate(ITemplateRepository repository)
+    {
+        var templateBuilder = new TemplateBuilder();
+        var template = templateBuilder
+            .WithId(0)
+            .WithAlias("testTemplate")
+            .WithName("Test Template")
+            .Build();
+
+        repository.Save(template);
+        return template;
     }
 
     [Test]
@@ -261,15 +476,15 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         {
             var templateRepository = CreateRepository(provider);
             var globalSettings = new GlobalSettings();
-            var serializer = new SystemTextJsonSerializer();
-            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
+            var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var commonRepository =
                 new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, IdKeyMap);
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
+            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var propertyEditors =
                 new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
             var dataValueReferences =
@@ -568,7 +783,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    protected Stream CreateStream(string contents = null)
+    private Stream CreateStream(string contents = null)
     {
         if (string.IsNullOrEmpty(contents))
         {

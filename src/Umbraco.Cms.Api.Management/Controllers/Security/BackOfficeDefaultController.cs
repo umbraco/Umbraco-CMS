@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
@@ -17,14 +18,10 @@ public class BackOfficeDefaultController : Controller
     public BackOfficeDefaultController(IRuntime umbracoRuntime)
         => _umbracoRuntime = umbracoRuntime;
 
-    [Obsolete("Use the non obsoleted constructor instead. Scheduled to be removed in v17")]
-    public BackOfficeDefaultController()
-        : this(StaticServiceProvider.Instance.GetRequiredService<IRuntime>())
-    {
-    }
-
     [HttpGet]
     [AllowAnonymous]
+    [EndpointSummary("Gets the back office default configuration.")]
+    [EndpointDescription("Gets the default configuration and settings for the Umbraco back office.")]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         // force authentication to occur since this is not an authorized endpoint

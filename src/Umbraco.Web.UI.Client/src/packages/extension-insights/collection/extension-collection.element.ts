@@ -1,4 +1,4 @@
-import type { UmbExtensionCollectionFilterModel, UmbExtensionDetailModel } from './types.js';
+import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from './types.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -8,7 +8,7 @@ import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-extension-collection')
 export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
-	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionDetailModel, UmbExtensionCollectionFilterModel>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionCollectionItemModel, UmbExtensionCollectionFilterModel>;
 
 	#options: Array<Option> = [];
 
@@ -49,25 +49,23 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 	static override styles = [
 		css`
 			#toolbar {
-				flex: 1;
 				display: flex;
 				gap: var(--uui-size-space-5);
 				justify-content: space-between;
 				align-items: center;
-			}
 
-			umb-collection-filter-field {
-				width: 100%;
-			}
+				umb-collection-filter-field {
+					flex: 1;
+				}
 
-			uui-select {
-				width: 100%;
+				uui-select {
+					flex: 1;
+				}
 			}
 		`,
 	];
 }
 
-/** @deprecated Should be exported as `element` only; to be removed in Umbraco 17. */
 export default UmbExtensionCollectionElement;
 
 export { UmbExtensionCollectionElement as element };

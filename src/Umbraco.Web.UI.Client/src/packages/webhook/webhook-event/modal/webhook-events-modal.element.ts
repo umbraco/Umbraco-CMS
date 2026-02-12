@@ -11,7 +11,7 @@ export class UmbWebhookEventsModalElement extends UmbModalBaseElement<
 	UmbWebhookPickerModalValue
 > {
 	@state()
-	_events: Array<UmbWebhookEventModel> = [];
+	private _events: Array<UmbWebhookEventModel> = [];
 
 	#repository = new UmbWebhookEventRepository(this);
 

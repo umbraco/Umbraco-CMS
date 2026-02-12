@@ -16,7 +16,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 	string
 > {
 	@state()
-	_snippets: Array<UmbSnippetLinkModel> = [];
+	private _snippets: Array<UmbSnippetLinkModel> = [];
 
 	#getCreateHref(snippet: PartialViewSnippetItemResponseModel) {
 		return `section/settings/workspace/partial-view/create/parent/${this.data?.parent.entityType}/${

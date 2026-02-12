@@ -1,9 +1,4 @@
 export const UMB_CONTEXT_REQUEST_EVENT_TYPE = 'umb:context-request';
-/**
- * @deprecated use UMB_CONTEXT_REQUEST_EVENT_TYPE
- * This will be removed in Umbraco 17
- */
-export const UMB_CONTENT_REQUEST_EVENT_TYPE = UMB_CONTEXT_REQUEST_EVENT_TYPE;
 export const UMB_DEBUG_CONTEXT_EVENT_TYPE = 'umb:debug-contexts';
 
 export type UmbContextCallback<T> = (instance: T | undefined) => void;

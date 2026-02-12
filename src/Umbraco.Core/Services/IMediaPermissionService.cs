@@ -39,4 +39,14 @@ public interface IMediaPermissionService
     /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <returns>A task resolving into a <see cref="MediaAuthorizationStatus"/>.</returns>
     Task<MediaAuthorizationStatus> AuthorizeBinAccessAsync(IUser user);
+
+    /// <summary>
+    ///     Filters media keys to only those the user has access to.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="mediaKeys">The identifiers of the media items to filter.</param>
+    /// <returns>A task resolving into the set of authorized media keys.</returns>
+    // TODO (V18): Remove default implementation.
+    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys)
+        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
 }

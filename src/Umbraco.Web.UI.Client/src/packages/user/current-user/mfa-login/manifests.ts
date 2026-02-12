@@ -1,4 +1,4 @@
-import { UMB_CURRENT_USER_ALLOW_MFA_CONDITION_ALIAS } from '@umbraco-cms/backoffice/user';
+import { UMB_CURRENT_USER_ALLOW_MFA_CONDITION_ALIAS } from '../conditions/allow-mfa/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

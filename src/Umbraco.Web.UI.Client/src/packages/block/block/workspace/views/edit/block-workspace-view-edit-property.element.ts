@@ -15,10 +15,10 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 	property?: UmbPropertyTypeModel;
 
 	@state()
-	_dataPath?: string;
+	private _dataPath?: string;
 
 	@state()
-	_writeable?: boolean;
+	private _writeable?: boolean;
 
 	@property({ attribute: false })
 	ownerContext?: UmbBlockElementManager;

@@ -24,7 +24,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	get props(): UmbAuthProviderDefaultProps {
 		return {
 			userLoginState: this.data?.userLoginState ?? 'loggingIn',
-			onSubmit: this.onSubmit.bind(this),
+			onSubmit: this.#onSubmit.bind(this),
 		};
 	}
 
@@ -137,7 +137,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
-	private onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
+	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
 		try {
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			if (!authContext) {
@@ -169,7 +169,10 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				justify-content: center;
+				width: 100vw;
+
 				background: var(--uui-color-background, #f4f4f4);
 
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);

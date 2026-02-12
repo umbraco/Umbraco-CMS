@@ -8,7 +8,7 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 	entityId?: string;
 
 	@state()
-	_package?: any;
+	private _package?: any;
 
 	override connectedCallback(): void {
 		super.connectedCallback();

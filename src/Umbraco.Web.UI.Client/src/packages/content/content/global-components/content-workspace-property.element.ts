@@ -2,8 +2,7 @@ import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../constants.js';
 import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_VARIANT_CONTEXT, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
@@ -21,22 +20,22 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	@state()
-	_datasetVariantId?: UmbVariantId;
+	private _datasetVariantId?: UmbVariantId;
 
 	@state()
-	_dataPath?: string;
+	private _dataPath?: string;
 
 	@state()
-	_viewable?: boolean;
+	private _viewable?: boolean;
 
 	@state()
-	_writeable?: boolean;
+	private _writeable?: boolean;
 
 	@state()
-	_workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_propertyType?: UmbPropertyTypeModel;
+	private _propertyType?: UmbPropertyTypeModel;
 
 	@state()
 	private _hasAccessToSensitiveData = false;
@@ -45,8 +44,14 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 		super();
 
 		// The Property Dataset is local to the active variant, we use this to retrieve the variant we like to gather the value from.
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
-			this._datasetVariantId = datasetContext?.getVariantId();
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (variantContext) => {
+			this.observe(
+				variantContext?.variantId,
+				(variantId) => {
+					this._datasetVariantId = variantId;
+				},
+				'observeDatasetVariantId',
+			);
 		});
 
 		// The Content Workspace Context is used to retrieve the property type we like to observe.
@@ -66,30 +71,12 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 	async #observePropertyType() {
 		if (!this._alias || !this._workspaceContext) return;
 
-		this.observe(await this._workspaceContext?.structure.propertyStructureByAlias(this._alias), (propertyType) => {
-			this._propertyType = propertyType;
-			this.#checkViewGuard();
-		});
-	}
-
-	#checkViewGuard() {
-		if (!this._workspaceContext || !this._propertyType || !this._datasetVariantId) return;
-
-		const propertyVariantId = new UmbVariantId(
-			this._propertyType.variesByCulture ? this._datasetVariantId.culture : null,
-			this._propertyType.variesBySegment ? this._datasetVariantId.segment : null,
-		);
-
 		this.observe(
-			this._workspaceContext.propertyViewGuard.isPermittedForVariantAndProperty(
-				propertyVariantId,
-				this._propertyType,
-				this._datasetVariantId,
-			),
-			(permitted) => {
-				this._viewable = permitted;
+			await this._workspaceContext?.structure.propertyStructureByAlias(this._alias),
+			(propertyType) => {
+				this._propertyType = propertyType;
 			},
-			`umbObservePropertyViewGuard`,
+			'observePropertyType',
 		);
 	}
 
@@ -115,12 +102,23 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 					this._workspaceContext.propertyWriteGuard.isPermittedForVariantAndProperty(
 						propertyVariantId,
 						this._propertyType,
-						propertyVariantId,
+						this._datasetVariantId,
 					),
 					(write) => {
 						this._writeable = write;
 					},
-					'observeView',
+					'umbObservePropertyWriteGuard',
+				);
+				this.observe(
+					this._workspaceContext.propertyViewGuard.isPermittedForVariantAndProperty(
+						propertyVariantId,
+						this._propertyType,
+						this._datasetVariantId,
+					),
+					(permitted) => {
+						this._viewable = permitted;
+					},
+					`umbObservePropertyViewGuard`,
 				);
 			}
 		}

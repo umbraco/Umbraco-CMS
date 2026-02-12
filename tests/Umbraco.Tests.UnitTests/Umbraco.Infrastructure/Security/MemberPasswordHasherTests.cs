@@ -15,8 +15,13 @@ public class MemberPasswordHasherTests
     [Test]
     [TestCase(
         "Password123!",
-        "AQAAAAIAAYagAAAAEJBorDjt+UEvw55UJVsbgAS6T2IGao+2XpCBbO3EKZoAMzoN+CNOpPdu1c0qrFcJVw==", null,  ExpectedResult = PasswordVerificationResult.Success, Description = "AspNetCoreIdentityPasswordHash: Correct password")]
-        [TestCase("Password123!", "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==",
+        "AQAAAAIAAYagAAAAEJBorDjt+UEvw55UJVsbgAS6T2IGao+2XpCBbO3EKZoAMzoN+CNOpPdu1c0qrFcJVw==",
+        null,
+        ExpectedResult = PasswordVerificationResult.Success,
+        Description = "AspNetCoreIdentityPasswordHash: Correct password")]
+    [TestCase(
+        "Password123!",
+        "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==",
         null,
         ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded,
         Description = "GivenALegacyAspNetCoreIdentityPasswordHash: Correct password")]
@@ -104,7 +109,7 @@ public class MemberPasswordHasherTests
 
         var sut = new MemberPasswordHasher(
             new LegacyPasswordSecurity(),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Options.Create(new LegacyPasswordMigrationSettings { MachineKeyDecryptionKey = decryptionKey }),
             NullLoggerFactory.Instance.CreateLogger<MemberPasswordHasher>());
 

@@ -97,7 +97,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		this._observeProgressItems();
 	}
 
-	_observeProgress() {
+	protected _observeProgress() {
 		this.observe(
 			this._manager.progress,
 			(progress) => {
@@ -170,7 +170,8 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 					compact
 					@click=${this.#handleRemove}
 					label=${this.localize.term('content_uploadClear')}>
-					<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
+					<uui-icon name="icon-trash"></uui-icon>
+					<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
 				</uui-button>
 			</div>
 		`;

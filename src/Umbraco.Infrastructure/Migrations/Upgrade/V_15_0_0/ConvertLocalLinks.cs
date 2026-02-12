@@ -17,6 +17,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
+/// <summary>
+/// Migrates local links in content and media properties from the legacy format using UDIs
+/// to the new one with GUIDs.
+/// </summary>
+/// <remarks>
+/// See: https://github.com/umbraco/Umbraco-CMS/pull/17307.
+/// </remarks>
 public class ConvertLocalLinks : MigrationBase
 {
     private readonly IUmbracoContextFactory _umbracoContextFactory;
@@ -30,7 +37,9 @@ public class ConvertLocalLinks : MigrationBase
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly LocalLinkMigrationTracker _linkMigrationTracker;
 
-    [Obsolete("Use non obsoleted contructor instead")]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class.
+    /// </summary>
     public ConvertLocalLinks(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
@@ -57,6 +66,10 @@ public class ConvertLocalLinks : MigrationBase
         _linkMigrationTracker = linkMigrationTracker;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal along with all other migrations to 17 in Umbraco 18.")]
     public ConvertLocalLinks(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
@@ -83,6 +96,7 @@ public class ConvertLocalLinks : MigrationBase
     {
     }
 
+    /// <inheritdoc/>
     protected override void Migrate()
     {
         IEnumerable<string> propertyEditorAliases = _localLinkProcessor.GetSupportedPropertyEditorAliases();
@@ -116,7 +130,7 @@ public class ConvertLocalLinks : MigrationBase
             _logger.LogInformation(
                 "Migration starting for all properties of type: {propertyEditorAlias}",
                 propertyEditorAlias);
-            if (ProcessPropertyTypes(propertyTypes, languagesById))
+            if (ProcessPropertyTypes(propertyEditorAlias, propertyTypes, languagesById))
             {
                 _logger.LogInformation(
                     "Migration succeeded for all properties of type: {propertyEditorAlias}",
@@ -134,7 +148,7 @@ public class ConvertLocalLinks : MigrationBase
         RebuildCache = true;
     }
 
-    private bool ProcessPropertyTypes(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
+    private bool ProcessPropertyTypes(string propertyEditorAlias, IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
     {
         foreach (IPropertyType propertyType in propertyTypes)
         {
@@ -145,112 +159,157 @@ public class ConvertLocalLinks : MigrationBase
                                            ?? throw new InvalidOperationException(
                                                "The data type value editor could not be fetched.");
 
-            Sql<ISqlContext> sql = Sql()
-                .Select<PropertyDataDto>()
-                .From<PropertyDataDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
-                    propertyData.VersionId == contentVersion.Id)
-                .LeftJoin<DocumentVersionDto>()
-                .On<ContentVersionDto, DocumentVersionDto>((contentVersion, documentVersion) =>
-                    contentVersion.Id == documentVersion.Id)
-                .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>(
-                    (propertyData, contentVersion, documentVersion) =>
-                        (contentVersion.Current == true || documentVersion.Published == true)
-                        && propertyData.PropertyTypeId == propertyType.Id);
-
-            List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(sql);
-            if (propertyDataDtos.Count < 1)
+            long propertyDataCount = Database.ExecuteScalar<long>(BuildPropertyDataSql(propertyType, true));
+            if (propertyDataCount == 0)
             {
                 continue;
             }
 
-            var updateBatch = propertyDataDtos.Select(propertyDataDto =>
-                UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
+            _logger.LogInformation(
+                "Migrating {PropertyDataCount} property data values for property {PropertyTypeAlias} ({PropertyTypeKey}) with property editor alias {PropertyEditorAlias}",
+                propertyDataCount,
+                propertyType.Alias,
+                propertyType.Key,
+                propertyEditorAlias);
 
-            var updatesToSkip = new ConcurrentBag<UpdateBatch<PropertyDataDto>>();
-
-            var progress = 0;
-
-            void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
+            // Process in pages to avoid loading all property data from the database into memory at once.
+            Sql<ISqlContext> sql = BuildPropertyDataSql(propertyType);
+            const int PageSize = 10000;
+            long pageNumber = 1;
+            long pageCount = (propertyDataCount + PageSize - 1) / PageSize;
+            int processedCount = 0;
+            while (processedCount < propertyDataCount)
             {
-                using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
-
-                progress++;
-                if (progress % 100 == 0)
+                Page<PropertyDataDto> propertyDataDtoPage = Database.Page<PropertyDataDto>(pageNumber, PageSize, sql);
+                if (propertyDataDtoPage.Items.Count == 0)
                 {
-                    _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
-                        updateBatch.Count);
+                    break;
                 }
 
-                PropertyDataDto propertyDataDto = update.Poco;
+                var updateBatchCollection = propertyDataDtoPage.Items
+                    .Select(propertyDataDto =>
+                        UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto)))
+                    .ToList();
 
-                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor) == false)
-                {
-                    updatesToSkip.Add(update);
-                }
-            }
+                var updatesToSkip = new ConcurrentBag<UpdateBatch<PropertyDataDto>>();
 
-            if (DatabaseType == DatabaseType.SQLite)
-            {
-                // SQLite locks up if we run the migration in parallel, so... let's not.
-                foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
+                var progress = 0;
+
+                void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
                 {
-                    HandleUpdateBatch(update);
-                }
-            }
-            else
-            {
-                Parallel.ForEachAsync(updateBatch, async (update, token) =>
-                {
-                    //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
-                    Task task;
-                    using (ExecutionContext.SuppressFlow())
+                    using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+
+                    progress++;
+                    if (progress % 100 == 0)
                     {
-                        task = Task.Run(
-                            () =>
-                            {
-                                using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-                                scope.Complete();
-                                HandleUpdateBatch(update);
-                            },
-                            token);
+                        _logger.LogInformation(
+                            "  - finished {Progress} of {PageTotal} properties in page {PageNumber} of {PageCount}",
+                            progress,
+                            updateBatchCollection.Count,
+                            pageNumber,
+                            pageCount);
                     }
 
-                    await task;
-                }).GetAwaiter().GetResult();
+                    PropertyDataDto propertyDataDto = update.Poco;
+
+                    if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor) == false)
+                    {
+                        updatesToSkip.Add(update);
+                    }
+                }
+
+                if (DatabaseType == DatabaseType.SQLite)
+                {
+                    // SQLite locks up if we run the migration in parallel, so... let's not.
+                    foreach (UpdateBatch<PropertyDataDto> update in updateBatchCollection)
+                    {
+                        HandleUpdateBatch(update);
+                    }
+                }
+                else
+                {
+                    Parallel.ForEachAsync(updateBatchCollection, async (update, token) =>
+                    {
+                        //Foreach here, but we need to suppress the flow before each task, but not the actual await of the task
+                        Task task;
+                        using (ExecutionContext.SuppressFlow())
+                        {
+                            task = Task.Run(
+                                () =>
+                                {
+                                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                                    scope.Complete();
+                                    HandleUpdateBatch(update);
+                                },
+                                token);
+                        }
+
+                        await task;
+                    }).GetAwaiter().GetResult();
+                }
+
+                updateBatchCollection.RemoveAll(updatesToSkip.Contains);
+
+                if (updateBatchCollection.Any() is false)
+                {
+                    _logger.LogDebug("  - no properties to convert, continuing");
+
+                    pageNumber++;
+                    processedCount += propertyDataDtoPage.Items.Count;
+
+                    continue;
+                }
+
+                _logger.LogInformation("  - {totalConverted} properties converted, saving...", updateBatchCollection.Count);
+                var result = Database.UpdateBatch(updateBatchCollection, new BatchOptions { BatchSize = 100 });
+                if (result != updateBatchCollection.Count)
+                {
+                    throw new InvalidOperationException(
+                        $"The database batch update was supposed to update {updateBatchCollection.Count} property DTO entries, but it updated {result} entries.");
+                }
+
+                _logger.LogDebug(
+                    "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+                    propertyType.Name,
+                    propertyType.Id,
+                    propertyType.Alias,
+                    propertyType.PropertyEditorAlias,
+                    result);
+
+                pageNumber++;
+                processedCount += propertyDataDtoPage.Items.Count;
             }
-
-            updateBatch.RemoveAll(updatesToSkip.Contains);
-
-            if (updateBatch.Any() is false)
-            {
-                _logger.LogDebug("  - no properties to convert, continuing");
-                continue;
-            }
-
-            _logger.LogInformation("  - {totalConverted} properties converted, saving...", updateBatch.Count);
-            var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
-            if (result != updateBatch.Count)
-            {
-                throw new InvalidOperationException(
-                    $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
-            }
-
-            _logger.LogDebug(
-                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
-                propertyType.Name,
-                propertyType.Id,
-                propertyType.Alias,
-                propertyType.PropertyEditorAlias,
-                result);
         }
 
         return true;
     }
 
-    private bool ProcessPropertyDataDto(PropertyDataDto propertyDataDto, IPropertyType propertyType,
-        IDictionary<int, ILanguage> languagesById, IDataValueEditor valueEditor)
+    private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, bool isCount = false)
+    {
+        Sql<ISqlContext> sql = isCount
+            ? Sql().SelectCount()
+            : Sql().Select<PropertyDataDto>();
+
+        sql = sql.From<PropertyDataDto>()
+            .InnerJoin<ContentVersionDto>()
+            .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
+                propertyData.VersionId == contentVersion.Id)
+            .LeftJoin<DocumentVersionDto>()
+            .On<ContentVersionDto, DocumentVersionDto>((contentVersion, documentVersion) =>
+                contentVersion.Id == documentVersion.Id)
+            .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>(
+                (propertyData, contentVersion, documentVersion) =>
+                    (contentVersion.Current || documentVersion.Published)
+                    && propertyData.PropertyTypeId == propertyType.Id);
+
+        return sql;
+    }
+
+    private bool ProcessPropertyDataDto(
+        PropertyDataDto propertyDataDto,
+        IPropertyType propertyType,
+        IDictionary<int, ILanguage> languagesById,
+        IDataValueEditor valueEditor)
     {
         // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
         var culture = propertyType.VariesByCulture()

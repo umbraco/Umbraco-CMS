@@ -4,7 +4,7 @@ import { UmbDeleteEntityBulkAction } from '@umbraco-cms/backoffice/entity-bulk-a
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbBulkDeleteWithRelationEntityAction extends UmbDeleteEntityBulkAction<MetaEntityBulkActionDeleteWithRelationKind> {
-	override async _confirmDelete() {
+	protected override async _confirmDelete() {
 		await umbOpenModal(this, UMB_BULK_DELETE_WITH_RELATION_CONFIRM_MODAL, {
 			data: {
 				uniques: this.selection,

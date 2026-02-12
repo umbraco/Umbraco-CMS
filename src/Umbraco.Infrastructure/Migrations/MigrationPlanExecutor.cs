@@ -1,15 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
-using Org.BouncyCastle.Utilities;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
-using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -51,9 +49,12 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly DistributedCache _distributedCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+
     private bool _rebuildCache;
     private bool _invalidateBackofficeUserAccess;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
         IScopeAccessor scopeAccessor,
@@ -65,6 +66,33 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         IKeyValueService keyValueService,
         IServiceScopeFactory serviceScopeFactory,
         AppCaches appCaches)
+        : this(
+            scopeProvider,
+            scopeAccessor,
+            loggerFactory,
+            migrationBuilder,
+            databaseFactory,
+            databaseCacheRebuilder,
+            distributedCache,
+            keyValueService,
+            serviceScopeFactory,
+            appCaches,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeFactory>())
+    {
+    }
+
+    public MigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        ILoggerFactory loggerFactory,
+        IMigrationBuilder migrationBuilder,
+        IUmbracoDatabaseFactory databaseFactory,
+        IDatabaseCacheRebuilder databaseCacheRebuilder,
+        DistributedCache distributedCache,
+        IKeyValueService keyValueService,
+        IServiceScopeFactory serviceScopeFactory,
+        AppCaches appCaches,
+        IPublishedContentTypeFactory publishedContentTypeFactory)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
@@ -76,36 +104,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _serviceScopeFactory = serviceScopeFactory;
         _appCaches = appCaches;
         _distributedCache = distributedCache;
+        _publishedContentTypeFactory = publishedContentTypeFactory;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
-
-    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v17")]
-    public MigrationPlanExecutor(
-        ICoreScopeProvider scopeProvider,
-        IScopeAccessor scopeAccessor,
-        ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder,
-        IUmbracoDatabaseFactory databaseFactory,
-        IDatabaseCacheRebuilder databaseCacheRebuilder,
-        DistributedCache distributedCache,
-        IKeyValueService keyValueService,
-        IServiceScopeFactory serviceScopeFactory)
-    : this(
-        scopeProvider,
-        scopeAccessor,
-        loggerFactory,
-        migrationBuilder,
-        databaseFactory,
-        databaseCacheRebuilder,
-        distributedCache,
-        keyValueService,
-        serviceScopeFactory,
-        StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
-    {
-    }
-
-    [Obsolete("Use ExecutePlan instead. Scheduled for removal in Umbraco 17.")]
-    public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
 
     /// <inheritdoc/>
     [Obsolete("Use ExecutePlanAsync instead. Scheduled for removal in Umbraco 18.")]
@@ -301,6 +302,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _appCaches.IsolatedCaches.ClearAllCaches();
         await _databaseCacheRebuilder.RebuildAsync(false);
         _distributedCache.RefreshAllPublishedSnapshot();
+        _publishedContentTypeFactory.ClearDataTypeCache();
     }
 
     private async Task RevokeBackofficeTokens()
@@ -318,7 +320,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         var backOfficeClientId = await openIddictApplicationManager.GetIdAsync(backOfficeClient);
         if (backOfficeClientId is null)
         {
-            _logger.LogWarning("Could not extract the clientId from the openIddict backofficelient Application. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            _logger.LogWarning("Could not extract the clientId from the openIddict backoffice client Application for {BackOfficeClientId}. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
             return;
         }
 

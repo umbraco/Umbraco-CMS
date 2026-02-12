@@ -8,10 +8,6 @@
   },
   "symbolInfo": [
     {
-      "id": "UmbracoVersion",
-      "isVisible": false
-    },
-    {
       "id": "UseHttpsRedirect",
       "isVisible": true,
       "persistenceScope": "templateGroup",
@@ -61,6 +57,11 @@
     {
       "id": "UnattendedUserPassword",
       "isVisible": true
+    },
+    {
+      "id": "UnattendedTelemetryLevel",
+      "isVisible": true,
+      "defaultValue": "Detailed"
     },
     {
       "id": "NoNodesViewPath",

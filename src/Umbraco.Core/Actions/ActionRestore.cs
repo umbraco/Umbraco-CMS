@@ -21,12 +21,6 @@ public class ActionRestore : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string? Category => null;
-
-    /// <inheritdoc />
-    public string Icon => "icon-undo";
-
-    /// <inheritdoc />
     public bool ShowInNotifier => true;
 
     /// <inheritdoc />

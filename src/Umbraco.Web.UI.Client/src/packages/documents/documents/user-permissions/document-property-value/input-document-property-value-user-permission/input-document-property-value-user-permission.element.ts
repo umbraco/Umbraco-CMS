@@ -28,12 +28,12 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-document-property-value-user-permission')
 export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
-	_permissions: Array<UmbDocumentPropertyValueUserPermissionModel> = [];
+	#permissions: Array<UmbDocumentPropertyValueUserPermissionModel> = [];
 	public get permissions(): Array<UmbDocumentPropertyValueUserPermissionModel> {
-		return this._permissions;
+		return this.#permissions;
 	}
 	public set permissions(value: Array<UmbDocumentPropertyValueUserPermissionModel>) {
-		this._permissions = value;
+		this.#permissions = value;
 		const uniques = value.map((item) => item.documentType.unique);
 		this.#observePickedDocumentTypes(uniques);
 	}
@@ -73,7 +73,7 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 					verbs: this.#getFallbackPermissionVerbsForEntityType(UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE),
 				},
 				pickablePropertyTypeFilter: (propertyType) =>
-					!this._permissions.some((permission) => permission.propertyType.unique === propertyType.unique),
+					!this.#permissions.some((permission) => permission.propertyType.unique === propertyType.unique),
 			},
 		});
 
@@ -89,7 +89,7 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 				verbs: value.verbs,
 			};
 
-			this.permissions = [...this._permissions, permissionItem];
+			this.permissions = [...this.#permissions, permissionItem];
 			this.dispatchEvent(new UmbChangeEvent());
 		} catch (error) {
 			console.error(error);
@@ -132,7 +132,7 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 			if (JSON.stringify(value.allowedVerbs) === JSON.stringify(currentPermission.verbs)) return;
 
 			// update permission with new verbs
-			this.permissions = this._permissions.map((permission) => {
+			this.permissions = this.#permissions.map((permission) => {
 				if (permission.propertyType.unique === currentPermission.propertyType.unique) {
 					return {
 						...permission,
@@ -144,12 +144,12 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 
 			this.dispatchEvent(new UmbChangeEvent());
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 
 	#removePermission(permission: UmbDocumentPropertyValueUserPermissionModel) {
-		this.permissions = this._permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
+		this.permissions = this.#permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -221,7 +221,7 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 
 		const documentType = this._documentTypes?.find((item) => item.unique === permission.documentType.unique);
 		const propertyType = documentType?.properties.find((item) => item.unique === permission.propertyType.unique);
-		const permissionName = `${documentType?.name}: ${propertyType?.name} (${propertyType?.alias})`;
+		const permissionName = `${this.localize.string(documentType?.name)}: ${this.localize.string(propertyType?.name)} (${propertyType?.alias})`;
 		const verbNames = this.#getVerbNamesForPermission(permission);
 
 		return html`

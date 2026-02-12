@@ -31,6 +31,7 @@ export const data: Array<UmbMockMemberModel> = [
 			},
 		],
 		kind: MemberKindModel.DEFAULT,
+		flags: [],
 	},
 	{
 		email: 'member2@member.com',
@@ -56,6 +57,7 @@ export const data: Array<UmbMockMemberModel> = [
 			},
 		],
 		kind: MemberKindModel.DEFAULT,
+		flags: [],
 	},
 	{
 		email: 'member3@member.com',
@@ -81,6 +83,7 @@ export const data: Array<UmbMockMemberModel> = [
 			},
 		],
 		kind: MemberKindModel.DEFAULT,
+		flags: [],
 	},
 	{
 		email: 'forbidden@example.com',
@@ -106,5 +109,6 @@ export const data: Array<UmbMockMemberModel> = [
 			},
 		],
 		kind: MemberKindModel.DEFAULT,
+		flags: [],
 	},
 ];

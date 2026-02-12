@@ -44,7 +44,6 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext;
 			this.#observeDocumentType();
@@ -179,7 +178,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 										id="versions-newer-than-days"
 										min="0"
 										placeholder="7"
-										.value=${this._keepAllVersionsNewerThanDays}
+										.value=${this._keepAllVersionsNewerThanDays?.toString() ?? ''}
 										@change=${this.#onChangeKeepAllVersionsNewerThanDays}></uui-input>
 								</uui-form-layout-item>
 
@@ -194,7 +193,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 										id="latest-version-per-day-days"
 										min="0"
 										placeholder="90"
-										.value=${this._keepLatestVersionPerDayForDays}
+										.value=${this._keepLatestVersionPerDayForDays?.toString() ?? ''}
 										@change=${this.#onChangeKeepLatestVersionPerDayForDays}></uui-input>
 								</uui-form-layout-item>
 							`,

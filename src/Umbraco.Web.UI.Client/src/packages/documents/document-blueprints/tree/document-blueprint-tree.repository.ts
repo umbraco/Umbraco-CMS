@@ -1,11 +1,11 @@
 import { UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentBlueprintTreeServerDataSource } from './document-blueprint-tree.server.data-source.js';
+import { UmbDocumentBlueprintTreeServerDataSource } from './server-data-source/document-blueprint-tree.server.data-source.js';
 import { UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT } from './document-blueprint-tree.store.context-token.js';
 import type { UmbDocumentBlueprintTreeItemModel, UmbDocumentBlueprintTreeRootModel } from './types.js';
-import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentBlueprintTreeRepository
 	extends UmbTreeRepositoryBase<UmbDocumentBlueprintTreeItemModel, UmbDocumentBlueprintTreeRootModel>
@@ -18,7 +18,7 @@ export class UmbDocumentBlueprintTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data: UmbDocumentBlueprintTreeRootModel = {

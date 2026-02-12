@@ -30,10 +30,9 @@ test('can apply page header format', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.hoverCascadingMenuItemWithName('Headers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Page header');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<h2>' + inputText + '</h2><p></p>');
 });
@@ -45,10 +44,9 @@ test('can apply section header format', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.hoverCascadingMenuItemWithName('Headers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Section header');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<h3>' + inputText + '</h3><p></p>');
 });
@@ -60,10 +58,9 @@ test('can apply paragraph header format', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.hoverCascadingMenuItemWithName('Headers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Paragraph header');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<h4>' + inputText + '</h4><p></p>');
 });
@@ -75,10 +72,9 @@ test('can apply paragraph blocks format', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.hoverCascadingMenuItemWithName('Blocks');
   await umbracoUi.content.clickCascadingMenuItemWithName('Paragraph');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
 });
@@ -90,10 +86,9 @@ test('can apply block quote format', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.hoverCascadingMenuItemWithName('Containers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Block quote');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<blockquote><p>' + inputText + '</p></blockquote><p></p>');
 });
@@ -105,10 +100,9 @@ test('can apply code block format', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.hoverCascadingMenuItemWithName('Containers');
   await umbracoUi.content.clickCascadingMenuItemWithName('Code block');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<pre><code>' + inputText + '</code></pre><p></p>');
 });

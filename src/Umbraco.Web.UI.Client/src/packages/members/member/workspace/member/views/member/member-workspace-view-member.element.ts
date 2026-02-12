@@ -10,6 +10,7 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 import './member-workspace-view-member-info.element.js';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -64,7 +65,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		)?.value;
 
 		if (newPassword !== confirmPassword) {
-			this._newPasswordError = 'Passwords do not match';
+			this._newPasswordError = this.localize.term('user_passwordMismatch');
 			return;
 		}
 
@@ -80,23 +81,33 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	};
 
 	#renderPasswordInput() {
-		if (this._isNew) {
+		if (this._isNew && this._workspaceContext) {
 			return html`
 				<umb-property-layout label=${this.localize.term('user_password')} mandatory>
 					<uui-input
 						slot="editor"
 						name="newPassword"
+						data-mark="input:password"
 						label=${this.localize.term('user_passwordEnterNew')}
 						type="password"
-						@input=${() => this.#onPasswordUpdate()}></uui-input>
+						@input=${() => this.#onPasswordUpdate()}
+						value=${this._workspaceContext.newPassword}
+						required
+						${umbBindToValidation(
+							this,
+							"$.values[?(@.alias == 'password' && @.culture == null && @.segment == null)].value",
+							this._workspaceContext.newPassword,
+						)}></uui-input>
 				</umb-property-layout>
 
-				<umb-property-layout label="Confirm password" mandatory>
+				<umb-property-layout label=${this.localize.term('user_confirmPassword')} mandatory>
 					<uui-input
 						slot="editor"
 						name="confirmPassword"
-						label="Confirm password"
+						data-mark="input:confirm-password"
+						label=${this.localize.term('user_confirmPassword')}
 						type="password"
+						value=${this._workspaceContext.newPassword}
 						@input=${() => this.#onPasswordUpdate()}></uui-input>
 				</umb-property-layout>
 
@@ -114,6 +125,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 								<uui-input
 									slot="editor"
 									name="newPassword"
+									data-mark="input:new-password"
 									label=${this.localize.term('user_newPassword')}
 									type="password"
 									@input=${() => this.#onPasswordUpdate()}></uui-input>
@@ -122,6 +134,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 								<uui-input
 									slot="editor"
 									name="confirmPassword"
+									data-mark="input:confirm-new-password"
 									label=${this.localize.term('user_confirmNewPassword')}
 									type="password"
 									@input=${() => this.#onPasswordUpdate()}></uui-input>
@@ -129,6 +142,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
 							<uui-button
 								label=${this.localize.term('general_cancel')}
+								data-mark="action:cancel"
 								look="secondary"
 								@click=${this.#onNewPasswordCancel}></uui-button>
 						</div>
@@ -136,6 +150,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					() => html`
 						<uui-button
 							slot="editor"
+							data-mark="action:change-password"
 							label=${this.localize.term('general_changePassword')}
 							look="secondary"
 							@click=${() => (this._showChangePasswordForm = true)}></uui-button>
@@ -155,8 +170,14 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						<uui-input
 							slot="editor"
 							name="login"
+							data-mark="input:username"
 							label=${this.localize.term('general_username')}
 							value=${this._workspaceContext.username}
+							${umbBindToValidation(
+								this,
+								"$.values[?(@.alias == 'username' && @.culture == null && @.segment == null)].value",
+								this._workspaceContext.username,
+							)}
 							required
 							required-message=${this.localize.term('user_loginnameRequired')}
 							@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
@@ -166,8 +187,14 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						<uui-input
 							slot="editor"
 							name="email"
+							data-mark="input:email"
 							label=${this.localize.term('general_email')}
 							value=${this._workspaceContext.email}
+							${umbBindToValidation(
+								this,
+								"$.values[?(@.alias == 'email' && @.culture == null && @.segment == null)].value",
+								this._workspaceContext.email,
+							)}
 							required
 							required-message=${this.localize.term('user_emailRequired')}
 							@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}></uui-input>
@@ -178,6 +205,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					<umb-property-layout label=${this.localize.term('content_membergroup')}>
 						<umb-input-member-group
 							slot="editor"
+							data-mark="input-member-group:member-group"
 							@change=${this.#onGroupsUpdated}
 							.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 					</umb-property-layout>
@@ -188,6 +216,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							<umb-property-layout label=${this.localize.term('user_stateApproved')}>
 								<uui-toggle
 									slot="editor"
+									data-mark="toggle:approved"
 									.checked=${this._workspaceContext!.isApproved}
 									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
 								</uui-toggle>
@@ -196,6 +225,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
 								<uui-toggle
 									slot="editor"
+									data-mark="toggle:locked-out"
 									?disabled=${this._isNew || !this._workspaceContext!.isLockedOut}
 									.checked=${this._workspaceContext!.isLockedOut}
 									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
@@ -206,6 +236,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					<umb-property-layout label=${this.localize.term('member_2fa')}>
 						<uui-toggle
 							slot="editor"
+							data-mark="toggle:two-factor"
 							?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
 							.checked=${this._workspaceContext.isTwoFactorEnabled}
 							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>

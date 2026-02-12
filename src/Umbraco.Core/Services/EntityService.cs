@@ -11,6 +11,13 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides entity-related operations for retrieving lightweight entity representations and managing entity identifiers.
+/// </summary>
+/// <remarks>
+///     This service provides efficient access to entity metadata without loading full entity objects,
+///     supporting operations like getting parent/child relationships, pagination, and ID/Key mapping.
+/// </remarks>
 public class EntityService : RepositoryService, IEntityService
 {
     private readonly IEntityRepository _entityRepository;
@@ -18,6 +25,14 @@ public class EntityService : RepositoryService, IEntityService
     private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;
     private IQuery<IUmbracoEntity>? _queryRootEntity;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EntityService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider for database operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="idKeyMap">The ID/Key mapping service for converting between integer IDs and GUIDs.</param>
+    /// <param name="entityRepository">The repository for entity data access.</param>
     public EntityService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -125,6 +140,7 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    /// <inheritdoc />
     public bool Exists(IEnumerable<Guid> keys)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -304,6 +320,7 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetChildren(Guid? key, UmbracoObjectTypes objectType)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -321,7 +338,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetSiblings(
         Guid key,
-        UmbracoObjectTypes objectType,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
         int before,
         int after,
         out long totalBefore,
@@ -343,8 +360,51 @@ public class EntityService : RepositoryService, IEntityService
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
+        var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
+
         IEnumerable<IEntitySlim> siblings = _entityRepository.GetSiblings(
-            objectType.GetGuid(),
+            objectTypeGuids,
+            key,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        scope.Complete();
+        return siblings;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IEntitySlim> GetTrashedSiblings(
+        Guid key,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        int before,
+        int after,
+        out long totalBefore,
+        out long totalAfter,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        if (before < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(before), "The 'before' parameter must be greater than or equal to 0.");
+        }
+
+        if (after < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(after), "The 'after' parameter must be greater than or equal to 0.");
+        }
+
+        ordering ??= new Ordering("sortOrder");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
+
+        IEnumerable<IEntitySlim> siblings = _entityRepository.GetTrashedSiblings(
+            objectTypeGuids,
             key,
             before,
             after,
@@ -398,6 +458,7 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, false, filter, ordering, out totalRecords);
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         UmbracoObjectTypes childObjectType,
@@ -416,6 +477,7 @@ public class EntityService : RepositoryService, IEntityService
             filter,
             ordering);
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         IEnumerable<UmbracoObjectTypes> parentObjectTypes,
@@ -438,7 +500,7 @@ public class EntityService : RepositoryService, IEntityService
 
         if (take == 0)
         {
-            totalRecords = CountChildren(parentId, childObjectType, filter);
+            totalRecords = CountChildren(parentId, childObjectType, filter: filter);
             return Enumerable.Empty<IEntitySlim>();
         }
 
@@ -468,6 +530,7 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, true, filter, ordering, out totalRecords);
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedTrashedChildren(
         Guid? key,
         UmbracoObjectTypes objectType,
@@ -482,6 +545,12 @@ public class EntityService : RepositoryService, IEntityService
         if (ResolveKey(key, objectType, out int parentId) is false)
         {
             totalRecords = 0;
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        if (take == 0)
+        {
+            totalRecords = CountChildren(parentId, objectType, true, filter);
             return Enumerable.Empty<IEntitySlim>();
         }
 
@@ -691,17 +760,18 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
-    private int CountChildren(int id, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null) =>
-        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, filter);
+    private int CountChildren(int id, UmbracoObjectTypes objectType, bool trashed = false, IQuery<IUmbracoEntity>? filter = null) =>
+        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, trashed, filter);
 
     private int CountChildren(
         int id,
         IEnumerable<UmbracoObjectTypes> objectTypes,
+        bool trashed = false,
         IQuery<IUmbracoEntity>? filter = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == trashed);
 
             var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
             return _entityRepository.CountByQuery(query, objectTypeGuids, filter);
@@ -757,6 +827,7 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         IEnumerable<UmbracoObjectTypes> parentObjectTypes,
@@ -780,7 +851,7 @@ public class EntityService : RepositoryService, IEntityService
 
             if (take == 0)
             {
-                totalRecords = CountChildren(parentId, childObjectTypes, filter);
+                totalRecords = CountChildren(parentId, childObjectTypes, filter: filter);
                 return Array.Empty<IEntitySlim>();
             }
 

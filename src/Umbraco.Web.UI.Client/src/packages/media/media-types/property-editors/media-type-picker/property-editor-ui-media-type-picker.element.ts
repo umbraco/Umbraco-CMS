@@ -22,10 +22,10 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 	}
 
 	@state()
-	_min = 0;
+	private _min = 0;
 
 	@state()
-	_max = Infinity;
+	private _max = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMediaTypeElement }) {
 		this.value = event.target.value;

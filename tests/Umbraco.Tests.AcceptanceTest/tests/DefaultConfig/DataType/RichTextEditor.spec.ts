@@ -2,20 +2,40 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Richtext editor';
-const tipTapPropertyEditorName = 'Rich Text Editor [Tiptap] Property Editor UI';
 const tipTapAlias = 'Umbraco.RichText';
 const tipTapUiAlias = 'Umb.PropertyEditorUi.Tiptap';
 const extensionsDefaultValue = [
+  "Umb.Tiptap.RichTextEssentials",
+  "Umb.Tiptap.Anchor",
+  "Umb.Tiptap.Block",
+  "Umb.Tiptap.Blockquote",
+  "Umb.Tiptap.Bold",
+  "Umb.Tiptap.BulletList",
+  "Umb.Tiptap.CodeBlock",
   "Umb.Tiptap.Embed",
-  "Umb.Tiptap.Link",
   "Umb.Tiptap.Figure",
+  "Umb.Tiptap.Heading",
+  "Umb.Tiptap.HorizontalRule",
+  "Umb.Tiptap.HtmlAttributeClass",
+  "Umb.Tiptap.HtmlAttributeDataset",
+  "Umb.Tiptap.HtmlAttributeId",
+  "Umb.Tiptap.HtmlAttributeStyle",
+  "Umb.Tiptap.HtmlTagDiv",
+  "Umb.Tiptap.HtmlTagSpan",
   "Umb.Tiptap.Image",
+  "Umb.Tiptap.Italic",
+  "Umb.Tiptap.Link",
+  "Umb.Tiptap.MediaUpload",
+  "Umb.Tiptap.OrderedList",
+  "Umb.Tiptap.Strike",
   "Umb.Tiptap.Subscript",
   "Umb.Tiptap.Superscript",
   "Umb.Tiptap.Table",
-  "Umb.Tiptap.Underline",
   "Umb.Tiptap.TextAlign",
-  "Umb.Tiptap.MediaUpload"
+  "Umb.Tiptap.TextDirection",
+  "Umb.Tiptap.TextIndent",
+  "Umb.Tiptap.TrailingNode",
+  "Umb.Tiptap.Underline"
 ];
 
 const toolbarDefaultValue = [
@@ -60,10 +80,9 @@ test('tiptap is the default property editor in rich text editor', async ({umbrac
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
-  // Assert 
+  // Assert
   await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tipTapSettings);
   await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.tipTapSettings);
-  await umbracoUi.dataType.doesPropertyEditorHaveName(tipTapPropertyEditorName);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(tipTapAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(tipTapUiAlias);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

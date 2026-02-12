@@ -15,6 +15,7 @@ import { manifests as sectionViewManifests } from './dashboard/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as urlManifests } from './url/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import * as entryPointModule from './entry-point.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...auditLogManifests,
@@ -34,4 +35,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...treeManifests,
 	...urlManifests,
 	...workspaceManifests,
+	{
+		name: 'Media Backoffice Entry Point',
+		alias: 'Umb.EntryPoint.Media',
+		type: 'backofficeEntryPoint',
+		js: entryPointModule,
+	},
 ];

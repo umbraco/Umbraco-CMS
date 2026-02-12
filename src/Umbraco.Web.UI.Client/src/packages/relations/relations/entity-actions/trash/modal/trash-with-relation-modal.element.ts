@@ -24,10 +24,10 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	UmbTrashWithRelationConfirmModalValue
 > {
 	@state()
-	_name?: string;
+	private _name?: string;
 
 	@state()
-	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#itemRepository?: UmbItemRepository<any>;
 
@@ -48,7 +48,13 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 		const item = data?.[0];
 		if (!item) throw new Error('Item not found.');
 
-		this._name = item.name;
+		if (this.data.itemDataResolver) {
+			const resolver = new this.data.itemDataResolver(this);
+			resolver.setData(item);
+			this._name = await resolver.getName();
+		} else {
+			this._name = item.name;
+		}
 
 		this._referencesConfig = {
 			unique: this.data.unique,

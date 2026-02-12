@@ -18,14 +18,15 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 	@property({ type: Boolean, reflect: true })
 	default = false;
 
-	_id = '';
+	#id = '';
+
 	@property({ type: String })
 	public override set id(newId: string) {
-		this._id = newId;
+		this.#id = newId;
 		super.value = newId;
 	}
 	public override get id() {
-		return this._id;
+		return this.#id;
 	}
 
 	protected override getFormElement() {

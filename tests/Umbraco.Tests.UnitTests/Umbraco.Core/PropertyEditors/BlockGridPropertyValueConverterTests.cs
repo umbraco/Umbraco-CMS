@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -191,7 +191,7 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = new BlockGridPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new BlockGridPropertyValueConstructorCache(),
             Mock.Of<IVariationContextAccessor>(),

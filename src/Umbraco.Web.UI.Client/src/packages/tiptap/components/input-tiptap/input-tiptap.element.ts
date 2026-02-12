@@ -1,3 +1,6 @@
+import { Editor } from '../../externals.js';
+import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
+import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
 import {
@@ -12,28 +15,34 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import type { Extensions } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-toolbar.element.js';
-import './tiptap-statusbar.element.js';
+import '../toolbar/tiptap-toolbar.element.js';
+import '../statusbar/tiptap-statusbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
 /**
- * The root path for the stylesheets on the server.
- * This is used to load the stylesheets from the server as a workaround until the server supports virtual paths.
+ * The default root path for the stylesheets on the server.
+ * This is used as a fallback if the server configuration is not available.
  */
-const STYLESHEET_ROOT_PATH = '/css';
+const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
+	#context = new UmbTiptapRteContext(this);
+
+	#hasToolbar = false;
+
+	#hasStatusbar = false;
+
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
+
+	#stylesheetRootPath = DEFAULT_STYLESHEET_ROOT_PATH;
 
 	@property({ type: String })
 	override set value(value: string) {
@@ -52,6 +61,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
+
+	@property()
+	label?: string;
 
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.
@@ -76,7 +88,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	private readonly _extensions: Array<UmbTiptapExtensionApi> = [];
 
 	@state()
-	private _styles: Array<CSSResultGroup> = [];
+	private _extensionStyles?: CSSResultGroup;
 
 	@state()
 	private _toolbar: UmbTiptapToolbarValue = [[[]]];
@@ -95,7 +107,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
+		await this.#loadStylesheetPath();
+		await this.#loadExtensions();
+		await this.#loadEditor();
 	}
 
 	/**
@@ -106,12 +120,20 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return this._editor?.isEmpty ?? false;
 	}
 
+	async #loadStylesheetPath() {
+		return this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
+			if (stylesheetRootPath) {
+				this.#stylesheetRootPath = stylesheetRootPath;
+			}
+		}).asPromise();
+	}
+
 	async #loadExtensions() {
 		const enabledExtensions = this.configuration?.getValueByAlias<string[]>('extensions') ?? [];
 
 		// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
 		if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
-			const { api } = await import('../../extensions/core/rich-text-essentials.tiptap-api.js');
+			const { default: api } = await import('../../extensions/core/rich-text-essentials.tiptap-api.js');
 			this._extensions.push(new api(this));
 		}
 
@@ -121,7 +143,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
 						if (extension) {
-							this._extensions.push(new extension(this));
+							const ext = new extension(this);
+							ext.manifest = manifest;
+							this._extensions.push(ext);
 						}
 					}
 				}
@@ -138,34 +162,51 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		if (stylesheets?.length) {
 			stylesheets.forEach((stylesheet) => {
 				const linkHref =
-					stylesheet.startsWith('http') || stylesheet.startsWith(STYLESHEET_ROOT_PATH)
+					stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
 						? stylesheet
-						: `${STYLESHEET_ROOT_PATH}${stylesheet}`;
+						: `${this.#stylesheetRootPath}${stylesheet}`;
 				this.#stylesheets.add(linkHref);
 			});
 		}
 
-		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
-		this._statusbar = this.configuration?.getValueByAlias<UmbTiptapStatusbarValue>('statusbar') ?? [];
-
-		const tiptapExtensions: Extensions = [];
+		const tiptapExtensions = new Map<string, AnyExtension>();
+		const collectedStyles: Array<CSSResultGroup> = [];
 
 		this._extensions.forEach((ext) => {
 			const tiptapExt = ext.getTiptapExtensions({ configuration: this.configuration });
 			if (tiptapExt?.length) {
-				tiptapExtensions.push(...tiptapExt);
+				tiptapExt.forEach((extension) => {
+					if (!tiptapExtensions.has(extension.name)) {
+						tiptapExtensions.set(extension.name, extension);
+					}
+				});
 			}
 
 			const styles = ext.getStyles();
 			if (styles) {
-				this._styles.push(styles);
+				collectedStyles.push(styles);
 			}
 		});
+
+		if (collectedStyles.length) {
+			this._extensionStyles = unsafeCSS(collectedStyles.map((s) => s.toString()).join(''));
+		}
+
+		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
+		this._statusbar = this.configuration?.getValueByAlias<UmbTiptapStatusbarValue>('statusbar') ?? [];
+		this.#hasToolbar = this._toolbar.flat(2).length > 0;
+		this.#hasStatusbar = this._statusbar.flat().length > 0;
 
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
-			extensions: tiptapExtensions,
+			editorProps: {
+				attributes: {
+					'aria-label': this.label || this.localize.term('rte_label'),
+					'aria-required': this.required ? 'true' : 'false',
+				},
+			},
+			extensions: Array.from(tiptapExtensions.values()),
 			content: this.#value,
 			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
 			//enableContentCheck: true,
@@ -181,6 +222,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
+
+		this.#context.setEditor(this._editor);
 	}
 
 	override render() {
@@ -188,27 +231,27 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			${when(loading, () => html`<div id="loader"><uui-loader></uui-loader></div>`)}
 			${when(!loading, () => html`${this.#renderStyles()}${this.#renderToolbar()}`)}
-			<div id="editor" data-mark="input:tiptap-rte"></div>
+			<div id="editor" data-mark="input:tiptap-rte" ?data-loaded=${!loading}></div>
 			${when(!loading, () => this.#renderStatusbar())}
 		`;
 	}
 
 	#renderStyles() {
-		if (!this._styles?.length) return;
+		if (!this._extensionStyles) return;
 		return html`
 			${repeat(
 				this.#stylesheets,
 				(stylesheet) => stylesheet,
-				(stylesheet) => html`<link rel="stylesheet" href="${stylesheet}" />`,
+				(stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`,
 			)}
 			<style>
-				${this._styles.map((style) => unsafeCSS(style))}
+				${this._extensionStyles}
 			</style>
 		`;
 	}
 
 	#renderToolbar() {
-		if (!this._toolbar.flat(2).length) return;
+		if (!this.#hasToolbar) return;
 		return html`
 			<umb-tiptap-toolbar
 				data-mark="tiptap-toolbar"
@@ -221,7 +264,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderStatusbar() {
-		if (!this._statusbar.flat().length) return;
+		if (!this.#hasStatusbar) return;
 		return html`
 			<umb-tiptap-statusbar
 				data-mark="tiptap-statusbar"
@@ -231,6 +274,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				?readonly=${this.readonly}>
 			</umb-tiptap-statusbar>
 		`;
+	}
+
+	override destroy(): void {
+		this._editor?.destroy();
+		this._editor = undefined;
 	}
 
 	static override readonly styles = [
@@ -243,6 +291,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				width: var(--umb-rte-width, unset);
 				min-width: var(--umb-rte-min-width, unset);
 				max-width: var(--umb-rte-max-width, 100%);
+			}
+
+			:host(:hover) {
+				--umb-tiptap-edge-border-color: var(--uui-color-border-standalone);
+			}
+
+			:host(:focus),
+			:host(:focus-within) {
+				--umb-tiptap-edge-border-color: var(--uui-color-border-emphasis);
 			}
 
 			:host([readonly]) {
@@ -272,7 +329,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				display: flex;
 				overflow: auto;
 				border-radius: var(--uui-border-radius);
-				border: 1px solid var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+				border: 1px solid transparent;
 				padding: 1rem;
 				box-sizing: border-box;
 
@@ -282,6 +339,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				width: 100%;
 				max-width: 100%;
+
+				&[data-loaded] {
+					border-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+				}
 
 				> .tiptap {
 					height: 100%;
@@ -308,6 +369,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					border-bottom-left-radius: 0;
 					border-bottom-right-radius: 0;
 				}
+			}
+
+			#editor,
+			umb-tiptap-toolbar,
+			umb-tiptap-statusbar {
+				transition: border-color 120ms ease-out;
 			}
 
 			umb-tiptap-toolbar + #editor {

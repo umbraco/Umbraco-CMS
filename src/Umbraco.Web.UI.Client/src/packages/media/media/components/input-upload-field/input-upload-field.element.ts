@@ -1,4 +1,4 @@
-import type { MediaValueType } from '../../property-editors/upload-field/types.js';
+import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -16,19 +16,26 @@ import type {
 } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-upload-field')
-export class UmbInputUploadFieldElement extends UmbLitElement {
+export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValueType, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	@property({ type: Object, attribute: false })
-	set value(value: MediaValueType) {
+	override set value(value: UmbMediaValueType | undefined) {
+		super.value = value;
 		this.#src = value?.src ?? '';
 		this.#setPreviewAlias();
 	}
-	get value(): MediaValueType {
-		return {
-			src: this.#src,
-			temporaryFileId: this.temporaryFile?.temporaryUnique,
-		};
+	override get value(): UmbMediaValueType | undefined {
+		if (this.#src || this.temporaryFile?.temporaryUnique) {
+			return {
+				src: this.#src,
+				temporaryFileId: this.temporaryFile?.temporaryUnique,
+			};
+		}
+		return undefined;
 	}
 	#src = '';
 
@@ -86,7 +93,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	async #getPreviewElementAlias() {
-		if (!this.value.src) return;
+		if (!this.value?.src) return;
 		const manifests = await this.#getManifests();
 		const fallbackAlias = manifests.find((manifest) =>
 			stringOrStringArrayContains(manifest.forMimeTypes, '*/*'),
@@ -158,7 +165,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this.temporaryFile && !this.value.src) {
+		if (!this.temporaryFile && !this.value?.src) {
 			return this.#renderDropzone();
 		}
 
@@ -201,7 +208,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#renderButtonRemove() {
 		return html`
 			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
+				<uui-icon name="icon-trash"></uui-icon>
+				<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
 			</uui-button>
 		`;
 	}

@@ -2,20 +2,10 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
-
-// TODO (V17):
-// - Remove the implementation of INotificationHandler as these have all been refactored out into sepate notification handler classes.
-// - Remove the unused parameters from the constructor.
 
 /// <summary>
 /// Defines the file upload property editor.
@@ -23,10 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataEditor(
     Constants.PropertyEditors.Aliases.UploadField,
     ValueEditorIsReusable = true)]
-public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
-    INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
-    INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
-    INotificationHandler<MemberDeletedNotification>
+public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator
 {
     private readonly IIOHelper _ioHelper;
 
@@ -35,10 +22,6 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// </summary>
     public FileUploadPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        MediaFileManager mediaFileManager,
-        IOptionsMonitor<ContentSettings> contentSettings,
-        UploadAutoFillProperties uploadAutoFillProperties,
-        IContentService contentService,
         IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
@@ -71,44 +54,4 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <returns>The corresponding property value editor.</returns>
     protected override IDataValueEditor CreateValueEditor()
         => DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
-
-    #region Obsolete notification handler notifications
-
-    /// <inheritdoc/>
-    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadContentCopiedNotificationHandler. Scheduled for removal in Umbraco 17.")]
-    public void Handle(ContentCopiedNotification notification)
-    {
-        // This handler is no longer registered. Logic has been migrated to FileUploadContentCopiedNotificationHandler.
-    }
-
-    /// <inheritdoc/>
-    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadMediaSavingNotificationHandler. Scheduled for removal in Umbraco 17.")]
-    public void Handle(MediaSavingNotification notification)
-    {
-        // This handler is no longer registered. Logic has been migrated to FileUploadMediaSavingNotificationHandler.
-    }
-
-    /// <inheritdoc/>
-    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadContentDeletedNotificationHandler. Scheduled for removal in Umbraco 17.")]
-    public void Handle(ContentDeletedNotification notification)
-    {
-        // This handler is no longer registered. Logic has been migrated to FileUploadContentDeletedNotificationHandler.
-    }
-
-
-    /// <inheritdoc/>
-    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadMediaDeletedNotificationHandler. Scheduled for removal in Umbraco 17.")]
-    public void Handle(MediaDeletedNotification notification)
-    {
-        // This handler is no longer registered. Logic has been migrated to FileUploadMediaDeletedNotificationHandler.
-    }
-
-    /// <inheritdoc/>
-    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadMemberDeletedNotificationHandler. Scheduled for removal in Umbraco 17.")]
-    public void Handle(MemberDeletedNotification notification)
-    {
-        // This handler is no longer registered. Logic has been migrated to FileUploadMemberDeletedNotificationHandler.
-    }
-
-    #endregion
 }

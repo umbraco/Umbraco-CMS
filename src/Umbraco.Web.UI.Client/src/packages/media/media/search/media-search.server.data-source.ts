@@ -40,6 +40,9 @@ export class UmbMediaSearchServerDataSource
 					parentId: args.searchFrom?.unique || undefined,
 					query: args.query,
 					trashed: args.includeTrashed,
+					dataTypeId: args.dataTypeUnique,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
 				},
 			}),
 		);
@@ -49,7 +52,7 @@ export class UmbMediaSearchServerDataSource
 				return {
 					entityType: UMB_MEDIA_ENTITY_TYPE,
 					hasChildren: item.hasChildren,
-					href: '/section/media/workspace/media/edit/' + item.id,
+					href: 'section/media/workspace/media/edit/' + item.id,
 					isTrashed: item.isTrashed,
 					unique: item.id,
 					mediaType: {

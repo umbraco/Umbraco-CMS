@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: '#actions_create',
+			label: '#actions_createFor',
 			additionalOptions: true,
 		},
 	},

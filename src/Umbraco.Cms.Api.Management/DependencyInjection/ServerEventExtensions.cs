@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Api.Management.ServerEvents.Authorizers;
@@ -28,6 +28,7 @@ internal static class ServerEventExtensions
     private static IUmbracoBuilder AddEvents(this IUmbracoBuilder builder)
     {
         builder.AddNotificationAsyncHandler<ContentSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ContentSavedBlueprintNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeSavedNotification, ServerEventSender>();
@@ -50,6 +51,7 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<WebhookSavedNotification, ServerEventSender>();
 
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ContentDeletedBlueprintNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, ServerEventSender>();
@@ -81,6 +83,7 @@ internal static class ServerEventExtensions
     {
         builder.EventSourceAuthorizers()
             .Append<DocumentEventAuthorizer>()
+            .Append<DocumentBlueprintEventAuthorizer>()
             .Append<DocumentTypeEventAuthorizer>()
             .Append<MediaEventAuthorizer>()
             .Append<MediaTypeEventAuthorizer>()

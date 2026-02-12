@@ -20,10 +20,10 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	#includeUnpublishedDescendants = false;
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_hasNotSelectedMandatory?: boolean;
+	private _hasNotSelectedMandatory?: boolean;
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {

@@ -20,7 +20,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
 
 	@state()
-	_hrefList: Array<string | undefined> = [];
+	private _hrefList: Array<string | undefined> = [];
 
 	#createLabel = this.localize.term('general_create');
 	#entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;
@@ -33,12 +33,12 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	}
 
 	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
-		event.stopPropagation();
-
 		// skip if href is defined
 		if (href) {
 			return;
 		}
+
+		event.stopPropagation();
 
 		if (!controller.api) throw new Error('No API found');
 		await controller.api.execute().catch(() => {});

@@ -38,6 +38,7 @@ const createDetailMockMapper = (request: CreateMemberTypeRequestModel): UmbMockM
 		hasChildren: false,
 		parent: null,
 		hasListView: false,
+		flags: [],
 	};
 };
 
@@ -74,6 +75,7 @@ const itemResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeItemRespons
 		id: item.id,
 		name: item.name,
 		icon: item.icon,
+		flags: item.flags,
 	};
 };
 

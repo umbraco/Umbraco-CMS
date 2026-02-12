@@ -1,10 +1,10 @@
+import { UMB_STATIC_FILE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbStaticFileItemModel } from './types.js';
+import { UmbManagementApiStaticFileItemDataRequestManager } from './static-file-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { StaticFileService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A server data source for Static File items
@@ -15,6 +15,7 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 	StaticFileItemResponseModel,
 	UmbStaticFileItemModel
 > {
+	#itemRequestManager = new UmbManagementApiStaticFileItemDataRequestManager(this);
 	/**
 	 * Creates an instance of UmbStaticFileItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -32,13 +33,7 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 		const serializer = new UmbServerFilePathUniqueSerializer();
 		const paths = uniques.map((unique) => serializer.toServerPath(unique)!);
 
-		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: (args) => StaticFileService.getItemStaticFile({ query: { path: args.uniques } }),
-			uniques: paths,
-		});
-
-		const { data, error } = await itemRequestManager.request();
+		const { data, error } = await this.#itemRequestManager.getItems(paths);
 
 		return { data: this._getMappedItems(data), error };
 	}
@@ -47,6 +42,7 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 const mapper = (item: StaticFileItemResponseModel): UmbStaticFileItemModel => {
 	const serializer = new UmbServerFilePathUniqueSerializer();
 	return {
+		entityType: UMB_STATIC_FILE_ENTITY_TYPE,
 		isFolder: item.isFolder,
 		name: item.name,
 		parentUnique: item.parent ? serializer.toUnique(item.parent.path) : null,

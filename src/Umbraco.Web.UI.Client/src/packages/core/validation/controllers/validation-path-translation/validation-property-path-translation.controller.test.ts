@@ -62,11 +62,11 @@ describe('UmbValidationPropertyPathTranslationController', () => {
 		});
 
 		it('returns Value', async () => {
-			const paths: Array<string> = ['$[0].Value'];
+			const paths: Array<string> = ['$[0].value'];
 
 			const result = await ctrl.translateProperties(paths, propertiesData, UmbDataPathPropertyValueQuery);
 
-			expect(result[0]).to.be.equal(`$[${UmbDataPathPropertyValueQuery(propertiesData[0])}].Value`);
+			expect(result[0]).to.be.equal(`$[${UmbDataPathPropertyValueQuery(propertiesData[0])}].value`);
 		});
 	});
 

@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -13,7 +11,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -39,8 +38,6 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
-    private IUmbracoMapper Mapper => GetRequiredService<IUmbracoMapper>();
-
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private IDocumentTypeContainerRepository DocumentTypeContainerRepository =>
@@ -52,7 +49,14 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
     private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+
     private IContentService ContentService => GetRequiredService<IContentService>();
+
+    private IUserGroupRepository UserGroupRepository => GetRequiredService<IUserGroupRepository>();
+
+    private ITemplateRepository TemplateRepository => GetRequiredService<ITemplateRepository>();
+
+    private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
 
     private ContentTypeRepository ContentTypeRepository =>
         (ContentTypeRepository)GetRequiredService<IContentTypeRepository>();
@@ -73,6 +77,171 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     // TODO: Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
 
     [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by Id should hit the database.
+        repository.Get(contentType.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache.
+        repository.Get(contentType.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by key should hit the database.
+        repository.Get(contentType.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache.
+        repository.Get(contentType.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by ID should hit the database.
+        repository.Get(contentType.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(contentType.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(contentType.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by key should hit the database.
+        repository.Get(contentType.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(contentType.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(contentType.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor, AppCaches? appCaches = null)
+    {
+        appCaches ??= AppCaches;
+
+        var commonRepository =
+            new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
+
+        return new ContentTypeRepository(
+            scopeAccessor,
+            appCaches,
+            LoggerFactory.CreateLogger<ContentTypeRepository>(),
+            commonRepository,
+            LanguageRepository,
+            ShortStringHelper,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            IdKeyMap,
+            Mock.Of<ICacheSyncService>());
+    }
+
+    [Test]
     public void Maps_Templates_Correctly()
     {
         // Arrange
@@ -89,7 +258,9 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 FileSystems,
                 ShortStringHelper,
                 Mock.Of<IViewHelper>(),
-                runtimeSettingsMock.Object);
+                runtimeSettingsMock.Object,
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
             var repository = ContentTypeRepository;
             Template[] templates =
             {
@@ -917,5 +1088,84 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var hasCulture = renewedContent.Properties["title"].Values.First().Culture != null;
             Assert.That(hasCulture, Is.True);
         }
+    }
+
+    [Test]
+    public void Can_Remove_Property_Value_Permissions_On_Removal_Of_Property_Types()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            // Create, save and re-retrieve a content type and user group.
+            IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: 0);
+            ContentTypeRepository.Save(contentType);
+            contentType = ContentTypeRepository.Get(contentType.Id);
+
+            var userGroup = CreateUserGroupWithGranularPermissions(contentType);
+
+            // Remove property types and verify that the permission is removed from the user group.
+            contentType.RemovePropertyType("author");
+            ContentTypeRepository.Save(contentType);
+            userGroup = UserGroupRepository.Get(userGroup.Id);
+            Assert.AreEqual(3, userGroup.GranularPermissions.Count);
+
+            contentType.RemovePropertyType("bodyText");
+            ContentTypeRepository.Save(contentType);
+            userGroup = UserGroupRepository.Get(userGroup.Id);
+            Assert.AreEqual(2, userGroup.GranularPermissions.Count);
+
+            contentType.RemovePropertyType("title");
+            ContentTypeRepository.Save(contentType);
+            userGroup = UserGroupRepository.Get(userGroup.Id);
+            Assert.AreEqual(0, userGroup.GranularPermissions.Count);
+        }
+    }
+
+    [Test]
+    public void Can_Remove_Property_Value_Permissions_On_Removal_Of_Content_Type()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            // Create, save and re-retrieve a content type and user group.
+            IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: 0);
+            ContentTypeRepository.Save(contentType);
+            contentType = ContentTypeRepository.Get(contentType.Id);
+
+            var userGroup = CreateUserGroupWithGranularPermissions(contentType);
+
+            // Remove the content type and verify all permissions are removed from the user group.
+            ContentTypeRepository.Delete(contentType);
+            userGroup = UserGroupRepository.Get(userGroup.Id);
+            Assert.AreEqual(0, userGroup.GranularPermissions.Count);
+        }
+    }
+
+    private IUserGroup CreateUserGroupWithGranularPermissions(IContentType contentType)
+    {
+        DocumentPropertyValueGranularPermission CreatePermission(IPropertyType propertyType, string permission = "")
+            => new()
+            {
+                Key = contentType.Key,
+                Permission = propertyType.Key.ToString().ToLowerInvariant() + "|" + permission,
+            };
+
+        var titlePropertyType = contentType.PropertyTypes.Single(x => x.Alias == "title");
+        var bodyTextPropertyType = contentType.PropertyTypes.Single(x => x.Alias == "bodyText");
+        var authorPropertyType = contentType.PropertyTypes.Single(x => x.Alias == "author");
+
+        var userGroup = new UserGroupBuilder()
+            .WithGranularPermissions([
+                CreatePermission(titlePropertyType, "Umb.Document.PropertyValue.Read"),
+                CreatePermission(titlePropertyType, "Umb.Document.PropertyValue.Write"),
+                CreatePermission(bodyTextPropertyType, "Umb.Document.PropertyValue.Read"),
+                CreatePermission(authorPropertyType)
+            ])
+            .Build();
+        UserGroupRepository.Save(userGroup);
+        userGroup = UserGroupRepository.Get(userGroup.Id);
+
+        Assert.AreEqual(4, userGroup.GranularPermissions.Count);
+        return userGroup;
     }
 }

@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -62,8 +62,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// Remove .skip when the front-end is ready. Currently the content name is read-only so cannot remane it.
-test.skip('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
+test('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedContentName = 'UpdatedContentName';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
@@ -76,11 +75,10 @@ test.skip('can rename content with language set in userGroup', async ({umbracoAp
   // Act
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedContentName);
-  await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.isContentInTreeVisible(updatedContentName);
 });
 
@@ -102,7 +100,7 @@ test('can not rename content with language not set in userGroup', async ({umbrac
   await umbracoUi.content.isDocumentNameInputEditable(false);
 });
 
-test('can update content property with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
+test('can update content property with language set in userGroup', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);

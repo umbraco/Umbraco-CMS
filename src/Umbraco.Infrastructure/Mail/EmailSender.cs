@@ -2,13 +2,11 @@
 // See LICENSE for more details.
 
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.IO;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
@@ -19,7 +17,7 @@ using Umbraco.Cms.Infrastructure.Mail.Interfaces;
 namespace Umbraco.Cms.Infrastructure.Mail;
 
 /// <summary>
-///     A utility class for sending emails
+///     A utility class for sending emails.
 /// </summary>
 public class EmailSender : IEmailSender
 {
@@ -30,32 +28,9 @@ public class EmailSender : IEmailSender
     private GlobalSettings _globalSettings;
     private readonly IEmailSenderClient _emailSenderClient;
 
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public EmailSender(
-        ILogger<EmailSender> logger,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IEventAggregator eventAggregator)
-        : this(logger, globalSettings, eventAggregator,null, null)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public EmailSender(
-        ILogger<EmailSender> logger,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IEventAggregator eventAggregator,
-        INotificationHandler<SendEmailNotification>? handler1,
-        INotificationAsyncHandler<SendEmailNotification>? handler2)
-    {
-        _logger = logger;
-        _eventAggregator = eventAggregator;
-        _globalSettings = globalSettings.CurrentValue;
-        _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
-        _emailSenderClient = StaticServiceProvider.Instance.GetRequiredService<IEmailSenderClient>();
-        globalSettings.OnChange(x => _globalSettings = x);
-    }
-
-    [ActivatorUtilitiesConstructor]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmailSender"/> class.
+    /// </summary>
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -72,28 +47,28 @@ public class EmailSender : IEmailSender
         globalSettings.OnChange(x => _globalSettings = x);
     }
 
-    /// <summary>
-    ///     Sends the message async
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public async Task SendAsync(EmailMessage message, string emailType) =>
-        await SendAsyncInternal(message, emailType, false);
+        await SendAsyncInternal(message, emailType, false, null);
 
+    /// <inheritdoc/>
     public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification) =>
-        await SendAsyncInternal(message, emailType, enableNotification);
+        await SendAsyncInternal(message, emailType, enableNotification, null);
 
-    /// <summary>
-    ///     Returns true if the application should be able to send a required application email
-    /// </summary>
+    /// <inheritdoc/>
+    public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification = false, TimeSpan? expires = null) =>
+        await SendAsyncInternal(message, emailType, enableNotification, expires);
+
+    /// <inheritdoc/>
     /// <remarks>
     ///     We assume this is possible if either an event handler is registered or an smtp server is configured
-    ///     or a pickup directory location is configured
+    ///     or a pickup directory location is configured.
     /// </remarks>
     public bool CanSendRequiredEmail() => _globalSettings.IsSmtpServerConfigured
                                           || _globalSettings.IsPickupDirectoryLocationConfigured
                                           || _notificationHandlerRegistered;
 
-    private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification)
+    private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
     {
         if (enableNotification)
         {
@@ -104,7 +79,7 @@ public class EmailSender : IEmailSender
             // if a handler handled sending the email then don't continue.
             if (notification.IsHandled)
             {
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
                     "The email sending for {Subject} was handled by a notification handler",
@@ -116,7 +91,7 @@ public class EmailSender : IEmailSender
 
         if (!_globalSettings.IsSmtpServerConfigured && !_globalSettings.IsPickupDirectoryLocationConfigured)
         {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
                 "Could not send email for {Subject}. It was not handled by a notification handler and there is no SMTP configured.",
@@ -173,7 +148,6 @@ public class EmailSender : IEmailSender
             while (true);
         }
 
-        await _emailSenderClient.SendAsync(message);
+        await _emailSenderClient.SendAsync(message, expires);
     }
-
 }

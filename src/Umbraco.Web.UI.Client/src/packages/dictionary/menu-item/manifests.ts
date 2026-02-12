@@ -1,5 +1,6 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_TREE_ALIAS } from '../tree/index.js';
+import { UMB_DICTIONARY_MENU_ITEM_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TRANSLATION_MENU_ALIAS } from '@umbraco-cms/backoffice/translation';
 
@@ -7,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.Dictionary',
+		alias: UMB_DICTIONARY_MENU_ITEM_ALIAS,
 		name: 'Dictionary Menu Item',
 		weight: 400,
 		meta: {
@@ -21,9 +22,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceContext',
+		kind: 'menuStructure',
 		name: 'Dictionary Menu Structure Workspace Context',
 		alias: 'Umb.Context.Dictionary.Menu.Structure',
 		api: () => import('./dictionary-menu-structure.context.js'),
+		meta: {
+			menuItemAlias: UMB_DICTIONARY_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

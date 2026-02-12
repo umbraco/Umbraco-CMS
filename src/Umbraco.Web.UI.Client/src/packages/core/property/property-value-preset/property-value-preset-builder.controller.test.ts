@@ -72,7 +72,10 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityUnique: 'test-unique',
+				entityType: 'test',
+			});
 
 			expect(result.length).to.be.equal(1);
 			expect(result[0]?.value).to.be.equal('first');
@@ -120,7 +123,10 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityUnique: 'test-unique',
+				entityType: 'test',
+			});
 
 			expect(result.length).to.be.equal(1);
 			expect(result[0]?.value).to.be.equal('first_second');
@@ -168,7 +174,10 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityUnique: 'test-unique',
+				entityType: 'test',
+			});
 
 			expect(result.length).to.be.equal(1);
 			expect(result[0]?.value).to.be.equal('second_first');
@@ -233,7 +242,10 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityUnique: 'test-unique',
+				entityType: 'test',
+			});
 
 			expect(result.length).to.be.equal(2);
 			expect(result[0]?.alias).to.be.equal('test');
@@ -310,7 +322,10 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityUnique: 'test-unique',
+				entityType: 'test',
+			});
 
 			// Test that only the right presets are used:
 			expect(result.length).to.be.equal(3);

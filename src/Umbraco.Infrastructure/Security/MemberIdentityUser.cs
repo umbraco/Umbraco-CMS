@@ -39,10 +39,10 @@ public class MemberIdentityUser : UmbracoIdentityUser
     }
 
     // No change tracking because the persisted value is only set with the IsLockedOut flag
-    public DateTime? LastLockoutDateUtc { get; set; }
+    public DateTime? LastLockoutDate { get; set; }
 
     // No change tracking because the persisted value is readonly
-    public DateTime CreatedDateUtc { get; set; }
+    public DateTime CreatedDate { get; set; }
 
     // No change tracking because the persisted value is readonly
     public Guid Key { get; set; }

@@ -4,12 +4,15 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.CacheInstruction)]
-[PrimaryKey("id")]
+[TableName(TableName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 public class CacheInstructionDto
 {
-    [Column("id")]
+    public const string TableName = Constants.DatabaseSchema.Tables.CacheInstruction;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    [Column(PrimaryKeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [PrimaryKeyColumn(AutoIncrement = true, Name = "PK_umbracoCacheInstruction")]
     public int Id { get; set; }

@@ -50,11 +50,11 @@ public interface IContentType : IContentTypeComposition
     bool RemoveTemplate(ITemplate template);
 
     /// <summary>
-    ///     Creates a deep clone of the current entity with its identity/alias and it's property identities reset
+    ///     Creates a deep clone of the current entity with its identity/alias and it's property identities reset.
     /// </summary>
-    /// <param name="newAlias"></param>
-    /// <returns></returns>
-    IContentType DeepCloneWithResetIdentities(string newAlias);
+    /// <param name="newAlias">The new alias for the cloned content type.</param>
+    /// <returns>A deep clone of the current <see cref="IContentType"/> with reset identities.</returns>
+    new IContentType DeepCloneWithResetIdentities(string newAlias);
 
     /// <summary>
     /// Gets or sets the history cleanup configuration.

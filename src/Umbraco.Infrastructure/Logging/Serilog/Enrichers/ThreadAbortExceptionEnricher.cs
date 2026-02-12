@@ -19,7 +19,8 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
 
     public ThreadAbortExceptionEnricher(
         IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
-        IHostingEnvironment hostingEnvironment, IMarchal marchal)
+        IHostingEnvironment hostingEnvironment,
+        IMarchal marchal)
     {
         _coreDebugSettings = coreDebugSettings.CurrentValue;
         _hostingEnvironment = hostingEnvironment;

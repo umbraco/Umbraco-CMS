@@ -22,7 +22,7 @@ export class UmbBulkTrashWithRelationConfirmModalElement extends UmbModalBaseEle
 	UmbBulkTrashWithRelationConfirmModalValue
 > {
 	@state()
-	_referencesConfig?: UmbConfirmBulkActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbConfirmBulkActionModalEntityReferencesConfig;
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);

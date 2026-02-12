@@ -24,8 +24,18 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
-    public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LanguageRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public LanguageRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<LanguageRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -127,9 +137,9 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     public int? GetDefaultId() => GetDefault().Id;
 
     protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
-    protected ILanguage ConvertFromDto(LanguageDto dto)
+    private ILanguage ConvertFromDto(LanguageDto dto)
     {
         lock (_codeIdMap)
         {
@@ -178,7 +188,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
 
     #region Overrides of RepositoryBase<int,Language>
 
-    protected override ILanguage? PerformGet(int id) => PerformGetAll(id).FirstOrDefault();
+    protected override ILanguage? PerformGet(int id) => PerformGetAll([id]).FirstOrDefault();
 
     protected override IEnumerable<ILanguage> PerformGetAll(params int[]? ids)
     {
@@ -241,23 +251,24 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Language}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Language)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var lIdWhere = $"WHERE {QuoteColumnName("languageId")} = @id";
         var list = new List<string>
         {
             // NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
             // but we still need to remove them
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DictionaryValue + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentUrl + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DictionaryValue)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.PropertyData)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentCultureVariation)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("tagId")} IN (SELECT id FROM {QuoteName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
         };
         return list;
     }

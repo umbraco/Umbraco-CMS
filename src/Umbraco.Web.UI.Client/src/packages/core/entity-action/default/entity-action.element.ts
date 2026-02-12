@@ -39,7 +39,7 @@ export class UmbEntityActionDefaultElement<
 	}
 
 	@state()
-	_href?: string;
+	private _href?: string;
 
 	override async focus() {
 		await this.updateComplete;

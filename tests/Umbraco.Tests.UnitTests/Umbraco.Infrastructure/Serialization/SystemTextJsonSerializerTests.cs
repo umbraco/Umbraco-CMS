@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -11,7 +11,7 @@ public class SystemTextJsonSerializerTests
     public void TryDeserialize_Can_Handle_JsonObject()
     {
         var json = JsonNode.Parse("{\"myProperty\":\"value\"}");
-        var subject = new SystemTextJsonSerializer();
+        var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         Assert.IsTrue(subject.TryDeserialize(json!, out MyItem myItem));
         Assert.AreEqual("value", myItem.MyProperty);
     }
@@ -20,7 +20,7 @@ public class SystemTextJsonSerializerTests
     public void TryDeserialize_Can_Handle_JsonArray()
     {
         var json = JsonNode.Parse("[{\"myProperty\":\"value1\"},{\"myProperty\":\"value2\"}]");
-        var subject = new SystemTextJsonSerializer();
+        var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         Assert.IsTrue(subject.TryDeserialize(json!, out MyItem[] myItems));
         Assert.AreEqual(2, myItems.Length);
         Assert.Multiple(() =>
@@ -34,7 +34,7 @@ public class SystemTextJsonSerializerTests
     public void TryDeserialize_Can_Handle_JsonString()
     {
         var json = "{\"myProperty\":\"value\"}";
-        var subject = new SystemTextJsonSerializer();
+        var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         Assert.IsTrue(subject.TryDeserialize(json, out MyItem myItem));
         Assert.AreEqual("value", myItem.MyProperty);
     }
@@ -42,7 +42,7 @@ public class SystemTextJsonSerializerTests
     [Test]
     public void TryDeserialize_Cannot_Handle_RandomString()
     {
-        var subject = new SystemTextJsonSerializer();
+        var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         Assert.IsFalse(subject.TryDeserialize<MyItem>("something something", out _));
     }
 

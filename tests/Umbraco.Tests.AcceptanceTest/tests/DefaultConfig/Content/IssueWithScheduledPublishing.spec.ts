@@ -30,12 +30,13 @@ test('can schedule publish after unselecting all languages', async ({umbracoUi})
   await umbracoUi.content.enterContentName('Tester');
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickSchedulePublishButton();
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectAllCheckbox();
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectAllCheckbox();
   await umbracoUi.content.clickSchedulePublishLanguageButton(languageName);
 
   // Assert
   await umbracoUi.content.doesSchedulePublishModalButtonContainDisabledTag(false);
+  await umbracoUi.content.clickSchedulePublishModalButton();
 });

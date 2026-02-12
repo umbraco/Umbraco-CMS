@@ -1,10 +1,9 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentTypeItemModel } from './types.js';
+import { UmbManagementApiDocumentTypeItemDataRequestManager } from './document-type-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A data source for Document Type items that fetches data from the server
@@ -15,6 +14,8 @@ export class UmbDocumentTypeItemServerDataSource extends UmbItemServerDataSource
 	DocumentTypeItemResponseModel,
 	UmbDocumentTypeItemModel
 > {
+	#itemRequestManager = new UmbManagementApiDocumentTypeItemDataRequestManager(this);
+
 	/**
 	 * Creates an instance of UmbDocumentTypeItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -27,13 +28,7 @@ export class UmbDocumentTypeItemServerDataSource extends UmbItemServerDataSource
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: (args) => DocumentTypeService.getItemDocumentType({ query: { id: args.uniques } }),
-			uniques,
-		});
-
-		const { data, error } = await itemRequestManager.request();
+		const { data, error } = await this.#itemRequestManager.getItems(uniques);
 
 		return { data: this._getMappedItems(data), error };
 	}
@@ -43,9 +38,9 @@ const mapper = (item: DocumentTypeItemResponseModel): UmbDocumentTypeItemModel =
 	return {
 		entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 		isElement: item.isElement,
-		icon: item.icon,
+		icon: item.icon ?? undefined,
 		unique: item.id,
 		name: item.name,
-		description: item.description,
+		description: item.description ?? undefined,
 	};
 };

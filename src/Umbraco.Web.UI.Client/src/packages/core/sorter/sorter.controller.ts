@@ -8,7 +8,7 @@ const autoScrollSpeed = 16;
 /**
  *
  * @param {Element} el - The element to check for ability to scroll
- * @param {Boolean} includeSelf - If true, the element itself will be included in the check
+ * @param {boolean} includeSelf - If true, the element itself will be included in the check
  * @returns {Element | null}
  */
 function getParentScrollElement(el: Element, includeSelf: boolean) {
@@ -110,14 +110,6 @@ export type UmbSorterResolvePlacementArgs<T, ElementType extends HTMLElement = H
 	pointerY: number;
 };
 
-/**
- * @deprecated will be removed in v.17, use `UmbSorterResolvePlacementArgs`
- */
-export type resolvePlacementArgs<T, ElementType extends HTMLElement = HTMLElement> = UmbSorterResolvePlacementArgs<
-	T,
-	ElementType
->;
-
 type UniqueType = string | symbol | number;
 
 /**
@@ -178,7 +170,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 		item: T;
 		model: Array<T>;
 		from: UmbSorterController<T, ElementType> | undefined;
-	}) => void;
+	}) => void | Promise<void>;
 	onEnd?: (argument: { item: T; element: ElementType }) => void;
 	itemHasNestedContainersResolver?: (element: HTMLElement) => boolean;
 	/**
@@ -246,7 +238,6 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
-
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
@@ -584,7 +575,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	#itemDropped = async (_e: DragEvent) => {
 		this.#handleMoveEnd();
 	};
@@ -934,7 +924,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#dragX = clientX;
 			this.#dragY = clientY;
 
-			this.handleAutoScroll(this.#dragX, this.#dragY);
+			this.#handleAutoScroll(this.#dragX, this.#dragY);
 
 			if (instant) {
 				this.#updateDragMove();
@@ -1422,10 +1412,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	// TODO: Move auto scroll into its own class?
 	#autoScrollRAF: number | null = null;
 	#autoScrollEl = document.scrollingElement || document.documentElement;
-	private autoScrollX = 0;
-	private autoScrollY = 0;
+	private _autoScrollX = 0;
+	private _autoScrollY = 0;
 
-	private handleAutoScroll(clientX: number, clientY: number) {
+	#handleAutoScroll(clientX: number, clientY: number) {
 		let scrollRect: DOMRect | null = null;
 		if (this.#scrollElement) {
 			this.#autoScrollEl = this.#scrollElement;
@@ -1452,14 +1442,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		cancelAnimationFrame(this.#autoScrollRAF!);
 
 		if (canScrollX || canScrollY) {
-			this.autoScrollX =
+			this._autoScrollX =
 				Math.abs(scrollRect.right - clientX) <= autoScrollSensitivity && scrollPosX + scrollRect.width < scrollWidth
 					? 1
 					: Math.abs(scrollRect.left - clientX) <= autoScrollSensitivity && !!scrollPosX
 						? -1
 						: 0;
 
-			this.autoScrollY =
+			this._autoScrollY =
 				Math.abs(scrollRect.bottom - clientY) <= autoScrollSensitivity && scrollPosY + scrollRect.height < scrollHeight
 					? 1
 					: Math.abs(scrollRect.top - clientY) <= autoScrollSensitivity && !!scrollPosY
@@ -1470,8 +1460,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 	#performAutoScroll = () => {
-		this.#autoScrollEl!.scrollLeft += this.autoScrollX * autoScrollSpeed;
-		this.#autoScrollEl!.scrollTop += this.autoScrollY * autoScrollSpeed;
+		this.#autoScrollEl!.scrollLeft += this._autoScrollX * autoScrollSpeed;
+		this.#autoScrollEl!.scrollTop += this._autoScrollY * autoScrollSpeed;
 		this.#autoScrollRAF = requestAnimationFrame(this.#performAutoScroll);
 	};
 	#stopAutoScroll() {

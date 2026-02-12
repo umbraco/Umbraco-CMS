@@ -31,7 +31,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can publish invariant content with descendants without unpublished content items', async ({umbracoApi, umbracoUi}) => {
+test('can publish invariant content with descendants without unpublished content items', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndDataType(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
@@ -135,7 +135,7 @@ test('can publish variant content with descendants without unpublished content i
   await umbracoUi.content.clickPublishWithDescendantsModalButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants, true, false, 10000);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
@@ -144,7 +144,7 @@ test('can publish variant content with descendants without unpublished content i
   expect(childContentData.variants[0].state).toBe('Draft');
 });
 
-test('can publish variant content with descendants and include unpublished content items', async ({umbracoApi, umbracoUi}) => {
+test('can publish variant content with descendants and include unpublished content items', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);

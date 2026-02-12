@@ -1,5 +1,5 @@
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbMediaTreeServerDataSource } from './media-tree.server.data-source.js';
+import { UmbMediaTreeServerDataSource } from './server-data-source/media-tree.server.data-source.js';
 import type {
 	UmbMediaTreeChildrenOfRequestArgs,
 	UmbMediaTreeItemModel,
@@ -25,7 +25,7 @@ export class UmbMediaTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data: UmbMediaTreeRootModel = {

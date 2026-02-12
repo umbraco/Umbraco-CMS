@@ -11,6 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+///     Cache refresher for content type, media type, and member type caches.
+/// </summary>
 public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresherNotification, ContentTypeCacheRefresher.JsonPayload>
 {
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
@@ -21,6 +24,20 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="idKeyMap">The ID-key mapping service.</param>
+    /// <param name="contentTypeCommonRepository">The content type common repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="publishedModelFactory">The published model factory.</param>
+    /// <param name="publishedContentTypeFactory">The published content type factory.</param>
+    /// <param name="documentCacheService">The document cache service.</param>
+    /// <param name="publishedContentTypeCache">The published content type cache.</param>
+    /// <param name="mediaCacheService">The media cache service.</param>
     public ContentTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -46,8 +63,17 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
     #region Json
 
+    /// <summary>
+    ///     Represents the JSON payload for content type cache refresh operations.
+    /// </summary>
     public class JsonPayload
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="itemType">The type name of the content type.</param>
+        /// <param name="id">The identifier of the content type.</param>
+        /// <param name="changeTypes">The types of changes that occurred.</param>
         public JsonPayload(string itemType, int id, ContentTypeChangeTypes changeTypes)
         {
             ItemType = itemType;
@@ -55,10 +81,19 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             ChangeTypes = changeTypes;
         }
 
+        /// <summary>
+        ///     Gets the type name of the content type (e.g., IContentType, IMediaType, IMemberType).
+        /// </summary>
         public string ItemType { get; }
 
+        /// <summary>
+        ///     Gets the identifier of the content type.
+        /// </summary>
         public int Id { get; }
 
+        /// <summary>
+        ///     Gets the types of changes that occurred.
+        /// </summary>
         public ContentTypeChangeTypes ChangeTypes { get; }
     }
 
@@ -66,17 +101,23 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
     #region Define
 
+    /// <summary>
+    ///     The unique identifier for this cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("6902E22C-9C10-483C-91F3-66B7CAE9E2F5");
 
+    /// <inheritdoc />
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc />
     public override string Name => "Content Type Cache Refresher";
 
     #endregion
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    /// <inheritdoc />
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         // TODO: refactor
         // we should NOT directly clear caches here, but instead ask whatever class
@@ -124,6 +165,12 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
 
+        base.RefreshInternal(payloads);
+    }
+
+    /// <inheritdoc />
+    public override void Refresh(JsonPayload[] payloads)
+    {
         _publishedContentTypeCache.ClearContentTypes(payloads.Select(x => x.Id));
         _publishedContentTypeFactory.NotifyDataTypeChanges();
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
@@ -131,20 +178,24 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             IEnumerable<int> documentTypeIds = payloads.Where(x => x.ItemType == nameof(IContentType)).Select(x => x.Id);
             IEnumerable<int> mediaTypeIds = payloads.Where(x => x.ItemType == nameof(IMediaType)).Select(x => x.Id);
 
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds);
-            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
+            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
         });
 
         // now we can trigger the event
         base.Refresh(payloads);
     }
 
+    /// <inheritdoc />
     public override void RefreshAll() => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(int id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(Guid id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Remove(int id) => throw new NotSupportedException();
 
     #endregion

@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datentyp ändern',
 		copy: 'Kopieren',
 		create: 'Neu',
+		createFor: (name: string) => (name ? `Neu erstellen für ${name}` : 'Neu'),
 		export: 'Exportieren',
 		createPackage: 'Neues Paket',
 		createGroup: 'Neue Gruppe',
@@ -63,6 +64,7 @@ export default {
 		unlock: 'Freigeben',
 		createblueprint: 'Inhaltsvorlage anlegen',
 		resendInvite: 'Einladung erneut versenden',
+		viewActionsFor: (name: string) => (name ? `Aktionen anzeigen für ${name}` : 'Aktionen anzeigen'),
 	},
 	actionCategories: {
 		content: 'Inhalt',
@@ -277,7 +279,7 @@ export default {
 		notCreated: 'Nicht angelegt',
 		updateDate: 'Zuletzt bearbeitet am',
 		updateDateDesc: 'Letzter Änderungszeitpunkt des Dokuments',
-		uploadClear: 'Datei entfernen',
+		uploadClear: 'Datei(en) entfernen',
 		uploadClearImageContext: 'Klicke hier um das das Bild vom Medienelement zu entfernen.',
 		uploadClearFileContext: 'Klicke hier um das das Bild vom Medienelement zu entfernen.',
 		urls: 'Link zum Dokument',
@@ -770,6 +772,7 @@ export default {
 		design: 'Design',
 		dictionary: 'Wörterbuch',
 		dimensions: 'Abmessungen',
+		dividerPosition: (value: string | number) => `Trenner bei ${value}%`,
 		discard: 'Verwerfen',
 		down: 'nach unten',
 		download: 'Herunterladen',
@@ -897,10 +900,20 @@ export default {
 		header: 'Kopf',
 		systemField: 'System Feld',
 		lastUpdated: 'Zuletzt geändert',
-		newVersionAvailable: 'Neue Version verfügbar',
 	},
 	colors: {
+		black: 'Schwarz',
 		blue: 'Blau',
+		brown: 'Braun',
+		cyan: 'Cyan',
+		green: 'Grün',
+		lightBlue: 'Hellblau',
+		pink: 'Pink',
+		red: 'Rot',
+		text: 'Schwarz',
+		yellow: 'Gelb',
+		white: 'Weiß',
+		grey: 'Grau',
 	},
 	shortcuts: {
 		addTab: 'Tab hinzufügen',
@@ -1245,7 +1258,8 @@ export default {
 		headline: 'Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen',
 		currentVersion: 'Aktuelle Version',
 		diffHelp:
-			'Zeigt die Unterschiede zwischen der aktuellen und der ausgewählten Version an.<br />Text in <del>rot</del> fehlen in der ausgewählten Version, <ins>grün</ins> markierter Text wurde hinzugefügt.',
+			'<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
+		showDiff: 'Unterschiede zwischen der aktuellen Version und der ausgewählten Version anzeigen.',
 		noDiff: 'Keine Unterschiede zwischen den beiden Versionen gefunden.',
 		documentRolledBack: 'Dokument wurde zurückgesetzt',
 		htmlHelp:
@@ -1270,14 +1284,6 @@ export default {
 		settings: 'Einstellungen',
 		translation: 'Übersetzung',
 		users: 'Benutzer',
-	},
-	help: {
-		tours: 'Touren',
-		theBestUmbracoVideoTutorials: 'Die besten Umbraco-Video-Tutorials',
-		umbracoForum: 'Besuche our.umbraco.com',
-		umbracoTv: 'Besuche umbraco.tv',
-		umbracoLearningBase: 'Schaue gratis Tutorials',
-		umbracoLearningBaseDescription: 'von Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Standardvorlage',
@@ -1925,7 +1931,8 @@ export default {
 		emptyDictionaryTree: 'Das Wörterbuch ist leer',
 	},
 	textbox: {
-		characters_left: 'Buchstaben verbleiben',
+		characters_left: '<strong>%0%</strong> Zeichen verbleiben.',
+		characters_exceed: 'Maximal %0% Zeichen, <strong>%1%</strong> zu viele.',
 	},
 	recycleBin: {
 		contentTrashed: 'Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen',
@@ -1976,6 +1983,7 @@ export default {
 		openBackofficeSearch: 'Back-Office Suche öffnen',
 		openCloseBackofficeHelp: 'Back-Office Hilfe öffnen / schliessen',
 		openCloseBackofficeProfileOptions: 'Ihre Profil-Einstellungen öffnen / schliessen',
+		profileOptions: 'Profil-Einstellungen',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Wählen Sie Alle',

@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for querying data type usage across the application.
+/// </summary>
 public interface IDataTypeUsageService
 {
     /// <summary>

@@ -268,13 +268,6 @@ internal partial class BlockListElementLevelVariationTests
 
         RefreshContentTypeCache(elementType, contentType);
 
-        // to re-publish the content in both cultures we need to set the culture names
-        content = ContentService.GetById(content.Key)!;
-        content.SetCultureName("Home (en)", "en-US");
-        content.SetCultureName("Home (da)", "da-DK");
-        ContentService.Save(content);
-        PublishContent(content, contentType);
-
         var publishedContent = GetPublishedContent(content.Key);
 
         SetVariationContext(culture, null);

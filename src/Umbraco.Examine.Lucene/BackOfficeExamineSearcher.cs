@@ -1,15 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -28,20 +30,16 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
     private readonly IExamineManager _examineManager;
-    private readonly ILocalizationService _languageService;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly ILanguageService _languageService;
     private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
-    private readonly IUmbracoMapper _umbracoMapper;
 
     public BackOfficeExamineSearcher(
         IExamineManager examineManager,
-        ILocalizationService languageService,
+        ILanguageService languageService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IEntityService entityService,
         IUmbracoTreeSearcherFields treeSearcherFields,
-        AppCaches appCaches,
-        IUmbracoMapper umbracoMapper,
-        IPublishedUrlProvider publishedUrlProvider)
+        AppCaches appCaches)
     {
         _examineManager = examineManager;
         _languageService = languageService;
@@ -49,32 +47,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         _entityService = entityService;
         _treeSearcherFields = treeSearcherFields;
         _appCaches = appCaches;
-        _umbracoMapper = umbracoMapper;
-        _publishedUrlProvider = publishedUrlProvider;
     }
-
-    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
-    public IEnumerable<ISearchResult> Search(
-        string query,
-        UmbracoEntityTypes entityType,
-        int pageSize,
-        long pageIndex,
-        out long totalFound,
-        string? searchFrom = null,
-        bool ignoreUserStartNodes = false)
-        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, null, searchFrom, ignoreUserStartNodes);
-
-    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
-    public IEnumerable<ISearchResult> Search(
-        string query,
-        UmbracoEntityTypes entityType,
-        int pageSize,
-        long pageIndex,
-        out long totalFound,
-        string[]? contentTypeAliases,
-        string? searchFrom = null,
-        bool ignoreUserStartNodes = false)
-        => Search(query, entityType, pageSize, pageIndex, out totalFound, contentTypeAliases, null, searchFrom, ignoreUserStartNodes);
 
     public IEnumerable<ISearchResult> Search(
         string query,
@@ -113,8 +86,6 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             fields.Remove(UmbracoExamineFieldNames.NodeKeyFieldName);
         }
 
-        IUser? currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
-
         switch (entityType)
         {
             case UmbracoEntityTypes.Member:
@@ -127,7 +98,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 }
 
                 if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
-                    searchFrom.Trim() != "-1")
+                    searchFrom.Trim() != Constants.System.RootString)
                 {
                     sb.Append("+__NodeTypeAlias:");
                     sb.Append(searchFrom);
@@ -143,10 +114,12 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     fieldsToLoad.Add(field);
                 }
 
-                var allMediaStartNodes = currentUser != null
-                    ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
-                    : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Media, searchFrom, ignoreUserStartNodes, out var abortMediaQuery);
+                if (abortMediaQuery)
+                {
+                    totalFound = 0;
+                    return [];
+                }
 
                 if (trashed.HasValue)
                 {
@@ -162,10 +135,12 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     fieldsToLoad.Add(field);
                 }
 
-                var allContentStartNodes = currentUser != null
-                    ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
-                    : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Document, searchFrom, ignoreUserStartNodes, out var abortContentQuery);
+                if (abortContentQuery)
+                {
+                    totalFound = 0;
+                    return [];
+                }
 
                 if (trashed.HasValue)
                 {
@@ -192,7 +167,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         if (!BuildQuery(sb, query, searchFrom, fields, type))
         {
             totalFound = 0;
-            return Enumerable.Empty<ISearchResult>();
+            return [];
         }
 
         ISearchResults? result = index.Searcher
@@ -222,7 +197,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         // then nodeName will be matched normally with wildcards
         // the rest will be normal without wildcards
 
-        var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
+        var allLangs = _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult().Select(x => x.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
         // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.
@@ -400,76 +375,89 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private static void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
+    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, string? searchFrom, bool ignoreUserStartNodes, out bool abortQuery)
     {
-        if (sb == null)
+        ArgumentNullException.ThrowIfNull(sb);
+
+        abortQuery = false;
+
+        if (searchFrom is Constants.System.RootString)
         {
-            throw new ArgumentNullException(nameof(sb));
+            searchFrom = null;
         }
 
-        if (entityService == null)
+        var userStartNodes = ignoreUserStartNodes ? [Constants.System.Root] : GetUserStartNodes(objectType);
+        if (searchFrom is null && userStartNodes.Contains(Constants.System.Root))
         {
-            throw new ArgumentNullException(nameof(entityService));
+            // If we have no searchFrom and the user either has access to the root node or we are ignoring user
+            // start nodes, we don't need to filter by path.
+            return;
         }
 
-        if (Guid.TryParse(searchFrom, out Guid guid))
+        string[] pathsToFilter;
+        if (searchFrom is null)
         {
-            searchFrom = entityService.GetId(guid, objectType).Result.ToString();
+            // If we don't want to filter by a specific entity, we can simply use the user start nodes.
+            pathsToFilter = GetEntityPaths(objectType, userStartNodes);
         }
         else
         {
-            // fallback to Udi for legacy reasons as the calling methods take string?
-            UdiParser.TryParse(searchFrom, true, out Udi? udi);
-            searchFrom = udi == null ? searchFrom : entityService.GetId(udi).Result.ToString();
-        }
-
-        TreeEntityPath? entityPath =
-            int.TryParse(searchFrom, NumberStyles.Integer, CultureInfo.InvariantCulture, out var searchFromId) &&
-            searchFromId > 0
-                ? entityService.GetAllPaths(objectType, searchFromId).FirstOrDefault()
-                : null;
-
-        if (entityPath != null)
-        {
-            // find... only what's underneath
-            sb.Append("+__Path:");
-            AppendPath(sb, entityPath.Path, false);
-            sb.Append(' ');
-        }
-        else if (startNodeIds?.Length == 0)
-        {
-            // make sure we don't find anything
-            sb.Append("+__Path:none ");
-        }
-        else if (startNodeIds?.Contains(-1) == false && ignoreUserStartNodes == false) // -1 = no restriction
-        {
-            IEnumerable<TreeEntityPath> entityPaths = entityService.GetAllPaths(objectType, startNodeIds);
-
-            // for each start node, find the start node, and what's underneath
-            // +__Path:(-1*,1234 -1*,1234,* -1*,5678 -1*,5678,* ...)
-            sb.Append("+__Path:(");
-            var first = true;
-            foreach (TreeEntityPath ep in entityPaths)
+            TreeEntityPath? searchFromPath = GetEntityPath(searchFrom, objectType);
+            if (searchFromPath is null)
             {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    sb.Append(' ');
-                }
-
-                AppendPath(sb, ep.Path, true);
+                // If the searchFrom cannot be found, return no results.
+                // This is to prevent showing entities outside the intended filter.
+                abortQuery = true;
+                return;
             }
 
-            sb.Append(") ");
+            var userStartNodePaths = GetEntityPaths(objectType, userStartNodes);
+
+            // If the user has access to the entity, we can simply filter by the entity path.
+            if (userStartNodePaths.Any(userStartNodePath => StartsWithPath(searchFromPath.Path, userStartNodePath)))
+            {
+                sb.Append("+__Path:");
+                AppendPath(sb, searchFromPath.Path, false);
+                sb.Append(' ');
+                return;
+            }
+
+            // If the user does not have access to the entity, let's filter the paths by the ones that start with the
+            // entity path (are descendants of the entity).
+            pathsToFilter = userStartNodePaths.Where(ep => StartsWithPath(ep, searchFromPath.Path)).ToArray();
         }
+
+        // If we have no paths left, no need to perform the query at all, just return no results.
+        if (pathsToFilter.Length == 0)
+        {
+            abortQuery = true;
+            return;
+        }
+
+        // For each start node, find the start node, and what's underneath
+        // +__Path:(-1*,1234 -1*,1234,* -1*,5678 -1*,5678,* ...)
+        sb.Append("+__Path:(");
+        var first = true;
+        foreach (string pathToFilter in pathsToFilter)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                sb.Append(' ');
+            }
+
+            AppendPath(sb, pathToFilter, true);
+        }
+
+        sb.Append(") ");
     }
 
     private static void AppendPath(StringBuilder sb, string path, bool includeThisNode)
     {
-        path = path.Replace("-", "\\-").Replace(",", "\\,");
+        path = path.Replace("-", "\\-");
         if (includeThisNode)
         {
             sb.Append(path);
@@ -477,6 +465,68 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
 
         sb.Append(path);
-        sb.Append("\\,*");
+        sb.Append(",*");
+    }
+
+    private static bool StartsWithPath(string path1, string path2)
+    {
+        if (path1.StartsWith(path2) == false)
+        {
+            return false;
+        }
+
+        return path1.Length == path2.Length || path1[path2.Length] == ',';
+    }
+
+    private int[] GetUserStartNodes(UmbracoObjectTypes objectType)
+    {
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (currentUser is null)
+        {
+            return [];
+        }
+
+        var startNodes = objectType switch
+        {
+            UmbracoObjectTypes.Document => currentUser.CalculateContentStartNodeIds(_entityService, _appCaches),
+            UmbracoObjectTypes.Media => currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches),
+            _ => throw new NotSupportedException($"The object type {objectType} is not supported for start nodes."),
+        };
+
+        return startNodes ?? [Constants.System.Root]; // If no start nodes are defined, we assume the user has access to the root node (-1).
+    }
+
+    private string[] GetEntityPaths(UmbracoObjectTypes objectType, int[] entityIds) =>
+        entityIds switch
+        {
+            [] => [],
+            _ when entityIds.Contains(Constants.System.Root) => [Constants.System.RootString],
+            _ => _entityService.GetAllPaths(objectType, entityIds).Select(x => x.Path).ToArray(),
+        };
+
+    private TreeEntityPath? GetEntityPath(string? searchFrom, UmbracoObjectTypes objectType)
+    {
+        if (searchFrom is null)
+        {
+            return null;
+        }
+
+        Guid? entityKey = null;
+        if (Guid.TryParse(searchFrom, out Guid entityGuid))
+        {
+            entityKey = entityGuid;
+        } // fallback to Udi for legacy reasons as the calling methods take string?
+        else if (UdiParser.TryParse(searchFrom, true, out Udi? udi) && udi is GuidUdi guidUdi)
+        {
+            entityKey = guidUdi.Guid;
+        }
+        else if (int.TryParse(searchFrom, NumberStyles.Integer, CultureInfo.InvariantCulture, out var entityId)
+                 && entityId > 0
+                 && _entityService.GetKey(entityId, objectType) is { Success: true } attempt)
+        {
+            entityKey = attempt.Result;
+        }
+
+        return entityKey is null ? null : _entityService.GetAllPaths(objectType, entityKey.Value).FirstOrDefault();
     }
 }

@@ -10,14 +10,17 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	//
 	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbMediaWorkspaceSplitViewElement();
+	private _splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 	#variants?: Array<UmbMediaVariantOptionModel>;
 	#isForbidden = false;
 
 	@state()
-	_routes?: Array<UmbRoute>;
+	private _routes?: Array<UmbRoute>;
+
+	@state()
+	private _loading?: boolean = true;
 
 	constructor() {
 		super();
@@ -26,6 +29,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
 			this.#observeForbidden();
+			this.#observeLoading();
 		});
 	}
 
@@ -51,14 +55,23 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	private _handleVariantFolderPart(index: number, folderPart: string) {
-		const variantSplit = folderPart.split('_');
-		const culture = variantSplit[0];
-		const segment = variantSplit[1];
-		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
+	#observeLoading() {
+		this.observe(
+			this.#workspaceContext?.loading.isOn,
+			(loading) => {
+				this._loading = loading ?? false;
+			},
+			'_observeLoading',
+		);
 	}
 
 	private async _generateRoutes() {
+		if (!this.#variants || this.#variants.length === 0) {
+			this._routes = [];
+			this.#ensureForbiddenRoute(this._routes);
+			return;
+		}
+
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
@@ -68,13 +81,10 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
-						const variantSplit = info.match.fragments.consumed.split('_&_');
-						variantSplit.forEach((part, index) => {
-							this._handleVariantFolderPart(index, part);
-						});
+						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 					},
 				});
 			});
@@ -85,11 +95,11 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: this._splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this._handleVariantFolderPart(0, info.match.fragments.consumed);
+					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
 				},
 			});
 		});
@@ -103,15 +113,25 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
+		this.#ensureForbiddenRoute(routes);
+
+		this._routes = routes;
+	}
+
+	/**
+	 * Ensure that there is a route to handle forbidden access.
+	 * This route will display a forbidden message when the user does not have permission to access certain resources.
+	 * Also handles not found routes.
+	 * @param {Array<UmbRoute>} routes - The array of routes to append the forbidden route to
+	 */
+	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
 		routes.push({
-			path: `**`,
+			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
 				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
 			},
 		});
-
-		this._routes = routes;
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
@@ -119,9 +139,9 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes && this._routes.length > 0
+		return !this._loading && this._routes && this._routes.length > 0
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
-			: '';
+			: html`<umb-view-loader></umb-view-loader>`;
 	}
 
 	static override styles = [

@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Textstring';
@@ -24,10 +24,9 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
 

@@ -11,6 +11,10 @@ public class SqliteDatabaseCreator : IDatabaseCreator
 {
     private readonly ILogger<SqliteDatabaseCreator> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqliteDatabaseCreator"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
     public SqliteDatabaseCreator(ILogger<SqliteDatabaseCreator> logger) => _logger = logger;
 
     /// <inheritdoc />
@@ -86,6 +90,7 @@ public class SqliteDatabaseCreator : IDatabaseCreator
         // Copy our blank(ish) wal mode sqlite database to its final location.
         try
         {
+            EnsureDatabaseDirectory(original.DataSource);
             File.Copy(tempFile, original.DataSource, true);
         }
         catch (Exception ex)
@@ -102,6 +107,15 @@ public class SqliteDatabaseCreator : IDatabaseCreator
         {
             // We can swallow this, no worries if we can't nuke the practically empty database file.
             _logger.LogWarning(ex, "Unable to cleanup temporary sqlite database file {path}", tempFile);
+        }
+    }
+
+    private static void EnsureDatabaseDirectory(string dataSource)
+    {
+        var directoryPath = Path.GetDirectoryName(dataSource);
+        if (string.IsNullOrEmpty(directoryPath) is false && Directory.Exists(directoryPath) is false)
+        {
+            Directory.CreateDirectory(directoryPath);
         }
     }
 }

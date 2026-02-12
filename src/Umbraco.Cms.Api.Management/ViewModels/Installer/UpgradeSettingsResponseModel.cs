@@ -17,5 +17,5 @@ public class UpgradeSettingsResponseModel
     public string OldVersion { get; set; } = string.Empty;
 
     public string ReportUrl =>
-        $"https://our.umbraco.com/contribute/releases/compare?from={OldVersion}&to={NewVersion}&notes=1";
+        $"https://releases.umbraco.com/compare?from={OldVersion}&to={NewVersion}&notes=1";
 }

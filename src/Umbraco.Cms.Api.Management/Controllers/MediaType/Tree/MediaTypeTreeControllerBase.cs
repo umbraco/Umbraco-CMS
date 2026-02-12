@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -19,8 +22,17 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
 {
     private readonly IMediaTypeService _mediaTypeService;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public MediaTypeTreeControllerBase(IEntityService entityService, IMediaTypeService mediaTypeService)
-        : base(entityService) =>
+        : this(
+            entityService,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+            mediaTypeService)
+    {
+    }
+
+    public MediaTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
+        : base(entityService, flagProviders) =>
         _mediaTypeService = mediaTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MediaType;

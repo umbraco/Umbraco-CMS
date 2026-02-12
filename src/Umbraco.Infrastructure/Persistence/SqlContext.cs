@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using IMapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.IMapperCollection;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 

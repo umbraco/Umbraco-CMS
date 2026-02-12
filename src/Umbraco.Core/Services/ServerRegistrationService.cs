@@ -55,12 +55,12 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
 
             if (server == null)
             {
-                server = new ServerRegistration(serverAddress, serverIdentity, DateTime.Now);
+                server = new ServerRegistration(serverAddress, serverIdentity, DateTime.UtcNow);
             }
             else
             {
                 server.ServerAddress = serverAddress; // should not really change but it might!
-                server.UpdateDate = DateTime.Now;
+                server.UpdateDate = DateTime.UtcNow;
             }
 
             server.IsActive = true;
@@ -138,7 +138,7 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
     ///     <paramref name="refresh" /> parameter to force a cache refresh and reload active servers
     ///     from the database.
     /// </remarks>
-    public IEnumerable<IServerRegistration>? GetActiveServers(bool refresh = false) =>
+    public IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false) =>
         GetServers(refresh).Where(x => x.IsActive);
 
     /// <summary>

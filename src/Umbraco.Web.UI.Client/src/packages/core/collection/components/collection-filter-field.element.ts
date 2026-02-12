@@ -25,14 +25,19 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-input
-				label=${this.localize.term('general_search')}
-				placeholder=${this.localize.term('placeholders_search')}
+				label=${this.localize.term('general_filter')}
+				placeholder=${this.localize.term('placeholders_filter')}
+				data-mark="input:filter"
 				@input=${this.#onInput}></uui-input>
 		`;
 	}
 
 	static override readonly styles = [
 		css`
+			:host {
+				display: flex;
+			}
+
 			uui-input {
 				width: 100%;
 			}

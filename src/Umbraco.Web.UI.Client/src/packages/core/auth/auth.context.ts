@@ -34,6 +34,18 @@ export class UmbAuthContext extends UmbContextBase {
 	#authWindowProxy?: WindowProxy | null;
 	#previousAuthUrl?: string;
 
+	// Event handler for storage events - arrow function to maintain consistent reference
+	#onStorageEvent = async (evt: StorageEvent) => {
+		if (evt.key === UMB_STORAGE_TOKEN_RESPONSE_NAME) {
+			// Close any open auth windows
+			this.#authWindowProxy?.close();
+			// Refresh the local storage state into memory
+			await this.setInitialState();
+			// Let any auth listeners (such as the auth modal) know that the auth state has changed
+			this.#authFlow.authorizationSignal.next();
+		}
+	};
+
 	/**
 	 * Observable that emits true when the auth context is initialized.
 	 * @remark It will only emit once and then complete itself.
@@ -89,7 +101,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 		// Observe changes to local storage and update the authorization state
 		// This establishes the tab-to-tab communication
-		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+		window.addEventListener('storage', this.#onStorageEvent);
 
 		if (!isTestEnvironment()) {
 			// Start the session timeout controller
@@ -99,18 +111,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	override destroy(): void {
 		super.destroy();
-		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
-	}
-
-	async #onStorageEvent(evt: StorageEvent) {
-		if (evt.key === UMB_STORAGE_TOKEN_RESPONSE_NAME) {
-			// Close any open auth windows
-			this.#authWindowProxy?.close();
-			// Refresh the local storage state into memory
-			await this.setInitialState();
-			// Let any auth listeners (such as the auth modal) know that the auth state has changed
-			this.#authFlow.authorizationSignal.next();
-		}
+		window.removeEventListener('storage', this.#onStorageEvent);
 	}
 
 	/**

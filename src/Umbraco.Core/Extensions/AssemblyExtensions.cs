@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="Assembly"/>.
+/// </summary>
 public static class AssemblyExtensions
 {
     private static string _rootDir = string.Empty;
@@ -43,20 +46,6 @@ public static class AssemblyExtensions
     }
 
     /// <summary>
-    ///     Returns the file used to load the assembly
-    /// </summary>
-    /// <param name="assembly"></param>
-    /// <returns></returns>
-    [Obsolete("This extension method is no longer used and will be removed in Umbraco 17.")]
-    public static FileInfo GetAssemblyFile(this Assembly assembly)
-    {
-        var codeBase = assembly.Location;
-        var uri = new Uri(codeBase);
-        var path = uri.LocalPath;
-        return new FileInfo(path);
-    }
-
-    /// <summary>
     ///     Returns true if the assembly is the App_Code assembly
     /// </summary>
     /// <param name="assembly"></param>
@@ -89,25 +78,6 @@ public static class AssemblyExtensions
 
         // only way I can figure out how to test is by the name
         assembly.FullName!.StartsWith("App_global.asax");
-
-    /// <summary>
-    ///     Returns the file used to load the assembly
-    /// </summary>
-    /// <param name="assemblyName"></param>
-    /// <returns></returns>
-    [Obsolete("This extension method is no longer used and will be removed in Umbraco 17.")]
-    public static FileInfo? GetAssemblyFile(this AssemblyName assemblyName)
-    {
-        var codeBase = assemblyName.CodeBase;
-        if (!string.IsNullOrEmpty(codeBase))
-        {
-            var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            return new FileInfo(path);
-        }
-
-        return null;
-    }
 
     /// <summary>
     /// Gets the assembly informational version for the specified <paramref name="assembly" />.

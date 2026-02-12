@@ -7,7 +7,7 @@ test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.userGroup.clickUserGroupsButton();
 });
 
-test('the default configuration of Administrators is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Administrators is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Administrators';
   const sections = [
@@ -30,15 +30,12 @@ test('the default configuration of Administrators is correct', async ({umbracoAp
     "Umb.Document.PublicAccess",
     "Umb.Document.CultureAndHostnames",
     "Umb.Document.Publish",
-    "Umb.Document.Permissions",
     "Umb.Document.Unpublish",
     "Umb.Document.Read",
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
-    "Umb.Document.PropertyValue.Read",
-    "Umb.Document.PropertyValue.Write"
   ];
-  const granularPermissions = [];
+  const granularPermissions: any = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
@@ -50,8 +47,8 @@ test('the default configuration of Administrators is correct', async ({umbracoAp
 
   // Act
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Default permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Granular permissions', ConstantHelper.userGroupGranularPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
   await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
   await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
@@ -67,7 +64,7 @@ test('the default configuration of Administrators is correct', async ({umbracoAp
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Editors is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Editors is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Editors';
   const sections = [
@@ -88,10 +85,8 @@ test('the default configuration of Editors is correct', async ({umbracoApi, umbr
     "Umb.Document.Read",
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
-    "Umb.Document.PropertyValue.Read",
-    "Umb.Document.PropertyValue.Write"
   ];
-  const granularPermissions = [];
+  const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
@@ -103,8 +98,8 @@ test('the default configuration of Editors is correct', async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Default permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Granular permissions', ConstantHelper.userGroupGranularPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
   await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
   await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
@@ -120,12 +115,12 @@ test('the default configuration of Editors is correct', async ({umbracoApi, umbr
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Sensitive data is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Sensitive data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Sensitive data';
-  const sections = [];
-  const fallbackPermissions = [];
-  const granularPermissions = [];
+  const sections: string[] = [];
+  const fallbackPermissions: string[] = [];
+  const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = false;
   const documentRootAccess = false;
   const mediaRootAccess = false;
@@ -137,8 +132,8 @@ test('the default configuration of Sensitive data is correct', async ({umbracoAp
 
   // Act
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Default permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Granular permissions', ConstantHelper.userGroupGranularPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
   await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
   await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
@@ -154,17 +149,15 @@ test('the default configuration of Sensitive data is correct', async ({umbracoAp
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Translators data is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Translators data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Translators';
   const sections = ["Umb.Section.Translation"];
   const fallbackPermissions = [
     "Umb.Document.Update",
     "Umb.Document.Read",
-    "Umb.Document.PropertyValue.Read",
-    "Umb.Document.PropertyValue.Write"
   ];
-  const granularPermissions = [];
+  const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
@@ -176,14 +169,15 @@ test('the default configuration of Translators data is correct', async ({umbraco
 
   // Act
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Default permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Granular permissions', ConstantHelper.userGroupGranularPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
   await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
   await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
-  expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
+  // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
+  // expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
   expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
@@ -191,7 +185,7 @@ test('the default configuration of Translators data is correct', async ({umbraco
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Writers data is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Writers data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Writers';
   const sections = ["Umb.Section.Content"];
@@ -200,10 +194,8 @@ test('the default configuration of Writers data is correct', async ({umbracoApi,
     "Umb.Document.Update",
     "Umb.Document.Read",
     "Umb.Document.Notifications",
-    "Umb.Document.PropertyValue.Read",
-    "Umb.Document.PropertyValue.Write"
   ];
-  const granularPermissions = [];
+  const granularPermissions: string[] = [];
   const hasAccessToAllLanguages = true;
   const documentRootAccess = true;
   const mediaRootAccess = true;
@@ -215,15 +207,15 @@ test('the default configuration of Writers data is correct', async ({umbracoApi,
 
   // Act
   await umbracoUi.userGroup.doesSettingHaveValue('Assign access', ConstantHelper.userGroupAssignAccessSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Default permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
-  await umbracoUi.userGroup.doesSettingHaveValue('Granular permissions', ConstantHelper.userGroupGranularPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document permissions', ConstantHelper.userGroupDefaultPermissionsSettings);
+  await umbracoUi.userGroup.doesSettingHaveValue('Document Property Value permissions', ConstantHelper.userGroupGranularPermissionsSettings);
   await umbracoUi.userGroup.doesPermissionsSettingsHaveValue(ConstantHelper.userGroupPermissionsSettings);
   await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(uiPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
   // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
-  //expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
+  // expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
   expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);

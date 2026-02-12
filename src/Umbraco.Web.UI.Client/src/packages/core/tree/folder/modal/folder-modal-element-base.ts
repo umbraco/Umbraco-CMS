@@ -12,7 +12,7 @@ export abstract class UmbFolderModalElementBase<
 	FolderModalValueType extends { folder: UmbFolderModel },
 > extends UmbModalBaseElement<FolderModalDataType, FolderModalValueType> {
 	@state()
-	_isNew = false;
+	protected _isNew = false;
 
 	folderRepository?: UmbDetailRepository<UmbFolderModel>;
 

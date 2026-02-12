@@ -1,11 +1,13 @@
 import { customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-eye-dropper')
-export class UmbInputEyeDropperElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputEyeDropperElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+) {
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -16,12 +18,26 @@ export class UmbInputEyeDropperElement extends UUIFormControlMixin(UmbLitElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+	@property({ type: Boolean })
+	required = false;
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
+	constructor() {
+		super();
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => !this.readonly && this.required && (!this.value || this.value === ''),
+		);
+	}
+
 	@property({ type: Boolean })
 	opacity = false;
-
 	@property({ type: Boolean })
 	showPalette = false;
-
 	@property({ type: Array })
 	swatches?: string[];
 

@@ -1,23 +1,34 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.IO;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
 [ApiVersion("1.0")]
 public class RootStaticFileTreeController : StaticFileTreeControllerBase
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public RootStaticFileTreeController(IPhysicalFileSystem physicalFileSystem)
         : base(physicalFileSystem)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public RootStaticFileTreeController(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
+    : base(physicalFileSystem, fileSystemTreeService)
     {
     }
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of static file items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of static file items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

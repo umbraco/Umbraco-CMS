@@ -1,22 +1,24 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMemberTypeMockDb } from '../../data/member-type/member-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const treeHandlers = [
-	rest.get(umbracoPath(`/tree${UMB_SLUG}/root`), (req, res, ctx) => {
-		const skip = Number(req.url.searchParams.get('skip') ?? '0');
-		const take = Number(req.url.searchParams.get('take') ?? '100');
+	http.get(umbracoPath(`/tree${UMB_SLUG}/root`), ({ request }) => {
+		const searchParams = new URL(request.url).searchParams;
+		const skip = Number(searchParams.get('skip') ?? '0');
+		const take = Number(searchParams.get('take') ?? '100');
 		const response = umbMemberTypeMockDb.tree.getRoot({ skip, take });
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.get(umbracoPath(`/tree${UMB_SLUG}/children`), (req, res, ctx) => {
-		const parentId = req.url.searchParams.get('parentId');
+	http.get(umbracoPath(`/tree${UMB_SLUG}/children`), ({ request }) => {
+		const searchParams = new URL(request.url).searchParams;
+		const parentId = searchParams.get('parentId');
 		if (!parentId) return;
-		const skip = Number(req.url.searchParams.get('skip') ?? '0');
-		const take = Number(req.url.searchParams.get('take') ?? '100');
+		const skip = Number(searchParams.get('skip') ?? '0');
+		const take = Number(searchParams.get('take') ?? '100');
 		const response = umbMemberTypeMockDb.tree.getChildrenOf({ parentId, skip, take });
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 ];

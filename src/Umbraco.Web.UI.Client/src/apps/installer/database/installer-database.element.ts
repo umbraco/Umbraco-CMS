@@ -9,7 +9,7 @@ import type {
 	DatabaseSettingsPresentationModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { InstallService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
@@ -238,6 +238,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		<uui-form-layout-item>
 			<uui-label for="server" slot="label" required>Server address</uui-label>
 			<uui-input
+				${umbFocus()}
 				type="text"
 				id="server"
 				name="server"
@@ -254,6 +255,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		html` <uui-form-layout-item>
 			<uui-label for="database-name" slot="label" required>Database Name</uui-label>
 			<uui-input
+				${umbFocus()}
 				type="text"
 				.value=${value}
 				id="database-name"
@@ -268,20 +270,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _renderCredentials = () => html`
 		<h2 class="uui-h4">Credentials</h2>
 		<hr />
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="useIntegratedAuthentication"
-				label="Use integrated authentication"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
-		</uui-form-layout-item>
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="trustServerCertificate"
-				label="Trust the database certificate"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
-		</uui-form-layout-item>
+		${this._renderIntegratedAuthentication()}
+		${this._renderTrustDatabaseCertificate()}
 
 			${
 				!this.databaseFormData.useIntegratedAuthentication
@@ -315,6 +305,34 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 		</uui-form-layout-item>
 	`;
+
+	private _renderIntegratedAuthentication() {
+		if (this._selectedDatabase?.supportsIntegratedAuthentication) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="useIntegratedAuthentication"
+					label="Use integrated authentication"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
+
+	private _renderTrustDatabaseCertificate() {
+		if (this._selectedDatabase?.supportsTrustServerCertificate) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="trustServerCertificate"
+					label="Trust the database certificate"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
 
 	private _renderCustom = () => html`
 		<uui-form-layout-item>

@@ -31,7 +31,7 @@ test('can go to section defined in userGroup', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 });
 
-test('can not see section that is not defined in userGroup', async ({umbracoApi, umbracoUi}) => {
+test('can not see section that is not defined in userGroup', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);

@@ -90,13 +90,13 @@ export class UmbExampleValidationContextDashboardElement extends UmbLitElement {
 				'City server-error message',
 				'8dfc2f15-fb9a-463b-bcec-2c5d3ba2d07d',
 			);
-		if (this.country == '')
-			this.validation.messages.addMessage(
-				'server',
-				'$.form.tab2.country',
-				'Country server-error message',
-				'd98624f6-82a2-4e94-822a-776b44b01495',
-			);
+	}
+
+	#checkValidity(){
+		this.validation.validate().then(
+			() => true,
+			() => false,
+		);
 	}
 
 	override render() {
@@ -122,6 +122,8 @@ export class UmbExampleValidationContextDashboardElement extends UmbLitElement {
 				${when(this.tab == '2', () => html` ${this.#renderTab2()} `)}
 
 				<uui-button look="primary" color="positive" @click=${this.#handleSave}>Save</uui-button>
+				<hr />
+				<uui-button look="primary" color="positive" @click=${this.#checkValidity}>Check valid</uui-button>
 				<hr />
 				<h3>Validation Context Messages</h3>
 				<pre>${JSON.stringify(this.messages ?? [], null, 3)}</pre>
@@ -179,7 +181,6 @@ export class UmbExampleValidationContextDashboardElement extends UmbLitElement {
 							type="text"
 							.value=${this.country}
 							@input=${(e: InputEvent) => (this.country = (e.target as HTMLInputElement).value)}
-							${umbBindToValidation(this, '$.form.tab2.country', this.country)}
 							required></uui-input>
 					</uui-form-validation-message>
 				</form>

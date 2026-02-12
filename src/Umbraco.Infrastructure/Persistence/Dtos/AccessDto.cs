@@ -5,12 +5,15 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Access)]
-[PrimaryKey("id", AutoIncrement = false)]
+[TableName(TableName)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class AccessDto
 {
-    [Column("id")]
+    public const string TableName = Constants.DatabaseSchema.Tables.Access;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_umbracoAccess", AutoIncrement = false)]
     public Guid Id { get; set; }
 
@@ -27,15 +30,15 @@ internal sealed class AccessDto
     [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_id2")]
     public int NoAccessNodeId { get; set; }
 
-    [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("createDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("updateDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "AccessId")]
+    [Reference(ReferenceType.Many, ReferenceMemberName = AccessRuleDto.AccessIdColumnName)]
     public List<AccessRuleDto> Rules { get; set; } = new();
 }

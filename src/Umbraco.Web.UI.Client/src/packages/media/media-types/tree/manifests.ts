@@ -8,6 +8,7 @@ import {
 	UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
 	UMB_MEDIA_TYPE_TREE_STORE_ALIAS,
 } from './constants.js';
+import { UmbMediaTypeTreeStore } from './media-type-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifest } from './tree-item-children/manifests.js';
 
@@ -22,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_MEDIA_TYPE_TREE_STORE_ALIAS,
 		name: 'Media Type Tree Store',
-		api: () => import('./media-type-tree.store.js'),
+		api: UmbMediaTypeTreeStore,
 	},
 	{
 		type: 'tree',

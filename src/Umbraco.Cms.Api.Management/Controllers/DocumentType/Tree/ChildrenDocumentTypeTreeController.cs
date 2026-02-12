@@ -1,23 +1,34 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
 [ApiVersion("1.0")]
 public class ChildrenDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ChildrenDocumentTypeTreeController(IEntityService entityService, IContentTypeService contentTypeService)
         : base(entityService, contentTypeService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ChildrenDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
+        : base(entityService, flagProviders, contentTypeService)
     {
     }
 
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of document type tree child items.")]
+    [EndpointDescription("Gets a paginated collection of document type tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<DocumentTypeTreeItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

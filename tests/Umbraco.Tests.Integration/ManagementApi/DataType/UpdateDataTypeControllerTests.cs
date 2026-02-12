@@ -1,0 +1,86 @@
+using System.Linq.Expressions;
+using System.Net;
+using System.Net.Http.Json;
+using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.DataType;
+using Umbraco.Cms.Api.Management.ViewModels.DataType;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
+
+public class UpdateDataTypeControllerTests : ManagementApiUserGroupTestBase<UpdateDataTypeController>
+{
+    private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
+    private Guid _dataTypeId;
+
+    [SetUp]
+    public async Task Setup()
+    {
+        var dataType = new DataTypeBuilder()
+            .WithId(0)
+            .WithName("Custom list view")
+            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .AddEditor()
+                .WithAlias(Constants.PropertyEditors.Aliases.ListView)
+                .Done()
+            .Build();
+        var response = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        _dataTypeId = response.Result.Key;
+    }
+
+    protected override Expression<Func<UpdateDataTypeController, object>> MethodSelector =>
+        x => x.Update(CancellationToken.None, _dataTypeId, null);
+
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
+
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
+
+    protected override async Task<HttpResponseMessage> ClientRequest()
+    {
+        UpdateDataTypeRequestModel updateDataTypeRequestModel =
+            new()
+            {
+                Name = "TestNameUpdated",
+                EditorAlias = "Umbraco.Label",
+                EditorUiAlias = "Umb.PropertyEditorUi.Label",
+                Values = new List<DataTypePropertyPresentationModel>
+                {
+                    new DataTypePropertyPresentationModel { Alias = "ValueAlias", Value = "TestValue", },
+                },
+            };
+
+        return await Client.PutAsync(Url, JsonContent.Create(updateDataTypeRequestModel));
+    }
+}

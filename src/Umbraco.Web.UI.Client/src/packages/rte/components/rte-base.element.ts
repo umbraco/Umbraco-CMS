@@ -1,6 +1,6 @@
 import type { UmbPropertyEditorRteValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -10,19 +10,32 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_VARIANT_CONTEXT, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 
+/**
+ * The abstract base class that is used as a base for the rich-text-editor component.
+ * @cssprop --umb-rte-width - The width of the rich-text-editor (default: unset)
+ * @cssprop --umb-rte-min-width - The minimum width of the rich-text-editor (default: unset)
+ * @cssprop --umb-rte-max-width - The maximum width of the rich-text-editor (default: 100%)
+ * @cssprop --umb-rte-height - The height of the rich-text-editor (default: 100%)
+ * @cssprop --umb-rte-min-height - The minimum height of the rich-text-editor (default: 100%)
+ * @cssprop --umb-rte-max-height - The maximum height of the rich-text-editor (default: 100%)
+ */
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
+	public name?: string;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -127,6 +140,10 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 	readonly #validationContext = new UmbValidationContext(this);
 
+	readonly #unusedLayoutLookup: Map<string, UmbBlockRteLayoutModel> = new Map();
+	readonly #unusedContentLookup: Map<string, UmbBlockDataModel> = new Map();
+	readonly #unusedSettingsLookup: Map<string, UmbBlockDataModel> = new Map();
+
 	constructor() {
 		super();
 
@@ -175,8 +192,14 @@ export abstract class UmbPropertyEditorUiRteElementBase
 			this.#gotPropertyContext(context);
 		});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context?.getVariantId());
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeContextualVariantId',
+			);
 		});
 
 		this.observe(
@@ -226,9 +249,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 			([layouts, contents, settings, exposes]) => {
 				if (layouts.length === 0) {
 					if (super.value?.markup === undefined) {
+						if (this.value === undefined) {
+							return;
+						}
 						super.value = undefined;
 					} else {
-						super.value = {
+						const newValue = {
 							...super.value,
 							blocks: {
 								layout: {},
@@ -237,9 +263,13 @@ export abstract class UmbPropertyEditorUiRteElementBase
 								expose: [],
 							},
 						};
+						if (jsonStringComparison(this.value, newValue)) {
+							return;
+						}
+						super.value = newValue;
 					}
 				} else {
-					super.value = {
+					const newValue = {
 						markup: this._markup,
 						blocks: {
 							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
@@ -248,6 +278,10 @@ export abstract class UmbPropertyEditorUiRteElementBase
 							expose: exposes,
 						},
 					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
@@ -262,8 +296,71 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		);
 	}
 
+	#setUnusedBlockLookups(unusedLayouts: Array<UmbBlockRteLayoutModel>) {
+		if (unusedLayouts.length) {
+			unusedLayouts.forEach((layout) => {
+				if (layout.contentKey) {
+					this.#unusedLayoutLookup.set(layout.contentKey, layout);
+
+					const contentBlock = this.#managerContext.getContentOf(layout.contentKey);
+					if (contentBlock) {
+						this.#unusedContentLookup.set(layout.contentKey, contentBlock);
+					} else {
+						console.warn(
+							`Expected content block for '${layout.contentKey}' was not found. This may indicate a data consistency issue.`,
+						);
+					}
+
+					if (layout.settingsKey) {
+						const settingsBlock = this.#managerContext.getSettingsOf(layout.settingsKey);
+						if (settingsBlock) {
+							this.#unusedSettingsLookup.set(layout.settingsKey, settingsBlock);
+						} else {
+							console.warn(
+								`Expected settings block for '${layout.settingsKey}' was not found. This may indicate a data consistency issue.`,
+							);
+						}
+					}
+				}
+			});
+		}
+	}
+
+	#restoreUnusedBlocks(usedContentKeys: Array<string | null>) {
+		if (usedContentKeys.length) {
+			usedContentKeys.forEach((contentKey) => {
+				if (contentKey && this.#unusedLayoutLookup.has(contentKey)) {
+					const layout = this.#unusedLayoutLookup.get(contentKey);
+					if (layout) {
+						this.#managerContext.setOneLayout(layout);
+						this.#unusedLayoutLookup.delete(contentKey);
+
+						const contentBlock = this.#unusedContentLookup.get(contentKey);
+						if (contentBlock) {
+							this.#managerContext.setOneContent(contentBlock);
+							this.#managerContext.setOneExpose(contentKey, UmbVariantId.CreateInvariant());
+							this.#unusedContentLookup.delete(contentKey);
+						}
+
+						if (layout.settingsKey && this.#unusedSettingsLookup.has(layout.settingsKey)) {
+							const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
+							if (settingsBlock) {
+								this.#managerContext.setOneSettings(settingsBlock);
+								this.#unusedSettingsLookup.delete(layout.settingsKey);
+							}
+						}
+					}
+				}
+			});
+		}
+	}
+
 	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
 		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
+
+		// Temporarily set the unused layouts to the lookup, as they could be restored later, e.g. via an RTE undo action. [LK]
+		this.#restoreUnusedBlocks(usedContentKeys);
+		this.#setUnusedBlockLookups(unusedLayouts);
 
 		const unusedContentKeys = unusedLayouts.map((x) => x.contentKey);
 
@@ -278,5 +375,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 	protected _fireChangeEvent() {
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	override destroy() {
+		super.destroy();
+		this.#unusedLayoutLookup.clear();
+		this.#unusedContentLookup.clear();
+		this.#unusedSettingsLookup.clear();
 	}
 }

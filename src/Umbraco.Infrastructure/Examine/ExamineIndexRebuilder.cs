@@ -6,18 +6,21 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 internal class ExamineIndexRebuilder : IIndexRebuilder
 {
-    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private const string RebuildAllOperationTypeName = "RebuildAllExamineIndexes";
+
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ExamineIndexRebuilder> _logger;
     private readonly IMainDom _mainDom;
     private readonly IEnumerable<IIndexPopulator> _populators;
-    private readonly object _rebuildLocker = new();
+    private readonly ILongRunningOperationService _longRunningOperationService;
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
@@ -29,16 +32,17 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         ILogger<ExamineIndexRebuilder> logger,
         IExamineManager examineManager,
         IEnumerable<IIndexPopulator> populators,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        ILongRunningOperationService longRunningOperationService)
     {
         _mainDom = mainDom;
         _runtimeState = runtimeState;
         _logger = logger;
         _examineManager = examineManager;
         _populators = populators;
-        _backgroundTaskQueue = backgroundTaskQueue;
+        _longRunningOperationService = longRunningOperationService;
     }
 
+    /// <inheritdoc/>
     public bool CanRebuild(string indexName)
     {
         if (!_examineManager.TryGetIndex(indexName, out IIndex index))
@@ -46,183 +50,161 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             throw new InvalidOperationException("No index found by name " + indexName);
         }
 
-        return _populators.Any(x => x.IsRegistered(index));
+        return HasRegisteredPopulator(index);
     }
 
+    /// <inheritdoc/>
+    [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in Umbraco 19.")]
     public virtual void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
+        => RebuildIndexAsync(indexName, delay, useBackgroundThread).GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
+    public virtual async Task<Attempt<IndexRebuildResult>> RebuildIndexAsync(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
-        if (delay == null)
-        {
-            delay = TimeSpan.Zero;
-        }
+        delay ??= TimeSpan.Zero;
 
         if (!CanRun())
         {
-            return;
+            return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
-        if (useBackgroundThread)
+        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
+            GetRebuildOperationTypeName(indexName),
+            async ct =>
+            {
+                await RebuildIndex(indexName, delay.Value, ct);
+                return Task.CompletedTask;
+            },
+            allowConcurrentExecution: false,
+            runInBackground: useBackgroundThread);
+
+        if (attempt.Success)
         {
-            _logger.LogInformation("Starting async background thread for rebuilding index {indexName}.", indexName);
-
-            _backgroundTaskQueue.QueueBackgroundWorkItem(
-                cancellationToken =>
-                {
-                    // Do not flow AsyncLocal to the child thread
-                    using (ExecutionContext.SuppressFlow())
-                    {
-                        Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken));
-
-                        // immediately return so the queue isn't waiting.
-                        return Task.CompletedTask;
-                    }
-                });
+            return Attempt.Succeed(IndexRebuildResult.Success);
         }
-        else
+
+        return attempt.Status switch
         {
-            RebuildIndex(indexName, delay.Value, CancellationToken.None);
-        }
+            LongRunningOperationEnqueueStatus.AlreadyRunning => Attempt.Fail(IndexRebuildResult.AlreadyRebuilding),
+            _ => Attempt.Fail(IndexRebuildResult.Unknown),
+        };
     }
 
+    /// <inheritdoc/>
+    [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
     public virtual void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
+        => RebuildIndexesAsync(onlyEmptyIndexes, delay, useBackgroundThread).GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
+    public virtual async Task<Attempt<IndexRebuildResult>> RebuildIndexesAsync(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
-        if (delay == null)
-        {
-            delay = TimeSpan.Zero;
-        }
+        delay ??= TimeSpan.Zero;
 
         if (!CanRun())
         {
-            return;
+            return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
-        if (useBackgroundThread)
-        {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
+            RebuildAllOperationTypeName,
+            async ct =>
             {
-                _logger.LogDebug($"Queuing background job for {nameof(RebuildIndexes)}.");
-            }
+                await RebuildIndexes(onlyEmptyIndexes, delay.Value, ct);
+                return Task.CompletedTask;
+            },
+            allowConcurrentExecution: false,
+            runInBackground: useBackgroundThread);
 
-            _backgroundTaskQueue.QueueBackgroundWorkItem(
-                cancellationToken =>
-                {
-                    // Do not flow AsyncLocal to the child thread
-                    using (ExecutionContext.SuppressFlow())
-                    {
-                        // This is a fire/forget task spawned by the background thread queue (which means we
-                        // don't need to worry about ExecutionContext flowing).
-                        Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
-
-                        // immediately return so the queue isn't waiting.
-                        return Task.CompletedTask;
-                    }
-                });
-        }
-        else
+        if (attempt.Success)
         {
-            RebuildIndexes(onlyEmptyIndexes, delay.Value, CancellationToken.None);
+            return Attempt.Succeed(IndexRebuildResult.Success);
         }
+
+        return attempt.Status switch
+        {
+            LongRunningOperationEnqueueStatus.AlreadyRunning => Attempt.Fail(IndexRebuildResult.AlreadyRebuilding),
+            _ => Attempt.Fail(IndexRebuildResult.Unknown),
+        };
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> IsRebuildingAsync(string indexName)
+        => (await _longRunningOperationService.GetByTypeAsync(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
+
+    private static string GetRebuildOperationTypeName(string indexName)
+    {
+        // Truncate to a maximum of 200 characters to ensure the type name doesn't overflow the database field.
+        const int TypeFieldSize = 200;
+        return $"RebuildExamineIndex-{indexName}".TruncateWithUniqueHash(TypeFieldSize);
     }
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
-    private void RebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
+    private async Task RebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
-            Thread.Sleep(delay);
+            await Task.Delay(delay, cancellationToken);
         }
 
-        try
+        if (!_examineManager.TryGetIndex(indexName, out IIndex index))
         {
-            if (!Monitor.TryEnter(_rebuildLocker))
-            {
-                _logger.LogWarning(
-                    "Call was made to RebuildIndexes but the task runner for rebuilding is already running");
-            }
-            else
-            {
-                if (!_examineManager.TryGetIndex(indexName, out IIndex index))
-                {
-                    throw new InvalidOperationException($"No index found with name {indexName}");
-                }
-
-                index.CreateIndex(); // clear the index
-                foreach (IIndexPopulator populator in _populators)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    populator.Populate(index);
-                }
-            }
+            throw new InvalidOperationException($"No index found with name {indexName}");
         }
-        finally
+
+        index.CreateIndex(); // clear the index
+        foreach (IIndexPopulator populator in _populators)
         {
-            if (Monitor.IsEntered(_rebuildLocker))
+            if (cancellationToken.IsCancellationRequested)
             {
-                Monitor.Exit(_rebuildLocker);
+                return;
             }
+
+            populator.Populate(index);
         }
     }
 
-    private void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
+    private async Task RebuildIndexes(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
-            Thread.Sleep(delay);
+            await Task.Delay(delay, cancellationToken);
         }
 
-        try
+        // If an index exists but it has zero docs we'll consider it empty and rebuild
+        // Only include indexes that have at least one populator registered, this is to avoid emptying out indexes
+        // that we have no chance of repopulating, for example our own search package
+        IIndex[] indexes = (onlyEmptyIndexes
+            ? _examineManager.Indexes.Where(ShouldRebuild)
+            : _examineManager.Indexes)
+            .Where(HasRegisteredPopulator)
+            .ToArray();
+
+        if (indexes.Length == 0)
         {
-            if (!Monitor.TryEnter(_rebuildLocker))
-            {
-                _logger.LogWarning(
-                    $"Call was made to {nameof(RebuildIndexes)} but the task runner for rebuilding is already running");
-            }
-            else
-            {
-                // If an index exists but it has zero docs we'll consider it empty and rebuild
-                IIndex[] indexes = (onlyEmptyIndexes
-                    ? _examineManager.Indexes.Where(ShouldRebuild)
-                    : _examineManager.Indexes).ToArray();
-
-                if (indexes.Length == 0)
-                {
-                    return;
-                }
-
-                foreach (IIndex index in indexes)
-                {
-                    index.CreateIndex(); // clear the index
-                }
-
-                // run each populator over the indexes
-                foreach (IIndexPopulator populator in _populators)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    try
-                    {
-                        populator.Populate(indexes);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
-                    }
-                }
-            }
+            return;
         }
-        finally
+
+        foreach (IIndex index in indexes)
         {
-            if (Monitor.IsEntered(_rebuildLocker))
+            index.CreateIndex(); // clear the index
+        }
+
+        // run each populator over the indexes
+        foreach (IIndexPopulator populator in _populators)
+        {
+            if (cancellationToken.IsCancellationRequested)
             {
-                Monitor.Exit(_rebuildLocker);
+                return;
+            }
+
+            try
+            {
+                populator.Populate(indexes);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
             }
         }
     }
@@ -239,4 +221,6 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return false;
         }
     }
+
+    private bool HasRegisteredPopulator(IIndex index) => _populators.Any(x => x.IsRegistered(index));
 }

@@ -1,6 +1,9 @@
+using System.Runtime.CompilerServices;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -13,26 +16,87 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Handlers;
 
+/// <summary>
+///     Handles audit logging for member and user related notifications.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This handler creates audit trail entries for various member and user operations including
+///         saving, deleting, role assignments, exports, and permission changes.
+///     </para>
+///     <para>
+///         The audit entries record the performing user, affected entity, IP address, and event details
+///         to provide a comprehensive audit trail for security and compliance purposes.
+///     </para>
+/// </remarks>
 public sealed class AuditNotificationsHandler :
     INotificationHandler<MemberSavedNotification>,
+    INotificationAsyncHandler<MemberSavedNotification>,
     INotificationHandler<MemberDeletedNotification>,
+    INotificationAsyncHandler<MemberDeletedNotification>,
     INotificationHandler<AssignedMemberRolesNotification>,
+    INotificationAsyncHandler<AssignedMemberRolesNotification>,
     INotificationHandler<RemovedMemberRolesNotification>,
+    INotificationAsyncHandler<RemovedMemberRolesNotification>,
     INotificationHandler<ExportedMemberNotification>,
+    INotificationAsyncHandler<ExportedMemberNotification>,
     INotificationHandler<UserSavedNotification>,
+    INotificationAsyncHandler<UserSavedNotification>,
     INotificationHandler<UserDeletedNotification>,
+    INotificationAsyncHandler<UserDeletedNotification>,
     INotificationHandler<UserGroupWithUsersSavedNotification>,
-    INotificationHandler<AssignedUserGroupPermissionsNotification>
+    INotificationAsyncHandler<UserGroupWithUsersSavedNotification>,
+    INotificationHandler<AssignedUserGroupPermissionsNotification>,
+    INotificationAsyncHandler<AssignedUserGroupPermissionsNotification>
 {
-    private readonly IAuditService _auditService;
+    private readonly IAuditEntryService _auditEntryService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
-    private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
     private readonly IMemberService _memberService;
     private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
+    /// </summary>
+    /// <param name="auditEntryService">The audit entry service for writing audit records.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="ipResolver">The IP address resolver.</param>
+    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="userGroupService">The user group service.</param>
+    public AuditNotificationsHandler(
+        IAuditEntryService auditEntryService,
+        IUserService userService,
+        IEntityService entityService,
+        IIpResolver ipResolver,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IMemberService memberService,
+        IUserGroupService userGroupService)
+    {
+        _auditEntryService = auditEntryService;
+        _userService = userService;
+        _entityService = entityService;
+        _ipResolver = ipResolver;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _memberService = memberService;
+        _userGroupService = userGroupService;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
+    /// </summary>
+    /// <param name="auditService">The audit service (no longer used).</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="ipResolver">The IP address resolver.</param>
+    /// <param name="globalSettings">The global settings (no longer used).</param>
+    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="userGroupService">The user group service.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public AuditNotificationsHandler(
         IAuditService auditService,
         IUserService userService,
@@ -42,59 +106,95 @@ public sealed class AuditNotificationsHandler :
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberService memberService,
         IUserGroupService userGroupService)
+        : this(
+            StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>(),
+            userService,
+            entityService,
+            ipResolver,
+            backOfficeSecurityAccessor,
+            memberService,
+            userGroupService)
     {
-        _auditService = auditService;
-        _userService = userService;
-        _entityService = entityService;
-        _ipResolver = ipResolver;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _memberService = memberService;
-        _userGroupService = userGroupService;
-        _globalSettings = globalSettings.CurrentValue;
     }
 
-    private IUser CurrentPerformingUser
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
+    /// </summary>
+    /// <param name="auditEntryService">The audit entry service for writing audit records.</param>
+    /// <param name="auditService">The audit service (no longer used).</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="ipResolver">The IP address resolver.</param>
+    /// <param name="globalSettings">The global settings (no longer used).</param>
+    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="userGroupService">The user group service.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public AuditNotificationsHandler(
+        IAuditEntryService auditEntryService,
+        IAuditService auditService,
+        IUserService userService,
+        IEntityService entityService,
+        IIpResolver ipResolver,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IMemberService memberService,
+        IUserGroupService userGroupService)
+        : this(
+            auditEntryService,
+            userService,
+            entityService,
+            ipResolver,
+            backOfficeSecurityAccessor,
+            memberService,
+            userGroupService)
     {
-        get
-        {
-            IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            IUser? user = identity == null ? null : _userService.GetAsync(identity.Key).GetAwaiter().GetResult();
-            return user ?? UnknownUser(_globalSettings);
-        }
     }
 
+    /// <summary>
+    ///     Gets the current user performing the action from the back office security context.
+    /// </summary>
+    /// <returns>The current user, or <c>null</c> if no user is authenticated.</returns>
+    private async Task<IUser?> GetCurrentPerformingUser() =>
+        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is { } identity
+            ? await _userService.GetAsync(identity.Key)
+            : null;
+
+    /// <summary>
+    ///     Gets the IP address of the current request.
+    /// </summary>
     private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
-    public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings)
+    /// <inheritdoc />
+    public async Task HandleAsync(AssignedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        Id = Constants.Security.UnknownUserId,
-        Name = Constants.Security.UnknownUserName,
-        Email = string.Empty,
-    };
-
-    public void Handle(AssignedMemberRolesNotification notification)
-    {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
         {
             members.TryGetValue(id, out IMember? member);
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
-                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: FormatDetails(id, member, appendType: true),
                 "umbraco/member/roles/assigned",
                 $"roles modified, assigned {roles}");
         }
     }
 
-    public void Handle(AssignedUserGroupPermissionsNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(AssignedMemberRolesNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(
+        AssignedUserGroupPermissionsNotification notification,
+        CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
         foreach (EntityPermission perm in perms)
         {
@@ -102,113 +202,132 @@ public sealed class AuditNotificationsHandler :
             var assigned = string.Join(", ", perm.AssignedPermissions);
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
+            await Audit(
+                performingUser,
+                null,
                 $"User Group {group?.Id} \"{group?.Name}\" ({group?.Alias})",
                 "umbraco/user-group/permissions-change",
                 $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity?.Name}\"");
         }
     }
 
-    public void Handle(ExportedMemberNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(AssignedUserGroupPermissionsNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(ExportedMemberNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IMember member = notification.Member;
 
-        _auditService.Write(
-            performingUser.Id,
-            $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-            PerformingIp,
-            DateTime.UtcNow,
-            -1,
-            $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+        await Audit(
+            performingUser,
+            null,
+            affectedDetails: FormatDetails(member, appendType: true),
             "umbraco/member/exported",
             "exported member data");
     }
 
-    public void Handle(MemberDeletedNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(ExportedMemberNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IMember> members = notification.DeletedEntities;
         foreach (IMember member in members)
         {
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
-                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: FormatDetails(member, appendType: true),
                 "umbraco/member/delete",
-                $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
+                $"delete member id:{FormatDetails(member)}");
         }
     }
 
-    public void Handle(MemberSavedNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(MemberDeletedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(MemberSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IMember> members = notification.SavedEntities;
         foreach (IMember member in members)
         {
             var dp = string.Join(", ", ((Member)member).GetWereDirtyProperties());
 
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
-                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: FormatDetails(member, appendType: true),
                 "umbraco/member/save",
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
         }
     }
 
-    public void Handle(RemovedMemberRolesNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(MemberSavedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(RemovedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
         {
             members.TryGetValue(id, out IMember? member);
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
-                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: FormatDetails(id, member, appendType: true),
                 "umbraco/member/roles/removed",
                 $"roles modified, removed {roles}");
         }
     }
 
-    public void Handle(UserDeletedNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(RemovedMemberRolesNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IUser> affectedUsers = notification.DeletedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                affectedUser.Id,
-                $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
+            await Audit(
+                performingUser,
+                affectedUser,
+                null,
                 "umbraco/user/delete",
                 "delete user");
         }
     }
 
-    public void Handle(UserGroupWithUsersSavedNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(UserDeletedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(UserGroupWithUsersSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         foreach (UserGroupWithUsers groupWithUser in notification.SavedEntities)
         {
             IUserGroup group = groupWithUser.UserGroup;
@@ -238,48 +357,45 @@ public sealed class AuditNotificationsHandler :
                 sb.Append($"default perms: {perms}");
             }
 
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                -1,
-                $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+            await Audit(
+                performingUser,
+                null,
+                $"User Group {FormatDetails(group)}",
                 "umbraco/user-group/save",
                 $"{sb}");
 
             // now audit the users that have changed
             foreach (IUser user in groupWithUser.RemovedUsers)
             {
-                _auditService.Write(
-                    performingUser.Id,
-                    $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                    PerformingIp,
-                    DateTime.UtcNow,
-                    user.Id,
-                    $"User \"{user.Name}\" {FormatEmail(user)}",
+                await Audit(
+                    performingUser,
+                    user,
+                    null,
                     "umbraco/user-group/save",
-                    $"Removed user \"{user.Name}\" {FormatEmail(user)} from group {group.Id} \"{group.Name}\" ({group.Alias})");
+                    $"Removed user {FormatDetails(user)} from group {FormatDetails(group)}");
             }
 
             foreach (IUser user in groupWithUser.AddedUsers)
             {
-                _auditService.Write(
-                    performingUser.Id,
-                    $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                    PerformingIp,
-                    DateTime.UtcNow,
-                    user.Id,
-                    $"User \"{user.Name}\" {FormatEmail(user)}",
+                await Audit(
+                    performingUser,
+                    user,
+                    null,
                     "umbraco/user-group/save",
-                    $"Added user \"{user.Name}\" {FormatEmail(user)} to group {group.Id} \"{group.Name}\" ({group.Alias})");
+                    $"Added user {FormatDetails(user)} to group {FormatDetails(group)}");
             }
         }
     }
 
-    public void Handle(UserSavedNotification notification)
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(UserGroupWithUsersSavedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IUser> affectedUsers = notification.SavedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
@@ -289,20 +405,103 @@ public sealed class AuditNotificationsHandler :
 
             var dp = string.Join(", ", ((User)affectedUser).GetWereDirtyProperties());
 
-            _auditService.Write(
-                performingUser.Id,
-                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
-                PerformingIp,
-                DateTime.UtcNow,
-                affectedUser.Id,
-                $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
+            await Audit(
+                performingUser,
+                affectedUser,
+                null,
                 "umbraco/user/save",
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? string.Empty : "; groups assigned: " + groups)}");
         }
     }
 
-    private string FormatEmail(IMember? member) =>
-        member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{member.Email}>";
+    /// <inheritdoc />
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Handle(UserSavedNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
-    private string FormatEmail(IUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{user.Email}>";
+    /// <summary>
+    ///     Writes an audit entry for the specified action.
+    /// </summary>
+    /// <param name="performingUser">The user performing the action.</param>
+    /// <param name="affectedUser">The user affected by the action, if applicable.</param>
+    /// <param name="affectedDetails">Details about the affected entity.</param>
+    /// <param name="eventType">The type of event being audited.</param>
+    /// <param name="eventDetails">Additional details about the event.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task Audit(
+        IUser? performingUser,
+        IUser? affectedUser,
+        string? affectedDetails,
+        string eventType,
+        string eventDetails)
+    {
+        affectedDetails ??= affectedUser is null ? string.Empty : FormatDetails(affectedUser, appendType: true);
+        await _auditEntryService.WriteAsync(
+            performingUser?.Key,
+            FormatDetails(performingUser, appendType: true),
+            PerformingIp,
+            DateTime.UtcNow,
+            affectedUser?.Key,
+            affectedDetails,
+            eventType,
+            eventDetails);
+    }
+
+    /// <summary>
+    ///     Formats user details for audit logging.
+    /// </summary>
+    /// <param name="user">The user to format details for.</param>
+    /// <param name="appendType">If <c>true</c>, prepends "User" to the output.</param>
+    /// <returns>A formatted string containing user details.</returns>
+    private static string FormatDetails(IUser? user, bool appendType = false)
+    {
+        var userName = user?.Name ?? Constants.Security.UnknownUserName;
+        var details = appendType ? $"User \"{userName}\"" : $"\"{userName}\"";
+        var email = FormatEmail(user?.Email);
+
+        return email is not null
+            ? $"{details} {email}"
+            : details;
+    }
+
+    /// <summary>
+    ///     Formats member details for audit logging.
+    /// </summary>
+    /// <param name="member">The member to format details for.</param>
+    /// <param name="appendType">If <c>true</c>, prepends "Member" to the output.</param>
+    /// <returns>A formatted string containing member details.</returns>
+    private static string FormatDetails(IMember member, bool appendType = false)
+        => FormatDetails(member.Id, member, appendType);
+
+    /// <summary>
+    ///     Formats member details for audit logging using the member ID and optional member instance.
+    /// </summary>
+    /// <param name="id">The member ID.</param>
+    /// <param name="member">The member instance, or <c>null</c> if not available.</param>
+    /// <param name="appendType">If <c>true</c>, prepends "Member" to the output.</param>
+    /// <returns>A formatted string containing member details.</returns>
+    private static string FormatDetails(int id, IMember? member, bool appendType = false)
+    {
+        var userName = member?.Name ?? "(unknown)";
+        var details = appendType ? $"Member {id} \"{userName}\"" : $"{id} \"{userName}\"";
+        var email = FormatEmail(member?.Email);
+
+        return email is not null
+            ? $"{details} {email}"
+            : details;
+    }
+
+    /// <summary>
+    ///     Formats user group details for audit logging.
+    /// </summary>
+    /// <param name="group">The user group to format details for.</param>
+    /// <returns>A formatted string containing user group details.</returns>
+    private static string FormatDetails(IUserGroup group) => $"{group.Id} \"{group.Name}\" ({group.Alias})";
+
+    /// <summary>
+    ///     Formats an email address for display in audit logs.
+    /// </summary>
+    /// <param name="email">The email address to format.</param>
+    /// <returns>The email wrapped in angle brackets, or <c>null</c> if the email is empty.</returns>
+    private static string? FormatEmail(string? email) => !email.IsNullOrWhiteSpace() ? $"<{email}>" : null;
 }

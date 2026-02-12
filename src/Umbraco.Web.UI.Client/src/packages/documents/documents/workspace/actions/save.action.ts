@@ -32,7 +32,7 @@ export class UmbDocumentSaveWorkspaceAction
 		return cultureVariantOptions ? cultureVariantOptions?.length > 1 : false;
 	}
 
-	override _gotWorkspaceContext() {
+	protected override _gotWorkspaceContext() {
 		super._gotWorkspaceContext();
 		this.#observeVariants();
 		this.#observeReadOnlyGuardRules();

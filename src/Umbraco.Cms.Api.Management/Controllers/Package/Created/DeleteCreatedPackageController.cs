@@ -24,12 +24,15 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Deletes a package with a given id.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <returns>The result of the deletion.</returns>
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Deletes a package.")]
+    [EndpointDescription("Deletes a package identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<PackageDefinition?, PackageOperationStatus> result =

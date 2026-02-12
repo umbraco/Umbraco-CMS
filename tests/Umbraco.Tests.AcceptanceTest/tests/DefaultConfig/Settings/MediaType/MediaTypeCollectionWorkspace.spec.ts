@@ -1,5 +1,5 @@
 import {expect} from "@playwright/test";
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const mediaTypeName = 'TestMediaType';
 const mediaTypeFolderName = 'TestMediaTypeFolder';
@@ -16,17 +16,16 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeFolderName);
 });
 
-test('can create a media type using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a media type using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.mediaType.clickMediaTypesMenu();
 
   // Act
   await umbracoUi.mediaType.clickCreateActionWithOptionName('Media Type');
   await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
-  await umbracoUi.mediaType.clickSaveButton();
+  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
-  await umbracoUi.mediaType.waitForMediaTypeToBeCreated();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
   // Check if the created media type is displayed in the collection view and has correct icon
   await umbracoUi.mediaType.clickMediaTypesMenu();
@@ -35,17 +34,16 @@ test('can create a media type using create options', async ({umbracoApi, umbraco
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName);
 });
 
-test('can create a media type folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a media type folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.mediaType.clickMediaTypesMenu();
 
   // Act
   await umbracoUi.mediaType.clickCreateActionWithOptionName('Folder');
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
-  await umbracoUi.mediaType.clickConfirmCreateFolderButton();
+  await umbracoUi.mediaType.clickConfirmCreateFolderButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
-  await umbracoUi.mediaType.waitForMediaTypeToBeCreated();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeFolderName)).toBeTruthy();
   // Check if the created media type is displayed in the collection view and has correct icon
   await umbracoUi.mediaType.clickMediaTypesMenu();
@@ -53,7 +51,7 @@ test('can create a media type folder using create options', async ({umbracoApi, 
   await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveIcon(mediaTypeFolderName, 'icon-folder');
 });
 
-test('can create a media type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a media type in a folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
   await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
@@ -61,10 +59,9 @@ test('can create a media type in a folder using create options', async ({umbraco
   // Act
   await umbracoUi.mediaType.clickCreateActionWithOptionName('Media Type');
   await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
-  await umbracoUi.mediaType.clickSaveButton();
+  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
-  await umbracoUi.mediaType.waitForMediaTypeToBeCreated();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
   // Check if the created media type is displayed in the collection view and has correct icon
   await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
@@ -82,10 +79,9 @@ test('can create a media type folder in a folder using create options', async ({
   // Act
   await umbracoUi.mediaType.clickCreateActionWithOptionName('Folder');
   await umbracoUi.mediaType.enterFolderName(childFolderName);
-  await umbracoUi.mediaType.clickConfirmCreateFolderButton();
+  await umbracoUi.mediaType.clickConfirmCreateFolderButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
-  await umbracoUi.mediaType.waitForMediaTypeToBeCreated();
   expect(await umbracoApi.mediaType.doesNameExist(childFolderName)).toBeTruthy();
   // Check if the created media type is displayed in the collection view and has correct icon
   await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveName(childFolderName);

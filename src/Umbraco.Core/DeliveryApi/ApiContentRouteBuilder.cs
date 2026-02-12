@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -11,6 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Default implementation of <see cref="IApiContentRouteBuilder"/> that builds content routes for the Delivery API.
+/// </summary>
 public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 {
     private readonly IApiContentPathProvider _apiContentPathProvider;
@@ -23,6 +26,18 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IDocumentUrlService _documentUrlService;
     private RequestHandlerSettings _requestSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiContentRouteBuilder"/> class.
+    /// </summary>
+    /// <param name="apiContentPathProvider">The API content path provider.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="requestPreviewService">The request preview service.</param>
+    /// <param name="requestSettings">The request handler settings.</param>
+    /// <param name="contentCache">The published content cache.</param>
+    /// <param name="navigationQueryService">The document navigation query service.</param>
+    /// <param name="publishStatusQueryService">The publish status query service.</param>
+    /// <param name="documentUrlService">The document URL service.</param>
     public ApiContentRouteBuilder(
         IApiContentPathProvider apiContentPathProvider,
         IOptions<GlobalSettings> globalSettings,
@@ -46,51 +61,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         requestSettings.OnChange(settings => _requestSettings = settings);
     }
 
-    [Obsolete("Use the non-obsolete constructor, scheduled for removal in v17")]
-    public ApiContentRouteBuilder(
-        IApiContentPathProvider apiContentPathProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        : this(
-        apiContentPathProvider,
-        globalSettings,
-        variationContextAccessor,
-        requestPreviewService,
-        requestSettings,
-        contentCache,
-        navigationQueryService,
-        publishStatusQueryService,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor, scheduled for removal in v17")]
-    public ApiContentRouteBuilder(
-        IApiContentPathProvider apiContentPathProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
-        : this(
-        apiContentPathProvider,
-        globalSettings,
-        variationContextAccessor,
-        requestPreviewService,
-        requestSettings,
-        contentCache,
-        navigationQueryService,
-        StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    {
-    }
-
+    /// <inheritdoc />
     public IApiContentRoute? Build(IPublishedContent content, string? culture = null)
     {
         if (content.ItemType != PublishedItemType.Content)

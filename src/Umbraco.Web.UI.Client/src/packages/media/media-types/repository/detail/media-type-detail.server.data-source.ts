@@ -150,7 +150,7 @@ export class UmbMediaTypeDetailServerDataSource implements UmbDetailDataSource<U
 			isElement: model.isElement,
 			properties: model.properties.map((property) => {
 				return {
-					id: property.id,
+					id: property.unique,
 					container: property.container,
 					sortOrder: property.sortOrder,
 					alias: property.alias,
@@ -217,7 +217,7 @@ export class UmbMediaTypeDetailServerDataSource implements UmbDetailDataSource<U
 			isElement: model.isElement,
 			properties: model.properties.map((property) => {
 				return {
-					id: property.id,
+					id: property.unique,
 					container: property.container,
 					sortOrder: property.sortOrder,
 					alias: property.alias,

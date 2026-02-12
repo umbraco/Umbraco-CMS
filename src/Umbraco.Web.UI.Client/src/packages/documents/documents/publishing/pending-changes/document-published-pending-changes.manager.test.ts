@@ -5,7 +5,7 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { type UmbDocumentDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -55,6 +55,7 @@ describe('UmbSelectionManager', () => {
 					collection: null,
 				},
 				isTrashed: false,
+				flags: [],
 				variants: [
 					{
 						state: DocumentVariantStateModel.PUBLISHED,
@@ -66,12 +67,12 @@ describe('UmbSelectionManager', () => {
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
 						scheduledUnpublishDate: null,
+						flags: [],
 					},
 				],
 				values: [
 					{
 						editorAlias: 'Umbraco.TextBox',
-						entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 						alias: 'prop1',
 						culture: null,
 						segment: null,
@@ -120,6 +121,7 @@ describe('UmbSelectionManager', () => {
 					collection: null,
 				},
 				isTrashed: false,
+				flags: [],
 				variants: [
 					{
 						state: DocumentVariantStateModel.PUBLISHED,
@@ -131,6 +133,7 @@ describe('UmbSelectionManager', () => {
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
 						scheduledUnpublishDate: null,
+						flags: [],
 					},
 					{
 						state: DocumentVariantStateModel.PUBLISHED,
@@ -142,12 +145,12 @@ describe('UmbSelectionManager', () => {
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
 						scheduledUnpublishDate: null,
+						flags: [],
 					},
 				],
 				values: [
 					{
 						editorAlias: 'Umbraco.TextBox',
-						entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 						alias: 'prop1',
 						culture: 'en-US',
 						segment: null,
@@ -155,7 +158,6 @@ describe('UmbSelectionManager', () => {
 					},
 					{
 						editorAlias: 'Umbraco.TextBox',
-						entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 						alias: 'prop1',
 						culture: 'da-DK',
 						segment: null,

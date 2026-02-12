@@ -44,6 +44,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			},
 			values: [],
 			variants: [],
+			flags: [],
 			...preset,
 		};
 
@@ -210,13 +211,15 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
-					scheduledUnpublishDate: variant.scheduledUnpublishDate || null
+					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
+					flags: variant.flags,
 				};
 			}),
 			documentType: {
 				unique: data.documentType.id,
 				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
 			},
+			flags: data.flags,
 		};
 	}
 }

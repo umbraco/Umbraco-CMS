@@ -1,12 +1,12 @@
 import { stripSlash } from './router-slot/util.js';
-import { umbUrlPatternToString, type UrlParametersRecord } from '@umbraco-cms/backoffice/utils';
+import { umbUrlPatternToString, type UmbUrlParametersRecord } from '@umbraco-cms/backoffice/utils';
 
 /**
  *
  * @param path
  */
 export function umbGenerateRoutePathBuilder(path: string) {
-	return (params: UrlParametersRecord | null) => {
+	return (params: UmbUrlParametersRecord | null) => {
 		return '/' + stripSlash(umbUrlPatternToString(path, params)) + '/';
 	};
 }

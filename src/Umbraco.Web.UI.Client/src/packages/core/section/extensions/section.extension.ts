@@ -1,8 +1,9 @@
+import type { UmbSectionContext } from '../section.context.js';
 import type { UmbSectionElement } from './section-element.interface.js';
-import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSection
-	extends ManifestElement<UmbSectionElement>,
+	extends ManifestElementAndApi<UmbSectionElement, UmbSectionContext>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'section';
 	meta: MetaSection;
@@ -11,4 +12,5 @@ export interface ManifestSection
 export interface MetaSection {
 	label: string;
 	pathname: string;
+	preventUrlRetention?: boolean;
 }

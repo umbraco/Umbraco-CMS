@@ -1,4 +1,4 @@
-import { html, customElement, property, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { debounce } from '@umbraco-cms/backoffice/utils';
@@ -72,24 +72,28 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-menu-item
-			href="${ifDefined(this.href)}"
-			label=${this.label}
-			.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this.label}
-			?active=${this._isActive}
-			?has-children=${this.hasChildren}
-			target=${ifDefined(this.href && this.target ? this.target : undefined)}>
-			<umb-icon slot="icon" name=${this.iconName}></umb-icon>
-			${this.entityType
-				? html`<umb-entity-actions-bundle
-						slot="actions"
-						.entityType=${this.entityType}
-						.unique=${null}
-						.label=${this.localize.term('actions_viewActionsFor', [this.label])}>
-					</umb-entity-actions-bundle>`
-				: ''}
-			<slot></slot>
-		</uui-menu-item>`;
+		return html`
+			<uui-menu-item
+				label=${this.label}
+				href=${ifDefined(this.href)}
+				target=${ifDefined(this.href && this.target ? this.target : undefined)}
+				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this.label}
+				?active=${this._isActive}
+				?has-children=${this.hasChildren}>
+				<umb-icon slot="icon" name=${this.iconName}></umb-icon>
+				${when(
+					this.entityType,
+					() => html`
+						<umb-entity-actions-bundle
+							slot="actions"
+							.entityType=${this.entityType}
+							.unique=${null}
+							.label=${this.label}></umb-entity-actions-bundle>
+					`,
+				)}
+				<slot></slot>
+			</uui-menu-item>
+		`;
 	}
 
 	override disconnectedCallback() {

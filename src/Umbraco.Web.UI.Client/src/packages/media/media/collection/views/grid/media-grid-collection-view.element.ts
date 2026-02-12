@@ -9,13 +9,9 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 
 import '@umbraco-cms/backoffice/imaging';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
-	@state()
-	private _workspacePathBuilder?: UmbModalRouteBuilder;
-
 	@state()
 	private _items: Array<UmbMediaCollectionItemModel> = [];
 
@@ -29,13 +25,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			collectionContext?.setupView(this);
-			this.observe(
-				collectionContext?.workspacePathBuilder,
-				(builder) => {
-					this._workspacePathBuilder = builder;
-				},
-				'observePath',
-			);
 			this.#observeCollectionContext();
 		});
 	}
@@ -69,12 +58,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#getEditUrl(item: UmbMediaCollectionItemModel) {
-		return item.unique && this._workspacePathBuilder
-			? this._workspacePathBuilder({ entityType: item.entityType }) +
-					UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
-						unique: item.unique,
-					})
-			: '';
+		return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
 	}
 
 	override render() {
@@ -104,7 +88,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-imaging-thumbnail
-					unique=${item.unique}
+					.unique=${item.unique}
 					alt=${ifDefined(item.name)}
 					icon=${ifDefined(item.icon)}></umb-imaging-thumbnail>
 			</uui-card-media>

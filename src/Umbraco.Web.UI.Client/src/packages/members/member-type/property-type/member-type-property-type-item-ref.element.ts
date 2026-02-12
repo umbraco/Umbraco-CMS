@@ -18,7 +18,7 @@ export class UmbMemberTypePropertyTypeItemRefElement extends UmbLitElement {
 	standalone = false;
 
 	@state()
-	_editPath = '';
+	private _editPath = '';
 
 	constructor() {
 		super();

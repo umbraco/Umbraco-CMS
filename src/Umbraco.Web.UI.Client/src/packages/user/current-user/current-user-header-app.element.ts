@@ -42,7 +42,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 			<uui-button
 				@click=${this.#handleUserClick}
 				look="primary"
-				label=${this.localize.term('visuallyHiddenTexts_openCloseBackofficeProfileOptions')}
+				label=${this.localize.term('visuallyHiddenTexts_profileOptions')}
 				compact>
 				<umb-user-avatar
 					id="Avatar"

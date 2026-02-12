@@ -18,6 +18,7 @@ public class RunMigrationPackageController : PackageControllerBase
     /// <summary>
     ///     Runs all migration plans for a package with a given name if any are pending.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the package.</param>
     /// <returns>The result of running the package migrations.</returns>
     [HttpPost("{name}/run-migration")]
@@ -25,6 +26,8 @@ public class RunMigrationPackageController : PackageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Runs pending package migrations.")]
+    [EndpointDescription("Executes all pending package migrations to update the database schema.")]
     public async Task<IActionResult> RunMigrations(CancellationToken cancellationToken, string name)
     {
         Attempt<bool, PackageMigrationOperationStatus> result = await _packageMigrationRunner.RunPendingPackageMigrations(name);

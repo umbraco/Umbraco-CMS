@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - release/*
       - v*/dev
       - v*/main
     paths:
@@ -15,8 +16,10 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+      - release/*
       - v*/dev
       - v*/main
+  workflow_dispatch:
 
 jobs:
   build_and_deploy_job:

@@ -76,10 +76,10 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets last login date
     /// </summary>
-    public DateTime? LastLoginDateUtc
+    public DateTime? LastLoginDate
     {
         get => _lastLoginDateUtc;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, nameof(LastLoginDateUtc));
+        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, nameof(LastLoginDate));
     }
 
     /// <summary>
@@ -112,11 +112,13 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets dateTime in UTC when the password was last changed.
     /// </summary>
-    public DateTime? LastPasswordChangeDateUtc
+    public DateTime? LastPasswordChangeDate
     {
         get => _lastPasswordChangeDateUtc;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc,
-            nameof(LastPasswordChangeDateUtc));
+        set => BeingDirty.SetPropertyValueAndDetectChanges(
+            value,
+            ref _lastPasswordChangeDateUtc,
+            nameof(LastPasswordChangeDate));
     }
 
     /// <summary>
@@ -260,7 +262,7 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     {
         get
         {
-            var isLocked = LockoutEnabled && LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
+            var isLocked = LockoutEnabled && LockoutEnd.HasValue && LockoutEnd.Value >= DateTime.UtcNow;
             return isLocked;
         }
     }

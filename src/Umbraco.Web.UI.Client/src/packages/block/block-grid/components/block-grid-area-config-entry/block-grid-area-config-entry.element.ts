@@ -30,13 +30,13 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	#context = new UmbBlockGridAreaConfigEntryContext(this);
 
 	@state()
-	_columnSpan?: number;
+	private _columnSpan?: number;
 
 	@state()
-	_rowSpan?: number;
+	private _rowSpan?: number;
 
 	@state()
-	_alias = '';
+	private _alias = '';
 
 	constructor() {
 		super();
@@ -73,7 +73,7 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	#renderBlock() {
 		return this._key
 			? html`
-					<span>${this._alias}</span>
+					<span class="alias">${this._alias}</span>
 					<uui-action-bar>
 						<uui-button label="edit" compact href=${this.workspacePath + 'edit/' + this._key}>
 							<uui-icon name="icon-edit"></uui-icon>
@@ -110,14 +110,18 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 				background-color: var(--uui-color-disabled-standalone);
 			}
 
+			:host([drag-placeholder]) {
+				opacity: 0.2;
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
 			}
 
-			:host([drag-placeholder]) {
-				opacity: 0.2;
+			.alias {
+				padding: var(--uui-size-space-4);
 			}
 		`,
 	];

@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a data type is moved.
+/// </summary>
 [WebhookEvent("Data Type Moved")]
 public class DataTypeMovedWebhookEvent : WebhookEventBase<DataTypeMovedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypeMovedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public DataTypeMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,9 +28,11 @@ public class DataTypeMovedWebhookEvent : WebhookEventBase<DataTypeMovedNotificat
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.DataTypeMoved;
 
-    public override object? ConvertNotificationToRequestPayload(DataTypeMovedNotification notification)
+    /// <inheritdoc />
+    public override object ConvertNotificationToRequestPayload(DataTypeMovedNotification notification)
         => notification.MoveInfoCollection.Select(moveEvent => new
         {
             Id = moveEvent.Entity.Key,

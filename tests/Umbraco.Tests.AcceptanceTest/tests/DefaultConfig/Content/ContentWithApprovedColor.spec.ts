@@ -28,10 +28,9 @@ test('can create content with the approved color data type', async ({umbracoApi,
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -48,17 +47,16 @@ test('can publish content with the approved color data type', async ({umbracoApi
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values).toEqual([]);
 });
 
-test('can create content with the custom approved color data type', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the custom approved color data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomApprovedColor';
   const colorValue = 'd73737';
@@ -71,10 +69,9 @@ test('can create content with the custom approved color data type', async ({umbr
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickApprovedColorByValue(colorValue);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));

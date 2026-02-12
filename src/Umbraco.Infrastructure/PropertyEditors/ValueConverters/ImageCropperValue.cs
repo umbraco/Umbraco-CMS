@@ -57,8 +57,11 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
         {
             return new ImageUrlGenerationOptions(url)
             {
-                Crop = new ImageUrlGenerationOptions.CropCoordinates(crop.Coordinates.X1, crop.Coordinates.Y1,
-                    crop.Coordinates.X2, crop.Coordinates.Y2)
+                Crop = new ImageUrlGenerationOptions.CropCoordinates(
+                    crop.Coordinates.X1,
+                    crop.Coordinates.Y1,
+                    crop.Coordinates.X2,
+                    crop.Coordinates.Y2)
             };
         }
 
@@ -68,8 +71,12 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
     /// <summary>
     ///     Gets the value image URL for a specified crop.
     /// </summary>
-    public string? GetCropUrl(string alias, IImageUrlGenerator imageUrlGenerator, bool useCropDimensions = true,
-        bool useFocalPoint = false, string? cacheBusterValue = null)
+    public string? GetCropUrl(
+        string alias,
+        IImageUrlGenerator imageUrlGenerator,
+        bool useCropDimensions = true,
+        bool useFocalPoint = false,
+        string? cacheBusterValue = null)
     {
         ImageCropperCrop? crop = GetCrop(alias);
 
@@ -96,7 +103,10 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
     /// <summary>
     ///     Gets the value image URL for a specific width and height.
     /// </summary>
-    public string? GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator,
+    public string? GetCropUrl(
+        int width,
+        int height,
+        IImageUrlGenerator imageUrlGenerator,
         string? cacheBusterValue = null)
     {
         ImageUrlGenerationOptions options = GetCropBaseOptions(null, null, false);

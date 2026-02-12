@@ -225,15 +225,17 @@ public static partial class NPocoDatabaseExtensions
     /// <returns></returns>
     public static string EscapeAtSymbols(string value)
     {
-        if (value.Contains("@") == false)
+        if (value.Contains('@') == false)
         {
             return value;
         }
 
         // this fancy regex will only match a single @ not a double, etc...
-        var regex = new Regex("(?<!@)@(?!@)");
-        return regex.Replace(value, "@@");
+        return AtRegex().Replace(value, "@@");
     }
+
+    [GeneratedRegex("(?<!@)@(?!@)")]
+    private static partial Regex AtRegex();
 
     /// <summary>
     ///     Returns the underlying connection as a typed connection - this is used to unwrap the profiled mini profiler stuff
@@ -241,7 +243,7 @@ public static partial class NPocoDatabaseExtensions
     /// <typeparam name="TConnection"></typeparam>
     /// <param name="connection"></param>
     /// <returns></returns>
-    public static TConnection GetTypedConnection<TConnection>(IDbConnection connection)
+    public static TConnection GetTypedConnection<TConnection>(IDbConnection? connection)
         where TConnection : class, IDbConnection
     {
         IDbConnection? c = connection;
@@ -258,7 +260,7 @@ public static partial class NPocoDatabaseExtensions
                     c = profiled.WrappedConnection;
                     break;
                 default:
-                    throw new NotSupportedException(connection.GetType().FullName);
+                    throw new NotSupportedException(connection?.GetType().FullName);
             }
         }
     }

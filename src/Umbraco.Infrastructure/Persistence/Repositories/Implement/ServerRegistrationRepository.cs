@@ -14,8 +14,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
     IServerRegistrationRepository
 {
-    public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger<ServerRegistrationRepository> logger)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    public ServerRegistrationRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<ServerRegistrationRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -23,14 +32,15 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
 
     public void DeactiveStaleServers(TimeSpan staleTimeout)
     {
-        DateTime timeoutDate = DateTime.Now.Subtract(staleTimeout);
+        DateTime timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
 
-        Database.Update<ServerRegistrationDto>(
-            "SET isActive=0, isSchedulingPublisher=0 WHERE lastNotifiedDate < @timeoutDate", new
-            {
-                /*timeoutDate =*/
-                timeoutDate,
-            });
+        Sql<ISqlContext> sql = Sql()
+            .Update<ServerRegistrationDto>(c => c
+                .Set(x => x.IsActive, false)
+                .Set(x => x.IsSchedulingPublisher, false))
+            .Where<ServerRegistrationDto>(x => x.DateAccessed < timeoutDate);
+        Database.Execute(sql);
+
         ClearCache();
     }
 
@@ -43,7 +53,7 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
         // note: this means that the ServerRegistrationRepository does *not* implement scoped cache,
         // and this is because the repository is special and should not participate in scopes
         // (cleanup in v8)
-        new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected override int PerformCount(IQuery<IServerRegistration>? query) =>
         throw new NotSupportedException("This repository does not support this method.");
@@ -83,7 +93,7 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { "DELETE FROM umbracoServer WHERE id = @id" };
+        var list = new List<string> { $"DELETE FROM {QuoteTableName("umbracoServer")} WHERE id = @id" };
         return list;
     }
 

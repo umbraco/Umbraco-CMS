@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice-lib/context-proxy",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

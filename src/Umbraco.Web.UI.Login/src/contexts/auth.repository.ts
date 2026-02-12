@@ -14,9 +14,9 @@ import {
 	postUserInviteCreatePassword,
 	postUserInviteVerify,
 } from '../api/index.js';
-import { isProblemDetails } from '../utils/is-problem-details.function.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { isProblemDetailsLike } from '@umbraco-cms/backoffice/resources';
 
 export class UmbAuthRepository extends UmbRepositoryBase {
 	#localize = new UmbLocalizationController(this);
@@ -195,7 +195,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 	}
 
 	#getApiErrorDetailText(error: unknown, fallbackText?: string): string | undefined {
-		if (isProblemDetails(error)) {
+		if (isProblemDetailsLike(error)) {
 			return error.detail ?? error.title ?? undefined;
 		}
 

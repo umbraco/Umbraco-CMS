@@ -41,6 +41,8 @@ public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Restores a media item from the recycle bin.")]
+    [EndpointDescription("Restores a media item from the recycle bin to its original location or a specified parent.")]
     public async Task<IActionResult> Restore(
         CancellationToken cancellationToken,
         Guid id,

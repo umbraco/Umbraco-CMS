@@ -4,12 +4,14 @@ export interface UmbConditionConfigBase<AliasType extends string = string> {
 	alias: AliasType;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type ConditionTypeMap<ConditionConfigs extends UmbConditionConfigBase> = {
 	[Condition in ConditionConfigs as Condition['alias']]: Condition;
 } & {
 	[key: string]: UmbConditionConfigBase;
 };
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type SpecificConditionTypeOrUmbConditionConfigBase<
 	ConditionConfigs extends UmbConditionConfigBase,
 	T extends keyof ConditionTypeMap<ConditionConfigs> | string,

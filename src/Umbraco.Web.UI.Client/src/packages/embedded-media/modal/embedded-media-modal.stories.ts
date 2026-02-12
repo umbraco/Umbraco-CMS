@@ -1,14 +1,8 @@
 import './embedded-media-modal.element.js';
+import type UmbEmbeddedMediaModalElement from './embedded-media-modal.element.js';
 
 import type { UmbEmbeddedMediaModalData } from './embedded-media-modal.token.js';
-import type { Meta } from '@storybook/web-components-vite';
-import { html } from '@umbraco-cms/backoffice/external/lit';
-
-export default {
-	title: 'Extension Type/Modal/Embedded Media',
-	component: 'umb-embedded-media-modal',
-	id: 'umb-embedded-media-modal',
-} as Meta;
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 
 const data: UmbEmbeddedMediaModalData = {
 	url: 'https://youtu.be/wJNbtYdr-Hg',
@@ -17,9 +11,16 @@ const data: UmbEmbeddedMediaModalData = {
 	constrain: true,
 };
 
-export const Docs = () => html`
-	<!-- TODO: figure out if generics are allowed for properties:
-	https://github.com/runem/lit-analyzer/issues/149
-	https://github.com/runem/lit-analyzer/issues/163 -->
-	<umb-embedded-media-modal .data=${data as any}></umb-embedded-media-modal>
-`;
+const meta: Meta<UmbEmbeddedMediaModalElement> = {
+	title: 'Extension Type/Modal/Embedded Media',
+	component: 'umb-embedded-media-modal',
+	id: 'umb-embedded-media-modal',
+	args: {
+		data,
+	},
+};
+
+export default meta;
+type Story = StoryObj<UmbEmbeddedMediaModalElement>;
+
+export const Docs: Story = {};

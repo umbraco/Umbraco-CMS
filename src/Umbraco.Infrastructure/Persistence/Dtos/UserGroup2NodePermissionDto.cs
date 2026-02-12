@@ -4,21 +4,25 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[Obsolete("Will be removed in Umbraco 18.")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 [TableName(Constants.DatabaseSchema.Tables.UserGroup2NodePermission)]
 [ExplicitColumns]
 internal class UserGroup2NodePermissionDto
 {
-    [Column("userGroupId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUserGroup2NodePermission", OnColumns = "userGroupId, nodeId, permission")]
+    private const string UserGroupIdColumnName = "userGroupId";
+    private const string NodeIdColumnName = "nodeId";
+    private const string PermissionColumnName = "permission";
+
+    [Column(UserGroupIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUserGroup2NodePermission", OnColumns = $"{UserGroupIdColumnName}, {NodeIdColumnName}, {PermissionColumnName}")]
     [ForeignKey(typeof(UserGroupDto))]
     public int UserGroupId { get; set; }
 
-    [Column("nodeId")]
+    [Column(NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUser2NodePermission_nodeId")]
     public int NodeId { get; set; }
 
-    [Column("permission")]
+    [Column(PermissionColumnName)]
     public string? Permission { get; set; }
 }

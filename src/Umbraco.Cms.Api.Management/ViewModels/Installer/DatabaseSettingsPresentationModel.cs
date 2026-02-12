@@ -28,5 +28,7 @@ public class DatabaseSettingsPresentationModel
 
     public bool SupportsIntegratedAuthentication { get; set; }
 
+    public bool SupportsTrustServerCertificate { get; set; }
+
     public bool RequiresConnectionTest { get; set; }
 }

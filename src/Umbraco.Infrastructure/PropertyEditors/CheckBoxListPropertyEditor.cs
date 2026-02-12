@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.CheckBoxList,
+    ValueType = ValueTypes.Text, // We use the Text value type to ensure we don't run out of storage space in the database field with large lists with multiple values selected.
     ValueEditorIsReusable = true)]
 public class CheckBoxListPropertyEditor : DataEditor
 {

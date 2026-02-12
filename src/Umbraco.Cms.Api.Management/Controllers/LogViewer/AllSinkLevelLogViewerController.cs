@@ -24,12 +24,15 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     /// <summary>
     ///     Gets a paginated list of all loggers' levels.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the configured loggers and their level.</returns>
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LoggerResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of log sink levels.")]
+    [EndpointDescription("Gets a collection of configured log sinks with their minimum log levels.")]
     public Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(
         CancellationToken cancellationToken,
         int skip = 0,

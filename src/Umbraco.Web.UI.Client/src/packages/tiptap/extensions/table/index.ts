@@ -1,1 +1,2 @@
-export * from './components/table-properties-modal.token.js';
+export * from './table.tiptap-extension.js';
+export * from './modals/index.js';

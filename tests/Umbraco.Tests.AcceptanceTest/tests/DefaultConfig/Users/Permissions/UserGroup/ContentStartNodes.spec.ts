@@ -53,12 +53,13 @@ test('can see root start node and children', async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName);
 });
 
-test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDocumentStartNode(userGroupName, childDocumentOneId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -72,7 +73,7 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
   await umbracoUi.content.goToContentWithName(rootDocumentName);
   await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName, false);
 });

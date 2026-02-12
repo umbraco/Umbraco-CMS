@@ -50,7 +50,14 @@ public enum SecureSocketOptions
 /// </summary>
 public class SmtpSettings : ValidatableEntryBase
 {
+    /// <summary>
+    ///     The default secure socket options for SMTP.
+    /// </summary>
     internal const string StaticSecureSocketOptions = "Auto";
+
+    /// <summary>
+    ///     The default SMTP delivery method.
+    /// </summary>
     internal const string StaticDeliveryMethod = "Network";
 
     /// <summary>
@@ -96,4 +103,9 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the SMTP password.
     /// </summary>
     public string? Password { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value for the time until an email expires.
+    /// </summary>
+    public TimeSpan? EmailExpiration { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.FileProviders;
@@ -32,7 +32,7 @@ public class PackageManifestReaderTests
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
         _loggerMock = new Mock<ILogger<AppPluginsPackageManifestReader>>();
-        _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
+        _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), _loggerMock.Object);
     }
 
     [Test]
@@ -186,8 +186,9 @@ public class PackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
-        EnsureLogErrorWasCalled();
+        var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
+        Assert.NotNull(exception);
+        Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
 
     [Test]
@@ -202,8 +203,9 @@ public class PackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
-        EnsureLogErrorWasCalled();
+        var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
+        Assert.NotNull(exception);
+        Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
 
     [Test]
@@ -224,8 +226,9 @@ public class PackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
-        EnsureLogErrorWasCalled();
+        var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
+        Assert.NotNull(exception);
+        Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
 
     [TestCase("This is not JSON")]
@@ -236,19 +239,10 @@ public class PackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
-        EnsureLogErrorWasCalled();
+        var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
+        Assert.NotNull(exception);
+        Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
-
-    private void EnsureLogErrorWasCalled(int numberOfTimes = 1) =>
-        _loggerMock.Verify(
-            x => x.Log(
-                It.Is<LogLevel>(l => l == LogLevel.Error),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)),
-            Times.Exactly(numberOfTimes));
 
     private IFileInfo CreateDirectoryMock(string path, params IFileInfo[] children)
     {

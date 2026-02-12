@@ -18,16 +18,6 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IScopeProvider _scopeProvider;
 
-    [Obsolete("Please use the non obsoleted constructor. Scheduled for removal in v17")]
-    public RelationTypePresentationFactory(IUmbracoMapper umbracoMapper)
-        : this(
-            umbracoMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IEntityRepository>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentPresentationFactory>(),
-            StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>())
-    {
-    }
-
     public RelationTypePresentationFactory(
         IUmbracoMapper umbracoMapper,
         IEntityRepository entityRepository,
@@ -68,7 +58,8 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         return Task.FromResult<IEnumerable<IReferenceResponseModel>>(result);
     }
 
-    private IReferenceResponseModel? MapDocumentReference(RelationItemModel relationItemModel,
+    private IReferenceResponseModel? MapDocumentReference(
+        RelationItemModel relationItemModel,
         List<IEntitySlim> slimEntities)
     {
         DocumentReferenceResponseModel? documentReferenceResponseModel =

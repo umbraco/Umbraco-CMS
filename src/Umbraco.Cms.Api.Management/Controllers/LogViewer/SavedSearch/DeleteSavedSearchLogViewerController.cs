@@ -18,12 +18,15 @@ public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <summary>
     ///     Deletes a saved log search with a given name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the saved log search.</param>
     /// <returns>The result of the deletion.</returns>
     [HttpDelete("{name}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Deletes a saved log search.")]
+    [EndpointDescription("Deletes a saved log search identified by the provided name.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, string name)
     {
         Attempt<ILogViewerQuery?, LogViewerOperationStatus> result = await _logViewerService.DeleteSavedLogQueryAsync(name);

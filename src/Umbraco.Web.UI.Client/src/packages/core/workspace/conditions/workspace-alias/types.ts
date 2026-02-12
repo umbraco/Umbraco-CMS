@@ -1,6 +1,8 @@
 import type { UMB_WORKSPACE_CONDITION_ALIAS } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
+// TODO: Rename this to `UmbWorkspaceAliasConditionConfig` in a future version.
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface WorkspaceAliasConditionConfig extends UmbConditionConfigBase<typeof UMB_WORKSPACE_CONDITION_ALIAS> {
 	/**
 	 * Define the workspace that this extension should be available in

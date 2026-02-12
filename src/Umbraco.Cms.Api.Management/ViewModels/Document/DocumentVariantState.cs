@@ -24,4 +24,9 @@ public enum DocumentVariantState
     ///     The item is published and there are pending changes
     /// </summary>
     PublishedPendingChanges = 4,
+
+    /// <summary>
+    ///     The item is in the recycle bin
+    /// </summary>
+    Trashed = 5,
 }

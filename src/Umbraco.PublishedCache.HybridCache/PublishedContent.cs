@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -59,11 +60,11 @@ internal class PublishedContent : PublishedContentBase
         Id = contentNode.Id;
         Key = contentNode.Key;
         CreatorId = contentNode.CreatorId;
-        CreateDate = contentNode.CreateDate;
+        CreateDate = contentNode.CreateDate.EnsureUtc();
         SortOrder = contentNode.SortOrder;
         WriterId = contentData.WriterId;
         TemplateId = contentData.TemplateId;
-        UpdateDate = contentData.VersionDate;
+        UpdateDate = contentData.VersionDate.EnsureUtc();
     }
 
     public override IPublishedContentType ContentType => _contentNode.ContentType;
@@ -134,7 +135,7 @@ internal class PublishedContent : PublishedContentBase
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
 
-    [Obsolete("Use the INavigationQueryService instead, scheduled for removal in v17")]
+    [Obsolete("Use the INavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override int Level
     {
         get
@@ -162,7 +163,7 @@ internal class PublishedContent : PublishedContentBase
         }
     }
 
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override IPublishedContent? Parent => GetParent();
 
     /// <inheritdoc />

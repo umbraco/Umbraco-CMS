@@ -4,12 +4,17 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.DataType)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[TableName(TableName)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class DataTypeDto
 {
-    [Column("nodeId")]
+    public const string TableName = Constants.DatabaseSchema.Tables.DataType;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+
+    internal const string ReferenceColumnName = "NodeId"; // should be DataTypeDto.PrimaryKeyColumnName, but for database compatibility we keep it like this
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(NodeDto))]
     public int NodeId { get; set; }
@@ -31,6 +36,6 @@ public class DataTypeDto
     public string? Configuration { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
+    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
     public NodeDto NodeDto { get; set; } = null!;
 }

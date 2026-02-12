@@ -10,7 +10,7 @@ internal sealed class MediaDto
     public int NodeId { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ContentDto.ReferenceMemberName)]
     public ContentDto ContentDto { get; set; } = null!;
 
     [ResultColumn]

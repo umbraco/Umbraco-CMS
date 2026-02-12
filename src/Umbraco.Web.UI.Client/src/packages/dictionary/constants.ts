@@ -6,5 +6,6 @@ export * from './repository/constants.js';
 export * from './search/constants.js';
 export * from './tree/constants.js';
 export * from './workspace/constants.js';
+export * from './menu-item/constants.js';
 
 export { UMB_DICTIONARY_ROOT_ENTITY_TYPE, UMB_DICTIONARY_ENTITY_TYPE } from './entity.js';

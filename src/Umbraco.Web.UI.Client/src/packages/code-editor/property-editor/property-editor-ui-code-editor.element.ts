@@ -9,11 +9,15 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 
 import '../components/code-editor.element.js';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-property-editor-ui-code-editor';
 
 @customElement(elementName)
-export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUICodeEditorElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	#defaultLanguage: CodeEditorLanguage = 'javascript';
 
 	@state()
@@ -31,8 +35,9 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	@state()
 	private _wordWrap = false;
 
-	@property()
-	value = '';
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -51,6 +56,16 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 		if (!(event instanceof UmbInputEvent)) return;
 		this.value = event.target.code;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage,
+			() => !!this.mandatory && (!this.value || this.value.length === 0),
+		);
 	}
 
 	override render() {

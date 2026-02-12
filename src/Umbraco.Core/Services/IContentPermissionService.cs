@@ -88,4 +88,15 @@ public interface IContentPermissionService
     /// <param name="culturesToCheck">The collection of cultures to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
     Task<ContentAuthorizationStatus> AuthorizeCultureAccessAsync(IUser user, ISet<string> culturesToCheck);
+
+    /// <summary>
+    ///     Filters content keys to only those the user has access to.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="contentKeys">The identifiers of the content items to filter.</param>
+    /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
+    /// <returns>A task resolving into the set of authorized content keys.</returns>
+    // TODO (V18): Remove default implementation.
+    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
+        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
 }

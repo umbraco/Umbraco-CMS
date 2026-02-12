@@ -13,6 +13,7 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// Adds the member webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -42,6 +43,7 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// Adds the member role webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -69,6 +71,7 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     /// Adds the member group webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>

@@ -27,6 +27,7 @@ const treeItemMapper = (model: UmbMockTemplateModel): NamedEntityTreeItemRespons
 		hasChildren: model.hasChildren,
 		id: model.id,
 		parent: model.parent,
+		flags: model.flags,
 	};
 };
 
@@ -35,6 +36,7 @@ const itemMapper = (item: UmbMockTemplateModel): TemplateItemResponseModel => {
 		id: item.id,
 		name: item.name,
 		alias: item.alias,
+		flags: item.flags,
 	};
 };
 

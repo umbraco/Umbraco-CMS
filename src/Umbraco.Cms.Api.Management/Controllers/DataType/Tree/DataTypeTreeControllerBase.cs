@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -19,8 +22,17 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
 {
     private readonly IDataTypeService _dataTypeService;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public DataTypeTreeControllerBase(IEntityService entityService, IDataTypeService dataTypeService)
-        : base(entityService) =>
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              dataTypeService)
+    {
+    }
+
+    public DataTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
+        : base(entityService, flagProviders) =>
         _dataTypeService = dataTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DataType;
@@ -31,8 +43,8 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
     {
         get
         {
-            var ordering = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectType), Direction.Descending); // We need to override to change direction
-            ordering.Next = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
+            var ordering = Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectTypeColumnName, Direction.Descending); // We need to override to change direction
+            ordering.Next = Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.TextColumnName);
 
             return ordering;
         }

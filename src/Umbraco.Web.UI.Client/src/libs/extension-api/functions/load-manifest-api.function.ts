@@ -1,6 +1,7 @@
 import type { UmbApi } from '../models/api.interface.js';
 import type {
 	ApiLoaderExports,
+	ApiLoaderPromise,
 	ApiLoaderProperty,
 	ClassConstructor,
 	ElementAndApiLoaderProperty,
@@ -20,10 +21,8 @@ export async function loadManifestApi<ApiType extends UmbApi>(
 			// Class Constructor
 			return property as ClassConstructor<ApiType>;
 		} else {
-			// Promise function
-			const result = await (
-				property as Exclude<Exclude<ApiLoaderProperty<ApiType>, string>, ClassConstructor<ApiType>>
-			)();
+			// Promise function (dynamic import)
+			const result = await (property as ApiLoaderPromise<ApiType>)();
 			if (typeof result === 'object' && result != null) {
 				const exportValue =
 					('api' in result ? result.api : undefined) ||
@@ -42,6 +41,14 @@ export async function loadManifestApi<ApiType extends UmbApi>(
 			if (exportValue && typeof exportValue === 'function') {
 				return exportValue;
 			}
+		}
+	} else if (propType === 'object' && property !== null) {
+		// Already resolved module object (statically imported)
+		const result = property as ApiLoaderExports<ApiType>;
+		const exportValue =
+			('api' in result ? result.api : undefined) || ('default' in result ? result.default : undefined);
+		if (exportValue && typeof exportValue === 'function') {
+			return exportValue;
 		}
 	}
 	return undefined;

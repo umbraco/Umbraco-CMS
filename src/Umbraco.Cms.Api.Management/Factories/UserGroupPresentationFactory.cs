@@ -54,6 +54,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Id = userGroup.Key,
             Name = userGroup.Name ?? string.Empty,
+            Description = userGroup.Description ?? string.Empty,
             Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             DocumentRootAccess = contentRootAccess,
@@ -87,6 +88,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Id = userGroup.Key,
             Name = userGroup.Name ?? string.Empty,
+            Description = userGroup.Description ?? string.Empty,
             Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
@@ -132,6 +134,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Name = CleanUserGroupNameOrAliasForXss(requestModel.Name),
             Alias = CleanUserGroupNameOrAliasForXss(requestModel.Alias),
+            Description = requestModel.Description,
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
             Permissions = requestModel.FallbackPermissions,
@@ -197,6 +200,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         current.Name = CleanUserGroupNameOrAliasForXss(request.Name);
         current.Alias = CleanUserGroupNameOrAliasForXss(request.Alias);
+        current.Description = request.Description;
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
 
@@ -211,11 +215,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
     private async Task<Attempt<IEnumerable<string>, UserGroupOperationStatus>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)
     {
-        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        string[] isoCodes = languages
-            .Where(x => ids.Contains(x.Id))
-            .Select(x => x.IsoCode)
-            .ToArray();
+        string[] isoCodes = await _languageService.GetIsoCodesByIdsAsync(ids.ToArray());
 
         // if a language id does not exist, it simply not returned.
         // We do this so we don't have to clean up user group data when deleting languages and to make it easier to restore accidentally removed languages

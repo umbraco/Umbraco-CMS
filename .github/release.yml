@@ -7,7 +7,7 @@ changelog:
       - duplicate
       - wontfix
   categories:
-    - title: 🙌 Notable Changes
+    - title: 🙌 Notable Changes 
       labels:
         - category/notable
     - title: 💥 Breaking Changes
@@ -23,7 +23,7 @@ changelog:
     - title: 📦 Dependencies
       labels:
         - dependencies
-    - title: 🌈 A11Y
+    - title: 🌈 Accessibility Improvements
       labels:
         - accessibility
         - category/accessibility

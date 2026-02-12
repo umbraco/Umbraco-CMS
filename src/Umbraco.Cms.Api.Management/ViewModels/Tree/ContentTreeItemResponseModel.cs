@@ -6,7 +6,5 @@ public abstract class ContentTreeItemResponseModel : EntityTreeItemResponseModel
 
     public bool IsTrashed { get; set; }
 
-    public Guid Id { get; set; }
-
     public DateTimeOffset CreateDate { get; set; }
 }

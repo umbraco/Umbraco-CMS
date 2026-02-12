@@ -31,7 +31,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-test('can access members section with section enabled', async ({umbracoApi, umbracoUi}) => {
+test('can access members section with section enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
@@ -65,12 +65,10 @@ test('can create member with members section set', async ({umbracoApi, umbracoUi
   await umbracoUi.member.enterConfirmPassword(password);
   await umbracoUi.member.clickDetailsTab();
   await umbracoUi.member.enterComments(comment);
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeCreated();
 
   // Assert
-  await umbracoUi.member.waitForMemberToBeCreated();
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
-  expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
 test('can update member with members section set', async ({umbracoApi, umbracoUi}) => {
@@ -88,10 +86,9 @@ test('can update member with members section set', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.enterUsername(updatedUsername);
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton(false);
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.username).toBe(updatedUsername);

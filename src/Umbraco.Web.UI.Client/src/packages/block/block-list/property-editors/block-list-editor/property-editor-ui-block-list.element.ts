@@ -4,30 +4,39 @@ import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../type
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	css,
+	nothing,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	extractJsonQueryProps,
+	UmbFormControlMixin,
+	UmbValidationContext,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+} from '@umbraco-cms/backoffice/validation';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '../../components/block-list-entry/index.js';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import {
-	extractJsonQueryProps,
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-	UmbFormControlMixin,
-	UmbValidationContext,
-} from '@umbraco-cms/backoffice/validation';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -63,6 +72,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 		if (!value) {
 			super.value = undefined;
+			// Clear manager state so blocks are actually removed
+			this.#managerContext.setLayouts([]);
+			this.#managerContext.setContents([]);
+			this.#managerContext.setSettings([]);
+			this.#managerContext.setExposes([]);
 			return;
 		}
 
@@ -99,8 +113,6 @@ export class UmbPropertyEditorUIBlockListElement
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
-		// TODO:
-		//config.useSingleBlockMode, not done jet
 
 		this.#managerContext.setEditorConfiguration(config);
 
@@ -162,7 +174,10 @@ export class UmbPropertyEditorUIBlockListElement
 	readonly #entriesContext = new UmbBlockListEntriesContext(this);
 
 	@state()
-	_notSupportedVariantSetting?: boolean;
+	private _notSupportedVariantSetting?: boolean;
+
+	@state()
+	private _isSortMode = false;
 
 	constructor() {
 		super();
@@ -216,6 +231,7 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#gotPropertyContext(context);
 		});
 
+		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
 		// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
 		this.observe(
 			this.#managerContext.layouts,
@@ -224,6 +240,7 @@ export class UmbPropertyEditorUIBlockListElement
 				const contentKeys = layouts.map((x) => x.contentKey);
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
 					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
+					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && contentKeys.indexOf(key) === -1) {
 						validationMessagesToRemove.push(message.key);
@@ -232,6 +249,7 @@ export class UmbPropertyEditorUIBlockListElement
 
 				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
+					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
 					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && settingsKeys.indexOf(key) === -1) {
@@ -245,9 +263,17 @@ export class UmbPropertyEditorUIBlockListElement
 			null,
 		);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
-			this.#managerContext.setVariantId(context?.getVariantId());
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeContextualVariantId',
+			);
 		});
+
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -274,7 +300,11 @@ export class UmbPropertyEditorUIBlockListElement
 		this.addValidator(
 			'valueMissing',
 			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => !!this.mandatory && this.#entriesContext.getLength() === 0,
+			() => {
+				if (!this.mandatory || this.readonly) return false;
+				const count = this.value?.layout?.[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]?.length ?? 0;
+				return count === 0;
+			},
 		);
 
 		this.observe(
@@ -336,15 +366,22 @@ export class UmbPropertyEditorUIBlockListElement
 			]).pipe(debounceTime(20)),
 			([layouts, contents, settings, exposes]) => {
 				if (layouts.length === 0) {
+					if (this.value === undefined) {
+						return;
+					}
 					super.value = undefined;
 				} else {
-					super.value = {
+					const newValue = {
 						...super.value,
 						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
 						expose: exposes,
 					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
@@ -364,18 +401,18 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	override render() {
-		if (this._notSupportedVariantSetting) {
-			return nothing;
-		}
+		if (this._notSupportedVariantSetting) return nothing;
 		return html`
+			${this.#renderSortModeToolbar()}
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
-				(layoutEntry, index) => html`
+				(layout, index) => `${index}_${layout.contentKey}`,
+				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
+						index=${index}
+						.contentKey=${layout.contentKey}
+						.layout=${layout}
 						${umbDestroyOnDisconnect()}>
 					</umb-block-list-entry>
 				`,
@@ -385,36 +422,59 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderCreateButtonGroup() {
-		if (this.readonly && this._layouts.length > 0) {
-			return nothing;
-		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
-		}
+		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
+		return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
 	}
 
 	#renderInlineCreateButton(index: number) {
 		if (this.readonly) return nothing;
-		return html`<uui-button-inline-create
-			label=${this._createButtonLabel}
-			href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>`;
+		const createPath = this.#entriesContext.getPathForCreateBlock(index);
+		return html`
+			<uui-button-inline-create
+				label=${this._createButtonLabel}
+				href=${ifDefined(createPath)}
+				@click=${() => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						this.#handleCreateWithNoCreatePath(index);
+					}
+				}}>
+			</uui-button-inline-create>
+		`;
 	}
 
 	#renderCreateButton() {
-		let createPath: string | undefined;
-		if (this._blocks?.length === 1) {
-			const elementKey = this._blocks[0].contentElementTypeKey;
-			createPath =
-				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
-		} else {
-			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
-		}
+		if (!this._catalogueRouteBuilder) return nothing;
+		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
-				label=${this._createButtonLabel}
-				href=${createPath ?? ''}
-				?disabled=${this.readonly}></uui-button>
+				.label=${this._createButtonLabel}
+				href=${ifDefined(createPath)}
+				?disabled=${this.readonly}
+				@click=${() => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						this.#handleCreateWithNoCreatePath();
+					}
+				}}></uui-button>
 		`;
+	}
+
+	async #handleCreateWithNoCreatePath(index?: number) {
+		if (!this._blocks || this._blocks.length === 0) {
+			throw new Error('No block types are configured for this Block List property editor');
+		}
+		if (index === undefined) {
+			index = -1;
+		}
+		const originData = { index };
+		const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
+		if (created) {
+			this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
+		} else {
+			throw new Error('Failed to create block');
+		}
 	}
 
 	#renderPasteButton() {
@@ -429,12 +489,16 @@ export class UmbPropertyEditorUIBlockListElement
 		`;
 	}
 
-	static override readonly styles = [
-		UmbTextStyles,
+	#renderSortModeToolbar() {
+		if (!this._isSortMode) return nothing;
+		return html`<umb-property-sort-mode-toolbar></umb-property-sort-mode-toolbar>`;
+	}
 
+	static override readonly styles = [
 		css`
 			:host {
 				display: grid;
+				align-content: start;
 				gap: 1px;
 			}
 			> div {

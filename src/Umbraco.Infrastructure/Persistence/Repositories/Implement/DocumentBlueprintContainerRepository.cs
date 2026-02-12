@@ -11,8 +11,16 @@ internal sealed class DocumentBlueprintContainerRepository : EntityContainerRepo
     public DocumentBlueprintContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
-        ILogger<DocumentBlueprintContainerRepository> logger)
-        : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DocumentBlueprintContainer)
+        ILogger<DocumentBlueprintContainerRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            Constants.ObjectTypes.DocumentBlueprintContainer,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 }

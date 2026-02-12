@@ -29,10 +29,10 @@ export class UmbConfirmBulkActionModalEntityReferencesElement extends UmbLitElem
 	};
 
 	@state()
-	_items: Array<any> = [];
+	private _items: Array<any> = [];
 
 	@state()
-	_totalItems: number = 0;
+	private _totalItems: number = 0;
 
 	#itemRepository?: UmbItemRepository<any>;
 	#referenceRepository?: UmbEntityReferenceRepository;

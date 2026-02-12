@@ -1,10 +1,14 @@
 import type { ManifestSection } from './extensions/section.extension.js';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_SECTION_CONTEXT } from './section.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSectionContext extends UmbContextBase {
+export class UmbSectionContext extends UmbContextBase implements UmbApi {
 	#manifestAlias = new UmbStringState<string | undefined>(undefined);
 	#manifestPathname = new UmbStringState<string | undefined>(undefined);
 	#manifestLabel = new UmbStringState<string | undefined>(undefined);
@@ -12,19 +16,47 @@ export class UmbSectionContext extends UmbContextBase {
 	public readonly pathname = this.#manifestPathname.asObservable();
 	public readonly label = this.#manifestLabel.asObservable();
 
+	#viewContext = new UmbViewContext(this, null);
+	#sectionContextExtensionController?: UmbExtensionsApiInitializer<any>;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SECTION_CONTEXT);
+
+		this.#createSectionContextExtensions();
 	}
 
-	public setManifest(manifest?: ManifestSection) {
+	public set manifest(manifest: ManifestSection | undefined) {
+		this._manifest = manifest;
+
 		this.#manifestAlias.setValue(manifest?.alias);
 		this.#manifestPathname.setValue(manifest?.meta?.pathname);
-		this.#manifestLabel.setValue(manifest ? manifest.meta?.label || manifest.name : undefined);
+
+		const sectionLabel = manifest ? manifest.meta?.label || manifest.name : undefined;
+		this.#manifestLabel.setValue(sectionLabel);
+		this.#viewContext.setTitle(sectionLabel);
 	}
+	public get manifest(): ManifestSection | undefined {
+		return this._manifest;
+	}
+	private _manifest?: ManifestSection | undefined;
 
 	getPathname() {
 		return this.#manifestPathname.getValue();
 	}
+
+	#createSectionContextExtensions() {
+		if (this.#sectionContextExtensionController) {
+			this.#sectionContextExtensionController.destroy();
+		}
+
+		this.#sectionContextExtensionController = new UmbExtensionsApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'sectionContext',
+			[],
+			undefined,
+		);
+	}
 }
 
-export const UMB_SECTION_CONTEXT = new UmbContextToken<UmbSectionContext>('UmbSectionContext');
+export default UmbSectionContext;

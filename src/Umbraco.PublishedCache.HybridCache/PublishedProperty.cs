@@ -96,13 +96,23 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
-        var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
-        if (hasValue.HasValue)
+        var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
+        if (isValue.HasValue)
         {
-            return hasValue.Value;
+            return isValue.Value;
         }
 
-        return PropertyType.IsValue(GetInterValue(culture, segment), PropertyValueLevel.Object) ?? false;
+        value = GetInterValue(culture, segment);
+        isValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
+        if (isValue.HasValue)
+        {
+            return isValue.Value;
+        }
+
+        value = GetValue(culture, segment);
+        isValue = PropertyType.IsValue(value, PropertyValueLevel.Object);
+
+        return isValue ?? false;
     }
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
@@ -177,10 +187,10 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         switch (cacheLevel)
         {
             case PropertyCacheLevel.None:
+            case PropertyCacheLevel.Snapshot: // Snapshot is obsolete, so for now treat as None
                 // never cache anything
                 cacheValues = new CacheValues();
                 break;
-            case PropertyCacheLevel.Snapshot: // Snapshot is obsolete, so for now treat as element
             case PropertyCacheLevel.Element:
                 // cache within the property object itself, ie within the content object
                 cacheValues = _cacheValues ??= new CacheValues();

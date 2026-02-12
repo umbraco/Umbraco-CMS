@@ -32,7 +32,7 @@ using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Web.Common.AspNetCore;
-using Umbraco.Extensions;
+
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
@@ -44,9 +44,7 @@ public class TestHelper : TestHelperBase
     private readonly IApplicationShutdownRegistry _hostingLifetime;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IIpResolver _ipResolver;
-    private readonly IBackOfficeInfo _backOfficeInfo;
     private IHostingEnvironment _hostingEnvironment;
-    private readonly string _tempWorkingDir;
 
     public TestHelper()
         : base(typeof(TestHelper).Assembly)
@@ -127,9 +125,15 @@ public class TestHelper : TestHelperBase
     public override IIpResolver GetIpResolver() => _ipResolver;
 
     /// <summary>
-    ///     Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based
-    ///     on a virtual path name
+    ///     Maps a virtual path to a physical path for test files.
     /// </summary>
+    /// <param name="relativePath">The relative path starting with "~/" to map.</param>
+    /// <returns>The physical file path.</returns>
+    /// <remarks>
+    ///     Some test files are copied to the /bin (/bin/debug) directory on build.
+    ///     This utility returns their physical path based on a virtual path name.
+    /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when the relativePath does not start with "~/".</exception>
     public override string MapPathForTestFiles(string relativePath)
     {
         if (!relativePath.StartsWith("~/"))
@@ -137,9 +141,7 @@ public class TestHelper : TestHelperBase
             throw new ArgumentException("relativePath must start with '~/'", nameof(relativePath));
         }
 
-        var codeBase = typeof(TestHelperBase).Assembly.CodeBase;
-        var uri = new Uri(codeBase);
-        var path = uri.LocalPath;
+        var path = typeof(TestHelperBase).Assembly.Location;
         var bin = Path.GetDirectoryName(path);
 
         return relativePath.Replace("~/", bin + "/");

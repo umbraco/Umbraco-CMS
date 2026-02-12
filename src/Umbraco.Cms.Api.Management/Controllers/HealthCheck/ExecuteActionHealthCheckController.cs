@@ -32,12 +32,15 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     /// <summary>
     ///     Executes a given action from a HealthCheck.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="action">The action to be executed.</param>
     /// <returns>The result of a health check after the health check action is performed.</returns>
     [HttpPost("execute-action")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HealthCheckResultResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Executes a health check action.")]
+    [EndpointDescription("Executes a specific action to fix or address a health check issue.")]
     public async Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(
         CancellationToken cancellationToken,
         HealthCheckActionRequestModel action)

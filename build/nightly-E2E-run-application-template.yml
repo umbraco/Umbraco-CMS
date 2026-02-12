@@ -1,0 +1,45 @@
+﻿parameters:
+  - name: SA_PASSWORD
+    type: string
+    default: ''
+
+  - name: buildConfiguration
+    type: string
+    default: ''
+
+  - name: additionalEnvironmentVariables
+    type: string
+    default: 'false'
+
+  - name: DatabaseType
+    type: string
+    default: ''
+
+steps:
+  # Skips the SQLServer setup if the databaseType does not match
+  - ${{ if eq(parameters.DatabaseType, 'SQLServer') }}:
+      # Start SQL Server Linux
+      - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{ parameters.SA_PASSWORD }}" mcr.microsoft.com/mssql/server:2022-latest
+        displayName: Start SQL Server Docker image (Linux)
+        condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+      # Start SQL Server LocalDB Windows
+      - pwsh: SqlLocalDB start MSSQLLocalDB
+        displayName: Start SQL Server LocalDB (Windows)
+        condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+
+  # Run application for Linux
+  - bash: |
+      nohup dotnet run --project UmbracoProject --configuration ${{ parameters.buildConfiguration }} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
+      echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
+    displayName: Run application (Linux)
+    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), eq(variables['additionalEnvironmentVariables'], 'false'))
+    workingDirectory: $(Agent.BuildDirectory)/app
+
+  # Run application for Windows
+  - pwsh: |
+      $process = Start-Process dotnet "run --project UmbracoProject --configuration ${{ parameters.buildConfiguration }} --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
+      Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
+    displayName: Run application (Windows)
+    condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), eq(variables['additionalEnvironmentVariables'], 'false'))
+    workingDirectory: $(Agent.BuildDirectory)/app

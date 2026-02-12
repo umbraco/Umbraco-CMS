@@ -704,9 +704,6 @@ export default {
 		notificationEmailsCheckErrorMessage:
 			'Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Лучшие обучающие видео-курсы по Umbraco',
-	},
 	imagecropper: {
 		reset: 'Сбросить',
 	},
@@ -1019,8 +1016,8 @@ export default {
 		folderWasRenamed: "'%0%' была переименована в '%1%'",
 	},
 	rollback: {
-		diffHelp:
-			'Здесь показаны различия между новейшей версией документа и выбранной Вами версией.<br /><del>Красным</del> отмечен текст, которого уже нет в последней версии, <ins>зеленым</ins> - текст, который добавлен',
+		diffHelp: '<del>Красный текст</del> будет удален в выбранной версии, <ins>зеленый текст</ins> будет добавлен.',
+		showDiff: 'Показать различия между текущей (черновой) версией и выбранной версией.',
 		documentRolledBack: 'Произведен откат к ранней версии',
 		htmlHelp: 'Текущая версия показана в виде HTML. Для просмотра различий в версиях выберите режим сравнения',
 		rollbackTo: 'Откатить к версии',
@@ -1269,7 +1266,8 @@ export default {
 		withTime: 'Дата и время',
 	},
 	textbox: {
-		characters_left: 'символов осталось',
+		characters_left: 'Осталось <strong>%0%</strong> символов.',
+		characters_exceed: 'Максимум %0% символов, <strong>%1%</strong> лишних.',
 	},
 	translation: {
 		details: 'Подробности перевода',

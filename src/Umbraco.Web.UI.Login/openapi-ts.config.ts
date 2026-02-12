@@ -2,9 +2,20 @@ import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
 	input: {
-		include:
-			'(ProblemDetails|ReferenceByIdModel|ResetPassword|PasswordConfiguration|SecurityConfiguration|InviteUser|CreateInitialPasswordUser|/security/|/user/invite/)',
 		path: '../Umbraco.Cms.Api.Management/OpenApi.json',
+	},
+	parser: {
+		filters: {
+			operations: {
+				include: [
+					'POST /umbraco/management/api/v1/security/forgot-password',
+					'POST /umbraco/management/api/v1/security/forgot-password/verify',
+					'POST /umbraco/management/api/v1/security/forgot-password/reset',
+					'POST /umbraco/management/api/v1/user/invite/verify',
+					'POST /umbraco/management/api/v1/user/invite/create-password',
+				],
+			},
+		},
 	},
 	output: {
 		path: './src/api',

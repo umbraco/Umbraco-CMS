@@ -7,12 +7,8 @@ export interface ManifestPropertyValueResolver extends ManifestApi<UmbPropertyVa
 	forEditorAlias: string;
 }
 
-export interface MetaPropertyValueResolver {
-	/**
-	 * @deprecated use `forEditorAlias` instead, will be removed in v.17
-	 */
-	editorAlias?: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface MetaPropertyValueResolver {}
 
 declare global {
 	interface UmbExtensionManifestMap {

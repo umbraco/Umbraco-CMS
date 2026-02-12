@@ -10,5 +10,5 @@ export const UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT = new UmbContextToken<
 	'UmbWorkspaceContext',
 	undefined,
 	(context): context is UmbContentCollectionWorkspaceContext<UmbContentTypeModel> =>
-		(context as UmbContentCollectionWorkspaceContext<UmbContentTypeModel>).contentTypeHasCollection !== undefined,
+		(context as UmbContentCollectionWorkspaceContext<UmbContentTypeModel>).collection?.hasCollection !== undefined,
 );

@@ -27,6 +27,7 @@ export const data: Array<UmbMockDictionaryModel> = [
 				translation: 'Dette er et forbudt ordbogsobjekt',
 			},
 		],
+		flags: [],
 	},
 	{
 		name: 'Hello',
@@ -44,6 +45,7 @@ export const data: Array<UmbMockDictionaryModel> = [
 				translation: '',
 			},
 		],
+		flags: [],
 	},
 	{
 		name: 'Hello again',
@@ -61,6 +63,7 @@ export const data: Array<UmbMockDictionaryModel> = [
 				translation: 'Hello in da',
 			},
 		],
+		flags: [],
 	},
 	{
 		name: 'Nested Hello again',
@@ -78,5 +81,6 @@ export const data: Array<UmbMockDictionaryModel> = [
 				translation: 'Nested Hello in da',
 			},
 		],
+		flags: [],
 	},
 ];

@@ -2,7 +2,9 @@
 // TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
 export * from './backoffice-modal-container/backoffice-modal-container.element.js';
 export * from './backoffice-notification-container/backoffice-notification-container.element.js';
+export * from './badge/index.js';
 export * from './body-layout/body-layout.element.js';
+export * from './figure-card/figure-card.element.js';
 export * from './code-block/index.js';
 export * from './dropdown/index.js';
 export * from './entity-actions-bundle/index.js';
@@ -19,12 +21,14 @@ export * from './input-manifest/index.js';
 export * from './input-number-range/index.js';
 export * from './input-radio-button-list/index.js';
 export * from './input-slider/index.js';
+export * from './input-time-zone/index.js';
 export * from './input-toggle/index.js';
 export * from './input-with-alias/input-with-alias.element.js';
 export * from './multiple-color-picker-input/index.js';
 export * from './multiple-text-string-input/index.js';
 export * from './popover-layout/index.js';
 export * from './ref-item/index.js';
-export * from './stack/index.js';
 export * from './split-panel/index.js';
+export * from './stack/index.js';
 export * from './table/index.js';
+export * from './view-loader/view-loader.element.js';

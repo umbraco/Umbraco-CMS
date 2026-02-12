@@ -24,12 +24,15 @@ public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerB
     /// <summary>
     ///     Gets a paginated list of all saved log searches.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the saved log searches.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SavedLogSearchResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of saved log searches.")]
+    [EndpointDescription("Gets a collection of saved log searches defined in the Umbraco installation.")]
     public async Task<ActionResult<PagedViewModel<SavedLogSearchResponseModel>>> AllSavedSearches(
         CancellationToken cancellationToken,
         int skip = 0,

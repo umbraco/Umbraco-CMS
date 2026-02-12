@@ -14,11 +14,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	#item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
 
 	@property({ type: Object })
-	public get item(): UmbDocumentItemModel | undefined {
-		return this.#item.getData();
-	}
 	public set item(value: UmbDocumentItemModel | undefined) {
 		this.#item.setData(value);
+	}
+	public get item(): UmbDocumentItemModel | undefined {
+		return this.#item.getData();
 	}
 
 	@property({ type: Boolean, reflect: true })

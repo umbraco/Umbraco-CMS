@@ -99,5 +99,14 @@ public class ApiContentResponseBuilderTests : UmbracoIntegrationTest
     }
 
     private void RefreshContentCache()
-        => GetRequiredService<ContentCacheRefresher>().Refresh([new ContentCacheRefresher.JsonPayload { ChangeTypes = TreeChangeTypes.RefreshAll }]);
+    {
+        var refresher = GetRequiredService<ContentCacheRefresher>();
+        ContentCacheRefresher.JsonPayload[] payloads =
+        [
+            new() { ChangeTypes = TreeChangeTypes.RefreshAll }
+        ];
+
+        refresher.RefreshInternal(payloads);
+        refresher.Refresh(payloads);
+    }
 }

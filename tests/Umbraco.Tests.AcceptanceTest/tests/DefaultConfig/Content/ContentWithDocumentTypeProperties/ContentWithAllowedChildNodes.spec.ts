@@ -28,10 +28,9 @@ test('can create content with allowed child node enabled', async ({umbracoApi, u
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 
   // Clean
@@ -51,7 +50,7 @@ test('cannot create child content if allowed child node is disabled', async ({um
 
   // Assert
   await umbracoUi.content.isDocumentTypeNameVisible(documentTypeName, false);
-  await umbracoUi.content.doesModalHaveText(noAllowedDocumentTypeAvailableMessage);
+  await umbracoUi.content.doesDocumentModalHaveText(noAllowedDocumentTypeAvailableMessage);
 });
 
 test('can create multiple child nodes with different document types', async ({umbracoApi, umbracoUi}) => {
@@ -72,10 +71,9 @@ test('can create multiple child nodes with different document types', async ({um
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(secondChildDocumentTypeName);
   await umbracoUi.content.enterContentName(secondChildContentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeTruthy();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(2);
@@ -84,7 +82,7 @@ test('can create multiple child nodes with different document types', async ({um
   // verify that the child content displays in the tree after reloading children
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadChildrenActionMenuOption();
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.doesContentTreeHaveName(firstChildContentName);
   await umbracoUi.content.doesContentTreeHaveName(secondChildContentName);
 

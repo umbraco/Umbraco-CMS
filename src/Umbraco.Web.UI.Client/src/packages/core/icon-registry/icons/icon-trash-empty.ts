@@ -1,0 +1,1 @@
+export default `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" class="lucide lucide-trash-2" viewBox="0 0 24 24"><path d="m14.6 11.4-5.2 5.2m0-5.2 5.2 5.2M19 6v14c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V6M3 6h18M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2" class="cls-1"/></svg>`;

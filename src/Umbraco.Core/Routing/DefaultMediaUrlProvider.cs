@@ -11,6 +11,11 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
     private readonly MediaUrlGeneratorCollection _mediaPathGenerators;
     private readonly IUrlAssembler _urlAssembler;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DefaultMediaUrlProvider" /> class.
+    /// </summary>
+    /// <param name="mediaPathGenerators">The media path generators.</param>
+    /// <param name="urlAssembler">The URL assembler.</param>
     public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, IUrlAssembler urlAssembler)
     {
         _mediaPathGenerators = mediaPathGenerators;
@@ -39,7 +44,7 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
         if (_mediaPathGenerators.TryGetMediaPath(propType?.EditorAlias, value, out var path))
         {
             Uri url = _urlAssembler.AssembleUrl(path!, current, mode);
-            return UrlInfo.Url(url.ToString(), culture);
+            return UrlInfo.FromUri(url, Constants.UrlProviders.Media, culture);
         }
 
         return null;

@@ -145,7 +145,9 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     }
 
     /// <inheritdoc />
-    public Task SetRoleNameAsync(UmbracoIdentityRole role, string? roleName,
+    public Task SetRoleNameAsync(
+        UmbracoIdentityRole role,
+        string? roleName,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -167,7 +169,9 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         => GetRoleNameAsync(role, cancellationToken);
 
     /// <inheritdoc />
-    public Task SetNormalizedRoleNameAsync(UmbracoIdentityRole role, string? normalizedName,
+    public Task SetNormalizedRoleNameAsync(
+        UmbracoIdentityRole role,
+        string? normalizedName,
         CancellationToken cancellationToken = default)
         => SetRoleNameAsync(role, normalizedName, cancellationToken);
 

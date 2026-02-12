@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Provides methods for backoffice security operations including authentication and authorization.
+/// </summary>
 public interface IBackOfficeSecurity
 {
     /// <summary>

@@ -83,10 +83,14 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 		} else {
 			variantsToStore = [...selectedVariants, invariantVariantId];
 		}
+		const data = this.getCurrent();
+		if (!data) throw new Error('Current data is missing');
+		//if (!data.unique) throw new Error('Unique of current data is missing');
 
 		// If we vary by segment we need to save all segments for a selected culture.
+		// And all segments for the invariant culture.
 		if (this._variesBySegment === true) {
-			const dataSegments = this.getCurrent()!.values.map((x) => x.segment);
+			const dataSegments = data.values.map((x) => x.segment).filter((x) => x) as Array<string>;
 			variantsToStore = [
 				...variantsToStore,
 				...dataSegments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),
@@ -98,12 +102,7 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 			];
 		}
 
-		const data = this.getCurrent();
-		if (!data) throw new Error('Current data is missing');
-		//if (!data.unique) throw new Error('Unique of current data is missing');
-
 		const persistedData = this.getPersisted();
-
 		return await new UmbMergeContentVariantDataController(this).process(
 			persistedData,
 			data,

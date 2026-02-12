@@ -191,13 +191,21 @@ export class UmbContextConsumer<
 			cancelAnimationFrame(this.#raf);
 		}
 
+		const hostElement = this._retrieveHost();
+
+		// Add connection check to prevent requesting on disconnected elements
+		if (hostElement && !hostElement.isConnected) {
+			console.warn('UmbContextConsumer: Attempting to request context on disconnected element', hostElement);
+			return;
+		}
+
 		const event = new UmbContextRequestEventImplementation(
 			this.#contextAlias,
 			this.#apiAlias,
 			this._onResponse,
 			this.#stopAtContextMatch,
 		);
-		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
+		(this.#skipHost ? hostElement?.parentNode : hostElement)?.dispatchEvent(event);
 
 		if (this.#promiseResolver && this.#promiseOptions?.preventTimeout !== true) {
 			this.#raf = requestAnimationFrame(() => {

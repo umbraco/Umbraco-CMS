@@ -62,6 +62,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 				memberType: { unique: item.memberType.id, icon: item.memberType.icon },
 				username: item.username,
 				values: item.values as UmbMemberValueModel[],
+				flags: item.flags,
 			};
 
 			return memberDetail;

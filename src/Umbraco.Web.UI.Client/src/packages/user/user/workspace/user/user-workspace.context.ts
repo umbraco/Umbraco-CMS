@@ -1,27 +1,26 @@
 import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } from '../../types.js';
-import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserDetailRepository } from '../../repository/index.js';
 import { UMB_USER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserAvatarRepository } from '../../repository/avatar/index.js';
 import { UmbUserConfigRepository } from '../../repository/config/index.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
-import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
+import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 type EntityType = UmbUserDetailModel;
 
 export class UmbUserWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbUserDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<EntityType, UmbUserDetailRepository>
 	implements UmbSubmittableWorkspaceContext
 {
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
 	public readonly configRepository = new UmbUserConfigRepository(this);
 
-	readonly name = this._data.createObservablePartOfCurrent((x) => x?.name);
 	readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
 	readonly kind = this._data.createObservablePartOfCurrent((x) => x?.kind);
 	readonly userGroupUniques = this._data.createObservablePartOfCurrent((x) => x?.userGroupUniques || []);
@@ -84,14 +83,17 @@ export class UmbUserWorkspaceContext
 		return response;
 	}
 
-	/* TODO: some properties are allowed to update without saving.
-		For a user properties like state will be updated when one of the entity actions are executed.
+	/* Some properties are allowed to update without saving.
+		For a user, properties like state will be updated when one of the entity actions are executed.
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
+		We update both current and persisted so these server-applied changes do not trigger dirty state.
 		There might be a less manual way to do this.
 	*/
 	onUserStoreChanges(user: EntityType | undefined) {
 		if (user) {
-			this._data.updateCurrent({ state: user.state, avatarUrls: user.avatarUrls });
+			const serverAppliedChanges: Partial<EntityType> = { state: user.state, avatarUrls: user.avatarUrls };
+			this._data.updateCurrent(serverAppliedChanges);
+			this._data.updatePersisted(serverAppliedChanges);
 		}
 	}
 
@@ -110,18 +112,10 @@ export class UmbUserWorkspaceContext
 		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
-	deleteAvatar() {
+	async deleteAvatar() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
-		return this.avatarRepository.deleteAvatar(unique);
-	}
-
-	getName(): string {
-		return this._data.getCurrent()?.name || '';
-	}
-
-	setName(name: string) {
-		this._data.updateCurrent({ name });
+		await this.avatarRepository.deleteAvatar(unique);
 	}
 
 	override destroy(): void {

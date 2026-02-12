@@ -1,3 +1,4 @@
+import type { UmbItemDataResolverConstructor } from '@umbraco-cms/backoffice/entity-item';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbTrashWithRelationConfirmModalData {
@@ -5,6 +6,7 @@ export interface UmbTrashWithRelationConfirmModalData {
 	entityType: string;
 	itemRepositoryAlias: string;
 	referenceRepositoryAlias: string;
+	itemDataResolver?: UmbItemDataResolverConstructor;
 }
 
 export type UmbTrashWithRelationConfirmModalValue = undefined;

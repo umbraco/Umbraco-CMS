@@ -306,5 +306,5 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             CacheManager.Media);
     }
 
-    private IJsonSerializer Serializer() => new SystemTextJsonSerializer();
+    private IJsonSerializer Serializer() => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 }

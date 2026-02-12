@@ -4,5 +4,5 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbReadDetailRepository<DetailModelType> extends UmbApi {
 	requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType | undefined>>;
-	byUnique(unique: string): Promise<Observable<DetailModelType | undefined>>;
+	byUnique?(unique: string): Promise<Observable<DetailModelType | undefined>>;
 }

@@ -18,19 +18,6 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
 
     private const string ExternalLoginProvidersKey = "Umbraco.Cms.Web.BackOffice.Security.BackOfficeExternalLoginProviders";
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public BackOfficeExternalLoginProviders(
-        IEnumerable<BackOfficeExternalLoginProvider> externalLogins,
-        IAuthenticationSchemeProvider authenticationSchemeProvider)
-        : this(
-              externalLogins,
-              authenticationSchemeProvider,
-              StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
-              StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-              StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeExternalLoginProviders>>())
-    {
-    }
-
     public BackOfficeExternalLoginProviders(
         IEnumerable<BackOfficeExternalLoginProvider> externalLogins,
         IAuthenticationSchemeProvider authenticationSchemeProvider,

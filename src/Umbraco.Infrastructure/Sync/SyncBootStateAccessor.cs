@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
@@ -9,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Sync;
 public class SyncBootStateAccessor : ISyncBootStateAccessor
 {
     private readonly ICacheInstructionService _cacheInstructionService;
-    private readonly LastSyncedFileManager _lastSyncedFileManager;
+    private readonly ILastSyncedManager _lastSyncedManager;
     private readonly ILogger<SyncBootStateAccessor> _logger;
     private GlobalSettings _globalSettings;
 
@@ -19,16 +21,45 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
 
     public SyncBootStateAccessor(
         ILogger<SyncBootStateAccessor> logger,
-        LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings,
-        ICacheInstructionService cacheInstructionService)
+        ICacheInstructionService cacheInstructionService,
+        ILastSyncedManager lastSyncedManager)
     {
         _logger = logger;
-        _lastSyncedFileManager = lastSyncedFileManager;
+        _lastSyncedManager = lastSyncedManager;
         _globalSettings = globalSettings.CurrentValue;
         _cacheInstructionService = cacheInstructionService;
 
         globalSettings.OnChange(x => _globalSettings = x);
+    }
+
+    [Obsolete("Please use the constructor without LastSyncedFileManager. Scheduled for removal in Umbraco 18.")]
+    public SyncBootStateAccessor(
+        ILogger<SyncBootStateAccessor> logger,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        ICacheInstructionService cacheInstructionService,
+        ILastSyncedManager lastSyncedManager)
+        : this(
+            logger,
+            globalSettings,
+            cacheInstructionService,
+            lastSyncedManager)
+    {
+    }
+
+    [Obsolete("Please use the constructor with ILastSyncedManager. Scheduled for removal in Umbraco 18.")]
+    public SyncBootStateAccessor(
+        ILogger<SyncBootStateAccessor> logger,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        ICacheInstructionService cacheInstructionService)
+        : this(
+            logger,
+            globalSettings,
+            cacheInstructionService,
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
+    {
     }
 
     public SyncBootState GetSyncBootState()
@@ -36,7 +67,7 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
             ref _syncBootState,
             ref _syncBootStateReady,
             ref _syncBootStateLock,
-            () => InitializeColdBootState(_lastSyncedFileManager.LastSyncedId));
+            () => InitializeColdBootState(_lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? -1));
 
     private SyncBootState InitializeColdBootState(int lastId)
     {
