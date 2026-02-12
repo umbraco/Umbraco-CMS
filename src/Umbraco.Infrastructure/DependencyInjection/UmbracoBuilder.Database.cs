@@ -23,6 +23,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUmbracoDbContext<UmbracoDbContext>((provider, options, connectionString, providerName) =>
         {
+            options.UseUmbracoDatabaseProvider(provider);
             options.UseOpenIddict();
         });
         builder.Services.AddUnique<IScopeAccessor>(sp => sp.GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>());

@@ -1,6 +1,8 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -23,6 +25,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     private bool _disposed;
     private TDbContext? _dbContext;
     private IDbContextFactory<TDbContext> _dbContextFactory;
+    private bool _connectionOverridden;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScope{TDbContext}"/> class.
@@ -221,17 +224,23 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         if (_dbContext.Database.CurrentTransaction is null)
         {
             DbTransaction? transaction = _innerScope?.Database.Transaction;
-            _dbContext.Database.SetDbConnection(transaction?.Connection);
-            Locks.EnsureLocks(InstanceId);
 
-            if (transaction is null)
+            if (transaction is not null)
             {
-                _dbContext.Database.BeginTransaction();
+                // Share the parent NPoco scope's connection so both ORMs participate
+                // in the same transaction. Note: SetDbConnection always nulls EF Core's
+                // internal _connectionString field, which we must restore before pool return
+                // (see DisposeEfCoreDatabase).
+                _connectionOverridden = true;
+                _dbContext.Database.SetDbConnection(transaction.Connection);
+                _dbContext.Database.UseTransaction(transaction);
             }
             else
             {
-                _dbContext.Database.UseTransaction(transaction);
+                _dbContext.Database.BeginTransaction();
             }
+
+            Locks.EnsureLocks(InstanceId);
         }
     }
 
@@ -290,6 +299,21 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             }
             finally
             {
+                // Restore connection state before returning context to the pool.
+                // SetDbConnection nulls EF Core's internal _connectionString, and the pool's
+                // ResetState never restores it (because _connectionOwned is false after
+                // SetDbConnection). Read the original connection string from the immutable
+                // DbContextOptions — the same source EF Core's RelationalConnection
+                // constructor uses — and write it back.
+                if (_dbContext is not null && _connectionOverridden)
+                {
+                    _dbContext.Database.SetDbConnection(null);
+
+                    IDbContextOptions options = _dbContext.GetInfrastructure().GetRequiredService<IDbContextOptions>();
+                    var connectionString = RelationalOptionsExtension.Extract(options).ConnectionString;
+                    _dbContext.Database.SetConnectionString(connectionString);
+                }
+
                 _dbContext?.Dispose();
                 _dbContext = null;
             }
