@@ -15,8 +15,6 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBa
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;

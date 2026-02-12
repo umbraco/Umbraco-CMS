@@ -55,13 +55,6 @@ export class UmbDocumentWorkspaceContext
 
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
 
-	/*
-	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
-	 */
-	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
-		(data) => !!data?.documentType.collection,
-	);
-
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
 
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
@@ -259,21 +252,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		});
-	}
-
-	/** @deprecated will be removed in v.18 */
-	getCollectionAlias() {
-		return UMB_DOCUMENT_COLLECTION_ALIAS;
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
 	}
 
 	/**

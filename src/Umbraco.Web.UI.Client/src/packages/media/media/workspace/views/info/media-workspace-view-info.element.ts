@@ -70,7 +70,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._mediaTypeUnique = context?.getContentTypeId();
+			this._mediaTypeUnique = context?.getContentTypeUnique();
 			this.#getData();
 			this.#observeContent();
 		});

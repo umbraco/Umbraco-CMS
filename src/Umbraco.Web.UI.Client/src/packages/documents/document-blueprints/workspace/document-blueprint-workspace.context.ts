@@ -17,7 +17,6 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import {
-	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/document';
@@ -97,20 +96,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 				},
 			},
 		});
-	}
-
-	getCollectionAlias() {
-		return UMB_DOCUMENT_COLLECTION_ALIAS;
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
 	}
 
 	/**

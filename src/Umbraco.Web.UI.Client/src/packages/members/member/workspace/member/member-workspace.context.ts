@@ -182,16 +182,6 @@ export class UmbMemberWorkspaceContext
 
 	/**
 	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbMemberWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
 	 * @returns { string | undefined} The unique identifier of the content type.
 	 * @memberof UmbMemberWorkspaceContext
 	 */

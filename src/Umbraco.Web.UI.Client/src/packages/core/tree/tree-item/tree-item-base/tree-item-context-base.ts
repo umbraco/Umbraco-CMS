@@ -10,7 +10,7 @@ import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
@@ -125,21 +125,6 @@ export abstract class UmbTreeItemContextBase<
 		return (this._treeItem.getValue() as any)?.ancestors;
 	}
 
-	/**
-	 * Returns the manifest.
-	 * @returns {ManifestCollection}
-	 * @memberof UmbTreeItemContextBase
-	 * @deprecated Use the `.manifest` property instead.
-	 */
-	public getManifest() {
-		new UmbDeprecation({
-			removeInVersion: '18.0.0',
-			deprecated: 'getManifest',
-			solution: 'Use .manifest property instead',
-		}).warn();
-		return this.#manifest;
-	}
-
 	public setTreeItem(treeItem: TreeItemType | undefined) {
 		if (!treeItem) {
 			this._treeItem.setValue(undefined);
@@ -180,14 +165,6 @@ export abstract class UmbTreeItemContextBase<
 	public loadChildren = (): Promise<void> => this._treeItemChildrenManager.loadChildren();
 
 	public reloadChildren = (): Promise<void> => this._treeItemChildrenManager.reloadChildren();
-
-	/**
-	 * Load more children of the tree item
-	 * @deprecated Use `loadNextItems` instead. Will be removed in v18.0.0.
-	 * @memberof UmbTreeItemContextBase
-	 * @returns {Promise<void>}
-	 */
-	public loadMore = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
 	/**
 	 * Load previous items of the tree item

@@ -74,7 +74,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._documentTypeUnique = this.#workspaceContext?.getContentTypeId();
+			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
 			this.#observeContent();
 		});
 

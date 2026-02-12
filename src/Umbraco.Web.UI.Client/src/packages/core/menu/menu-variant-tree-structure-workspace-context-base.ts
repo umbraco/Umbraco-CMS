@@ -4,7 +4,7 @@ import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import {
@@ -32,12 +32,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
-	/**
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
-	 */
-	public readonly parent = this.#parent.asObservable();
-
 	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
 	#parentContext = new UmbParentEntityContext(this);
@@ -52,8 +46,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
@@ -202,9 +194,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
 
-		// TODO: remove this when the parent gets removed from the structure interface
-		this.#parent.setValue(parent);
-
 		const parentEntity = parent
 			? {
 					unique: parent.unique,
@@ -264,7 +253,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	override destroy(): void {
 		super.destroy();
 		this.#structure.destroy();
-		this.#parent.destroy();
 		this.#parentContext.destroy();
 		this.#ancestorContext.destroy();
 	}
