@@ -66,7 +66,7 @@ public class ManifestControllerBaseTests
     [Test]
     public void ReplaceCacheBusterTokens_Handles_Empty_Extensions()
     {
-        var model = CreateModel(Array.Empty<object>());
+        var model = CreateModel([]);
 
         List<ManifestResponseModel> models = [model];
         TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
@@ -91,7 +91,7 @@ public class ManifestControllerBaseTests
             ],
             "PackageB");
 
-        var modelEmpty = CreateModel(Array.Empty<object>(), "PackageC");
+        var modelEmpty = CreateModel([], "PackageC");
 
         List<ManifestResponseModel> models = [modelWithToken, modelWithoutToken, modelEmpty];
         TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
@@ -131,7 +131,7 @@ public class ManifestControllerBaseTests
     public void ReplaceCacheBusterTokens_Preserves_All_Models_In_Output()
     {
         List<ManifestResponseModel> models = Enumerable.Range(0, 5)
-            .Select(i => CreateModel(Array.Empty<object>(), $"Package{i}"))
+            .Select(i => CreateModel([], $"Package{i}"))
             .ToList();
 
         TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
@@ -167,6 +167,27 @@ public class ManifestControllerBaseTests
             Assert.That(json, Does.Contain("/App_Plugins/Foo/three.js"));
             Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
         });
+    }
+
+    [Test]
+    public void ReplaceCacheBusterTokens_Produces_Valid_Json_When_Hash_Contains_Special_Characters()
+    {
+        var model = CreateModel(
+            [
+                JsonSerializer.Deserialize<JsonElement>(
+                    """{"js":"/App_Plugins/Foo/bundle.js?v=%CACHE_BUSTER%"}"""),
+            ]);
+
+        const string unsafeHash = """hash"with\special""";
+
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, unsafeHash);
+
+        var json = JsonSerializer.Serialize(models[0].Extensions);
+        Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
+
+        // Verify the result is still valid JSON by round-tripping
+        Assert.DoesNotThrow(() => JsonSerializer.Deserialize<object[]>(json));
     }
 
     private static ManifestResponseModel CreateModel(object[] extensions, string name = "TestPackage")

@@ -26,7 +26,7 @@ public abstract class ManifestControllerBase : ManagementApiControllerBase
                 continue;
             }
 
-            json = json.Replace(Constants.Web.CacheBusterToken, cacheBustHash);
+            json = json.Replace(Constants.Web.CacheBusterToken, JsonEncodedText.Encode(cacheBustHash).ToString());
             model.Extensions = JsonSerializer.Deserialize<object[]>(json) ?? model.Extensions;
         }
     }
