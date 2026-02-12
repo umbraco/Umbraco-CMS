@@ -338,7 +338,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		if (!this._showActions) return nothing;
 		return html`
 			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
+				${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}
 			</uui-action-bar>
 		`;
 	}
