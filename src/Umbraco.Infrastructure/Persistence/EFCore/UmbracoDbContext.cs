@@ -100,11 +100,5 @@ public class UmbracoDbContext : DbContext
         base.OnConfiguring(optionsBuilder);
 
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-
-        // TODO: Remove me
-        optionsBuilder.ConfigureWarnings(warn =>
-        {
-            warn.Ignore();
-        });
     }
 }
