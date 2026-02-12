@@ -21,7 +21,6 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
 
-        // UmbracoDbContext — keep UseOpenIddict() so EF Core migrations still include the OpenIddict schema.
         builder.Services.AddUmbracoDbContext<UmbracoDbContext>((provider, options, connectionString, providerName) =>
         {
             options.UseOpenIddict();
