@@ -12,12 +12,18 @@ public class RuntimeHash : IRuntimeHash
     private readonly RuntimeHashPaths _paths;
     private string? _calculated;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RuntimeHash" /> class.
+    /// </summary>
+    /// <param name="logger">The profiling logger for timing hash calculations.</param>
+    /// <param name="paths">The paths to include in the hash calculation.</param>
     public RuntimeHash(IProfilingLogger logger, RuntimeHashPaths paths)
     {
         _logger = logger;
         _paths = paths;
     }
 
+    /// <inheritdoc />
     public string GetHashValue()
     {
         if (_calculated != null)

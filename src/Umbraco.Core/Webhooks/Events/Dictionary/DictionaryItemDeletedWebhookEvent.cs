@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a dictionary item is deleted.
+/// </summary>
 [WebhookEvent("Dictionary Item Deleted")]
 public class DictionaryItemDeletedWebhookEvent : WebhookEventBase<DictionaryItemDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryItemDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public DictionaryItemDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class DictionaryItemDeletedWebhookEvent : WebhookEventBase<DictionaryItem
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.DictionaryItemDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(DictionaryItemDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

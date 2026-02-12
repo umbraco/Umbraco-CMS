@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for publishing and unpublishing content.
+/// </summary>
 public interface IContentPublishingService
 {
     /// <summary>
@@ -48,7 +51,7 @@ public interface IContentPublishingService
     /// <param name="key">The key of the root content.</param>
     /// <param name="culturesToPublishOrSchedule">The cultures to publish or schedule.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
-    /// <returns></returns>
+    /// <returns>An <see cref="Attempt{TResult,TStatus}"/> containing the result of the publish operation.</returns>
     Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,

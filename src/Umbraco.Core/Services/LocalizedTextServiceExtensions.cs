@@ -12,10 +12,25 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class LocalizedTextServiceExtensions
 {
+    /// <summary>
+    ///     Localizes a key using an enum value and the current thread culture.
+    /// </summary>
+    /// <typeparam name="T">The enum type.</typeparam>
+    /// <param name="manager">The localized text service.</param>
+    /// <param name="area">The area/category of the localization key.</param>
+    /// <param name="key">The enum value representing the localization key.</param>
+    /// <returns>The localized string.</returns>
     public static string Localize<T>(this ILocalizedTextService manager, string area, T key)
         where T : Enum =>
         manager.Localize(area, key.ToString(), Thread.CurrentThread.CurrentUICulture);
 
+    /// <summary>
+    ///     Localizes a key using the current thread culture.
+    /// </summary>
+    /// <param name="manager">The localized text service.</param>
+    /// <param name="area">The area/category of the localization key.</param>
+    /// <param name="alias">The alias/key to localize.</param>
+    /// <returns>The localized string.</returns>
     public static string Localize(this ILocalizedTextService manager, string? area, string? alias)
         => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture);
 
@@ -42,6 +57,13 @@ public static class LocalizedTextServiceExtensions
     public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture, string?[] tokens)
         => manager.Localize(area, alias, culture, ConvertToDictionaryVars(tokens));
 
+    /// <summary>
+    ///     Translates text using the Umbraco dictionary, falling back to localized text service.
+    /// </summary>
+    /// <param name="manager">The localized text service.</param>
+    /// <param name="cultureDictionary">The culture dictionary.</param>
+    /// <param name="text">The text to translate. If it starts with '#', it will be looked up in the dictionary.</param>
+    /// <returns>The translated text, or the original text if no translation is found.</returns>
     public static string? UmbracoDictionaryTranslate(
         this ILocalizedTextService manager,
         ICultureDictionary cultureDictionary,

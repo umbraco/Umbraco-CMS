@@ -12,9 +12,6 @@ import {
 	type UmbCollectionItemPickerModalValue,
 	type UmbCollectionLayoutConfiguration,
 } from '@umbraco-cms/backoffice/collection';
-import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
-import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_TREE_PICKER_MODAL_ALIAS,
@@ -39,8 +36,6 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	UmbItemModel,
 	UmbItemModel | UmbTreeItemModel
 > {
-	#dataSourceAlias?: string;
-	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerDataSource;
 	#dataSourceConfig?: UmbConfigCollectionModel | undefined;
 	#pickerViews?: Array<{ alias: string }> | undefined;
@@ -52,22 +47,29 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	}
 
 	/**
-	 * Sets the data source alias for the input context.
-	 * @param {(string | undefined)} alias
+	 * Sets the data source API for the input context and updates the modal token accordingly.
+	 * @param {UmbPickerDataSource | undefined} api The data source API to set for the input context.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	setDataSourceAlias(alias: string | undefined) {
-		this.#dataSourceAlias = alias;
-		this.#createDataSourceApi(alias);
+	setDataSourceApi(api: UmbPickerDataSource | undefined) {
+		if (api) {
+			this.#dataSourceApi = api;
+			api.setConfig?.(this.#dataSourceConfig);
+			this.#dataSourceApiContext.setDataSourceApi(api);
+			this.#setModalToken();
+		} else {
+			this.#dataSourceApi = undefined;
+			this.#dataSourceApiContext.setDataSourceApi(undefined);
+		}
 	}
 
 	/**
-	 * Gets the data source alias for the input context.
-	 * @returns {(string | undefined)} The data source alias.
+	 * Gets the data source API for the input context.
+	 * @returns {(UmbPickerDataSource | undefined)} The data source API for the input context.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	getDataSourceAlias(): string | undefined {
-		return this.#dataSourceAlias;
+	getDataSourceApi(): UmbPickerDataSource | undefined {
+		return this.#dataSourceApi;
 	}
 
 	/**
@@ -116,31 +118,6 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 		// @ts-ignore
 		this.modalAlias = this.getModalAlias();
 		await super.openPicker(pickerData);
-	}
-
-	#createDataSourceApi(dataSourceAlias: string | undefined) {
-		if (!dataSourceAlias) {
-			this.#dataSourceApiInitializer?.destroy();
-			return;
-		}
-
-		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<
-			ManifestPropertyEditorDataSource,
-			UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>,
-			UmbPickerDataSource
-		>(this, umbExtensionsRegistry, dataSourceAlias, [this._host], (permitted, ctrl) => {
-			if (!permitted) {
-				// TODO: clean up if not permitted
-				return;
-			}
-
-			// TODO: Check if it is a picker data source
-			this.#dataSourceApi = ctrl.api as UmbPickerDataSource;
-			this.#dataSourceApi.setConfig?.(this.#dataSourceConfig);
-
-			this.#dataSourceApiContext.setDataSourceApi(this.#dataSourceApi);
-			this.#setModalToken();
-		});
 	}
 
 	#setModalToken() {

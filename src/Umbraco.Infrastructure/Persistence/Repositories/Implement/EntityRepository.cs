@@ -294,12 +294,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // the final query for before and after positions will increase. So we need to calculate the offset based on the provided values.
         int beforeAfterParameterIndexOffset = GetBeforeAfterParameterOffset(objectTypes, filter);
 
+        // use all lower case alias names to avoid sql syntax issues
+        string targetAlias = "target";
+
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
             .Select("rn")
-            .From().AppendSubQuery(rowNumberSql, "Target")
-            .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
+            .From().AppendSubQuery(rowNumberSql, targetAlias)
+            .Where<NodeDto>(x => x.UniqueId == targetKey, targetAlias);
 
         // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
         // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
@@ -316,8 +319,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         return Sql()
-            .Select("UniqueId")
-            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Select(QuoteColumnName("uniqueId"))
+            .From().AppendSubQuery(rowNumberSql, "nn")
             .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
             .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
@@ -355,9 +358,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
         Sql<ISqlContext>? sql = Sql()
             .SelectCount()
-            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .From().AppendSubQuery(rowNumberSql, "nn")
             .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
-        return Database.ExecuteScalar<long>(sql);
+        return Database.FirstOrDefault<long>(sql);
     }
 
 
@@ -459,7 +462,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
     {
         // NodeId is named Id on TreeEntityPath = use an alias
-        Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, nameof(TreeEntityPath.Id)), x => x.Path)
+        Sql<ISqlContext> sql = Sql().Select<NodeDto>(
+                x => Alias(x.NodeId, nameof(TreeEntityPath.Id)),
+                x => x.Path,
+                x => Alias(x.UniqueId, nameof(TreeEntityPath.Key)))
             .From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
         filter?.Invoke(sql);
         return Database.Fetch<TreeEntityPath>(sql);
@@ -495,14 +501,14 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
             .Where<NodeDto>(x => x.NodeId == id);
-        return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+        return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
     public UmbracoObjectTypes GetObjectType(Guid key)
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == key);
-        return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+        return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
     public int ReserveId(Guid key)
@@ -969,11 +975,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
                 case "NODEID":
-                    orderBy = runner.OrderBy;
+                    orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "id");
                     orderingIncludesNodeId = true;
                     break;
                 default:
-                    orderBy = QuoteColumnName(runner.OrderBy) ?? string.Empty;
+                    orderBy = runner.OrderBy != null
+                        ? SqlSyntax.GetQuotedColumn(NodeDto.TableName, runner.OrderBy)
+                        : string.Empty;
                     break;
             }
 

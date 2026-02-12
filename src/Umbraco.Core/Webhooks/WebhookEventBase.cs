@@ -10,25 +10,46 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
+/// <summary>
+/// Abstract base class for webhook events that handles notification processing and webhook firing.
+/// </summary>
+/// <typeparam name="TNotification">The type of notification this webhook event handles.</typeparam>
 public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotificationAsyncHandler<TNotification>
     where TNotification : INotification
 {
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
+    /// <inheritdoc />
     public abstract string Alias { get; }
 
+    /// <inheritdoc />
     public string EventName { get; set; }
 
+    /// <inheritdoc />
     public string EventType { get; }
 
+    /// <summary>
+    /// Gets the webhook firing service used to send webhook requests.
+    /// </summary>
     protected IWebhookFiringService WebhookFiringService { get; }
 
+    /// <summary>
+    /// Gets the webhook service used to retrieve webhook configurations.
+    /// </summary>
     protected IWebhookService WebhookService { get; }
 
+    /// <summary>
+    /// Gets the current webhook settings configuration.
+    /// </summary>
     protected WebhookSettings WebhookSettings { get; private set; }
 
-
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookEventBase{TNotification}"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The service responsible for firing webhooks.</param>
+    /// <param name="webhookService">The service for managing webhook configurations.</param>
+    /// <param name="webhookSettings">The webhook settings configuration.</param>
+    /// <param name="serverRoleAccessor">The server role accessor to determine the current server role.</param>
     protected WebhookEventBase(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -73,6 +94,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
     public virtual bool ShouldFireWebhookForNotification(TNotification notificationObject)
         => true;
 
+    /// <inheritdoc />
     public async Task HandleAsync(TNotification notification, CancellationToken cancellationToken)
     {
         if (WebhookSettings.Enabled is false)

@@ -480,7 +480,7 @@ test.describe('fetch content items from a query', () => {
     const childContentName = childPublishInvariantContentPrefix + '1';
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, invariantDocTypeId, publishInvariantParentId);
     await umbracoApi.document.publish(childId);
-    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
+    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.long); // Wait is needed to ensure content is indexed
     const fetch = 'ancestors:' + childId;
 
     // Act

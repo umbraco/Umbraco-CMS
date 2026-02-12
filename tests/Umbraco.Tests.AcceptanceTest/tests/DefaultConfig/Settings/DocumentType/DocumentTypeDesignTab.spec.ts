@@ -159,7 +159,7 @@ test('can create a document type with multiple groups', {tag: '@release'}, async
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickAddGroupButton();
   await umbracoUi.documentType.enterGroupName(secondGroupName, 1);
-  await umbracoUi.documentType.addPropertyEditor(secondDataTypeName, 1);
+  await umbracoUi.documentType.addPropertyEditor(secondDataTypeName, 2);
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert

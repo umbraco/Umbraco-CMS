@@ -337,22 +337,30 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host(:not([sort-mode-active])) {
-				display: grid;
-				grid-template-columns: 300px auto;
-				column-gap: var(--uui-size-layout-2);
+			:host {
+				display: block;
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;
+			}
+			:host(:not([sort-mode-active])) {
+				display: grid;
+				grid-template-columns: 320px auto;
+				column-gap: var(--uui-size-space-5);
 				container-type: inline-size;
 			}
 
-			:host > div {
+			:host > * {
 				grid-column: span 2;
 			}
 
 			@container (width > 700px) {
-				:host(:not([orientation='vertical'])) > div {
+				:host(:not([orientation='vertical'])) > * {
 					grid-column: span 1;
+				}
+				#header {
+					position: sticky;
+					top: var(--uui-size-space-4);
+					height: min-content;
 				}
 			}
 
@@ -367,15 +375,13 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: relative;
 				display: flex;
 				padding: 0;
-				margin-bottom: var(--uui-size-3);
-			}
-
-			:host([sort-mode-active]:last-of-type) {
-				margin-bottom: 0;
 			}
 
 			:host([sort-mode-active]:not([_inherited])) {
 				cursor: grab;
+			}
+			:host([sort-mode-active][_inherited]) {
+				cursor: not-allowed;
 			}
 
 			:host([sort-mode-active]) .sortable {
@@ -387,9 +393,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			}
 			:host([sort-mode-active][_inherited]) .sortable {
 				color: var(--uui-color-disabled-contrast);
-			}
-			:host([sort-mode-active]:not([_inherited])) .sortable {
-				background-color: var(--uui-color-divider);
 			}
 
 			:host([sort-mode-active]) uui-input {
@@ -420,12 +423,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				margin-bottom: 0;
 			}
 
-			#header {
-				position: sticky;
-				top: var(--uui-size-space-4);
-				height: min-content;
-			}
-
 			#header i {
 				opacity: 0.55;
 				float: right;
@@ -445,6 +442,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#editor {
 				position: relative;
+				min-height: 80px;
 				--uui-button-background-color: var(--uui-color-background);
 				--uui-button-background-color-hover: var(--uui-color-background);
 			}

@@ -25,6 +25,8 @@ public class ByKeyMemberTypeController : MemberTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a member type.")]
+    [EndpointDescription("Gets a member type identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IMemberType? memberType = await _memberTypeService.GetAsync(id);

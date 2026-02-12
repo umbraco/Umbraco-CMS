@@ -12,6 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides property validation functionality for content, media, and member properties.
+/// </summary>
 public class PropertyValidationService : IPropertyValidationService
 {
     private readonly IDataTypeService _dataTypeService;
@@ -22,6 +25,16 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly ILanguageService _languageService;
     private readonly ContentSettings _contentSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PropertyValidationService" /> class.
+    /// </summary>
+    /// <param name="propertyEditors">The collection of property editors.</param>
+    /// <param name="dataTypeService">The data type service for retrieving data types.</param>
+    /// <param name="textService">The localized text service for retrieving validation messages.</param>
+    /// <param name="valueEditorCache">The value editor cache for caching value editors.</param>
+    /// <param name="cultureDictionary">The culture dictionary for translating validation messages.</param>
+    /// <param name="languageService">The language service for language operations.</param>
+    /// <param name="contentSettings">The content settings options.</param>
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,

@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
 {
     public ConvertRichTextEditorProperties(

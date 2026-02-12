@@ -442,7 +442,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -462,7 +462,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 1, 1, out var totalRecords, null, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 1, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -482,7 +482,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -502,7 +502,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("SortOrder", Direction.Descending)).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("SortOrder", Direction.Descending)).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -522,7 +522,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -544,7 +544,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
 
             var filter = provider.CreateQuery<IMedia>().Where(x => x.Name.Contains("File"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.EqualTo(1));
@@ -566,7 +566,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             var query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
 
             var filter = provider.CreateQuery<IMedia>().Where(x => x.Name.Contains("Test"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder")).ToArray();
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter, Ordering.By("SortOrder")).ToArray();
 
             // Assert
             Assert.That(totalRecords, Is.EqualTo(2));

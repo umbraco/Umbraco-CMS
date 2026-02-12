@@ -14,7 +14,7 @@ export class UmbEntityDataPickerDataSourceApiContext<
 		super(host, UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT);
 	}
 
-	setDataSourceApi(dataSourceApi: DataSourceApiType) {
+	setDataSourceApi(dataSourceApi: DataSourceApiType | undefined) {
 		this.#dataSourceApi.setValue(dataSourceApi);
 	}
 

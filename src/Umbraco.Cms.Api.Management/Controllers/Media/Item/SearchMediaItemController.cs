@@ -19,35 +19,19 @@ public class SearchMediaItemController : MediaItemControllerBase
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
-    private readonly IMediaTypeService _mediaTypeService;
 
     [ActivatorUtilitiesConstructor]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,
-        IDataTypeService dataTypeService,
-        IMediaTypeService mediaTypeService)
+        IDataTypeService dataTypeService)
     {
         _indexedEntitySearchService = indexedEntitySearchService;
         _mediaPresentationFactory = mediaPresentationFactory;
         _dataTypeService = dataTypeService;
-        _mediaTypeService = mediaTypeService;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead, will be removed in Umbraco 18.")]
-    public SearchMediaItemController(
-        IIndexedEntitySearchService indexedEntitySearchService,
-        IMediaPresentationFactory mediaPresentationFactory,
-        IDataTypeService dataTypeService)
-        : this(
-            indexedEntitySearchService,
-            mediaPresentationFactory,
-            dataTypeService,
-            StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead, will be removed in Umbraco 18.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory)
@@ -83,6 +67,8 @@ public class SearchMediaItemController : MediaItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches media items.")]
+    [EndpointDescription("Searches media items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchFromParentWithAllowedTypes(
         CancellationToken cancellationToken,
         string query,
@@ -96,13 +82,9 @@ public class SearchMediaItemController : MediaItemControllerBase
     {
         // We always want to include folders in the search results (aligns with behaviour in Umbraco 13, and allows folders
         // to be selected to find the selectable items inside).
-        if (allowedMediaTypes is not null)
+        if (allowedMediaTypes is not null && allowedMediaTypes.Contains(Constants.MediaTypes.Guids.FolderGuid) is false)
         {
-            IMediaType? folderMediaType = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
-            if (folderMediaType is not null && allowedMediaTypes.Contains(folderMediaType.Key) is false)
-            {
-                allowedMediaTypes = [..allowedMediaTypes, folderMediaType.Key];
-            }
+            allowedMediaTypes = [.. allowedMediaTypes, Constants.MediaTypes.Guids.FolderGuid];
         }
 
         var ignoreUserStartNodes = await IgnoreUserStartNodes(dataTypeId);
