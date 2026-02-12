@@ -21,7 +21,7 @@ public abstract class ManifestControllerBase : ManagementApiControllerBase
             }
 
             var json = JsonSerializer.Serialize(model.Extensions);
-            if (!json.Contains(Constants.Web.CacheBusterToken))
+            if (json.Contains(Constants.Web.CacheBusterToken) is false)
             {
                 continue;
             }

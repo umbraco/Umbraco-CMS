@@ -29,6 +29,7 @@ public class AllManifestController : ManifestControllerBase
     {
     }
 
+    [ActivatorUtilitiesConstructor]
     public AllManifestController(
         IPackageManifestService packageManifestService,
         IUmbracoMapper umbracoMapper,
