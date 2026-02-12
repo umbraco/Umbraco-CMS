@@ -187,7 +187,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
 
             if (onlyDefault is false)
             {
-                builder.AddVersion(payloadType);
+                builder.AddVersion();
             }
         });
 

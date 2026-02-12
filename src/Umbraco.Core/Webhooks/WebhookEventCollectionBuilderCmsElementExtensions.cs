@@ -50,8 +50,7 @@ public static class WebhookEventCollectionBuilderCmsElementExtensions
     /// Adds the element version events.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <param name="payloadType">The webhook payload type.</param>
-    public static WebhookEventCollectionBuilderCmsElement AddVersion(this WebhookEventCollectionBuilderCmsElement builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
+    public static WebhookEventCollectionBuilderCmsElement AddVersion(this WebhookEventCollectionBuilderCmsElement builder)
     {
         builder.Builder
             .Add<ElementDeletedVersionsWebhookEvent>()
