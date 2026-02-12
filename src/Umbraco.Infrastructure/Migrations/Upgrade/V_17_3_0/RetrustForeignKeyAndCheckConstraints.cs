@@ -10,13 +10,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 /// for join elimination, cardinality estimation, and index selection. They can result from historical
 /// upgrades, EF Core migrations, or DBA operations such as backup restores.
 /// </summary>
-public class RetrustForeignKeyConstraints : AsyncMigrationBase
+public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="RetrustForeignKeyConstraints"/> class.
+    /// Initializes a new instance of the <see cref="RetrustForeignKeyAndCheckConstraints"/> class.
     /// </summary>
     /// <param name="context">The migration context.</param>
-    public RetrustForeignKeyConstraints(IMigrationContext context)
+    public RetrustForeignKeyAndCheckConstraints(IMigrationContext context)
         : base(context)
     {
     }
