@@ -11,7 +11,7 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count';
+import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count.js';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement

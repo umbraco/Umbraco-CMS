@@ -1,9 +1,9 @@
-export interface CharacterCountState {
+export interface UmbCharacterCountState {
 	remaining: number;
 	visible: boolean;
 }
 
-export function getCharacterCountState(maxChars: number, currentLength: number): CharacterCountState {
+export function getCharacterCountState(maxChars: number, currentLength: number): UmbCharacterCountState {
 	const remaining = maxChars - currentLength;
 	const threshold = Math.round(maxChars * 0.2);
 	return {
