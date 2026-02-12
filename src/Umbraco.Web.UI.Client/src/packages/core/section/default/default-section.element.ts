@@ -172,9 +172,3 @@ declare global {
 		'umb-section-default': UmbDefaultSectionElement;
 	}
 }
-
-/**
- *
- * @deprecated Since 16. Use UmbDefaultSectionElement instead. UmbSectionDefaultElement will be removed in v18.
- */
-export { UmbDefaultSectionElement as UmbSectionDefaultElement };

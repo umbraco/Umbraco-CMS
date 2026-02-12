@@ -7,12 +7,6 @@ export type UmbActiveVariant = {
 	segment: string | null;
 };
 
-/**
- * @deprecated Use {@link UmbActiveVariant} instead. This will be removed in Umbraco 18.
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type ActiveVariant = UmbActiveVariant;
-
 const UBM_VARIANT_DELIMITER = '_&_';
 
 /**

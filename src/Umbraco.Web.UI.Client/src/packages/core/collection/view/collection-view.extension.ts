@@ -39,12 +39,6 @@ export interface UmbConditionsCollectionView {
 	entityType: string;
 }
 
-/**
- * @deprecated Use {@link UmbConditionsCollectionView} instead. This will be removed in Umbraco 18.
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/naming-convention
-export interface ConditionsCollectionView extends UmbConditionsCollectionView {}
-
 declare global {
 	interface UmbExtensionManifestMap {
 		umbCollectionView: ManifestCollectionView;
