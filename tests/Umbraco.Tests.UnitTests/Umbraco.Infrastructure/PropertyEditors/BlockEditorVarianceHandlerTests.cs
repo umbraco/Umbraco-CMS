@@ -14,13 +14,10 @@ public class BlockEditorVarianceHandlerTests
     [Test]
     public async Task Assigns_Default_Culture_When_Culture_Variance_Is_Enabled()
     {
-        var propertyValue = new BlockPropertyValue { Culture = null };
-        var owner = PublishedElement(ContentVariation.Culture);
-        var subject = BlockEditorVarianceHandler("da-DK", owner);
-        var result = await subject.AlignedPropertyVarianceAsync(
-            propertyValue,
-            PublishedPropertyType(ContentVariation.Culture),
-            owner);
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Culture,
+            ContentVariation.Culture,
+            new BlockPropertyValue { Culture = null });
         Assert.IsNotNull(result);
         Assert.AreEqual("da-DK", result.Culture);
     }
@@ -28,13 +25,10 @@ public class BlockEditorVarianceHandlerTests
     [Test]
     public async Task Removes_Default_Culture_When_Culture_Variance_Is_Disabled()
     {
-        var propertyValue = new BlockPropertyValue { Culture = "da-DK" };
-        var owner = PublishedElement(ContentVariation.Nothing);
-        var subject = BlockEditorVarianceHandler("da-DK", owner);
-        var result = await subject.AlignedPropertyVarianceAsync(
-            propertyValue,
-            PublishedPropertyType(ContentVariation.Nothing),
-            owner);
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Nothing,
+            ContentVariation.Nothing,
+            new BlockPropertyValue { Culture = "da-DK" });
         Assert.IsNotNull(result);
         Assert.AreEqual(null, result.Culture);
     }
@@ -42,13 +36,10 @@ public class BlockEditorVarianceHandlerTests
     [Test]
     public async Task Ignores_NonDefault_Culture_When_Culture_Variance_Is_Disabled()
     {
-        var propertyValue = new BlockPropertyValue { Culture = "en-US" };
-        var owner = PublishedElement(ContentVariation.Nothing);
-        var subject = BlockEditorVarianceHandler("da-DK", owner);
-        var result = await subject.AlignedPropertyVarianceAsync(
-            propertyValue,
-            PublishedPropertyType(ContentVariation.Nothing),
-            owner);
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Nothing,
+            ContentVariation.Nothing,
+            new BlockPropertyValue { Culture = "en-US" });
         Assert.IsNull(result);
     }
 
@@ -158,12 +149,10 @@ public class BlockEditorVarianceHandlerTests
     public async Task AlignedPropertyVarianceAsync_Returns_As_Is_When_Variation_Matches()
     {
         var propertyValue = new BlockPropertyValue { Culture = "da-DK", Alias = "test", Value = "test value" };
-        var owner = PublishedElement(ContentVariation.Culture);
-        var subject = BlockEditorVarianceHandler("da-DK", owner);
-        var result = await subject.AlignedPropertyVarianceAsync(
-            propertyValue,
-            PublishedPropertyType(ContentVariation.Culture),
-            owner);
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Culture,
+            ContentVariation.Culture,
+            propertyValue);
         Assert.IsNotNull(result);
         Assert.AreEqual("da-DK", result.Culture);
         Assert.AreSame(propertyValue, result);
@@ -316,6 +305,19 @@ public class BlockEditorVarianceHandlerTests
     {
         var subject = BlockEditorVarianceHandler("da-DK", owner);
         subject.AlignExposeVariance(blockValue);
+    }
+
+    private static async Task<BlockPropertyValue?> ExecuteAlignedPropertyVarianceAsync(
+        ContentVariation ownerVariation,
+        ContentVariation propertyTypeVariation,
+        BlockPropertyValue propertyValue)
+    {
+        var owner = PublishedElement(ownerVariation);
+        var subject = BlockEditorVarianceHandler("da-DK", owner);
+        return await subject.AlignedPropertyVarianceAsync(
+            propertyValue,
+            PublishedPropertyType(propertyTypeVariation),
+            owner);
     }
 
     private static BlockListValue CreateBlockListValue(Guid contentDataKey, Guid contentTypeKey, List<BlockPropertyValue> values, List<BlockItemVariation> expose)
