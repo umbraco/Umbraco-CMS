@@ -2062,17 +2062,46 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         var nodeIds = nodes.Values.ToArray();
-        IEnumerable<NodePermissions> results = objectTypes
-            .SelectMany(objectType => _entityService.GetAll(objectType, nodeIds))
+
+        // Use GetAllPaths (lighter query returning only Id, Path, Key) instead of GetAll (full IEntitySlim).
+        TreeEntityPath[] entityPaths = objectTypes
+            .SelectMany(objectType => _entityService.GetAllPaths(objectType, nodeIds))
             .DistinctBy(entity => entity.Key)
-            .Select(entity =>
-            {
-                EntityPermissionSet permissionSet = GetPermissionsForPath(user, entity.Path);
-                return new NodePermissions { NodeKey = entity.Key, Permissions = permissionSet.GetAllPermissions() };
-            })
             .ToArray();
 
-        return Attempt.SucceedWithStatus(UserOperationStatus.Success, results);
+        if (entityPaths.Length == 0)
+        {
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
+        }
+
+        // Collect all unique node IDs from all entity paths for a single batch query.
+        var pathDataByKey = new Dictionary<Guid, int[]>();
+        var allUniqueNodeIds = new HashSet<int>();
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            int[] pathIds = entityPath.Path.GetIdsFromPathReversed();
+            pathDataByKey[entityPath.Key] = pathIds;
+            allUniqueNodeIds.UnionWith(pathIds);
+        }
+
+        // Single batch permission query for all unique node IDs.
+        EntityPermissionCollection allPermissions = GetPermissions(user, [.. allUniqueNodeIds]);
+
+        // Per-entity in-memory resolution using the batch results.
+        var results = new NodePermissions[entityPaths.Length];
+        for (var i = 0; i < entityPaths.Length; i++)
+        {
+            int[] pathIds = pathDataByKey[entityPaths[i].Key];
+            var pathNodeIdSet = new HashSet<int>(pathIds);
+            EntityPermission[] relevantPermissions = allPermissions
+                .Where(p => pathNodeIdSet.Contains(p.EntityId))
+                .ToArray();
+
+            EntityPermissionSet permissionSet = CalculatePermissionsForPathForUser(relevantPermissions, pathIds);
+            results[i] = new NodePermissions { NodeKey = entityPaths[i].Key, Permissions = permissionSet.GetAllPermissions() };
+        }
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, results.AsEnumerable());
     }
 
     /// <summary>
