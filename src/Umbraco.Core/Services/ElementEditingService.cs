@@ -70,6 +70,10 @@ internal sealed class ElementEditingService
         _auditService = auditService;
     }
 
+    /// <inheritdoc/>
+    protected override string RelateParentOnDeleteAlias
+        => Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias;
+
     public Task<IElement?> GetAsync(Guid key)
     {
         IElement? element = ContentService.GetById(key);
