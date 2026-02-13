@@ -88,18 +88,21 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             return;
         }
 
-        IEnumerable<IDatabaseConfigurator> configurators = serviceProvider.GetServices<IDatabaseConfigurator>();
-        IDatabaseConfigurator? configurator = configurators.FirstOrDefault(
-            x => x.CanHandle(connectionStrings.ProviderName));
+        IEnumerable<IDatabaseConfigurator> configurators = serviceProvider.GetServices<IDatabaseConfigurator>()
+            .Where(x => x.CanHandle(connectionStrings.ProviderName))
+            .ToArray();
 
-        if (configurator is null)
+        if (configurators.Any() is false)
         {
             throw new InvalidDataException(
                 $"The provider {connectionStrings.ProviderName} is not supported. " +
                 "Ensure the appropriate EF Core provider package is installed.");
         }
 
-        configurator.Configure(builder, connectionStrings.ConnectionString);
+        foreach (IDatabaseConfigurator configurator in configurators)
+        {
+            configurator.Configure(builder, connectionStrings.ConnectionString);
+        }
     }
 
     private static void SetupDbContext(Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
