@@ -67,8 +67,7 @@ public class PublishElementController : ElementControllerBase
 
         if (modelResult.Success is false)
         {
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            return BadRequest();
+            return ElementPublishingOperationStatusResult(modelResult.Status);
         }
 
         Attempt<ContentPublishingResult, ContentPublishingOperationStatus> attempt = await _elementPublishingService.PublishAsync(
@@ -77,7 +76,6 @@ public class PublishElementController : ElementControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            : BadRequest();
+            : ElementPublishingOperationStatusResult(attempt.Status, attempt.Result.InvalidPropertyAliases);
     }
 }
