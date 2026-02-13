@@ -1,4 +1,4 @@
-import { manifests as entityDataPickerManifests } from './manifests.js';
+import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_PICKER_DATA_SOURCE_TYPE } from '@umbraco-cms/backoffice/picker-data-source';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
@@ -18,7 +18,7 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 		)
 		.subscribe((pickerPropertyEditorDataSource) => {
 			if (pickerPropertyEditorDataSource.length > 0 && !initialized) {
-				extensionRegistry.registerMany(entityDataPickerManifests);
+				extensionRegistry.registerMany(propertyEditorManifests);
 				initialized = true;
 			}
 		});
