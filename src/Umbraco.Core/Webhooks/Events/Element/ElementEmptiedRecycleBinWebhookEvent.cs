@@ -39,5 +39,5 @@ public class ElementEmptiedRecycleBinWebhookEvent : WebhookEventBase<ElementEmpt
     public override string Alias => Constants.WebhookEvents.Aliases.ElementEmptiedRecycleBin;
 
     public override object? ConvertNotificationToRequestPayload(ElementEmptiedRecycleBinNotification notification)
-        => null;
+        => new ();
 }
