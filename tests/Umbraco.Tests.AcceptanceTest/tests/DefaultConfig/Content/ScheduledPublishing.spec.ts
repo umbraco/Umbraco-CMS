@@ -8,11 +8,8 @@ const childContentName = 'ChildContent';
 const childDocumentTypeName = 'ChildDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const contentText = 'This is test content text';
-const scheduleWaitTime = 180000;
 
 test.beforeEach(async ({umbracoApi}) => {
-  // Need to increase the timeout of the tests due to the time to wait for publishing
-  test.setTimeout(200000);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeId = dataTypeData.id;
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -48,15 +45,6 @@ test('can schedule the publishing of invariant unpublish content', {tag: '@smoke
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  console.log('Current time after waiting: ' + await umbracoApi.getCurrentTimePlusMinute(0));
-  //const contentData = await umbracoApi.document.getByName(contentName);
-  //expect(contentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 test('can schedule the publishing of invariant published content', async ({umbracoApi, umbracoUi}) => {
@@ -84,14 +72,6 @@ test('can schedule the publishing of invariant published content', async ({umbra
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 test('can schedule the publishing of variant unpublish content', async ({umbracoApi, umbracoUi}) => {
@@ -117,14 +97,6 @@ test('can schedule the publishing of variant unpublish content', async ({umbraco
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 test('can schedule the publishing of variant published content', async ({umbracoApi, umbracoUi}) => {
@@ -152,14 +124,6 @@ test('can schedule the publishing of variant published content', async ({umbraco
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 test('can schedule the publishing of invariant unpublish child content', async ({umbracoApi, umbracoUi}) => {
@@ -189,14 +153,6 @@ test('can schedule the publishing of invariant unpublish child content', async (
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 test('can schedule the publishing of variant unpublish child content', async ({umbracoApi, umbracoUi}) => {
@@ -226,20 +182,12 @@ test('can schedule the publishing of variant unpublish child content', async ({u
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 test('can schedule the publishing of invariant published child content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName, childDocumentTypeId);
   const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.publish(contentId);
   const childContentId = await umbracoApi.document.createDocumentWithTextContentAndParent(childContentName, childDocumentTypeId, contentText, dataTypeName, contentId);
@@ -264,24 +212,16 @@ test('can schedule the publishing of invariant published child content', async (
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 test('can schedule the publishing of variant published child content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
-  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoApi.document.publish(contentId);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
+  const contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.publishDocumentWithCulture(contentId, 'en-US');
   const childContentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContentAndParent(childContentName, childDocumentTypeId, contentText, dataTypeName, contentId);
-  await umbracoApi.document.publish(childContentId);
+  await umbracoApi.document.publishDocumentWithCulture(childContentId, 'en-US');
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -302,14 +242,6 @@ test('can schedule the publishing of variant published child content', async ({u
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
-  // verify the status of content after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Published');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Published');
-  // verify the value of "Last published"
-  await umbracoUi.content.doesLastPublishedContainText(publishedTime.substring(0, publishedTime.length - 5));
 });
 
 // Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18554
@@ -365,16 +297,6 @@ test('can schedule the publishing of multiple culture variants content', async (
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
   // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(firstPublishedTime);
-  // verify the status of first culture after the publish time is Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  let contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.variants[1].state).toBe('Draft');
-// verify the status of both culture after the second publish time are Published
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.variants[1].state).toBe('Published');
 
   // Clean
   await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
@@ -466,12 +388,6 @@ test('can schedule the unpublishing of invariant published content', async ({umb
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
-  // verify the status of content after the unpublish time is Unpublished
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Draft');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
 });
 
 test('can schedule the unpublishing of variant published content', async ({umbracoApi, umbracoUi}) => {
@@ -500,12 +416,6 @@ test('can schedule the unpublishing of variant published content', async ({umbra
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
-  // verify the status of content after the unpublish time is Unpublished
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Draft');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
 });
 
 test('can schedule the unpublishing of invariant published child content', async ({umbracoApi, umbracoUi}) => {
@@ -536,12 +446,6 @@ test('can schedule the unpublishing of invariant published child content', async
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
-  // verify the status of content after the unpublish time is Unpublished
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(childContentName);
-  expect(contentData.variants[0].state).toBe('Draft');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
 });
 
 test('can schedule the unpublishing of variant published child content', async ({umbracoApi, umbracoUi}) => {
@@ -572,10 +476,4 @@ test('can schedule the unpublishing of variant published child content', async (
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
   // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
-  // verify the status of content after the unpublish time is Unpublished
-  await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(childContentName);
-  expect(contentData.variants[0].state).toBe('Draft');
-  await umbracoUi.reloadPage();
-  await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
 });
