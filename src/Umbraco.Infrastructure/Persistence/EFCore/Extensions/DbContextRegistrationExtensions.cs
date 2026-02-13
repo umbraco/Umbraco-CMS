@@ -29,6 +29,27 @@ public static class DBContextRegistrationExtensions
         return registration;
     }
 
+    /// <summary>
+    /// Adds a <see cref="IDbContextServiceRegistrar"/> to the builder, which will be replayed
+    /// against all registered DbContext types.
+    /// </summary>
+    /// <typeparam name="TRegistrar">
+    /// The type of <see cref="IDbContextServiceRegistrar"/> to add. Must have a parameterless constructor.
+    /// </typeparam>
+    /// <param name="builder">The Umbraco builder.</param>
+    public static void AddDbContextRegistrar<TRegistrar>(this IUmbracoBuilder builder)
+        where TRegistrar : IDbContextServiceRegistrar, new()
+    {
+        DbContextRegistration registration = builder.Services.GetDbContextRegistration();
+        registration.AddRegistrar(builder.Services, new TRegistrar());
+    }
+
+    /// <summary>
+    /// Adds a <see cref="IDbContextServiceRegistrar"/> instance to the builder, which will be replayed
+    /// against all registered DbContext types.
+    /// </summary>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <param name="registrar">The registrar instance to add.</param>
     public static void AddDbContextRegistrar(this IUmbracoBuilder builder, IDbContextServiceRegistrar registrar)
     {
         DbContextRegistration registration = builder.Services.GetDbContextRegistration();

@@ -20,6 +20,6 @@ public class EFCoreSqlServerComposer : IComposer
         builder.Services.AddSingleton<IMigrationProviderSetup, SqlServerMigrationProviderSetup>();
         builder.Services.AddSingleton<IDatabaseConfigurator, SqlServerDatabaseConfigurator>();
 
-        builder.AddDbContextRegistrar(new SqlServerDbContextServiceRegistrar());
+        builder.AddDbContextRegistrar<SqlServerDbContextServiceRegistrar>();
     }
 }

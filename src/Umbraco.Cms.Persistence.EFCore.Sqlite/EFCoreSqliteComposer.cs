@@ -20,6 +20,6 @@ public class EFCoreSqliteComposer : IComposer
         builder.Services.AddSingleton<IMigrationProviderSetup, SqliteMigrationProviderSetup>();
         builder.Services.AddSingleton<IDatabaseConfigurator, SqliteDatabaseConfigurator>();
 
-        builder.AddDbContextRegistrar(new SqliteDbContextServiceRegistrar());
+        builder.AddDbContextRegistrar<SqliteDbContextServiceRegistrar>();
     }
 }

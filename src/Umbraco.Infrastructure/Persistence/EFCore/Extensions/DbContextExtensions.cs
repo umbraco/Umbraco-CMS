@@ -82,7 +82,5 @@ public static class DbContextExtensions
     /// <param name="targetMigrationId">The ID of the target migration.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     public static async Task MigrateDatabaseAsync(this DbContext context, string targetMigrationId)
-    {
-        await context.GetService<IMigrator>().MigrateAsync(targetMigrationId);
-    }
+        => await context.GetService<IMigrator>().MigrateAsync(targetMigrationId);
 }
