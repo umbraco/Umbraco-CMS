@@ -11,6 +11,7 @@ import {
 	type UmbRepositoryResponse,
 	type UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbDataTypeDetailRepository, type UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import type { MappingFunction, Observable } from '@umbraco-cms/backoffice/observable-api';
@@ -77,6 +78,11 @@ export class UmbContentTypeStructureManager<
 	#contentTypeObservers = new Array<UmbController>();
 
 	#contentTypes = new UmbArrayState<T>([], (x) => x.unique);
+
+	// Data type detail loading for bulk optimization
+	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+	#dataTypeDetails = new UmbArrayState<UmbDataTypeDetailModel>([], (x) => x.unique);
+
 	readonly contentTypes = this.#contentTypes.asObservable();
 	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
 		x.find((y) => y.unique === this.#ownerContentTypeUnique),
@@ -109,6 +115,16 @@ export class UmbContentTypeStructureManager<
 			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
 			.filter(UmbFilterDuplicateStrings);
 	});
+
+	/**
+	 * Get an observable for the data type detail of a data type that is in use by this content type structure.
+	 * @param {string} dataTypeUnique - The unique identifier of the data type.
+	 * @returns {Observable<UmbDataTypeDetailModel | undefined>} An observable that emits the data type detail or undefined.
+	 */
+	contentTypeDataTypeDetailOf(dataTypeUnique: string): Observable<UmbDataTypeDetailModel | undefined> {
+		return this.#dataTypeDetails.asObservablePart((details) => details.find((d) => d.unique === dataTypeUnique));
+	}
+
 	readonly contentTypeHasProperties = this.#contentTypes.asObservablePart((contentTypes) => {
 		return contentTypes.some((x) => x.properties.length > 0);
 	});
@@ -179,6 +195,22 @@ export class UmbContentTypeStructureManager<
 				this.#loadContentTypeCompositions(contentTypeCompositions);
 			},
 			null,
+		);
+
+		// Observe data type uniques and bulk load their details
+		this.observe(
+			this.contentTypeDataTypeUniques,
+			async (dataTypeUniques) => {
+				if (dataTypeUniques.length > 0) {
+					const { data } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
+					if (data) {
+						this.#dataTypeDetails.setValue(data);
+					}
+				} else {
+					this.#dataTypeDetails.setValue([]);
+				}
+			},
+			'observeDataTypeUniques',
 		);
 	}
 
@@ -990,11 +1022,13 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypeObservers = [];
 		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
+		this.#dataTypeDetails.setValue([]);
 		this.#ownerContentTypeUnique = undefined;
 	}
 
 	public override destroy() {
 		this.#contentTypes.destroy();
+		this.#dataTypeDetails.destroy();
 		super.destroy();
 	}
 
