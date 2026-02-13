@@ -3,6 +3,9 @@ import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
+export type { UmbElementTreeItemContext } from './element-tree-item.context.js';
+export type { UmbElementTreeRepository } from './element-tree.repository.js';
+
 export interface UmbElementTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbElementEntityType | UmbElementFolderEntityType;
 	isTrashed: boolean;

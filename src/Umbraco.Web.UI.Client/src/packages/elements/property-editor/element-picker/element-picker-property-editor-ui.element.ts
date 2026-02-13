@@ -2,19 +2,14 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin, UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
-import type { UmbInputEntityDataElement } from '@umbraco-cms/backoffice/entity-data-picker';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-
-import '@umbraco-cms/backoffice/entity-data-picker';
 
 @customElement('umb-element-picker-property-editor-ui')
 export class UmbElementPickerPropertyEditorUIElement
 	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	#dataSourceAlias = 'Umb.PropertyEditorDataSource.Element';
-
 	@property({ type: Boolean })
 	mandatory?: boolean;
 
@@ -51,13 +46,13 @@ export class UmbElementPickerPropertyEditorUIElement
 	private _maxMessage = '';
 
 	override focus() {
-		return this.shadowRoot?.querySelector('umb-input-entity-data')?.focus();
+		return this.shadowRoot?.querySelector('umb-input-element')?.focus();
 	}
 
 	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.firstUpdated(changedProperties);
 
-		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-entity-data')!);
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-element')!);
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(
@@ -67,24 +62,22 @@ export class UmbElementPickerPropertyEditorUIElement
 		}
 	}
 
-	#onChange(event: CustomEvent & { target: UmbInputEntityDataElement }) {
+	#onChange(event: CustomEvent & { target: { selection: Array<string> } }) {
 		this.value = event.target.selection;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
 		return html`
-			<umb-input-entity-data
+			<umb-input-element
 				.selection=${this.value ?? []}
-				.dataSourceAlias=${this.#dataSourceAlias}
-				.dataSourceConfig=${[]}
 				.min=${this._min}
 				.min-message=${this._minMessage}
 				.max=${this._max}
 				.max-message=${this._maxMessage}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}>
-			</umb-input-entity-data>
+			</umb-input-element>
 		`;
 	}
 }

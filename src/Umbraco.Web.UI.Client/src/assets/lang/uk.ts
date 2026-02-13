@@ -1265,7 +1265,8 @@ export default {
 		withTime: 'Дата і час',
 	},
 	textbox: {
-		characters_left: 'символів залишилося',
+		characters_left: 'Залишилося <strong>%0%</strong> символів.',
+		characters_exceed: 'Максимум %0% символів, <strong>%1%</strong> зайвих.',
 	},
 	translation: {
 		details: 'Подробиці перекладу',
