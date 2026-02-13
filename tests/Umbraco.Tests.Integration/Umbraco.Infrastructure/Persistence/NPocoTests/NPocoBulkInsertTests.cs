@@ -278,4 +278,50 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
                 "NPoco's InsertBulk with SqlBulkCopyOptions.Default causes constraints to become untrusted.");
         }
     }
+
+    [Test]
+    public async Task InsertBulkAsync_Does_Not_Create_Untrusted_Foreign_Key_Constraints()
+    {
+        if (BaseTestDatabase.IsSqlServer() is false)
+        {
+            Assert.Ignore("This test only applies to SQL Server (SQLite has no constraint trust concept).");
+        }
+
+        // Replicate what WebhookRepository does when saving a webhook with associated events:
+        // insert the webhook row, then InsertBulkAsync the event associations.
+        using (ScopeProvider.CreateScope(autoComplete: true))
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+
+            // Insert a parent webhook row so the FK reference is valid.
+            var webhookDto = new WebhookDto
+            {
+                Key = Guid.NewGuid(),
+                Url = "https://example.com/hook",
+                Enabled = true,
+            };
+            await db.InsertAsync(webhookDto);
+
+            // InsertBulkAsync the event associations (mirrors WebhookRepository.CreateAsync).
+            var eventDtos = new List<Webhook2EventsDto>
+            {
+                new() { WebhookId = webhookDto.Id, Event = "Umbraco.ContentPublish" },
+                new() { WebhookId = webhookDto.Id, Event = "Umbraco.ContentUnpublish" },
+            };
+            await db.InsertBulkAsync(eventDtos);
+
+            var untrustedCount = db.ExecuteScalar<int>(
+                @"SELECT COUNT(*)
+                  FROM sys.foreign_keys
+                  WHERE is_not_trusted = 1
+                    AND OBJECT_NAME(parent_object_id) = @0",
+                Constants.DatabaseSchema.Tables.Webhook2Events);
+
+            Assert.That(
+                untrustedCount,
+                Is.EqualTo(0),
+                "FK constraints on umbracoWebhook2Events should be trusted after InsertBulkAsync. " +
+                "NPoco's InsertBulkAsync with SqlBulkCopyOptions.Default causes constraints to become untrusted.");
+        }
+    }
 }
