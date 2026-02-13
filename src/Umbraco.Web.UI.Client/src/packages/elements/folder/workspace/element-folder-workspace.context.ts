@@ -1,4 +1,5 @@
-import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS, type UmbElementFolderRepository } from '../repository/index.js';
+import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../repository/constants.js';
+import type { UmbElementFolderRepository } from '../repository/index.js';
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbElementFolderModel } from '../types.js';
 import { UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
