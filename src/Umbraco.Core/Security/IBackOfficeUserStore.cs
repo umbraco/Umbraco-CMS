@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Security;
@@ -56,8 +56,18 @@ public interface IBackOfficeUserStore
     /// <returns>Task resolving into an <see cref="IUser"/>.</returns>
     Task<IUser?> GetAsync(Guid key);
 
+    /// <summary>
+    ///     Gets users by their keys.
+    /// </summary>
+    /// <param name="keys">The keys of the users to retrieve.</param>
+    /// <returns>A task resolving into an <see cref="IEnumerable{IUser}" />.</returns>
     Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys);
 
+    /// <summary>
+    ///     Gets users by their IDs.
+    /// </summary>
+    /// <param name="ids">The IDs of the users to retrieve.</param>
+    /// <returns>A task resolving into an <see cref="IEnumerable{IUser}" />.</returns>
     Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids);
 
 

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Reflection;
 using Umbraco.Cms.Core.Exceptions;
 
@@ -15,6 +15,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </example>
 public class ModelType : Type
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ModelType"/> class.
+    /// </summary>
+    /// <param name="contentTypeAlias">The content type alias.</param>
     private ModelType(string? contentTypeAlias)
     {
         if (contentTypeAlias == null)
@@ -86,6 +90,13 @@ public class ModelType : Type
     public static Type Map(Type type, Dictionary<string, Type>? modelTypes)
         => Map(type, modelTypes, false);
 
+    /// <summary>
+    ///     Gets the actual CLR type by replacing model types, if any.
+    /// </summary>
+    /// <param name="type">The type.</param>
+    /// <param name="modelTypes">The model types map.</param>
+    /// <param name="dictionaryIsInvariant">A value indicating whether the dictionary is case-insensitive.</param>
+    /// <returns>The actual CLR type.</returns>
     public static Type Map(Type type, Dictionary<string, Type>? modelTypes, bool dictionaryIsInvariant)
     {
         // it may be that senders forgot to send an invariant dictionary (garbage-in)
@@ -372,11 +383,20 @@ public class ModelType : Type
         => new ModelTypeArrayType(this);
 }
 
-/// <inheritdoc />
+/// <summary>
+///     Represents an array type of a <see cref="ModelType"/>.
+/// </summary>
+/// <remarks>
+///     This class is used internally to represent array types of model types.
+/// </remarks>
 internal sealed class ModelTypeArrayType : Type
 {
     private readonly Type _elementType;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ModelTypeArrayType"/> class.
+    /// </summary>
+    /// <param name="type">The model type.</param>
     public ModelTypeArrayType(ModelType type)
     {
         _elementType = type;
@@ -384,38 +404,55 @@ internal sealed class ModelTypeArrayType : Type
         Name = "{" + type.ContentTypeAlias + "}[*]";
     }
 
+    /// <summary>
+    ///     Gets the content type alias.
+    /// </summary>
     public string ContentTypeAlias { get; }
 
+    /// <inheritdoc />
     public override Type UnderlyingSystemType => this;
 
+    /// <inheritdoc />
     public override Type? BaseType => null;
 
+    /// <inheritdoc />
     public override string Name { get; }
 
+    /// <inheritdoc />
     public override Guid GUID { get; } = Guid.NewGuid();
 
+    /// <inheritdoc />
     public override Module Module => GetType().Module; // hackish but FullName requires something
 
+    /// <inheritdoc />
     public override Assembly Assembly => GetType().Assembly; // hackish but FullName requires something
 
+    /// <inheritdoc />
     public override string FullName => Name;
 
+    /// <inheritdoc />
     public override string Namespace => string.Empty;
 
+    /// <inheritdoc />
     public override string AssemblyQualifiedName => Name;
 
+    /// <inheritdoc />
     public override string ToString()
         => Name;
 
+    /// <inheritdoc />
     public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
         => Array.Empty<ConstructorInfo>();
 
+    /// <inheritdoc />
     public override Type[] GetInterfaces()
         => Array.Empty<Type>();
 
+    /// <inheritdoc />
     protected override TypeAttributes GetAttributeFlagsImpl()
         => TypeAttributes.Class;
 
+    /// <inheritdoc />
     protected override ConstructorInfo? GetConstructorImpl(
         BindingFlags bindingAttr,
         Binder? binder,
@@ -424,30 +461,39 @@ internal sealed class ModelTypeArrayType : Type
         ParameterModifier[]? modifiers)
         => null;
 
+    /// <inheritdoc />
     public override Type? GetInterface(string name, bool ignoreCase)
         => null;
 
+    /// <inheritdoc />
     public override EventInfo[] GetEvents(BindingFlags bindingAttr)
         => Array.Empty<EventInfo>();
 
+    /// <inheritdoc />
     public override EventInfo? GetEvent(string name, BindingFlags bindingAttr)
         => null;
 
+    /// <inheritdoc />
     public override Type[] GetNestedTypes(BindingFlags bindingAttr)
         => Array.Empty<Type>();
 
+    /// <inheritdoc />
     public override Type? GetNestedType(string name, BindingFlags bindingAttr)
         => null;
 
+    /// <inheritdoc />
     public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
         => Array.Empty<PropertyInfo>();
 
+    /// <inheritdoc />
     public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
         => Array.Empty<MethodInfo>();
 
+    /// <inheritdoc />
     public override FieldInfo[] GetFields(BindingFlags bindingAttr)
         => Array.Empty<FieldInfo>();
 
+    /// <inheritdoc />
     protected override PropertyInfo? GetPropertyImpl(
         string name,
         BindingFlags bindingAttr,
@@ -457,6 +503,7 @@ internal sealed class ModelTypeArrayType : Type
         ParameterModifier[]? modifiers)
         => null;
 
+    /// <inheritdoc />
     protected override MethodInfo? GetMethodImpl(
         string name,
         BindingFlags bindingAttr,
@@ -466,24 +513,31 @@ internal sealed class ModelTypeArrayType : Type
         ParameterModifier[]? modifiers)
         => null;
 
+    /// <inheritdoc />
     public override FieldInfo? GetField(string name, BindingFlags bindingAttr)
         => null;
 
+    /// <inheritdoc />
     public override MemberInfo[] GetMembers(BindingFlags bindingAttr)
         => Array.Empty<MemberInfo>();
 
+    /// <inheritdoc />
     public override object[] GetCustomAttributes(Type attributeType, bool inherit)
         => Array.Empty<object>();
 
+    /// <inheritdoc />
     public override object[] GetCustomAttributes(bool inherit)
         => Array.Empty<object>();
 
+    /// <inheritdoc />
     public override bool IsDefined(Type attributeType, bool inherit)
         => false;
 
+    /// <inheritdoc />
     public override Type GetElementType()
         => _elementType;
 
+    /// <inheritdoc />
     public override object InvokeMember(
         string name,
         BindingFlags invokeAttr,
@@ -495,24 +549,31 @@ internal sealed class ModelTypeArrayType : Type
         string[]? namedParameters) =>
         throw new NotSupportedException();
 
+    /// <inheritdoc />
     protected override bool HasElementTypeImpl()
         => true;
 
+    /// <inheritdoc />
     protected override bool IsArrayImpl()
         => true;
 
+    /// <inheritdoc />
     protected override bool IsByRefImpl()
         => false;
 
+    /// <inheritdoc />
     protected override bool IsPointerImpl()
         => false;
 
+    /// <inheritdoc />
     protected override bool IsPrimitiveImpl()
         => false;
 
+    /// <inheritdoc />
     protected override bool IsCOMObjectImpl()
         => false;
 
+    /// <inheritdoc />
     public override int GetArrayRank()
         => 1;
 }

@@ -32,7 +32,11 @@ export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<Um
 		const { data, error } = await tryExecute(
 			this.#host,
 			DataTypeService.getItemDataTypeSearch({
-				query: { query: args.query },
+				query: {
+					query: args.query,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
+				},
 			}),
 		);
 

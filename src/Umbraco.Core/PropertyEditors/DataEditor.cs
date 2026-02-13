@@ -58,6 +58,9 @@ public class DataEditor : IDataEditor
     /// </summary>
     protected DataEditorAttribute? Attribute { get; }
 
+    /// <summary>
+    /// Gets the data value editor factory used to create value editors.
+    /// </summary>
     protected IDataValueEditorFactory DataValueEditorFactory { get; }
 
     /// <summary>
@@ -75,8 +78,13 @@ public class DataEditor : IDataEditor
     [DataMember(Name = "supportsReadOnly", IsRequired = true)]
     public bool SupportsReadOnly { get; set; }
 
-    // Adding a virtual method that wraps the default implementation allows derived classes
-    // to override the default implementation without having to explicitly inherit the interface.
+    /// <summary>
+    ///     Gets a value indicating whether the data editor supports configurable elements.
+    /// </summary>
+    /// <remarks>
+    ///     Adding a virtual method that wraps the default implementation allows derived classes
+    ///     to override the default implementation without having to explicitly inherit the interface.
+    /// </remarks>
     public virtual bool SupportsConfigurableElements => false;
 
     /// <inheritdoc />
@@ -203,6 +211,7 @@ public class DataEditor : IDataEditor
     /// <inheritdoc />
     public virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
 
+    /// <inheritdoc />
     public virtual object? MergeVariantInvariantPropertyValue(
         object? sourceValue,
         object? targetValue,

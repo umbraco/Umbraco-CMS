@@ -85,6 +85,7 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentTypeName = createObservablePart(this.ownerContentType, (x) => x?.name);
 	readonly ownerContentTypeCompositions = createObservablePart(this.ownerContentType, (x) => x?.compositions);
 
+	// TODO: for v.18 make it pausable for this to be undefined when no content-type are present. [NL]
 	readonly contentTypeCompositions = this.#contentTypes.asObservablePart((contentTypes) => {
 		return contentTypes.flatMap((x) => x.compositions ?? []);
 	});
@@ -781,6 +782,13 @@ export class UmbContentTypeStructureManager<
 		return this.getOwnerContentType()?.properties?.find((property) => property.unique === propertyUnique);
 	}
 
+	async getOwnerPropertiesOf(containerId: string | null): Promise<Array<UmbPropertyTypeModel> | undefined> {
+		await this.#init;
+		return this.getOwnerContentType()?.properties?.filter((property) =>
+			containerId ? property.container?.id === containerId : !property.container,
+		);
+	}
+
 	async getPropertyStructureByAlias(propertyAlias: string) {
 		await this.#init;
 		for (const docType of this.#contentTypes.getValue()) {
@@ -796,7 +804,9 @@ export class UmbContentTypeStructureManager<
 		return this.#contentTypes.asObservablePart((docTypes) => {
 			return (
 				docTypes.find((docType) => {
-					return docType.properties?.find((property) => property.container?.id === containerId);
+					return docType.properties?.find((property) =>
+						containerId ? property.container?.id === containerId : !property.container,
+					);
 				}) !== undefined
 			);
 		});

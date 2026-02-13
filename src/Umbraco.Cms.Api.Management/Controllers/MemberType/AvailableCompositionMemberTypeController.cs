@@ -26,6 +26,8 @@ public class AvailableCompositionMemberTypeController : MemberTypeControllerBase
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<AvailableMemberTypeCompositionResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets available compositions.")]
+    [EndpointDescription("Gets a collection of member types that are available to use as compositions for the specified member type.")]
     public async Task<IActionResult> AvailableCompositions(
         CancellationToken cancellationToken,
         MemberTypeCompositionRequestModel compositionModel)

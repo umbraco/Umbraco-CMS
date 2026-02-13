@@ -212,6 +212,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						<uui-textarea
 							label="description"
 							name="description"
+							data-mark="input:description"
 							id="description-input"
 							placeholder=${this.localize.term('placeholders_enterDescription')}
 							.value=${this.property.description}
@@ -225,11 +226,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					id="editor"
 					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
+					data-mark="action:editor-settings"
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.unique })}>
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
 					<uui-action-bar>
-						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+						<uui-button label="${this.localize.term('actions_delete')}" data-mark="action:delete" @click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
@@ -253,6 +255,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				type="number"
 				?disabled=${this._inherited}
 				label="sort order"
+				data-mark="input:sort-order"
 				@change=${this.#onPropertyOrderChanged}
 				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
 		`;
@@ -349,13 +352,18 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				container-type: inline-size;
 			}
 
-			:host > div {
+			:host > * {
 				grid-column: span 2;
 			}
 
 			@container (width > 700px) {
-				:host(:not([orientation='vertical'])) > div {
+				:host(:not([orientation='vertical'])) > * {
 					grid-column: span 1;
+				}
+				#header {
+					position: sticky;
+					top: var(--uui-size-space-4);
+					height: min-content;
 				}
 			}
 
@@ -418,12 +426,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				margin-bottom: 0;
 			}
 
-			#header {
-				position: sticky;
-				top: var(--uui-size-space-4);
-				height: min-content;
-			}
-
 			#header i {
 				opacity: 0.55;
 				float: right;
@@ -443,6 +445,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#editor {
 				position: relative;
+				min-height: 80px;
 				--uui-button-background-color: var(--uui-color-background);
 				--uui-button-background-color-hover: var(--uui-color-background);
 			}

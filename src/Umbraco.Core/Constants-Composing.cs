@@ -10,6 +10,9 @@ public static partial class Constants
     /// </summary>
     public static class Composing
     {
+        /// <summary>
+        ///     The array of Umbraco core assembly names used for type discovery.
+        /// </summary>
         public static readonly string[] UmbracoCoreAssemblyNames =
         {
             "Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Examine.Lucene",

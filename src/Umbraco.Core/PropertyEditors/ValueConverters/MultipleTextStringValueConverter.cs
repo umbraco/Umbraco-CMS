@@ -2,20 +2,27 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+///     Provides property value conversion for multiple text string properties.
+/// </summary>
 [DefaultPropertyValueConverter]
 public class MultipleTextStringValueConverter : PropertyValueConverterBase
 {
     private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => Constants.PropertyEditors.Aliases.MultipleTextstring.Equals(propertyType.EditorAlias);
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IEnumerable<string>);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         // data is (both in database and xml):

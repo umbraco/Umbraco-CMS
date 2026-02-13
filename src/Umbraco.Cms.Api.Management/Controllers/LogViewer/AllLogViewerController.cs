@@ -42,6 +42,8 @@ public class AllLogViewerController : LogViewerControllerBase
     [HttpGet("log")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LogMessageResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of log entries.")]
+    [EndpointDescription("Gets a paginated collection of log entries with optional filtering and date range.")]
     public async Task<IActionResult> AllLogs(
         CancellationToken cancellationToken,
         int skip = 0,

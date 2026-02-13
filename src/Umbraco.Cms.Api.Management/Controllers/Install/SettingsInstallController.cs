@@ -38,6 +38,8 @@ public class SettingsInstallController : InstallControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(InstallSettingsResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets install settings.")]
+    [EndpointDescription("Gets the current installation settings and status.")]
     public async Task<IActionResult> Settings(CancellationToken cancellationToken)
     {
         InstallSettingsModel installSettings = _installSettingsFactory.GetInstallSettings();

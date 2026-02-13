@@ -9,6 +9,10 @@ internal sealed class UserPermissionService : IUserPermissionService
 {
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserPermissionService" /> class.
+    /// </summary>
+    /// <param name="userService">The user service.</param>
     public UserPermissionService(IUserService userService)
         => _userService = userService;
 

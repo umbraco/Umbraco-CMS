@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkProcessorForFaultyLinks
 {
     private readonly IIdKeyMap _idKeyMap;

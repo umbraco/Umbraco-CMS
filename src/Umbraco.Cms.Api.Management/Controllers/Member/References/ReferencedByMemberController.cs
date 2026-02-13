@@ -55,6 +55,8 @@ public class ReferencedByMemberController : MemberControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a collection of items that reference members.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the members identified by the provided Ids.")]
     public async Task<IActionResult> ReferencedBy2(
         CancellationToken cancellationToken,
         Guid id,

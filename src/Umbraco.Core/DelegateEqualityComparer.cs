@@ -11,12 +11,23 @@ public class DelegateEqualityComparer<T> : IEqualityComparer<T>
 
     #region Implementation of IEqualityComparer<in T>
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DelegateEqualityComparer{T}" /> class.
+    /// </summary>
+    /// <param name="equals">A delegate that determines if two objects are equal.</param>
+    /// <param name="getHashcode">A delegate that returns the hash code for an object.</param>
     public DelegateEqualityComparer(Func<T?, T?, bool> equals, Func<T, int> getHashcode)
     {
         _getHashcode = getHashcode;
         _equals = equals;
     }
 
+    /// <summary>
+    ///     Creates a <see cref="DelegateEqualityComparer{T}" /> that compares objects based on a specific member.
+    /// </summary>
+    /// <typeparam name="TMember">The type of the member to compare.</typeparam>
+    /// <param name="memberExpression">A function that extracts the member to compare.</param>
+    /// <returns>A new <see cref="DelegateEqualityComparer{T}" /> instance.</returns>
     public static DelegateEqualityComparer<T> CompareMember<TMember>(Func<T?, TMember> memberExpression)
         where TMember : IEquatable<TMember> =>
         new DelegateEqualityComparer<T>(
