@@ -94,7 +94,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		let data: DetailResponseModelType | undefined;
 		let error: UmbApiError | UmbCancelError | undefined;
 
-		const inflightCacheKey = `read:${id}`;
+		const inflightCacheKey = `detail:${id}`;
 
 		// Only read from the cache when we are connected to the server events
 		if (this.#isConnectedToServerEvents && this.#dataCache.has(id)) {
@@ -134,6 +134,8 @@ export class UmbManagementApiDetailDataRequestManager<
 	/**
 	 * Reads multiple items by their IDs.
 	 * Only available if a readMany function was provided in the constructor args.
+	 * Deduplicates concurrent requests: if an ID is already being fetched by another
+	 * concurrent readMany call, it waits for that request instead of re-fetching.
 	 * @param {Array<string>} ids - The IDs of the items to read
 	 * @returns {Promise<UmbApiResponse<{ data?: { items: Array<DetailResponseModelType> } }>>} - The API response containing the items or an error
 	 */
@@ -145,7 +147,6 @@ export class UmbManagementApiDetailDataRequestManager<
 		let error: UmbApiError | UmbCancelError | undefined;
 		let idsToRequest: Array<string> = [...ids];
 		let cacheItems: Array<DetailResponseModelType> = [];
-		let serverItems: Array<DetailResponseModelType> | undefined;
 
 		// Only read from the cache when we are connected to the server events
 		if (this.#isConnectedToServerEvents) {
@@ -156,24 +157,89 @@ export class UmbManagementApiDetailDataRequestManager<
 			idsToRequest = ids.filter((id) => !this.#dataCache.has(id));
 		}
 
-		if (idsToRequest.length > 0) {
-			const getItemsController = new UmbItemDataApiGetRequestController(this, {
-				api: (args) => this.#readMany!(args.uniques),
-				uniques: idsToRequest,
-			});
+		// Split remaining IDs into those already inflight vs those needing a new request
+		const inflightPromises: Array<Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>> = [];
+		const newIds: Array<string> = [];
 
-			const { data: serverData, error: serverError } = await getItemsController.request();
-
-			serverItems = serverData.items ?? [];
-			error = serverError;
-
-			if (this.#isConnectedToServerEvents) {
-				// If we are connected to server events, we can cache the server data
-				serverItems?.forEach((item) => this.#dataCache.set(item.id, item));
+		for (const id of idsToRequest) {
+			const inflightCacheKey = `detail:${id}`;
+			if (this.#inflightRequestCache.has(inflightCacheKey)) {
+				inflightPromises.push(this.#inflightRequestCache.get(inflightCacheKey)!.requestPromise);
+			} else {
+				newIds.push(id);
 			}
 		}
 
-		const items: Array<DetailResponseModelType> = [...cacheItems, ...(serverItems ?? [])];
+		// For new IDs, create per-item deferred promises and store in inflight cache before making the API call
+		const deferredMap = new Map<
+			string,
+			{ resolve: (value: UmbApiResponse<{ data?: DetailResponseModelType }>) => void }
+		>();
+
+		for (const id of newIds) {
+			const inflightCacheKey = `detail:${id}`;
+			let resolve!: (value: UmbApiResponse<{ data?: DetailResponseModelType }>) => void;
+			const promise = new Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>((r) => {
+				resolve = r;
+			});
+			deferredMap.set(id, { resolve });
+			this.#inflightRequestCache.set(inflightCacheKey, promise);
+		}
+
+		// Fetch new IDs from the server
+		let newlyFetchedItems: Array<DetailResponseModelType> = [];
+
+		if (newIds.length > 0) {
+			try {
+				const getItemsController = new UmbItemDataApiGetRequestController(this, {
+					api: (args) => this.#readMany!(args.uniques),
+					uniques: newIds,
+				});
+
+				const { data: serverData, error: serverError } = await getItemsController.request();
+				const serverItems = serverData?.items ?? [];
+				error = serverError;
+
+				if (this.#isConnectedToServerEvents) {
+					serverItems.forEach((item) => this.#dataCache.set(item.id, item));
+				}
+
+				newlyFetchedItems = serverItems;
+
+				// Resolve each deferred promise with the corresponding item
+				for (const id of newIds) {
+					const item = serverItems.find((serverItem) => serverItem.id === id);
+					deferredMap.get(id)!.resolve({ data: item, error: serverError });
+				}
+			} catch (e) {
+				// If the batch call throws, resolve all deferred promises with the error
+				for (const id of newIds) {
+					deferredMap.get(id)!.resolve({ data: undefined, error: e as UmbApiError | UmbCancelError });
+				}
+			} finally {
+				// Always clean up inflight cache entries
+				for (const id of newIds) {
+					this.#inflightRequestCache.delete(`detail:${id}`);
+				}
+			}
+		}
+
+		// Await inflight results from other concurrent readMany calls
+		let inflightItems: Array<DetailResponseModelType> = [];
+
+		if (inflightPromises.length > 0) {
+			const inflightResults = await Promise.all(inflightPromises);
+			inflightItems = inflightResults
+				.map((result) => result.data)
+				.filter((x): x is DetailResponseModelType => x !== undefined);
+
+			// Propagate the first inflight error if we don't already have one from our own batch
+			if (!error) {
+				error = inflightResults.find((result) => result.error)?.error;
+			}
+		}
+
+		const items: Array<DetailResponseModelType> = [...cacheItems, ...inflightItems, ...newlyFetchedItems];
 
 		return { data: { items }, error };
 	}

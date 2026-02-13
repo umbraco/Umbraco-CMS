@@ -344,7 +344,7 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 
 			await manager.read('item-1');
 
-			expect(inflightRequestCache.has('read:item-1')).to.be.false;
+			expect(inflightRequestCache.has('detail:item-1')).to.be.false;
 		});
 
 		it('returns an error if the read API fails', async () => {
@@ -489,6 +489,171 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			expect(result.data?.items).to.have.lengthOf(2);
 		});
 
+		it('deduplicates concurrent readMany calls with overlapping IDs', async () => {
+			const requestedIdBatches: Array<Array<string>> = [];
+			mockReadMany = async (ids: Array<string>) => {
+				requestedIdBatches.push([...ids]);
+				// Simulate network delay so both calls are concurrent
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Make concurrent requests with overlapping IDs
+			const [result1, result2] = await Promise.all([
+				manager.readMany(['item-1', 'item-2', 'item-3']),
+				manager.readMany(['item-2', 'item-3', 'item-4']),
+			]);
+
+			// The first call should request all 3 IDs, the second should only request item-4
+			// (item-2 and item-3 are already inflight from the first call)
+			const allRequestedIds = requestedIdBatches.flat();
+			expect(allRequestedIds).to.include('item-1');
+			expect(allRequestedIds).to.include('item-4');
+			// item-2 and item-3 should only appear once across all batches
+			expect(allRequestedIds.filter((id) => id === 'item-2')).to.have.lengthOf(1);
+			expect(allRequestedIds.filter((id) => id === 'item-3')).to.have.lengthOf(1);
+
+			// Both results should contain the items they requested
+			expect(result1.data?.items).to.have.lengthOf(3);
+			expect(result2.data?.items).to.have.lengthOf(3);
+
+			expect(result1.data?.items.map((i) => i.id)).to.include.members(['item-1', 'item-2', 'item-3']);
+			expect(result2.data?.items.map((i) => i.id)).to.include.members(['item-2', 'item-3', 'item-4']);
+		});
+
+		it('cleans up inflight cache after concurrent requests complete', async () => {
+			mockReadMany = async (ids: Array<string>) => {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			await Promise.all([manager.readMany(['item-1', 'item-2']), manager.readMany(['item-2', 'item-3'])]);
+
+			// All inflight entries should be cleaned up
+			expect(inflightRequestCache.has('detail:item-1')).to.be.false;
+			expect(inflightRequestCache.has('detail:item-2')).to.be.false;
+			expect(inflightRequestCache.has('detail:item-3')).to.be.false;
+		});
+
+		it('makes zero server requests when all IDs are already inflight', async () => {
+			let readManyCallCount = 0;
+			mockReadMany = async (ids: Array<string>) => {
+				readManyCallCount++;
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			const [result1, result2] = await Promise.all([
+				manager.readMany(['item-1', 'item-2']),
+				manager.readMany(['item-1', 'item-2']),
+			]);
+
+			// Only one batch API call should have been made
+			expect(readManyCallCount).to.equal(1);
+
+			// Both callers should get the same data
+			expect(result1.data?.items).to.have.lengthOf(2);
+			expect(result2.data?.items).to.have.lengthOf(2);
+			expect(result1.data?.items.map((i) => i.id)).to.include.members(['item-1', 'item-2']);
+			expect(result2.data?.items.map((i) => i.id)).to.include.members(['item-1', 'item-2']);
+		});
+
+		it('combines data cache, inflight, and new requests correctly', async () => {
+			mockServerEventContext.setIsConnected(true);
+
+			// Pre-populate cache with one item
+			dataCache.set('item-1', { id: 'item-1', name: 'Cached Item 1' });
+
+			const requestedIdBatches: Array<Array<string>> = [];
+			mockReadMany = async (ids: Array<string>) => {
+				requestedIdBatches.push([...ids]);
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Fresh Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Wait for context observation
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			const [result1, result2] = await Promise.all([
+				manager.readMany(['item-1', 'item-2', 'item-3']),
+				manager.readMany(['item-1', 'item-2', 'item-4']),
+			]);
+
+			// item-1 should come from data cache (not requested)
+			// item-2 and item-3 should be requested by first call
+			// item-4 should be requested by second call
+			// item-2 should NOT be re-requested by second call (inflight from first)
+			const allRequestedIds = requestedIdBatches.flat();
+			expect(allRequestedIds).to.not.include('item-1'); // from cache
+			expect(allRequestedIds.filter((id) => id === 'item-2')).to.have.lengthOf(1); // only once
+			expect(allRequestedIds).to.include('item-3');
+			expect(allRequestedIds).to.include('item-4');
+
+			// Both results should have all their requested items
+			expect(result1.data?.items).to.have.lengthOf(3);
+			expect(result2.data?.items).to.have.lengthOf(3);
+
+			// Verify cached item was returned from cache with its cached name
+			const cachedItem = result1.data?.items.find((item) => item.id === 'item-1');
+			expect(cachedItem?.name).to.equal('Cached Item 1');
+		});
+
 		it('caches fetched items when connected to server events', async () => {
 			mockServerEventContext.setIsConnected(true);
 
@@ -517,6 +682,136 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 
 			expect(dataCache.has('item-1')).to.be.true;
 			expect(dataCache.has('item-2')).to.be.true;
+		});
+	});
+
+	describe('read and readMany inflight deduplication', () => {
+		it('readMany reuses an inflight read request for the same ID', async () => {
+			let readCallCount = 0;
+			const requestedReadManyIdBatches: Array<Array<string>> = [];
+
+			mockRead = async (id: string) => {
+				readCallCount++;
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return { data: { id, name: `Item ${id}` } };
+			};
+
+			mockReadMany = async (ids: Array<string>) => {
+				requestedReadManyIdBatches.push([...ids]);
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Start a read for item-1, then a readMany that includes item-1
+			const [readResult, readManyResult] = await Promise.all([
+				manager.read('item-1'),
+				manager.readMany(['item-1', 'item-2']),
+			]);
+
+			// read should have been called once for item-1
+			expect(readCallCount).to.equal(1);
+
+			// readMany should only request item-2 (item-1 is already inflight from read)
+			const allReadManyIds = requestedReadManyIdBatches.flat();
+			expect(allReadManyIds).to.not.include('item-1');
+			expect(allReadManyIds).to.include('item-2');
+
+			// Both should return their data
+			expect(readResult.data).to.deep.equal({ id: 'item-1', name: 'Item item-1' });
+			expect(readManyResult.data?.items).to.have.lengthOf(2);
+			expect(readManyResult.data?.items.map((i) => i.id)).to.include.members(['item-1', 'item-2']);
+		});
+
+		it('read reuses an inflight readMany request for the same ID', async () => {
+			let readCallCount = 0;
+			let readManyCallCount = 0;
+
+			mockRead = async (id: string) => {
+				readCallCount++;
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return { data: { id, name: `Item ${id}` } };
+			};
+
+			mockReadMany = async (ids: Array<string>) => {
+				readManyCallCount++;
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Start a readMany that includes item-1, then a read for item-1
+			const [readManyResult, readResult] = await Promise.all([
+				manager.readMany(['item-1', 'item-2']),
+				manager.read('item-1'),
+			]);
+
+			// readMany should have been called once
+			expect(readManyCallCount).to.equal(1);
+
+			// read should not have made its own request (item-1 is already inflight from readMany)
+			expect(readCallCount).to.equal(0);
+
+			// Both should return their data
+			expect(readResult.data).to.deep.equal({ id: 'item-1', name: 'Item item-1' });
+			expect(readManyResult.data?.items).to.have.lengthOf(2);
+		});
+
+		it('cleans up shared inflight cache after cross-method requests complete', async () => {
+			mockRead = async (id: string) => {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return { data: { id, name: `Item ${id}` } };
+			};
+
+			mockReadMany = async (ids: Array<string>) => {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			await Promise.all([manager.read('item-1'), manager.readMany(['item-1', 'item-2'])]);
+
+			expect(inflightRequestCache.has('detail:item-1')).to.be.false;
+			expect(inflightRequestCache.has('detail:item-2')).to.be.false;
 		});
 	});
 
