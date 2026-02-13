@@ -521,6 +521,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host {
 				position: relative;
 				display: block;
+				margin-bottom: 1px;
 				--umb-block-list-entry-actions-opacity: 0;
 			}
 
