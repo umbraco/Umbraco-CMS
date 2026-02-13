@@ -319,6 +319,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
+			// Set unique before processing so observers triggered during _scaffoldProcessData
+			// (e.g. collection manager) can read the correct unique via getUnique().
+			this.#entityContext.setUnique(data.unique);
+
 			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
@@ -327,7 +331,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			}
 
 			this.setIsNew(true);
-			this.#entityContext.setUnique(data.unique);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 		}
