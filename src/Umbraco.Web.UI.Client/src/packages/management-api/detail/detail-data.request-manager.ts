@@ -94,7 +94,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		let data: DetailResponseModelType | undefined;
 		let error: UmbApiError | UmbCancelError | undefined;
 
-		const inflightCacheKey = `detail:${id}`;
+		const inflightCacheKey = `read:${id}`;
 
 		// Only read from the cache when we are connected to the server events
 		if (this.#isConnectedToServerEvents && this.#dataCache.has(id)) {
@@ -162,7 +162,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		const newIds: Array<string> = [];
 
 		for (const id of idsToRequest) {
-			const inflightCacheKey = `detail:${id}`;
+			const inflightCacheKey = `read:${id}`;
 			if (this.#inflightRequestCache.has(inflightCacheKey)) {
 				inflightPromises.push(this.#inflightRequestCache.get(inflightCacheKey)!.requestPromise);
 			} else {
@@ -177,7 +177,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		>();
 
 		for (const id of newIds) {
-			const inflightCacheKey = `detail:${id}`;
+			const inflightCacheKey = `read:${id}`;
 			let resolve!: (value: UmbApiResponse<{ data?: DetailResponseModelType }>) => void;
 			const promise = new Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>((r) => {
 				resolve = r;
@@ -219,7 +219,7 @@ export class UmbManagementApiDetailDataRequestManager<
 			} finally {
 				// Always clean up inflight cache entries
 				for (const id of newIds) {
-					this.#inflightRequestCache.delete(`detail:${id}`);
+					this.#inflightRequestCache.delete(`read:${id}`);
 				}
 			}
 		}

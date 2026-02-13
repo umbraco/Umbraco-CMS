@@ -344,7 +344,7 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 
 			await manager.read('item-1');
 
-			expect(inflightRequestCache.has('detail:item-1')).to.be.false;
+			expect(inflightRequestCache.has('read:item-1')).to.be.false;
 		});
 
 		it('returns an error if the read API fails', async () => {
@@ -558,9 +558,9 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			await Promise.all([manager.readMany(['item-1', 'item-2']), manager.readMany(['item-2', 'item-3'])]);
 
 			// All inflight entries should be cleaned up
-			expect(inflightRequestCache.has('detail:item-1')).to.be.false;
-			expect(inflightRequestCache.has('detail:item-2')).to.be.false;
-			expect(inflightRequestCache.has('detail:item-3')).to.be.false;
+			expect(inflightRequestCache.has('read:item-1')).to.be.false;
+			expect(inflightRequestCache.has('read:item-2')).to.be.false;
+			expect(inflightRequestCache.has('read:item-3')).to.be.false;
 		});
 
 		it('makes zero server requests when all IDs are already inflight', async () => {
@@ -810,8 +810,8 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 
 			await Promise.all([manager.read('item-1'), manager.readMany(['item-1', 'item-2'])]);
 
-			expect(inflightRequestCache.has('detail:item-1')).to.be.false;
-			expect(inflightRequestCache.has('detail:item-2')).to.be.false;
+			expect(inflightRequestCache.has('read:item-1')).to.be.false;
+			expect(inflightRequestCache.has('read:item-2')).to.be.false;
 		});
 	});
 
