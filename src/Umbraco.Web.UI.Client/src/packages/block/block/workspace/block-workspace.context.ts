@@ -84,6 +84,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 
+		this.content.view.inheritFrom(this.view);
+		this.settings.view.inheritFrom(this.view);
+
 		this.addValidationContext(this.content.validation);
 		this.addValidationContext(this.settings.validation);
 
