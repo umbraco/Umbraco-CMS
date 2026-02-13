@@ -67,9 +67,9 @@ public class BlockEditorVarianceHandlerTests
         var expose = CreateBlockItemVariations((contentDataKey, null, null));
         var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
         ExecuteAlignExposeVariance(owner, blockValue);
-        var alignedExpose = blockValue.Expose.First();
-        Assert.AreEqual("en-US", alignedExpose.Culture);
-        Assert.AreEqual("segment-one", alignedExpose.Segment);
+            var alignedExpose = blockValue.Expose.First();
+            Assert.AreEqual("en-US", alignedExpose.Culture);
+            Assert.AreEqual("segment-one", alignedExpose.Segment);
     }
 
     [Test]
@@ -87,9 +87,9 @@ public class BlockEditorVarianceHandlerTests
     public async Task AlignPropertyVarianceAsync_Throws_When_PropertyType_Is_Null()
     {
         var propertyValues = new List<BlockPropertyValue> { new() { Culture = null, PropertyType = null! } };
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => 
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => 
             await ExecuteAlignPropertyVarianceAsync(ContentVariation.Culture, propertyValues, null));
-        Assert.IsTrue((await ex)!.Message.Contains("property type"));
+        Assert.IsTrue(ex!.Message.Contains("property type"));
     }
 
     [Test]
