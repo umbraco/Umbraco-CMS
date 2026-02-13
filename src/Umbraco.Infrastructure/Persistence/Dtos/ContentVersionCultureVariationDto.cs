@@ -44,7 +44,7 @@ internal sealed class ContentVersionCultureVariationDto
     [Column(UpdateDateColumnName)] // TODO: db rename to 'updateDate'
     public DateTime UpdateDate { get; set; }
 
-    [Column(UpdateUserIdColumnName)] // TODO: db rename to 'availableUserId'
+    [Column(UpdateUserIdColumnName)] // TODO: db rename to 'updateUserId'
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? UpdateUserId
