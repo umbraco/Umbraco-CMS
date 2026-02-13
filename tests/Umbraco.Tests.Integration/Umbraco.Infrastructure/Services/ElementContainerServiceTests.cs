@@ -154,6 +154,10 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         => builder.Services.Configure<ContentSettings>(config =>
             config.DisableDeleteWhenReferenced = true);
 
+    public static void ConfigureDisableUnpublishWhenReferenced(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableUnpublishWhenReferenced = true);
+
     private struct FolderWithElementsStructureInfo
     {
         public Guid RootContainerKey { get; init; }

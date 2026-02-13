@@ -24,6 +24,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     private readonly IElementService _elementService;
     private readonly IOptionsMonitor<ContentSettings> _contentSettingsOptions;
     private readonly IRelationService _relationService;
+    private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly ILogger<ElementContainerService> _logger;
 
     // internal so the tests can reach it
@@ -42,6 +43,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IElementService elementService,
         IOptionsMonitor<ContentSettings> contentSettingsOptions,
         IRelationService relationService,
+        ITrackedReferencesService trackedReferencesService,
         ILogger<ElementContainerService> logger)
         : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
@@ -52,6 +54,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         _elementService = elementService;
         _contentSettingsOptions = contentSettingsOptions;
         _relationService = relationService;
+        _trackedReferencesService = trackedReferencesService;
         _logger = logger;
     }
 
@@ -67,6 +70,18 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
+
+        if (_contentSettingsOptions.CurrentValue.DisableUnpublishWhenReferenced)
+        {
+            Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> referencedDescendants = await _trackedReferencesService
+                .GetPagedDescendantsInReferencesAsync(key, UmbracoObjectTypes.ElementContainer, 0, 0, filterMustBeIsDependency: true);
+
+            if (referencedDescendants.Result.Total > 0)
+            {
+                scope.Complete();
+                return Attempt.Fail(EntityContainerOperationStatus.HasReferencedDescendants);
+            }
+        }
 
         var originalPath = string.Empty;
         Attempt<EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
