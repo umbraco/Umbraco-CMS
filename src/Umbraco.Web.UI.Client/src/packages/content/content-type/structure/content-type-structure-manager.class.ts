@@ -197,16 +197,25 @@ export class UmbContentTypeStructureManager<
 			null,
 		);
 
-		// Observe data type uniques and bulk load their details
+		// Observe data type uniques and bulk load their details.
+		// Uses nested observation: outer watches which data types are needed,
+		// inner subscribes to the store-backed observable for reactivity.
 		this.observe(
 			this.contentTypeDataTypeUniques,
 			async (dataTypeUniques) => {
 				if (dataTypeUniques.length > 0) {
-					const { data } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
-					if (data) {
-						this.#dataTypeDetails.setValue(data);
+					const { asObservable } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
+					if (asObservable) {
+						this.observe(
+							asObservable(),
+							(dataTypeDetails) => {
+								this.#dataTypeDetails.setValue(dataTypeDetails ?? []);
+							},
+							'observeDataTypeDetails',
+						);
 					}
 				} else {
+					this.removeUmbControllerByAlias('observeDataTypeDetails');
 					this.#dataTypeDetails.setValue([]);
 				}
 			},
