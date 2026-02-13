@@ -67,7 +67,7 @@ test('can publish content with the element picker data type', async ({umbracoApi
   expect(contentData.values).toEqual([]);
 });
 
-test('can publish content with an element selected', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can publish content with an element picker selected', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
