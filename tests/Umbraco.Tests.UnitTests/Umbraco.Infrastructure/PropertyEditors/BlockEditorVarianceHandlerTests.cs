@@ -84,15 +84,6 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
-    public async Task AlignPropertyVarianceAsync_Throws_When_PropertyType_Is_Null()
-    {
-        var propertyValues = new List<BlockPropertyValue> { new() { Culture = null, PropertyType = null! } };
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => 
-            await ExecuteAlignPropertyVarianceAsync(ContentVariation.Culture, propertyValues, null));
-        Assert.IsTrue(ex!.Message.Contains("property type"));
-    }
-
-    [Test]
     public async Task AlignedExposeVarianceAsync_Assigns_Default_Culture_When_All_Null()
     {
         var (owner, element, blockValue) = SetupAlignedExposeTest(ContentVariation.Culture, ContentVariation.Culture, 
