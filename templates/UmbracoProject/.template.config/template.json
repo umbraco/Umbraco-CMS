@@ -425,7 +425,7 @@
     "PackageManagement": {
       "type": "parameter",
       "datatype": "choice",
-      "defaultValue": "PerProject",
+      "defaultValue": "Central",
       "displayName": "Package Version Management",
       "description": "Choose how to manage Nuget package versions",
       "choices": [
