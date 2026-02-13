@@ -54,8 +54,8 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
-				padding-bottom: 1px;
 				display: block;
+				margin-bottom: 1px;
 			}
 
 			umb-block-grid-areas-container::part(area) {
