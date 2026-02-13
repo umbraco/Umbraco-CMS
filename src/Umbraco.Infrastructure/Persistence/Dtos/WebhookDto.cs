@@ -48,6 +48,6 @@ internal sealed class WebhookDto
 
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2HeadersDto.WebhookId))]
-    public List<Webhook2ContentTypeKeysDto> Webhook2Headers { get; set; } = new();
+    public List<Webhook2HeadersDto> Webhook2Headers { get; set; } = new();
 }
 
