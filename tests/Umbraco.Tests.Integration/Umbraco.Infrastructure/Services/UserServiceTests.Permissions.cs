@@ -168,6 +168,91 @@ internal sealed partial class UserServiceTests
     }
 
     [Test]
+    public async Task GetDocumentPermissionsAsync_Returns_Default_Permissions_When_No_Explicit_Permissions_Set()
+    {
+        // Arrange
+        var defaultPermissions = new[] { ActionBrowse.ActionLetter, ActionUpdate.ActionLetter }.ToHashSet();
+        var userGroup = UserGroupBuilder.CreateUserGroup(permissions: defaultPermissions);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+
+        var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var parent = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(parent);
+        var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
+        ContentService.Save(child);
+
+        // No explicit permissions set on any node.
+
+        // Act
+        var result = await UserService
+            .GetDocumentPermissionsAsync(user.Key, [child.Key]);
+
+        // Assert - child should get the group's default permissions.
+        Assert.IsTrue(result.Success);
+        var nodePermissions = result.Result.ToArray();
+        Assert.AreEqual(1, nodePermissions.Length);
+        Assert.AreEqual(child.Key, nodePermissions[0].NodeKey);
+        Assert.AreEqual(2, nodePermissions[0].Permissions.Count);
+        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionUpdate.ActionLetter));
+    }
+
+    [Test]
+    public async Task GetDocumentPermissionsAsync_Child_Permissions_Do_Not_Influence_Parent()
+    {
+        // Arrange
+        var defaultPermissions = new[] { ActionBrowse.ActionLetter, ActionUpdate.ActionLetter }.ToHashSet();
+        var userGroup = UserGroupBuilder.CreateUserGroup(permissions: defaultPermissions);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+
+        var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var parent = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(parent);
+        var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
+        ContentService.Save(child);
+
+        // Set explicit permissions on the child only
+        ContentService.SetPermission(child, ActionDelete.ActionLetter, [userGroup.Id]);
+        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+
+        // Act - query permissions for both parent and child
+        var result = await UserService
+            .GetDocumentPermissionsAsync(user.Key, [parent.Key, child.Key]);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        var nodePermissions = result.Result.ToArray();
+        Assert.AreEqual(2, nodePermissions.Length);
+
+        var parentPermissions = nodePermissions.Single(x => x.NodeKey == parent.Key);
+        var childPermissions = nodePermissions.Single(x => x.NodeKey == child.Key);
+
+        // Parent should have default permissions only, not influenced by child's explicit permissions
+        Assert.AreEqual(2, parentPermissions.Permissions.Count);
+        Assert.IsTrue(parentPermissions.Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.IsTrue(parentPermissions.Permissions.Contains(ActionUpdate.ActionLetter));
+
+        // Child should have its own explicit permissions
+        Assert.AreEqual(2, childPermissions.Permissions.Count);
+        Assert.IsTrue(childPermissions.Permissions.Contains(ActionDelete.ActionLetter));
+        Assert.IsTrue(childPermissions.Permissions.Contains(ActionMove.ActionLetter));
+    }
+
+    [Test]
     public async Task GetDocumentPermissionsAsync_Returns_Failure_For_Unknown_User()
     {
         // Arrange
