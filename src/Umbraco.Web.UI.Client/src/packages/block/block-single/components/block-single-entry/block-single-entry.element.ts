@@ -507,7 +507,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			:host {
 				position: relative;
 				display: block;
-				margin-bottom: 1px;
 				--umb-block-single-entry-actions-opacity: 0;
 			}
 

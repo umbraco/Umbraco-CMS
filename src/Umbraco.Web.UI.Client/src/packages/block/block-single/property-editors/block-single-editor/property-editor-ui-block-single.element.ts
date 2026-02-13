@@ -460,7 +460,7 @@ export class UmbPropertyEditorUIBlockSingleElement
 
 		css`
 			uui-button-group {
-				padding-top: 1px;
+				margin-top: 1px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}

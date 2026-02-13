@@ -497,6 +497,7 @@ export class UmbPropertyEditorUIBlockListElement
 	static override readonly styles = [
 		css`
 			uui-button-group {
+				margin-top: 1px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}
