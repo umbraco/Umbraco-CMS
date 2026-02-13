@@ -25,7 +25,12 @@ internal abstract class PermissionFilterServiceBase
     /// </summary>
     protected abstract string BrowseActionLetter { get; }
 
-    /// <inheritdoc cref="IDocumentPermissionFilterService.FilterAsync(IEntitySlim[], long)"/>
+    /// <summary>
+    /// Filters entities based on the current user's browse permissions.
+    /// </summary>
+    /// <param name="entities">The entities to filter.</param>
+    /// <param name="totalItems">The total number of items before filtering.</param>
+    /// <returns>A tuple containing the filtered entities and the adjusted total items count.</returns>
     public async Task<(IEntitySlim[] Entities, long TotalItems)> FilterAsync(IEntitySlim[] entities, long totalItems)
     {
         Dictionary<Guid, NodePermissions>? permissionsByNodeKey = await GetPermissionsByNodeKeyAsync(entities);
@@ -40,7 +45,14 @@ internal abstract class PermissionFilterServiceBase
         return (filteredEntities, totalItems - removedCount);
     }
 
-    /// <inheritdoc cref="IDocumentPermissionFilterService.FilterAsync(Guid, IEntitySlim[], long, long)"/>
+    /// <summary>
+    /// Filters sibling entities based on the current user's browse permissions.
+    /// </summary>
+    /// <param name="targetKey">The key of the target entity around which siblings are being retrieved.</param>
+    /// <param name="entities">The entities to filter.</param>
+    /// <param name="totalBefore">The total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">The total number of siblings after the target entity.</param>
+    /// <returns>A tuple containing the filtered entities and the adjusted before/after counts.</returns>
     public async Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterAsync(
         Guid targetKey,
         IEntitySlim[] entities,
