@@ -16,6 +16,8 @@ public class EndPreviewController : PreviewControllerBase
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Exits preview mode.")]
+    [EndpointDescription("Exits preview mode and returns to the normal back office viewing experience.")]
     [AllowAnonymous] // It's okay the client can do this from the website without having a token
     public async Task<IActionResult> End(CancellationToken cancellationToken)
     {

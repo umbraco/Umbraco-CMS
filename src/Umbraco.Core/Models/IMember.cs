@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a member in Umbraco.
+/// </summary>
 public interface IMember : IContentBase, IMembershipUser
 {
     /// <summary>

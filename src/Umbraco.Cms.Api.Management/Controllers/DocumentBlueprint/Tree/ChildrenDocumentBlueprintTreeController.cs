@@ -28,6 +28,8 @@ public class ChildrenDocumentBlueprintTreeController : DocumentBlueprintTreeCont
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentBlueprintTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of document blueprint tree child items.")]
+    [EndpointDescription("Gets a paginated collection of document blueprint tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<DocumentBlueprintTreeItemResponseModel>>> Children(CancellationToken cancellationToken, Guid parentId, int skip = 0, int take = 100, bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);

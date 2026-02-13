@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <inheritdoc cref="ILastSyncedRepository"/>
 public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
 {
-    private readonly IMachineInfoFactory  _machineInfoFactory;
+    private readonly IMachineInfoFactory _machineInfoFactory;
 
     public LastSyncedRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, IMachineInfoFactory machineInfoFactory)
         : base(scopeAccessor, appCaches)
@@ -58,7 +58,7 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
 
         await Database.InsertOrUpdateAsync(
             dto,
-            "SET lastSyncedInternalId=@LastSyncedInternalId, lastSyncedDate=@LastSyncedDate WHERE machineId=@MachineId",
+            $"SET {QuoteColumnName("lastSyncedInternalId")}=@LastSyncedInternalId, {QuoteColumnName("lastSyncedDate")}=@LastSyncedDate WHERE {QuoteColumnName("machineId")}=@MachineId",
             new
             {
                 dto.LastSyncedInternalId,
@@ -79,7 +79,7 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
 
         await Database.InsertOrUpdateAsync(
             dto,
-            "SET lastSyncedExternalId=@LastSyncedExternalId, lastSyncedDate=@LastSyncedDate WHERE machineId=@MachineId",
+            $"SET {QuoteColumnName("lastSyncedExternalId")}=@LastSyncedExternalId, {QuoteColumnName("lastSyncedDate")}=@LastSyncedDate WHERE {QuoteColumnName("machineId")}=@MachineId",
             new
             {
                 dto.LastSyncedExternalId,
@@ -91,11 +91,14 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
     /// <inheritdoc />
     public async Task DeleteEntriesOlderThanAsync(DateTime pruneDate)
     {
-        var maxId = Database.ExecuteScalar<int>($"SELECT MAX(Id) FROM umbracoCacheInstruction;");
+        Sql<ISqlContext> maxIdSql = Database.SqlContext.Sql()
+                .SelectMax<CacheInstructionDto>(x => x.Id)
+                .From<CacheInstructionDto>();
+        var maxId = await Database.ExecuteScalarAsync<int>(maxIdSql);
 
         Sql sql =
             new Sql().Append(
-                @"DELETE FROM umbracoLastSynced WHERE lastSyncedDate < @pruneDate OR lastSyncedInternalId > @maxId AND lastSyncedExternalId > @maxId;",
+                @$"DELETE FROM {QuoteTableName("umbracoLastSynced")} WHERE {QuoteColumnName("lastSyncedDate")} < @pruneDate OR {QuoteColumnName("lastSyncedInternalId")} > @maxId AND {QuoteColumnName("lastSyncedExternalId")} > @maxId;",
                 new { pruneDate, maxId });
 
         await Database.ExecuteAsync(sql);

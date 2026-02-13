@@ -570,9 +570,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     public sealed class WebhookEventCollectionBuilderCmsContent
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WebhookEventCollectionBuilderCmsContent" /> class.
+        /// </summary>
+        /// <param name="builder">The webhook event collection builder.</param>
         internal WebhookEventCollectionBuilderCmsContent(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
+        /// <summary>
+        ///     Gets the underlying webhook event collection builder.
+        /// </summary>
         internal WebhookEventCollectionBuilder Builder { get; }
     }
 
@@ -581,9 +588,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     public sealed class WebhookEventCollectionBuilderCmsContentType
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WebhookEventCollectionBuilderCmsContentType" /> class.
+        /// </summary>
+        /// <param name="builder">The webhook event collection builder.</param>
         internal WebhookEventCollectionBuilderCmsContentType(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
+        /// <summary>
+        ///     Gets the underlying webhook event collection builder.
+        /// </summary>
         internal WebhookEventCollectionBuilder Builder { get; }
     }
 
@@ -592,9 +606,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     public sealed class WebhookEventCollectionBuilderCmsMember
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WebhookEventCollectionBuilderCmsMember" /> class.
+        /// </summary>
+        /// <param name="builder">The webhook event collection builder.</param>
         internal WebhookEventCollectionBuilderCmsMember(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
+        /// <summary>
+        ///     Gets the underlying webhook event collection builder.
+        /// </summary>
         internal WebhookEventCollectionBuilder Builder { get; }
     }
 
@@ -603,9 +624,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     public sealed class WebhookEventCollectionBuilderCmsFile
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WebhookEventCollectionBuilderCmsFile" /> class.
+        /// </summary>
+        /// <param name="builder">The webhook event collection builder.</param>
         internal WebhookEventCollectionBuilderCmsFile(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
+        /// <summary>
+        ///     Gets the underlying webhook event collection builder.
+        /// </summary>
         internal WebhookEventCollectionBuilder Builder { get; }
     }
 
@@ -614,9 +642,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </summary>
     public sealed class WebhookEventCollectionBuilderCmsUser
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WebhookEventCollectionBuilderCmsUser" /> class.
+        /// </summary>
+        /// <param name="builder">The webhook event collection builder.</param>
         internal WebhookEventCollectionBuilderCmsUser(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
+        /// <summary>
+        ///     Gets the underlying webhook event collection builder.
+        /// </summary>
         internal WebhookEventCollectionBuilder Builder { get; }
     }
 }

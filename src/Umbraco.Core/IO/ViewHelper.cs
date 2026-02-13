@@ -7,19 +7,30 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Provides helper methods for working with template view files.
+/// </summary>
 public class ViewHelper : IViewHelper
 {
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;
     private readonly IFileSystem _viewFileSystem;
 
-        public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ViewHelper"/> class.
+    /// </summary>
+    /// <param name="fileSystems">The file systems provider.</param>
+    /// <param name="defaultViewContentProvider">The default view content provider.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any required parameter is null.</exception>
+    public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
         {
             _viewFileSystem = fileSystems.MvcViewsFileSystem ?? throw new ArgumentNullException(nameof(fileSystems));
             _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
     }
 
+    /// <inheritdoc />
     public bool ViewExists(ITemplate t) => t.Alias is not null && _viewFileSystem.FileExists(ViewPath(t.Alias));
 
+    /// <inheritdoc />
     public string GetFileContents(ITemplate t)
     {
         var viewContent = string.Empty;
@@ -37,6 +48,7 @@ public class ViewHelper : IViewHelper
         return viewContent;
     }
 
+    /// <inheritdoc />
     public string CreateView(ITemplate t, bool overWrite = false)
     {
         string viewContent;
@@ -58,6 +70,7 @@ public class ViewHelper : IViewHelper
         return viewContent;
     }
 
+    /// <inheritdoc />
     public string? UpdateViewFile(ITemplate t, string? currentAlias = null)
     {
         var path = ViewPath(t.Alias);
@@ -83,8 +96,14 @@ public class ViewHelper : IViewHelper
         return t.Content;
     }
 
+    /// <inheritdoc />
     public string ViewPath(string alias) => _viewFileSystem.GetRelativePath(alias.Replace(" ", string.Empty) + ".cshtml");
 
+    /// <summary>
+    /// Saves the template content to a view file.
+    /// </summary>
+    /// <param name="template">The template to save.</param>
+    /// <returns>The content that was saved to the file.</returns>
     private string SaveTemplateToFile(ITemplate template)
     {
         var design = template.Content.IsNullOrWhiteSpace() ? EnsureInheritedLayout(template) : template.Content!;
@@ -101,6 +120,11 @@ public class ViewHelper : IViewHelper
         return design;
     }
 
+    /// <summary>
+    /// Ensures that the template has an inherited layout set.
+    /// </summary>
+    /// <param name="template">The template to check.</param>
+    /// <returns>The template content with an inherited layout.</returns>
     private string EnsureInheritedLayout(ITemplate template)
     {
         var design = template.Content;

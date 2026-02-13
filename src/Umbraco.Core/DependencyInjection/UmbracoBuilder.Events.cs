@@ -44,6 +44,13 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Registers a notification handler against the service collection.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification.</typeparam>
+    /// <typeparam name="TNotificationHandler">The type of notification handler.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The <see cref="IServiceCollection" />.</returns>
     internal static IServiceCollection AddNotificationHandler<TNotification, TNotificationHandler>(
         this IServiceCollection services)
         where TNotificationHandler : INotificationHandler<TNotification>
@@ -63,6 +70,13 @@ public static partial class UmbracoBuilderExtensions
         return services;
     }
 
+    /// <summary>
+    ///     Registers a notification async handler against the service collection.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification.</typeparam>
+    /// <typeparam name="TNotificationAsyncHandler">The type of notification async handler.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The <see cref="IServiceCollection" />.</returns>
     internal static IServiceCollection AddNotificationAsyncHandler<TNotification, TNotificationAsyncHandler>(
         this IServiceCollection services)
         where TNotificationAsyncHandler : INotificationAsyncHandler<TNotification>

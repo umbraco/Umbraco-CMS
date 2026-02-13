@@ -17,6 +17,8 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQuerySettingsResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets template query settings.")]
+    [EndpointDescription("Gets the available configuration settings for template queries including document type aliases, properties, and operators.")]
     public Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings(CancellationToken cancellationToken)
     {
         var contentTypeAliases = _contentTypeService

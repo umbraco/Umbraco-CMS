@@ -12,6 +12,12 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
     private bool _cancel;
     private IDictionary<string, object>? _eventState;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CancellableEventArgs" /> class.
+    /// </summary>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
+    /// <param name="messages">The event messages.</param>
+    /// <param name="additionalData">Additional data associated with the event.</param>
     public CancellableEventArgs(bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
     {
         CanCancel = canCancel;
@@ -19,6 +25,11 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
         AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CancellableEventArgs" /> class.
+    /// </summary>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
+    /// <param name="eventMessages">The event messages.</param>
     public CancellableEventArgs(bool canCancel, EventMessages eventMessages)
     {
         CanCancel = canCancel;
@@ -26,6 +37,10 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
         AdditionalData = EmptyAdditionalData;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CancellableEventArgs" /> class.
+    /// </summary>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
     public CancellableEventArgs(bool canCancel)
     {
         CanCancel = canCancel;
@@ -35,11 +50,18 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
         AdditionalData = EmptyAdditionalData;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CancellableEventArgs" /> class with cancellation enabled.
+    /// </summary>
+    /// <param name="eventMessages">The event messages.</param>
     public CancellableEventArgs(EventMessages eventMessages)
         : this(true, eventMessages)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CancellableEventArgs" /> class with cancellation enabled.
+    /// </summary>
     public CancellableEventArgs()
         : this(true)
     {
@@ -103,10 +125,23 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
         set => _eventState = value;
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="CancellableEventArgs" /> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(CancellableEventArgs? left, CancellableEventArgs? right) => Equals(left, right);
 
+    /// <summary>
+    ///     Determines whether two <see cref="CancellableEventArgs" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(CancellableEventArgs left, CancellableEventArgs right) => Equals(left, right) == false;
 
+    /// <inheritdoc />
     public bool Equals(CancellableEventArgs? other)
     {
         if (ReferenceEquals(null, other))
@@ -133,6 +168,7 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
         Messages.Add(cancelationMessage);
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -153,5 +189,6 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
         return Equals((CancellableEventArgs)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode() => AdditionalData != null ? AdditionalData.GetHashCode() : 0;
 }
