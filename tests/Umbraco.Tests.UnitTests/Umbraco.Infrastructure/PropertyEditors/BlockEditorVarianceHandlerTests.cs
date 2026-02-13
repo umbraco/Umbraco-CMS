@@ -361,10 +361,7 @@ public class BlockEditorVarianceHandlerTests
             {
                 return elementType.Object;
             }
-            var mockType = new Mock<IContentType>();
-            mockType.SetupGet(e => e.Key).Returns(key);
-            mockType.SetupGet(e => e.Variations).Returns(element.ContentType.Variations);
-            return mockType.Object;
+            return null!; // Return null for unknown content types
         });
         return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object);
     }
