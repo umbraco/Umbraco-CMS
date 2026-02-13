@@ -90,15 +90,15 @@ public class UserGroupDto
     public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserGroup2PermissionDto.UserGroupKey))]
+    [Reference(ReferenceType.Many, ColumnName = nameof(Key), ReferenceMemberName = nameof(UserGroup2PermissionDto.UserGroupKey))]
     public List<UserGroup2PermissionDto> UserGroup2PermissionDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserGroup2GranularPermissionDto.UserGroupKey))]
+    [Reference(ReferenceType.Many, ColumnName = nameof(Key), ReferenceMemberName = nameof(UserGroup2GranularPermissionDto.UserGroupKey))]
     public List<UserGroup2GranularPermissionDto> UserGroup2GranularPermissionDtos { get; set; }
 
     /// <summary>
-    ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)
+    ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts).
     /// </summary>
     [ResultColumn]
     public int UserCount { get; set; }
