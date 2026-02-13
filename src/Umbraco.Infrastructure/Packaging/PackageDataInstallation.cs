@@ -1851,7 +1851,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var templateName = templateElement.Element("Name")?.Value;
                 var alias = templateElement.Element("Alias")!.Value;
                 var design = templateElement.Element("Design")?.Value;
-                XElement? layoutElement = GetLayoutTemplateElement(templateElement);
 
                 var existingTemplate = await _templateService.GetAsync(alias) as Template;
 
@@ -1864,16 +1863,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
 
                 template.Content = design;
-
-                if (layoutElement != null && string.IsNullOrEmpty((string)layoutElement) == false)
-                {
-                    template.LayoutTemplateAlias = layoutElement.Value;
-                    ITemplate? layoutTemplate = templates.FirstOrDefault(x => x.Alias == layoutElement.Value);
-                    if (layoutTemplate != null)
-                    {
-                        template.LayoutTemplateId = new Lazy<int>(() => layoutTemplate.Id);
-                    }
-                }
 
                 templates.Add(template);
             }
@@ -1893,9 +1882,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return templates;
         }
 
-        /// Support both old &lt;Master&gt; and new &lt;LayoutTemplate&gt; XML element names for backward compat.
-        private static XElement? GetLayoutTemplateElement(XElement templateElement)
-            => templateElement.Element("LayoutTemplate") ?? templateElement.Element("Master");
 
         #endregion
     }

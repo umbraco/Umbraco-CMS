@@ -95,7 +95,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Child_Template_Paths_Are_Updated_When_Reassigning_Master()
+    public async Task Child_Template_Paths_Are_Updated_When_Reassigning_Layout()
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -195,7 +195,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Master_Template_Cannot_Be_Deleted()
+    public async Task Layout_Template_Cannot_Be_Deleted()
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -230,7 +230,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_Create_Child_Template_Without_Master_Template()
+    public async Task Cannot_Create_Child_Template_Without_Layout_Template()
     {
         var result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -238,7 +238,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_Update_Child_Template_Without_Master_Template()
+    public async Task Cannot_Update_Child_Template_Without_Layout_Template()
     {
         var result = await TemplateService.CreateAsync("Child", "child", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
