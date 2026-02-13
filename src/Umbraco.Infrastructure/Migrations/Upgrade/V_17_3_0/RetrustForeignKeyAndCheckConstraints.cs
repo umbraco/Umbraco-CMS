@@ -63,6 +63,9 @@ public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
 
         Logger.LogInformation("Found {Count} untrusted constraint(s) to re-trust.", untrustedConstraints.Count);
 
+        // Ensure we have a long command timeout, in case the migration targets a huge table.
+        EnsureLongCommandTimeout(Database);
+
         var retrusted = 0;
         var failed = 0;
 
