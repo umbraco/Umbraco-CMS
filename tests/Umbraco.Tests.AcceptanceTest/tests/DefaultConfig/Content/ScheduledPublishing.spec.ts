@@ -187,7 +187,7 @@ test('can schedule the publishing of variant unpublish child content', async ({u
 test('can schedule the publishing of invariant published child content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
-  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName, childDocumentTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
   const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.publish(contentId);
   const childContentId = await umbracoApi.document.createDocumentWithTextContentAndParent(childContentName, childDocumentTypeId, contentText, dataTypeName, contentId);
@@ -451,11 +451,11 @@ test('can schedule the unpublishing of invariant published child content', async
 test('can schedule the unpublishing of variant published child content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
-  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoApi.document.publish(contentId);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
+  const contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.publishDocumentWithCulture(contentId, 'en-US');
   const childContentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContentAndParent(childContentName, childDocumentTypeId, contentText, dataTypeName, contentId);
-  await umbracoApi.document.publish(childContentId);
+  await umbracoApi.document.publishDocumentWithCulture(childContentId, 'en-US');
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
