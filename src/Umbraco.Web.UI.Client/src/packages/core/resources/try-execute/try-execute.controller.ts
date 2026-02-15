@@ -63,6 +63,12 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 				return;
 			}
 
+			// Skip notification when custom messages were already displayed via
+			// the Umb-Notifications header by the notifications interceptor.
+			if (apiError.problemDetails.notificationsDeliveredViaHeader) {
+				return;
+			}
+
 			// UmbProblemDetails, show notification
 			message = apiError.problemDetails.title;
 			details = apiError.problemDetails.errors ?? undefined;
