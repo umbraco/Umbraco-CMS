@@ -57,6 +57,11 @@ public sealed class AppendEventMessagesAttribute : TypeFilterAttribute
                 }));
 
             context.HttpContext.Response.Headers[Constants.Headers.Notifications] = headerContent;
+
+            if (context.Result is ObjectResult { Value: ProblemDetails problemDetails })
+            {
+                problemDetails.Extensions["notificationsDeliveredViaHeader"] = true;
+            }
         }
 
         public void OnActionExecuting(ActionExecutingContext context)

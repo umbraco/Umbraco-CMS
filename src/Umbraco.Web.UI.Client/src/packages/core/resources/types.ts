@@ -25,6 +25,7 @@ export interface UmbProblemDetails {
 	operationStatus?: string;
 	extensions?: Record<string, unknown>;
 	errors?: Record<string, string[]>;
+	notificationsDeliveredViaHeader?: boolean;
 }
 
 export interface UmbTryExecuteOptions {
