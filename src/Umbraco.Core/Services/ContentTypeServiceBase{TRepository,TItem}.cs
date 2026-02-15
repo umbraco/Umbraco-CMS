@@ -892,7 +892,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.CancelledByNotification;
         }
 
-        PerformDelete(scope, item, eventMessages, deletingNotification, performingUserId);
+        PerformDelete(scope, item, deletingNotification, performingUserId);
 
         scope.Complete();
         return ContentTypeOperationStatus.Success;
@@ -916,52 +916,36 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 return;
             }
 
-            PerformDelete(scope, item, eventMessages, deletingNotification, userId);
+            PerformDelete(scope, item, deletingNotification, userId);
 
             scope.Complete();
         }
     }
 
-    /// <summary>
-    /// Performs the actual content type deletion after the cancelable notification has been published.
-    /// Shared by both the sync <see cref="Delete"/> and async <see cref="DeleteAsync"/> methods.
-    /// </summary>
-    private void PerformDelete(ICoreScope scope, TItem item, EventMessages eventMessages, DeletingNotification<TItem> deletingNotification, int userId)
+    private void PerformDelete(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, int userId)
     {
+        EventMessages eventMessages = EventMessagesFactory.Get();
         scope.WriteLock(WriteLockIds);
 
-        // all descendants are going to be deleted
-        TItem[] descendantsAndSelf = GetDescendants(item.Id, true)
-            .ToArray();
-        TItem[] deleted = descendantsAndSelf;
+        TItem[] descendantsAndSelf = GetDescendants(item.Id, true).ToArray();
 
         // all impacted (through composition) probably lose some properties
-        // don't try to be too clever here, just report them all
-        // do this before anything is deleted
         TItem[] changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
             .Distinct()
             .Except(descendantsAndSelf)
             .ToArray();
 
-        // delete content
         DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
 
-        // Next find all other document types that have a reference to this content type
+        // remove references to this content type from other content types
         IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
         foreach (TItem reference in referenceToAllowedContentTypes)
         {
             reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
             var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
-            // Fire change event
             scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
         }
 
-        // finally delete the content type
-        // - recursively deletes all descendants
-        // - deletes all associated property data
-        //  (contents of any descendant type have been deleted but
-        //   contents of any composed (impacted) type remain but
-        //   need to have their property data cleared)
         Repository.Delete(item);
 
         ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
@@ -970,10 +954,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
         _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
-
         scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
-        DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
+        DeletedNotification<TItem> deletedNotification = GetDeletedNotification(descendantsAndSelf.DistinctBy(x => x.Id), eventMessages);
         deletedNotification.WithStateFrom(deletingNotification);
         scope.Notifications.Publish(deletedNotification);
 
