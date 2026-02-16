@@ -83,7 +83,7 @@ npx playwright test --ui tests/DefaultConfig
 
 ## Test Helpers and Fixtures
 
-Tests use the `@umbraco/playwright-testhelpers` package which provides three main fixtures:
+Tests use the helpers and builders in the `lib/` folder (published to npm as `@umbraco/acceptance-test-helpers`). Three main fixtures are provided:
 
 ### `umbracoUi` - UI Interaction Helper
 
@@ -136,7 +136,7 @@ await page.screenshot({ path: 'debug.png' });
 ### Helper Constants
 
 ```typescript
-import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco/playwright-testhelpers';
+import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco/acceptance-test-helpers';
 
 // Section names
 ConstantHelper.sections.content
@@ -160,7 +160,7 @@ AliasHelper.toAlias('Test Document Type')  // → 'testDocumentType'
 All tests follow the Arrange-Act-Assert pattern:
 
 ```typescript
-import { ConstantHelper, test } from '@umbraco/playwright-testhelpers';
+import { ConstantHelper, test } from '@umbraco/acceptance-test-helpers';
 import { expect } from '@playwright/test';
 
 const documentTypeName = 'TestDocumentType';
@@ -313,5 +313,4 @@ Key settings in `playwright.config.ts`:
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)
 - [Umbraco Documentation](https://docs.umbraco.com/)
-- [@umbraco/playwright-testhelpers](https://www.npmjs.com/package/@umbraco/playwright-testhelpers)
-- [@umbraco/json-models-builders](https://www.npmjs.com/package/@umbraco/json-models-builders)
+- [@umbraco/acceptance-test-helpers](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers) (published from this project)
