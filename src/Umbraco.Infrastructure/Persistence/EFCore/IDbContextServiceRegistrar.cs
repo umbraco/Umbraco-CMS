@@ -14,6 +14,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 public interface IDbContextServiceRegistrar
 {
     /// <summary>
+    /// Determines whether this registrar should register services for the specified database provider.
+    /// </summary>
+    /// <param name="providerName">The database provider name from the connection string configuration.</param>
+    /// <returns><c>true</c> if this registrar should handle the specified provider; otherwise, <c>false</c>.</returns>
+    bool CanHandle(string providerName);
+
+    /// <summary>
     /// Registers provider-specific services for the specified <see cref="DbContext"/> type.
     /// </summary>
     /// <typeparam name="TContext">The type of <see cref="DbContext"/>.</typeparam>

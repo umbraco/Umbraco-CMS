@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;
@@ -11,6 +12,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
 /// </summary>
 public class SqlServerDbContextServiceRegistrar : IDbContextServiceRegistrar
 {
+    /// <inheritdoc />
+    public bool CanHandle(string providerName)
+        => string.Equals(providerName, Constants.ProviderNames.SQLServer, StringComparison.OrdinalIgnoreCase);
+
     /// <inheritdoc />
     public void RegisterServices<TContext>(IServiceCollection services)
         where TContext : DbContext

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
-using Constants = Umbraco.Cms.Infrastructure.Persistence.EFCore.Constants;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 

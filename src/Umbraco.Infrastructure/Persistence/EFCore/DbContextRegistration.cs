@@ -23,6 +23,17 @@ public class DbContextRegistration
 {
     private readonly List<Action<IServiceCollection, IDbContextServiceRegistrar>> _contextTypeActions = new();
     private readonly List<IDbContextServiceRegistrar> _registrars = new();
+    private readonly string? _providerName;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DbContextRegistration"/> class.
+    /// </summary>
+    /// <param name="providerName">
+    /// The database provider name from the connection string configuration,
+    /// used to filter registrars via <see cref="IDbContextServiceRegistrar.CanHandle"/>.
+    /// When <c>null</c>, all registrars are accepted.
+    /// </param>
+    public DbContextRegistration(string? providerName = null) => _providerName = providerName;
 
     /// <summary>
     /// Registers a DbContext type and invokes all existing registrars for it.
@@ -32,13 +43,22 @@ public class DbContextRegistration
     public void RegisterDbContextType<T>(IServiceCollection services)
         where T : DbContext
     {
-        // Store a replay action for future registrars (captures <T> in the closure)
-        _contextTypeActions.Add((serviceCollection, registrar) => registrar.RegisterServices<T>(serviceCollection));
+        // Store a replay action for future registrars (captures <T> in the closure).
+        _contextTypeActions.Add((serviceCollection, registrar) =>
+        {
+            if (_providerName is null || registrar.CanHandle(_providerName))
+            {
+                registrar.RegisterServices<T>(serviceCollection);
+            }
+        });
 
         // Execute for already-registered registrars
         foreach (IDbContextServiceRegistrar registrar in _registrars)
         {
-            registrar.RegisterServices<T>(services);
+            if (_providerName is null || registrar.CanHandle(_providerName))
+            {
+                registrar.RegisterServices<T>(services);
+            }
         }
     }
 
@@ -51,7 +71,7 @@ public class DbContextRegistration
     {
         _registrars.Add(registrar);
 
-        // Replay for already-registered context types
+        // Replay for already-registered context types (actions check CanHandle internally)
         foreach (Action<IServiceCollection, IDbContextServiceRegistrar> action in _contextTypeActions)
         {
             action(services, registrar);

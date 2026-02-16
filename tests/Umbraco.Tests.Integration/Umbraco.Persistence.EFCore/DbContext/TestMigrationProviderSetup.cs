@@ -2,8 +2,8 @@
 // See LICENSE for more details.
 
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
-using Constants = Umbraco.Cms.Infrastructure.Persistence.EFCore.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
