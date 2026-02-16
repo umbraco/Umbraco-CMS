@@ -440,7 +440,7 @@ internal sealed class ElementEditingService
             new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
 
-        await _auditService.AddAsync(AuditType.Copy, userKey, copy.Id, UmbracoObjectTypes.Element.GetName());
+        await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());
 
         scope.Complete();
 
