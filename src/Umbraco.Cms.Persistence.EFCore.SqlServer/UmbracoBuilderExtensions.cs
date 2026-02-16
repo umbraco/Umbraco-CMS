@@ -18,9 +18,9 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoEFCoreSqlServerSupport(this IUmbracoBuilder builder)
     {
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IMigrationProvider, SqlServerMigrationProvider>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IMigrationProviderSetup, SqlServerMigrationProviderSetup>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseConfigurator, SqlServerDatabaseConfigurator>());
+        builder.Services.AddSingleton<IMigrationProvider, SqlServerMigrationProvider>();
+        builder.Services.AddSingleton<IMigrationProviderSetup, SqlServerMigrationProviderSetup>();
+        builder.Services.AddSingleton<IDatabaseConfigurator, SqlServerDatabaseConfigurator>();
 
         builder.AddDbContextRegistrar<SqlServerDbContextServiceRegistrar>();
 

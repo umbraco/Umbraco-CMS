@@ -17,9 +17,9 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoEFCoreSqliteSupport(this IUmbracoBuilder builder)
     {
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IMigrationProvider, SqliteMigrationProvider>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IMigrationProviderSetup, SqliteMigrationProviderSetup>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseConfigurator, SqliteDatabaseConfigurator>());
+        builder.Services.AddSingleton<IMigrationProvider, SqliteMigrationProvider>();
+        builder.Services.AddSingleton<IMigrationProviderSetup, SqliteMigrationProviderSetup>();
+        builder.Services.AddSingleton<IDatabaseConfigurator, SqliteDatabaseConfigurator>();
 
         builder.AddDbContextRegistrar<SqliteDbContextServiceRegistrar>();
 

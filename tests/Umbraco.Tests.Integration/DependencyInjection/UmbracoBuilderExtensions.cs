@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using Examine;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,22 +7,21 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Persistence.EFCore.Sqlite;
+using Umbraco.Cms.Persistence.EFCore.SqlServer;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -97,14 +93,17 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique<IAmbientEFCoreScopeStack<TestUmbracoDbContext>, AmbientEFCoreScopeStack<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>, EFCoreScopeAccessor<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeProvider<TestUmbracoDbContext>, EFCoreScopeProvider<TestUmbracoDbContext>>();
-        builder.Services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
-        builder.Services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
 
         builder.Services.AddSingleton<IMigrationProviderSetup, TestSqliteMigrationProviderSetup>();
         builder.Services.AddSingleton<IMigrationProviderSetup, TestSqlServerMigrationProviderSetup>();
 
         builder.Services.AddSingleton<IReservedFieldNamesService, ReservedFieldNamesService>();
 
+        builder.Services.AddSingleton<IDatabaseConfigurator, SqlServerDatabaseConfigurator>();
+        builder.Services.AddSingleton<IDatabaseConfigurator, SqliteDatabaseConfigurator>();
+
+        builder.AddDbContextRegistrar<SqlServerDbContextServiceRegistrar>();
+        builder.AddDbContextRegistrar<SqliteDbContextServiceRegistrar>();
         return builder;
     }
 
