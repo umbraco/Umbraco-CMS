@@ -42,10 +42,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     /// <inheritdoc />
     public override async Task Create(TEntity entity, Func<TEntity, Task> persistNew)
     {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
+        ArgumentNullException.ThrowIfNull(entity);
 
         try
         {
@@ -77,10 +74,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     /// <inheritdoc />
     public override async Task Update(TEntity entity, Func<TEntity, Task> persistUpdated)
     {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
+        ArgumentNullException.ThrowIfNull(entity);
 
         try
         {
@@ -116,10 +110,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     /// <inheritdoc />
     public override async Task Delete(TEntity entity, Func<TEntity, Task> persistDeleted)
     {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
+        ArgumentNullException.ThrowIfNull(entity);
 
         try
         {
