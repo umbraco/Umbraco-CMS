@@ -29,8 +29,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
-    private readonly TemplateByGuidReadRepository _templateByGuidReadRepository;
-
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -53,13 +51,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
         _runtimeSettings = runtimeSettings;
-        _templateByGuidReadRepository = new TemplateByGuidReadRepository(
-            this,
-            scopeAccessor,
-            cache,
-            loggerFactory.CreateLogger<TemplateByGuidReadRepository>(),
-            repositoryCacheVersionService,
-            cacheSyncService);
     }
 
     [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
@@ -87,11 +78,16 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     {
     }
 
-    public ITemplate? Get(Guid key) => _templateByGuidReadRepository.Get(key);
+    // GUID-based lookups delegate to GetMany() which is served from FullDataSetRepositoryCachePolicy.
+    public ITemplate? Get(Guid key) => GetMany().FirstOrDefault(x => x.Key == key);
 
-    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys) => _templateByGuidReadRepository.GetMany(keys);
+    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys)
+    {
+        IEnumerable<ITemplate> all = GetMany();
+        return keys?.Length > 0 ? all.Where(x => keys.Contains(x.Key)).ToArray() : all;
+    }
 
-    public bool Exists(Guid id) => _templateByGuidReadRepository.Exists(id);
+    public bool Exists(Guid id) => GetMany().Any(x => x.Key == id);
 
     public override void Save(ITemplate entity)
     {
@@ -99,7 +95,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         // Force population of the full dataset cache so subsequent lookups don't hit the database.
         // TemplateRepository uses FullDataSetRepositoryCachePolicy which caches all templates together.
-        // The GUID read repository delegates to this cache, so no separate GUID caching is needed.
+        // GUID-based lookups also use this cache via GetMany().
         GetMany();
     }
 
@@ -717,80 +713,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         {
             AddChildren(all, descendants, child.Alias);
         }
-    }
-
-    #endregion
-
-    #region Read Repository implementation for Guid keys
-
-    // Reading repository purely for looking up by GUID.
-    // This leverages the outer repository's GetMany() which uses FullDataSetRepositoryCachePolicy
-    // to cache all templates together, ensuring efficient lookups by both ID and GUID.
-    private sealed class TemplateByGuidReadRepository : EntityRepositoryBase<Guid, ITemplate>
-    {
-        private readonly TemplateRepository _outerRepo;
-
-        public TemplateByGuidReadRepository(
-            TemplateRepository outerRepo,
-            IScopeAccessor scopeAccessor,
-            AppCaches cache,
-            ILogger<TemplateByGuidReadRepository> logger,
-            IRepositoryCacheVersionService repositoryCacheVersionService,
-            ICacheSyncService cacheSyncService)
-            : base(
-                scopeAccessor,
-                cache,
-                logger,
-                repositoryCacheVersionService,
-                cacheSyncService) =>
-            _outerRepo = outerRepo;
-
-        // No separate GUID cache is needed because PerformGet/PerformGetAll delegate entirely
-        // to the outer repo's GetMany(), which caches the full dataset via FullDataSetRepositoryCachePolicy.
-        // GuidReadRepositoryCachePolicy is not suitable here because FullDataSetRepositoryCachePolicy.ClearAll()
-        // only clears its own entry (exact key removal), so GUID-prefixed entries would become stale
-        // after Create/Update/Delete operations on the outer repository.
-        protected override IRepositoryCachePolicy<ITemplate, Guid> CreateCachePolicy()
-            => NoCacheRepositoryCachePolicy<ITemplate, Guid>.Instance;
-
-        protected override ITemplate? PerformGet(Guid id)
-        {
-            // Use the outer repository's GetMany() which benefits from FullDataSetRepositoryCachePolicy.
-            // This ensures all templates are cached together for efficient lookups.
-            return _outerRepo.GetMany().FirstOrDefault(x => x.Key == id);
-        }
-
-        protected override IEnumerable<ITemplate> PerformGetAll(params Guid[]? ids)
-        {
-            // Use the outer repository's GetMany() which benefits from FullDataSetRepositoryCachePolicy.
-            IEnumerable<ITemplate> all = _outerRepo.GetMany();
-
-            if (ids?.Length > 0)
-            {
-                return all.Where(x => ids.Contains(x.Key)).ToArray();
-            }
-
-            return all;
-        }
-
-        protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override IEnumerable<string> GetDeleteClauses() =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override void PersistNewItem(ITemplate entity) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override void PersistUpdatedItem(ITemplate entity) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override string GetBaseWhereClause() =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
     }
 
     #endregion
