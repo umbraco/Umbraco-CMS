@@ -68,7 +68,7 @@ internal sealed class GuidReadRepositoryCachePolicy<TEntity> : RepositoryCachePo
 
         if (entity is { HasIdentity: true })
         {
-            Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            Cache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
         }
 
         return entity;
@@ -121,7 +121,7 @@ internal sealed class GuidReadRepositoryCachePolicy<TEntity> : RepositoryCachePo
                 if (entity.HasIdentity)
                 {
                     var cacheKey = GuidCacheKeyPrefix + entity.Key;
-                    Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+                    Cache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
                 }
             }
         }

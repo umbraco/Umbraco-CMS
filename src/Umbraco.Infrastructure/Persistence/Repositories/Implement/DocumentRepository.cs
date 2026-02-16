@@ -1692,7 +1692,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         if (entity.HasIdentity)
         {
             var cacheKey = GetCacheKey(entity.Id);
-            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
         }
     }
 
@@ -1806,7 +1806,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             if (entity.HasIdentity)
             {
                 var cacheKey = GetCacheKey(entity.Key);
-                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+                IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
             }
         }
 
