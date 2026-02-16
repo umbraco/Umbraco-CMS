@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Extensions;
 using BlockGridAreaConfiguration = Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration.BlockGridAreaConfiguration;
 
@@ -43,7 +44,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
     {
         var config = configuration as BlockGridConfiguration;
 
-        // Build area item schema
+        // Build area item schema (BlockGrid-specific)
         var areaItemSchema = new JsonObject
         {
             ["type"] = "object",
@@ -58,138 +59,61 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
             },
         };
 
-        // Build layout item schema (with grid-specific properties)
-        var layoutItemSchema = new JsonObject
+        // Build layout item schema (BlockGrid-specific - with columnSpan, rowSpan, areas)
+        JsonObject layoutItemSchema = BlockJsonSchemaHelper.CreateBaseLayoutItemSchema();
+        layoutItemSchema["properties"]!.AsObject()["columnSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 };
+        layoutItemSchema["properties"]!.AsObject()["rowSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 };
+        layoutItemSchema["properties"]!.AsObject()["areas"] = new JsonObject
         {
-            ["type"] = "object",
-            ["required"] = new JsonArray("contentKey"),
-            ["properties"] = new JsonObject
-            {
-                ["contentKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
-                ["settingsKey"] = new JsonObject { ["type"] = new JsonArray("string", "null"), ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
-                ["columnSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 },
-                ["rowSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 },
-                ["areas"] = new JsonObject
-                {
-                    ["type"] = "array",
-                    ["items"] = areaItemSchema,
-                },
-            },
+            ["type"] = "array",
+            ["items"] = areaItemSchema,
         };
 
-        // Build block item data schema
-        var blockItemDataSchema = new JsonObject
-        {
-            ["type"] = "object",
-            ["required"] = new JsonArray("key", "contentTypeKey"),
-            ["properties"] = new JsonObject
-            {
-                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
-                ["contentTypeKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
-                ["values"] = new JsonObject
-                {
-                    ["type"] = "array",
-                    ["items"] = new JsonObject
-                    {
-                        ["type"] = "object",
-                        ["properties"] = new JsonObject
-                        {
-                            ["alias"] = new JsonObject { ["type"] = "string" },
-                            ["culture"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
-                            ["segment"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
-                            ["value"] = new JsonObject { }, // Any type - depends on property editor
-                        },
-                    },
-                },
-            },
-        };
-
-        // Build content data schema with allowed content type constraints
-        var contentDataItemSchema = blockItemDataSchema.DeepClone().AsObject();
-        if (config?.Blocks is { Length: > 0 })
-        {
-            var allowedContentTypes = new JsonArray();
-            foreach (var block in config.Blocks)
-            {
-                allowedContentTypes.Add(JsonValue.Create(block.ContentElementTypeKey.ToString()));
-            }
-
-            contentDataItemSchema["properties"]!["contentTypeKey"]!.AsObject()["enum"] = allowedContentTypes;
-        }
-
-        // Build settings data schema with allowed settings type constraints
-        var settingsDataItemSchema = blockItemDataSchema.DeepClone().AsObject();
-        if (config?.Blocks is { Length: > 0 })
-        {
-            var allowedSettingsTypes = new JsonArray();
-            foreach (var block in config.Blocks)
-            {
-                if (block.SettingsElementTypeKey.HasValue)
-                {
-                    allowedSettingsTypes.Add(JsonValue.Create(block.SettingsElementTypeKey.Value.ToString()));
-                }
-            }
-
-            if (allowedSettingsTypes.Count > 0)
-            {
-                settingsDataItemSchema["properties"]!["contentTypeKey"]!.AsObject()["enum"] = allowedSettingsTypes;
-            }
-        }
+        // Build content and settings data schemas with constraints
+        JsonObject contentDataItemSchema = BlockJsonSchemaHelper.CreateContentDataSchema(config?.Blocks);
+        JsonObject settingsDataItemSchema = BlockJsonSchemaHelper.CreateSettingsDataSchema(config?.Blocks);
 
         // Build the main schema
-        var schema = new JsonObject
+        JsonObject schema = BlockJsonSchemaHelper.CreateRootSchema();
+        schema["$defs"] = new JsonObject
         {
-            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
-            ["type"] = new JsonArray("object", "null"),
-            ["$defs"] = new JsonObject
+            ["layoutItem"] = layoutItemSchema,
+        };
+        schema["properties"] = new JsonObject
+        {
+            ["layout"] = new JsonObject
             {
-                ["layoutItem"] = layoutItemSchema,
-            },
-            ["properties"] = new JsonObject
-            {
-                ["layout"] = new JsonObject
+                ["type"] = "object",
+                ["properties"] = new JsonObject
                 {
-                    ["type"] = "object",
-                    ["properties"] = new JsonObject
+                    [Constants.PropertyEditors.Aliases.BlockGrid] = new JsonObject
                     {
-                        [Constants.PropertyEditors.Aliases.BlockGrid] = new JsonObject
-                        {
-                            ["type"] = "array",
-                            ["items"] = new JsonObject { ["$ref"] = "#/$defs/layoutItem" },
-                        },
+                        ["type"] = "array",
+                        ["items"] = new JsonObject { ["$ref"] = "#/$defs/layoutItem" },
                     },
                 },
-                ["contentData"] = new JsonObject
-                {
-                    ["type"] = "array",
-                    ["items"] = contentDataItemSchema,
-                },
-                ["settingsData"] = new JsonObject
-                {
-                    ["type"] = "array",
-                    ["items"] = settingsDataItemSchema,
-                },
+            },
+            ["contentData"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = contentDataItemSchema,
+            },
+            ["settingsData"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = settingsDataItemSchema,
             },
         };
 
-        // Add grid columns constraint from configuration
+        // Add grid columns constraint from configuration (BlockGrid-specific)
         if (config?.GridColumns is int gridColumns && gridColumns > 0)
         {
             layoutItemSchema["properties"]!["columnSpan"]!.AsObject()["maximum"] = gridColumns;
         }
 
         // Add validation constraints
-        if (config?.ValidationLimit?.Min is int min && min > 0)
-        {
-            var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockGrid]!.AsObject();
-            layoutArray["minItems"] = min;
-        }
-
-        if (config?.ValidationLimit?.Max is int max && max > 0)
-        {
-            var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockGrid]!.AsObject();
-            layoutArray["maxItems"] = max;
-        }
+        var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockGrid]!.AsObject();
+        BlockJsonSchemaHelper.ApplyValidationConstraints(layoutArray, config?.ValidationLimit?.Min, config?.ValidationLimit?.Max);
 
         return schema;
     }
