@@ -39,6 +39,8 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HealthCheckResultResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Executes a health check action.")]
+    [EndpointDescription("Executes a specific action to fix or address a health check issue.")]
     public async Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(
         CancellationToken cancellationToken,
         HealthCheckActionRequestModel action)

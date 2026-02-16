@@ -31,7 +31,7 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
     /// <param name="idKeyMap">The ID-key mapping service.</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="factory">The cache refresher notification factory.</param>
-    [Obsolete("Use the non obsoleted contructor instead. Planned for removal in V18")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : this(
             appCaches,

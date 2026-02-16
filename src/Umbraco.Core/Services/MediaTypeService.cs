@@ -73,7 +73,7 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
     /// <param name="eventAggregator">The <see cref="IEventAggregator"/> for publishing events.</param>
     /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
     /// <param name="contentTypeFilters">The collection of content type filters.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public MediaTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -116,7 +116,7 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
     /// <param name="eventAggregator">The <see cref="IEventAggregator"/> for publishing events.</param>
     /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
     /// <param name="contentTypeFilters">The collection of content type filters.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public MediaTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

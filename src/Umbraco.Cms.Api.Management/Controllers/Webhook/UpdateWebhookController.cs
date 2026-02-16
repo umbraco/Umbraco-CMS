@@ -29,6 +29,8 @@ public class UpdateWebhookController : WebhookControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Updates a webhook.")]
+    [EndpointDescription("Updates a webhook identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
         Guid id,

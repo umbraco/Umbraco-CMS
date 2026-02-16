@@ -24,6 +24,8 @@ public class AllLanguageController : LanguageControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LanguageResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of languages.")]
+    [EndpointDescription("Gets a paginated collection of all configured languages.")]
     public async Task<ActionResult<PagedViewModel<LanguageResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,

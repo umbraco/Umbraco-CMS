@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
@@ -22,6 +22,8 @@ public class CreateDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a document blueprint folder.")]
+    [EndpointDescription("Creates a new document blueprint folder with the provided name and parent location.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateFolderRequestModel createFolderRequestModel)
         => await CreateFolderAsync<ByKeyDocumentBlueprintFolderController>(
             createFolderRequestModel,

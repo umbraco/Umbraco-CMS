@@ -1,4 +1,14 @@
-import { css, customElement, html, ifDefined, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	state,
+	styleMap,
+	unsafeHTML,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type {
@@ -9,6 +19,7 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count.js';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement
@@ -71,17 +82,40 @@ export class UmbPropertyEditorUITextareaElement
 		return this.shadowRoot?.querySelector<UUITextareaElement>('uui-textarea')?.focus();
 	}
 
+	#getMaxLengthMessage(max: number, current: number) {
+		const exceeded = current - max;
+		return this.localize.term('textbox_characters_exceed', max, exceeded);
+	}
+
 	#onInput(event: InputEvent) {
 		const newValue = (event.target as HTMLTextAreaElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
+
+		if (isCharacterLimitExceeded(this._maxChars, newValue.length)) {
+			const textarea = this.shadowRoot?.querySelector<UUITextareaElement>('uui-textarea');
+			if (textarea) {
+				textarea.pristine = false;
+			}
+			this.pristine = false;
+		}
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#renderCharacterCount() {
+		if (!this._maxChars || this.readonly) return nothing;
+
+		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
+		if (!visible) return nothing;
+
+		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
 	}
 
 	override render() {
 		return html`
 			<uui-textarea
 				.label=${this.localize.term('general_fieldFor', [this.name])}
+				data-mark="input:textarea"
 				style=${styleMap(this._css)}
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}
@@ -90,11 +124,9 @@ export class UmbPropertyEditorUITextareaElement
 				@input=${this.#onInput}
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
-				.maxlengthMessage=${() => {
-					const exceeded = (this.value?.length ?? 0) - (this._maxChars ?? 0);
-					return this.localize.term('textbox_characters_exceed', this._maxChars, exceeded);
-				}}
+				.maxlengthMessage=${this.#getMaxLengthMessage.bind(this)}
 				?readonly=${this.readonly}></uui-textarea>
+			${this.#renderCharacterCount()}
 		`;
 	}
 
@@ -103,6 +135,14 @@ export class UmbPropertyEditorUITextareaElement
 		css`
 			uui-textarea {
 				width: 100%;
+			}
+
+			.char-count {
+				color: var(--uui-color-text-alt);
+			}
+
+			:host(:not(:focus-within)) .char-count {
+				display: none;
 			}
 		`,
 	];

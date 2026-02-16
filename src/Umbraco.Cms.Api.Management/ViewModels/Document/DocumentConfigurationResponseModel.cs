@@ -8,6 +8,6 @@ public class DocumentConfigurationResponseModel
 
     public required bool AllowEditInvariantFromNonDefault { get; set; }
 
-    [Obsolete("This functionality will be moved to a client-side extension. Scheduled for removal in V19.")]
+    [Obsolete("This functionality will be moved to a client-side extension. Scheduled for removal in Umbraco 19.")]
     public required bool AllowNonExistingSegmentsCreation { get; set; }
 }

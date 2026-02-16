@@ -5,17 +5,17 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([UserIdColumnName, NodeIdColumnName, ActionColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class User2NodeNotifyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.User2NodeNotify;
-    public const string PrimaryKeyColumnName = "userId";
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     public const string ActionColumnName = "action";
+    private const string UserIdColumnName = "userId";
 
-    [Column(PrimaryKeyColumnName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodeNotify", OnColumns = $"{PrimaryKeyColumnName}, {NodeIdColumnName}, {ActionColumnName}")]
+    [Column(UserIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodeNotify", OnColumns = $"{UserIdColumnName}, {NodeIdColumnName}, {ActionColumnName}")]
     [ForeignKey(typeof(UserDto))]
     public int UserId { get; set; }
 

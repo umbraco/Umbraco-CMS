@@ -43,7 +43,7 @@ public class DocumentDto
     // [NullSetting(NullSetting = NullSettings.Null)] // is documentVersionDto.TemplateId for the published version
     // public int? PublishTemplateId { get; set; }
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ContentDto.ReferenceMemberName)]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentDto.NodeId))]
     public ContentDto ContentDto { get; set; } = null!;
 
     // although a content has many content versions,

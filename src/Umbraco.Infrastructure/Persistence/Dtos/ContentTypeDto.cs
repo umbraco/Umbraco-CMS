@@ -13,8 +13,6 @@ internal class ContentTypeDto
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-    internal const string ReferenceColumnName = "NodeId"; // should be ContentTypeDto.NodeIdColumnName, but for database compatibility we keep it like this
-
     private string? _alias;
 
     // Public constants to bind properties between DTOs
@@ -64,6 +62,6 @@ internal class ContentTypeDto
     public byte Variations { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(NodeId))]
     public NodeDto NodeDto { get; set; } = null!;
 }

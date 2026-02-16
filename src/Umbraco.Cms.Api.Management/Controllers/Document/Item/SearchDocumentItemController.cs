@@ -30,7 +30,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _dataTypeService = dataTypeService;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead, will be removed in v18")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public SearchDocumentItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IDocumentPresentationFactory documentPresentationFactory)
@@ -66,6 +66,8 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches document items.")]
+    [EndpointDescription("Searches document items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchWithTrashed(
         CancellationToken cancellationToken,
         string query,

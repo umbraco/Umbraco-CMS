@@ -25,6 +25,8 @@ public class GetAllClientCredentialsUserController : ClientCredentialsUserContro
 
     [HttpGet("{id:guid}/client-credentials")]
     [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets all client credentials for a user.")]
+    [EndpointDescription("Gets a collection of OAuth client credentials for the user identified by the provided Id.")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
