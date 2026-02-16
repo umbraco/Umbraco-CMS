@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-internal sealed class DeliveryApiMediaAccessAttribute : TypeFilterAttribute
+public sealed class DeliveryApiMediaAccessAttribute : TypeFilterAttribute
 {
     public DeliveryApiMediaAccessAttribute()
         : base(typeof(DeliveryApiMediaAccessFilter))
