@@ -195,20 +195,43 @@ internal sealed class ContentPermissionService : IContentPermissionService
         var authorizedKeys = new HashSet<Guid>();
         int[]? startNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
 
+        // Check path access and collect all unique node IDs across all paths.
+        var pathDataByKey = new Dictionary<Guid, int[]>();
+        var allUniqueNodeIds = new HashSet<int>();
+
         foreach (TreeEntityPath entityPath in entityPaths)
         {
-            // Check path access
             if (ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinContent) == false)
             {
                 continue;
             }
 
-            // Check permission access
-            EntityPermissionSet permissionSet = _userService.GetPermissionsForPath(user, entityPath.Path);
+            int[] pathIds = entityPath.Path.GetIdsFromPathReversed();
+            pathDataByKey[entityPath.Key] = pathIds;
+            allUniqueNodeIds.UnionWith(pathIds);
+        }
+
+        if (pathDataByKey.Count == 0)
+        {
+            return Task.FromResult<ISet<Guid>>(authorizedKeys);
+        }
+
+        // Single batch query for permissions on ALL unique node IDs across all paths.
+        EntityPermissionCollection allPermissions = _userService.GetPermissions(user, [.. allUniqueNodeIds]);
+
+        // Resolve permissions per entity using the batch results.
+        foreach ((Guid key, int[] pathIds) in pathDataByKey)
+        {
+            var pathNodeIdSet = new HashSet<int>(pathIds);
+            EntityPermission[] relevantPermissions = allPermissions
+                .Where(p => pathNodeIdSet.Contains(p.EntityId))
+                .ToArray();
+
+            EntityPermissionSet permissionSet = UserService.CalculatePermissionsForPathForUser(relevantPermissions, pathIds);
             ISet<string> permissionSetPermissions = permissionSet.GetAllPermissions();
             if (permissionsToCheck.All(p => permissionSetPermissions.Contains(p)))
             {
-                authorizedKeys.Add(entityPath.Key);
+                authorizedKeys.Add(key);
             }
         }
 

@@ -39,15 +39,15 @@ internal sealed class WebhookDto
     public bool Enabled { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = Webhook2EventsDto.ReferenceMemberName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2EventsDto.WebhookId))]
     public List<Webhook2EventsDto> Webhook2Events { get; set; } = new();
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = Webhook2ContentTypeKeysDto.ReferenceMemberName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2ContentTypeKeysDto.WebhookId))]
     public List<Webhook2ContentTypeKeysDto> Webhook2ContentTypeKeys { get; set; } = new();
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = Webhook2HeadersDto.ReferenceMemberName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2HeadersDto.WebhookId))]
     public List<Webhook2HeadersDto> Webhook2Headers { get; set; } = new();
 }
 

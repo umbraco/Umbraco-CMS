@@ -1931,7 +1931,8 @@ export default {
 		emptyDictionaryTree: 'Das Wörterbuch ist leer',
 	},
 	textbox: {
-		characters_left: 'Buchstaben verbleiben',
+		characters_left: '<strong>%0%</strong> Zeichen verbleiben.',
+		characters_exceed: 'Maximal %0% Zeichen, <strong>%1%</strong> zu viele.',
 	},
 	recycleBin: {
 		contentTrashed: 'Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen',

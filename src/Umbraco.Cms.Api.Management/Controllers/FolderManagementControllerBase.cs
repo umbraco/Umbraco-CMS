@@ -104,6 +104,10 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the folder operation.")
                 .Build()),
+            EntityContainerOperationStatus.HasReferencedDescendants => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder has referenced descendants")
+                .WithDetail("The folder cannot be moved to the recycle bin because it contains items that are referenced by other content.")
+                .Build()),
             _ => new ObjectResult(problemDetailsBuilder
                 .WithTitle("Unknown folder operation status.")
                 .Build()) { StatusCode = StatusCodes.Status500InternalServerError },

@@ -39,6 +39,6 @@ internal sealed class AccessDto
     public DateTime UpdateDate { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = AccessRuleDto.AccessIdColumnName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(AccessRuleDto.AccessId))]
     public List<AccessRuleDto> Rules { get; set; } = new();
 }
