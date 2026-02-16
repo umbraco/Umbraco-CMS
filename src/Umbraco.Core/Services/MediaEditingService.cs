@@ -181,7 +181,7 @@ internal sealed class MediaEditingService
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>
-    protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override Task<IMedia?> CopyAsync(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for media");
 
     /// <inheritdoc />
