@@ -669,6 +669,16 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 cacheSyncService) =>
             _outerRepo = outerRepo;
 
+        // Use a GUID-specific cache policy with a distinct prefix ("uRepoGuid_IMedia_")
+        // so that GUID-keyed cache entries don't interfere with the parent int-keyed repository's
+        // prefix-based search and count validation in DefaultRepositoryCachePolicy.
+        protected override IRepositoryCachePolicy<IMedia, Guid> CreateCachePolicy()
+            => new GuidReadRepositoryCachePolicy<IMedia>(
+                GlobalIsolatedCache,
+                ScopeAccessor,
+                RepositoryCacheVersionService,
+                CacheSyncService);
+
         protected override IMedia? PerformGet(Guid id)
         {
             Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(QueryType.Single)
@@ -749,7 +759,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             }
         }
 
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IMedia>() + key;
+        private static string GetCacheKey(Guid key) => GuidReadRepositoryCachePolicy<IMedia>.GetCacheKey(key);
     }
 
     #endregion

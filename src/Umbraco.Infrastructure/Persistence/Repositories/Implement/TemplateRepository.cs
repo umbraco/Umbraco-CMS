@@ -99,18 +99,13 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         // Force population of the full dataset cache so subsequent lookups don't hit the database.
         // TemplateRepository uses FullDataSetRepositoryCachePolicy which caches all templates together.
+        // The GUID read repository delegates to this cache, so no separate GUID caching is needed.
         GetMany();
-
-        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-        _templateByGuidReadRepository.PopulateCacheByKey(entity);
     }
 
     public override void Delete(ITemplate entity)
     {
         base.Delete(entity);
-
-        // Also clear the GUID cache so subsequent lookups by GUID don't return stale data.
-        _templateByGuidReadRepository.ClearCacheByKey(entity.Key);
     }
 
     public Stream GetFileContentStream(string filepath)
@@ -378,12 +373,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         //use the underlying GetAll which will force cache all templates
         ITemplate? template = GetMany().FirstOrDefault(x => x.Id == id);
 
-        if (template != null)
-        {
-            // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-            _templateByGuidReadRepository.PopulateCacheByKey(template);
-        }
-
         return template;
     }
 
@@ -415,9 +404,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             .ToArray();
 
         ITemplate[] templates = dtos.Select(d => MapFromDto(d, childIds)).ToArray();
-
-        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-        _templateByGuidReadRepository.PopulateCacheByKey(templates);
 
         return templates;
     }
@@ -759,6 +745,14 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
                 cacheSyncService) =>
             _outerRepo = outerRepo;
 
+        // No separate GUID cache is needed because PerformGet/PerformGetAll delegate entirely
+        // to the outer repo's GetMany(), which caches the full dataset via FullDataSetRepositoryCachePolicy.
+        // GuidReadRepositoryCachePolicy is not suitable here because FullDataSetRepositoryCachePolicy.ClearAll()
+        // only clears its own entry (exact key removal), so GUID-prefixed entries would become stale
+        // after Create/Update/Delete operations on the outer repository.
+        protected override IRepositoryCachePolicy<ITemplate, Guid> CreateCachePolicy()
+            => NoCacheRepositoryCachePolicy<ITemplate, Guid>.Instance;
+
         protected override ITemplate? PerformGet(Guid id)
         {
             // Use the outer repository's GetMany() which benefits from FullDataSetRepositoryCachePolicy.
@@ -797,42 +791,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         protected override string GetBaseWhereClause() =>
             throw new InvalidOperationException("This method won't be implemented.");
 
-        /// <summary>
-        /// Populates the GUID-keyed cache with the given entity.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
-        /// </summary>
-        public void PopulateCacheByKey(ITemplate entity)
-        {
-            if (entity.HasIdentity)
-            {
-                var cacheKey = GetCacheKey(entity.Key);
-                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
-            }
-        }
-
-        /// <summary>
-        /// Populates the GUID-keyed cache with the given entities.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
-        /// </summary>
-        public void PopulateCacheByKey(IEnumerable<ITemplate> entities)
-        {
-            foreach (ITemplate entity in entities)
-            {
-                PopulateCacheByKey(entity);
-            }
-        }
-
-        /// <summary>
-        /// Clears the GUID-keyed cache entry for the given key.
-        /// This ensures deleted entities are not returned from the cache.
-        /// </summary>
-        public void ClearCacheByKey(Guid key)
-        {
-            var cacheKey = GetCacheKey(key);
-            IsolatedCache.Clear(cacheKey);
-        }
-
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<ITemplate>() + key;
     }
 
     #endregion

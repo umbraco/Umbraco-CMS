@@ -1731,6 +1731,16 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 cacheSyncService) =>
             _outerRepo = outerRepo;
 
+        // Use a GUID-specific cache policy with a distinct prefix ("uRepoGuid_IContent_")
+        // so that GUID-keyed cache entries don't interfere with the parent int-keyed repository's
+        // prefix-based search and count validation in DefaultRepositoryCachePolicy.
+        protected override IRepositoryCachePolicy<IContent, Guid> CreateCachePolicy()
+            => new GuidReadRepositoryCachePolicy<IContent>(
+                GlobalIsolatedCache,
+                ScopeAccessor,
+                RepositoryCacheVersionService,
+                CacheSyncService);
+
         protected override IContent? PerformGet(Guid id)
         {
             Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(QueryType.Single)
@@ -1811,7 +1821,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
         }
 
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IContent>() + key;
+        private static string GetCacheKey(Guid key) => GuidReadRepositoryCachePolicy<IContent>.GetCacheKey(key);
     }
 
     #endregion
