@@ -1,25 +1,14 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Persistence.EFCore;
-using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
-using Umbraco.Cms.Persistence.EFCore.Migrations;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
 
 /// <summary>
-/// Composer for registering SQL Server EF Core migration services.
+/// Automatically adds SQL Server EF Core support to Umbraco when this project is referenced.
 /// </summary>
 public class EFCoreSqlServerComposer : IComposer
 {
     /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<IMigrationProvider, SqlServerMigrationProvider>();
-        builder.Services.AddSingleton<IMigrationProviderSetup, SqlServerMigrationProviderSetup>();
-        builder.Services.AddSingleton<IDatabaseConfigurator, SqlServerDatabaseConfigurator>();
-
-        builder.AddDbContextRegistrar<SqlServerDbContextServiceRegistrar>();
-    }
+        => builder.AddUmbracoEFCoreSqlServerSupport();
 }
