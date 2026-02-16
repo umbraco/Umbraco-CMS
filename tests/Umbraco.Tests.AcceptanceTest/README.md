@@ -4,6 +4,8 @@ End-to-end acceptance tests for Umbraco CMS using [Playwright](https://playwrigh
 
 You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.
 
+> **npm package**: This project is also published to npm as [`@umbraco/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the package documentation.
+
 ---
 
 ## Prerequisites
@@ -78,78 +80,6 @@ npx playwright test --ui tests/DefaultConfig
 ```
 
 > **Note**: In UI mode, if you only see the authenticate test, click on 'Projects' and select 'defaultConfig' to see all tests.
-
----
-
-## Test Helpers and Fixtures
-
-Tests use the helpers and builders in the `lib/` folder (published to npm as `@umbraco/acceptance-test-helpers`). Three main fixtures are provided:
-
-### `umbracoUi` - UI Interaction Helper
-
-For browser interactions organized by section:
-
-```typescript
-// Navigation
-await umbracoUi.goToBackOffice();
-await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-// Interactions
-await umbracoUi.content.enterContentName('My Content');
-await umbracoUi.content.clickSaveButton();
-await umbracoUi.content.clickSaveAndPublishButton();
-
-// Assertions
-await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-await umbracoUi.content.doesSuccessNotificationHaveText('Content saved');
-```
-
-### `umbracoApi` - REST API Helper
-
-For server-side operations (setup/teardown):
-
-```typescript
-// Create test data
-const docTypeId = await umbracoApi.documentType.createDefaultDocumentType('TestType');
-const dataTypeId = await umbracoApi.dataType.createTextstringDataType('TestDataType');
-
-// Query data
-const exists = await umbracoApi.document.doesNameExist('MyContent');
-const data = await umbracoApi.document.getByName('MyContent');
-
-// Cleanup (idempotent - won't fail if not exists)
-await umbracoApi.documentType.ensureNameNotExists('TestType');
-
-// Publishing
-await umbracoApi.document.publish(documentId);
-```
-
-### `page` - Raw Playwright Page
-
-Direct access to Playwright's Page object for custom interactions:
-
-```typescript
-await page.pause();  // Pause for debugging
-await page.screenshot({ path: 'debug.png' });
-```
-
-### Helper Constants
-
-```typescript
-import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco/acceptance-test-helpers';
-
-// Section names
-ConstantHelper.sections.content
-ConstantHelper.sections.media
-ConstantHelper.sections.settings
-
-// Notification messages
-NotificationConstantHelper.success.published
-NotificationConstantHelper.success.saved
-
-// String utilities
-AliasHelper.toAlias('Test Document Type')  // → 'testDocumentType'
-```
 
 ---
 
