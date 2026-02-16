@@ -325,7 +325,7 @@ Configuration models in `/Configuration/Models`:
 ### What Depends on Umbraco.Core
 - **Umbraco.Infrastructure** - Implements all Core interfaces
 - **Umbraco.PublishedCache.HybridCache** - Published content caching
-- **Umbraco.Cms.Persistence.EFCore** - EF Core persistence
+- **Umbraco.Cms.Persistence.EFCore.SqlServer** / **EFCore.Sqlite** - EF Core provider packages
 - **Umbraco.Cms.Api.Common** - API infrastructure
 - All higher-level Umbraco projects
 

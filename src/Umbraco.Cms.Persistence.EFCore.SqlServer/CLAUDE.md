@@ -1,10 +1,10 @@
 # Umbraco.Cms.Persistence.EFCore.SqlServer
 
-SQL Server-specific EF Core provider for Umbraco CMS. Contains SQL Server migrations and provider setup for the EF Core persistence layer.
+SQL Server-specific EF Core provider for Umbraco CMS. Implements SQL Server database configuration, distributed locking, migrations, and service registration for the EF Core persistence layer.
 
 **Project Type**: Class Library (NuGet package)
 **Target Framework**: net10.0
-**Dependencies**: Umbraco.Cms.Persistence.EFCore
+**Dependencies**: Umbraco.Infrastructure
 
 ---
 
@@ -12,11 +12,14 @@ SQL Server-specific EF Core provider for Umbraco CMS. Contains SQL Server migrat
 
 ### Project Purpose
 
-This is a thin provider project that implements SQL Server-specific functionality for the EF Core persistence layer:
+This provider project implements SQL Server-specific functionality for the EF Core persistence layer:
 
-1. **Migration Provider** - Executes SQL Server-specific migrations
-2. **Migration Provider Setup** - Configures DbContext to use SQL Server
-3. **Migrations** - SQL Server-specific migration files for OpenIddict tables
+1. **Database Configurator** - Configures DbContext with SQL Server-specific options (`IDatabaseConfigurator`)
+2. **Service Registrar** - Registers SQL Server-specific services like distributed locking (`IDbContextServiceRegistrar`)
+3. **Distributed Locking** - SQL Server-specific distributed locking mechanism
+4. **Migration Provider** - Executes SQL Server-specific EF Core migrations
+5. **Migration Provider Setup** - Configures DbContext to use SQL Server for migrations
+6. **Migrations** - SQL Server-specific migration files (OpenIddict tables, webhooks, etc.)
 
 ### Folder Structure
 
@@ -27,19 +30,26 @@ Umbraco.Cms.Persistence.EFCore.SqlServer/
 │   ├── 20230807654321_AddOpenIddict.cs          # OpenIddict tables
 │   ├── 20240403140654_UpdateOpenIddictToV5.cs   # OpenIddict v5 schema changes
 │   ├── 20251006140751_UpdateOpenIddictToV7.cs   # Token Type column expansion
+│   ├── 20260209102250_AddWebhookDto.cs          # Webhook tables
 │   └── UmbracoDbContextModelSnapshot.cs         # Current model state
 ├── EFCoreSqlServerComposer.cs                   # DI registration
+├── SqlServerDatabaseConfigurator.cs             # IDatabaseConfigurator impl
+├── SqlServerDbContextServiceRegistrar.cs        # IDbContextServiceRegistrar impl
+├── SqlServerEFCoreDistributedLockingMechanism.cs # Distributed locking
 ├── SqlServerMigrationProvider.cs                # IMigrationProvider impl
-└── SqlServerMigrationProviderSetup.cs           # IMigrationProviderSetup impl
+├── SqlServerMigrationProviderSetup.cs           # IMigrationProviderSetup impl
+└── UmbracoBuilderExtensions.cs                  # IUmbracoBuilder extensions
 ```
 
-### Relationship with Parent Project
+### Relationship with Infrastructure
 
-This project extends `Umbraco.Cms.Persistence.EFCore`:
+This project extends `Umbraco.Infrastructure`:
 
-- Implements `IMigrationProvider` interface defined in parent
-- Implements `IMigrationProviderSetup` interface defined in parent
-- Uses `UmbracoDbContext` from parent project
+- Implements `IDatabaseConfigurator` interface defined in Infrastructure
+- Implements `IDbContextServiceRegistrar` interface defined in Infrastructure
+- Implements `IMigrationProvider` interface defined in Infrastructure
+- Implements `IMigrationProviderSetup` interface defined in Infrastructure
+- Uses `UmbracoDbContext` from Infrastructure
 - Provider name: `Microsoft.Data.SqlClient` (from `Constants.ProviderNames.SQLServer`)
 
 ---
@@ -47,23 +57,46 @@ This project extends `Umbraco.Cms.Persistence.EFCore`:
 ## 2. Commands
 
 **For Git workflow and build commands**, see [repository root](../../CLAUDE.md).
-**For EF Core migration commands**, see [parent project](../Umbraco.Cms.Persistence.EFCore/CLAUDE.md) (substitute `-p src/Umbraco.Cms.Persistence.EFCore.SqlServer`).
+
+```bash
+# Build this project
+dotnet build src/Umbraco.Cms.Persistence.EFCore.SqlServer
+
+# Run related tests
+dotnet test --filter "FullyQualifiedName~EFCore"
+```
 
 ---
 
 ## 3. Key Components
 
-### EFCoreSqlServerComposer (line 10-14)
+### EFCoreSqlServerComposer
 
-Registers SQL Server implementations of `IMigrationProvider` and `IMigrationProviderSetup`.
+Registers SQL Server implementations of `IMigrationProvider`, `IMigrationProviderSetup`, and provider registration services.
+
+### SqlServerDatabaseConfigurator
+
+Implements `IDatabaseConfigurator` to configure `DbContextOptionsBuilder` with `UseSqlServer`. Called by `DbContextRegistration` when registering DbContext types.
+
+### SqlServerDbContextServiceRegistrar
+
+Implements `IDbContextServiceRegistrar` to register SQL Server-specific services (e.g., distributed locking) for each registered DbContext type.
+
+### SqlServerEFCoreDistributedLockingMechanism
+
+SQL Server-specific distributed locking implementation using database-level locks. Moved from Infrastructure to this provider package as it is provider-specific.
 
 ### SqlServerMigrationProvider
 
 Executes migrations via `MigrateAsync(EFCoreMigration)` or `MigrateAllAsync()`. Unlike SQLite sibling, no transaction check needed (SQL Server handles concurrent migrations natively).
 
-### SqlServerMigrationProviderSetup (line 11-14)
+### SqlServerMigrationProviderSetup
 
 Configures `DbContextOptionsBuilder` with `UseSqlServer` and migrations assembly.
+
+### UmbracoBuilderExtensions
+
+Extension methods on `IUmbracoBuilder` for adding SQL Server EF Core support to the application.
 
 ---
 
@@ -75,8 +108,9 @@ Configures `DbContextOptionsBuilder` with `UseSqlServer` and migrations assembly
 |-----------|------|---------|
 | `InitialCreate` | 2023-06-22 | No-op - NPoco creates base tables |
 | `AddOpenIddict` | 2023-08-07 | Creates OpenIddict tables |
-| `UpdateOpenIddictToV5` | 2024-04-03 | Renames Type→ClientType, adds ApplicationType/JsonWebKeySet/Settings |
+| `UpdateOpenIddictToV5` | 2024-04-03 | Renames Type->ClientType, adds ApplicationType/JsonWebKeySet/Settings |
 | `UpdateOpenIddictToV7` | 2025-10-06 | Expands Token.Type from nvarchar(50) to nvarchar(150) |
+| `AddWebhookDto` | 2026-02-09 | Webhook tables |
 
 ### OpenIddict Tables Created
 
@@ -91,9 +125,9 @@ Prefixed with `umbraco`: Applications, Authorizations, Scopes, Tokens (see SQLit
 ### Adding New Migrations
 
 1. Configure SQL Server connection string in `src/Umbraco.Web.UI/appsettings.json`
-2. Run migration command from repository root (see parent project docs)
+2. Run migration command from repository root
 3. **Critical**: Also add equivalent migration to `Umbraco.Cms.Persistence.EFCore.Sqlite`
-4. Update `SqlServerMigrationProvider.GetMigrationType()` switch (line 27-35) if adding named migrations
+4. Update `SqlServerMigrationProvider.GetMigrationType()` switch if adding named migrations
 
 ---
 
@@ -101,7 +135,7 @@ Prefixed with `umbraco`: Applications, Authorizations, Scopes, Tokens (see SQLit
 
 ### Named Migration Mapping
 
-`SqlServerMigrationProvider.GetMigrationType()` (line 27-35) maps `EFCoreMigration` enum to migration types. Update both parent enum and this switch when adding named migrations.
+`SqlServerMigrationProvider.GetMigrationType()` maps `EFCoreMigration` enum to migration types. Update both the enum in Infrastructure and this switch when adding named migrations.
 
 ### Transaction Handling
 
@@ -119,14 +153,18 @@ SQL Server handles concurrent migrations natively - no transaction check needed 
 
 | File | Purpose |
 |------|---------|
+| `SqlServerDatabaseConfigurator.cs` | DbContext configuration (IDatabaseConfigurator) |
+| `SqlServerDbContextServiceRegistrar.cs` | Provider service registration (IDbContextServiceRegistrar) |
+| `SqlServerEFCoreDistributedLockingMechanism.cs` | Distributed locking |
 | `SqlServerMigrationProvider.cs` | Migration execution |
-| `SqlServerMigrationProviderSetup.cs` | DbContext configuration |
+| `SqlServerMigrationProviderSetup.cs` | Migration DbContext configuration |
 | `EFCoreSqlServerComposer.cs` | DI registration |
+| `UmbracoBuilderExtensions.cs` | Builder extensions |
 | `Migrations/*.cs` | Migration files |
 
 ### Provider Name
 `Constants.ProviderNames.SQLServer` = `"Microsoft.Data.SqlClient"`
 
 ### Related Projects
-- **Parent**: `Umbraco.Cms.Persistence.EFCore` - Interfaces and base DbContext
+- **Parent**: `Umbraco.Infrastructure` - EF Core abstractions, DbContext, provider registration contracts
 - **Sibling**: `Umbraco.Cms.Persistence.EFCore.Sqlite` - SQLite equivalent

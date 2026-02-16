@@ -34,7 +34,7 @@ Implementation layer for Umbraco CMS, providing concrete implementations of all 
 ### Project Structure
 ```
 src/Umbraco.Infrastructure/
-├── Persistence/                   # Database access (NPoco)
+├── Persistence/                   # Database access (NPoco + EF Core)
 │   ├── Repositories/              # Repository implementations (47 repos)
 │   │   └── Implement/             # Concrete repository classes
 │   ├── Dtos/                      # Database DTOs (80+ files)
@@ -43,7 +43,16 @@ src/Umbraco.Infrastructure/
 │   ├── Querying/                  # Query builders and translators
 │   ├── SqlSyntax/                 # SQL dialect handlers (SQL Server, SQLite)
 │   ├── DatabaseModelDefinitions/  # Table/column definitions
-│   └── UmbracoDatabase.cs         # Main database wrapper (NPoco)
+│   ├── UmbracoDatabase.cs         # Main database wrapper (NPoco)
+│   └── EFCore/                    # EF Core abstractions & provider registration
+│       ├── DbContextRegistration.cs       # Bidirectional provider registration
+│       ├── IDbContextServiceRegistrar.cs  # Provider service registration contract
+│       ├── IDatabaseConfigurator.cs       # Provider configuration contract
+│       ├── UmbracoDbContext.cs            # Base DbContext for EF Core
+│       ├── EfCoreMigrationExecutor.cs     # Migration execution
+│       ├── Migrations/                    # Migration provider interfaces
+│       ├── Scoping/                       # EF Core scope management
+│       └── Extensions/                    # DI extension methods
 │
 ├── Services/                      # Service implementations
 │   └── Implement/                 # Concrete service classes (16 services)
@@ -157,6 +166,12 @@ src/Umbraco.Infrastructure/
    - `MigrationPlanExecutor` runs migrations in order
 
 7. **Builder Pattern** - `ValueSetBuilder` for search indexing
+
+8. **Provider Registration Pattern** - Bidirectional replay for EF Core providers
+   - `DbContextRegistration` coordinates DbContext types and provider registrars
+   - `IDbContextServiceRegistrar` for provider-specific service registration (e.g., distributed locking)
+   - `IDatabaseConfigurator` for provider-specific DbContext configuration (e.g., UseSqlServer/UseSqlite)
+   - Supports registration in any order: providers and DbContext types can register independently
 
 ---
 
@@ -595,7 +610,7 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Historical: Predates EF Core
 - Performance: Faster than EF Core for Umbraco's workload
 - Control: Fine-grained SQL control
-- **Note**: EF Core support added in parallel (`Umbraco.Cms.Persistence.EFCore` project)
+- **Note**: EF Core abstractions (DbContext, migrations, provider registration) now live directly in `Umbraco.Infrastructure/Persistence/EFCore/`, with provider-specific implementations in `Umbraco.Cms.Persistence.EFCore.SqlServer` and `Umbraco.Cms.Persistence.EFCore.Sqlite`
 
 **Why Separate Factories and Mappers?**
 - **Factories**: DTO → Entity (one direction, for reading from DB)
