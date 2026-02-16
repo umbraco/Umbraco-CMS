@@ -2,7 +2,7 @@ import type { UmbChangePasswordModalData, UmbChangePasswordModalValue } from './
 import { css, customElement, html, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
+import { UmbUserItemRepository, UmbUserConfigRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
 
@@ -23,7 +23,11 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 	@state()
 	private _isCurrentUser: boolean = false;
 
+	@state()
+	private _minimumPasswordLength = 10;
+
 	#userItemRepository = new UmbUserItemRepository(this);
+	#userConfigRepository = new UmbUserConfigRepository(this);
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	#onClose() {
@@ -54,6 +58,15 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
 			this.#setIsCurrentUser();
+		});
+
+		this.#loadPasswordConfiguration();
+	}
+
+	async #loadPasswordConfiguration() {
+		await this.#userConfigRepository.initialized;
+		this.observe(this.#userConfigRepository.part('passwordConfiguration'), (passwordConfig) => {
+			this._minimumPasswordLength = passwordConfig.minimumPasswordLength ?? this._minimumPasswordLength;
 		});
 	}
 
@@ -110,6 +123,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 							<uui-input-password
 								id="newPassword"
 								name="newPassword"
+								minlength=${this._minimumPasswordLength}
 								required
 								required-message="New password is required">
 							</uui-input-password>
@@ -121,6 +135,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 							<uui-input-password
 								id="confirmPassword"
 								name="confirmPassword"
+								minlength=${this._minimumPasswordLength}
 								required
 								required-message="Confirm password is required">
 							</uui-input-password>
