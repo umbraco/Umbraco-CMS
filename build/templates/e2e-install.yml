@@ -47,3 +47,7 @@ steps:
   - script: npm ci --no-fund --no-audit --prefer-offline
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
     displayName: Restore NPM packages
+
+  - script: npm run build
+    workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
+    displayName: Build test helpers
