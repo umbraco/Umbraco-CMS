@@ -14,8 +14,6 @@ public class UserDto
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string KeyColumnName = "key";
 
-    private const string ReferenceMemberColumnName = "UserId";
-
     public UserDto()
     {
         UserGroupDtos = new List<UserGroupDto>();
@@ -121,10 +119,10 @@ public class UserDto
     public string? Avatar { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = ReferenceMemberColumnName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(User2UserGroupDto.UserId))]
     public List<UserGroupDto> UserGroupDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = ReferenceMemberColumnName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserStartNodeDto.UserId))]
     public HashSet<UserStartNodeDto> UserStartNodeDtos { get; set; }
 }
