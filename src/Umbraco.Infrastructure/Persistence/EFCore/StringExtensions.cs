@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
+﻿using Umbraco.Cms.Core;
+
+namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
 /// <summary>
 /// Provides extension methods for string operations related to EF Core persistence.
@@ -23,6 +25,6 @@ internal static class StringExtensions
             return true;
         }
 
-        return connectionProvider is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLLite && compareString is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLLite;
+        return connectionProvider is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLite && compareString is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLite;
     }
 }

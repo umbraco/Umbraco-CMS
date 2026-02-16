@@ -2,14 +2,14 @@
 // See LICENSE for more details.
 
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
-using Constants = Umbraco.Cms.Infrastructure.Persistence.EFCore.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
 internal class TestSqliteMigrationProviderSetup : IMigrationProviderSetup
 {
-    public string ProviderName => Constants.ProviderNames.SQLLite;
+    public string ProviderName => Constants.ProviderNames.SQLite;
 
     public void Setup(DbContextOptionsBuilder builder, string? connectionString)
         => builder.UseSqlite(connectionString);

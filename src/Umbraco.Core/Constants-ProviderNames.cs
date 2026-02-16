@@ -10,7 +10,7 @@ public static partial class Constants
         /// <summary>
         ///     The provider name for SQLite databases.
         /// </summary>
-        public const string SQLLite = "Microsoft.Data.Sqlite";
+        public const string SQLite = "Microsoft.Data.Sqlite";
 
         /// <summary>
         ///     The provider name for SQL Server databases.

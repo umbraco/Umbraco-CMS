@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SQLitePCL;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
@@ -18,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;
 /// Implements distributed locking for SQLite databases using EF Core.
 /// </summary>
 /// <typeparam name="T">The type of DbContext.</typeparam>
-internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
+public sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
     private readonly ILogger<SqliteEFCoreDistributedLockingMechanism<T>> _logger;
@@ -54,7 +55,7 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
     /// <inheritdoc />
     public bool Enabled
         => _connectionStrings.IsConnectionStringConfigured() &&
-        string.Equals(_connectionStrings.ProviderName, Constants.ProviderNames.SQLLite, StringComparison.InvariantCultureIgnoreCase) &&
+        string.Equals(_connectionStrings.ProviderName, Constants.ProviderNames.SQLite, StringComparison.InvariantCultureIgnoreCase) &&
         _efCoreScopeAccessor.Value.AmbientScope is not null;
 
     /// <inheritdoc />

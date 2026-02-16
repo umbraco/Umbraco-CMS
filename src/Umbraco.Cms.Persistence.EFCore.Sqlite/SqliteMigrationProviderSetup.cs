@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
-using Umbraco.Cms.Persistence.EFCore.Migrations;
-using Constants = Umbraco.Cms.Infrastructure.Persistence.EFCore.Constants;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
@@ -12,7 +10,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 public class SqliteMigrationProviderSetup : IMigrationProviderSetup
 {
     /// <inheritdoc />
-    public string ProviderName => Constants.ProviderNames.SQLLite;
+    public string ProviderName => Constants.ProviderNames.SQLite;
 
     /// <inheritdoc />
     public void Setup(DbContextOptionsBuilder builder, string? connectionString)

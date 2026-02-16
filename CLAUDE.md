@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 10.0. This repository contains 20 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -12,7 +12,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ### What This Repository Contains
 
-**21 Production Projects** organized in 3 main categories:
+**20 Production Projects** organized in 3 main categories:
 
 1. **Core Architecture** (Domain & Infrastructure)
    - `Umbraco.Core` - Interface contracts, domain models, notifications
@@ -26,7 +26,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
    - `Umbraco.Cms.Api.Common` - Shared API infrastructure
 
 3. **Specialized Features** (Pluggable Modules)
-   - Persistence: EF Core (modern), NPoco (legacy) for SQL Server & SQLite
+   - Persistence: EF Core provider packages (SQL Server, SQLite), NPoco (legacy)
    - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
    - Search: `Examine.Lucene` (full-text search)
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
@@ -56,7 +56,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ```
 Umbraco-CMS/
-├── src/                                    # 21 production projects
+├── src/                                    # 20 production projects
 │   ├── Umbraco.Core/                      # Domain contracts (interfaces only)
 │   │   └── CLAUDE.md                      # ⭐ Core architecture guide
 │   ├── Umbraco.Infrastructure/            # Service implementations
@@ -68,9 +68,8 @@ Umbraco-CMS/
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
 │   ├── Umbraco.Examine.Lucene/            # Search indexing
-│   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
-│   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
-│   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/
+│   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/  # EF Core SQLite provider
+│   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/ # EF Core SQL Server provider
 │   ├── Umbraco.Cms.Persistence.Sqlite/    # Legacy SQLite
 │   ├── Umbraco.Cms.Persistence.SqlServer/ # Legacy SQL Server
 │   ├── Umbraco.Cms.Imaging.ImageSharp/    # Image processing v1
@@ -384,7 +383,12 @@ public interface IMyService
 
 The repository contains BOTH (actively supported):
 - **Current**: NPoco-based persistence (`Umbraco.Cms.Persistence.Sqlite`, `Umbraco.Cms.Persistence.SqlServer`) - widely used and fully supported
-- **Future**: EF Core-based persistence (`Umbraco.Cms.Persistence.EFCore.*`) - migration in progress
+- **Future**: EF Core-based persistence - migration in progress
+
+**EF Core Architecture**:
+- **Abstractions** (DbContext, migrations, scoping, provider registration contracts) live in `Umbraco.Infrastructure/Persistence/EFCore/`
+- **Provider packages** (`Umbraco.Cms.Persistence.EFCore.SqlServer`, `Umbraco.Cms.Persistence.EFCore.Sqlite`) implement provider-specific functionality (database configuration, distributed locking, migrations)
+- **Provider Registration Pattern**: `DbContextRegistration` coordinates provider setup using `IDbContextServiceRegistrar` and `IDatabaseConfigurator` contracts, enabling bidirectional replay so providers can register before or after DbContext types
 
 **Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 

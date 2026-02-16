@@ -16,6 +16,8 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.EFCore.Sqlite;
+using Umbraco.Cms.Persistence.EFCore.SqlServer;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
