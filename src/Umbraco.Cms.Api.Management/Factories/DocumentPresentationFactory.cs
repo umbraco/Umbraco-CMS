@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -65,6 +66,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         _flagProviderCollection = flagProviderCollection;
     }
 
+    /// <inheritdoc/>
     public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
     {
         PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
@@ -80,6 +82,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    /// <inheritdoc/>
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
@@ -96,6 +99,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    /// <inheritdoc/>
     public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
     {
         Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Document);
@@ -119,6 +123,25 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    /// <inheritdoc/>
+    public SearchDocumentItemResponseModel CreateSearchItemResponseModel(IDocumentEntitySlim entity, IEnumerable<SearchResultAncestorModel> ancestors)
+    {
+        DocumentItemResponseModel baseModel = CreateItemResponseModel(entity);
+        return new SearchDocumentItemResponseModel
+        {
+            Id = baseModel.Id,
+            IsTrashed = baseModel.IsTrashed,
+            IsProtected = baseModel.IsProtected,
+            Parent = baseModel.Parent,
+            HasChildren = baseModel.HasChildren,
+            DocumentType = baseModel.DocumentType,
+            Variants = baseModel.Variants,
+            Flags = baseModel.Flags,
+            Ancestors = ancestors,
+        };
+    }
+
+    /// <inheritdoc/>
     public DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
     {
         var responseModel = new DocumentBlueprintItemResponseModel
@@ -132,6 +155,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    /// <inheritdoc/>
     public IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity)
     {
         if (entity.Variations.VariesByCulture() is false)
@@ -162,9 +186,11 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         }
     }
 
+    /// <inheritdoc/>
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
+    /// <inheritdoc/>
     public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
     {
         var model = new List<CulturePublishScheduleModel>();

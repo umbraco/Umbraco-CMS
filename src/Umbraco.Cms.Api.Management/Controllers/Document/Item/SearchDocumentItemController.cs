@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -18,18 +20,35 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
+    private readonly ISearchResultAncestorService _searchResultAncestorService;
 
     [ActivatorUtilitiesConstructor]
     public SearchDocumentItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IDocumentPresentationFactory documentPresentationFactory,
-        IDataTypeService dataTypeService)
+        IDataTypeService dataTypeService,
+        ISearchResultAncestorService searchResultAncestorService)
     {
         _indexedEntitySearchService = indexedEntitySearchService;
         _documentPresentationFactory = documentPresentationFactory;
         _dataTypeService = dataTypeService;
+        _searchResultAncestorService = searchResultAncestorService;
     }
 
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public SearchDocumentItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDataTypeService dataTypeService)
+        : this(
+            indexedEntitySearchService,
+            documentPresentationFactory,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<ISearchResultAncestorService>())
+    {
+    }
+
+#pragma warning disable CS0618 // Type or member is obsolete
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public SearchDocumentItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
@@ -40,6 +59,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
             StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
     {
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -65,7 +85,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedModel<SearchDocumentItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Searches document items.")]
     [EndpointDescription("Searches document items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchWithTrashed(
@@ -91,9 +111,23 @@ public class SearchDocumentItemController : DocumentItemControllerBase
             take,
             ignoreUserStartNodes);
 
-        var result = new PagedModel<DocumentItemResponseModel>
+        IDocumentEntitySlim[] documentEntities = searchResult.Items.OfType<IDocumentEntitySlim>().ToArray();
+
+        IReadOnlyDictionary<Guid, IReadOnlyList<SearchResultAncestorModel>> ancestorsByKey =
+            await _searchResultAncestorService.ResolveAsync(documentEntities, UmbracoObjectTypes.Document);
+
+        SearchDocumentItemResponseModel[] items = documentEntities
+            .Select(entity =>
+                _documentPresentationFactory.CreateSearchItemResponseModel(
+                    entity,
+                    ancestorsByKey.TryGetValue(entity.Key, out IReadOnlyList<SearchResultAncestorModel>? ancestors)
+                        ? ancestors
+                        : []))
+            .ToArray();
+
+        var result = new PagedModel<SearchDocumentItemResponseModel>
         {
-            Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
+            Items = items,
             Total = searchResult.Total,
         };
 

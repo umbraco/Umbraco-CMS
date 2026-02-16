@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
@@ -24,8 +25,10 @@ internal sealed class MediaPresentationFactory : IMediaPresentationFactory
         _idKeyMap = idKeyMap;
     }
 
+    /// <inheritdoc/>
     public MediaResponseModel CreateResponseModel(IMedia media) => _umbracoMapper.Map<MediaResponseModel>(media)!;
 
+    /// <inheritdoc/>
     public MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity)
     {
         Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Media);
@@ -41,6 +44,24 @@ internal sealed class MediaPresentationFactory : IMediaPresentationFactory
         };
     }
 
+    /// <inheritdoc/>
+    public SearchMediaItemResponseModel CreateSearchItemResponseModel(IMediaEntitySlim entity, IEnumerable<SearchResultAncestorModel> ancestors)
+    {
+        MediaItemResponseModel baseModel = CreateItemResponseModel(entity);
+        return new SearchMediaItemResponseModel
+        {
+            Id = baseModel.Id,
+            IsTrashed = baseModel.IsTrashed,
+            Parent = baseModel.Parent,
+            HasChildren = baseModel.HasChildren,
+            MediaType = baseModel.MediaType,
+            Variants = baseModel.Variants,
+            Flags = baseModel.Flags,
+            Ancestors = ancestors,
+        };
+    }
+
+    /// <inheritdoc/>
     public IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IMediaEntitySlim entity)
         =>
         [
@@ -51,6 +72,7 @@ internal sealed class MediaPresentationFactory : IMediaPresentationFactory
             }
         ];
 
+    /// <inheritdoc/>
     public MediaTypeReferenceResponseModel CreateMediaTypeReferenceResponseModel(IMediaEntitySlim entity)
         => _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!;
 }

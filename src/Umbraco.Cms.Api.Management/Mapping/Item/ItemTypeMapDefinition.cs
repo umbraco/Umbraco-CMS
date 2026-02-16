@@ -33,6 +33,11 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
         mapper.Define<IWebhook, WebhookItemResponseModel>((_, _) => new WebhookItemResponseModel(), Map);
+        mapper.Define<IDataType, SearchDataTypeItemResponseModel>((_, _) => new SearchDataTypeItemResponseModel(), (source, target, context) => Map(source, target, context));
+        mapper.Define<IContentType, SearchDocumentTypeItemResponseModel>((_, _) => new SearchDocumentTypeItemResponseModel(), (source, target, context) => Map(source, target, context));
+        mapper.Define<IMediaType, SearchMediaTypeItemResponseModel>((_, _) => new SearchMediaTypeItemResponseModel(), (source, target, context) => Map(source, target, context));
+        mapper.Define<IMemberType, SearchMemberTypeItemResponseModel>((_, _) => new SearchMemberTypeItemResponseModel(), (source, target, context) => Map(source, target, context));
+        mapper.Define<ITemplate, SearchTemplateItemResponseModel>((_, _) => new SearchTemplateItemResponseModel { Alias = string.Empty }, (source, target, context) => Map(source, target, context));
     }
 
     // Umbraco.Code.MapAll

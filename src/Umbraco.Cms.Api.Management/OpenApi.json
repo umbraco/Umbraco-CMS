@@ -1571,7 +1571,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelDataTypeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchDataTypeItemResponseModel"
                     }
                   ]
                 }
@@ -6813,7 +6813,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelDocumentTypeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchDocumentTypeItemResponseModel"
                     }
                   ]
                 }
@@ -10984,7 +10984,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelDocumentItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchDocumentItemResponseModel"
                     }
                   ]
                 }
@@ -14674,7 +14674,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelMediaTypeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchMediaTypeItemResponseModel"
                     }
                   ]
                 }
@@ -17185,7 +17185,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelMediaItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchMediaItemResponseModel"
                     }
                   ]
                 }
@@ -20310,7 +20310,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelMemberTypeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchMemberTypeItemResponseModel"
                     }
                   ]
                 }
@@ -22583,7 +22583,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelMemberItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchMemberItemResponseModel"
                     }
                   ]
                 }
@@ -30662,7 +30662,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelTemplateItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelSearchTemplateItemResponseModel"
                     }
                   ]
                 }
@@ -46222,102 +46222,6 @@
         },
         "additionalProperties": false
       },
-      "PagedModelDataTypeItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DataTypeItemResponseModel"
-                }
-              ]
-            }
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedModelDocumentItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentItemResponseModel"
-                }
-              ]
-            }
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedModelDocumentTypeItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentTypeItemResponseModel"
-                }
-              ]
-            }
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedModelMediaItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/MediaItemResponseModel"
-                }
-              ]
-            }
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedModelMediaTypeItemResponseModel": {
         "required": [
           "items",
@@ -46342,7 +46246,7 @@
         },
         "additionalProperties": false
       },
-      "PagedModelMemberItemResponseModel": {
+      "PagedModelSearchDataTypeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -46354,7 +46258,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MemberItemResponseModel"
+                  "$ref": "#/components/schemas/SearchDataTypeItemResponseModel"
                 }
               ]
             }
@@ -46366,7 +46270,7 @@
         },
         "additionalProperties": false
       },
-      "PagedModelMemberTypeItemResponseModel": {
+      "PagedModelSearchDocumentItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -46378,7 +46282,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MemberTypeItemResponseModel"
+                  "$ref": "#/components/schemas/SearchDocumentItemResponseModel"
                 }
               ]
             }
@@ -46390,7 +46294,7 @@
         },
         "additionalProperties": false
       },
-      "PagedModelTemplateItemResponseModel": {
+      "PagedModelSearchDocumentTypeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -46402,7 +46306,127 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/TemplateItemResponseModel"
+                  "$ref": "#/components/schemas/SearchDocumentTypeItemResponseModel"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedModelSearchMediaItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchMediaItemResponseModel"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedModelSearchMediaTypeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchMediaTypeItemResponseModel"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedModelSearchMemberItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchMemberItemResponseModel"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedModelSearchMemberTypeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchMemberTypeItemResponseModel"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedModelSearchTemplateItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchTemplateItemResponseModel"
                 }
               ]
             }
@@ -47865,6 +47889,417 @@
         },
         "additionalProperties": false
       },
+      "SearchDataTypeItemResponseModel": {
+        "required": [
+          "ancestors",
+          "editorAlias",
+          "flags",
+          "id",
+          "isDeletable",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "editorUiAlias": {
+            "type": "string",
+            "nullable": true
+          },
+          "editorAlias": {
+            "type": "string"
+          },
+          "isDeletable": {
+            "type": "boolean"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchDocumentItemResponseModel": {
+        "required": [
+          "ancestors",
+          "documentType",
+          "flags",
+          "hasChildren",
+          "id",
+          "isProtected",
+          "isTrashed",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "isProtected": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchDocumentTypeItemResponseModel": {
+        "required": [
+          "ancestors",
+          "flags",
+          "id",
+          "isElement",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "isElement": {
+            "type": "boolean"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchMediaItemResponseModel": {
+        "required": [
+          "ancestors",
+          "flags",
+          "hasChildren",
+          "id",
+          "isTrashed",
+          "mediaType",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                }
+              ]
+            }
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchMediaTypeItemResponseModel": {
+        "required": [
+          "ancestors",
+          "flags",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchMemberItemResponseModel": {
+        "required": [
+          "ancestors",
+          "flags",
+          "id",
+          "kind",
+          "memberType",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "memberType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MemberTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                }
+              ]
+            }
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MemberKindModel"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchMemberTypeItemResponseModel": {
+        "required": [
+          "ancestors",
+          "flags",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchResultAncestorModel": {
+        "required": [
+          "entityType",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "SearchResultResponseModel": {
         "required": [
           "fieldCount",
@@ -47893,6 +48328,49 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/FieldPresentationModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchTemplateItemResponseModel": {
+        "required": [
+          "alias",
+          "ancestors",
+          "flags",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultAncestorModel"
                 }
               ]
             }

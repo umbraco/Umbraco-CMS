@@ -1,7 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Services;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -16,34 +20,64 @@ public class SearchMediaTypeItemController : MediaTypeItemControllerBase
     private readonly IEntitySearchService _entitySearchService;
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IUmbracoMapper _mapper;
+    private readonly ISearchResultAncestorService _searchResultAncestorService;
 
-    public SearchMediaTypeItemController(IEntitySearchService entitySearchService, IMediaTypeService mediaTypeService, IUmbracoMapper mapper)
+    [ActivatorUtilitiesConstructor]
+    public SearchMediaTypeItemController(
+        IEntitySearchService entitySearchService,
+        IMediaTypeService mediaTypeService,
+        IUmbracoMapper mapper,
+        ISearchResultAncestorService searchResultAncestorService)
     {
         _entitySearchService = entitySearchService;
         _mediaTypeService = mediaTypeService;
         _mapper = mapper;
+        _searchResultAncestorService = searchResultAncestorService;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public SearchMediaTypeItemController(IEntitySearchService entitySearchService, IMediaTypeService mediaTypeService, IUmbracoMapper mapper)
+        : this(
+            entitySearchService,
+            mediaTypeService,
+            mapper,
+            StaticServiceProvider.Instance.GetRequiredService<ISearchResultAncestorService>())
+    {
     }
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedModel<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedModel<SearchMediaTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Searches media type items.")]
     [EndpointDescription("Searches media type items by the provided query with pagination support.")]
-    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.MediaType, query, skip, take);
         if (searchResult.Items.Any() is false)
         {
-            return Task.FromResult<IActionResult>(Ok(new PagedModel<MediaTypeItemResponseModel> { Total = searchResult.Total }));
+            return Ok(new PagedModel<SearchMediaTypeItemResponseModel> { Total = searchResult.Total });
         }
 
+        IReadOnlyDictionary<Guid, IReadOnlyList<SearchResultAncestorModel>> ancestorsByKey =
+            await _searchResultAncestorService.ResolveAsync(searchResult.Items, UmbracoObjectTypes.MediaType);
+
         IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(searchResult.Items.Select(item => item.Key).ToArray().EmptyNull());
-        var result = new PagedModel<MediaTypeItemResponseModel>
+        IEnumerable<SearchMediaTypeItemResponseModel> searchModels = _mapper.MapEnumerable<IMediaType, SearchMediaTypeItemResponseModel>(mediaTypes);
+
+        foreach (SearchMediaTypeItemResponseModel model in searchModels)
         {
-            Items = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes),
+            if (ancestorsByKey.TryGetValue(model.Id, out IReadOnlyList<SearchResultAncestorModel>? ancestors))
+            {
+                model.Ancestors = ancestors;
+            }
+        }
+
+        var result = new PagedModel<SearchMediaTypeItemResponseModel>
+        {
+            Items = searchModels,
             Total = searchResult.Total
         };
 
-        return Task.FromResult<IActionResult>(Ok(result));
+        return Ok(result);
     }
 }

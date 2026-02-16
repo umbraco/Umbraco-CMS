@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -19,18 +21,35 @@ public class SearchMediaItemController : MediaItemControllerBase
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
+    private readonly ISearchResultAncestorService _searchResultAncestorService;
 
     [ActivatorUtilitiesConstructor]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,
-        IDataTypeService dataTypeService)
+        IDataTypeService dataTypeService,
+        ISearchResultAncestorService searchResultAncestorService)
     {
         _indexedEntitySearchService = indexedEntitySearchService;
         _mediaPresentationFactory = mediaPresentationFactory;
         _dataTypeService = dataTypeService;
+        _searchResultAncestorService = searchResultAncestorService;
     }
 
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public SearchMediaItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IMediaPresentationFactory mediaPresentationFactory,
+        IDataTypeService dataTypeService)
+        : this(
+            indexedEntitySearchService,
+            mediaPresentationFactory,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<ISearchResultAncestorService>())
+    {
+    }
+
+#pragma warning disable CS0618 // Type or member is obsolete
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
@@ -41,6 +60,7 @@ public class SearchMediaItemController : MediaItemControllerBase
             StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
     {
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -66,7 +86,7 @@ public class SearchMediaItemController : MediaItemControllerBase
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedModel<SearchMediaItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Searches media items.")]
     [EndpointDescription("Searches media items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchFromParentWithAllowedTypes(
@@ -98,9 +118,24 @@ public class SearchMediaItemController : MediaItemControllerBase
             skip,
             take,
             ignoreUserStartNodes);
-        var result = new PagedModel<MediaItemResponseModel>
+
+        IMediaEntitySlim[] mediaEntities = searchResult.Items.OfType<IMediaEntitySlim>().ToArray();
+
+        IReadOnlyDictionary<Guid, IReadOnlyList<SearchResultAncestorModel>> ancestorsByKey =
+            await _searchResultAncestorService.ResolveAsync(mediaEntities, UmbracoObjectTypes.Media);
+
+        SearchMediaItemResponseModel[] items = mediaEntities
+            .Select(entity =>
+                _mediaPresentationFactory.CreateSearchItemResponseModel(
+                    entity,
+                    ancestorsByKey.TryGetValue(entity.Key, out IReadOnlyList<SearchResultAncestorModel>? ancestors)
+                        ? ancestors
+                        : []))
+            .ToArray();
+
+        var result = new PagedModel<SearchMediaItemResponseModel>
         {
-            Items = searchResult.Items.OfType<IMediaEntitySlim>().Select(_mediaPresentationFactory.CreateItemResponseModel),
+            Items = items,
             Total = searchResult.Total,
         };
 
