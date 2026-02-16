@@ -384,6 +384,8 @@
     </Compile>
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.SiblingUserAccessEntities.cs">
       <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
+    <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.Permissions.cs">
+      <DependentUpon>UserServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

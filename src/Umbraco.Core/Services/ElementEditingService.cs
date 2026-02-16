@@ -25,6 +25,7 @@ internal sealed class ElementEditingService
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IAuditService _auditService;
+    private readonly IRelationService _relationService;
 
     public ElementEditingService(
         IElementService elementService,
@@ -68,7 +69,12 @@ internal sealed class ElementEditingService
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
         _auditService = auditService;
+        _relationService = relationService;
     }
+
+    /// <inheritdoc/>
+    protected override string RelateParentOnDeleteAlias
+        => Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias;
 
     public Task<IElement?> GetAsync(Guid key)
     {
@@ -203,6 +209,20 @@ internal sealed class ElementEditingService
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
+
+        IElement? element = await GetAsync(key);
+        if (element is null)
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        if (ContentSettings.DisableUnpublishWhenReferenced
+            && _relationService.IsRelated(element.Id, RelationDirectionFilter.Child, null))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
+        }
 
         var originalPath = string.Empty;
         Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(

@@ -9421,6 +9421,7 @@ export type GetImagingResizeUrlsData = {
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
+        format?: string;
     };
     url: '/umbraco/management/api/v1/imaging/resize/urls';
 };
