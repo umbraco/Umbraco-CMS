@@ -55,7 +55,7 @@ public sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLoc
     /// <inheritdoc />
     public bool Enabled
         => _connectionStrings.IsConnectionStringConfigured() &&
-        string.Equals(_connectionStrings.ProviderName, Constants.ProviderNames.SQLLite, StringComparison.InvariantCultureIgnoreCase) &&
+        string.Equals(_connectionStrings.ProviderName, Constants.ProviderNames.SQLite, StringComparison.InvariantCultureIgnoreCase) &&
         _efCoreScopeAccessor.Value.AmbientScope is not null;
 
     /// <inheritdoc />

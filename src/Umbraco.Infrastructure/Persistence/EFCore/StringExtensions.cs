@@ -25,6 +25,6 @@ internal static class StringExtensions
             return true;
         }
 
-        return connectionProvider is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLLite && compareString is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLLite;
+        return connectionProvider is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLite && compareString is "Microsoft.Data.SQLite" or Constants.ProviderNames.SQLite;
     }
 }

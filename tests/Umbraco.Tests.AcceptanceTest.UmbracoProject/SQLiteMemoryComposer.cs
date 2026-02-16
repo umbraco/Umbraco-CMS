@@ -15,7 +15,7 @@ public sealed class SQLiteMemoryComposer : IComposer
     {
         var connectionString = builder.Config.GetUmbracoConnectionString(out var providerName);
         if (!string.IsNullOrEmpty(connectionString) &&
-            Constants.ProviderNames.SQLLite.InvariantEquals(providerName) &&
+            Constants.ProviderNames.SQLite.InvariantEquals(providerName) &&
             connectionString.InvariantContains("Mode=Memory"))
         {
             // Open new SQLite connection to ensure in-memory database is persisted for the whole application duration

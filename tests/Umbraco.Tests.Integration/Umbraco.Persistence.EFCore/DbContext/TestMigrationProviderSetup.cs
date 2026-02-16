@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
 internal class TestSqliteMigrationProviderSetup : IMigrationProviderSetup
 {
-    public string ProviderName => Constants.ProviderNames.SQLLite;
+    public string ProviderName => Constants.ProviderNames.SQLite;
 
     public void Setup(DbContextOptionsBuilder builder, string? connectionString)
         => builder.UseSqlite(connectionString);

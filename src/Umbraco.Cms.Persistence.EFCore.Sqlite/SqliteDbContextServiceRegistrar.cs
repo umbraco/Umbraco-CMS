@@ -14,7 +14,7 @@ public class SqliteDbContextServiceRegistrar : IDbContextServiceRegistrar
 {
     /// <inheritdoc />
     public bool CanHandle(string providerName)
-        => string.Equals(providerName, Constants.ProviderNames.SQLLite, StringComparison.OrdinalIgnoreCase)
+        => string.Equals(providerName, Constants.ProviderNames.SQLite, StringComparison.OrdinalIgnoreCase)
         || string.Equals(providerName, "Microsoft.Data.SQLite", StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc />

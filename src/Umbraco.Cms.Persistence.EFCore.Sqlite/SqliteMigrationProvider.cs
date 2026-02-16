@@ -23,7 +23,7 @@ public class SqliteMigrationProvider : IMigrationProvider
         => _dbContextFactory = dbContextFactory;
 
     /// <inheritdoc />
-    public string ProviderName => Constants.ProviderNames.SQLLite;
+    public string ProviderName => Constants.ProviderNames.SQLite;
 
     /// <inheritdoc />
     public async Task MigrateAsync(EFCoreMigration migration)
