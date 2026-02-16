@@ -51,7 +51,6 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
             {
                 responseModel.Icon = contentType.Icon ?? responseModel.Icon;
                 responseModel.IsElement = contentType.IsElement;
-                responseModel.AllowedInLibrary = contentType.AllowedInLibrary;
             }
 
             return responseModel;

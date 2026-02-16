@@ -884,7 +884,6 @@ export type DocumentTypeTreeItemResponseModel = {
     isFolder: boolean;
     noAccess: boolean;
     isElement: boolean;
-    allowedInLibrary: boolean;
     icon: string;
 };
 

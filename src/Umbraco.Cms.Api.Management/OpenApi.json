@@ -46190,7 +46190,6 @@
       },
       "DocumentTypeTreeItemResponseModel": {
         "required": [
-          "allowedInLibrary",
           "flags",
           "hasChildren",
           "icon",
@@ -46237,9 +46236,6 @@
             "type": "boolean"
           },
           "isElement": {
-            "type": "boolean"
-          },
-          "allowedInLibrary": {
             "type": "boolean"
           },
           "icon": {
