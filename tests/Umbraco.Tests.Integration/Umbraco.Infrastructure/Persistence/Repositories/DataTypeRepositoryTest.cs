@@ -304,6 +304,46 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Any(dt => dt.Key == dataType.Key));
     }
 
+    [Test]
+    public void Retrieval_By_Guid_After_GetMany_By_Guid_Is_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var dataType = CreateDataType(repository);
+
+        // Clear the isolated cache so the next retrieval hits the database.
+        realCache.IsolatedCaches.ClearCache<IDataType>();
+
+        var guidRepo = (IReadRepository<Guid, IDataType>)repository;
+
+        database.EnableSqlCount = true;
+
+        // GetMany with specific GUIDs should hit the database and populate the GUID cache.
+        var result = guidRepo.GetMany(dataType.Key).ToArray();
+        Assert.IsNotEmpty(result);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent Get by the same GUID should be served from the GUID cache.
+        var cached = guidRepo.Get(dataType.Key);
+        Assert.IsNotNull(cached);
+        Assert.AreEqual(dataType.Key, cached!.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
     private static AppCaches CreateAppCaches() =>
         new(
             new ObjectCacheAppCache(),

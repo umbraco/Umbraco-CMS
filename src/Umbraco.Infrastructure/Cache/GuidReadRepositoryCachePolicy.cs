@@ -3,7 +3,6 @@
 
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -35,8 +34,14 @@ namespace Umbraco.Cms.Core.Cache;
 internal sealed class GuidReadRepositoryCachePolicy<TEntity> : RepositoryCachePolicyBase<TEntity, Guid>
     where TEntity : class, IEntity
 {
+    /// <summary>
+    /// Gets the cache key prefix used for storing GUIDs associated with the entity type.
+    /// </summary>
     internal static string GuidCacheKeyPrefix { get; } = RepositoryCacheKeys.GetGuidKey<TEntity>();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GuidReadRepositoryCachePolicy{TEntity}"/> class.
+    /// </summary>
     public GuidReadRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
@@ -104,9 +109,24 @@ internal sealed class GuidReadRepositoryCachePolicy<TEntity> : RepositoryCachePo
             }
         }
 
-        // For the full set (no IDs), always delegate to the repository.
-        // The parent int-keyed repository handles full-set caching with count validation.
-        return performGetAll(ids)?.WhereNotNull().ToArray() ?? Array.Empty<TEntity>();
+        // Cache miss (partial or full set) — delegate to the repository.
+        TEntity[] entities = performGetAll(ids)?.WhereNotNull().ToArray() ?? [];
+
+        // For specific IDs, populate the GUID cache so subsequent lookups hit the cache.
+        // For the full set (no IDs), skip, as the parent int-keyed repository handles full-set caching.
+        if (ids?.Length > 0)
+        {
+            foreach (TEntity entity in entities)
+            {
+                if (entity.HasIdentity)
+                {
+                    var cacheKey = GuidCacheKeyPrefix + entity.Key;
+                    Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+                }
+            }
+        }
+
+        return entities;
     }
 
     /// <inheritdoc />
