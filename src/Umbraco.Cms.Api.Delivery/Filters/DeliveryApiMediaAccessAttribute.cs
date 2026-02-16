@@ -4,6 +4,10 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
+/// <summary>
+/// An action filter attribute that verifies public access to the media Delivery API, returning
+/// a <c>401 Unauthorized</c> result if access is denied.
+/// </summary>
 public sealed class DeliveryApiMediaAccessAttribute : TypeFilterAttribute
 {
     public DeliveryApiMediaAccessAttribute()
