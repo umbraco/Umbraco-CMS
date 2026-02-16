@@ -109,18 +109,28 @@ export class UmbDefaultCollectionContext<
 		// The parent entity context is used to get the parent entity for the collection items
 		// All items in the collection are children of the current entity context
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
-			const currentEntityUnique = context?.getUnique();
-			const currentEntityType = context?.getEntityType();
+			if (!context) {
+				this.#parentEntityContext?.setParent(undefined);
+				return;
+			}
 
-			const parent: UmbEntityModel | undefined =
-				currentEntityUnique && currentEntityType
-					? {
-							unique: currentEntityUnique,
-							entityType: currentEntityType,
-						}
-					: undefined;
+			this.observe(
+				context.unique,
+				(currentEntityUnique) => {
+					const currentEntityType = context.getEntityType();
 
-			this.#parentEntityContext?.setParent(parent);
+					const parent: UmbEntityModel | undefined =
+						currentEntityUnique && currentEntityType
+							? {
+									unique: currentEntityUnique,
+									entityType: currentEntityType,
+								}
+							: undefined;
+
+					this.#parentEntityContext?.setParent(parent);
+				},
+				'_observeEntityContextUnique',
+			);
 		});
 	}
 

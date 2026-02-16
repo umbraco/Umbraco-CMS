@@ -58,6 +58,19 @@ export class UmbContentCollectionManager<
 			},
 			null,
 		);
+
+		// Observe the workspace unique so the collection config stays in sync
+		// when unique is set after initial config creation (e.g. during createScaffold).
+		this.observe(
+			this.#host.unique,
+			(unique) => {
+				const currentConfig = this.#collectionConfig.getValue();
+				if (currentConfig) {
+					this.#collectionConfig.setValue({ ...currentConfig, unique });
+				}
+			},
+			'_observeHostUnique',
+		);
 	}
 
 	getCollectionAlias() {
