@@ -103,19 +103,27 @@ internal sealed class ElementEditingService
             createModel.Variants.Select(variant => variant.Culture),
             userKey);
 
-    public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
+    protected override IContentType? TryGetAndValidateContentType(
+        Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase,
+        out ContentEditingOperationStatus operationStatus)
     {
-        IContentType? contentType = await ContentTypeService.GetAsync(createModel.ContentTypeKey);
+        IContentType? contentType = base.TryGetAndValidateContentType(contentTypeKey, contentEditingModelBase, out operationStatus);
         if (contentType is null)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ElementCreateResult());
+            return null;
         }
 
         if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ElementCreateResult());
+            operationStatus = ContentEditingOperationStatus.NotAllowed;
+            return null;
         }
 
+        return contentType;
+    }
+
+    public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
+    {
         if (await ValidateCulturesAsync(createModel) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ElementCreateResult());
