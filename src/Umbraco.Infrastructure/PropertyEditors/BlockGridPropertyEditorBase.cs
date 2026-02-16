@@ -104,6 +104,38 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
             },
         };
 
+        // Build content data schema with allowed content type constraints
+        var contentDataItemSchema = blockItemDataSchema.DeepClone().AsObject();
+        if (config?.Blocks is { Length: > 0 })
+        {
+            var allowedContentTypes = new JsonArray();
+            foreach (var block in config.Blocks)
+            {
+                allowedContentTypes.Add(JsonValue.Create(block.ContentElementTypeKey.ToString()));
+            }
+
+            contentDataItemSchema["properties"]!["contentTypeKey"]!.AsObject()["enum"] = allowedContentTypes;
+        }
+
+        // Build settings data schema with allowed settings type constraints
+        var settingsDataItemSchema = blockItemDataSchema.DeepClone().AsObject();
+        if (config?.Blocks is { Length: > 0 })
+        {
+            var allowedSettingsTypes = new JsonArray();
+            foreach (var block in config.Blocks)
+            {
+                if (block.SettingsElementTypeKey.HasValue)
+                {
+                    allowedSettingsTypes.Add(JsonValue.Create(block.SettingsElementTypeKey.Value.ToString()));
+                }
+            }
+
+            if (allowedSettingsTypes.Count > 0)
+            {
+                settingsDataItemSchema["properties"]!["contentTypeKey"]!.AsObject()["enum"] = allowedSettingsTypes;
+            }
+        }
+
         // Build the main schema
         var schema = new JsonObject
         {
@@ -130,12 +162,12 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
                 ["contentData"] = new JsonObject
                 {
                     ["type"] = "array",
-                    ["items"] = blockItemDataSchema,
+                    ["items"] = contentDataItemSchema,
                 },
                 ["settingsData"] = new JsonObject
                 {
                     ["type"] = "array",
-                    ["items"] = blockItemDataSchema.DeepClone(),
+                    ["items"] = settingsDataItemSchema,
                 },
             },
         };
