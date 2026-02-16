@@ -12,13 +12,14 @@ public class UserGroup2PermissionDto
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2Permission;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
+    private const string UserGroupKeyColumnName = "userGroupKey";
     private const string PermissionColumnName = "permission";
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_userGroup2Permission", AutoIncrement = true)]
     public int Id { get; set; }
 
-    [Column("userGroupKey")]
+    [Column(UserGroupKeyColumnName)]
     [Index(IndexTypes.NonClustered, IncludeColumns = PermissionColumnName)]
     [ForeignKey(typeof(UserGroupDto), Column = UserGroupDto.KeyColumnName)]
     public Guid UserGroupKey { get; set; }

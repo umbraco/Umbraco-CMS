@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -47,6 +49,8 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IEntityService EntityService => GetRequiredService<IEntityService>();
+
+    private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     private async Task<IContentType> CreateInvariantElementType(bool allowedAtRoot = true)
     {
@@ -106,13 +110,17 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         return elementType;
     }
 
-    private async Task<IElement> CreateInvariantElement(Guid? parentKey = null)
+    private async Task<IElement> CreateInvariantElement(Guid? parentKey = null, Guid? contentTypeKey = null)
     {
-        var elementType = await CreateInvariantElementType();
+        if (contentTypeKey is null)
+        {
+            var elementType = await CreateInvariantElementType();
+            contentTypeKey = elementType.Key;
+        }
 
         var createModel = new ElementCreateModel
         {
-            ContentTypeKey = elementType.Key,
+            ContentTypeKey = contentTypeKey.Value,
             ParentKey = parentKey,
             Variants =
             [
@@ -220,6 +228,10 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
 
     private IEntitySlim[] GetFolderChildren(Guid containerKey, bool trashed = false)
         => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 999, trashed, out _).ToArray();
+
+    public static void ConfigureDisableUnpublishWhenReferenced(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableUnpublishWhenReferenced = true);
 
     internal sealed class ElementNotificationHandler : INotificationHandler<ElementUnpublishingNotification>
     {

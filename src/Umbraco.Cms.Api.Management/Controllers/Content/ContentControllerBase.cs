@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -10,6 +12,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
+    protected abstract string EntityName { get; }
+
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
@@ -78,12 +82,12 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("The supplied name is already in use for the same content type.")
                 .Build()),
             ContentEditingOperationStatus.CannotDeleteWhenReferenced => BadRequest(problemDetailsBuilder
-                .WithTitle("Cannot delete a referenced content item")
-                .WithDetail("Cannot delete a referenced document, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
+                .WithTitle($"Cannot delete a referenced {EntityName}")
+                .WithDetail($"Cannot delete a referenced {EntityName}, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
                 .Build()),
             ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced => BadRequest(problemDetailsBuilder
-                .WithTitle("Cannot move a referenced document to the recycle bin")
-                .WithDetail("Cannot move a referenced document to the recycle bin, while the setting ContentSettings.DisableUnpublishWhenReferenced is enabled.")
+                .WithTitle($"Cannot move a referenced {EntityName} to the recycle bin")
+                .WithDetail($"Cannot move a referenced {EntityName} to the recycle bin, while the setting ContentSettings.DisableUnpublishWhenReferenced is enabled.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
@@ -105,6 +109,122 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Unknown get references operation status.")
                 .Build()),
         });
+
+    protected IActionResult ContentPublishingOperationStatusResult(
+        ContentPublishingOperationStatus status,
+        IEnumerable<string>? invalidPropertyAliases = null,
+        IEnumerable<ContentPublishingBranchItemResult>? failedBranchItems = null)
+        => OperationStatusResult(
+            status,
+            problemDetailsBuilder => status switch
+            {
+                ContentPublishingOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
+                    .WithTitle($"The requested {EntityName} could not be found")
+                    .Build()),
+                ContentPublishingOperationStatus.CancelledByEvent => BadRequest(problemDetailsBuilder
+                    .WithTitle("Publish cancelled by event")
+                    .WithDetail("The publish operation was cancelled by an event.")
+                    .Build()),
+                ContentPublishingOperationStatus.ContentInvalid => BadRequest(problemDetailsBuilder
+                    .WithTitle($"Invalid {EntityName}")
+                    .WithDetail($"The specified {EntityName} had an invalid configuration.")
+                    .WithExtension("invalidProperties", invalidPropertyAliases ?? Enumerable.Empty<string>())
+                    .Build()),
+                ContentPublishingOperationStatus.NothingToPublish => BadRequest(problemDetailsBuilder
+                    .WithTitle("Nothing to publish")
+                    .WithDetail("None of the specified cultures needed publishing.")
+                    .Build()),
+                ContentPublishingOperationStatus.MandatoryCultureMissing => BadRequest(problemDetailsBuilder
+                    .WithTitle("Mandatory culture missing")
+                    .WithDetail("Must include all mandatory cultures when publishing.")
+                    .Build()),
+                ContentPublishingOperationStatus.HasExpired => BadRequest(problemDetailsBuilder
+                    .WithTitle($"{EntityName.ToFirstUpperInvariant()} expired")
+                    .WithDetail($"Could not publish the {EntityName} because it was expired.")
+                    .Build()),
+                ContentPublishingOperationStatus.CultureHasExpired => BadRequest(problemDetailsBuilder
+                    .WithTitle($"{EntityName.ToFirstUpperInvariant()} culture expired")
+                    .WithDetail($"Could not publish the {EntityName} because some of the specified cultures were expired.")
+                    .Build()),
+                ContentPublishingOperationStatus.AwaitingRelease => BadRequest(problemDetailsBuilder
+                    .WithTitle($"{EntityName.ToFirstUpperInvariant()} awaiting release")
+                    .WithDetail($"Could not publish the {EntityName} because it was awaiting release.")
+                    .Build()),
+                ContentPublishingOperationStatus.CultureAwaitingRelease => BadRequest(problemDetailsBuilder
+                    .WithTitle($"{EntityName.ToFirstUpperInvariant()} culture awaiting release")
+                    .WithDetail(
+                        $"Could not publish the {EntityName} because some of the specified cultures were awaiting release.")
+                    .Build()),
+                ContentPublishingOperationStatus.InTrash => BadRequest(problemDetailsBuilder
+                    .WithTitle($"{EntityName.ToFirstUpperInvariant()} in the recycle bin")
+                    .WithDetail($"Could not publish the {EntityName} because it was in the recycle bin.")
+                    .Build()),
+                ContentPublishingOperationStatus.PathNotPublished => BadRequest(problemDetailsBuilder
+                    .WithTitle("Parent not published")
+                    .WithDetail($"Could not publish the {EntityName} because its parent was not published.")
+                    .Build()),
+                ContentPublishingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid cultures specified")
+                    .WithDetail("A specified culture is not valid for the operation.")
+                    .Build()),
+                ContentPublishingOperationStatus.CultureMissing => BadRequest(problemDetailsBuilder
+                    .WithTitle("Culture missing")
+                    .WithDetail("A culture needs to be specified to execute the operation.")
+                    .Build()),
+                ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant => BadRequest(problemDetailsBuilder
+                    .WithTitle("Cannot publish invariant when variant")
+                    .WithDetail($"Cannot publish invariant culture when the {EntityName} varies by culture.")
+                    .Build()),
+                ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant => BadRequest(problemDetailsBuilder
+                    .WithTitle("Cannot publish variant when not variant.")
+                    .WithDetail($"Cannot publish a given culture when the {EntityName} is invariant.")
+                    .Build()),
+                ContentPublishingOperationStatus.ConcurrencyViolation => BadRequest(problemDetailsBuilder
+                    .WithTitle("Concurrency violation detected")
+                    .WithDetail("An attempt was made to publish a version older than the latest version.")
+                    .Build()),
+                ContentPublishingOperationStatus.UnsavedChanges => BadRequest(problemDetailsBuilder
+                    .WithTitle("Unsaved changes")
+                    .WithDetail(
+                        $"Could not publish the {EntityName} because it had unsaved changes. Make sure to save all changes before attempting a publish.")
+                    .Build()),
+                ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime => BadRequest(problemDetailsBuilder
+                    .WithTitle("Unpublish time needs to be after the publish time")
+                    .WithDetail(
+                        "Cannot handle an unpublish time that is not after the specified publish time.")
+                    .Build()),
+                ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture => BadRequest(problemDetailsBuilder
+                    .WithTitle("Publish time needs to be higher than the current time")
+                    .WithDetail(
+                        "Cannot handle a publish time that is not after the current server time.")
+                    .Build()),
+                ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture => BadRequest(problemDetailsBuilder
+                    .WithTitle("Unpublish time needs to be higher than the current time")
+                    .WithDetail(
+                        "Cannot handle an unpublish time that is not after the current server time.")
+                    .Build()),
+                ContentPublishingOperationStatus.CannotUnpublishWhenReferenced => BadRequest(problemDetailsBuilder
+                    .WithTitle($"Cannot unpublish {EntityName} when it's referenced somewhere else.")
+                    .WithDetail(
+                        $"Cannot unpublish a referenced {EntityName}, while the setting ContentSettings.DisableUnpublishWhenReferenced is enabled.")
+                    .Build()),
+                ContentPublishingOperationStatus.FailedBranch => BadRequest(problemDetailsBuilder
+                    .WithTitle("Failed branch operation")
+                    .WithDetail("One or more items in the branch could not complete the operation.")
+                    .WithExtension("failedBranchItems", failedBranchItems?.Select(item => new DocumentPublishBranchItemResult { Id = item.Key, OperationStatus = item.OperationStatus }) ?? [])
+                    .Build()),
+                ContentPublishingOperationStatus.Failed => BadRequest(
+                    problemDetailsBuilder
+                        .WithTitle("Publish or unpublish failed")
+                        .WithDetail(
+                            "An unspecified error occurred while (un)publishing. Please check the logs for additional information.")
+                        .Build()),
+                ContentPublishingOperationStatus.TaskResultNotFound => NotFound(problemDetailsBuilder
+                    .WithTitle("The result of the submitted task could not be found")
+                    .Build()),
+
+                _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
+            });
 
     protected IActionResult ContentEditingOperationStatusResult<TContentModelBase, TValueModel, TVariantModel>(
         ContentEditingOperationStatus status,
