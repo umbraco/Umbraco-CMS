@@ -164,6 +164,7 @@ public sealed class BlockEditorVarianceHandler
     public void AlignExposeVariance(BlockValue blockValue)
     {
         var contentDataToAlign = new List<BlockItemData>();
+        var validContentKeys = blockValue.ContentData.Select(cd => cd.Key).ToHashSet();
         var elementTypesByKey = blockValue
             .ContentData
             .Select(cd => cd.ContentTypeKey)
@@ -197,11 +198,11 @@ public sealed class BlockEditorVarianceHandler
             }
         }
 
-        if (contentDataToAlign.Any() is false)
-        {
-            return;
-        }
+        // Remove expose entries that don't have matching ContentData
+        blockValue.Expose.RemoveAll(v => !validContentKeys.Contains(v.ContentKey));
 
+        if (contentDataToAlign.Any())
+        {
         blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
         foreach (BlockItemData contentData in contentDataToAlign)
         {
@@ -211,6 +212,7 @@ public sealed class BlockEditorVarianceHandler
                          .DistinctBy(v => v.Culture + v.Segment))
             {
                 blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
+                }
             }
         }
 
