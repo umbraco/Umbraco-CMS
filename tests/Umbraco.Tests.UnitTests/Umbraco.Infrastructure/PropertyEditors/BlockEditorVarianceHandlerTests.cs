@@ -168,6 +168,6 @@ public class BlockEditorVarianceHandlerTests
         elementType.SetupGet(e => e.Key).Returns(element.ContentType.Key);
         elementType.SetupGet(e => e.Variations).Returns(element.ContentType.Variations);
         contentTypeServiceMock.Setup(c => c.Get(element.ContentType.Key)).Returns(elementType.Object);
-        return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object);
+        return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object, Mock.Of<IVariationContextAccessor>());
     }
 }
