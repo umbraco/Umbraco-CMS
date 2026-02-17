@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -17,7 +19,11 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     private readonly Guid _folderObjectTypeId;
     private bool _foldersOnly;
 
+    protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
+    protected IEntitySearchService EntitySearchService { get; }
+
+    protected IIdKeyMap IdKeyMap { get; }
 
     protected override Ordering ItemOrdering
     {
@@ -54,8 +60,12 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         FlagProviderCollection flagProviders,
         IEntitySearchService entitySearchService,
         IIdKeyMap idKeyMap)
-        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
+        : base(entityService, flagProviders)
+    {
+        EntitySearchService = entitySearchService;
+        IdKeyMap = idKeyMap;
         _folderObjectTypeId = FolderObjectType.GetGuid();
+    }
 
 
     /// <inheritdoc/>
@@ -173,4 +183,64 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     }
 
     private UmbracoObjectTypes[] GetObjectTypes() => _foldersOnly ? [FolderObjectType] : [FolderObjectType, ItemObjectType];
+
+    protected async Task<ActionResult<PagedViewModel<TItem>>> SearchTreeEntities(
+        string? query,
+        int skip,
+        int take,
+        TreeItemKind itemKind)
+    {
+        PagedModel<IEntitySlim> itemSearchResult =
+            query.IsNullOrWhiteSpace()
+                ? EntitySearchService.Search(GetItemObjectTypes(itemKind), skip, take)
+                : EntitySearchService.Search(GetItemObjectTypes(itemKind), query, skip, take);
+
+        (IEntitySlim[] entities, long totalItems) =
+            await FilterTreeEntities(itemSearchResult.Items.ToArray(), itemSearchResult.Total);
+
+        TItem[] treeItemViewModels = MapSearchTreeItemViewModels(entities);
+
+        await PopulateFlags(treeItemViewModels);
+
+        PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
+
+        return Ok(result);
+    }
+
+    protected virtual TItem[] MapSearchTreeItemViewModels(IEntitySlim[] entities)
+        => entities.Select(entity => MapTreeItemViewModel(
+                FolderObjectType == UmbracoObjectTypes.Unknown
+                    ? null
+                    : IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType).Result,
+                entity))
+            .ToArray();
+
+    private IEnumerable<UmbracoObjectTypes> GetItemObjectTypes(TreeItemKind itemKind)
+    {
+        var types = new List<UmbracoObjectTypes>();
+
+        if (itemKind.HasFlag(TreeItemKind.Item))
+        {
+            types.Add(ItemObjectType);
+        }
+
+        if (itemKind.HasFlag(TreeItemKind.Folder) && FolderObjectType != UmbracoObjectTypes.Unknown)
+        {
+            types.Add(FolderObjectType);
+        }
+
+        return types.Count > 0 ? types : [ItemObjectType];
+    }
+
+    /// <summary>
+    /// Specifies the types of tree items to include in search results.
+    /// </summary>
+    [Flags]
+    public enum TreeItemKind
+    {
+        None = 0,
+        Item = 1,
+        Folder = 2,
+        All = Item | Folder
+    }
 }

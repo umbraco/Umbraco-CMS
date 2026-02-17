@@ -75,38 +75,10 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
-    protected DocumentTreeControllerBase(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        IPublicAccessService publicAccessService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory,
-        IDocumentPermissionFilterService documentPermissionFilterService)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            userStartNodeEntitiesService,
-            dataTypeService,
-            publicAccessService,
-            appCaches,
-            backofficeSecurityAccessor,
-            documentPresentationFactory,
-            documentPermissionFilterService)
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
-        IEntitySearchService entitySearchService,
-        IIdKeyMap idKeyMap,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
@@ -114,7 +86,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory,
         IDocumentPermissionFilterService documentPermissionFilterService)
-        : base(entityService, flagProviders, entitySearchService, idKeyMap, userStartNodeEntitiesService, dataTypeService)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;
@@ -124,8 +96,6 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
-
-    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Document;
 
     protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 

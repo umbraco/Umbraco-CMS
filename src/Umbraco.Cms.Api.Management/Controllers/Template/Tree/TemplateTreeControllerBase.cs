@@ -24,25 +24,12 @@ public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEnt
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public TemplateTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
     public TemplateTreeControllerBase(
         IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IEntitySearchService entitySearchService,
-        IIdKeyMap idKeyMap)
-        : base(entityService, flagProviders, entitySearchService, idKeyMap)
+        FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Template;
-    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Unknown;
 }

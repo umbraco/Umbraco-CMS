@@ -46,40 +46,16 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MediaTreeControllerBase(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            userStartNodeEntitiesService,
-            dataTypeService,
-            appCaches,
-            backofficeSecurityAccessor,
-            mediaPresentationFactory)
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public MediaTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
-        IEntitySearchService entitySearchService,
-        IIdKeyMap idKeyMap,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, flagProviders, entitySearchService, idKeyMap, userStartNodeEntitiesService, dataTypeService)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -87,7 +63,6 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
-    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Media;
 
     protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 

@@ -445,6 +445,12 @@ public interface IEntityService
     /// <returns>The path with each ID converted to a GUID.</returns>
     Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false) => [];
 
+    /// <summary>
+    /// Gets descendants of root for multiple object types.
+    /// </summary>
+    /// <remarks>
+    /// This method has a no-op default implementation.
+    /// </remarks>
     IEnumerable<IEntitySlim> GetPagedDescendants(
         IEnumerable<UmbracoObjectTypes> objectTypes,
         long pageIndex,
@@ -452,5 +458,9 @@ public interface IEntityService
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null,
-        bool includeTrashed = true);
+        bool includeTrashed = true)
+    {
+        totalRecords = 0;
+        return [];
+    }
 }

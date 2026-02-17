@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -23,8 +24,7 @@ internal sealed class EntitySearchService : IEntitySearchService
     {
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
 
-        // if the query is a GUID, search for that explicitly
-        Guid.TryParse(query, out Guid guidQuery);
+        IQuery<IUmbracoEntity> filter = CreateQueryFilter(query);
 
         IEntitySlim[] entities = _entityService
             .GetPagedDescendants(
@@ -32,8 +32,7 @@ internal sealed class EntitySearchService : IEntitySearchService
                 pageNumber,
                 pageSize,
                 out long totalRecords,
-                _sqlContext.Query<IUmbracoEntity>()
-                    .Where(x => x.Name!.Contains(query) || x.Key == guidQuery),
+                filter,
                 Ordering.By(nameof(NodeDto.Text).ToFirstLowerInvariant()))
             .ToArray();
 
@@ -45,11 +44,16 @@ internal sealed class EntitySearchService : IEntitySearchService
     }
 
     public PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, string query, int skip = 0, int take = 100)
+        => SearchInternal(objectTypes, query, skip, take);
+
+    public PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, int skip = 0, int take = 100)
+        => SearchInternal(objectTypes, null, skip, take);
+
+    private PagedModel<IEntitySlim> SearchInternal(IEnumerable<UmbracoObjectTypes> objectTypes, string? query, int skip, int take)
     {
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
 
-        // if the query is a GUID, search for that explicitly
-        Guid.TryParse(query, out Guid guidQuery);
+        IQuery<IUmbracoEntity> filter = CreateQueryFilter(query);
 
         IEntitySlim[] entities = _entityService
             .GetPagedDescendants(
@@ -57,8 +61,7 @@ internal sealed class EntitySearchService : IEntitySearchService
                 pageNumber,
                 pageSize,
                 out long totalRecords,
-                _sqlContext.Query<IUmbracoEntity>()
-                    .Where(x => x.Name!.Contains(query) || x.Key == guidQuery),
+                filter,
                 Ordering.By(nameof(NodeDto.Text).ToFirstLowerInvariant()))
             .ToArray();
 
@@ -69,24 +72,18 @@ internal sealed class EntitySearchService : IEntitySearchService
         };
     }
 
-    public PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, int skip = 0, int take = 100)
+    private IQuery<IUmbracoEntity> CreateQueryFilter(string? query)
     {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
-
-        IEntitySlim[] entities = _entityService
-            .GetPagedDescendants(
-                objectTypes,
-                pageNumber,
-                pageSize,
-                out long totalRecords,
-                _sqlContext.Query<IUmbracoEntity>(),
-                Ordering.By(nameof(NodeDto.Text).ToFirstLowerInvariant()))
-            .ToArray();
-
-        return new PagedModel<IEntitySlim>
+        if (string.IsNullOrWhiteSpace(query))
         {
-            Items = entities,
-            Total = totalRecords
-        };
+            return _sqlContext.Query<IUmbracoEntity>();
+        }
+
+        if (Guid.TryParse(query, out Guid guidQuery))
+        {
+            return _sqlContext.Query<IUmbracoEntity>().Where(x => x.Key == guidQuery);
+        }
+
+        return _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(query));
     }
 }

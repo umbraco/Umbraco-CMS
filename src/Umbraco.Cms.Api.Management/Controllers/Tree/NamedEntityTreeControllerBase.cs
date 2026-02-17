@@ -16,22 +16,10 @@ public abstract class NamedEntityTreeControllerBase<TItem> : EntityTreeControlle
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    protected NamedEntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
     protected NamedEntityTreeControllerBase(
         IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IEntitySearchService entitySearchService,
-        IIdKeyMap idKeyMap)
-        : base(entityService, flagProviders, entitySearchService, idKeyMap)
+        FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 

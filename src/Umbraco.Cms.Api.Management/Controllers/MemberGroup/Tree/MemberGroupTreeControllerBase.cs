@@ -24,25 +24,12 @@ public class MemberGroupTreeControllerBase : NamedEntityTreeControllerBase<Named
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberGroupTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
     public MemberGroupTreeControllerBase(
         IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IEntitySearchService entitySearchService,
-        IIdKeyMap idKeyMap)
-        : base(entityService, flagProviders, entitySearchService, idKeyMap)
+        FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MemberGroup;
-    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.Unknown;
 }
