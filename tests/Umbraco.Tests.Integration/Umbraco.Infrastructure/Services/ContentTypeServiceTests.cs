@@ -611,19 +611,23 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
 
-        // Enable cancellation on the deleting notification handler
-        ContentTypeDeletingNotificationHandler.CancelOperation = true;
+        try
+        {
+            // Enable cancellation on the deleting notification handler
+            ContentTypeDeletingNotificationHandler.CancelOperation = true;
 
-        var result = await ContentTypeService.DeleteAsync(contentType.Key, Constants.Security.SuperUserKey);
+            var result = await ContentTypeService.DeleteAsync(contentType.Key, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(ContentTypeOperationStatus.CancelledByNotification, result);
+            Assert.AreEqual(ContentTypeOperationStatus.CancelledByNotification, result);
 
-        // Verify the content type was NOT deleted
-        var stillExists = ContentTypeService.Get(contentType.Id);
-        Assert.IsNotNull(stillExists);
-
-        // Clean up
-        ContentTypeDeletingNotificationHandler.CancelOperation = false;
+            // Verify the content type was NOT deleted
+            var stillExists = ContentTypeService.Get(contentType.Id);
+            Assert.IsNotNull(stillExists);
+        }
+        finally
+        {
+            ContentTypeDeletingNotificationHandler.CancelOperation = false;
+        }
     }
 
     [Test]
