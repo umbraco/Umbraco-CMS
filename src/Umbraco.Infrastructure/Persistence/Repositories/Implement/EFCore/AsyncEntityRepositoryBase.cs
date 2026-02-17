@@ -134,13 +134,13 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
         if (ids.Length <= Core.Constants.Sql.MaxParameterCount)
         {
-            return await CachePolicy.GetAllAsync(ids, PerformGetAllAsync);
+            return await CachePolicy.GetAllAsync(PerformGetAllAsync);
         }
 
         var entities = new List<TEntity>();
         foreach (IEnumerable<TId> group in ids.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
         {
-            TEntity[] groups = await CachePolicy.GetAllAsync(group.ToArray(), PerformGetAllAsync);
+            TEntity[] groups = await CachePolicy.GetAllAsync(PerformGetAllAsync);
             entities.AddRange(groups);
         }
 
@@ -160,7 +160,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
 
     protected abstract Task<TEntity?> PerformGetAsync(TId? id);
 
-    protected abstract Task<IEnumerable<TEntity>?> PerformGetAllAsync(params TId[]? ids);
+    protected abstract Task<IEnumerable<TEntity>?> PerformGetAllAsync();
 
     protected abstract Task PersistNewItemAsync(TEntity item);
 
@@ -169,16 +169,19 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     protected virtual Task<bool> PerformExistsAsync(TId id)
         => AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            var intId = Convert.ToInt32(id);
-            return await db.Set<TEntity>().AnyAsync(e => e.Id == intId);
+            if (id is not Guid key)
+            {
+                return false;
+            }
+
+            return await db.Set<TEntity>().AnyAsync(e => e.Key == key);
         });
 
     protected virtual async Task PersistDeletedItemAsync(TEntity entity)
     {
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            db.Set<TEntity>().Remove(entity);
-            await db.SaveChangesAsync();
+            await db.Set<TEntity>().Where(x => x.Id == entity.Id).ExecuteDeleteAsync();
             return true;
         });
 

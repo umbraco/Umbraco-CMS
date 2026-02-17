@@ -71,7 +71,7 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     public abstract Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeleted);
 
     /// <inheritdoc />
-    public abstract Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll);
+    public abstract Task<TEntity[]> GetAllAsync(Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
     public abstract Task ClearAllAsync();

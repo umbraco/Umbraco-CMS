@@ -47,8 +47,8 @@ public class AsyncNoCacheRepositoryCachePolicy<TEntity, TId> : IAsyncRepositoryC
     public async Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeleted) => await persistDeleted(entity);
 
     /// <inheritdoc />
-    public async Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll) =>
-        (await performGetAll(ids))?.ToArray() ?? Array.Empty<TEntity>();
+    public async Task<TEntity[]> GetAllAsync(Func<Task<IEnumerable<TEntity>?>> performGetAll) =>
+        (await performGetAll())?.ToArray() ?? Array.Empty<TEntity>();
 
     /// <inheritdoc />
     public Task ClearAllAsync() => Task.CompletedTask;

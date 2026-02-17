@@ -68,11 +68,10 @@ public interface IAsyncRepositoryCachePolicy<TEntity, TId>
     /// <summary>
     ///     Gets entities.
     /// </summary>
-    /// <param name="ids">The identifiers.</param>
     /// <param name="performGetAll">The repository PerformGetAll method.</param>
-    /// <returns>If <paramref name="ids" /> is empty, all entities, else the entities with the specified identifiers.</returns>
+    /// <returns> Returns all entities.</returns>
     /// <remarks>Get all the entities. Either from the cache or the repository depending on the implementation.</remarks>
-    Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll);
+    Task<TEntity[]> GetAllAsync(Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <summary>
     ///     Clears the entire cache.
