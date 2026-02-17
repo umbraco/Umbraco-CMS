@@ -13,7 +13,7 @@ internal sealed class AccessRuleDto
     public const string TableName = Constants.DatabaseSchema.Tables.AccessRule;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    internal const string AccessIdColumnName = "accessId";
+    private const string AccessIdColumnName = "accessId";
 
     private const string RuleValueColumnName = "ruleValue";
     private const string RuleTypeColumnName = "ruleType";
