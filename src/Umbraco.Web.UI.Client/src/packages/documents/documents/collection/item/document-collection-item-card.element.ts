@@ -169,6 +169,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 				@deselected=${this.#onDeselected}>
 				${this.#renderIcon()} ${this.#renderState()}
 				<div id="properties">${this.#renderProperties()}</div>
+				<slot name="actions" slot="actions"></slot>
 			</uui-card-content-node>
 		`;
 	}
