@@ -33,6 +33,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
+        target.AllowedInLibrary = source.AllowedInLibrary;
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
 
         target.Containers = MapPropertyTypeContainers(source);

@@ -33,6 +33,7 @@ public class ChildrenElementTreeControllerTests : ManagementApiUserGroupTestBase
             .WithAlias(Guid.NewGuid().ToString())
             .WithName($"Test Element {Guid.NewGuid()}")
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .Build();
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 

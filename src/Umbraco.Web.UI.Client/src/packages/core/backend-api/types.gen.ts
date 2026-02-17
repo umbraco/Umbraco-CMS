@@ -204,6 +204,7 @@ export type CreateDocumentTypeRequestModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<CreateDocumentTypePropertyTypeRequestModel>;
     containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
     id?: string | null;
@@ -288,6 +289,7 @@ export type CreateMediaTypeRequestModel = {
     variesByCulture: boolean;
     variesBySegment: boolean;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
     id?: string | null;
@@ -348,6 +350,7 @@ export type CreateMemberTypeRequestModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<CreateMemberTypePropertyTypeRequestModel>;
     containers: Array<CreateMemberTypePropertyTypeContainerRequestModel>;
     id?: string | null;
@@ -805,6 +808,7 @@ export type DocumentTypeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isElement: boolean;
+    allowedInLibrary: boolean;
     icon?: string | null;
     description?: string | null;
 };
@@ -855,6 +859,7 @@ export type DocumentTypeResponseModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<DocumentTypePropertyTypeResponseModel>;
     containers: Array<DocumentTypePropertyTypeContainerResponseModel>;
     id: string;
@@ -1533,6 +1538,7 @@ export type MediaTypeResponseModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<MediaTypePropertyTypeResponseModel>;
     containers: Array<MediaTypePropertyTypeContainerResponseModel>;
     id: string;
@@ -1733,6 +1739,7 @@ export type MemberTypeResponseModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<MemberTypePropertyTypeResponseModel>;
     containers: Array<MemberTypePropertyTypeContainerResponseModel>;
     id: string;
@@ -2862,6 +2869,7 @@ export type UpdateDocumentTypeRequestModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<UpdateDocumentTypePropertyTypeRequestModel>;
     containers: Array<UpdateDocumentTypePropertyTypeContainerRequestModel>;
     allowedTemplates: Array<ReferenceByIdModel>;
@@ -2929,6 +2937,7 @@ export type UpdateMediaTypeRequestModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<UpdateMediaTypePropertyTypeRequestModel>;
     containers: Array<UpdateMediaTypePropertyTypeContainerRequestModel>;
     allowedMediaTypes: Array<MediaTypeSortModel>;
@@ -2986,6 +2995,7 @@ export type UpdateMemberTypeRequestModel = {
     variesBySegment: boolean;
     collection?: ReferenceByIdModel | null;
     isElement: boolean;
+    allowedInLibrary: boolean;
     properties: Array<UpdateMemberTypePropertyTypeRequestModel>;
     containers: Array<UpdateMemberTypePropertyTypeContainerRequestModel>;
     compositions: Array<MemberTypeCompositionModel>;
@@ -5529,6 +5539,36 @@ export type GetDocumentTypeAllowedAtRootResponses = {
 };
 
 export type GetDocumentTypeAllowedAtRootResponse = GetDocumentTypeAllowedAtRootResponses[keyof GetDocumentTypeAllowedAtRootResponses];
+
+export type GetDocumentTypeAllowedInLibraryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-type/allowed-in-library';
+};
+
+export type GetDocumentTypeAllowedInLibraryErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentTypeAllowedInLibraryResponses = {
+    /**
+     * OK
+     */
+    200: PagedAllowedDocumentTypeModel;
+};
+
+export type GetDocumentTypeAllowedInLibraryResponse = GetDocumentTypeAllowedInLibraryResponses[keyof GetDocumentTypeAllowedInLibraryResponses];
 
 export type PostDocumentTypeAvailableCompositionsData = {
     body?: DocumentTypeCompositionRequestModel;

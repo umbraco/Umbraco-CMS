@@ -515,7 +515,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <returns>The user ID.</returns>
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
-    private TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
+    protected virtual TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
     {
         TContentType? contentType = ContentTypeService.Get(contentTypeKey);
         if (contentType == null)
