@@ -164,7 +164,6 @@ public sealed class BlockEditorVarianceHandler
     public void AlignExposeVariance(BlockValue blockValue)
     {
         var contentDataToAlign = new List<BlockItemData>();
-        var validContentKeys = blockValue.ContentData.Select(cd => cd.Key).ToHashSet();
         var elementTypesByKey = blockValue
             .ContentData
             .Select(cd => cd.ContentTypeKey)
@@ -198,21 +197,20 @@ public sealed class BlockEditorVarianceHandler
             }
         }
 
-        // Remove expose entries that don't have matching ContentData
-        blockValue.Expose.RemoveAll(v => !validContentKeys.Contains(v.ContentKey));
-
-        if (contentDataToAlign.Any())
+        if (contentDataToAlign.Any() is false)
         {
-            blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
-            foreach (BlockItemData contentData in contentDataToAlign)
+            return;
+        }
+
+        blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
+        foreach (BlockItemData contentData in contentDataToAlign)
+        {
+            var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
+            foreach (BlockPropertyValue value in contentData.Values
+                         .Where(v => omitNullCulture is false || v.Culture is not null)
+                         .DistinctBy(v => v.Culture + v.Segment))
             {
-                var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
-                foreach (BlockPropertyValue value in contentData.Values
-                             .Where(v => omitNullCulture is false || v.Culture is not null)
-                             .DistinctBy(v => v.Culture + v.Segment))
-                {
-                    blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
-                }
+                blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
             }
         }
 
