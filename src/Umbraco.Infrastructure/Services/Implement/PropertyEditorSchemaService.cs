@@ -132,6 +132,11 @@ internal sealed class PropertyEditorSchemaService : IPropertyEditorSchemaService
             return node;
         }
 
+        if (value is JsonElement element)
+        {
+            return element.Deserialize<JsonNode?>();
+        }
+
         if (value is string stringValue)
         {
             // Try to parse as JSON, otherwise treat as string literal
