@@ -6,7 +6,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import type { UmbUserDetailModel } from '@umbraco-cms/backoffice/user';
 
 export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	UmbDocumentCollectionItemModel,
