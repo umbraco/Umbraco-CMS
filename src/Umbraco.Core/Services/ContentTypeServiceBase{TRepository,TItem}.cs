@@ -892,7 +892,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.CancelledByNotification;
         }
 
-        PerformDelete(scope, item, deletingNotification, performingUserId);
+        PerformDelete(scope, item, deletingNotification, eventMessages, performingUserId);
 
         scope.Complete();
         return ContentTypeOperationStatus.Success;
@@ -916,15 +916,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 return;
             }
 
-            PerformDelete(scope, item, deletingNotification, userId);
+            PerformDelete(scope, item, deletingNotification, eventMessages, userId);
 
             scope.Complete();
         }
     }
 
-    private void PerformDelete(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, int userId)
+    private void PerformDelete(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
     {
-        EventMessages eventMessages = EventMessagesFactory.Get();
         scope.WriteLock(WriteLockIds);
 
         TItem[] descendantsAndSelf = GetDescendants(item.Id, true).ToArray();
