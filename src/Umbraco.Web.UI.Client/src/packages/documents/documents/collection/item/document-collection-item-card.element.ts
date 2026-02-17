@@ -1,9 +1,12 @@
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token.js';
+import type { UmbDocumentCollectionFilterModel } from '../types.js';
 import type { UmbDocumentCollectionItemModel } from './types.js';
-import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type {
-	UmbCollectionItemDetailPropertyConfig,
+	UmbCollectionColumnConfiguration,
+	UmbDefaultCollectionContext,
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
 
@@ -36,8 +39,32 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	@property({ type: String })
 	href?: string;
 
-	@property({ type: Array })
-	detailProperties?: Array<UmbCollectionItemDetailPropertyConfig>;
+	@state()
+	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+
+	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
+			this.#collectionContext = collectionContext;
+			collectionContext?.setupView(this);
+			this.#observeCollectionContext();
+		});
+	}
+
+	#observeCollectionContext() {
+		if (!this.#collectionContext) return;
+
+		this.observe(
+			this.#collectionContext.userDefinedProperties,
+			(userDefinedProperties) => {
+				this._userDefinedProperties = userDefinedProperties;
+			},
+			'_observeUserDefinedProperties',
+		);
+	}
 
 	#onSelected(event: CustomEvent) {
 		if (!this.item) return;
@@ -57,7 +84,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 			<umb-document-grid-collection-card
 				href=${ifDefined(this.href)}
 				.item=${this.item}
-				.columns=${this.detailProperties}
+				.columns=${this._userDefinedProperties}
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}
@@ -72,6 +99,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	static override styles = [
 		css`
 			umb-document-grid-collection-card {
+				min-width: auto;
 				width: 100%;
 				min-height: 180px;
 			}
