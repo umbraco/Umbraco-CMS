@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
+internal sealed partial class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RichTextPropertyIndexValueFactory> _logger;
@@ -134,6 +134,12 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
     protected override IEnumerable<RawDataItem> GetDataItems(RichTextEditorValue input, bool published)
         => GetDataItems(input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
 
+    [GeneratedRegex(@"<[a-zA-Z/!][\s\S]*?>")]
+    private static partial Regex StringHtmlRegex { get; }
+
+    [GeneratedRegex(@"\s{2,}")]
+    private static partial Regex MultipleSpacesRegex { get; }
+
     /// <summary>
     /// Strips HTML tags from content while preserving whitespace from line breaks.
     /// This addresses the issue where &lt;br&gt; tags don't create word boundaries when HTML is stripped.
@@ -147,13 +153,8 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
             return string.Empty;
         }
 
-        // Replace <br> and <br/> tags (with any amount of whitespace and attributes) with spaces
-        // This regex matches:
-        // - <br> (with / without spaces or attributes)
-        // - <br /> (with / without spaces or attributes)
-        html = Regex.Replace(html, @"<br\b[^>]*/?>\s*", " ", RegexOptions.IgnoreCase);
-
-        // Use the existing Microsoft StripHtml function for everything else
-        return html.StripHtml();
+        //Replace all HTML tags with a space to preserve word boundaries. This can result in multiple spaces, which we then collapse into a single space.
+        var stripped = StringHtmlRegex.Replace(html, " ");
+        return MultipleSpacesRegex.Replace(stripped, " ");
     }
 }
