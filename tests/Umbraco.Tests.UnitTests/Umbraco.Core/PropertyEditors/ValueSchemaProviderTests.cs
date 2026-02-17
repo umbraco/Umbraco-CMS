@@ -102,29 +102,6 @@ public class ValueSchemaProviderTests
     }
 
     [Test]
-    public void ContentPickerPropertyEditor_Returns_String_Schema_With_UDI_Pattern()
-    {
-        // Arrange
-        var editor = CreateContentPickerPropertyEditor();
-
-        // Act
-        var schema = editor.GetValueSchema(null);
-
-        // Assert
-        Assert.That(schema, Is.Not.Null);
-        Assert.That(schema!["$schema"]?.GetValue<string>(), Is.EqualTo("https://json-schema.org/draft/2020-12/schema"));
-
-        var typeArray = schema["type"] as JsonArray;
-        Assert.That(typeArray, Is.Not.Null);
-        Assert.That(typeArray!.Select(t => t?.GetValue<string>()), Is.EquivalentTo(new[] { "string", "null" }));
-
-        var pattern = schema["pattern"]?.GetValue<string>();
-        Assert.That(pattern, Is.Not.Null);
-        // The pattern uses escaped forward slashes in the regex
-        Assert.That(pattern, Contains.Substring("umb:").And.Contains("document"));
-    }
-
-    [Test]
     public void ContentPickerPropertyEditor_Returns_ValueType_String()
     {
         // Arrange

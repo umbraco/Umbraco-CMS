@@ -2,16 +2,19 @@ using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services;
 
 [TestFixture]
-public class PropertyEditorSchemaServiceTests
+public partial class PropertyEditorSchemaServiceTests
 {
     private Mock<IDataTypeService> _dataTypeServiceMock = null!;
     private List<IDataEditor> _dataEditors = null!;
