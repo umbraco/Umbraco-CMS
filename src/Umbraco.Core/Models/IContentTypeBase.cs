@@ -58,6 +58,14 @@ public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     bool IsElement { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether this content type is allowed in the library.
+    /// </summary>
+    /// <remarks>
+    ///     This is only meaningful for element types (where <see cref="IsElement"/> is <c>true</c>).
+    /// </remarks>
+    bool AllowedInLibrary { get; set; }
+
+    /// <summary>
     ///     Gets or sets the content variation of the content type.
     /// </summary>
     ContentVariation Variations { get; set; }

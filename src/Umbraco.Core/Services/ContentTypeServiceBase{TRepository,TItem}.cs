@@ -1374,6 +1374,30 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return pagedModel;
     }
 
+    /// <inheritdoc />
+    public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.IsElement && x.AllowedInLibrary);
+        IEnumerable<TItem> contentTypes = Repository.Get(query);
+
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes);
+        }
+
+        contentTypes = contentTypes.ToArray();
+
+        var pagedModel = new PagedModel<TItem>
+        {
+            Total = contentTypes.Count(),
+            Items = contentTypes.Skip(skip).Take(take),
+        };
+
+        return pagedModel;
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
