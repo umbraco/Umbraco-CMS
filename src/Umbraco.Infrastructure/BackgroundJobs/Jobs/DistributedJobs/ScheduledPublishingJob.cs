@@ -26,6 +26,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
 
 
     private readonly IContentService _contentService;
+    private readonly IElementService _elementService;
     private readonly ILogger<ScheduledPublishingJob> _logger;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly TimeProvider _timeProvider;
@@ -37,6 +38,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
     /// </summary>
     public ScheduledPublishingJob(
         IContentService contentService,
+        IElementService elementService,
         IUmbracoContextFactory umbracoContextFactory,
         ILogger<ScheduledPublishingJob> logger,
         IServerMessenger serverMessenger,
@@ -44,6 +46,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         TimeProvider timeProvider)
     {
         _contentService = contentService;
+        _elementService = elementService;
         _umbracoContextFactory = umbracoContextFactory;
         _logger = logger;
         _serverMessenger = serverMessenger;
@@ -80,12 +83,24 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
             scope.EagerWriteLock(Constants.Locks.ScheduledPublishing);
             try
             {
-                // Run
-                IEnumerable<PublishResult> result = _contentService.PerformScheduledPublish(_timeProvider.GetUtcNow().UtcDateTime);
+                DateTime date = _timeProvider.GetUtcNow().UtcDateTime;
+
+                // Run scheduled publishing for documents
+                IEnumerable<PublishResult> result = _contentService.PerformScheduledPublish(date);
                 foreach (IGrouping<PublishResultType, PublishResult> grouped in result.GroupBy(x => x.Result))
                 {
                     _logger.LogInformation(
                         "Scheduled publishing result: '{StatusCount}' items with status {Status}",
+                        grouped.Count(),
+                        grouped.Key);
+                }
+
+                // Run scheduled publishing for elements
+                IEnumerable<PublishResult> elementResult = _elementService.PerformScheduledPublish(date);
+                foreach (IGrouping<PublishResultType, PublishResult> grouped in elementResult.GroupBy(x => x.Result))
+                {
+                    _logger.LogInformation(
+                        "Scheduled element publishing result: '{StatusCount}' items with status {Status}",
                         grouped.Count(),
                         grouped.Key);
                 }
