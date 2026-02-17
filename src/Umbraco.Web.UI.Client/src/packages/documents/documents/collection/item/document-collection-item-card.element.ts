@@ -49,7 +49,6 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 
 		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
-			collectionContext?.setupView(this);
 			this.#observeCollectionContext();
 		});
 	}
