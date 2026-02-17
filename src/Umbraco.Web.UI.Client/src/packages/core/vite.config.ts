@@ -52,6 +52,7 @@ export default defineConfig({
 			'property-editor-data-source/index': './property-editor-data-source/index.ts',
 			'property-editor/index': './property-editor/index.ts',
 			'property-sort-mode/index': './property-sort-mode/index.ts',
+			'property-value-presentation/index': './property-value-presentation/index.ts',
 			'property/index': './property/index.ts',
 			'recycle-bin/index': './recycle-bin/index.ts',
 			'repository/index': './repository/index.ts',

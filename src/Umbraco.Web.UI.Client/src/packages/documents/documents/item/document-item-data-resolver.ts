@@ -1,19 +1,20 @@
 import { UmbDocumentVariantState } from '../types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
-import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
 	UmbBooleanState,
 	UmbObjectState,
 	UmbStringState,
-	type Observable,
 } from '@umbraco-cms/backoffice/observable-api';
-import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
 
@@ -237,7 +238,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	}
 
 	#setName() {
-		const variant = this.#getCurrentVariant();
+		const variant = this._getCurrentVariant();
 		if (variant?.name) {
 			this.#name.setValue(variant.name);
 			return;
@@ -258,19 +259,19 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	}
 
 	#setIsDraft() {
-		const variant = this.#getCurrentVariant();
+		const variant = this._getCurrentVariant();
 		const isDraft = variant?.state === UmbDocumentVariantState.DRAFT || false;
 		this.#isDraft.setValue(isDraft);
 	}
 
 	#setState() {
-		const variant = this.#getCurrentVariant();
+		const variant = this._getCurrentVariant();
 		const state = variant?.state || UmbDocumentVariantState.NOT_CREATED;
 		this.#state.setValue(state);
 	}
 
 	async #setCreateDate() {
-		const variant = await this.#getCurrentVariant();
+		const variant = await this._getCurrentVariant();
 		if (variant) {
 			this.#createDate.setValue(variant.createDate);
 			return;
@@ -286,7 +287,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	}
 
 	async #setUpdateDate() {
-		const variant = await this.#getCurrentVariant();
+		const variant = await this._getCurrentVariant();
 		if (variant) {
 			this.#updateDate.setValue(variant.updateDate);
 			return;
@@ -309,11 +310,11 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 		}
 
 		const flags = data.flags ?? [];
-		const variantFlags = this.#getCurrentVariant()?.flags ?? [];
+		const variantFlags = this._getCurrentVariant()?.flags ?? [];
 		this.#flags.setValue([...flags, ...variantFlags]);
 	}
 
-	#getCurrentVariant() {
+	protected _getCurrentVariant() {
 		const variants = this.getData()?.variants;
 		if (!variants) return undefined;
 
