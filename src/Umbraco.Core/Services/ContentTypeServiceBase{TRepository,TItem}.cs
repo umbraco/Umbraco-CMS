@@ -929,6 +929,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         TItem[] descendantsAndSelf = GetDescendants(item.Id, true).ToArray();
 
         // all impacted (through composition) probably lose some properties
+        // don't try to be too clever here, just report them all
+        // do this before anything is deleted
         TItem[] changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
             .Distinct()
             .Except(descendantsAndSelf)
@@ -945,6 +947,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
         }
 
+        // finally delete the content type
+        // - recursively deletes all descendants
+        // - deletes all associated property data
+        //  (contents of any descendant type have been deleted but
+        //   contents of any composed (impacted) type remain but
+        //   need to have their property data cleared)
         Repository.Delete(item);
 
         ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
