@@ -84,6 +84,12 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         {
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
         }
+
+        // The friendly published extensions use static fields to store various resolved services from the static service provider.
+        // These MUST be cleared before running a new test, because they might be stale or reference other stale services; for example,
+        // they might end up trying to query a SQLite database from a previous test that has now been destroyed.
+        FriendlyPublishedElementExtensions.Reset();
+        FriendlyPublishedContentExtensions.Reset();
     }
 
     [TearDown]
