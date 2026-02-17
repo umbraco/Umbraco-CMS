@@ -26,12 +26,12 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     where TEntity : class, IEntity
 {
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
-    private readonly RepositoryCachePolicyOptions _options;
+    private readonly AsyncRepositoryCachePolicyOptions _options;
 
     public AsyncDefaultRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
-        RepositoryCachePolicyOptions options,
+        AsyncRepositoryCachePolicyOptions options,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
         : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
@@ -40,7 +40,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />
-    public override async Task Create(TEntity entity, Func<TEntity, Task> persistNew)
+    public override async Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNew)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -72,7 +72,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task Update(TEntity entity, Func<TEntity, Task> persistUpdated)
+    public override async Task UpdateAsync(TEntity entity, Func<TEntity, Task> persistUpdated)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -104,11 +104,11 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
 
         // We've changed the entity, register cache change for other servers.
         // We assume that if something goes wrong, we'll roll back, so don't need to register the change.
-        await RegisterCacheChange();
+        await RegisterCacheChangeAsync();
     }
 
     /// <inheritdoc />
-    public override async Task Delete(TEntity entity, Func<TEntity, Task> persistDeleted)
+    public override async Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeleted)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -128,13 +128,13 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
         }
 
         // We've removed an entity, register cache change for other servers.
-        await RegisterCacheChange();
+        await RegisterCacheChangeAsync();
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity?> Get(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet)
     {
-        await EnsureCacheIsSynced();
+        await EnsureCacheIsSyncedAsync();
 
         var cacheKey = GetEntityCacheKey(id);
 
@@ -170,17 +170,17 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity?> GetCached(TId id)
+    public override async Task<TEntity?> GetCachedAsync(TId id)
     {
-        await EnsureCacheIsSynced();
+        await EnsureCacheIsSyncedAsync();
         var cacheKey = GetEntityCacheKey(id);
         return Cache.GetCacheItem<TEntity>(cacheKey);
     }
 
     /// <inheritdoc />
-    public override async Task<bool> Exists(TId id, Func<TId, Task<bool>> performExists, Func<TId[], Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists)
     {
-        await EnsureCacheIsSynced();
+        await EnsureCacheIsSyncedAsync();
         // if found in cache the return else check
         var cacheKey = GetEntityCacheKey(id);
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -188,14 +188,14 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity[]> GetAll(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll)
     {
-        await EnsureCacheIsSynced();
+        await EnsureCacheIsSyncedAsync();
         if (ids?.Length > 0)
         {
             // try to get each entity from the cache
             // if we can find all of them, return
-            TEntity?[] entities = (await Task.WhenAll(ids.Select(GetCached))).WhereNotNull().ToArray();
+            TEntity?[] entities = (await Task.WhenAll(ids.Select(GetCachedAsync))).WhereNotNull().ToArray();
             if (ids.Length.Equals(entities.Length))
             {
                 return entities!; // no need for null checks, we are not caching nulls
@@ -213,9 +213,9 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
                 if (_options.GetAllCacheValidateCount)
                 {
                     // need to validate the count, get the actual count and return if ok
-                    if (_options.PerformCount is not null)
+                    if (_options.PerformCountAsync is not null)
                     {
-                        var totalCount = _options.PerformCount();
+                        var totalCount = await _options.PerformCountAsync();
                         if (entities.Length == totalCount)
                         {
                             return entities.WhereNotNull().ToArray();
@@ -254,7 +254,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task ClearAll() => Cache.ClearByKey(EntityTypeCacheKey);
+    public override async Task ClearAllAsync() => Cache.ClearByKey(EntityTypeCacheKey);
 
     protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
 

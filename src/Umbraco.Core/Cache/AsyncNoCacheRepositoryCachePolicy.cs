@@ -27,29 +27,29 @@ public class AsyncNoCacheRepositoryCachePolicy<TEntity, TId> : IAsyncRepositoryC
     public static AsyncNoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new();
 
     /// <inheritdoc />
-    public async Task<TEntity?> Get(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll) =>
+    public async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet) =>
         await performGet(id);
 
     /// <inheritdoc />
-    public Task<TEntity?> GetCached(TId id) => Task.FromResult<TEntity?>(null);
+    public Task<TEntity?> GetCachedAsync(TId id) => Task.FromResult<TEntity?>(null);
 
     /// <inheritdoc />
-    public async Task<bool> Exists(TId id, Func<TId, Task<bool>> performExists, Func<TId[], Task<IEnumerable<TEntity>?>> performGetAll) =>
+    public async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists) =>
         await performExists(id);
 
     /// <inheritdoc />
-    public async Task Create(TEntity entity, Func<TEntity, Task> persistNew) => await persistNew(entity);
+    public async Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNew) => await persistNew(entity);
 
     /// <inheritdoc />
-    public async Task Update(TEntity entity, Func<TEntity, Task> persistUpdated) => await persistUpdated(entity);
+    public async Task UpdateAsync(TEntity entity, Func<TEntity, Task> persistUpdated) => await persistUpdated(entity);
 
     /// <inheritdoc />
-    public async Task Delete(TEntity entity, Func<TEntity, Task> persistDeleted) => await persistDeleted(entity);
+    public async Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeleted) => await persistDeleted(entity);
 
     /// <inheritdoc />
-    public async Task<TEntity[]> GetAll(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll) =>
+    public async Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll) =>
         (await performGetAll(ids))?.ToArray() ?? Array.Empty<TEntity>();
 
     /// <inheritdoc />
-    public Task ClearAll() => Task.CompletedTask;
+    public Task ClearAllAsync() => Task.CompletedTask;
 }

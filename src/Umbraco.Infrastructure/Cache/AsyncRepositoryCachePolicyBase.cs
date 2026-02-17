@@ -28,8 +28,8 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     {
         _globalCache = globalCache ?? throw new ArgumentNullException(nameof(globalCache));
         _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
-        _cacheVersionService = cacheVersionService;
-        _cacheSyncService = cacheSyncService;
+        _cacheVersionService = cacheVersionService ?? throw new ArgumentNullException(nameof(cacheVersionService));
+        _cacheSyncService = cacheSyncService ?? throw new ArgumentNullException(nameof(cacheSyncService));
     }
 
     protected IAppPolicyCache Cache
@@ -53,33 +53,33 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     }
 
     /// <inheritdoc />
-    public abstract Task<TEntity?> Get(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll);
+    public abstract Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet);
 
     /// <inheritdoc />
-    public abstract Task<TEntity?> GetCached(TId id);
+    public abstract Task<TEntity?> GetCachedAsync(TId id);
 
     /// <inheritdoc />
-    public abstract Task<bool> Exists(TId id, Func<TId, Task<bool>> performExists, Func<TId[], Task<IEnumerable<TEntity>?>> performGetAll);
+    public abstract Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists);
 
     /// <inheritdoc />
-    public abstract Task Create(TEntity entity, Func<TEntity, Task> persistNew);
+    public abstract Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNew);
 
     /// <inheritdoc />
-    public abstract Task Update(TEntity entity, Func<TEntity, Task> persistUpdated);
+    public abstract Task UpdateAsync(TEntity entity, Func<TEntity, Task> persistUpdated);
 
     /// <inheritdoc />
-    public abstract Task Delete(TEntity entity, Func<TEntity, Task> persistDeleted);
+    public abstract Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeleted);
 
     /// <inheritdoc />
-    public abstract Task<TEntity[]> GetAll(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll);
+    public abstract Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
-    public abstract Task ClearAll();
+    public abstract Task ClearAllAsync();
 
     /// <summary>
     /// Ensures that the cache is synced with the database.
     /// </summary>
-    protected async Task EnsureCacheIsSynced()
+    protected async Task EnsureCacheIsSyncedAsync()
     {
         var synced = await _cacheVersionService.IsCacheSyncedAsync<TEntity>();
         if (synced)
@@ -93,5 +93,5 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     /// <summary>
     /// Registers a change in the cache.
     /// </summary>
-    protected async Task RegisterCacheChange() => await _cacheVersionService.SetCacheUpdatedAsync<TEntity>();
+    protected async Task RegisterCacheChangeAsync() => await _cacheVersionService.SetCacheUpdatedAsync<TEntity>();
 }

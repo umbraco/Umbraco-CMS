@@ -15,19 +15,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// </summary>
 /// <typeparam name="TId">The type of the entity's unique identifier.</typeparam>
 /// <typeparam name="TEntity">The type of the entity managed by this repository.</typeparam>
-public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IReadWriteRepository<TId, TEntity>
+public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryBase, IAsyncReadWriteRepository<TId, TEntity>
     where TEntity : class, IEntity
 {
-    private static RepositoryCachePolicyOptions? _defaultOptions;
+    private static AsyncRepositoryCachePolicyOptions? _defaultOptions;
 
-    private readonly ILogger<EntityRepositoryBase<TId, TEntity>> _logger;
+    private readonly ILogger<AsyncEntityRepositoryBase<TId, TEntity>> _logger;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
 
-    public EntityRepositoryBase(
+    public AsyncEntityRepositoryBase(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
-        ILogger<EntityRepositoryBase<TId, TEntity>> logger,
+        ILogger<AsyncEntityRepositoryBase<TId, TEntity>> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
         : base(scopeAccessor, appCaches)
@@ -67,9 +67,9 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     /// <summary>
     ///     Gets the default <see cref="RepositoryCachePolicyOptions" />
     /// </summary>
-    protected virtual RepositoryCachePolicyOptions DefaultOptions => _defaultOptions
-        ??= new RepositoryCachePolicyOptions(() =>
-            AmbientScope.ExecuteWithContextAsync<int>(db => db.Set<TEntity>().CountAsync()).GetAwaiter().GetResult());
+    protected virtual AsyncRepositoryCachePolicyOptions DefaultOptions => _defaultOptions
+        ??= new AsyncRepositoryCachePolicyOptions(() =>
+            AmbientScope.ExecuteWithContextAsync(db => db.Set<TEntity>().CountAsync()));
 
     /// <summary>
     ///     Gets the repository cache policy
@@ -102,25 +102,25 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         }
     }
 
-    public async Task Save(TEntity entity)
+    public async Task SaveAsync(TEntity entity)
     {
         if (entity.HasIdentity == false)
         {
-            await CachePolicy.Create(entity, PersistNewItem);
+            await CachePolicy.CreateAsync(entity, PersistNewItemAsync);
         }
         else
         {
-            await CachePolicy.Update(entity, PersistUpdatedItem);
+            await CachePolicy.UpdateAsync(entity, PersistUpdatedItemAsync);
         }
     }
 
-    public async Task Delete(TEntity entity) =>
-        await CachePolicy.Delete(entity, PersistDeletedItem);
+    public async Task DeleteAsync(TEntity entity) =>
+        await CachePolicy.DeleteAsync(entity, PersistDeletedItemAsync);
 
-    public async Task<TEntity?> Get(TId? id) =>
-        await CachePolicy.Get(id, PerformGet, PerformGetAll);
+    public async Task<TEntity?> GetAsync(TId? id) =>
+        await CachePolicy.GetAsync(id, PerformGetAsync);
 
-    public async Task<IEnumerable<TEntity>> GetMany(params TId[]? ids)
+    public async Task<IEnumerable<TEntity>> GetManyAsync(params TId[]? ids)
     {
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
         ids = ids?.Distinct()
@@ -134,21 +134,21 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
         if (ids.Length <= Core.Constants.Sql.MaxParameterCount)
         {
-            return await CachePolicy.GetAll(ids, PerformGetAll);
+            return await CachePolicy.GetAllAsync(ids, PerformGetAllAsync);
         }
 
         var entities = new List<TEntity>();
         foreach (IEnumerable<TId> group in ids.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
         {
-            TEntity[] groups = await CachePolicy.GetAll(group.ToArray(), PerformGetAll);
+            TEntity[] groups = await CachePolicy.GetAllAsync(group.ToArray(), PerformGetAllAsync);
             entities.AddRange(groups);
         }
 
         return entities;
     }
 
-    public async Task<bool> Exists(TId id)
-        => await CachePolicy.Exists(id, PerformExists, PerformGetAll);
+    public async Task<bool> ExistsAsync(TId id)
+        => await CachePolicy.ExistsAsync(id, PerformExistsAsync);
 
     protected virtual IAsyncRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
         => new AsyncDefaultRepositoryCachePolicy<TEntity, TId>(
@@ -158,22 +158,22 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             _repositoryCacheVersionService,
             _cacheSyncService);
 
-    protected abstract Task<TEntity?> PerformGet(TId? id);
+    protected abstract Task<TEntity?> PerformGetAsync(TId? id);
 
-    protected abstract Task<IEnumerable<TEntity>?> PerformGetAll(params TId[]? ids);
+    protected abstract Task<IEnumerable<TEntity>?> PerformGetAllAsync(params TId[]? ids);
 
-    protected abstract Task PersistNewItem(TEntity item);
+    protected abstract Task PersistNewItemAsync(TEntity item);
 
-    protected abstract Task PersistUpdatedItem(TEntity item);
+    protected abstract Task PersistUpdatedItemAsync(TEntity item);
 
-    protected virtual Task<bool> PerformExists(TId id)
+    protected virtual Task<bool> PerformExistsAsync(TId id)
         => AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var intId = Convert.ToInt32(id);
             return await db.Set<TEntity>().AnyAsync(e => e.Id == intId);
         });
 
-    protected virtual async Task PersistDeletedItem(TEntity entity)
+    protected virtual async Task PersistDeletedItemAsync(TEntity entity)
     {
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {

@@ -5,10 +5,10 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
-public class RepositoryBase : IRepository
+public class AsyncRepositoryBase : IRepository
 {
 
-    public RepositoryBase(IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor, AppCaches appCaches)
+    public AsyncRepositoryBase(IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor, AppCaches appCaches)
     {
         ScopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
         AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));

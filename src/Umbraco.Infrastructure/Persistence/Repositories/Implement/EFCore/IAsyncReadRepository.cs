@@ -2,20 +2,20 @@
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
-public interface IReadRepository<in TId, TEntity> : IRepository
+public interface IAsyncReadRepository<in TId, TEntity> : IRepository
 {
     /// <summary>
     ///     Gets an entity.
     /// </summary>
-    Task<TEntity?> Get(TId? id);
+    Task<TEntity?> GetAsync(TId? id);
 
     /// <summary>
     ///     Gets entities.
     /// </summary>
-    Task<IEnumerable<TEntity>> GetMany(params TId[]? ids);
+    Task<IEnumerable<TEntity>> GetManyAsync(params TId[]? ids);
 
     /// <summary>
     ///     Gets a value indicating whether an entity exists.
     /// </summary>
-    Task<bool> Exists(TId id);
+    Task<bool> ExistsAsync(TId id);
 }

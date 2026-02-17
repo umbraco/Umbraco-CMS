@@ -2,16 +2,16 @@
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
-public interface IWriteRepository<in TEntity> : IRepository
+public interface IAsyncWriteRepository<in TEntity> : IRepository
 {
     /// <summary>
     ///     Saves an entity.
     /// </summary>
-    Task Save(TEntity entity);
+    Task SaveAsync(TEntity entity);
 
     /// <summary>
     ///     Deletes an entity.
     /// </summary>
     /// <param name="entity"></param>
-    Task Delete(TEntity entity);
+    Task DeleteAsync(TEntity entity);
 }
