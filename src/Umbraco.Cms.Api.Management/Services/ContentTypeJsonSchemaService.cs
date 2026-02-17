@@ -33,24 +33,24 @@ internal sealed class ContentTypeJsonSchemaService : IContentTypeJsonSchemaServi
     }
 
     /// <inheritdoc />
-    public Task<JsonObject?> GetDocumentTypeSchemaAsync(Guid key)
+    public async Task<JsonObject?> GetDocumentTypeSchemaAsync(Guid key)
     {
-        IContentType? contentType = _contentTypeService.Get(key);
-        return Task.FromResult(contentType is null ? null : BuildSchema(contentType, "document"));
+        IContentType? contentType = await _contentTypeService.GetAsync(key);
+        return contentType is null ? null : BuildSchema(contentType, "document");
     }
 
     /// <inheritdoc />
-    public Task<JsonObject?> GetMediaTypeSchemaAsync(Guid key)
+    public async Task<JsonObject?> GetMediaTypeSchemaAsync(Guid key)
     {
-        IMediaType? mediaType = _mediaTypeService.Get(key);
-        return Task.FromResult(mediaType is null ? null : BuildSchema(mediaType, "media"));
+        IMediaType? mediaType = await _mediaTypeService.GetAsync(key);
+        return mediaType is null ? null : BuildSchema(mediaType, "media");
     }
 
     /// <inheritdoc />
-    public Task<JsonObject?> GetMemberTypeSchemaAsync(Guid key)
+    public async Task<JsonObject?> GetMemberTypeSchemaAsync(Guid key)
     {
-        IMemberType? memberType = _memberTypeService.Get(key);
-        return Task.FromResult(memberType is null ? null : BuildSchema(memberType, "member"));
+        IMemberType? memberType = await _memberTypeService.GetAsync(key);
+        return memberType is null ? null : BuildSchema(memberType, "member");
     }
 
     private JsonObject BuildSchema(IContentTypeComposition contentType, string contentKind)
