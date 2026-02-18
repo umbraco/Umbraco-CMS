@@ -1032,8 +1032,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					'Workspace Context: validate called with an empty array of variantIds, only validation-contexts with no variantId will be validated.',
 				);
 			}
-			console.log(this.#variantValidationContexts);
-			console.log('Workspace Context: validate called with variantIds: ', variantIds);
 			return (await this.validationContext.validateByVariantIds(variantIds)) as any as Promise<void[]>;
 		}
 
