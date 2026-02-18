@@ -89,6 +89,11 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 			uui-card-media {
 				height: 100%;
 			}
+
+			slot[name='actions'] {
+				--uui-button-background-color: var(--uui-color-surface);
+				--uui-button-background-color-hover: var(--uui-color-surface);
+			}
 		`,
 	];
 }
