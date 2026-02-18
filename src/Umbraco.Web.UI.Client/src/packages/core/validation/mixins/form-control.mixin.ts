@@ -155,6 +155,7 @@ export function UmbFormControlMixin<
 		private _pristine: boolean = true;
 
 		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
+		#valueOnFocus: ValueType | DefaultValueType = undefined as unknown as DefaultValueType;
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: UmbFormControlValidatorConfig[] = [];
@@ -164,11 +165,14 @@ export function UmbFormControlMixin<
 			super(...args);
 			this._internals = this.attachInternals();
 
+			this.addEventListener('focus', () => {
+				this.#valueOnFocus = this.value;
+			});
 			this.addEventListener('blur', () => {
-				/*if (e.composedPath().some((x) => x === this)) {
-					return;
-				}*/
-				this.checkValidity();
+				if (this.#valueOnFocus !== this.value) {
+					this.checkValidity();
+				}
+				this.#valueOnFocus = undefined as unknown as ValueType | DefaultValueType;
 			});
 		}
 
