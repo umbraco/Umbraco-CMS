@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Sync;
 
@@ -10,7 +12,7 @@ namespace Umbraco.Cms.Core.Sync;
 internal sealed class LastSyncedManager : ILastSyncedManager
 {
     private readonly ILastSyncedRepository _lastSyncedRepository;
-    private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IScopeProvider _scopeProvider;
     private int? _lastSyncedInternalId;
     private int? _lastSyncedExternalId;
 
@@ -19,10 +21,10 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     /// </summary>
     /// <param name="lastSyncedRepository">The repository for persisting last synced data.</param>
     /// <param name="coreScopeProvider">The scope provider for database transactions.</param>
-    public LastSyncedManager(ILastSyncedRepository lastSyncedRepository, ICoreScopeProvider coreScopeProvider)
+    public LastSyncedManager(ILastSyncedRepository lastSyncedRepository, IScopeProvider scopeProvider)
     {
         _lastSyncedRepository = lastSyncedRepository;
-        _coreScopeProvider = coreScopeProvider;
+        _scopeProvider = scopeProvider;
     }
 
     /// <inheritdoc/>
@@ -33,7 +35,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             return _lastSyncedInternalId;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         _lastSyncedInternalId = await _lastSyncedRepository.GetInternalIdAsync();
         scope.Complete();
 
@@ -48,7 +50,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             return _lastSyncedExternalId;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         _lastSyncedExternalId = await _lastSyncedRepository.GetExternalIdAsync();
         scope.Complete();
 
@@ -56,39 +58,45 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     }
 
     /// <inheritdoc/>
-    public async Task SaveLastSyncedInternalAsync(int id)
+    public async Task<Attempt<LastSyncedOperationStatus>> SaveLastSyncedInternalAsync(int id)
     {
         if (id < 0)
         {
-            throw new ArgumentException("Invalid last synced id. Must be non-negative.");
+            return Attempt.Fail(LastSyncedOperationStatus.InvalidId);
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         await _lastSyncedRepository.SaveInternalIdAsync(id);
         _lastSyncedInternalId = id;
         scope.Complete();
+
+        return Attempt.Succeed(LastSyncedOperationStatus.Success);
     }
 
     /// <inheritdoc/>
-    public async Task SaveLastSyncedExternalAsync(int id)
+    public async Task<Attempt<LastSyncedOperationStatus>> SaveLastSyncedExternalAsync(int id)
     {
         if (id < 0)
         {
-            throw new ArgumentException("Invalid last synced id. Must be non-negative.");
+            return Attempt.Fail(LastSyncedOperationStatus.InvalidId);
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         await _lastSyncedRepository.SaveExternalIdAsync(id);
         _lastSyncedExternalId = id;
         scope.Complete();
+
+        return Attempt.Succeed(LastSyncedOperationStatus.Success);
     }
 
     /// <inheritdoc/>
-    public async Task DeleteOlderThanAsync(DateTime date)
+    public async Task<Attempt<LastSyncedOperationStatus>> DeleteOlderThanAsync(DateTime date)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         await _lastSyncedRepository.DeleteEntriesOlderThanAsync(date);
         scope.Complete();
+
+        return Attempt.Succeed(LastSyncedOperationStatus.Success);
     }
 
     /// <summary>

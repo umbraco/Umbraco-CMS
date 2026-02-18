@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
+using WebhookDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
@@ -41,6 +42,10 @@ public class UmbracoDbContext : DbContext
     { }
 
     public required DbSet<WebhookDto> Webhooks { get; set; }
+
+    public required DbSet<LastSyncedDto> LastSynced { get; set; }
+
+    public required DbSet<CacheInstructionDto> CacheInstructions { get; set; }
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
