@@ -102,8 +102,8 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Returns the href for a specific media collection item.
-	 * @param {UmbMediaCollectionItemModel} item - The user item to get the href for.
-	 * @returns {Promise<string | undefined>} - The edit workspace href for the user.
+	 * @param {UmbMediaCollectionItemModel} item - The media item to get the href for.
+	 * @returns {Promise<string | undefined>} - The edit workspace href for the media.
 	 */
 	override async requestItemHref(item: UmbMediaCollectionItemModel): Promise<string | undefined> {
 		return `${UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique })}`;
