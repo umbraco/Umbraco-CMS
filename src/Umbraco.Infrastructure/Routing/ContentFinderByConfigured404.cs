@@ -27,6 +27,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
     private ContentSettings _contentSettings;
 
     /// <summary>
@@ -41,7 +42,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentUrlService documentUrlService,
         IPublishedContentCache publishedContentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService)
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IMediaNavigationQueryService mediaNavigationQueryService)
     {
         _logger = logger;
         _entityService = entityService;
@@ -52,6 +54,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         _documentUrlService = documentUrlService;
         _publishedContentCache = publishedContentCache;
         _documentNavigationQueryService = documentNavigationQueryService;
+        _mediaNavigationQueryService = mediaNavigationQueryService;
 
         contentSettings.OnChange(x => _contentSettings = x);
     }
@@ -73,7 +76,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         umbracoContextAccessor,
         StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
         StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
     {
     }
 
@@ -139,7 +143,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService),
+            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService, _mediaNavigationQueryService),
             errorCulture,
             domainContentId);
 
