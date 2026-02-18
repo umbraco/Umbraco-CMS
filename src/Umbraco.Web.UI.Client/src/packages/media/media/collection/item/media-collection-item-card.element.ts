@@ -68,6 +68,7 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 					.unique=${this.item.unique}
 					alt=${ifDefined(this.item.name)}
 					icon=${ifDefined(this.item.icon)}></umb-imaging-thumbnail>
+				<slot name="actions" slot="actions"></slot>
 			</uui-card-media>
 		`;
 	}
