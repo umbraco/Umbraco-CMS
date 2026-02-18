@@ -155,6 +155,6 @@ internal sealed partial class RichTextPropertyIndexValueFactory : BlockValueProp
 
         //Replace all HTML tags with a space to preserve word boundaries. This can result in multiple spaces, which we then collapse into a single space.
         var stripped = StringHtmlRegex.Replace(html, " ");
-        return MultipleSpacesRegex.Replace(stripped, " ");
+        return MultipleSpacesRegex.Replace(stripped, " ").Trim();
     }
 }
