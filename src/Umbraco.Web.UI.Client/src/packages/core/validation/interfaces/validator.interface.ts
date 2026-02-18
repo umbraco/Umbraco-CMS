@@ -7,12 +7,12 @@ export interface UmbValidator extends EventTarget {
 	//readonly dataPath?: string;
 
 	/**
-	 * Validate the form, will return a promise that resolves to true if what the Validator represents is valid.
+	 * Validate the form, will return a promise that resolves if what the Validator represents is valid.
 	 */
 	validate(): Promise<void>;
 
 	/**
-	 * Validate the form by an array of variant IDs, will return a promise that resolves to true if what the Validator represents is valid.
+	 * Validate the form by an array of variant IDs, will return a promise that resolves if what the Validator represents is valid.
 	 */
 	validateByVariantIds?: (variantIds: Array<UmbVariantId>) => Promise<void>;
 
