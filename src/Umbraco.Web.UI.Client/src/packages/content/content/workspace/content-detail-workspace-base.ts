@@ -1024,7 +1024,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @param {Array<UmbVariantId> | undefined} variantIds Optional array of variantIds to filter which contexts to validate.
 	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
 	 */
-	async #validateByVariantIds(variantIds?: Array<UmbVariantId>): Promise<Array<void>> {
+	async #validateByVariantIds(variantIds?: Array<UmbVariantId>): Promise<void> {
 		// If variantIds are provided, we only validate the contexts matching those variantIds, or those without a variantId.
 		if (variantIds) {
 			if (variantIds.length === 0) {
@@ -1032,10 +1032,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					'Workspace Context: validate called with an empty array of variantIds, only validation-contexts with no variantId will be validated.',
 				);
 			}
-			return (await this.validationContext.validateByVariantIds(variantIds)) as any as Promise<void[]>;
+			return await this.validationContext.validateByVariantIds(variantIds);
 		}
 
-		return await super.validate();
+		return await (super.validate() as unknown as Promise<void>);
 	}
 
 	/**
