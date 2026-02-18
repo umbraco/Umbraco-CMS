@@ -154,15 +154,13 @@ public static class UmbracoBuilderExtensions
             IRuntimeState runtimeState,
             ILogger<ExamineIndexRebuilder> logger,
             IExamineManager examineManager,
-            IEnumerable<IIndexPopulator> populators,
-            ILongRunningOperationService longRunningOperationService)
+            IEnumerable<IIndexPopulator> populators)
             : base(
             mainDom,
             runtimeState,
             logger,
             examineManager,
-            populators,
-            longRunningOperationService)
+            populators)
         {
         }
 

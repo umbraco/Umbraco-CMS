@@ -1,26 +1,25 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Concurrent;
 using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 internal class ExamineIndexRebuilder : IIndexRebuilder
 {
-    private const string RebuildAllOperationTypeName = "RebuildAllExamineIndexes";
+    // Static because the class is registered as Transient - all instances must share the same state.
+    private static readonly ConcurrentDictionary<string, Task> RebuildTasks = new();
 
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ExamineIndexRebuilder> _logger;
     private readonly IMainDom _mainDom;
     private readonly IEnumerable<IIndexPopulator> _populators;
-    private readonly ILongRunningOperationService _longRunningOperationService;
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
@@ -31,15 +30,13 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         IRuntimeState runtimeState,
         ILogger<ExamineIndexRebuilder> logger,
         IExamineManager examineManager,
-        IEnumerable<IIndexPopulator> populators,
-        ILongRunningOperationService longRunningOperationService)
+        IEnumerable<IIndexPopulator> populators)
     {
         _mainDom = mainDom;
         _runtimeState = runtimeState;
         _logger = logger;
         _examineManager = examineManager;
         _populators = populators;
-        _longRunningOperationService = longRunningOperationService;
     }
 
     /// <inheritdoc/>
@@ -68,26 +65,48 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
-        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
-            GetRebuildOperationTypeName(indexName),
-            async ct =>
-            {
-                await RebuildIndex(indexName, delay.Value, ct);
-                return Task.CompletedTask;
-            },
-            allowConcurrentExecution: false,
-            runInBackground: useBackgroundThread);
-
-        if (attempt.Success)
+        if (RebuildTasks.TryGetValue(indexName, out Task? existing) && !existing.IsCompleted)
         {
-            return Attempt.Succeed(IndexRebuildResult.Success);
+            _logger.LogWarning("Call was made to RebuildIndex but a rebuild for {IndexName} is already running.", indexName);
+            return Attempt.Fail(IndexRebuildResult.AlreadyRebuilding);
         }
 
-        return attempt.Status switch
+        if (useBackgroundThread)
         {
-            LongRunningOperationEnqueueStatus.AlreadyRunning => Attempt.Fail(IndexRebuildResult.AlreadyRebuilding),
-            _ => Attempt.Fail(IndexRebuildResult.Unknown),
-        };
+            // Do not flow AsyncLocal to the child thread
+            using (ExecutionContext.SuppressFlow())
+            {
+                Task rebuildTask = Task.Run(() =>
+                {
+                    try
+                    {
+                        PerformRebuildIndex(indexName, delay.Value, CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred while rebuilding index {IndexName} in the background.", indexName);
+                    }
+                    finally
+                    {
+                        RebuildTasks.TryRemove(indexName, out _);
+                    }
+                });
+                RebuildTasks[indexName] = rebuildTask;
+            }
+        }
+        else
+        {
+            try
+            {
+                PerformRebuildIndex(indexName, delay.Value, CancellationToken.None);
+            }
+            finally
+            {
+                RebuildTasks.TryRemove(indexName, out _);
+            }
+        }
+
+        return Attempt.Succeed(IndexRebuildResult.Success);
     }
 
     /// <inheritdoc/>
@@ -105,46 +124,36 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
-        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
-            RebuildAllOperationTypeName,
-            async ct =>
-            {
-                await RebuildIndexes(onlyEmptyIndexes, delay.Value, ct);
-                return Task.CompletedTask;
-            },
-            allowConcurrentExecution: false,
-            runInBackground: useBackgroundThread);
-
-        if (attempt.Success)
+        if (useBackgroundThread)
         {
-            return Attempt.Succeed(IndexRebuildResult.Success);
+            // Do not flow AsyncLocal to the child thread
+            using (ExecutionContext.SuppressFlow())
+            {
+                _ = Task.Run(() =>
+                {
+                    PerformRebuildIndexes(onlyEmptyIndexes, delay.Value, CancellationToken.None);
+                });
+            }
+        }
+        else
+        {
+            PerformRebuildIndexes(onlyEmptyIndexes, delay.Value, CancellationToken.None);
         }
 
-        return attempt.Status switch
-        {
-            LongRunningOperationEnqueueStatus.AlreadyRunning => Attempt.Fail(IndexRebuildResult.AlreadyRebuilding),
-            _ => Attempt.Fail(IndexRebuildResult.Unknown),
-        };
+        return Attempt.Succeed(IndexRebuildResult.Success);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsRebuildingAsync(string indexName)
-        => (await _longRunningOperationService.GetByTypeAsync(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
-
-    private static string GetRebuildOperationTypeName(string indexName)
-    {
-        // Truncate to a maximum of 200 characters to ensure the type name doesn't overflow the database field.
-        const int TypeFieldSize = 200;
-        return $"RebuildExamineIndex-{indexName}".TruncateWithUniqueHash(TypeFieldSize);
-    }
+    public Task<bool> IsRebuildingAsync(string indexName)
+        => Task.FromResult(RebuildTasks.TryGetValue(indexName, out Task? task) && task.IsCompleted is false);
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
-    private async Task RebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
+    private void PerformRebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
-            await Task.Delay(delay, cancellationToken);
+            Thread.Sleep(delay);
         }
 
         if (!_examineManager.TryGetIndex(indexName, out IIndex index))
@@ -164,11 +173,11 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         }
     }
 
-    private async Task RebuildIndexes(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
+    private void PerformRebuildIndexes(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
-            await Task.Delay(delay, cancellationToken);
+            Thread.Sleep(delay);
         }
 
         // If an index exists but it has zero docs we'll consider it empty and rebuild
