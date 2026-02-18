@@ -54,15 +54,4 @@ public interface IPropertyEditorSchemaService : IService
     /// <param name="propertyEditorAlias">The alias of the property editor.</param>
     /// <returns><c>true</c> if the editor implements <see cref="IValueSchemaProvider"/>; otherwise, <c>false</c>.</returns>
     bool SupportsSchema(string propertyEditorAlias);
-
-    /// <summary>
-    /// Validates a value against the JSON Schema for a specific data type.
-    /// </summary>
-    /// <param name="dataTypeKey">The unique key of the data type.</param>
-    /// <param name="value">The value to validate, as a JSON string or JSON-compatible object.</param>
-    /// <returns>
-    /// An attempt containing a collection of validation results (empty if validation passes, or errors if not),
-    /// or an appropriate operation status if the data type was not found or doesn't support schemas.
-    /// </returns>
-    Task<Attempt<IEnumerable<SchemaValidationResult>, PropertyEditorSchemaOperationStatus>> ValidateValueAsync(Guid dataTypeKey, object? value);
 }
