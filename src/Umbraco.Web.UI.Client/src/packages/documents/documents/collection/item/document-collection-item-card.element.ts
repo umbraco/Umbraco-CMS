@@ -6,12 +6,15 @@ import type {
 	UmbCollectionItemDetailPropertyConfig,
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 
 import './document-grid-collection-card.element.js';
 
 @customElement('umb-document-collection-item-card')
 export class UmbDocumentCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	#item?: UmbDocumentCollectionItemModel | undefined;
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 
 	@property({ type: Object })
 	public get item(): UmbDocumentCollectionItemModel | undefined {
@@ -19,6 +22,11 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 	public set item(value: UmbDocumentCollectionItemModel | undefined) {
 		this.#item = value;
+
+		const documentTypeUnique = value?.documentType.unique;
+
+		this.#entityContentTypeContext.setEntityType(documentTypeUnique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
+		this.#entityContentTypeContext.setUnique(documentTypeUnique);
 	}
 
 	@property({ type: Boolean })
