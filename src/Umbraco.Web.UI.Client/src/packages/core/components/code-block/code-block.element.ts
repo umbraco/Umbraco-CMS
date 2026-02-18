@@ -1,6 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { Ref } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { createRef, css, customElement, html, property, ref, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
 //import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
