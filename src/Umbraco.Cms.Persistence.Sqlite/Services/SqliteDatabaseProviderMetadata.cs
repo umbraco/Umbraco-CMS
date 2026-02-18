@@ -6,6 +6,9 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
+/// <summary>
+/// Provides metadata for the SQLite database provider.
+/// </summary>
 [DataContract]
 public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
 {

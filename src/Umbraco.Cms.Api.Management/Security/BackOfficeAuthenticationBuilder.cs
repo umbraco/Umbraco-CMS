@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
@@ -20,6 +21,8 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
         : base(services)
         => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
+    // TODO (V18): Change the return value to be not nullable and remove the NotNullIfNotNull attribute.
+    [return: NotNullIfNotNull(nameof(scheme))]
     public static string? SchemeForBackOffice(string scheme)
         => scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
 

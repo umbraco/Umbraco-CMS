@@ -59,6 +59,12 @@ public interface ITagService : IService
     /// </summary>
     IEnumerable<ITag> GetAllTags(string? group = null, string? culture = null);
 
+    /// <summary>
+    ///     Gets all tags asynchronously.
+    /// </summary>
+    /// <param name="group">The optional tag group to filter by.</param>
+    /// <param name="culture">The optional culture to filter by.</param>
+    /// <returns>A task that represents the asynchronous operation, containing a collection of <see cref="ITag"/> objects.</returns>
     Task<IEnumerable<ITag>> GetAllAsync(string? group = null, string? culture = null)
     {
         if (culture == string.Empty)
@@ -69,6 +75,13 @@ public interface ITagService : IService
         return Task.FromResult(GetAllTags(group, culture));
     }
 
+    /// <summary>
+    ///     Gets tags matching the specified query asynchronously.
+    /// </summary>
+    /// <param name="query">The search query to filter tags by.</param>
+    /// <param name="group">The optional tag group to filter by.</param>
+    /// <param name="culture">The optional culture to filter by.</param>
+    /// <returns>A task that represents the asynchronous operation, containing a collection of matching <see cref="ITag"/> objects.</returns>
     Task<IEnumerable<ITag>> GetByQueryAsync(string query, string? group = null, string? culture = null)
         => Task.FromResult(GetAllAsync(group, culture).GetAwaiter().GetResult().Where(x => x.Text.InvariantContains(query)));
 

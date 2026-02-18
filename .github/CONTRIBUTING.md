@@ -30,7 +30,7 @@ This guide describes each step to make your first contribution:
 
    Create a new branch based on `main` and name it after the issue you're fixing. For example: `v15/bugfix/18132-rte-tinymce-onchange-value-check`.
 
-   Please follow this format for branches: `v{major}/{feature|bugfix|task}/{issue}-{description}`.
+   Please follow this format for branches: `v{major}/{feature|bugfix|task|qa|improvement}/{issue}-{description}`.
 
    This is a development branch for the particular issue you're working on, in this case, a bug-fix for issue number `18132` that affects Umbraco v.15.
 

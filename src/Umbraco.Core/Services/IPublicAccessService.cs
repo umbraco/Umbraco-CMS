@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides operations for managing public access restrictions on content.
+/// </summary>
 public interface IPublicAccessService : IService
 {
     /// <summary>

@@ -212,7 +212,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     public async Task Can_Get_Updated_Draft_Published_Content_By_Key(bool preview, bool result)
     {
         // Arrange
-        PublishedTextPage.Variants = [new() { Name = NewName }];;
+        PublishedTextPage.Variants = [new() { Name = NewName }];
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
             Properties = PublishedTextPage.Properties,

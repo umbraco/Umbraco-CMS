@@ -162,7 +162,6 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(importChildDictionaryName);
 });
 
-// Skip this test as the search function is removed
 test('can search a dictionary item in list when have results', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
@@ -170,7 +169,7 @@ test('can search a dictionary item in list when have results', async ({umbracoAp
   await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.dictionary.enterSearchKeywordAndPressEnter(dictionaryName);
+  await umbracoUi.dictionary.searchByKeywordInCollection(dictionaryName);
 
   // Assert
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
@@ -184,7 +183,7 @@ test('can search a dictionary item in list when have no results', async ({umbrac
   await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.dictionary.enterSearchKeywordAndPressEnter('xyz');
+  await umbracoUi.dictionary.searchByKeywordInCollection('xyz');
 
   // Assert
   await umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage);

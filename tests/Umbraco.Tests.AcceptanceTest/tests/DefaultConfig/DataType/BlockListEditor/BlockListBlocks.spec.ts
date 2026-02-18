@@ -5,9 +5,12 @@ const blockListEditorName = 'TestBlockListEditor';
 const elementTypeName = 'BlockListElement';
 const dataTypeName = 'Textstring';
 const groupName = 'testGroup';
+let elementTypeId = '';
+let textStringData: any = null;
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
-  await umbracoApi.dataType.ensureNameNotExists(blockListEditorName);
+  textStringData =  await umbracoApi.dataType.getByName(dataTypeName);
+  elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
 });
@@ -19,8 +22,6 @@ test.afterEach(async ({umbracoApi}) => {
 test('can add a label to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const labelText = 'ThisIsALabel';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
@@ -38,8 +39,6 @@ test('can update a label for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const labelText = 'ThisIsALabel';
   const newLabelText = 'ThisIsANewLabel';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, labelText);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 
@@ -57,28 +56,24 @@ test('can update a label for a block', async ({umbracoApi, umbracoUi}) => {
 test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const labelText = 'ThisIsALabel';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, labelText);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.enterBlockLabelText("");
+  await umbracoUi.dataType.enterBlockLabelText('');
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, "")).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, '')).toBeTruthy();
 });
 
 test('can update overlay size for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const overlaySize = 'medium';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, "");
+  await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, '');
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -94,8 +89,6 @@ test('can update overlay size for a block', async ({umbracoApi, umbracoUi}) => {
 
 test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
@@ -110,8 +103,6 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
 // Skip this test as it is impossible to remove a content model in front-end
 test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
@@ -128,11 +119,9 @@ test.skip('can remove a content model from a block', async ({umbracoApi, umbraco
 
 test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   const secondElementName = 'SecondElementTest';
   const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -150,11 +139,9 @@ test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi,
 
 test('can remove a settings model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   const secondElementName = 'SecondElementTest';
   const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(blockListEditorName, contentElementTypeId, settingsElementTypeId);
+  await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(blockListEditorName, elementTypeId, settingsElementTypeId);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
 
   // Act
@@ -175,9 +162,7 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
 test('can add a background color to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = '#ff0000';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -195,9 +180,7 @@ test('can update a background color for a block', {tag: '@smoke'}, async ({umbra
   // Arrange
   const backgroundColor = '#ff0000';
   const newBackgroundColor = '#ff4444';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, backgroundColor);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, backgroundColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
 
@@ -216,9 +199,7 @@ test('can update a background color for a block', {tag: '@smoke'}, async ({umbra
 test('can delete a background color from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = '#ff0000';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, backgroundColor);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, backgroundColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
 
@@ -237,9 +218,7 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
 test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = '#ff0000';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -257,9 +236,7 @@ test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = '#ff0000';
   const newIconColor = '#ff4444';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, "", iconColor);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', iconColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
 
@@ -278,9 +255,7 @@ test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
 test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = '#ff0000';
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, '', iconColor);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', iconColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
 
@@ -309,9 +284,9 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(secondStylesheetName);
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, '', '', encodedStylesheetPath);
+  
+
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
 
   // Act
@@ -339,9 +314,9 @@ test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umb
   const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, '', '', encodedStylesheetPath);
+  
+
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
 
@@ -362,9 +337,7 @@ test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umb
 
 test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -380,9 +353,7 @@ test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}
 
 test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithHideContentEditor(blockListEditorName, contentElementTypeId, true);
+  await umbracoApi.dataType.createBlockListWithBlockWithHideContentEditor(blockListEditorName, elementTypeId, true);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
 
@@ -401,11 +372,8 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
 test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
   const mediaUrl = await umbracoApi.media.getFullMediaUrl(mediaId);
 
   // Act
@@ -417,20 +385,62 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.doesBlockHaveThumbnailImage(mediaUrl);
+  await umbracoUi.dataType.doesBlockHaveThumbnailImage(elementTypeName, mediaUrl);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test.fixme('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can remove a thumbnail from a block ', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+// Arrange
+  const mediaName = 'TestMedia';
+  await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const mediaData = await umbracoApi.media.getByName(mediaName);
+  const thumbnailPath = '/wwwroot' + mediaData.values[0].value.src;
+  await umbracoApi.dataType.createBlockListWithAThumbnail(blockListEditorName, elementTypeId, thumbnailPath);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.removeBlockThumbnail();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  await umbracoUi.dataType.doesBlockHaveNoThumbnailImage(elementTypeName);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+});
+
+test('can remove a not-found thumbnail from a block ', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+// Arrange
+  const mediaName = 'TestMedia';
+  const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const mediaData = await umbracoApi.media.getByName(mediaName);
+  const thumbnailPath = '/wwwroot' + mediaData.values[0].value.src;
+  await umbracoApi.dataType.createBlockListWithAThumbnail(blockListEditorName, elementTypeId, thumbnailPath);
+  await umbracoApi.media.delete(imageId); // Make the thumbnail not found
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.removeNotFoundItem(thumbnailPath);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  await umbracoUi.dataType.doesBlockHaveNoThumbnailImage(elementTypeName);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
 // This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20962
 test('only allow image file as a block thumbnail', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const notAllowedFileNames = ['Program.cs', 'appsettings.json', '.csproj'];
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);

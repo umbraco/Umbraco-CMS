@@ -214,7 +214,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         List<ContentTypeTemplateDto>? templateDtos = Database?.Fetch<ContentTypeTemplateDto>(sql1);
 
         // var templates = templateRepository.GetMany(templateDtos.Select(x => x.TemplateNodeId).ToArray()).ToDictionary(x => x.Id, x => x);
-        IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany();
+        IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany((int[]?)null);
 
         var templates = allTemplates.ToDictionary(x => x.Id, x => x);
         var templateDtoIx = 0;

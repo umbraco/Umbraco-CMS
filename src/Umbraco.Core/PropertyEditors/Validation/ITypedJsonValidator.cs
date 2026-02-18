@@ -11,6 +11,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 /// <typeparam name="TConfiguration">The type of the configuration consumed by validator.</typeparam>
 public interface ITypedJsonValidator<TValue, TConfiguration>
 {
+    /// <summary>
+    ///     Validates the specified value against the configuration.
+    /// </summary>
+    /// <param name="value">The deserialized value to validate.</param>
+    /// <param name="configuration">The data type configuration.</param>
+    /// <param name="valueType">The value type.</param>
+    /// <param name="validationContext">The property validation context.</param>
+    /// <returns>A collection of validation results.</returns>
     public abstract IEnumerable<ValidationResult> Validate(
         TValue? value,
         TConfiguration? configuration,

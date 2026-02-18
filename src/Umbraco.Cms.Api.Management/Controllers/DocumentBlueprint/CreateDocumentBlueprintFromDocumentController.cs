@@ -40,6 +40,8 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a document blueprint from an existing document.")]
+    [EndpointDescription("Creates a new document blueprint based on an existing document identified by the provided Id.")]
     public async Task<IActionResult> CreateFromDocument(CancellationToken cancellationToken, CreateDocumentBlueprintFromDocumentRequestModel fromDocumentRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

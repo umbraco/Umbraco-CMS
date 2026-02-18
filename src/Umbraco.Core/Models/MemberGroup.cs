@@ -13,6 +13,9 @@ public class MemberGroup : EntityBase, IMemberGroup
     private int _creatorId;
     private string? _name;
 
+    /// <summary>
+    ///     Gets or sets the name of the member group.
+    /// </summary>
     [DataMember]
     public string? Name
     {
@@ -20,6 +23,9 @@ public class MemberGroup : EntityBase, IMemberGroup
         set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
     }
 
+    /// <summary>
+    ///     Gets or sets the identifier of the user who created this member group.
+    /// </summary>
     [DataMember]
     public int CreatorId
     {

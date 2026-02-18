@@ -1,12 +1,39 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
 {
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
+    [Test]
+    public async Task Invariant_content_returns_only_default_language_url()
+    {
+        // Arrange: Add a second language (Danish) alongside the default English
+        var danishLanguage = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .WithCultureName("Danish")
+            .Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+
+        // The base class creates invariant content (ContentType doesn't vary by culture)
+        // Publish the root content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act: Get all URLs for the invariant content
+        var urls = await PublishedUrlInfoProvider.GetAllAsync(Textpage);
+
+        // Assert: Invariant content should only return ONE URL (for the default language)
+        // not multiple URLs for each configured language
+        Assert.AreEqual(1, urls.Count, "Invariant content should only return one URL for the default language, not URLs for all configured languages");
+        Assert.IsNotNull(urls.First().Url);
+        Assert.AreEqual("en-US", urls.First().Culture, "The URL should be for the default language (en-US)");
+    }
 
     [Test]
     public async Task Two_items_in_level_1_with_same_name_will_have_conflicting_routes()

@@ -46,6 +46,43 @@ export const data: Array<UmbMockMediaModel> = [
 	},
 	{
 		hasChildren: false,
+		id: 'f2f81a40-c989-4b6b-84e2-057cecd3grd4',
+		createDate: '2023-02-06T15:32:05.350038',
+		parent: null,
+		noAccess: true,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-1-id',
+			icon: 'icon-picture',
+		},
+		values: [
+			{
+				editorAlias: 'Umbraco.UploadField',
+				alias: 'mediaPicker',
+				value: {
+					src: '/umbraco/backoffice/assets/installer-illustration.svg',
+				},
+			},
+			{
+				editorAlias: 'Umbraco.TextBox',
+				alias: 'mediaType1Property1',
+				value: 'The daily life at Umbraco HQ',
+			},
+		],
+		variants: [
+			{
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: null,
+				name: 'Permissions - No Access',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+		flags: [],
+	},
+	{
+		hasChildren: false,
 		id: '69431027-8867-45bf-a93b-72bbdabfb177',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,

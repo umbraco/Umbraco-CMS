@@ -17,10 +17,10 @@ export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEnti
 	 */
 	override async execute() {
 		await umbConfirmModal(this._host, {
-			headline: `Empty Recycle Bin`,
-			content: `When items are deleted from the recycle bin, they will be gone forever.`,
+			headline: `#actions_emptyrecyclebin`,
+			content: `#defaultdialogs_recycleBinWarning`,
 			color: 'danger',
-			confirmLabel: 'Empty Recycle Bin',
+			confirmLabel: '#actions_emptyrecyclebin',
 		});
 
 		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(

@@ -41,14 +41,13 @@ test('can create a document type with a template using create options', {tag: '@
   // Act
   await umbracoUi.documentType.clickCreateActionWithOptionName('Document Type with Template');
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
+  const {documentTypeId, templateId} = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeAndTemplateToBeCreated();
 
   // Assert
   // Checks if both the success notification for document Types and the template are visible
   // Checks if the documentType contains the template
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  const templateData = await umbracoApi.template.getByName(documentTypeName);
-  expect(documentTypeData.allowedTemplates[0].id).toEqual(templateData.id);
+  const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
+  expect(documentTypeData.allowedTemplates[0].id).toEqual(templateId);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Check if the created document type is displayed in the collection view and has correct icon
   await umbracoUi.documentType.clickDocumentTypesMenu();
@@ -122,13 +121,12 @@ test('can create a document type with a template in a folder using create option
   // Act
   await umbracoUi.documentType.clickCreateActionWithOptionName('Document Type with Template');
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
+  const {documentTypeId, templateId} = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeAndTemplateToBeCreated();
 
   // Assert
   // Checks if the documentType contains the template
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  const templateData = await umbracoApi.template.getByName(documentTypeName);
-  expect(documentTypeData.allowedTemplates[0].id).toEqual(templateData.id);
+  const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
+  expect(documentTypeData.allowedTemplates[0].id).toEqual(templateId);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Check if the created document type is displayed in the collection view and has correct icon
   await umbracoUi.documentType.goToDocumentType(documentFolderName);

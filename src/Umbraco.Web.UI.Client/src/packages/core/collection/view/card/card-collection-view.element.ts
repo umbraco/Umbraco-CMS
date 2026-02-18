@@ -8,12 +8,14 @@ export class UmbCardCollectionViewElement extends UmbCollectionViewElementBase {
 	override render() {
 		if (this._loading) return nothing;
 		return html`
-			<div id="card-grid">
-				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
-				)}
+			<div id="card-grid-container">
+				<div id="card-grid">
+					${repeat(
+						this._items,
+						(item) => item.unique,
+						(item) => this.#renderItem(item),
+					)}
+				</div>
 			</div>
 		`;
 	}
@@ -23,8 +25,8 @@ export class UmbCardCollectionViewElement extends UmbCollectionViewElementBase {
 		return html` <umb-entity-collection-item-card
 			.item=${item}
 			href=${href ?? nothing}
-			?selectable=${this._selectable}
-			?select-only=${this._selection.length > 0}
+			?selectable=${this._isSelectableItem(item)}
+			?select-only=${this._selectOnly}
 			?selected=${this._isSelectedItem(item.unique)}
 			@selected=${() => this._selectItem(item.unique)}
 			@deselected=${() => this._deselectItem(item.unique)}>
@@ -43,10 +45,21 @@ export class UmbCardCollectionViewElement extends UmbCollectionViewElementBase {
 				flex-direction: column;
 			}
 
+			#card-grid-container {
+				container-type: inline-size;
+				container-name: card-grid-container;
+			}
+
 			#card-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				gap: var(--uui-size-space-4);
+			}
+
+			@container card-grid-container (width > 800px) {
+				#card-grid {
+					grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-large-min-width), 1fr));
+				}
 			}
 		`,
 	];

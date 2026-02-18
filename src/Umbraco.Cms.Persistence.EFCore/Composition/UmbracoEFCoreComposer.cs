@@ -10,8 +10,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Composition;
 
+/// <summary>
+/// Composer that registers Entity Framework Core services and configurations for Umbraco.
+/// </summary>
 public class UmbracoEFCoreComposer : IComposer
 {
+    /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IEFCoreMigrationExecutor, EfCoreMigrationExecutor>();
@@ -38,20 +42,29 @@ public class UmbracoEFCoreComposer : IComposer
 }
 
 
+/// <summary>
+/// Notification handler that creates EF Core database tables after schema creation or unattended install.
+/// </summary>
 public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification>, INotificationAsyncHandler<UnattendedInstallNotification>
 {
     private readonly IEFCoreMigrationExecutor _iefCoreMigrationExecutor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EFCoreCreateTablesNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="iefCoreMigrationExecutor">The EF Core migration executor.</param>
     public EFCoreCreateTablesNotificationHandler(IEFCoreMigrationExecutor iefCoreMigrationExecutor)
     {
         _iefCoreMigrationExecutor = iefCoreMigrationExecutor;
     }
 
+    /// <inheritdoc />
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         await HandleAsync();
     }
 
+    /// <inheritdoc />
     public async Task HandleAsync(DatabaseSchemaAndDataCreatedNotification notification, CancellationToken cancellationToken)
     {
         if (notification.RequiresUpgrade is false)

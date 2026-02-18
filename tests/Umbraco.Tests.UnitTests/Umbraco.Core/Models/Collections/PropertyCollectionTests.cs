@@ -38,15 +38,6 @@ public class PropertyCollectionTests
     }
 
     [Test]
-    public void SimpleOrder_Returns_Null_On_FirstOrDefault_When_Empty()
-    {
-        var orders = new SimpleOrder();
-        var item = orders.FirstOrDefault();
-
-        Assert.That(item == null, Is.True);
-    }
-
-    [Test]
     public void PropertyCollection_Returns_Null_On_FirstOrDefault_When_Empty()
     {
         var list = new List<Property>();

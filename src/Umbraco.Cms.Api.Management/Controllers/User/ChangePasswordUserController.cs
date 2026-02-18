@@ -37,6 +37,8 @@ public class ChangePasswordUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Changes a user's password.")]
+    [EndpointDescription("Changes the password for the user identified by the provided Id.")]
     public async Task<IActionResult> ChangePassword(
         CancellationToken cancellationToken,
         Guid id,

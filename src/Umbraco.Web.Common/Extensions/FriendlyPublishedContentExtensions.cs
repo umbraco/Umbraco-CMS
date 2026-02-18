@@ -234,9 +234,7 @@ public static class FriendlyPublishedContentExtensions
     ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" />.
     /// </returns>
     /// <remarks>
-    ///     This is the same as calling
-    ///     <see cref="AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c>
-    ///     set to 1.
+    ///     This method returns the ancestor or self at level 1, which is the root of the content tree.
     /// </remarks>
     public static IPublishedContent Root(this IPublishedContent content)
         => content.Root(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content));
@@ -252,9 +250,8 @@ public static class FriendlyPublishedContentExtensions
     ///     <typeparamref name="T" />.
     /// </returns>
     /// <remarks>
-    ///     This is the same as calling
-    ///     <see cref="AncestorOrSelf{T}(IPublishedContent, int)" /> with
-    ///     <c>maxLevel</c> set to 1.
+    ///     This method returns the ancestor or self at level 1, which is the root of the content tree,
+    ///     if it matches the specified content type <typeparamref name="T" />.
     /// </remarks>
     public static T? Root<T>(this IPublishedContent content)
         where T : class, IPublishedContent

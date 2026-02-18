@@ -1258,7 +1258,8 @@ export default {
 		headline: 'Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen',
 		currentVersion: 'Aktuelle Version',
 		diffHelp:
-			'Zeigt die Unterschiede zwischen der aktuellen und der ausgewählten Version an.<br />Text in <del>rot</del> fehlen in der ausgewählten Version, <ins>grün</ins> markierter Text wurde hinzugefügt.',
+			'<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
+		showDiff: 'Unterschiede zwischen der aktuellen Version und der ausgewählten Version anzeigen.',
 		noDiff: 'Keine Unterschiede zwischen den beiden Versionen gefunden.',
 		documentRolledBack: 'Dokument wurde zurückgesetzt',
 		htmlHelp:
@@ -1930,7 +1931,8 @@ export default {
 		emptyDictionaryTree: 'Das Wörterbuch ist leer',
 	},
 	textbox: {
-		characters_left: 'Buchstaben verbleiben',
+		characters_left: '<strong>%0%</strong> Zeichen verbleiben.',
+		characters_exceed: 'Maximal %0% Zeichen, <strong>%1%</strong> zu viele.',
 	},
 	recycleBin: {
 		contentTrashed: 'Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen',

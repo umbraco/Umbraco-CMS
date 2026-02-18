@@ -1221,7 +1221,8 @@ export default {
 		changes: 'Modifiche',
 		headline: 'Seleziona una versione da confrontare con la versione corrente',
 		diffHelp:
-			'Qui vengono mostrate le differenze tra la versione corrente e la versione selezionata<br />Il testo <del>in rosso</del> non verrà mostrato nella versione selezionata, <ins>quello in verde verrà aggiunto</ins>',
+			'<del>Il testo rosso</del> verrà rimosso nella versione selezionata, <ins>il testo verde</ins> verrà aggiunto.',
+		showDiff: 'Mostra le differenze tra la versione corrente (bozza) e la versione selezionata.',
 		documentRolledBack: 'Il documento è stato riportato alla versione scelta.',
 		htmlHelp:
 			'Qui viene mostrata la versione selezionata in formato html, se vuoi vedere contemporaneamente le differenze tra le due versioni, usa la modalità diff view',

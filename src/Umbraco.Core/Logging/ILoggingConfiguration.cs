@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Logging;
 
+/// <summary>
+///     Defines the configuration settings for the logging system.
+/// </summary>
 public interface ILoggingConfiguration
 {
     /// <summary>

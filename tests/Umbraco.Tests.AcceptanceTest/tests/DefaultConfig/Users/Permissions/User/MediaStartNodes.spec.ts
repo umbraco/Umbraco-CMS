@@ -1,32 +1,48 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import { expect } from "@playwright/test";
+import { ConstantHelper, test } from "@umbraco/playwright-testhelpers";
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
+let testUserCookieAndToken = { cookie: "", accessToken: "", refreshToken: "" };
 
-const userGroupName = 'TestUserGroup';
+const userGroupName = "TestUserGroup";
 let userGroupId = null;
 
 let rootFolderId = null;
 let childFolderOneId = null;
-const rootFolderName = 'RootFolder';
-const childFolderOneName = 'ChildFolderOne';
-const childFolderTwoName = 'ChildFolderTwo';
+const rootFolderName = "RootFolder";
+const childFolderOneName = "ChildFolderOne";
+const childFolderTwoName = "ChildFolderTwo";
 
-test.beforeEach(async ({umbracoApi}) => {
+test.beforeEach(async ({ umbracoApi }) => {
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.media.ensureNameNotExists(rootFolderName);
   await umbracoApi.media.ensureNameNotExists(childFolderOneName);
   await umbracoApi.media.ensureNameNotExists(childFolderTwoName);
-  rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootFolderName);
-  childFolderOneId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderOneName, rootFolderId);
-  await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderTwoName, rootFolderId);
-  userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithMediaSection(userGroupName);
+  rootFolderId = await umbracoApi.media.createDefaultMediaFolder(
+    rootFolderName
+  );
+  childFolderOneId = await umbracoApi.media.createDefaultMediaFolderAndParentId(
+    childFolderOneName,
+    rootFolderId
+  );
+  await umbracoApi.media.createDefaultMediaFolderAndParentId(
+    childFolderTwoName,
+    rootFolderId
+  );
+  userGroupId =
+    await umbracoApi.userGroup.createSimpleUserGroupWithMediaSection(
+      userGroupName
+    );
 });
 
-test.afterEach(async ({umbracoApi}) => {
+test.afterEach(async ({ umbracoApi }) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser(
+    testUserCookieAndToken.cookie,
+    testUserCookieAndToken.accessToken,
+    testUserCookieAndToken.refreshToken
+  );
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.media.ensureNameNotExists(rootFolderName);
@@ -34,10 +50,25 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(childFolderTwoName);
 });
 
-test('can see root media start node and children', async ({umbracoApi, umbracoUi}) => {
+test("can see root media start node and children", async ({
+  umbracoApi,
+  umbracoUi,
+}) => {
   // Arrange
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [rootFolderId]);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.setUserPermissions(
+    testUser.name,
+    testUser.email,
+    testUser.password,
+    userGroupId,
+    [],
+    false,
+    [rootFolderId]
+  );
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+    testUser.name,
+    testUser.email,
+    testUser.password
+  );
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -50,11 +81,72 @@ test('can see root media start node and children', async ({umbracoApi, umbracoUi
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+test("can see parent of start node but not access it", async ({
+  umbracoApi,
+  umbracoUi,
+}) => {
   // Arrange
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [childFolderOneId]);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.setUserPermissions(
+    testUser.name,
+    testUser.email,
+    testUser.password,
+    userGroupId!,
+    [],
+    false,
+    [childFolderOneId!]
+  );
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+    testUser.name,
+    testUser.email,
+    testUser.password
+  );
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.user.goToSection(ConstantHelper.sections.media, false);
+
+  // Assert
+
+  // Get initial URL (should be on media section)
+  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
+  const initialUrl = umbracoUi.page.url();
+
+  await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
+  await umbracoUi.media.goToMediaWithName(rootFolderName);
+  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
+
+  // Assert - URL should not have changed (no navigation occurred)
+  const currentUrl = umbracoUi.page.url();
+  expect(currentUrl).toBe(initialUrl);
+
+  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
+  await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
+  await umbracoUi.media.isChildMediaVisible(
+    rootFolderName,
+    childFolderTwoName,
+    false
+  );
+});
+
+test("see no-access view when deep-linking to restricted media", async ({
+  umbracoApi,
+  umbracoUi,
+}) => {
+  // Arrange
+  await umbracoApi.user.setUserPermissions(
+    testUser.name,
+    testUser.email,
+    testUser.password,
+    userGroupId!,
+    [],
+    false,
+    [childFolderOneId!]
+  );
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+    testUser.name,
+    testUser.email,
+    testUser.password
+  );
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -62,18 +154,29 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for workspace to load
-  await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
-  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
-  await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
-  await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
+  await umbracoUi.page.goto(
+    `${umbracoUi.page.url().replace('/collection', '')}/workspace/media/edit/${rootFolderId!}`
+  );
+  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
+  await umbracoUi.media.doesMediaWorkspaceHaveText("Access denied");
 });
 
-test('can not see any media when no media start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test("can not see any media when no media start nodes specified", async ({
+  umbracoApi,
+  umbracoUi,
+}) => {
   // Arrange
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.setUserPermissions(
+    testUser.name,
+    testUser.email,
+    testUser.password,
+    userGroupId
+  );
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+    testUser.name,
+    testUser.email,
+    testUser.password
+  );
   await umbracoUi.goToBackOffice();
 
   // Act

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <remarks>
 ///     <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice URL of a document.</para>
 /// </remarks>
-[Obsolete("Scheduled for removal in Umbraco 18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class ContentFinderByUrl : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrl> _logger;

@@ -44,6 +44,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	@state()
 	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
 
+	@state()
+	private _isFiltering = false;
+
 	pagination = new UmbPaginationManager();
 
 	#collectionRepository;
@@ -162,20 +165,24 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	async #getDataTypes() {
-		this.pagination.setCurrentPageNumber(this._currentPage);
+		try {
+			this.pagination.setCurrentPageNumber(this._currentPage);
 
-		const { data } = await this.#collectionRepository.requestCollection({
-			skip: this.pagination.getSkip(),
-			take: this.pagination.getPageSize(),
-			name: this.#currentFilterQuery,
-		});
+			const { data } = await this.#collectionRepository.requestCollection({
+				skip: this.pagination.getSkip(),
+				take: this.pagination.getPageSize(),
+				name: this.#currentFilterQuery,
+			});
 
-		this.pagination.setTotalItems(data?.total ?? 0);
+			this.pagination.setTotalItems(data?.total ?? 0);
 
-		if (this.pagination.getCurrentPageNumber() > 1) {
-			this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
-		} else {
-			this.#dataTypes = data?.items ?? [];
+			if (this.pagination.getCurrentPageNumber() > 1) {
+				this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
+			} else {
+				this.#dataTypes = data?.items ?? [];
+			}
+		} finally {
+			this._isFiltering = false;
 		}
 	}
 
@@ -196,6 +203,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#onFilterInput(event: UUIInputEvent) {
+		this._isFiltering = true;
 		this.#currentFilterQuery = (event.target.value as string).toLocaleLowerCase();
 		this.#debouncedFilterInput();
 	}
@@ -271,7 +279,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			placeholder=${this.localize.term('placeholders_filter')}
 			label=${this.localize.term('placeholders_filter')}
 			${umbFocus()}>
-			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
+			<div slot="prepend">
+				${this._isFiltering
+					? html`<uui-loader-circle id="filtering-indicator"></uui-loader-circle>`
+					: html`<uui-icon name="search"></uui-icon>`}
+			</div>
 		</uui-input>`;
 	}
 
@@ -404,11 +416,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				margin-bottom: var(--uui-size-space-4);
 			}
 
-			#filter-icon {
-				height: 100%;
-				padding-left: var(--uui-size-space-2);
+			uui-input [slot='prepend'] {
 				display: flex;
-				color: var(--uui-color-border);
+				align-items: center;
+			}
+
+			#filtering-indicator {
+				margin-left: 7px;
 			}
 
 			#item-grid {
@@ -471,6 +485,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 			.choice-type-headline {
 				border-bottom: 1px solid var(--uui-color-divider);
+			}
+
+			.loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-space-6);
 			}
 		`,
 	];

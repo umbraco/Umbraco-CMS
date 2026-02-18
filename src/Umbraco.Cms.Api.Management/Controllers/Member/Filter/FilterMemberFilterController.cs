@@ -33,6 +33,8 @@ public class FilterMemberFilterController : MemberFilterControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a filtered collection of members.")]
+    [EndpointDescription("Filters members based on the provided criteria with support for pagination.")]
     public async Task<IActionResult> Filter(
         CancellationToken cancellationToken,
         Guid? memberTypeId = null,

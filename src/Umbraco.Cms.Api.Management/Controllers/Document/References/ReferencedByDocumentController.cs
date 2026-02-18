@@ -55,7 +55,10 @@ public class ReferencedByDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a collection of items that reference documents.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the documents identified by the provided Ids.")]
     public async Task<IActionResult> ReferencedBy2(
+
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,

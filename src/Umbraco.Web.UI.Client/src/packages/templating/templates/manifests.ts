@@ -6,6 +6,7 @@ import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import * as entryPointModule from './entry-point.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...conditionsManifests,
@@ -20,6 +21,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Template Backoffice Entry Point',
 		alias: 'Umb.EntryPoint.Template',
 		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
+		js: entryPointModule,
 	},
 ];

@@ -9,6 +9,9 @@ namespace Umbraco.Cms.Core.Configuration;
 /// </summary>
 public class UmbracoVersion : IUmbracoVersion
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbracoVersion" /> class.
+    /// </summary>
     public UmbracoVersion()
     {
         Assembly umbracoCoreAssembly = typeof(SemVersion).Assembly;

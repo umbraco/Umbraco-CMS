@@ -336,6 +336,12 @@ export class UmbDefaultTreeContext<
 			},
 		);
 	}
+
+	public override destroy(): void {
+		this.loadTree.cancel();
+		this.reloadTree.cancel();
+		super.destroy();
+	}
 }
 
 export { UmbDefaultTreeContext as api };

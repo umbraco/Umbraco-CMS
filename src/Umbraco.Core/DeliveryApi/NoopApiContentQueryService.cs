@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     A no-operation implementation of <see cref="IApiContentQueryService"/> that always returns an empty result.
+/// </summary>
 public sealed class NoopApiContentQueryService : IApiContentQueryService
 {
     /// <inheritdoc />

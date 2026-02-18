@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -49,11 +50,11 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             throw new InvalidOperationException("No index found by name " + indexName);
         }
 
-        return _populators.Any(x => x.IsRegistered(index));
+        return HasRegisteredPopulator(index);
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in v19.")]
+    [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in Umbraco 19.")]
     public virtual void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
         => RebuildIndexAsync(indexName, delay, useBackgroundThread).GetAwaiter().GetResult();
 
@@ -90,7 +91,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in v19.")]
+    [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
     public virtual void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
         => RebuildIndexesAsync(onlyEmptyIndexes, delay, useBackgroundThread).GetAwaiter().GetResult();
 
@@ -130,7 +131,12 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     public async Task<bool> IsRebuildingAsync(string indexName)
         => (await _longRunningOperationService.GetByTypeAsync(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
 
-    private static string GetRebuildOperationTypeName(string indexName) => $"RebuildExamineIndex-{indexName}";
+    private static string GetRebuildOperationTypeName(string indexName)
+    {
+        // Truncate to a maximum of 200 characters to ensure the type name doesn't overflow the database field.
+        const int TypeFieldSize = 200;
+        return $"RebuildExamineIndex-{indexName}".TruncateWithUniqueHash(TypeFieldSize);
+    }
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
@@ -166,9 +172,13 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         }
 
         // If an index exists but it has zero docs we'll consider it empty and rebuild
+        // Only include indexes that have at least one populator registered, this is to avoid emptying out indexes
+        // that we have no chance of repopulating, for example our own search package
         IIndex[] indexes = (onlyEmptyIndexes
             ? _examineManager.Indexes.Where(ShouldRebuild)
-            : _examineManager.Indexes).ToArray();
+            : _examineManager.Indexes)
+            .Where(HasRegisteredPopulator)
+            .ToArray();
 
         if (indexes.Length == 0)
         {
@@ -211,4 +221,6 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return false;
         }
     }
+
+    private bool HasRegisteredPopulator(IIndex index) => _populators.Any(x => x.IsRegistered(index));
 }
