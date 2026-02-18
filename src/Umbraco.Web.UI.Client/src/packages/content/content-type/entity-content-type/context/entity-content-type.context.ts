@@ -1,4 +1,4 @@
-import { UMB_ENTITY_CONTENT_TYPE_ENTITY_CONTEXT } from './entity-content-type-entity.context-token.js';
+import { UMB_ENTITY_CONTENT_TYPE_ENTITY_CONTEXT } from './entity-content-type.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
