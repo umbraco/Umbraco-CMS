@@ -34,6 +34,8 @@ public class ByKeyMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a media item.")]
+    [EndpointDescription("Gets a media item identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

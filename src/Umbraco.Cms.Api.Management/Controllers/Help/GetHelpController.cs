@@ -11,7 +11,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Help;
 
-[Obsolete("This is no longer used and will be removed in v19")]
+[Obsolete("This is no longer used. Scheduled for removal in Umbraco 19.")]
 [ApiVersion("1.0")]
 public class GetHelpController : HelpControllerBase
 {
@@ -33,6 +33,8 @@ public class GetHelpController : HelpControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<HelpPageResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets help information.")]
+    [EndpointDescription("Gets help information and documentation resources for the Umbraco back office.")]
     public async Task<IActionResult> Get(
         CancellationToken cancellationToken,
         string section,

@@ -17,6 +17,8 @@ public class StatusModelsBuilderController : ModelsBuilderControllerBase
 
     [HttpGet("status")]
     [ProducesResponseType(typeof(OutOfDateStatusResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets models builder status.")]
+    [EndpointDescription("Gets the current status and configuration of the models builder.")]
     [MapToApiVersion("1.0")]
     public Task<ActionResult<OutOfDateStatusResponseModel>> GetModelsOutOfDateStatus(CancellationToken cancellationToken)
     {

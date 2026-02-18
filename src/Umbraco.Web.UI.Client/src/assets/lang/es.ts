@@ -1451,7 +1451,8 @@ export default {
 		emptyDictionaryTree: 'No hay elementos de Diccionario para elegir',
 	},
 	textbox: {
-		characters_left: 'caracteres restantes',
+		characters_left: '<strong>%0%</strong> caracteres restantes.',
+		characters_exceed: 'Máximo %0% caracteres, <strong>%1%</strong> de más.',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Seleccionar todo',
