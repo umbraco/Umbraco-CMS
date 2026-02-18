@@ -51,5 +51,9 @@ public class AsyncNoCacheRepositoryCachePolicy<TEntity, TId> : IAsyncRepositoryC
         (await performGetAll())?.ToArray() ?? Array.Empty<TEntity>();
 
     /// <inheritdoc />
+    public async Task<TEntity[]> GetManyAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetMany) =>
+        (await performGetMany(ids))?.ToArray() ?? Array.Empty<TEntity>();
+
+    /// <inheritdoc />
     public Task ClearAllAsync() => Task.CompletedTask;
 }

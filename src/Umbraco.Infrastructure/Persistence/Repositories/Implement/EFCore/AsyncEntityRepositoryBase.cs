@@ -20,7 +20,6 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
 {
     private static AsyncRepositoryCachePolicyOptions? _defaultOptions;
 
-    private readonly ILogger<AsyncEntityRepositoryBase<TId, TEntity>> _logger;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
 
@@ -36,6 +35,12 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         _repositoryCacheVersionService = repositoryCacheVersionService;
         _cacheSyncService = cacheSyncService;
     }
+
+    /// <summary>
+    ///     Gets the logger
+    /// </summary>
+    protected ILogger<AsyncEntityRepositoryBase<TId, TEntity>> _logger { get;  }
+
 
     /// <summary>
     ///     Gets the isolated cache for the <typeparamref name="TEntity"/>
@@ -102,7 +107,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         }
     }
 
-    public async Task SaveAsync(TEntity entity)
+    public async Task SaveAsync(TEntity entity, CancellationToken cancellationToken)
     {
         if (entity.HasIdentity == false)
         {
@@ -114,13 +119,13 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         }
     }
 
-    public async Task DeleteAsync(TEntity entity) =>
+    public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken) =>
         await CachePolicy.DeleteAsync(entity, PersistDeletedItemAsync);
 
-    public async Task<TEntity?> GetAsync(TId? id) =>
+    public async Task<TEntity?> GetAsync(TId? id, CancellationToken cancellationToken) =>
         await CachePolicy.GetAsync(id, PerformGetAsync);
 
-    public async Task<IEnumerable<TEntity>> GetManyAsync(params TId[]? ids)
+    public async Task<IEnumerable<TEntity>> GetManyAsync(TId[]? ids, CancellationToken cancellationToken)
     {
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
         ids = ids?.Distinct()
@@ -140,14 +145,14 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         var entities = new List<TEntity>();
         foreach (IEnumerable<TId> group in ids.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
         {
-            TEntity[] groups = await CachePolicy.GetAllAsync(PerformGetAllAsync);
+            TEntity[] groups = await CachePolicy.GetManyAsync(group.ToArray(), PerformGetManyAsync);
             entities.AddRange(groups);
         }
 
         return entities;
     }
 
-    public async Task<bool> ExistsAsync(TId id)
+    public async Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken)
         => await CachePolicy.ExistsAsync(id, PerformExistsAsync);
 
     protected virtual IAsyncRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
@@ -161,6 +166,8 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     protected abstract Task<TEntity?> PerformGetAsync(TId? id);
 
     protected abstract Task<IEnumerable<TEntity>?> PerformGetAllAsync();
+
+    protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TId[]? ids);
 
     protected abstract Task PersistNewItemAsync(TEntity item);
 

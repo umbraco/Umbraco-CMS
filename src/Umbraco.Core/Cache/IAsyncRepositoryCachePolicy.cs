@@ -74,6 +74,14 @@ public interface IAsyncRepositoryCachePolicy<TEntity, TId>
     Task<TEntity[]> GetAllAsync(Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <summary>
+    ///     Gets many entities.
+    /// </summary>
+    /// <param name="performGetMany">The repository PerformGetMany method.</param>
+    /// <returns> Returns entities from the list of <param name="ids"></param>.</returns>
+    /// <remarks>Get the entities. Either from the cache or the repository depending on the implementation.</remarks>
+    Task<TEntity[]> GetManyAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetMany);
+
+    /// <summary>
     ///     Clears the entire cache.
     /// </summary>
     Task ClearAllAsync();

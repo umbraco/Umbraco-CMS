@@ -1,11 +1,8 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using IScopeAccessor = Umbraco.Cms.Core.Scoping.EFCore.IScopeAccessor;
 
@@ -234,6 +231,72 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
             .Where(x => x.HasIdentity) // be safe, though would be weird...
             .ToArray();
 
+        InsertEntities(repoEntities);
+
+        return repoEntities ?? Array.Empty<TEntity>();
+    }
+
+    /// <inheritdoc />
+    public override async Task<TEntity[]> GetManyAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetMany)
+    {
+        await EnsureCacheIsSyncedAsync();
+        if (ids?.Length > 0)
+        {
+            // try to get each entity from the cache
+            // if we can find all of them, return
+            TEntity[] entities = (await Task.WhenAll(ids.Select(GetCachedAsync))).WhereNotNull().ToArray();
+            if (ids.Length.Equals(entities.Length))
+            {
+                return entities; // no need for null checks, we are not caching nulls
+            }
+        }
+        else
+        {
+            // get everything we have
+            TEntity?[] entities = Cache.GetCacheItemsByKeySearch<TEntity>(EntityTypeCacheKey)
+                .ToArray(); // no need for null checks, we are not caching nulls
+
+            if (entities.Length > 0)
+            {
+                // if some of them were in the cache...
+                if (_options.GetAllCacheValidateCount)
+                {
+                    // need to validate the count, get the actual count and return if ok
+                    if (_options.PerformCountAsync is not null)
+                    {
+                        var totalCount = await _options.PerformCountAsync();
+                        if (entities.Length == totalCount)
+                        {
+                            return entities.WhereNotNull().ToArray();
+                        }
+                    }
+                }
+                else
+                {
+                    // no need to validate, just return what we have and assume it's all there is
+                    return entities.WhereNotNull().ToArray();
+                }
+            }
+            else if (_options.GetAllCacheAllowZeroCount)
+            {
+                // if none of them were in the cache
+                // and we allow zero count - check for the special (empty) entry
+                TEntity[]? empty = Cache.GetCacheItem<TEntity[]>(EntityTypeCacheKey);
+                if (empty != null)
+                {
+                    return empty;
+                }
+            }
+        }
+
+        // cache failed, get from repo and cache
+        IEnumerable<TEntity>? repoResult = await performGetMany(ids);
+        TEntity[]? repoEntities = repoResult?
+            .WhereNotNull() // exclude nulls!
+            .Where(x => x.HasIdentity) // be safe, though would be weird...
+            .ToArray();
+
+        // note: if empty & allow zero count, will cache a special (empty) entry
         InsertEntities(repoEntities);
 
         return repoEntities ?? Array.Empty<TEntity>();
