@@ -260,7 +260,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
 
-		const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]);
+		const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]) ?? '';
 
 		const waitNotice = notificationContext?.peek('warning', {
 			data: {
