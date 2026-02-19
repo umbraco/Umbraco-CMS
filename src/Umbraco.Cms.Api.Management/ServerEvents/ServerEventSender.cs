@@ -388,8 +388,10 @@ internal sealed class ServerEventSender :
     {
         foreach (ContentTypeChange<T> change in notification.Changes)
         {
-            // Skip removed types - these are already handled by the Deleted notification handler.
-            if (change.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
+            // Skip created and removed types as these are already handled by the Deleted
+            // and Saved notification handler respectively.
+            if (change.ChangeTypes.HasType(ContentTypeChangeTypes.Create)
+                || change.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
             {
                 continue;
             }

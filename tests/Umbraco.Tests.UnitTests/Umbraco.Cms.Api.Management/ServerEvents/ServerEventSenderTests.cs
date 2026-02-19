@@ -1437,6 +1437,29 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
+    public async Task HandleAsync_ContentTypeChangedNotification_SkipsCreatedTypes()
+    {
+        // Arrange
+        var createdTypeKey = Guid.NewGuid();
+        var createdType = Mock.Of<IContentType>(t => t.Key == createdTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IContentType>(createdType, ContentTypeChangeTypes.Create),
+        };
+
+        var notification = new ContentTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - no events should be routed for created types (already handled by Saved notification).
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(0));
+    }
+
+    [Test]
     public async Task HandleAsync_MediaTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
     {
         // Arrange
