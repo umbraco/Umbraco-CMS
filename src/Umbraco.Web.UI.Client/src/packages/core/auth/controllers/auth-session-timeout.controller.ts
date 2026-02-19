@@ -66,6 +66,9 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			host.session$,
 			(session) => {
 				if (session) {
+					// Session was refreshed (possibly by another tab) — close any open timeout modal
+					this.#closeTimeoutModal();
+
 					// Inform the token check worker about the new session expiry
 					console.log('[Auth Context] Informing token check worker about new session state.');
 					this.#tokenCheckWorker?.port.postMessage({
