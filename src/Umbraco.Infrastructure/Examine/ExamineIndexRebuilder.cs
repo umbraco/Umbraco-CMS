@@ -91,6 +91,21 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     /// <inheritdoc/>
     public virtual Task<Attempt<IndexRebuildResult>> RebuildIndexAsync(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
+        if (!CanRun())
+        {
+            return Task.FromResult(Attempt.Fail(IndexRebuildResult.NotAllowedToRun));
+        }
+
+        if (!_examineManager.TryGetIndex(indexName, out IIndex index))
+        {
+            return Task.FromResult(Attempt.Fail(IndexRebuildResult.Unknown));
+        }
+
+        if (!HasRegisteredPopulator(index))
+        {
+            return Task.FromResult(Attempt.Fail(IndexRebuildResult.Unknown));
+        }
+
         RebuildIndex(indexName, delay, useBackgroundThread);
         return Task.FromResult(Attempt.Succeed(IndexRebuildResult.Success));
     }
@@ -140,6 +155,11 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     /// <inheritdoc/>
     public virtual Task<Attempt<IndexRebuildResult>> RebuildIndexesAsync(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
+        if (!CanRun())
+        {
+            return Task.FromResult(Attempt.Fail(IndexRebuildResult.NotAllowedToRun));
+        }
+
         RebuildIndexes(onlyEmptyIndexes, delay, useBackgroundThread);
         return Task.FromResult(Attempt.Succeed(IndexRebuildResult.Success));
     }

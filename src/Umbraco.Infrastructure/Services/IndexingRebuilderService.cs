@@ -1,9 +1,11 @@
 using Examine;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Models;
 
 namespace Umbraco.Cms.Infrastructure.Services;
 
@@ -51,7 +53,14 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         try
         {
             Set(indexName);
-            await _indexRebuilder.RebuildIndexAsync(indexName);
+            Attempt<IndexRebuildResult> result = await _indexRebuilder.RebuildIndexAsync(indexName);
+
+            if (result.Success is false)
+            {
+                Clear(indexName);
+                return false;
+            }
+
             return true;
         }
         catch (Exception exception)
