@@ -169,22 +169,21 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		const modalManager = await this.getContext(contextToken);
 
 		try {
-			await modalManager
-				?.open(this, UMB_MODAL_AUTH_TIMEOUT, {
-					modal: {
-						key: 'auth-timeout',
+			const modal = modalManager?.open(this, UMB_MODAL_AUTH_TIMEOUT, {
+				modal: {
+					key: 'auth-timeout',
+				},
+				data: {
+					remainingTimeInSeconds,
+					onLogout: () => {
+						this.#host.signOut();
 					},
-					data: {
-						remainingTimeInSeconds,
-						onLogout: () => {
-							this.#host.signOut();
-						},
-						onContinue: () => {
-							this.#tryValidateToken();
-						},
+					onContinue: () => {
+						this.#tryValidateToken();
 					},
-				})
-				.onSubmit();
+				},
+			});
+			await modal?.onSubmit();
 		} catch {
 			// Modal was force-closed or an error occurred — try to refresh gracefully
 			this.#tryValidateToken();

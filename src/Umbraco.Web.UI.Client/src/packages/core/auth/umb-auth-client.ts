@@ -83,6 +83,8 @@ export class UmbAuthClient {
 		this.#state = generateRandom(10);
 		const codeChallenge = await deriveChallenge(this.#codeVerifier);
 
+		/* eslint-disable @typescript-eslint/naming-convention */
+		// OAuth 2.0 / PKCE wire-format parameter names — must use snake_case per RFC 6749 / RFC 7636
 		const params = new URLSearchParams({
 			client_id: this.#clientId,
 			redirect_uri: this.#redirectUri,
@@ -94,6 +96,7 @@ export class UmbAuthClient {
 			prompt: 'consent',
 			access_type: 'offline',
 		});
+		/* eslint-enable @typescript-eslint/naming-convention */
 
 		if (identityProvider !== 'Umbraco') {
 			params.set('identity_provider', identityProvider);
@@ -112,6 +115,7 @@ export class UmbAuthClient {
 	 * We only extract session timing from the response.
 	 */
 	async exchangeCode(code: string, codeVerifier: string): Promise<UmbTokenEndpointResponse | undefined> {
+		/* eslint-disable @typescript-eslint/naming-convention */
 		const body = new URLSearchParams({
 			client_id: this.#clientId,
 			redirect_uri: this.#redirectUri,
@@ -119,6 +123,7 @@ export class UmbAuthClient {
 			code,
 			code_verifier: codeVerifier,
 		});
+		/* eslint-enable @typescript-eslint/naming-convention */
 
 		return this.#performTokenRequest(body);
 	}
@@ -127,6 +132,7 @@ export class UmbAuthClient {
 	 * Refreshes the session using the httpOnly refresh token cookie.
 	 */
 	async refreshToken(): Promise<UmbTokenEndpointResponse | undefined> {
+		/* eslint-disable @typescript-eslint/naming-convention */
 		const body = new URLSearchParams({
 			client_id: this.#clientId,
 			redirect_uri: this.#redirectUri,
@@ -134,6 +140,7 @@ export class UmbAuthClient {
 			// refresh_token value is in the httpOnly cookie — server reads it from there
 			refresh_token: '[redacted]',
 		});
+		/* eslint-enable @typescript-eslint/naming-convention */
 
 		return this.#performTokenRequest(body);
 	}
@@ -142,11 +149,13 @@ export class UmbAuthClient {
 	 * Revokes the current session tokens via the revocation endpoint.
 	 */
 	async revokeToken(): Promise<void> {
+		/* eslint-disable @typescript-eslint/naming-convention */
 		const body = new URLSearchParams({
 			client_id: this.#clientId,
 			token: '[redacted]',
 			token_type_hint: 'access_token',
 		});
+		/* eslint-enable @typescript-eslint/naming-convention */
 
 		try {
 			await fetch(this.#endpoints.revocationEndpoint, {

@@ -237,19 +237,33 @@ export class UmbAuthContext extends UmbContextBase {
 		};
 		window.addEventListener('message', pkceHandler);
 
-		// Wait for the popup to complete via BroadcastChannel
+		// Wait for the popup to complete via BroadcastChannel.
+		// Resolves when authorized; also resolves (no-op) if the popup is closed/cancelled.
 		return new Promise<void>((resolve) => {
+			const cleanup = () => {
+				clearInterval(closedPoll);
+				this.#channel.removeEventListener('message', handler);
+				window.removeEventListener('message', pkceHandler);
+			};
+
 			const handler = (evt: MessageEvent) => {
 				if (evt.data?.type === 'authorized') {
-					this.#channel.removeEventListener('message', handler);
-					window.removeEventListener('message', pkceHandler);
+					cleanup();
 					this.#client.clearPkceState();
-					// Close the popup window
 					this.#authWindowProxy?.close();
 					resolve();
 				}
 			};
 			this.#channel.addEventListener('message', handler);
+
+			// Poll for popup closed (user cancelled or closed the window)
+			const closedPoll = setInterval(() => {
+				if (this.#authWindowProxy?.closed) {
+					cleanup();
+					this.#client.clearPkceState();
+					resolve();
+				}
+			}, 500);
 		});
 	}
 
