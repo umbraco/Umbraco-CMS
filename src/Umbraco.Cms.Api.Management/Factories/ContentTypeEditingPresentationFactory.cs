@@ -35,6 +35,7 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
             Icon = viewModel.Icon,
             Name = viewModel.Name,
             IsElement = viewModel.IsElement,
+            AllowedInLibrary = viewModel.AllowedInLibrary,
             AllowedAsRoot = viewModel.AllowedAsRoot,
             VariesByCulture = viewModel.VariesByCulture,
             VariesBySegment = viewModel.VariesBySegment,
