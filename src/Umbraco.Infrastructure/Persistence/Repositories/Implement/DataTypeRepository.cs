@@ -533,7 +533,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         if (entity.HasIdentity)
         {
             var cacheKey = GetCacheKey(entity.Id);
-            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
         }
     }
 
@@ -570,6 +570,16 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
                 repositoryCacheVersionService,
                 cacheSyncService) =>
             _outerRepo = outerRepo;
+
+        // Use a GUID-specific cache policy with a distinct prefix ("uRepoGuid_IDataType_")
+        // so that GUID-keyed cache entries don't interfere with the parent int-keyed repository's
+        // prefix-based search and count validation in DefaultRepositoryCachePolicy.
+        protected override IRepositoryCachePolicy<IDataType, Guid> CreateCachePolicy()
+            => new GuidReadRepositoryCachePolicy<IDataType>(
+                GlobalIsolatedCache,
+                ScopeAccessor,
+                RepositoryCacheVersionService,
+                CacheSyncService);
 
         protected override IDataType? PerformGet(Guid id)
         {
@@ -649,7 +659,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
             if (entity.HasIdentity)
             {
                 var cacheKey = GetCacheKey(entity.Key);
-                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+                IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
             }
         }
 
@@ -675,7 +685,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
             IsolatedCache.Clear(cacheKey);
         }
 
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IDataType>() + key;
+        private static string GetCacheKey(Guid key) => GuidReadRepositoryCachePolicy<IDataType>.GetCacheKey(key);
     }
 
     #endregion

@@ -234,6 +234,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
             $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} WHERE {uniqueId} IN
               (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
         ];
+
     }
 
     #endregion
@@ -295,6 +296,8 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     public override int RecycleBinId => Constants.System.RecycleBinContent;
 
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
+
+
 
     #endregion
 }
