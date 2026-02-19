@@ -17,14 +17,14 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 		const icon = this.item?.mediaType.icon;
 
 		return html`
-			<span id="icon-container" slot="icon">
-				${icon
-					? html`
-							<umb-icon id="icon" slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>
-							${this.#renderStateIcon()}
-						`
-					: nothing}
-			</span>
+			<div id="icon-container" slot="icon">
+				<umb-entity-sign-bundle .entityType=${this._item?.entityType} .entityFlags=${this._flags}>
+					${icon
+						? html`<umb-icon id="icon" name="${this._getIconToRender(icon)}"></umb-icon>`
+						: nothing}
+				</umb-entity-sign-bundle>
+				${this.#renderStateIcon()}
+			</div>
 		`;
 	}
 
@@ -68,38 +68,11 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 				bottom: -5px;
 				right: -5px;
 				font-size: 10px;
-				background: var(--uui-color-surface);
+				background: var(--umb-sign-bundle-bg, var(--uui-color-surface));
 				width: 14px;
 				height: 14px;
 				border-radius: 100%;
 				line-height: 14px;
-			}
-
-			:hover #state-icon {
-				background: var(--uui-color-surface-emphasis);
-			}
-
-			/** Active */
-			[active] #state-icon {
-				background: var(--uui-color-current);
-			}
-
-			[active]:hover #state-icon {
-				background: var(--uui-color-current-emphasis);
-			}
-
-			/** Selected */
-			[selected] #state-icon {
-				background-color: var(--uui-color-selected);
-			}
-
-			[selected]:hover #state-icon {
-				background-color: var(--uui-color-selected-emphasis);
-			}
-
-			/** Disabled */
-			[disabled] #state-icon {
-				background-color: var(--uui-color-disabled);
 			}
 		`,
 	];
