@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 
 internal class ExamineIndexRebuilder : IIndexRebuilder
 {
-    // Static because the class is registered as Transient - all instances must share the same state.
+    // Static so that all instances of this type share the same rebuild task state across the application.
     private static readonly ConcurrentDictionary<string, Task> RebuildTasks = new();
 
     private readonly IExamineManager _examineManager;
