@@ -1,5 +1,7 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -105,5 +107,29 @@ public class UmbracoDbContext : DbContext
         base.OnConfiguring(optionsBuilder);
 
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    }
+
+    /// <summary>
+    /// A Update or Insert helper. If there's nothing to update, this method inserts.
+    /// </summary>
+    /// <param name="dto">The specific DTO to be Upserted.</param>
+    /// <param name="predicate">The predicate affirming the condition to look for.</param>
+    /// <param name="settersBuilder">The EFCore setters builder. Used to specify updated properties.</param>
+    /// <typeparam name="TDto">The DTO Type.</typeparam>
+    public async Task UpsertAsync<TDto>(
+        TDto dto,
+        Expression<Func<TDto, bool>> predicate,
+        Action<UpdateSettersBuilder<TDto>> settersBuilder)
+        where TDto : class
+    {
+        var rowsAffected = await Set<TDto>()
+            .Where(predicate)
+            .ExecuteUpdateAsync(settersBuilder);
+
+        if (rowsAffected == 0)
+        {
+            await Set<TDto>().AddAsync(dto);
+            await SaveChangesAsync();
+        }
     }
 }
