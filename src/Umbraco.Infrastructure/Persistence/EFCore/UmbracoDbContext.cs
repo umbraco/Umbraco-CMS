@@ -52,6 +52,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<CacheInstructionDto> CacheInstructions { get; set; }
 
+    public required DbSet<TemplateDto> Templates { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var extensions = options.Extensions.FirstOrDefault() as Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension;
