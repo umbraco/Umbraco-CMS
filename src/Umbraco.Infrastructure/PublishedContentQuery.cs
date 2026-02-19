@@ -29,9 +29,11 @@ public class PublishedContentQuery : IPublishedContentQuery
     private static readonly HashSet<string> _returnedQueryFields =
         new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
-    /// </summary>
+    
+
+    ///// <summary>
+    /////     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
+    ///// </summary>
     public PublishedContentQuery(
         IVariationContextAccessor variationContextAccessor,
         IExamineManager examineManager,
@@ -49,9 +51,23 @@ public class PublishedContentQuery : IPublishedContentQuery
         _mediaNavigationQueryService = mediaNavigationQueryService;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
-    /// </summary>
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
+    public PublishedContentQuery(
+        IVariationContextAccessor variationContextAccessor,
+        IExamineManager examineManager,
+        IPublishedContentCache publishedContent,
+        IPublishedMediaCache publishedMediaCache,
+        IDocumentNavigationQueryService documentNavigationQueryService) : this(
+        variationContextAccessor,
+        examineManager,
+        publishedContent,
+        publishedMediaCache,
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
+    {
+    }
+
     [Obsolete("Scheduled for removal in Umbraco 18")]
     public PublishedContentQuery(
         IVariationContextAccessor variationContextAccessor,
@@ -241,8 +257,8 @@ public class PublishedContentQuery : IPublishedContentQuery
     private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<Guid> ids)
         => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache, INavigationQueryService nav)
-        => nav.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false ? []
+    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache, INavigationQueryService navigationQueryService)
+        => navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false ? []
              : rootKeys.Select(x => cache?.GetById(false, x)).WhereNotNull();
 
     #endregion
