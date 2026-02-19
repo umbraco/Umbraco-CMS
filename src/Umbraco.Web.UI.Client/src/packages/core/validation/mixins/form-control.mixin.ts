@@ -63,7 +63,6 @@ export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
@@ -92,7 +91,6 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
