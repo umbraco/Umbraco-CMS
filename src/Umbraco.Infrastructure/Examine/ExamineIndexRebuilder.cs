@@ -67,7 +67,6 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
 
         if (RebuildTasks.TryGetValue(indexName, out Task? existing) && !existing.IsCompleted)
         {
-            _logger.LogWarning("Call was made to RebuildIndex but a rebuild for {IndexName} is already running.", indexName);
             return Attempt.Fail(IndexRebuildResult.AlreadyRebuilding);
         }
 
