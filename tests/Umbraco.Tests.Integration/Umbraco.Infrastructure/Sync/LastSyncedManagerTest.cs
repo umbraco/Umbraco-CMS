@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -34,6 +35,7 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
     {
         var result = await manager.SaveLastSyncedInternalAsync(-1);
         Assert.IsFalse(result.Success);
+        Assert.AreEqual(result.Result, LastSyncedOperationStatus.InvalidId);
     }
 
     [Test]
@@ -41,6 +43,7 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
     {
         var result = await manager.SaveLastSyncedExternalAsync(-1);
         Assert.IsFalse(result.Success);
+        Assert.AreEqual(result.Result, LastSyncedOperationStatus.InvalidId);
     }
 
     [Test]
