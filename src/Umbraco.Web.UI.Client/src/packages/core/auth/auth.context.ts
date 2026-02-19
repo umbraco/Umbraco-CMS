@@ -152,6 +152,12 @@ export class UmbAuthContext extends UmbContextBase {
 					this.#session.setValue(undefined);
 					this.#isAuthorized.setValue(false);
 					break;
+				case 'signedOut':
+					this.#session.setValue(undefined);
+					this.#isAuthorized.setValue(false);
+					// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
+					location.href = this.#postLogoutRedirectUri;
+					break;
 			}
 		};
 
@@ -438,8 +444,9 @@ export class UmbAuthContext extends UmbContextBase {
 		// Revoke the token (best-effort)
 		await this.#client.revokeToken().catch(() => {});
 
-		// Clear internal state
+		// Clear internal state and notify other tabs to redirect to logout
 		this.clearTokenStorage();
+		this.#channel.postMessage({ type: 'signedOut' });
 
 		// Redirect to end session endpoint
 		const postLogoutRedirectUri = new URL(this.#postLogoutRedirectUri, window.origin);
