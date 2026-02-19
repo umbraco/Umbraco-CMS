@@ -383,7 +383,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 *   const token = await authContext.getLatestToken();
 	 *   const result = await fetch('https://my-api.com', { headers: { Authorization: `Bearer ${token}` } });
 	 * ```
-	 * @deprecated Use `configureClient()` for `@hey-api/openapi-ts` clients or `getOpenApiConfiguration()` for manual fetch calls. With cookie-based auth this always returns `'[redacted]'`. Scheduled for removal in Umbraco 19.
+	 * @deprecated Use {@link configureClient} for `@hey-api/openapi-ts` clients or {@link getOpenApiConfiguration} for manual fetch calls. With cookie-based auth this always returns `'[redacted]'`. Scheduled for removal in Umbraco 19.
+	 * @see {@link configureClient} for automatic token handling with `@hey-api/openapi-ts` clients.
+	 * @see {@link getOpenApiConfiguration} for manual fetch calls with cookie-based auth.
 	 * @memberof UmbAuthContext
 	 * @returns The latest token from the Management API
 	 */
