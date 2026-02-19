@@ -383,23 +383,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 *   const token = await authContext.getLatestToken();
 	 *   const result = await fetch('https://my-api.com', { headers: { Authorization: `Bearer ${token}` } });
 	 * ```
+	 * @deprecated Use `configureClient()` for `@hey-api/openapi-ts` clients or `getOpenApiConfiguration()` for manual fetch calls. With cookie-based auth this always returns `'[redacted]'`. Scheduled for removal in Umbraco 19.
 	 * @memberof UmbAuthContext
 	 * @returns The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
-		const session = this.#session.getValue();
-
-		// If the access token is still valid, return immediately
-		if (session && session.accessTokenExpiresAt > Math.floor(Date.now() / 1000)) {
-			return '[redacted]';
-		}
-
-		// Access token expired — try to refresh
-		const success = await this.makeRefreshTokenRequest();
-		if (!success) {
-			this.clearTokenStorage();
-		}
-
 		return '[redacted]';
 	}
 
@@ -498,9 +486,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 * ```
 	 * @example <caption></caption>
 	 * ```js
-	 * 	const serverUrl = authContext.getServerUrl();
-	 * 	const token = await authContext.getLatestToken();
-	 * 	const result = await fetch(`${serverUrl}/umbraco/management/api/v1/my-resource`, { headers: { Authorization: `Bearer ${token}` } });
+	 * 	const config = authContext.getOpenApiConfiguration();
+	 * 	const result = await fetch(`${config.base}/umbraco/management/api/v1/my-resource`, {
+	 * 		credentials: config.credentials,
+	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
+	 * 	});
 	 * ```
 	 * @returns The server url to the Management API
 	 */
@@ -526,7 +516,7 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: this.#serverUrl,
 			credentials: 'include',
-			token: () => this.getLatestToken(),
+			token: () => Promise.resolve('[redacted]'),
 		};
 	}
 
@@ -622,11 +612,10 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param providerKey
 	 */
 	async unlinkLogin(loginProvider: string, providerKey: string): Promise<boolean> {
-		const token = await this.getLatestToken();
 		const request = new Request(this.#unlinkEndpoint, {
 			method: 'POST',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			headers: { 'Content-Type': 'application/json', Authorization: 'Bearer [redacted]' },
 			body: JSON.stringify({ loginProvider, providerKey }),
 		});
 
@@ -713,12 +702,10 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	async #makeLinkTokenRequest(provider: string) {
-		const token = await this.getLatestToken();
-
 		const request = await fetch(`${this.#linkKeyEndpoint}?provider=${provider}`, {
 			credentials: 'include',
 			headers: {
-				Authorization: `Bearer ${token}`,
+				Authorization: 'Bearer [redacted]',
 				'Content-Type': 'application/json',
 			},
 		});

@@ -60,16 +60,11 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 	}
 
 	#observeIsAuthorized() {
-		this.observe(this.#authContext?.isAuthorized, async (isAuthorized) => {
+		this.observe(this.#authContext?.isAuthorized, (isAuthorized) => {
 			if (isAuthorized === undefined) return;
 
 			if (isAuthorized) {
-				const token = await this.#authContext?.getLatestToken();
-				if (token) {
-					this.#initHubConnection(token);
-				} else {
-					throw new Error('No auth token found');
-				}
+				this.#initHubConnection('[redacted]');
 			} else {
 				this.#isConnected.setValue(false);
 				this.#connection?.stop();
