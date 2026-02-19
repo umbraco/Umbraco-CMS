@@ -33,6 +33,22 @@ public static class RepositoryCacheKeys
         => _guidKeys.GetOrAdd(typeof(T), static type => "uRepoGuid_" + type.Name + "_");
 
     /// <summary>
+    /// Gets the GUID-specific repository cache key for the provided type and GUID.
+    /// </summary>
+    /// <typeparam name="T">The entity type to get the cache key for.</typeparam>
+    /// <param name="id">The entity GUID identifier.</param>
+    /// <returns>A cache key string in the format "uRepoGuid_{TypeName}_{Guid}", or an empty string if the id is <see cref="Guid.Empty"/>.</returns>
+    public static string GetGuidKey<T>(Guid id)
+    {
+        if (id == Guid.Empty)
+        {
+            return string.Empty;
+        }
+
+        return GetGuidKey<T>() + id;
+    }
+
+    /// <summary>
     /// Gets the repository cache key for the provided type and Id.
     /// </summary>
     /// <typeparam name="T">The entity type to get the cache key for.</typeparam>

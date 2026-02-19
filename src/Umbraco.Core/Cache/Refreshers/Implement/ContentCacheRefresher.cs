@@ -174,7 +174,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
 
                 // By GUID Key (GUID-keyed read repository uses a separate "uRepoGuid_" prefix)
-                isolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>() + payload.Key);
+                isolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(payload.Key.GetValueOrDefault()));
             }
 
             // remove those that are in the branch

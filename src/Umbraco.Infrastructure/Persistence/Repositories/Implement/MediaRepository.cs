@@ -585,7 +585,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // The MediaCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
         // GUID-keyed read repository uses a separate "uRepoGuid_" prefix.
-        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IMedia>() + entity.Key);
+        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IMedia>(entity.Key));
     }
 
     protected override void PersistDeletedItem(IMedia entity)
