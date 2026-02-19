@@ -1320,8 +1320,9 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
         // We need to flush the isolated cache by key explicitly here.
         // The ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
-        // might have already consumed the cached version (which at this point is the previous version).
-        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<TEntity, Guid>(entity.Key));
+        // might have already consumed the cached version (which at this point is Key));
+        // GUID-keyed read repository uses a separate "uRepoGuid_" prefix.
+        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(entity.Key));
 
         // troubleshooting
         //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
@@ -1531,7 +1532,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         if (entity.HasIdentity)
         {
             var cacheKey = GetCacheKey(entity.Id);
-            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
         }
     }
 
@@ -1570,6 +1571,16 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 repositoryCacheVersionService,
                 cacheSyncService) =>
             _outerRepo = outerRepo;
+
+        // Use a GUID-specific cache policy with a distinct prefix ("uRepoGuid_IContent_")
+        // so that GUID-keyed cache entries don't interfere with the parent int-keyed repository's
+        // prefix-based search and count validation in DefaultRepositoryCachePolicy.
+        protected override IRepositoryCachePolicy<TEntity, Guid> CreateCachePolicy()
+            => new GuidReadRepositoryCachePolicy<TEntity>(
+                GlobalIsolatedCache,
+                ScopeAccessor,
+                RepositoryCacheVersionService,
+                CacheSyncService);
 
         protected override TEntity? PerformGet(Guid id)
         {
@@ -1635,7 +1646,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             if (entity.HasIdentity)
             {
                 var cacheKey = GetCacheKey(entity.Key);
-                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+                IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
             }
         }
 
