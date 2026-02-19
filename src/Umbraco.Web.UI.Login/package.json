@@ -1,28 +1,28 @@
 {
-	"name": "login",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build",
-		"watch": "tsc && vite build --watch",
-		"preview": "vite preview",
-		"generate:server-api": "openapi-ts"
-	},
-	"engines": {
-		"node": ">=22",
-		"npm": ">=10.9"
-	},
-	"devDependencies": {
-		"@hey-api/openapi-ts": "^0.85.0",
-		"@umbraco-cms/backoffice": "^16.2.0",
-		"msw": "^2.11.3",
-		"typescript": "^5.9.3",
-		"vite": "^7.2.0"
-	},
-	"msw": {
-		"workerDirectory": [
-			"public"
-		]
-	}
+  "name": "login",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "watch": "tsc && vite build --watch",
+    "preview": "vite preview",
+    "generate:server-api": "openapi-ts"
+  },
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10.9"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.85.0",
+    "@umbraco-cms/backoffice": "^17.1.0",
+    "msw": "^2.12.7",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
 }

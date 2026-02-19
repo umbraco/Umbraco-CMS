@@ -42,9 +42,8 @@ test('can create content with a rich text editor that has a stylesheet', {tag: '
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(documentName);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(documentName)).toBeTruthy();
 });

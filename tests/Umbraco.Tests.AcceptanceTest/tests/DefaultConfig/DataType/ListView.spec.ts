@@ -27,10 +27,9 @@ test('can update page size', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterPageSizeValue(pageSizeValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'pageSize', pageSizeValue)).toBeTruthy();
 });
 
@@ -42,10 +41,9 @@ test('can update order direction', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.chooseOrderDirection(true);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'orderDirection', orderDirectionValue)).toBeTruthy();
 });
 
@@ -58,10 +56,9 @@ test('can add column displayed', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.addColumnDisplayed(columnData[0], columnData[1], columnData[2]);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesListViewHaveProperty(customDataTypeName, columnData[3], columnData[2], 1)).toBeTruthy();
 });
 
@@ -73,10 +70,9 @@ test('can remove column displayed', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.removeColumnDisplayed('updateDate');
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesListViewHaveProperty(customDataTypeName, 'Last edited', 'updateDate')).toBeFalsy();
 });
 
@@ -89,10 +85,9 @@ test('can add layouts', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.addLayouts(layoutName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesListViewHaveLayout(customDataTypeName, layoutName, 'icon-table', layoutCollectionView)).toBeTruthy();
 });
 
@@ -106,10 +101,9 @@ test('can remove layouts', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.removeLayouts(layoutCollectionView);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesListViewHaveLayout(customDataTypeName, layoutName, 'icon-list', layoutCollectionView)).toBeFalsy();
 });
 
@@ -121,10 +115,9 @@ test('can update order by', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.chooseOrderByValue(orderByValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'orderBy', 'updateDate')).toBeTruthy();
 });
 
@@ -137,10 +130,9 @@ test('can update workspace view icon', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickSelectIconButton();
   await umbracoUi.dataType.chooseWorkspaceViewIconByValue(iconValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'icon', iconValue)).toBeTruthy();
 });
 
@@ -152,10 +144,9 @@ test('can update workspace view name', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterWorkspaceViewName(workspaceViewName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'tabName', workspaceViewName)).toBeTruthy();
 });
 
@@ -166,10 +157,9 @@ test('can enable show content workspace view first', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.dataType.clickShowContentWorkspaceViewFirstToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'showContentFirst', true)).toBeTruthy();
 });
 

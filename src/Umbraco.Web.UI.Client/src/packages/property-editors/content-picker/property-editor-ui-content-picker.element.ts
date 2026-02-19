@@ -17,6 +17,7 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 // import of local component
 import './components/input-content/index.js';
@@ -60,7 +61,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _maxMessage = '';
 
 	@state()
-	private _allowedContentTypeUniques?: string | null;
+	private _allowedContentTypeUniques?: string;
 
 	@state()
 	private _rootUnique?: string | null;
@@ -150,9 +151,12 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
+		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
+		const unique = workspaceContext?.getUnique() ?? null;
+
 		const ancestorsContext = await this.getContext(UMB_ANCESTORS_ENTITY_CONTEXT);
-		const ancestors = ancestorsContext?.getAncestors();
-		const [parentUnique, unique] = ancestors?.slice(-2).map((x) => x.unique) ?? [];
+		const ancestors = ancestorsContext?.getAncestors() ?? [];
+		const parentUnique = ancestors.at(-1)?.unique ?? null;
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
@@ -204,7 +208,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				.max=${this._max}
 				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
-				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
+				.allowedContentTypeIds=${this._allowedContentTypeUniques}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}

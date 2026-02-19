@@ -1093,8 +1093,8 @@ export default {
 	},
 	rollback: {
 		changes: 'Değişiklikler',
-		diffHelp:
-			'Bu, mevcut sürüm ile seçili sürüm arasındaki farkları gösterir <br /> <del> Kırmızı </del> metin seçili sürümde gösterilmeyecektir. , <ins> yeşil eklendi demektir </ins>',
+		diffHelp: '<del>Kırmızı metin</del> seçili sürümde kaldırılacak, <ins>yeşil metin</ins> eklenecektir.',
+		showDiff: 'Mevcut (taslak) sürüm ile seçili sürüm arasındaki farkları göster.',
 		documentRolledBack: 'Belge geri alındı ​​',
 		headline: 'Mevcut sürümle karşılaştırmak için bir sürüm seçin',
 		htmlHelp:

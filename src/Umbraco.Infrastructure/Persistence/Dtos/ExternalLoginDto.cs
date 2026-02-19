@@ -7,39 +7,46 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
 [ExplicitColumns]
-[PrimaryKey("Id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 internal sealed class ExternalLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ExternalLogin;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    [Column("id")]
+    private const string UserIdColumnName = "userId";
+    private const string UserOrMemberKeyColumnName = "userOrMemberKey";
+    private const string LoginProviderColumnName = "loginProvider";
+    private const string ProviderKeyColumnName = "providerKey";
+
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
     [Obsolete("This only exists to ensure you can upgrade using external logins from umbraco version where this was used to the new where it is not used")]
-    [ResultColumn("userId")]
+    [ResultColumn(UserIdColumnName)]
     public int? UserId { get; set; }
 
-    [Column("userOrMemberKey")]
+    [Column(UserOrMemberKeyColumnName)]
     [Index(IndexTypes.NonClustered)]
     public Guid UserOrMemberKey { get; set; }
 
     /// <summary>
     ///     Used to store the name of the provider (i.e. Facebook, Google)
     /// </summary>
-    [Column("loginProvider")]
+    [Column(LoginProviderColumnName)]
     [Length(400)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userOrMemberKey", Name = "IX_" + TableName + "_LoginProvider")]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{LoginProviderColumnName},{UserOrMemberKeyColumnName}", Name = "IX_" + TableName + "_LoginProvider")]
     public string LoginProvider { get; set; } = null!;
 
     /// <summary>
     ///     Stores the key the provider uses to lookup the login
     /// </summary>
-    [Column("providerKey")]
+    [Column(ProviderKeyColumnName)]
     [Length(4000)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.NonClustered, ForColumns = "loginProvider,providerKey", Name = "IX_" + TableName + "_ProviderKey")]
+    [Index(IndexTypes.NonClustered, ForColumns = $"{LoginProviderColumnName},{ProviderKeyColumnName}", Name = "IX_" + TableName + "_ProviderKey")]
     public string ProviderKey { get; set; } = null!;
 
     [Column("createDate")]

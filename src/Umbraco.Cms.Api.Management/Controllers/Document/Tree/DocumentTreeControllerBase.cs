@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -28,6 +29,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IDocumentPermissionFilterService _documentPermissionFilterService;
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected DocumentTreeControllerBase(
@@ -50,7 +52,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     {
     }
 
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -60,17 +62,42 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory)
+        : this(
+              entityService,
+              flagProviders,
+              userStartNodeEntitiesService,
+              dataTypeService,
+              publicAccessService,
+              appCaches,
+              backofficeSecurityAccessor,
+              documentPresentationFactory,
+              StaticServiceProvider.Instance.GetRequiredService<IDocumentPermissionFilterService>())
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    protected DocumentTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        IPublicAccessService publicAccessService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentPermissionFilterService documentPermissionFilterService)
         : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
         _documentPresentationFactory = documentPresentationFactory;
+        _documentPermissionFilterService = documentPermissionFilterService;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
-    protected override Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.SortOrder));
+    protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 
     protected override DocumentTreeItemResponseModel MapTreeItemViewModel(Guid? parentId, IEntitySlim entity)
     {
@@ -92,6 +119,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         return responseModel;
     }
 
+    /// <inheritdoc/>
     protected override int[] GetUserStartNodeIds()
         => _backofficeSecurityAccessor
                .BackOfficeSecurity?
@@ -99,10 +127,19 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
                .CalculateContentStartNodeIds(EntityService, _appCaches)
            ?? Array.Empty<int>();
 
+    /// <inheritdoc/>
     protected override string[] GetUserStartNodePaths()
         => _backofficeSecurityAccessor
                .BackOfficeSecurity?
                .CurrentUser?
                .GetContentStartNodePaths(EntityService, _appCaches)
            ?? Array.Empty<string>();
+
+    /// <inheritdoc/>
+    protected override Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities, long totalItems)
+        => _documentPermissionFilterService.FilterAsync(entities, totalItems);
+
+    /// <inheritdoc/>
+    protected override Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(Guid targetKey, IEntitySlim[] entities, long totalBefore, long totalAfter)
+        => _documentPermissionFilterService.FilterAsync(targetKey, entities, totalBefore, totalAfter);
 }

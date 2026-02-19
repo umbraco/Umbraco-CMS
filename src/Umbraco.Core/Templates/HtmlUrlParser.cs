@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Logging;
 
 namespace Umbraco.Cms.Core.Templates;
 
+/// <summary>
+///     Utility class used to parse and resolve relative URLs in HTML content.
+/// </summary>
 public sealed class HtmlUrlParser
 {
     private static readonly Regex _resolveUrlPattern = new(
@@ -18,6 +21,13 @@ public sealed class HtmlUrlParser
     private readonly IProfilingLogger _profilingLogger;
     private ContentSettings _contentSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HtmlUrlParser"/> class.
+    /// </summary>
+    /// <param name="contentSettings">The content settings options monitor.</param>
+    /// <param name="logger">The logger instance.</param>
+    /// <param name="profilingLogger">The profiling logger instance.</param>
+    /// <param name="ioHelper">The IO helper for resolving URLs.</param>
     public HtmlUrlParser(IOptionsMonitor<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
     {
         _contentSettings = contentSettings.CurrentValue;

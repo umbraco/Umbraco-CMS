@@ -536,8 +536,8 @@ export default {
 		removeLink: '링크 삭제',
 	},
 	rollback: {
-		diffHelp:
-			'현재 버전과 선택한 버전의 차이점을 보여줍니다<br /><del>빨간</del> 텍스트는 선택한 버전에선 보이지 않습니다. <ins>녹색은 추가되었음을 의미합니다</ins>',
+		diffHelp: '<del>빨간 텍스트</del>는 선택한 버전에서 제거되고, <ins>녹색 텍스트</ins>는 추가됩니다.',
+		showDiff: '현재 (초안) 버전과 선택한 버전 간의 차이점 표시.',
 		documentRolledBack: '문서가 롤백되었습니다.',
 		htmlHelp: '선택한 버전을 html로 보여줍니다. 두 버전의 차이점을 동시에 보시려면, 차이점 보기를 사용하세요',
 		rollbackTo: '롤백',

@@ -5,7 +5,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 
-export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<never> {
+export class UmbDocumentCreateBlueprintEntityAction extends UmbEntityActionBase<never> {
 	#repository = new UmbDocumentCreateBlueprintRepository(this);
 
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -25,4 +25,4 @@ export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<
 		await this.#repository.create({ name, parent, document: { id: this.args.unique } });
 	}
 }
-export default UmbCreateDocumentBlueprintEntityAction;
+export default UmbDocumentCreateBlueprintEntityAction;

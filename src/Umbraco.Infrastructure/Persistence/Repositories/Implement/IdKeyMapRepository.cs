@@ -85,7 +85,10 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
                 .Select<NodeDto>(c => c.UniqueId)
                 .From<NodeDto>()
                 .Where<NodeDto>(n => n.NodeId == id);
-            return database?.ExecuteScalar<Guid?>(sql);
+
+            // We must use FirstOrDefault over ExecuteScalar when retrieving a nullable Guid, to ensure we go through the full NPoco mapping pipeline.
+            // Without that, though it will succeed on SQLite and SQLServer, it could fail on other database providers.
+            return database?.FirstOrDefault<Guid?>(sql);
         }
 
         Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
@@ -96,7 +99,10 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
                 n.NodeId == id
                 && (n.NodeObjectType == type
                     || n.NodeObjectType == Constants.ObjectTypes.IdReservation));
-        return database?.ExecuteScalar<Guid?>(sql);
+
+        // We must use FirstOrDefault over ExecuteScalar when retrieving a nullable Guid, to ensure we go through the full NPoco mapping pipeline.
+        // Without that, though it will succeed on SQLite and SQLServer, it could fail on other database providers.
+        return database?.FirstOrDefault<Guid?>(sql);
     }
 
     private Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)

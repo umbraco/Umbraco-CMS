@@ -1,5 +1,6 @@
 import type { UmbUploadableItem } from './types.js';
 
+// TODO: Should be changed into a custom 'type' as it is different from the native 'change' event. [NL]
 export class UmbDropzoneChangeEvent extends Event {
 	public static readonly TYPE = 'change';
 

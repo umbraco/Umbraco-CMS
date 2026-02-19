@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_1_0;
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class RebuildCacheMigration : MigrationBase
 {
     private readonly IDocumentCacheService _documentCacheService;

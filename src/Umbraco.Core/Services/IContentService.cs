@@ -97,7 +97,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <returns>The created content.</returns>
     /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
     /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -124,6 +124,16 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="id">The identifier of the document.</param>
     /// <returns>The document, or null if not found.</returns>
     IContent? GetById(int id);
+
+    /// <summary>
+    ///     Gets a document.
+    /// </summary>
+    /// <param name="key">The unique identifier of the document.</param>
+    /// <returns>The document, or null if not found.</returns>
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+    IContent? GetById(Guid key);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
@@ -262,7 +272,30 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
+
+    /// <summary>
+    ///     Gets child documents of a parent with optional property filtering.
+    /// </summary>
+    /// <param name="id">The parent identifier.</param>
+    /// <param name="pageIndex">The page number.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Total number of documents.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="filter">Query filter.</param>
+    /// <param name="ordering">Ordering infos.</param>
+    /// <param name="loadTemplates">
+    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
+    ///     (e.g., collection views). Default is true.
+    /// </param>
+#pragma warning disable CS0618 // Type or member is obsolete
+    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
+        => GetPagedChildren(id, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets descendant documents of a given parent.
@@ -341,8 +374,15 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <param name="keys">The content keys.</param>
     /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
+    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 
+    /// <summary>
+    ///     Gets a dictionary of content keys and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
+    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys) => ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
 
     #endregion
 

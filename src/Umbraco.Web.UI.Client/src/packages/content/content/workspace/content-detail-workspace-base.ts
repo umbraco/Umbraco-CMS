@@ -9,6 +9,7 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
+import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
@@ -154,6 +155,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
+	getLanguages(): Array<UmbLanguageDetailModel> {
+		return this.#languages.getValue();
+	}
 
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
@@ -221,6 +225,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.validationContext,
 			this.view.hints,
 		);
+
+		new UmbContentDetailWorkspaceTypeTransformController(this as any);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
@@ -425,14 +431,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this._segments.setValue([]);
 		}
 
-		// Set culture and segment for all values:
-		const cultures = this.#languages.getValue().map((x) => x.unique);
-
-		let segments: Array<string> | undefined;
-		if (this.#variesBySegment) {
-			segments = this._segments.getValue().map((s) => s.alias);
-		}
-
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
@@ -464,10 +462,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cultures);
-		if (segments) {
-			controller.setSegments(segments);
+
+		const variantOptions = (await firstValueFrom(this.variantOptions)).map(
+			(o) => new UmbVariantId(o.culture, o.segment),
+		);
+		if (contentTypeVariesByCulture) {
+			variantOptions.push(UmbVariantId.CreateInvariant()); // Ensure invariant is included, when the contentType varies by culture, because we do not have a invariant-variant in our variant-options. [NL]
 		}
+		controller.setVariantOptions(variantOptions);
 
 		controller.setValues(data.values);
 

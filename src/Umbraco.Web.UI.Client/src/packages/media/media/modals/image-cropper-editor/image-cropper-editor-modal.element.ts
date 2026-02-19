@@ -15,6 +15,7 @@ import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/bac
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
+import './components/index.js';
 import '../../components/input-upload-field/file-upload-preview.element.js';
 
 @customElement('umb-image-cropper-editor-modal')

@@ -36,6 +36,8 @@ public class MoveMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves a media item.")]
+    [EndpointDescription("Moves a media item identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(
         CancellationToken cancellationToken,
         Guid id,

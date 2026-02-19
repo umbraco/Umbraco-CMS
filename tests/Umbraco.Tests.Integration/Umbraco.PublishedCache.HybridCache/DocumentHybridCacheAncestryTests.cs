@@ -2,7 +2,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
@@ -25,7 +24,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
 
     private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
 
-    private Content SubSubPage;
+    private Content _subSubPage;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -37,9 +36,9 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
     {
         base.Setup();
         // Publish documents
-        SubSubPage = ContentBuilder.CreateSimpleContent(ContentType, "SubSubPage", Subpage.Id);
-        SubSubPage.Key = Guid.Parse("E4C369B5-CCCA-4981-ADAC-389824CF6B0B");
-        ContentService.Save(SubSubPage, -1);
+        _subSubPage = ContentBuilder.CreateSimpleContent(ContentType, "_subSubPage", Subpage.Id);
+        _subSubPage.Key = Guid.Parse("E4C369B5-CCCA-4981-ADAC-389824CF6B0B");
+        ContentService.Save(_subSubPage, -1);
     }
 
     [Test]
@@ -51,7 +50,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
         await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
-        var published = await PublishedContentCache.GetByIdAsync(SubSubPage.Key);
+        var published = await PublishedContentCache.GetByIdAsync(_subSubPage.Key);
         Assert.IsNull(published);
     }
 
@@ -60,8 +59,8 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
     {
         await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
 
-        var published = await PublishedContentCache.GetByIdAsync(SubSubPage.Key);
-        CacheTestsHelper.AssertPage(SubSubPage, published);
+        var published = await PublishedContentCache.GetByIdAsync(_subSubPage.Key);
+        CacheTestsHelper.AssertPage(_subSubPage, published);
     }
 
     [Test]
@@ -78,7 +77,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         cacheService!.ResetSeedKeys();
         await DocumentCacheService.ClearMemoryCacheAsync(CancellationToken.None);
 
-        var unpublishedSubSubPage = await PublishedContentCache.GetByIdAsync(SubSubPage.Key);
+        var unpublishedSubSubPage = await PublishedContentCache.GetByIdAsync(_subSubPage.Key);
         var unpublishedSubPage = await PublishedContentCache.GetByIdAsync(Subpage.Key);
         Assert.IsNull(unpublishedSubSubPage);
         Assert.IsNull(unpublishedSubPage);
@@ -86,8 +85,5 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         // We should however be able to get the still published root Text Page
         var publishedTextPage = await PublishedContentCache.GetByIdAsync(Textpage.Key);
         CacheTestsHelper.AssertPage(Textpage, publishedTextPage);
-
     }
-
-
 }

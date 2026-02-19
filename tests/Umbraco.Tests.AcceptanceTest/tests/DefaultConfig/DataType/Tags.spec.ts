@@ -24,10 +24,9 @@ test('can update define a tag group', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterDefineTagGroupValue(tagGroup);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'group', tagGroup)).toBeTruthy();
 });
 
@@ -39,10 +38,9 @@ test('can select storage type', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.selectStorageTypeOption(storageType);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'storageType', storageType)).toBeTruthy();
 });
 

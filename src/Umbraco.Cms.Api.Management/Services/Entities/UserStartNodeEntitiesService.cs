@@ -11,12 +11,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services.Entities;
 
+/// <summary>
+/// Provides functionality for retrieving user start node entities with access information.
+/// </summary>
 public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 {
     private readonly IEntityService _entityService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserStartNodeEntitiesService"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
+    /// <param name="idKeyMap">The ID to key mapping service.</param>
     public UserStartNodeEntitiesService(IEntityService entityService, ICoreScopeProvider scopeProvider, IIdKeyMap idKeyMap)
     {
         _entityService = entityService;
@@ -133,7 +142,8 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
             }
 
             // is ancestor of a start node?
-            if (userStartNodePaths.Any(path => path.StartsWith(child.Path)))
+            // Note: Add trailing comma to prevent false matches (e.g., path "-1,100" should not match "-1,1001")
+            if (userStartNodePaths.Any(path => path.StartsWith($"{child.Path},")))
             {
                 return new UserAccessEntity(child, false);
             }
@@ -150,8 +160,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         int after,
         Ordering ordering,
         out long totalBefore,
-        out long totalAfter
-        )
+        out long totalAfter)
     {
         Attempt<int> targetIdAttempt = _idKeyMap.GetIdForKey(targetKey, umbracoObjectType);
         if (targetIdAttempt.Success is false)
@@ -212,5 +221,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         => entities.Select(entity => new UserAccessEntity(entity, IsDescendantOrSelf(entity, userStartNodePaths))).ToArray();
 
     private static bool IsDescendantOrSelf(IEntitySlim child, string[] userStartNodePaths)
-        => userStartNodePaths.Any(path => child.Path.StartsWith(path));
+        // Note: Add trailing commas to both paths to prevent false matches (e.g., path "-1,100" should not match "-1,1001")
+        // This matches the pattern used in lines 92 and 192 of this file
+        => userStartNodePaths.Any(path => $"{child.Path},".StartsWith($"{path},"));
 }

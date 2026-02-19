@@ -247,7 +247,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private IEnumerable<IContent> MapDtosToContent(
         List<DocumentDto> dtos,
         bool withCache = false,
-        bool loadProperties = true,
+        string[]? propertyAliases = null,
         bool loadTemplates = true,
         bool loadVariants = true)
     {
@@ -327,11 +327,15 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 .ToDictionary(x => x.Id, x => x);
         }
 
+        // An empty array of propertyAliases indicates that no properties need to be loaded (null = load all properties).
+        var loadProperties = propertyAliases is { Length: 0 } is false;
+
         IDictionary<int, PropertyCollection>? properties = null;
         if (loadProperties)
         {
-            // load all properties for all documents from database in 1 query - indexed by version id
-            properties = GetPropertyCollections(temps);
+            // load properties for all documents from database in 1 query - indexed by version id
+            // if propertyAliases is provided, only load those specific properties
+            properties = GetPropertyCollections(temps, propertyAliases);
         }
 
         // assign templates and properties
@@ -363,6 +367,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 {
                     throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
                 }
+            }
+            else
+            {
+                // When loadProperties is false (propertyAliases is empty array), clear the property collection
+                temp.Content!.Properties = new PropertyCollection();
             }
         }
 
@@ -841,6 +850,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
       $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Access)} WHERE {QuoteColumnName("noAccessNodeId")} = @id",
       $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentUrl)} WHERE {uniqueId} IN
         (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
+      $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} WHERE {uniqueId} IN
+        (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
       $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;
@@ -888,8 +899,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             Database.Page<DocumentDto>(pageIndex + 1, take, sql).Items,
             true,
             // load bare minimum, need variants though since this is used to rollback with variants
-            false,
-            false);
+            propertyAliases: [],
+            loadTemplates: false,
+            loadVariants: true);
     }
 
     public override IContent? GetVersion(int versionId)
@@ -1422,7 +1434,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         // We need to flush the isolated cache by key explicitly here.
         // The ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
-        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IContent, Guid>(entity.Key));
+        // GUID-keyed read repository uses a separate "uRepoGuid_" prefix.
+        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(entity.Key));
 
         // troubleshooting
         //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
@@ -1549,6 +1562,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     public void AddOrUpdatePermissions(ContentPermissionSet permission) => PermissionRepository.Save(permission);
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public override IEnumerable<IContent> GetPage(
         IQuery<IContent>? query,
         long pageIndex,
@@ -1556,6 +1570,29 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         out long totalRecords,
         IQuery<IContent>? filter,
         Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering, loadTemplates: true);
+
+    /// <inheritdoc />
+    public override IEnumerable<IContent> GetPage(
+        IQuery<IContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IContent>? filter,
+        Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering, loadTemplates: true);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPage(
+        IQuery<IContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IContent>? filter,
+        Ordering? ordering,
+        bool loadTemplates)
     {
         Sql<ISqlContext>? filterSql = null;
 
@@ -1588,7 +1625,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             pageIndex,
             pageSize,
             out totalRecords,
-            x => MapDtosToContent(x),
+            x => MapDtosToContent(x, propertyAliases: propertyAliases, loadTemplates: loadTemplates),
             filterSql,
             ordering);
     }
@@ -1655,7 +1692,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         if (entity.HasIdentity)
         {
             var cacheKey = GetCacheKey(entity.Id);
-            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
         }
     }
 
@@ -1694,6 +1731,16 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 repositoryCacheVersionService,
                 cacheSyncService) =>
             _outerRepo = outerRepo;
+
+        // Use a GUID-specific cache policy with a distinct prefix ("uRepoGuid_IContent_")
+        // so that GUID-keyed cache entries don't interfere with the parent int-keyed repository's
+        // prefix-based search and count validation in DefaultRepositoryCachePolicy.
+        protected override IRepositoryCachePolicy<IContent, Guid> CreateCachePolicy()
+            => new GuidReadRepositoryCachePolicy<IContent>(
+                GlobalIsolatedCache,
+                ScopeAccessor,
+                RepositoryCacheVersionService,
+                CacheSyncService);
 
         protected override IContent? PerformGet(Guid id)
         {
@@ -1759,7 +1806,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             if (entity.HasIdentity)
             {
                 var cacheKey = GetCacheKey(entity.Key);
-                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+                IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
             }
         }
 
@@ -1775,7 +1822,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
         }
 
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IContent>() + key;
+        private static string GetCacheKey(Guid key) => GuidReadRepositoryCachePolicy<IContent>.GetCacheKey(key);
     }
 
     #endregion

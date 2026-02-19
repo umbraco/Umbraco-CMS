@@ -107,6 +107,14 @@ stages:
               command: build
               projects: $(solution)
               arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
+          # Publish compiled DLLs for C# API documentation generation
+          # Separate artifact to avoid increasing build_output size for all builds
+          - task: PublishPipelineArtifact@1
+            displayName: Publish DocFX DLLs
+            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
+            inputs:
+              targetPath: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
+              artifactName: csharp-docs-dlls
           - powershell: |
               dotnet tool install --global CycloneDX
               dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
@@ -200,12 +208,22 @@ stages:
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
-      # C# API Reference
+      # C# API Reference - uses pre-compiled DLLs for faster generation (csproj approach caused timeouts)
       - job:
         displayName: Build C# API Reference
         pool:
           vmImage: "windows-latest"
         steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - task: DownloadPipelineArtifact@2
+            displayName: Download DocFX DLLs
+            inputs:
+              artifact: csharp-docs-dlls
+              path: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -215,7 +233,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                choco install docfx --version=2.59.4 -y
+                dotnet tool install -g docfx --version 2.78.4
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
@@ -817,9 +835,7 @@ stages:
 
   - stage: Deploy_NuGet
     displayName: NuGet release
-    dependsOn:
-      - Deploy_MyGet
-      - Build_Docs
+    dependsOn: Deploy_MyGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
@@ -879,6 +895,7 @@ stages:
     displayName: Upload API Documentation
     dependsOn:
       - Build
+      - Build_Docs
       - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:

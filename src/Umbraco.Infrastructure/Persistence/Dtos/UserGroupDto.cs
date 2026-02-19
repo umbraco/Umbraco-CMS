@@ -6,11 +6,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 public class UserGroupDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string KeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
 
     public UserGroupDto()
     {
@@ -20,11 +22,11 @@ public class UserGroupDto
         UserGroup2GranularPermissionDtos = new List<UserGroup2GranularPermissionDto>();
     }
 
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 6)]
     public int Id { get; set; }
 
-    [Column("key")]
+    [Column(KeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupKey")]
@@ -40,10 +42,15 @@ public class UserGroupDto
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupName")]
     public string? Name { get; set; }
 
+    [Column(Name = "description")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? Description { get; set; }
+
     [Column("userGroupDefaultPermissions")]
     [Length(50)]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Obsolete("Is not used anymore Use UserGroup2PermissionDtos instead. This will be removed in Umbraco 18.")]
+    [Obsolete("Is not used anymore. Use UserGroup2PermissionDtos instead. Scheduled for removal in Umbraco 18.")]
     public string? DefaultPermissions { get; set; }
 
     [Column("createDate")]
@@ -75,23 +82,23 @@ public class UserGroupDto
     public int? StartMediaId { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserGroup2AppDto.UserGroupId))]
     public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserGroup2LanguageDto.UserGroupId))]
     public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    [Reference(ReferenceType.Many, ColumnName = nameof(Key), ReferenceMemberName = nameof(UserGroup2PermissionDto.UserGroupKey))]
     public List<UserGroup2PermissionDto> UserGroup2PermissionDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    [Reference(ReferenceType.Many, ColumnName = nameof(Key), ReferenceMemberName = nameof(UserGroup2GranularPermissionDto.UserGroupKey))]
     public List<UserGroup2GranularPermissionDto> UserGroup2GranularPermissionDtos { get; set; }
 
     /// <summary>
-    ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)
+    ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts).
     /// </summary>
     [ResultColumn]
     public int UserCount { get; set; }

@@ -78,7 +78,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         // At this point content has 5 versions, 3 historic versions, a draft version and a published version.
 
         var allVersions = ContentService.GetVersions(content.Id);
-        Debug.Assert(allVersions.Count() == 5); // Sanity check
+        Debug.Assert(allVersions.Count() == 5, "Expected 5 versions for sanity check.");
 
         using (var scope = ScopeProvider.CreateScope())
         {

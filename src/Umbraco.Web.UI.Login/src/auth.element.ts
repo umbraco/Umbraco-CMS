@@ -112,6 +112,7 @@ const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement, 
 	// Bind validation
 	input.oninput = () => validateInput(input, validationMessage, localizationKey);
 	input.onblur = () => validateInput(input, validationMessage, localizationKey);
+	input.oninvalid = () => validateInput(input, validationMessage, localizationKey);
 
 	return formLayoutItem;
 };
@@ -139,6 +140,7 @@ const createFormLayoutPasswordItem = (
 	// Bind validation
 	input.oninput = () => validateInput(input, validationMessage, requiredMessageKey);
 	input.onblur = () => validateInput(input, validationMessage, requiredMessageKey);
+	input.oninvalid = () => validateInput(input, validationMessage, requiredMessageKey);
 
 	return formLayoutItem;
 };

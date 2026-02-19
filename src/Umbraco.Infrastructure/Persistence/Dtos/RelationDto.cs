@@ -6,26 +6,31 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class RelationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Relation;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    [Column("id")]
+    private const string RelationTypeColumnName = "relType";
+    private const string ParentIdColumnName = "parentId";
+    private const string ChildIdColumnName = "childId";
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("parentId")]
+    [Column(ParentIdColumnName)]
     [ForeignKey(typeof(NodeDto), Name = "FK_umbracoRelation_umbracoNode")]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelation_parentChildType", ForColumns = "parentId,childId,relType")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelation_parentChildType", ForColumns = $"{ParentIdColumnName},{ChildIdColumnName},{RelationTypeColumnName}")]
     public int ParentId { get; set; }
 
-    [Column("childId")]
+    [Column(ChildIdColumnName)]
     [ForeignKey(typeof(NodeDto), Name = "FK_umbracoRelation_umbracoNode1")]
     public int ChildId { get; set; }
 
-    [Column("relType")]
+    [Column(RelationTypeColumnName)]
     [ForeignKey(typeof(RelationTypeDto))]
     public int RelationType { get; set; }
 

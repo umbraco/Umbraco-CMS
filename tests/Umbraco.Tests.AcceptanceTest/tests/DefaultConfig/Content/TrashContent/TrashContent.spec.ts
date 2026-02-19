@@ -34,10 +34,9 @@ test('can trash an invariant content node', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.content.clickTrashActionMenuOption();
   // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
@@ -55,10 +54,9 @@ test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickTrashActionMenuOption();
   // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
@@ -77,10 +75,9 @@ test('can trash a published content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickTrashActionMenuOption();
   // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
@@ -104,10 +101,9 @@ test('can trash an invariant content node that references one item', async ({umb
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
@@ -131,10 +127,9 @@ test('can trash a variant content node that references one item', async ({umbrac
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
@@ -167,10 +162,9 @@ test('can trash an invariant content node that references more than 3 items', as
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
   await umbracoUi.content.doesReferencesContainText('...and one more item');
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
@@ -208,10 +202,9 @@ test('can trash a variant content node that references more than 3 items', async
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
   await umbracoUi.content.doesReferencesContainText('...and one more item');
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
@@ -245,10 +238,9 @@ test('can trash a content node with multiple cultures that references one item',
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();

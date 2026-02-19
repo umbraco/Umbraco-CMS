@@ -32,6 +32,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	// TODO: Move to API
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
+	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
 	override setIsMenu(isMenu: boolean) {
 		super.setIsMenu(isMenu);

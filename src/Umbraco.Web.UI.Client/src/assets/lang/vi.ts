@@ -1388,8 +1388,9 @@ export default {
 		created: 'Đã tạo',
 		currentVersion: 'Phiên bản hiện tại',
 		diffHelp:
-			'Điều này hiển thị sự khác biệt giữa phiên bản hiện tại (bản nháp) và phiên bản được chọn.<br /><del>Văn bản màu đỏ</del> sẽ bị xóa trong phiên bản được chọn, <ins>văn bản màu xanh</ins> sẽ được thêm vào.',
-		noDiff: 'Không có sự khác biệt nào giữa phiên bản hiện tại (bản nháp) và phiên bản được chọn',
+			'<del>Văn bản màu đỏ</del> sẽ bị xóa trong phiên bản được chọn, <ins>văn bản màu xanh</ins> sẽ được thêm vào.',
+		showDiff: 'Hiển thị sự khác biệt giữa phiên bản hiện tại (bản nháp) và phiên bản được chọn.',
+		noDiff: 'Không có sự khác biệt nào giữa phiên bản hiện tại (bản nháp) và phiên bản được chọn.',
 		documentRolledBack: 'Tài liệu đã được hoàn tác',
 		headline: 'Chọn một phiên bản để so sánh với phiên bản hiện tại',
 		htmlHelp:

@@ -102,7 +102,7 @@ test('can edit property values with UI write permission', async ({umbracoApi, um
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.enterTextstring(updatedText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const documentData = await umbracoApi.document.getByName(documentName);

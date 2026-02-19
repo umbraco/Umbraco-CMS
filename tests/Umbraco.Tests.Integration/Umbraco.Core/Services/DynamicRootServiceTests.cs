@@ -27,7 +27,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Parent,
         Current,
         Site,
-        ByKey
+        ByKey,
+        ContentRoot
     }
 
     public enum DynamicRootStepAlias
@@ -532,6 +533,28 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.AreEqual(ContentYears.Key, result);
+    }
+
+    [Test]
+    public void CalculateOriginKey__ContentRoot_should_return_the_system_root_key()
+    {
+        // Arrange
+        var selector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.ContentRoot.ToString(),
+            OriginKey = null,
+            Context = new DynamicRootContext()
+            {
+                CurrentKey = ContentAct2022RanD.Key,
+                ParentKey = ContentActs2022.Key,
+            },
+        };
+
+        // Act
+        var result = DynamicRootService.FindOriginKey(selector);
+
+        // Assert
+        Assert.AreEqual(global::Umbraco.Cms.Core.Constants.System.RootSystemKey, result);
     }
 
     [Test]

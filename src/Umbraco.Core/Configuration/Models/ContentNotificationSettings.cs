@@ -10,6 +10,9 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class ContentNotificationSettings
 {
+    /// <summary>
+    ///     The default value for disabling HTML email notifications.
+    /// </summary>
     internal const bool StaticDisableHtmlEmail = false;
 
     /// <summary>

@@ -30,10 +30,9 @@ test('can change value type', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.changeValueType("Long String");
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'umbracoDataValueType', 'TEXT')).toBeTruthy();
 });
 

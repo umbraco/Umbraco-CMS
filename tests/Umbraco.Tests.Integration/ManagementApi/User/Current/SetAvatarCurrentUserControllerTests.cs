@@ -20,7 +20,7 @@ public class SetAvatarCurrentUserControllerTests : ManagementApiUserGroupTestBas
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
-    private Guid _avatarKey;
+    private readonly Guid _avatarKey = Guid.NewGuid();
 
     [SetUp]
     public async Task SetUp()
