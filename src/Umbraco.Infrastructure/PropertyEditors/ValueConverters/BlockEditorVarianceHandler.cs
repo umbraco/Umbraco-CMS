@@ -203,15 +203,15 @@ public sealed class BlockEditorVarianceHandler
 
         if (contentDataToAlign.Any())
         {
-        blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
-        foreach (BlockItemData contentData in contentDataToAlign)
-        {
-            var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
-            foreach (BlockPropertyValue value in contentData.Values
-                         .Where(v => omitNullCulture is false || v.Culture is not null)
-                         .DistinctBy(v => v.Culture + v.Segment))
+            blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
+            foreach (BlockItemData contentData in contentDataToAlign)
             {
-                blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
+                var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
+                foreach (BlockPropertyValue value in contentData.Values
+                             .Where(v => omitNullCulture is false || v.Culture is not null)
+                             .DistinctBy(v => v.Culture + v.Segment))
+                {
+                    blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
                 }
             }
         }

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -142,6 +145,32 @@ public class BlockEditorVarianceHandlerTests
         Assert.AreEqual("da-DK", blockValue.Expose.First().Culture);
     }
 
+    [Test]
+    public void AlignExposeVariance_Removes_Expose_When_ContentData_Is_Missing()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var blockValue = CreateBlockListValue(Guid.NewGuid(), owner.ContentType.Key, [], 
+            [new() { ContentKey = Guid.NewGuid(), Culture = "da-DK" }]);
+        ExecuteAlignExposeVariance(owner, blockValue);
+        Assert.IsEmpty(blockValue.Expose);
+    }
+
+    [Test]
+    public void AlignExposeVariance_Deduplicates_Expose_Entries()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var contentDataKey = Guid.NewGuid();
+        var values = CreateBlockPropertyValues(
+            ("one", "da-DK", null, "Value one"),
+            ("two", "da-DK", null, "Value two"));
+        var expose = CreateBlockItemVariations(
+            (contentDataKey, "da-DK", null),
+            (contentDataKey, "da-DK", null));
+        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
+        ExecuteAlignExposeVariance(owner, blockValue);
+        Assert.AreEqual(1, blockValue.Expose.Count);
+    }
+
     private static IPublishedPropertyType PublishedPropertyType(ContentVariation variation)
     {
         var propertyTypeMock = new Mock<IPublishedPropertyType>();
@@ -169,5 +198,41 @@ public class BlockEditorVarianceHandlerTests
         elementType.SetupGet(e => e.Variations).Returns(element.ContentType.Variations);
         contentTypeServiceMock.Setup(c => c.Get(element.ContentType.Key)).Returns(elementType.Object);
         return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object);
+    }
+
+    private static List<BlockPropertyValue> CreateBlockPropertyValues(params (string alias, string? culture, string? segment, object? value)[] configs)
+    {
+        return configs.Select(c => new BlockPropertyValue 
+        { 
+            Alias = c.alias,
+            Culture = c.culture, 
+            Segment = c.segment,
+            Value = c.value
+        }).ToList();
+    }
+
+    private static List<BlockItemVariation> CreateBlockItemVariations(params (Guid contentKey, string? culture, string? segment)[] configs)
+    {
+        return configs.Select(c => new BlockItemVariation 
+        { 
+            ContentKey = c.contentKey,
+            Culture = c.culture, 
+            Segment = c.segment
+        }).ToList();
+    }
+
+    private static void ExecuteAlignExposeVariance(IPublishedElement owner, BlockListValue blockValue)
+    {
+        var subject = BlockEditorVarianceHandler("da-DK", owner);
+        subject.AlignExposeVariance(blockValue);
+    }
+
+    private static BlockListValue CreateBlockListValue(Guid contentDataKey, Guid contentTypeKey, List<BlockPropertyValue> values, List<BlockItemVariation> expose)
+    {
+        return new BlockListValue
+        {
+            ContentData = [new() { Key = contentDataKey, ContentTypeKey = contentTypeKey, Values = values }],
+            Expose = expose
+        };
     }
 }
