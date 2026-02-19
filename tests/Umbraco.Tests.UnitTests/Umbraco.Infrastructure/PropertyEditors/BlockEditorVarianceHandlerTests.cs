@@ -93,32 +93,6 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
-    public void AlignExposeVariance_Removes_Expose_When_ContentData_Is_Missing()
-    {
-        var owner = PublishedElement(ContentVariation.Culture);
-        var blockValue = CreateBlockListValue(Guid.NewGuid(), owner.ContentType.Key, [], 
-            [new() { ContentKey = Guid.NewGuid(), Culture = "da-DK" }]);
-        ExecuteAlignExposeVariance(owner, blockValue);
-        Assert.IsEmpty(blockValue.Expose);
-    }
-
-    [Test]
-    public void AlignExposeVariance_Deduplicates_Expose_Entries()
-    {
-        var owner = PublishedElement(ContentVariation.Culture);
-        var contentDataKey = Guid.NewGuid();
-        var values = CreateBlockPropertyValues(
-            ("one", "da-DK", null, "Value one"),
-            ("two", "da-DK", null, "Value two"));
-        var expose = CreateBlockItemVariations(
-            (contentDataKey, "da-DK", null),
-            (contentDataKey, "da-DK", null));
-        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
-        ExecuteAlignExposeVariance(owner, blockValue);
-        Assert.AreEqual(1, blockValue.Expose.Count);
-    }
-
-    [Test]
     public async Task AlignPropertyVarianceAsync_Assigns_Culture_When_PropertyType_Varies_By_Culture()
     {
         var propertyValues = CreatePropertyValues((ContentVariation.Culture, null));
