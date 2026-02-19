@@ -527,7 +527,7 @@ export class UmbAuthContext extends UmbContextBase {
 		client.setConfig({
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
-			auth: () => this.getLatestToken(),
+			auth: () => '[redacted]',
 		});
 	}
 
@@ -619,13 +619,12 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Configures the default umbHttpClient with auth settings.
+	 * Sets the baseUrl on umbHttpClient. Credentials and auth are already
+	 * configured at module level in `@umbraco-cms/backoffice/http-client`.
 	 */
 	#configureDefaultClient() {
 		umbHttpClient.setConfig({
 			baseUrl: this.#serverUrl,
-			credentials: 'include',
-			auth: () => this.getLatestToken(),
 		});
 	}
 
