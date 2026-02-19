@@ -5,7 +5,7 @@ import {
 
 const workspaceViewAlias: UmbExtensionManifest = {
 	type: 'workspaceView',
-	alias: 'Example.WorkspaceView.EntityContentTypeAliasCondition',
+	alias: 'Example.WorkspaceView.WorkspaceContentTypeAliasCondition',
 	name: 'Example Workspace View With Entity Content Type Alias Condition',
 	element: () => import('./content-type-alias-condition-workspace-view.element.js'),
 	meta: {
@@ -24,7 +24,7 @@ const workspaceViewAlias: UmbExtensionManifest = {
 
 const workspaceViewUnique: UmbExtensionManifest = {
 	type: 'workspaceView',
-	alias: 'Example.WorkspaceView.EntityContentTypeUniqueCondition',
+	alias: 'Example.WorkspaceView.WorkspaceContentTypeUniqueCondition',
 	name: 'Example Workspace View With Content Type Unique Condition',
 	element: () => import('./content-type-unique-condition-workspace-view.element.js'),
 	meta: {
