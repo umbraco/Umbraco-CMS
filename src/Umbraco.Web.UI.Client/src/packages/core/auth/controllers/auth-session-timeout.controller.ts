@@ -1,12 +1,9 @@
 import type { UmbAuthContext } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#host: UmbAuthContext;
-	#keepUserLoggedIn = false;
-	#hasCheckedKeepUserLoggedIn = false;
 	#timeoutId?: ReturnType<typeof setTimeout>;
 	#scheduledExpiresAt?: number;
 
@@ -23,9 +20,13 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				this.#clearScheduledCheck();
 
 				if (session) {
-					// Session refreshed — close any open timeout modal and schedule next check
+					// Session refreshed — close any open timeout modal and schedule next check.
+					// When keepUserLoggedIn is true, schedule based on the access token expiry
+					// so we proactively refresh before API calls get 401s.
+					// When false, schedule based on the full session expiry for the timeout modal.
 					this.#closeTimeoutModal();
-					this.#scheduleCheck(session.expiresAt);
+					const expiresAt = host.keepUserLoggedIn ? session.accessTokenExpiresAt : session.expiresAt;
+					this.#scheduleCheck(expiresAt);
 				}
 			},
 			'_sessionState',
@@ -39,17 +40,6 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				await this.#closeTimeoutModal();
 			},
 			'_timeoutSignal',
-		);
-
-		// Check keepUserLoggedIn preference once authorized
-		this.observe(
-			host.isAuthorized,
-			(isAuthorized) => {
-				if (isAuthorized) {
-					this.#observeKeepUserLoggedIn();
-				}
-			},
-			'_isAuthorized',
 		);
 	}
 
@@ -103,7 +93,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		// during the buffer zone (before full expiry), when the session is still "valid".
 		if (this.#scheduledExpiresAt !== originalExpiresAt) return;
 
-		if (this.#keepUserLoggedIn) {
+		if (this.#host.keepUserLoggedIn) {
 			console.log('[Auth] Session expiring, auto-refreshing (keepUserLoggedIn=true)');
 			const success = await this.#tryValidateToken();
 			if (!success) {
@@ -142,20 +132,6 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				}
 			}, secondsRemaining * 1000);
 		}
-	}
-
-	/**
-	 * Observe the user's preference for staying logged in
-	 * and update the internal state accordingly.
-	 * This method fetches the current user configuration from the server to find the value.
-	 * // TODO: We cannot observe the config store directly here yet, as it would create a circular dependency, so maybe we need to move the config option somewhere else?
-	 */
-	async #observeKeepUserLoggedIn() {
-		if (this.#hasCheckedKeepUserLoggedIn) return;
-		this.#hasCheckedKeepUserLoggedIn = true;
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		const { data } = await UserService.getUserCurrentConfiguration();
-		this.#keepUserLoggedIn = data?.keepUserLoggedIn ?? false;
 	}
 
 	async #closeTimeoutModal() {

@@ -114,11 +114,24 @@ export class UmbAuthContext extends UmbContextBase {
 		);
 	}
 
-	constructor(host: UmbControllerHost, serverUrl: string, backofficePath: string, isBypassed: boolean) {
+	/**
+	 * Whether the server is configured to keep users logged in by auto-refreshing before session expiry.
+	 * Provided by the backend via the `keep-user-logged-in` attribute on `<umb-app>`.
+	 */
+	readonly keepUserLoggedIn: boolean;
+
+	constructor(
+		host: UmbControllerHost,
+		serverUrl: string,
+		backofficePath: string,
+		isBypassed: boolean,
+		keepUserLoggedIn = false,
+	) {
 		super(host, UMB_AUTH_CONTEXT);
 		this.#isBypassed = isBypassed;
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
+		this.keepUserLoggedIn = keepUserLoggedIn;
 
 		const redirectUri = this.getRedirectUrl();
 		this.#postLogoutRedirectUri = this.getPostLogoutRedirectUrl();

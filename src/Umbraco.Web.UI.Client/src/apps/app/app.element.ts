@@ -49,6 +49,13 @@ export class UmbAppElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'bypass-auth' })
 	bypassAuth = false;
 
+	/**
+	 * Keep the user logged in by automatically refreshing the session before it expires.
+	 * @attr
+	 */
+	@property({ type: Boolean, attribute: 'keep-user-logged-in' })
+	keepUserLoggedIn = false;
+
 	private _routes: UmbRoute[] = [
 		{
 			path: 'error',
@@ -165,7 +172,13 @@ export class UmbAppElement extends UmbLitElement {
 	async #setup() {
 		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
 
-		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
+		this.#authContext = new UmbAuthContext(
+			this,
+			this.serverUrl,
+			this.backofficePath,
+			this.bypassAuth,
+			this.keepUserLoggedIn,
+		);
 		this.#authContext.configureClient(umbHttpClient);
 		new UmbServerContext(this, {
 			backofficePath: this.backofficePath,
