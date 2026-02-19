@@ -59,14 +59,12 @@ public class LastSyncedRepository : AsyncRepositoryBase, ILastSyncedRepository
 
         await AmbientScope.ExecuteWithContextAsync<LastSyncedDto>(async db =>
         {
-            await db.UpsertAsync(
-                dto,
-                x => x.MachineId == dto.MachineId,
-                setter =>
-                {
-                    setter.SetProperty(x => x.LastSyncedInternalId, dto.LastSyncedInternalId);
-                    setter.SetProperty(x => x.LastSyncedDate, dto.LastSyncedDate);
-                });
+            await db.UpsertAsync(dto, () =>
+                db.LastSynced
+                    .Where(x => x.MachineId == dto.MachineId)
+                    .ExecuteUpdateAsync(setter => setter
+                        .SetProperty(x => x.LastSyncedInternalId, dto.LastSyncedInternalId)
+                        .SetProperty(x => x.LastSyncedDate, dto.LastSyncedDate)));
         });
     }
 
@@ -82,14 +80,12 @@ public class LastSyncedRepository : AsyncRepositoryBase, ILastSyncedRepository
 
         await AmbientScope.ExecuteWithContextAsync<LastSyncedDto>(async db =>
         {
-            await db.UpsertAsync(
-                dto,
-                x => x.MachineId == dto.MachineId,
-                setter =>
-                {
-                    setter.SetProperty(x => x.LastSyncedExternalId, dto.LastSyncedExternalId);
-                    setter.SetProperty(x => x.LastSyncedDate, dto.LastSyncedDate);
-                });
+            await db.UpsertAsync(dto, () =>
+                db.LastSynced
+                    .Where(x => x.MachineId == dto.MachineId)
+                    .ExecuteUpdateAsync(setter => setter
+                        .SetProperty(x => x.LastSyncedExternalId, dto.LastSyncedExternalId)
+                        .SetProperty(x => x.LastSyncedDate, dto.LastSyncedDate)));
         });
     }
 
