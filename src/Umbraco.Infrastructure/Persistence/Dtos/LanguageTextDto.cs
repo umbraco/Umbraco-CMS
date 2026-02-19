@@ -12,8 +12,6 @@ public class LanguageTextDto
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryValue;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
 
-    internal const string ReferenceMemberName = "UniqueId"; // for clarity in DictionaryDto reference
-
     private const string LanguageIdColumnName = "languageId";
     private const string UniqueIdColumnName = "UniqueId";
 

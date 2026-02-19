@@ -450,6 +450,31 @@ public static partial class StringExtensions
     }
 
     /// <summary>
+    /// Truncates a string to the specified maximum length and appends a hash-based suffix to preserve uniqueness.
+    /// </summary>
+    /// <param name="text">The text to truncate.</param>
+    /// <param name="maxLength">The maximum length of the resulting string including the hash suffix.</param>
+    /// <returns>
+    /// The original string if it does not exceed <paramref name="maxLength"/>;
+    /// otherwise a truncated string with a deterministic 8-character hex hash suffix (e.g. "-a1b2c3d4")
+    /// derived from the full original text, guaranteeing that different inputs produce different results.
+    /// </returns>
+    public static string TruncateWithUniqueHash(this string text, int maxLength)
+    {
+        if (text.Length <= maxLength)
+        {
+            return text;
+        }
+
+        // 9 chars reserved for "-" + 8 hex digits from a SHA-256 hash.
+        const int HashSuffixLength = 9;
+
+        var hash = Convert.ToHexStringLower(
+            System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(text)))[..(HashSuffixLength - 1)];
+        return $"{text[..(maxLength - HashSuffixLength)]}-{hash}";
+    }
+
+    /// <summary>
     /// Strips carriage returns and line feeds from the specified text.
     /// </summary>
     /// <param name="input">The string to process.</param>

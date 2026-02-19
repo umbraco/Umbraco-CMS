@@ -25,6 +25,8 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a document type.")]
+    [EndpointDescription("Gets a document type identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IContentType? contentType = await _contentTypeService.GetAsync(id);

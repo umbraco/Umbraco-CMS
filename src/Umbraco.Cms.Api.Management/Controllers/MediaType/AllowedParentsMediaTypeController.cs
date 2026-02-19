@@ -23,6 +23,8 @@ public class AllowedParentsMediaTypeController : MediaTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaTypeAllowedParentsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets allowed parent media types.")]
+    [EndpointDescription("Gets a collection of media types that are allowed as parents of the specified media type.")]
     public async Task<IActionResult> AllowedParentsByKey(
         CancellationToken cancellationToken,
         Guid id)

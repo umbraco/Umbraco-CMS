@@ -33,6 +33,8 @@ public class AncestorsPartialViewTreeController : PartialViewTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor partial view items.")]
+    [EndpointDescription("Gets a collection of partial view items that are ancestors to the provided Id.")]
     public async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> Ancestors(
         CancellationToken cancellationToken,
         string descendantPath)

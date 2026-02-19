@@ -1043,7 +1043,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         PerformGetReferencedDtos(dtos);
 
         IUser user = UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
-        IsolatedCache.Insert(cacheKey, () => user, TimeSpan.FromMinutes(5), true);
+        IsolatedCache.Insert(cacheKey, () => user, RepositoryCacheConstants.DefaultCacheDuration, true);
 
         return user;
     }
