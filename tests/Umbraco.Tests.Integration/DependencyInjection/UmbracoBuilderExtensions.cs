@@ -20,8 +20,9 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -154,13 +155,15 @@ public static class UmbracoBuilderExtensions
             IRuntimeState runtimeState,
             ILogger<ExamineIndexRebuilder> logger,
             IExamineManager examineManager,
-            IEnumerable<IIndexPopulator> populators)
+            IEnumerable<IIndexPopulator> populators,
+            IBackgroundTaskQueue backgroundTaskQueue)
             : base(
             mainDom,
             runtimeState,
             logger,
             examineManager,
-            populators)
+            populators,
+            backgroundTaskQueue)
         {
         }
 

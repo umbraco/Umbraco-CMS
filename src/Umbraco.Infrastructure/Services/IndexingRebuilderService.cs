@@ -1,27 +1,21 @@
 using Examine;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Models;
 
 namespace Umbraco.Cms.Infrastructure.Services;
 
 /// <inheritdoc />
 public class IndexingRebuilderService : IIndexingRebuilderService
 {
+    private const string IsRebuildingIndexRuntimeCacheKeyPrefix = "temp_indexing_op_";
+
+    private readonly IAppPolicyCache _runtimeCache;
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly ILogger<IndexingRebuilderService> _logger;
 
-    public IndexingRebuilderService(
-        IIndexRebuilder indexRebuilder,
-        ILogger<IndexingRebuilderService> logger)
-    {
-        _indexRebuilder = indexRebuilder;
-        _logger = logger;
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public IndexingRebuilderService(
         AppCaches runtimeCache,
         IIndexRebuilder indexRebuilder,
@@ -29,6 +23,18 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     {
         _indexRebuilder = indexRebuilder;
         _logger = logger;
+        _runtimeCache = runtimeCache.RuntimeCache;
+    }
+
+    [Obsolete("Use the constructor that accepts AppCaches. Scheduled for removal in Umbraco 19.")]
+    public IndexingRebuilderService(
+        IIndexRebuilder indexRebuilder,
+        ILogger<IndexingRebuilderService> logger)
+        : this(
+            StaticServiceProvider.Instance.GetRequiredService<AppCaches>(),
+            indexRebuilder,
+            logger)
+    {
     }
 
     /// <inheritdoc />
@@ -44,11 +50,13 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     {
         try
         {
-            Attempt<IndexRebuildResult> attempt = await _indexRebuilder.RebuildIndexAsync(indexName);
-            return attempt.Success;
+            Set(indexName);
+            await _indexRebuilder.RebuildIndexAsync(indexName);
+            return true;
         }
         catch (Exception exception)
         {
+            Clear(indexName);
             _logger.LogError(exception, "An error occurred rebuilding index");
             return false;
         }
@@ -57,9 +65,28 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     /// <inheritdoc />
     [Obsolete("Use IsRebuildingAsync() instead. Scheduled for removal in Umbraco 19.")]
     public bool IsRebuilding(string indexName)
-        => IsRebuildingAsync(indexName).GetAwaiter().GetResult();
+    {
+        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
+        return _runtimeCache.Get(cacheKey) is not null;
+    }
 
     /// <inheritdoc />
     public Task<bool> IsRebuildingAsync(string indexName)
-        => _indexRebuilder.IsRebuildingAsync(indexName);
+    {
+        return Task.FromResult(IsRebuilding(indexName));
+    }
+
+    private void Set(string indexName)
+    {
+        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
+
+        // put temp val in cache which is used as a rudimentary way to know when the indexing is done
+        _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
+    }
+
+    private void Clear(string indexName)
+    {
+        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
+        _runtimeCache.Clear(cacheKey);
+    }
 }
