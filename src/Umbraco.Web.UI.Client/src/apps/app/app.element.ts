@@ -20,7 +20,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
-import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
@@ -143,7 +142,6 @@ export class UmbAppElement extends UmbLitElement {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
-	#apiInterceptorController = new UmbApiInterceptorController(this);
 
 	constructor() {
 		super();
@@ -165,14 +163,10 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setup() {
-		umbHttpClient.setConfig({
-			baseUrl: this.serverUrl,
-		});
-
-		this.#apiInterceptorController.bindDefaultInterceptors(umbHttpClient);
 		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
+		this.#authContext.configureClient(umbHttpClient);
 		new UmbServerContext(this, {
 			backofficePath: this.backofficePath,
 			serverUrl: this.serverUrl,

@@ -110,12 +110,17 @@ describe('UmbAuthContext', () => {
 		it('sets the config on a client', () => {
 			let receivedConfig: Record<string, unknown> = {};
 			const mockClient = {
+				buildUrl: () => '',
+				getConfig: () => ({}),
+				request: () => Promise.resolve({}) as never,
+				interceptors: { request: { use: () => {} }, response: { use: () => {} } },
 				setConfig: (config: Record<string, unknown>) => {
 					receivedConfig = config;
+					return config;
 				},
 			};
 
-			context.configureClient(mockClient);
+			context.configureClient(mockClient as never);
 
 			expect(receivedConfig).to.have.property('baseUrl', 'http://localhost');
 			expect(receivedConfig).to.have.property('credentials', 'include');

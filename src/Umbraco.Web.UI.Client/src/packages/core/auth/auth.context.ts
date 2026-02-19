@@ -6,6 +6,7 @@ import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	ReplaySubject,
@@ -17,7 +18,7 @@ import {
 } from '@umbraco-cms/backoffice/external/rxjs';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -128,9 +129,6 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#unlinkEndpoint = endpoints.unlinkEndpoint;
 
 		this.#client = new UmbAuthClient(endpoints, redirectUri);
-
-		// Configure the shared http client for authenticated API calls
-		this.#configureDefaultClient();
 
 		// Set up cross-tab coordination via BroadcastChannel
 		this.#channel = new BroadcastChannel('umb:auth');
@@ -513,22 +511,26 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Configures a @hey-api/openapi-ts client for authenticated API calls.
-	 * Use this when you have a custom API client generated from your own OpenAPI spec.
+	 * Configures a `@hey-api/openapi-ts` client for authenticated API calls.
+	 * Sets baseUrl, credentials, auth header, and binds the default response
+	 * interceptors (401 retry, error handling, notifications).
 	 * @example
 	 * ```js
 	 * const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 	 * authContext.configureClient(myClient);
-	 * // Now myClient automatically includes auth headers
+	 * // Now myClient automatically includes auth headers and interceptors
 	 * ```
-	 * @param client A client with a setConfig method (e.g. from @hey-api/openapi-ts).
+	 * @param client A `@hey-api/openapi-ts` client instance.
 	 */
-	configureClient(client: { setConfig: (config: Record<string, unknown>) => void }) {
+	configureClient(client: typeof umbHttpClient) {
 		client.setConfig({
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
 			auth: () => '[redacted]',
 		});
+
+		const interceptorController = new UmbApiInterceptorController(this._host);
+		interceptorController.bindDefaultInterceptors(client);
 	}
 
 	/**
@@ -616,16 +618,6 @@ export class UmbAuthContext extends UmbContextBase {
 		await this.signOut();
 
 		return true;
-	}
-
-	/**
-	 * Sets the baseUrl on umbHttpClient. Credentials and auth are already
-	 * configured at module level in `@umbraco-cms/backoffice/http-client`.
-	 */
-	#configureDefaultClient() {
-		umbHttpClient.setConfig({
-			baseUrl: this.#serverUrl,
-		});
 	}
 
 	/**
