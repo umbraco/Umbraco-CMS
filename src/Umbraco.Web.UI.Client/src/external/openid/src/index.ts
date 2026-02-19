@@ -1,7 +1,9 @@
 /**
  * @deprecated This package is no longer used by Umbraco auth. Scheduled for removal in Umbraco 19.
  * The Umbraco backoffice now uses cookie-based authentication with a minimal PKCE client.
- * These types are provided only for backwards compatibility with external consumers.
+ * Data classes (TokenResponse, AuthorizationRequest, etc.) remain functional for compatibility.
+ * Handler classes (RedirectRequestHandler, BaseTokenRequestHandler, etc.) reject with an error
+ * because the underlying OAuth operations are no longer possible with cookie-based auth.
  */
 
 /**
