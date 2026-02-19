@@ -19,7 +19,7 @@ import {
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
-import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
+import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * The multiplier for the token expiry time.
@@ -102,6 +102,12 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns An observable that emits when the authorization state changes.
 	 */
 	get authorizationSignal(): Observable<void> {
+		new UmbDeprecation({
+			deprecated: 'get authorizationSignal',
+			solution:
+				'Observe isAuthorized instead. This provides more useful information (authorized or not) and is more efficient to consume. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
 		return this.#authorizationSignal.asObservable().pipe(
 			// Throttle the signal to ensure that it emits once, then waits for 1s before allowing another emission.
 			throttleTime(1000),
@@ -390,6 +396,12 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
+		new UmbDeprecation({
+			deprecated: 'getLatestToken',
+			solution:
+				'Use configureClient for @hey-api/openapi-ts clients or getOpenApiConfiguration for manual fetch calls. With cookie-based auth this always returns "[redacted]".',
+			removeInVersion: '19.0.0',
+		}).warn();
 		return '[redacted]';
 	}
 
