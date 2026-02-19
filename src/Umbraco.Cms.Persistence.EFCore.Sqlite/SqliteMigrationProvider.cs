@@ -53,6 +53,7 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.UpdateOpenIddictToV5 => typeof(Migrations.UpdateOpenIddictToV5),
             EFCoreMigration.UpdateOpenIddictToV7 => typeof(Migrations.UpdateOpenIddictToV7),
             EFCoreMigration.AddWebhookDto => typeof(Migrations.AddWebhookDto),
+            EFCoreMigration.AddLastSyncedDto => typeof(Migrations.AddLastSyncedDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }
