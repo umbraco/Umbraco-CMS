@@ -158,6 +158,14 @@ export class UmbAuthContext extends UmbContextBase {
 					// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
 					location.href = this.#postLogoutRedirectUri;
 					break;
+				case 'sessionRequest': {
+					// Another tab is asking for the current session state (e.g. new tab opening)
+					const session = this.#session.getValue();
+					if (session) {
+						this.#channel.postMessage({ type: 'sessionResponse', session });
+					}
+					break;
+				}
 			}
 		};
 
@@ -325,8 +333,8 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Sets the initial state of the auth flow.
-	 * With cookie auth, this is lightweight — no localStorage reads.
-	 * If a session is already set (e.g. from BroadcastChannel), this is a no-op.
+	 * First asks existing tabs for their session via BroadcastChannel.
+	 * If no peer responds, falls back to a server refresh.
 	 * @returns {Promise<void>}
 	 */
 	async setInitialState(): Promise<void> {
@@ -335,7 +343,15 @@ export class UmbAuthContext extends UmbContextBase {
 			return;
 		}
 
-		// Try a token refresh to establish session timing.
+		// Ask existing tabs for their session state (avoids a /token call for new tabs)
+		const peerSession = await this.#requestSessionFromPeers();
+		if (peerSession) {
+			this.#session.setValue(peerSession);
+			this.#isAuthorized.setValue(true);
+			return;
+		}
+
+		// No peer responded — try a server refresh.
 		// Uses the Web Lock so concurrent calls (from API requests via getLatestToken)
 		// are deduplicated — only one actual /token call is made.
 		await this.makeRefreshTokenRequest();
@@ -626,6 +642,30 @@ export class UmbAuthContext extends UmbContextBase {
 
 		// Broadcast the session update to other tabs
 		this.#channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt, expiresAt });
+	}
+
+	/**
+	 * Asks other tabs for their current session state via BroadcastChannel.
+	 * Returns the first response within 300ms, or undefined if no peer responds.
+	 */
+	#requestSessionFromPeers(): Promise<UmbAuthSession | undefined> {
+		return new Promise((resolve) => {
+			const timeout = setTimeout(() => {
+				this.#channel.removeEventListener('message', handler);
+				resolve(undefined);
+			}, 300);
+
+			const handler = (evt: MessageEvent) => {
+				if (evt.data?.type === 'sessionResponse' && evt.data.session) {
+					clearTimeout(timeout);
+					this.#channel.removeEventListener('message', handler);
+					resolve(evt.data.session);
+				}
+			};
+
+			this.#channel.addEventListener('message', handler);
+			this.#channel.postMessage({ type: 'sessionRequest' });
+		});
 	}
 
 	/**

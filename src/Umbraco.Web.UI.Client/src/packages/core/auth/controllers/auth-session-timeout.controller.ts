@@ -4,102 +4,44 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
-	#tokenCheckWorker?: SharedWorker;
 	#host: UmbAuthContext;
 	#keepUserLoggedIn = false;
 	#hasCheckedKeepUserLoggedIn = false;
+	#timeoutId?: ReturnType<typeof setTimeout>;
+	#scheduledExpiresAt?: number;
 
 	constructor(host: UmbAuthContext) {
 		super(host, 'UmbAuthSessionTimeoutController');
 
 		this.#host = host;
 
-		this.#tokenCheckWorker = new SharedWorker(new URL('../workers/token-check.worker.js', import.meta.url), {
-			name: 'TokenCheckWorker',
-			type: 'module',
-		});
-
-		// Ensure the worker is ready to receive messages
-		this.#tokenCheckWorker.port.start();
-
-		// Listen for messages from the token check worker
-		this.#tokenCheckWorker.port.onmessage = async (event) => {
-			if (event.data?.command === 'sessionState') {
-				// New tab: worker is sending us the current session state
-				// This is handled via the auth context's setInitialState/BroadcastChannel
-				return;
-			}
-
-			if (event.data?.command === 'logout') {
-				if (this.#keepUserLoggedIn) {
-					// Last resort: try to refresh before giving up
-					console.log(
-						'[Auth Context] Session fully expired, but user chose to stay logged in. Attempting last-resort refresh.',
-					);
-					const success = await this.#tryValidateToken();
-					if (!success) {
-						host.timeOut();
-					}
-					return;
-				}
-				// If the worker signals a logout, we clear the token storage and set the user as unauthorized
-				host.timeOut();
-			} else if (event.data?.command === 'refreshToken') {
-				if (this.#keepUserLoggedIn) {
-					console.log(
-						'[Auth Context] User chose to stay logged in, attempting to validate token instead of showing timeout.',
-					);
-					// Check if session is already valid (another tab may have refreshed)
-					if (host.isSessionValid()) {
-						return;
-					}
-					await this.#tryValidateToken();
-					return;
-				}
-				// If the worker signals a token refresh, we let the user decide whether to continue or logout
-				this.#openTimeoutModal(event.data.secondsUntilLogout);
-			}
-		};
-
-		// Initialize the token check worker with the current session state
+		// When the session changes, reschedule the expiry check.
+		// This fires when: initial login, token refresh (this or another tab), BroadcastChannel update.
 		this.observe(
 			host.session$,
 			(session) => {
-				if (session) {
-					// Session was refreshed (possibly by another tab) — close any open timeout modal
-					this.#closeTimeoutModal();
+				this.#clearScheduledCheck();
 
-					// Inform the token check worker about the new session expiry
-					console.log('[Auth Context] Informing token check worker about new session state.');
-					this.#tokenCheckWorker?.port.postMessage({
-						command: 'init',
-						expiresAt: session.expiresAt,
-					});
-				} else {
-					// No session — stop the worker's interval
-					this.#tokenCheckWorker?.port.postMessage({
-						command: 'init',
-					});
+				if (session) {
+					// Session refreshed — close any open timeout modal and schedule next check
+					this.#closeTimeoutModal();
+					this.#scheduleCheck(session.expiresAt);
 				}
 			},
-			'_authFlowSessionState',
+			'_sessionState',
 		);
 
-		// Listen for the timeout signal to stop the token check worker
+		// When the user times out, clean up
 		this.observe(
 			host.timeoutSignal,
 			async () => {
-				// Stop the token check worker when the user has timed out
-				this.#tokenCheckWorker?.port.postMessage({
-					command: 'init',
-				});
-
-				// Close the modal if it is open
+				this.#clearScheduledCheck();
 				await this.#closeTimeoutModal();
 			},
-			'_authFlowTimeoutSignal',
+			'_timeoutSignal',
 		);
 
+		// Check keepUserLoggedIn preference once authorized
 		this.observe(
 			host.isAuthorized,
 			(isAuthorized) => {
@@ -107,14 +49,101 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 					this.#observeKeepUserLoggedIn();
 				}
 			},
-			'_authFlowIsAuthorizedSignal',
+			'_isAuthorized',
 		);
 	}
 
 	override destroy(): void {
 		super.destroy();
-		this.#tokenCheckWorker?.port.close();
-		this.#tokenCheckWorker = undefined;
+		this.#clearScheduledCheck();
+	}
+
+	#clearScheduledCheck() {
+		if (this.#timeoutId !== undefined) {
+			clearTimeout(this.#timeoutId);
+			this.#timeoutId = undefined;
+		}
+	}
+
+	/**
+	 * Schedules a check for when the session enters the warning zone (buffer before expiry).
+	 * Uses adaptive buffer: 25% of session lifetime, clamped between 5s and 60s.
+	 */
+	#scheduleCheck(expiresAt: number) {
+		this.#scheduledExpiresAt = expiresAt;
+
+		const now = Math.floor(Date.now() / 1000);
+		const secondsUntilExpiry = expiresAt - now;
+
+		if (secondsUntilExpiry <= 0) {
+			// Already expired
+			this.#onSessionExpiring(0);
+			return;
+		}
+
+		// Adaptive buffer: 25% of session, clamped to [5s, 60s]
+		const buffer = Math.max(5, Math.min(60, Math.floor(secondsUntilExpiry * 0.25)));
+		const secondsUntilWarning = secondsUntilExpiry - buffer;
+
+		if (secondsUntilWarning <= 0) {
+			// Already in the buffer zone
+			this.#onSessionExpiring(secondsUntilExpiry);
+		} else {
+			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(buffer), secondsUntilWarning * 1000);
+		}
+	}
+
+	/**
+	 * Called when the session is expiring or has expired.
+	 * Decides whether to auto-refresh, show the timeout modal, or time out.
+	 */
+	async #onSessionExpiring(secondsRemaining: number) {
+		// Guard: if session was refreshed since we scheduled this check, skip
+		if (this.#host.isSessionValid()) return;
+
+		if (this.#keepUserLoggedIn) {
+			console.log('[Auth] Session expiring, auto-refreshing (keepUserLoggedIn=true)');
+			const success = await this.#tryValidateToken();
+			if (!success) {
+				this.#host.timeOut();
+			}
+			return;
+		}
+
+		if (secondsRemaining <= 0) {
+			console.log('[Auth] Session fully expired');
+			this.#host.timeOut();
+			return;
+		}
+
+		// Show timeout modal — only one tab via Web Lock leader election
+		await this.#showTimeoutModalAsLeader(secondsRemaining);
+	}
+
+	/**
+	 * Uses a Web Lock to ensure only one tab shows the timeout modal.
+	 * Non-leader tabs set a fallback timeout for when the session fully expires.
+	 */
+	async #showTimeoutModalAsLeader(secondsRemaining: number) {
+		const acquired = await navigator.locks.request(
+			'umb:timeout-modal',
+			{ ifAvailable: true },
+			async (lock) => {
+				if (!lock) return false;
+				// We're the leader — show the modal. Lock is held until the modal closes.
+				await this.#openTimeoutModal(secondsRemaining);
+				return true;
+			},
+		);
+
+		if (!acquired) {
+			// Another tab is showing the modal. Set a fallback for full expiry.
+			this.#timeoutId = setTimeout(() => {
+				if (!this.#host.isSessionValid()) {
+					this.#host.timeOut();
+				}
+			}, secondsRemaining * 1000);
+		}
 	}
 
 	/**
@@ -137,38 +166,38 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		modalManager?.close('auth-timeout');
 	}
 
-	async #openTimeoutModal(remainingTimeInSeconds: number) {
+	async #openTimeoutModal(remainingTimeInSeconds: number): Promise<void> {
 		const contextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
 		const modalManager = await this.getContext(contextToken);
-		modalManager
-			?.open(this, UMB_MODAL_AUTH_TIMEOUT, {
-				modal: {
-					key: 'auth-timeout',
-				},
-				data: {
-					remainingTimeInSeconds,
-					onLogout: () => {
-						this.#host.signOut();
+
+		try {
+			await modalManager
+				?.open(this, UMB_MODAL_AUTH_TIMEOUT, {
+					modal: {
+						key: 'auth-timeout',
 					},
-					onContinue: () => {
-						// If the user chooses to stay logged in, we validate the token
-						this.#tryValidateToken();
+					data: {
+						remainingTimeInSeconds,
+						onLogout: () => {
+							this.#host.signOut();
+						},
+						onContinue: () => {
+							this.#tryValidateToken();
+						},
 					},
-				},
-			})
-			.onSubmit()
-			.catch(() => {
-				// If the modal is forced closed or an error occurs, we handle it gracefully
-				this.#tryValidateToken();
-			});
+				})
+				.onSubmit();
+		} catch {
+			// Modal was force-closed or an error occurred — try to refresh gracefully
+			this.#tryValidateToken();
+		}
 	}
 
 	async #tryValidateToken(): Promise<boolean> {
 		try {
 			return await this.#host.validateToken();
 		} catch (error) {
-			console.error('[Auth Context] Error validating token:', error);
-			// If the token validation fails, we clear the token storage and set the user as unauthorized
+			console.error('[Auth] Error validating token:', error);
 			this.#host.timeOut();
 			return false;
 		}
