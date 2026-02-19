@@ -21,9 +21,9 @@ export async function tryXhrRequest<T>(
 ): Promise<UmbApiResponse<T>> {
 	const config = umbHttpClient.getConfig();
 	const promise = createXhrRequest<T>({
-		...options,
 		baseUrl: config.baseUrl,
 		token: '[redacted]',
+		...options,
 	});
 	const controller = new UmbTryExecuteController(host, promise);
 	const response = await controller.tryExecute(options);
