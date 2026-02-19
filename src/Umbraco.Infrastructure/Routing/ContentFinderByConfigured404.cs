@@ -59,7 +59,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public ContentFinderByConfigured404(
         ILogger<ContentFinderByConfigured404> logger,
         IEntityService entityService,
@@ -69,21 +69,22 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentUrlService documentUrlService,
         IPublishedContentCache publishedContentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService) : this(
-        logger,
-        entityService,
-        contentSettings,
-        examineManager,
-        variationContextAccessor,
-        umbracoContextAccessor,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            logger,
+            entityService,
+            contentSettings,
+            examineManager,
+            variationContextAccessor,
+            umbracoContextAccessor,
+            documentUrlService,
+            publishedContentCache,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
     {
     }
 
-    [Obsolete("Scheduled for removal in Umbraco 18")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ContentFinderByConfigured404(
         ILogger<ContentFinderByConfigured404> logger,
         IEntityService entityService,
@@ -91,17 +92,16 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IExamineManager examineManager,
         IVariationContextAccessor variationContextAccessor,
         IUmbracoContextAccessor umbracoContextAccessor)
-    : this(
-        logger,
-        entityService,
-        contentSettings,
-        examineManager,
-        variationContextAccessor,
-        umbracoContextAccessor,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
+        : this(
+            logger,
+            entityService,
+            contentSettings,
+            examineManager,
+            variationContextAccessor,
+            umbracoContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
     {
     }
 

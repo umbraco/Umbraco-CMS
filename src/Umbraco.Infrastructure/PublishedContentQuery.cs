@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure;
 
 /// <summary>
-///     A class used to query for published content, media items
+///     A class used to query for published content and media items.
 /// </summary>
 /// <seealso cref="Umbraco.Cms.Core.IPublishedContentQuery" />
 public class PublishedContentQuery : IPublishedContentQuery
@@ -29,11 +29,9 @@ public class PublishedContentQuery : IPublishedContentQuery
     private static readonly HashSet<string> _returnedQueryFields =
         new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
 
-    
-
-    ///// <summary>
-    /////     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
-    ///// </summary>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
+    /// </summary>
     public PublishedContentQuery(
         IVariationContextAccessor variationContextAccessor,
         IExamineManager examineManager,
@@ -42,8 +40,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         IDocumentNavigationQueryService documentNavigationQueryService,
         IMediaNavigationQueryService mediaNavigationQueryService)
     {
-        _variationContextAccessor = variationContextAccessor ??
-                                    throw new ArgumentNullException(nameof(variationContextAccessor));
+        _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
         _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
         _publishedContent = publishedContent;
         _publishedMediaCache = publishedMediaCache;
@@ -51,36 +48,35 @@ public class PublishedContentQuery : IPublishedContentQuery
         _mediaNavigationQueryService = mediaNavigationQueryService;
     }
 
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public PublishedContentQuery(
         IVariationContextAccessor variationContextAccessor,
         IExamineManager examineManager,
         IPublishedContentCache publishedContent,
         IPublishedMediaCache publishedMediaCache,
-        IDocumentNavigationQueryService documentNavigationQueryService) : this(
-        variationContextAccessor,
-        examineManager,
-        publishedContent,
-        publishedMediaCache,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            variationContextAccessor,
+            examineManager,
+            publishedContent,
+            publishedMediaCache,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
     {
     }
 
-    [Obsolete("Scheduled for removal in Umbraco 18")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public PublishedContentQuery(
         IVariationContextAccessor variationContextAccessor,
         IExamineManager examineManager,
         IPublishedContentCache publishedContent,
         IPublishedMediaCache publishedMediaCache)
-    : this(
-        variationContextAccessor,
-        examineManager,
-        publishedContent,
-        publishedMediaCache,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
+        : this(
+            variationContextAccessor,
+            examineManager,
+            publishedContent,
+            publishedMediaCache,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
     {
     }
 
