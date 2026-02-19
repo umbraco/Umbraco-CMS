@@ -7,9 +7,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * Abstract base class for collection view elements.
  * Provides shared state management, selection handling, and context consumption for collection views.
  */
-export abstract class UmbCollectionViewElementBase extends UmbLitElement {
+export abstract class UmbCollectionViewElementBase<
+	CollectionItemType extends UmbCollectionItemModel = UmbCollectionItemModel,
+> extends UmbLitElement {
 	@state()
-	protected _items: Array<UmbCollectionItemModel> = [];
+	protected _items: Array<CollectionItemType> = [];
 
 	@state()
 	protected _selectable = false;
@@ -76,10 +78,10 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 
 	/**
 	 * Determines if an item is selectable
-	 * @param {UmbCollectionItemModel} item - The item to check for selectability.
+	 * @param {CollectionItemType} item - The item to check for selectability.
 	 * @returns {boolean} True if the item is selectable, false otherwise.
 	 */
-	protected _isSelectableItem(item: UmbCollectionItemModel): boolean {
+	protected _isSelectableItem(item: CollectionItemType): boolean {
 		if (!this._selectable) {
 			return false;
 		}
@@ -95,7 +97,7 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	 * Selects an item in the collection.
 	 * @param {string} unique - The unique identifier of the item to select.
 	 */
-	protected _selectItem(unique: UmbCollectionItemModel['unique']) {
+	protected _selectItem(unique: CollectionItemType['unique']) {
 		this.#collectionContext?.selection.select(unique);
 	}
 
@@ -103,7 +105,7 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	 * Deselects an item in the collection.
 	 * @param {string} unique - The unique identifier of the item to deselect.
 	 */
-	protected _deselectItem(unique: UmbCollectionItemModel['unique']) {
+	protected _deselectItem(unique: CollectionItemType['unique']) {
 		this.#collectionContext?.selection.deselect(unique);
 	}
 
@@ -120,7 +122,7 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	 * @param {string} unique - The unique identifier of the item to check.
 	 * @returns {boolean} True if the item is selected, false otherwise.
 	 */
-	protected _isSelectedItem(unique: UmbCollectionItemModel['unique']): boolean {
+	protected _isSelectedItem(unique: CollectionItemType['unique']): boolean {
 		return this.#collectionContext?.selection.isSelected(unique) ?? false;
 	}
 
