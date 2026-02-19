@@ -77,7 +77,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		if (secondsUntilExpiry <= 0) {
 			// Already expired
-			this.#onSessionExpiring(0);
+			this.#onSessionExpiring(0, expiresAt);
 			return;
 		}
 
@@ -87,9 +87,9 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		if (secondsUntilWarning <= 0) {
 			// Already in the buffer zone
-			this.#onSessionExpiring(secondsUntilExpiry);
+			this.#onSessionExpiring(secondsUntilExpiry, expiresAt);
 		} else {
-			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(buffer), secondsUntilWarning * 1000);
+			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(buffer, expiresAt), secondsUntilWarning * 1000);
 		}
 	}
 
@@ -97,9 +97,11 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	 * Called when the session is expiring or has expired.
 	 * Decides whether to auto-refresh, show the timeout modal, or time out.
 	 */
-	async #onSessionExpiring(secondsRemaining: number) {
-		// Guard: if session was refreshed since we scheduled this check, skip
-		if (this.#host.isSessionValid()) return;
+	async #onSessionExpiring(secondsRemaining: number, originalExpiresAt: number) {
+		// Guard: if the session was refreshed since we scheduled this check, skip.
+		// We compare expiresAt rather than using isSessionValid() because this fires
+		// during the buffer zone (before full expiry), when the session is still "valid".
+		if (this.#scheduledExpiresAt !== originalExpiresAt) return;
 
 		if (this.#keepUserLoggedIn) {
 			console.log('[Auth] Session expiring, auto-refreshing (keepUserLoggedIn=true)');
@@ -125,16 +127,12 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	 * Non-leader tabs set a fallback timeout for when the session fully expires.
 	 */
 	async #showTimeoutModalAsLeader(secondsRemaining: number) {
-		const acquired = await navigator.locks.request(
-			'umb:timeout-modal',
-			{ ifAvailable: true },
-			async (lock) => {
-				if (!lock) return false;
-				// We're the leader — show the modal. Lock is held until the modal closes.
-				await this.#openTimeoutModal(secondsRemaining);
-				return true;
-			},
-		);
+		const acquired = await navigator.locks.request('umb:timeout-modal', { ifAvailable: true }, async (lock) => {
+			if (!lock) return false;
+			// We're the leader — show the modal. Lock is held until the modal closes.
+			await this.#openTimeoutModal(secondsRemaining);
+			return true;
+		});
 
 		if (!acquired) {
 			// Another tab is showing the modal. Set a fallback for full expiry.
