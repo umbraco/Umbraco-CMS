@@ -117,6 +117,12 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	 * Non-leader tabs set a fallback timeout for when the session fully expires.
 	 */
 	async #showTimeoutModalAsLeader(secondsRemaining: number) {
+		// Fallback for environments without Web Locks — every tab shows the modal
+		if (!navigator.locks) {
+			await this.#openTimeoutModal(secondsRemaining);
+			return;
+		}
+
 		const acquired = await navigator.locks.request('umb:timeout-modal', { ifAvailable: true }, async (lock) => {
 			if (!lock) return false;
 			// We're the leader — show the modal. Lock is held until the modal closes.
@@ -126,6 +132,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		if (!acquired) {
 			// Another tab is showing the modal. Set a fallback for full expiry.
+			// Cleared by #clearScheduledCheck when the leader broadcasts a sessionUpdate.
 			this.#timeoutId = setTimeout(() => {
 				if (!this.#host.isSessionValid()) {
 					this.#host.timeOut();

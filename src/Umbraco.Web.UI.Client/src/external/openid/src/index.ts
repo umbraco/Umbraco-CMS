@@ -247,11 +247,11 @@ export class AuthorizationResponse {
  */
 export class AuthorizationError {
 	error: string;
-	errorDescription: string;
-	errorUri: string;
-	state: string;
+	errorDescription: string | undefined;
+	errorUri: string | undefined;
+	state: string | undefined;
 
-	constructor(error: { error: string; error_description: string; error_uri: string; state: string }) {
+	constructor(error: { error: string; error_description?: string; error_uri?: string; state?: string }) {
 		this.error = error.error;
 		this.errorDescription = error.error_description;
 		this.errorUri = error.error_uri;

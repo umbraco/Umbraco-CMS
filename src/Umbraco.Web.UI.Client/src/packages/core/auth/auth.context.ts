@@ -56,7 +56,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	// Popup management
 	#authWindowProxy?: WindowProxy | null;
-	#previousAuthUrl?: string;
+	#popupCleanup?: () => void;
 
 	/**
 	 * @deprecated Observe isAuthorized instead. Scheduled for removal in Umbraco 19.
@@ -236,14 +236,16 @@ export class UmbAuthContext extends UmbContextBase {
 			manifest?.meta?.behavior?.popupFeatures ??
 			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
 
+		// Clean up any pending popup flow before starting a new one
+		this.#popupCleanup?.();
+
 		if (!this.#authWindowProxy || this.#authWindowProxy.closed) {
 			this.#authWindowProxy = window.open(redirectUrl, popupTarget, popupFeatures);
-		} else if (this.#previousAuthUrl !== redirectUrl) {
+		} else {
+			// Popup still open — navigate to the new URL (always different due to PKCE state)
 			this.#authWindowProxy = window.open(redirectUrl, popupTarget);
 			this.#authWindowProxy?.focus();
 		}
-
-		this.#previousAuthUrl = redirectUrl;
 
 		// Store PKCE state for the popup's postMessage request
 		const codeVerifier = this.#client.codeVerifier;
@@ -266,7 +268,9 @@ export class UmbAuthContext extends UmbContextBase {
 				clearInterval(closedPoll);
 				this.#channel.removeEventListener('message', handler);
 				window.removeEventListener('message', pkceHandler);
+				this.#popupCleanup = undefined;
 			};
+			this.#popupCleanup = cleanup;
 
 			const handler = (evt: MessageEvent) => {
 				if (evt.data?.type === 'authorized') {
@@ -438,6 +442,17 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
+		// Fallback for environments without Web Locks (some enterprise/kiosk browsers)
+		if (!navigator.locks) {
+			console.warn('[UmbAuth] navigator.locks is not available — token refresh coordination disabled.');
+			const response = await this.#client.refreshToken();
+			if (response) {
+				this.#updateSession(response.expiresIn, response.issuedAt);
+				return true;
+			}
+			return false;
+		}
+
 		// Capture the access token expiry before acquiring the lock so we can detect
 		// if another tab refreshed while we waited.
 		const expiryBeforeLock = this.#session.getValue()?.accessTokenExpiresAt;
@@ -486,6 +501,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @memberof UmbAuthContext
 	 */
 	timeOut() {
+		this.#session.setValue(undefined);
 		this.#isAuthorized.setValue(false);
 		this.#isTimeout.next();
 	}
@@ -577,8 +593,9 @@ export class UmbAuthContext extends UmbContextBase {
 			auth: () => '[redacted]',
 		});
 
-		// Controller self-registers on the host via UmbControllerBase constructor,
+		// Controller self-registers on the host element via UmbControllerBase constructor,
 		// so the anonymous reference is intentional — lifecycle is managed by the host.
+		// Note: _host must be a proper UmbControllerHost (element host) for correct cleanup.
 		new UmbApiInterceptorController(this._host).bindDefaultInterceptors(client);
 	}
 
@@ -697,6 +714,8 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Asks other tabs for their current session state via BroadcastChannel.
 	 * Returns the first response within 300ms, or undefined if no peer responds.
+	 * The 300ms window is empirical — long enough for a loaded peer tab to respond
+	 * via the event loop, short enough to not noticeably delay login.
 	 */
 	#requestSessionFromPeers(): Promise<UmbAuthSession | undefined> {
 		return new Promise((resolve) => {

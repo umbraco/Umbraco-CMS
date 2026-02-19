@@ -103,8 +103,10 @@ export class UmbAppElement extends UmbLitElement {
 					// The BroadcastChannel message already notified the parent.
 					if (hasOwnOpener(this.backofficePath)) return;
 
-					// For redirect flows (no popup), redirect to the stored path
-					redirectToStoredPath(this.backofficePath);
+					// For redirect flows (no popup), navigate to the stored path.
+					// Use force=true for a full page navigation so the new page
+					// runs setInitialState() with the fresh httpOnly cookies.
+					redirectToStoredPath(this.backofficePath, true);
 				} catch {
 					(component as UmbAppOauthElement).failure = true;
 					console.error('[Fatal] Authorization request failed');
