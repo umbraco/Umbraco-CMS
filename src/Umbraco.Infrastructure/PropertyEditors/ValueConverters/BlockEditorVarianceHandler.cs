@@ -199,7 +199,7 @@ public sealed class BlockEditorVarianceHandler
         }
 
         // Remove expose entries that don't have matching ContentData
-        blockValue.Expose.RemoveAll(v => !validContentKeys.Contains(v.ContentKey));
+        blockValue.Expose.RemoveAll(v => validContentKeys.Contains(v.ContentKey) is false);
 
         if (contentDataToAlign.Any())
         {
