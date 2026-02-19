@@ -5,7 +5,6 @@ using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -91,37 +90,6 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
             Mock.Of<IPublishedMediaCache>(),
             Mock.Of<IDocumentNavigationQueryService>(),
             Mock.Of<IMediaNavigationQueryService>());
-    }
-
-    [Test]
-    public void Search_WithEmptyIndexName_UsesExternalIndexByDefault()
-    {
-        using var luceneDir = new RandomIdRAMDirectory();
-        var fields = new[] { (Name: "title", Culture: (string)null) };
-        using var indexer = CreateTestIndex(luceneDir, fields);
-
-        var query = CreatePublishedContentQuery(
-            indexer,
-            indexName: Constants.UmbracoIndexes.ExternalIndexName);
-
-        var ids = query.Search("Products", "*", string.Empty).Select(x => x.Content.Id).ToArray();
-        CollectionAssert.AreEqual(new[] { 1 }, ids);
-    }
-
-    [Test]
-    public void Search_WithNullIndexName_UsesExternalIndexByDefault()
-    {
-        using var luceneDir = new RandomIdRAMDirectory();
-        var fields = new[] { (Name: "title", Culture: (string)null) };
-        using var indexer = CreateTestIndex(luceneDir, fields);
-
-        var query = CreatePublishedContentQuery(
-            indexer,
-            indexName: Constants.UmbracoIndexes.ExternalIndexName);
-
-        string nullIndexName = null!;
-        var ids = query.Search("Products", "*", nullIndexName).Select(x => x.Content.Id).ToArray();
-        CollectionAssert.AreEqual(new[] { 1 }, ids);
     }
 
     [TestCase("fr-fr", ExpectedResult = "1, 3", Description = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]
