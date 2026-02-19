@@ -183,7 +183,10 @@ export class UmbAuthClient {
 			}
 
 			const json = await response.json();
-			const expiresIn = json.expires_in ? parseInt(json.expires_in, 10) : 0;
+			const expiresIn = json.expires_in ? parseInt(String(json.expires_in), 10) : 0;
+			if (expiresIn === 0) {
+				console.warn('[UmbAuthClient] Token response missing or zero expires_in — session timing may be inaccurate');
+			}
 			const issuedAt = json.issued_at ?? Math.floor(Date.now() / 1000);
 
 			return { expiresIn, issuedAt };

@@ -63,6 +63,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 */
 	readonly #authorizationSignal = new Subject<void>();
 
+	// Track clients that have been configured to prevent duplicate interceptor binding
+	#configuredClients = new WeakSet();
+
 	// Endpoint URLs
 	#linkEndpoint;
 	#linkKeyEndpoint;
@@ -280,11 +283,12 @@ export class UmbAuthContext extends UmbContextBase {
 					const parsed = JSON.parse(pkceData);
 					if (parsed.state === state) {
 						codeVerifier = parsed.codeVerifier;
+						sessionStorage.removeItem('umb:pkce');
 					}
 				} catch {
 					// Ignore parse errors
+					sessionStorage.removeItem('umb:pkce');
 				}
-				sessionStorage.removeItem('umb:pkce');
 			}
 		}
 
@@ -400,14 +404,14 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
-		// Capture session state before acquiring the lock so we can detect
+		// Capture the access token expiry before acquiring the lock so we can detect
 		// if another tab refreshed while we waited.
-		const sessionBeforeLock = this.#session.getValue();
+		const expiryBeforeLock = this.#session.getValue()?.accessTokenExpiresAt;
 
 		return navigator.locks.request('umb:token-refresh', async () => {
-			// If the session changed while we waited for the lock, another tab already refreshed
-			const currentSession = this.#session.getValue();
-			if (currentSession && currentSession !== sessionBeforeLock) {
+			// If the session's expiry changed while we waited, another tab already refreshed
+			const currentExpiry = this.#session.getValue()?.accessTokenExpiresAt;
+			if (currentExpiry && currentExpiry !== expiryBeforeLock) {
 				return true;
 			}
 
@@ -435,6 +439,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 */
 	clearTokenStorage() {
 		this.#session.setValue(undefined);
+		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'sessionCleared' });
 	}
 
@@ -456,14 +461,15 @@ export class UmbAuthContext extends UmbContextBase {
 		// Revoke the token (best-effort)
 		await this.#client.revokeToken().catch(() => {});
 
-		// Clear internal state and notify other tabs to redirect to logout
-		this.clearTokenStorage();
+		// Clear local state (don't call clearTokenStorage — signedOut covers other tabs)
+		this.#session.setValue(undefined);
+		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'signedOut' });
 
 		// Redirect to end session endpoint
-		const postLogoutRedirectUri = new URL(this.#postLogoutRedirectUri, window.origin);
+		const postLogoutRedirectUri = new URL(this.#postLogoutRedirectUri, window.location.origin);
 		const endSessionEndpoint = `${this.#serverUrl}/umbraco/management/api/v1/security/back-office/signout`;
-		const postLogoutLocation = new URL(endSessionEndpoint, this.getRedirectUrl());
+		const postLogoutLocation = new URL(endSessionEndpoint);
 		postLogoutLocation.searchParams.set('post_logout_redirect_uri', postLogoutRedirectUri.href);
 		location.href = postLogoutLocation.href;
 	}
@@ -523,14 +529,16 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param client A `@hey-api/openapi-ts` client instance.
 	 */
 	configureClient(client: typeof umbHttpClient) {
+		if (this.#configuredClients.has(client)) return;
+		this.#configuredClients.add(client);
+
 		client.setConfig({
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
 			auth: () => '[redacted]',
 		});
 
-		const interceptorController = new UmbApiInterceptorController(this._host);
-		interceptorController.bindDefaultInterceptors(client);
+		new UmbApiInterceptorController(this._host).bindDefaultInterceptors(client);
 	}
 
 	/**
