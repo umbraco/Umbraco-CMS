@@ -354,5 +354,16 @@ public static partial class Constants
             /// </summary>
             public const string RichContent = "Rich Content";
         }
+
+        /// <summary>
+        ///     Defines Umbraco built-in property editor UI aliases.
+        /// </summary>
+        public static class PropertyEditorUiAliases
+        {
+            /// <summary>
+            ///     Collection (List View).
+            /// </summary>
+            public const string Collection = "Umb.PropertyEditorUi.Collection";
+        }
     }
 }

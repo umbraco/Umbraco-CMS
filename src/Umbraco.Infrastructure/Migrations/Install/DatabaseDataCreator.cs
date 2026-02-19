@@ -2362,7 +2362,7 @@ internal sealed class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.DefaultContentListView,
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
-                    EditorUiAlias = "Umb.PropertyEditorUi.Collection",
+                    EditorUiAlias = Constants.PropertyEditors.PropertyEditorUiAliases.Collection,
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
@@ -2381,7 +2381,7 @@ internal sealed class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.DefaultMediaListView,
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
-                    EditorUiAlias = "Umb.PropertyEditorUi.Collection",
+                    EditorUiAlias = Constants.PropertyEditors.PropertyEditorUiAliases.Collection,
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
@@ -2400,7 +2400,7 @@ internal sealed class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.DefaultMembersListView,
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
-                    EditorUiAlias = "Umb.PropertyEditorUi.Collection",
+                    EditorUiAlias = Constants.PropertyEditors.PropertyEditorUiAliases.Collection,
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":10, \"orderBy\":\"username\", \"orderDirection\":\"asc\", \"includeProperties\":[{\"alias\":\"username\",\"isSystem\":true},{\"alias\":\"email\",\"isSystem\":true},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true}]}",

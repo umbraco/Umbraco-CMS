@@ -55,7 +55,7 @@ public class AddEditorUiToDataType : MigrationBase
                 Constants.PropertyEditors.Aliases.ImageCropper => "Umb.PropertyEditorUi.ImageCropper",
                 Constants.PropertyEditors.Aliases.Integer => "Umb.PropertyEditorUi.Integer",
                 Constants.PropertyEditors.Aliases.Decimal => "Umb.PropertyEditorUi.Decimal",
-                Constants.PropertyEditors.Aliases.ListView => "Umb.PropertyEditorUi.Collection",
+                Constants.PropertyEditors.Aliases.ListView => Constants.PropertyEditors.PropertyEditorUiAliases.Collection,
                 Constants.PropertyEditors.Aliases.MediaPicker3 => "Umb.PropertyEditorUi.MediaPicker",
                 Constants.PropertyEditors.Aliases.MemberPicker => "Umb.PropertyEditorUi.MemberPicker",
                 Constants.PropertyEditors.Aliases.MemberGroupPicker => "Umb.PropertyEditorUi.MemberGroupPicker",
