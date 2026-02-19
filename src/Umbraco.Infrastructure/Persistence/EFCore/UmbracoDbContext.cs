@@ -42,6 +42,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<WebhookDto> Webhooks { get; set; }
 
+    public required DbSet<TemplateDto> Templates { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var extensions = options.Extensions.FirstOrDefault() as Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension;
