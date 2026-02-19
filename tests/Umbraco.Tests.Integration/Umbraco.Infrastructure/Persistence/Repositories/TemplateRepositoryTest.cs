@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -274,6 +275,31 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         retrievedTemplate = repository.Get(template.Key);
         Assert.IsNull(retrievedTemplate);
+    }
+
+    /// <summary>
+    /// Verifies that retrieving all templates from the GUID-based repository returns all items when the cache is
+    /// populated.
+    /// </summary>
+    /// <remarks>
+    /// Verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/21756 as this test fails before
+    /// the fix is applied.
+    /// </remarks>
+    [Test]
+    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    {
+        var realCache = CreateAppCaches();
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        CreateTemplate(repository);
+
+        var guidRepo = (IReadRepository<Guid, ITemplate>)repository;
+
+        var result = guidRepo.GetMany().ToArray();
+        Assert.IsNotEmpty(result);
     }
 
     private static AppCaches CreateAppCaches() =>
