@@ -126,7 +126,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 								minlength=${this._minimumPasswordLength}
 								required
 								required-message="New password is required"
-								min-length-message=${this.localize.term('user_newPasswordFormatLengthTip', [this._minimumPasswordLength])}>
+								.minlengthMessage=${this.localize.term('user_newPasswordFormatLengthTip', [this._minimumPasswordLength])}>
 							</uui-input-password>
 						</uui-form-layout-item>
 						<uui-form-layout-item>
@@ -139,7 +139,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 								minlength=${this._minimumPasswordLength}
 								required
 								required-message="Confirm password is required"
-								min-length-message=${this.localize.term('user_newPasswordFormatLengthTip', [this._minimumPasswordLength])}>
+								.minlengthMessage=${this.localize.term('user_newPasswordFormatLengthTip', [this._minimumPasswordLength])}>
 							</uui-input-password>
 						</uui-form-layout-item>
 					</form>
