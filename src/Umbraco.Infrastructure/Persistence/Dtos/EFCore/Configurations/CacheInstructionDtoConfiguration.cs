@@ -19,8 +19,7 @@ public class CacheInstructionDtoConfiguration : IEntityTypeConfiguration<CacheIn
             .HasColumnName("utcStamp");
 
         builder.Property(x => x.Instructions)
-            .HasColumnName("jsonInstruction")
-            .HasMaxLength(int.MaxValue);
+            .HasColumnName("jsonInstruction");
 
         builder.Property(x => x.OriginIdentity)
             .HasColumnName("originated")
