@@ -1,13 +1,15 @@
 /**
- * Applies a buffer time before the actual expiration of the token.
+ * Default buffer time before the actual expiration of the token.
  * This is to ensure that we have time to refresh the token before it expires.
+ * For short sessions (< 2 minutes), the buffer is reduced to 25% of the session lifetime.
  */
-const BUFFER_BEFORE_EXPIRATION = 60; // 1 minute in seconds
+const DEFAULT_BUFFER_BEFORE_EXPIRATION = 60; // 1 minute in seconds
 
 /**
- * The interval at which the token will be validated.
+ * Default interval at which the token will be validated.
+ * For short sessions, the interval is reduced proportionally.
  */
-const VALIDATION_INTERVAL = 30000; // 30 seconds in milliseconds
+const DEFAULT_VALIDATION_INTERVAL = 30000; // 30 seconds in milliseconds
 
 const ports: MessagePort[] = [];
 
@@ -58,13 +60,13 @@ _self.onconnect = (event: MessageEvent) => {
 /**
  * Checks if the session has expired based on the absolute expiresAt timestamp.
  */
-function isTokenExpired(expiresAt: number) {
+function isTokenExpired(expiresAt: number, bufferSeconds: number) {
 	const currentTime = Math.floor(Date.now() / 1000);
 	const secondsRemaining = expiresAt - currentTime;
 
 	console.log('[Token Check Worker] Token expires in', secondsRemaining, 'seconds');
 
-	const bufferedSeconds = Math.max(0, secondsRemaining - BUFFER_BEFORE_EXPIRATION);
+	const bufferedSeconds = Math.max(0, secondsRemaining - bufferSeconds);
 
 	return {
 		tokenIsExpired: bufferedSeconds === 0,
@@ -97,8 +99,17 @@ function init(expiresAt: number) {
 		clearInterval(interval);
 	}
 
+	// For short sessions (< 2 minutes), reduce buffer and check interval proportionally
+	const sessionDuration = expiresAt - Math.floor(Date.now() / 1000);
+	const bufferSeconds = Math.min(DEFAULT_BUFFER_BEFORE_EXPIRATION, Math.floor(sessionDuration * 0.25));
+	const validationInterval = Math.min(DEFAULT_VALIDATION_INTERVAL, Math.max(5000, bufferSeconds * 500));
+
+	console.log(
+		`[Token Check Worker] Session: ${sessionDuration}s, buffer: ${bufferSeconds}s, check interval: ${validationInterval}ms`,
+	);
+
 	interval = setInterval(() => {
-		const result = isTokenExpired(expiresAt);
+		const result = isTokenExpired(expiresAt, bufferSeconds);
 
 		if (result.tokenIsExpired) {
 			console.log('[Token Check Worker] Token is expired or missing, triggering logout.');
@@ -106,12 +117,12 @@ function init(expiresAt: number) {
 			clearInterval(interval);
 			interval = undefined;
 			console.log('[Token Check Worker] Waiting for token refresh...');
-		} else if (result.numberOfSecondsUntilExpiration <= BUFFER_BEFORE_EXPIRATION) {
+		} else if (result.numberOfSecondsUntilExpiration <= bufferSeconds) {
 			console.log('[Token Check Worker] Token should be refreshed, but it is not expired yet.');
 			broadcastMessage({
 				command: 'refreshToken',
 				secondsUntilLogout: result.numberOfSecondsUntilExpiration,
 			});
 		}
-	}, VALIDATION_INTERVAL);
+	}, validationInterval);
 }

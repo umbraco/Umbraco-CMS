@@ -28,6 +28,9 @@ import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 const TOKEN_EXPIRY_MULTIPLIER = 4;
 
 interface UmbAuthSession {
+	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
+	accessTokenExpiresAt: number;
+	/** When the full session expires (issuedAt + expiresIn * MULTIPLIER). Used by the worker for timeout UI. */
 	expiresAt: number;
 }
 
@@ -139,7 +142,10 @@ export class UmbAuthContext extends UmbContextBase {
 					this.#authorizationSignal.next();
 					break;
 				case 'sessionUpdate':
-					this.#session.setValue({ expiresAt: evt.data.expiresAt });
+					this.#session.setValue({
+						accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
+						expiresAt: evt.data.expiresAt,
+					});
 					this.#isAuthorized.setValue(true);
 					break;
 				case 'sessionCleared':
@@ -347,12 +353,12 @@ export class UmbAuthContext extends UmbContextBase {
 	async getLatestToken(): Promise<string> {
 		const session = this.#session.getValue();
 
-		// If the session is still valid, return [redacted]
-		if (session && session.expiresAt > Math.floor(Date.now() / 1000)) {
+		// If the access token is still valid, return immediately
+		if (session && session.accessTokenExpiresAt > Math.floor(Date.now() / 1000)) {
 			return '[redacted]';
 		}
 
-		// Try to refresh
+		// Access token expired — try to refresh
 		const success = await this.makeRefreshTokenRequest();
 		if (!success) {
 			this.clearTokenStorage();
@@ -376,10 +382,14 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
+		// Capture session state before acquiring the lock so we can detect
+		// if another tab refreshed while we waited.
+		const sessionBeforeLock = this.#session.getValue();
+
 		return navigator.locks.request('umb:token-refresh', async () => {
-			// Check if another tab already refreshed while we waited for the lock
-			const session = this.#session.getValue();
-			if (session && session.expiresAt > Math.floor(Date.now() / 1000)) {
+			// If the session changed while we waited for the lock, another tab already refreshed
+			const currentSession = this.#session.getValue();
+			if (currentSession && currentSession !== sessionBeforeLock) {
 				return true;
 			}
 
@@ -602,14 +612,15 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Updates the in-memory session state and broadcasts to other tabs.
 	 */
 	#updateSession(expiresIn: number, issuedAt: number) {
+		const accessTokenExpiresAt = issuedAt + expiresIn;
 		// The access_token lives for 1/4 of the refresh_token lifetime.
 		// Multiply to get the full session expiry.
 		const expiresAt = issuedAt + expiresIn * TOKEN_EXPIRY_MULTIPLIER;
-		this.#session.setValue({ expiresAt });
+		this.#session.setValue({ accessTokenExpiresAt, expiresAt });
 		this.#isAuthorized.setValue(true);
 
 		// Broadcast the session update to other tabs
-		this.#channel.postMessage({ type: 'sessionUpdate', expiresAt });
+		this.#channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt, expiresAt });
 	}
 
 	/**
