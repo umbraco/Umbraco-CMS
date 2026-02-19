@@ -33,6 +33,9 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 	@state()
 	private _passwordPattern = '';
 
+	@state()
+	private _isLoadingConfig = true;
+
 	#userItemRepository = new UmbUserItemRepository(this);
 	#userConfigRepository = new UmbUserConfigRepository(this);
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
@@ -147,8 +150,16 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
 
-		// Clear any previous custom validity
-		if (this._newPasswordInput) {
+		// Prevent submission if configuration is still loading
+		if (this._isLoadingConfig || !this._passwordConfiguration) {
+			return;
+		}
+
+		// Re-validate to ensure validation state is current
+		const passwordError = this.#validatePassword(this._newPasswordInput?.value as string);
+		if (passwordError && this._newPasswordInput) {
+			this._newPasswordInput.setCustomValidity(passwordError);
+		} else if (this._newPasswordInput) {
 			this._newPasswordInput.setCustomValidity('');
 		}
 
@@ -159,14 +170,6 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 
 		const oldPassword = formData.get('oldPassword') as string;
 		const newPassword = formData.get('newPassword') as string;
-
-		// Validate password against pattern
-		const passwordError = this.#validatePassword(newPassword);
-		if (passwordError && this._newPasswordInput) {
-			this._newPasswordInput.setCustomValidity(passwordError);
-			this._newPasswordInput.checkValidity();
-			return;
-		}
 
 		this.value = { oldPassword, newPassword };
 		this.modalContext?.submit();
@@ -213,6 +216,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			}
 			pattern += `.{${passwordConfig.minimumPasswordLength ?? 10},}`;
 			this._passwordPattern = pattern;
+			this._isLoadingConfig = false;
 		});
 	}
 
@@ -298,6 +302,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 					form="ChangePasswordForm"
 					color="positive"
 					look="primary"
+					?disabled=${this._isLoadingConfig}
 					label=${this.localize.term('general_confirm')}></uui-button>
 			</uui-dialog-layout>
 		`;
