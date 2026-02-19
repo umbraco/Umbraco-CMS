@@ -83,26 +83,21 @@ export class UmbAppElement extends UmbLitElement {
 					return;
 				}
 
-				// Complete the authorization request, which will send the authorization signal
+				// Complete the authorization request (exchanges code, saves session, broadcasts to other tabs)
 				try {
 					const result = await this.#authContext.completeAuthorizationRequest();
 
 					if (result === null) {
-						// If the result is null, it could mean that no new token was required, so we can redirect the user
-						// This could happen if the user is already authorized or accidentally enters the oauth_complete url
+						// No authorization was pending — redirect the user
 						redirectToStoredPath(this.backofficePath, true);
 						return;
 					}
 
-					// If we are in the main window (i.e. no opener), we should redirect to the root after the authorization request is completed.
-					// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
-					// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
-					// If we are in the main window, the signal will be caught right here and the user will be redirected to their previous path (or root).
+					// If this is a popup window, the parent will handle navigation.
+					// The BroadcastChannel message already notified the parent.
 					if (hasOwnOpener(this.backofficePath)) return;
 
-					// Listen for the first authorization signal after the initial authorization request
-					await firstValueFrom(this.#authContext.authorizationSignal);
-					// When it hits, we should redirect the user to the backoffice
+					// For redirect flows (no popup), redirect to the stored path
 					redirectToStoredPath(this.backofficePath);
 				} catch {
 					(component as UmbAppOauthElement).failure = true;
@@ -230,7 +225,6 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
-	// TODO: move set initial auth state into auth context
 	async #setAuthStatus() {
 		if (this.bypassAuth) return;
 
@@ -238,15 +232,8 @@ export class UmbAppElement extends UmbLitElement {
 			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
 
-		// Get service configuration from authentication server
-		await this.#authContext?.setInitialState();
-
-		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
-		umbHttpClient.setConfig({
-			baseUrl: this.serverUrl,
-			credentials: 'include',
-			auth: () => this.#authContext!.getLatestToken(),
-		});
+		// Auth context configures umbHttpClient in its constructor, so we only need to set initial state
+		await this.#authContext.setInitialState();
 	}
 
 	#redirect() {
