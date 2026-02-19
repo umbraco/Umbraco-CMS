@@ -144,9 +144,6 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         return Task.FromResult(Attempt.Succeed(IndexRebuildResult.Success));
     }
 
-    /// <inheritdoc/>
-    public Task<bool> IsRebuildingAsync(string indexName) => Task.FromResult(false);
-
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
     private void RebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
