@@ -28,7 +28,7 @@ import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils
  */
 const TOKEN_EXPIRY_MULTIPLIER = 4;
 
-interface UmbAuthSession {
+export interface UmbAuthSession {
 	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
 	accessTokenExpiresAt: number;
 	/** When the full session expires (issuedAt + expiresIn * MULTIPLIER). Used by the worker for timeout UI. */
@@ -140,7 +140,6 @@ export class UmbAuthContext extends UmbContextBase {
 			authorizationEndpoint: `${serverUrl}/umbraco/management/api/v1/security/back-office/authorize`,
 			tokenEndpoint: `${serverUrl}/umbraco/management/api/v1/security/back-office/token`,
 			revocationEndpoint: `${serverUrl}/umbraco/management/api/v1/security/back-office/revoke`,
-			endSessionEndpoint: `${serverUrl}/umbraco/management/api/v1/security/back-office/signout`,
 			linkEndpoint: `${serverUrl}/umbraco/management/api/v1/security/back-office/link-login`,
 			linkKeyEndpoint: `${serverUrl}/umbraco/management/api/v1/security/back-office/link-login-key`,
 			unlinkEndpoint: `${serverUrl}/umbraco/management/api/v1/security/back-office/unlink-login`,
@@ -156,11 +155,15 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#channel = new BroadcastChannel('umb:auth');
 		this.#channel.onmessage = (evt: MessageEvent) => {
 			switch (evt.data?.type) {
-				case 'authorized':
-					this.#updateSession(evt.data.expiresIn, evt.data.issuedAt);
+				case 'authorized': {
+					// Set session locally — do NOT call #updateSession which would re-broadcast
+					const accessTokenExpiresAt = evt.data.issuedAt + evt.data.expiresIn;
+					const expiresAt = evt.data.issuedAt + evt.data.expiresIn * TOKEN_EXPIRY_MULTIPLIER;
+					this.#session.setValue({ accessTokenExpiresAt, expiresAt });
 					this.#isAuthorized.setValue(true);
 					this.#authorizationSignal.next();
 					break;
+				}
 				case 'sessionUpdate':
 					this.#session.setValue({
 						accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
@@ -335,7 +338,9 @@ export class UmbAuthContext extends UmbContextBase {
 			return null;
 		}
 
-		this.#updateSession(response.expiresIn, response.issuedAt);
+		// Set session locally — use #setSessionLocally (not #updateSession) to avoid
+		// broadcasting sessionUpdate AND authorized, which would cause a message storm.
+		this.#setSessionLocally(response.expiresIn, response.issuedAt);
 		this.#isAuthorized.setValue(true);
 
 		// Broadcast to all tabs that authorization is complete
@@ -438,7 +443,10 @@ export class UmbAuthContext extends UmbContextBase {
 		const expiryBeforeLock = this.#session.getValue()?.accessTokenExpiresAt;
 
 		return navigator.locks.request('umb:token-refresh', async () => {
-			// If the session's expiry changed while we waited, another tab already refreshed
+			// If the session's expiry changed while we waited, another tab already refreshed.
+			// This also works when expiryBeforeLock is undefined (first load): if another tab
+			// set a session via BroadcastChannel, currentExpiry becomes truthy and differs
+			// from undefined, so we correctly skip the redundant refresh.
 			const currentExpiry = this.#session.getValue()?.accessTokenExpiresAt;
 			if (currentExpiry && currentExpiry !== expiryBeforeLock) {
 				return true;
@@ -569,6 +577,8 @@ export class UmbAuthContext extends UmbContextBase {
 			auth: () => '[redacted]',
 		});
 
+		// Controller self-registers on the host via UmbControllerBase constructor,
+		// so the anonymous reference is intentional — lifecycle is managed by the host.
 		new UmbApiInterceptorController(this._host).bindDefaultInterceptors(client);
 	}
 
@@ -659,18 +669,29 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Updates the in-memory session state and broadcasts to other tabs.
+	 * Sets the in-memory session state without broadcasting.
+	 * Use when the caller handles broadcasting separately (e.g. completeAuthorizationRequest).
 	 */
-	#updateSession(expiresIn: number, issuedAt: number) {
+	#setSessionLocally(expiresIn: number, issuedAt: number) {
 		const accessTokenExpiresAt = issuedAt + expiresIn;
 		// The access_token lives for 1/4 of the refresh_token lifetime.
 		// Multiply to get the full session expiry.
 		const expiresAt = issuedAt + expiresIn * TOKEN_EXPIRY_MULTIPLIER;
 		this.#session.setValue({ accessTokenExpiresAt, expiresAt });
 		this.#isAuthorized.setValue(true);
+	}
 
-		// Broadcast the session update to other tabs
-		this.#channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt, expiresAt });
+	/**
+	 * Updates the in-memory session state and broadcasts to other tabs.
+	 */
+	#updateSession(expiresIn: number, issuedAt: number) {
+		this.#setSessionLocally(expiresIn, issuedAt);
+		const session = this.#session.getValue()!;
+		this.#channel.postMessage({
+			type: 'sessionUpdate',
+			accessTokenExpiresAt: session.accessTokenExpiresAt,
+			expiresAt: session.expiresAt,
+		});
 	}
 
 	/**

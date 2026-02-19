@@ -6,7 +6,6 @@ const TEST_ENDPOINTS: UmbAuthClientEndpoints = {
 	authorizationEndpoint: 'http://localhost/authorize',
 	tokenEndpoint: 'http://localhost/token',
 	revocationEndpoint: 'http://localhost/revoke',
-	endSessionEndpoint: 'http://localhost/signout',
 	linkEndpoint: 'http://localhost/link-login',
 	linkKeyEndpoint: 'http://localhost/link-login-key',
 	unlinkEndpoint: 'http://localhost/unlink-login',

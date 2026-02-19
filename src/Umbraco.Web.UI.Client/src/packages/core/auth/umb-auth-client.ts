@@ -34,7 +34,6 @@ export interface UmbAuthClientEndpoints {
 	authorizationEndpoint: string;
 	tokenEndpoint: string;
 	revocationEndpoint: string;
-	endSessionEndpoint: string;
 	linkEndpoint: string;
 	linkKeyEndpoint: string;
 	unlinkEndpoint: string;
@@ -80,7 +79,7 @@ export class UmbAuthClient {
 	 */
 	async buildAuthorizationUrl(identityProvider: string, usernameHint?: string): Promise<string> {
 		this.#codeVerifier = generateRandom(128);
-		this.#state = generateRandom(10);
+		this.#state = generateRandom(32);
 		const codeChallenge = await deriveChallenge(this.#codeVerifier);
 
 		/* eslint-disable @typescript-eslint/naming-convention */
@@ -130,6 +129,10 @@ export class UmbAuthClient {
 
 	/**
 	 * Refreshes the session using the httpOnly refresh token cookie.
+	 * The `refresh_token` body parameter is `[redacted]` because the server's
+	 * `HideBackOfficeTokensHandler` intercepts the request and swaps it for
+	 * the real token from the httpOnly cookie. The parameter must be present
+	 * (OpenIddict's pipeline requires it) but the value is ignored by the handler.
 	 */
 	async refreshToken(): Promise<UmbTokenEndpointResponse | undefined> {
 		/* eslint-disable @typescript-eslint/naming-convention */
@@ -137,7 +140,6 @@ export class UmbAuthClient {
 			client_id: this.#clientId,
 			redirect_uri: this.#redirectUri,
 			grant_type: 'refresh_token',
-			// refresh_token value is in the httpOnly cookie — server reads it from there
 			refresh_token: '[redacted]',
 		});
 		/* eslint-enable @typescript-eslint/naming-convention */
