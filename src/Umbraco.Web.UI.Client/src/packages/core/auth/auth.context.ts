@@ -336,11 +336,9 @@ export class UmbAuthContext extends UmbContextBase {
 		}
 
 		// Try a token refresh to establish session timing.
-		// The httpOnly cookie carries the real refresh token.
-		const response = await this.#client.refreshToken();
-		if (response) {
-			this.#updateSession(response.expiresIn, response.issuedAt);
-		}
+		// Uses the Web Lock so concurrent calls (from API requests via getLatestToken)
+		// are deduplicated — only one actual /token call is made.
+		await this.makeRefreshTokenRequest();
 	}
 
 	/**
