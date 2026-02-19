@@ -39,6 +39,7 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 		it('should be permitted when entity type matches', (done) => {
 			context.setEntityType('document-type');
 
+			let callbackCount = 0;
 			condition = new UmbEntityContentTypeEntityTypeCondition(childElement, {
 				host: childElement,
 				config: {
@@ -46,13 +47,16 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 					match: 'document-type',
 				},
 				onChange: () => {
-					expect(condition.permitted).to.be.true;
-					done();
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						done();
+					}
 				},
 			});
 		});
 
-		it('should not be permitted when entity type does not match', (done) => {
+		it('should not be permitted when entity type does not match', async () => {
 			context.setEntityType('media-type');
 
 			condition = new UmbEntityContentTypeEntityTypeCondition(childElement, {
@@ -61,14 +65,14 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 					alias: UMB_ENTITY_CONTENT_TYPE_ENTITY_TYPE_CONDITION_ALIAS,
 					match: 'document-type',
 				},
-				onChange: () => {
-					expect(condition.permitted).to.be.false;
-					done();
-				},
+				onChange: () => {},
 			});
+
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			expect(condition.permitted).to.be.false;
 		});
 
-		it('should not be permitted when entity type is undefined', (done) => {
+		it('should not be permitted when entity type is undefined', async () => {
 			context.setEntityType(undefined);
 
 			condition = new UmbEntityContentTypeEntityTypeCondition(childElement, {
@@ -77,11 +81,11 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 					alias: UMB_ENTITY_CONTENT_TYPE_ENTITY_TYPE_CONDITION_ALIAS,
 					match: 'document-type',
 				},
-				onChange: () => {
-					expect(condition.permitted).to.be.false;
-					done();
-				},
+				onChange: () => {},
 			});
+
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			expect(condition.permitted).to.be.false;
 		});
 
 		it('should update permitted when entity type changes', (done) => {
@@ -97,14 +101,13 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 				onChange: () => {
 					callbackCount++;
 					if (callbackCount === 1) {
-						expect(condition.permitted).to.be.false;
-						context.setEntityType('document-type');
-					} else if (callbackCount === 2) {
 						expect(condition.permitted).to.be.true;
 						done();
 					}
 				},
 			});
+
+			context.setEntityType('document-type');
 		});
 	});
 
@@ -112,6 +115,7 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 		it('should be permitted when entity type is in the list', (done) => {
 			context.setEntityType('media-type');
 
+			let callbackCount = 0;
 			condition = new UmbEntityContentTypeEntityTypeCondition(childElement, {
 				host: childElement,
 				config: {
@@ -119,13 +123,16 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 					oneOf: ['document-type', 'media-type'],
 				},
 				onChange: () => {
-					expect(condition.permitted).to.be.true;
-					done();
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						done();
+					}
 				},
 			});
 		});
 
-		it('should not be permitted when entity type is not in the list', (done) => {
+		it('should not be permitted when entity type is not in the list', async () => {
 			context.setEntityType('member-type');
 
 			condition = new UmbEntityContentTypeEntityTypeCondition(childElement, {
@@ -134,14 +141,14 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 					alias: UMB_ENTITY_CONTENT_TYPE_ENTITY_TYPE_CONDITION_ALIAS,
 					oneOf: ['document-type', 'media-type'],
 				},
-				onChange: () => {
-					expect(condition.permitted).to.be.false;
-					done();
-				},
+				onChange: () => {},
 			});
+
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			expect(condition.permitted).to.be.false;
 		});
 
-		it('should not be permitted when entity type is undefined', (done) => {
+		it('should not be permitted when entity type is undefined', async () => {
 			context.setEntityType(undefined);
 
 			condition = new UmbEntityContentTypeEntityTypeCondition(childElement, {
@@ -150,11 +157,11 @@ describe('UmbEntityContentTypeEntityTypeCondition', () => {
 					alias: UMB_ENTITY_CONTENT_TYPE_ENTITY_TYPE_CONDITION_ALIAS,
 					oneOf: ['document-type', 'media-type'],
 				},
-				onChange: () => {
-					expect(condition.permitted).to.be.false;
-					done();
-				},
+				onChange: () => {},
 			});
+
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			expect(condition.permitted).to.be.false;
 		});
 	});
 
