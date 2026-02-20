@@ -407,6 +407,10 @@ public static partial class StringExtensions
     public static string StripHtml(this string text, string replacement)
     {
         var stripped = StringHtmlRegex().Replace(text, replacement);
+        if (replacement == string.Empty)
+        {
+            return stripped;
+        }
         return Regex.Replace(stripped, Regex.Escape(replacement) + "{2,}", replacement).Trim();
     }
 
