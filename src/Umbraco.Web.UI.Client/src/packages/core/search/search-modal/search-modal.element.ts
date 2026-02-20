@@ -17,8 +17,6 @@ import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/b
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
-
 import '../search-result/search-result-item.element.js';
 import { UMB_BACKOFFICE_CONTEXT } from '../../../../apps/backoffice/backoffice.context.js';
 
@@ -127,7 +125,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 						name: controller.manifest.meta?.label || controller.manifest.name,
 						api: searchApi,
 						alias: controller.alias,
-						sectionAlias: this.#extractSectionAlias(controller.manifest.conditions),
+						sectionAlias: controller.manifest.meta?.sectionAlias,
 					};
 
 					globalSearch.push(searcher);
@@ -137,16 +135,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 			this._globalSearchers = globalSearch;
 			this.#updateDefaultSearcher();
 		});
-	}
-
-	#extractSectionAlias(conditions?: UmbExtensionConditionConfig[]): string | undefined {
-		if (!conditions) return undefined;
-		const sectionCondition = conditions.find((c) => c.alias === UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS);
-		if (sectionCondition && 'match' in sectionCondition && typeof sectionCondition.match === 'string') {
-			return sectionCondition.match;
-		}
-
-		return undefined;
 	}
 
 	#updateDefaultSearcher() {
