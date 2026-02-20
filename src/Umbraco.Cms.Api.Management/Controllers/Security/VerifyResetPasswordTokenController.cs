@@ -30,6 +30,8 @@ public class VerifyResetPasswordTokenController : SecurityControllerBase
     [ProducesResponseType(typeof(VerifyResetPasswordResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Verifies a password reset token.")]
+    [EndpointDescription("Verifies the provided password reset token for the specified user.")]
     [UserPasswordEnsureMinimumResponseTime]
     public async Task<IActionResult> VerifyResetPasswordToken(
         CancellationToken cancellationToken,

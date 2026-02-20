@@ -198,4 +198,111 @@ public partial class StringExtensionsTests
         var result = input.ToSingleLine();
         Assert.AreEqual(expected, result);
     }
+
+    [TestCase("hello", 10, "...", "hello")] // shorter than limit
+    [TestCase("hello", 5, "...", "hello")] // exactly at limit
+    [TestCase("hello world", 8, "...", "hello...")]  // truncated with default suffix
+    [TestCase("hello world", 8, "..", "hello..")]  // trailing space trimmed before suffix
+    [TestCase("hello world", 5, "...", "he...")] // tight truncation
+    [TestCase("hello world", 11, "...", "hello world")] // exactly at limit
+    [TestCase("hello world", 12, "...", "hello world")] // longer than text
+    [TestCase("hello world", 0, "...", "hello world")] // zero maxLength returns original
+    [TestCase("hello world", -1, "...", "hello world")] // negative maxLength returns original
+    [TestCase("hello world", 3, "...", "hello world")] // maxLength equal to suffix length returns original
+    [TestCase("hello world", 2, "...", "hello world")] // maxLength less than suffix length returns original
+    [TestCase("hello world", 4, "...", "h...")] // maxLength just above suffix length
+    [TestCase("hello   world", 10, "...", "hello...")] // trailing spaces trimmed before suffix
+    public void Truncate_ReturnsExpectedResult(string input, int maxLength, string suffix, string expected)
+    {
+        var result = input.Truncate(maxLength, suffix);
+        Assert.AreEqual(expected, result);
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Short_String_Returns_Unchanged()
+    {
+        var result = "hello world".TruncateWithUniqueHash(50);
+
+        Assert.AreEqual("hello world", result);
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Exactly_At_Limit_Returns_Unchanged()
+    {
+        var text = new string('x', 50);
+
+        var result = text.TruncateWithUniqueHash(50);
+
+        Assert.AreEqual(text, result);
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Exceeds_Limit_Truncates_To_Max_Length()
+    {
+        var text = new string('x', 51);
+
+        var result = text.TruncateWithUniqueHash(50);
+
+        Assert.That(result.Length, Is.EqualTo(50));
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Exceeds_Limit_Ends_With_Hash_Suffix()
+    {
+        var text = new string('x', 100);
+
+        var result = text.TruncateWithUniqueHash(50);
+
+        // Last 9 chars should be "-" + 8 hex digits.
+        Assert.That(result[^9], Is.EqualTo('-'));
+        Assert.That(result[^8..], Does.Match("^[0-9a-f]{8}$"));
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Preserves_Readable_Prefix()
+    {
+        var text = "RebuildExamineIndex-MyCustomIndex" + new string('x', 200);
+
+        var result = text.TruncateWithUniqueHash(50);
+
+        Assert.That(result, Does.StartWith("RebuildExamineIndex-MyCustomIndex"));
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Different_Inputs_Produce_Different_Results()
+    {
+        var textA = new string('a', 100);
+        var textB = new string('b', 100);
+
+        var resultA = textA.TruncateWithUniqueHash(50);
+        var resultB = textB.TruncateWithUniqueHash(50);
+
+        Assert.AreNotEqual(resultA, resultB);
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Inputs_Sharing_Prefix_Produce_Different_Results()
+    {
+        var sharedPrefix = new string('x', 100);
+        var textA = sharedPrefix + "_alpha";
+        var textB = sharedPrefix + "_bravo";
+
+        var resultA = textA.TruncateWithUniqueHash(50);
+        var resultB = textB.TruncateWithUniqueHash(50);
+
+        Assert.That(resultA.Length, Is.EqualTo(50));
+        Assert.That(resultB.Length, Is.EqualTo(50));
+        Assert.AreNotEqual(resultA, resultB);
+    }
+
+    [Test]
+    public void TruncateWithUniqueHash_Same_Input_Is_Deterministic()
+    {
+        var text = new string('z', 100);
+
+        var result1 = text.TruncateWithUniqueHash(50);
+        var result2 = text.TruncateWithUniqueHash(50);
+
+        Assert.AreEqual(result1, result2);
+    }
 }

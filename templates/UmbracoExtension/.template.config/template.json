@@ -22,21 +22,6 @@
   "defaultName": "Umbraco.Extension",
   "preferNameDirectory": true,
   "symbols": {
-    "Framework": {
-      "displayName": "Framework",
-      "description": "The target framework for the project.",
-      "type": "parameter",
-      "datatype": "choice",
-      "choices": [
-        {
-          "displayName": ".NET 9.0",
-          "description": "Target net9.0",
-          "choice": "net9.0"
-        }
-      ],
-      "defaultValue": "net9.0",
-      "replaces": "net9.0"
-    },
     "UmbracoVersion": {
       "displayName": "Umbraco version",
       "description": "The version of Umbraco.Cms to add as PackageReference. By default it installs the latest non pre-release version",

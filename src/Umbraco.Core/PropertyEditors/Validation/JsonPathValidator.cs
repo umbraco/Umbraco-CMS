@@ -1,10 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 
+/// <summary>
+/// Provides utility methods for extracting JSON path validation errors from validation results.
+/// </summary>
 internal static class JsonPathValidator
 {
+    /// <summary>
+    /// Extracts JSON path validation errors from the specified validation result.
+    /// </summary>
+    /// <param name="validationResult">The validation result to extract errors from.</param>
+    /// <returns>A collection of JSON path validation errors.</returns>
     public static IEnumerable<JsonPathValidationError> ExtractJsonPathValidationErrors(ValidationResult validationResult)
     {
         var root = new JsonPathValidationTreeItem { JsonPath = string.Empty };

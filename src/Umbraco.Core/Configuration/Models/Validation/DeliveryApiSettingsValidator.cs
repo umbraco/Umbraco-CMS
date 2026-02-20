@@ -14,6 +14,10 @@ public class DeliveryApiSettingsValidator : IValidateOptions<DeliveryApiSettings
 {
     private readonly ILogger<DeliveryApiSettingsValidator> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DeliveryApiSettingsValidator" /> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
     public DeliveryApiSettingsValidator(ILogger<DeliveryApiSettingsValidator> logger)
         => _logger = logger;
 

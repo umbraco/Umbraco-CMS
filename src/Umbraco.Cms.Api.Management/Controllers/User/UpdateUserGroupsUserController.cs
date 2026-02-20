@@ -35,6 +35,8 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
     [HttpPost("set-user-groups")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Updates user group assignments.")]
+    [EndpointDescription("Updates the user group assignments for the specified users.")]
     public async Task<IActionResult> UpdateUserGroups(
         CancellationToken cancellationToken,
         UpdateUserGroupsOnUserRequestModel requestModel)

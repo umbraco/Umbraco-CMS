@@ -35,6 +35,8 @@ public class InviteUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Invites new users.")]
+    [EndpointDescription("Sends invitation emails to create new user accounts with the specified details.")]
     public async Task<IActionResult> Invite(CancellationToken cancellationToken, InviteUserRequestModel model)
     {
         UserInviteModel userInvite = await _userPresentationFactory.CreateInviteModelAsync(model);

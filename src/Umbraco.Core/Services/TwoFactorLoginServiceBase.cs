@@ -15,6 +15,12 @@ internal abstract class TwoFactorLoginServiceBase
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IDictionary<string, ITwoFactorProvider> _twoFactorSetupGenerators;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TwoFactorLoginServiceBase" /> class.
+    /// </summary>
+    /// <param name="twoFactorLoginService">The two-factor login service for managing 2FA data.</param>
+    /// <param name="twoFactorSetupGenerators">The collection of two-factor providers.</param>
+    /// <param name="scopeProvider">The scope provider for unit of work operations.</param>
     protected TwoFactorLoginServiceBase(ITwoFactorLoginService twoFactorLoginService, IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators, ICoreScopeProvider scopeProvider)
     {
         _twoFactorLoginService = twoFactorLoginService;
@@ -22,6 +28,12 @@ internal abstract class TwoFactorLoginServiceBase
         _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x => x.ProviderName);
     }
 
+    /// <summary>
+    ///     Disables two-factor authentication for the specified user and provider.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="providerName">The name of the two-factor provider to disable.</param>
+    /// <returns>An attempt result indicating success or failure with the operation status.</returns>
     public virtual async Task<Attempt<TwoFactorOperationStatus>> DisableAsync(Guid userKey, string providerName)
     {
         var result = await _twoFactorLoginService.DisableAsync(userKey, providerName);
@@ -49,6 +61,12 @@ internal abstract class TwoFactorLoginServiceBase
     /// <returns>The random secret</returns>
     protected virtual string GenerateSecret() => Guid.NewGuid().ToString();
 
+    /// <summary>
+    ///     Gets the setup information for enabling two-factor authentication.
+    /// </summary>
+    /// <param name="userOrMemberKey">The unique key of the user or member.</param>
+    /// <param name="providerName">The name of the two-factor provider.</param>
+    /// <returns>An attempt result containing the setup model and operation status.</returns>
     public virtual async Task<Attempt<ISetupTwoFactorModel, TwoFactorOperationStatus>> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
     {
         var secret = await _twoFactorLoginService.GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
@@ -70,6 +88,14 @@ internal abstract class TwoFactorLoginServiceBase
         return Attempt.SucceedWithStatus(TwoFactorOperationStatus.Success, result);
     }
 
+    /// <summary>
+    ///     Validates the two-factor code and saves the provider configuration if valid.
+    /// </summary>
+    /// <param name="providerName">The name of the two-factor provider.</param>
+    /// <param name="userOrMemberKey">The unique key of the user or member.</param>
+    /// <param name="secret">The secret key for the provider.</param>
+    /// <param name="code">The verification code to validate.</param>
+    /// <returns>An attempt result indicating success or failure with the operation status.</returns>
     public virtual async Task<Attempt<TwoFactorOperationStatus>> ValidateAndSaveAsync(
         string providerName,
         Guid userOrMemberKey,
@@ -114,8 +140,12 @@ internal abstract class TwoFactorLoginServiceBase
     }
 
     /// <summary>
-    /// Disables 2FA with Code.
+    ///     Disables two-factor authentication by validating a code.
     /// </summary>
+    /// <param name="providerName">The name of the two-factor provider.</param>
+    /// <param name="userOrMemberKey">The unique key of the user or member.</param>
+    /// <param name="code">The verification code to validate before disabling.</param>
+    /// <returns>An attempt result indicating success or failure with the operation status.</returns>
     public async Task<Attempt<TwoFactorOperationStatus>> DisableByCodeAsync(string providerName, Guid userOrMemberKey, string code)
     {
         var secret = await _twoFactorLoginService.GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);

@@ -34,6 +34,8 @@ public class RootStylesheetTreeController : StylesheetTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of stylesheet items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of stylesheet items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models.Blocks;
+namespace Umbraco.Cms.Core.Models.Blocks;
 
+/// <summary>
+///     Base class for block layout items.
+/// </summary>
 public abstract class BlockLayoutItemBase : IBlockLayoutItem
 {
     private Guid? _contentKey;
@@ -8,7 +11,8 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     private Udi? _contentUdi;
     private Udi? _settingsUdi;
 
-    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+    /// <inheritdoc />
+    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? ContentUdi
     {
         get => _contentUdi;
@@ -24,7 +28,8 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
         }
     }
 
-    [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+    /// <inheritdoc />
+    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? SettingsUdi
     {
         get => _settingsUdi;
@@ -40,28 +45,42 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
         }
     }
 
+    /// <inheritdoc />
     public Guid ContentKey
     {
         get => _contentKey ?? throw new InvalidOperationException("ContentKey has not yet been initialized");
         set => _contentKey = value;
     }
 
+    /// <inheritdoc />
     public Guid? SettingsKey
     {
         get => _settingsKey;
         set => _settingsKey = value;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
+    /// </summary>
     protected BlockLayoutItemBase()
     { }
 
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
+    /// </summary>
+    /// <param name="contentUdi">The content UDI.</param>
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     protected BlockLayoutItemBase(Udi contentUdi)
         : this((contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)))
     {
     }
 
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
+    /// </summary>
+    /// <param name="contentUdi">The content UDI.</param>
+    /// <param name="settingsUdi">The settings UDI.</param>
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     protected BlockLayoutItemBase(Udi contentUdi, Udi settingsUdi)
         : this(
             (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
@@ -69,12 +88,21 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
+    /// </summary>
+    /// <param name="contentKey">The content key.</param>
     protected BlockLayoutItemBase(Guid contentKey)
     {
         ContentKey = contentKey;
         ContentUdi = new GuidUdi(Constants.UdiEntityType.Element, contentKey);
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
+    /// </summary>
+    /// <param name="contentKey">The content key.</param>
+    /// <param name="settingsKey">The settings key.</param>
     protected BlockLayoutItemBase(Guid contentKey, Guid settingsKey)
         : this(contentKey)
     {
@@ -82,9 +110,11 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
         SettingsUdi = new GuidUdi(Constants.UdiEntityType.Element, settingsKey);
     }
 
+    /// <inheritdoc />
     public virtual bool ReferencesContent(Guid key)
         => ContentKey == key;
 
+    /// <inheritdoc />
     public virtual bool ReferencesSetting(Guid key)
         => SettingsKey == key;
 }

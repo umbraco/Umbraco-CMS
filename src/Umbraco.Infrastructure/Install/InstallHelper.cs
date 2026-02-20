@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Install
 {
-    [Obsolete("InstallHelper is no longer used internally and will be removed in Umbraco 19.")]
+    [Obsolete("InstallHelper is no longer used internally. Scheduled for removal in Umbraco 19.")]
     public sealed class InstallHelper
     {
 
@@ -30,9 +30,9 @@ namespace Umbraco.Cms.Infrastructure.Install
         }
 
         /// <summary>
-        ///     This method used to send installer telemetry to Our.Umbraco.com but no longer does anything and will be removed in Umbraco 19.
+        ///     This method used to send installer telemetry to Our.Umbraco.com but no longer does anything. Scheduled for removal in Umbraco 19.
         /// </summary>
-        [Obsolete("SetInstallStatusAsync no longer has any function and will be removed in Umbraco 19.")]
+        [Obsolete("SetInstallStatusAsync no longer has any function. Scheduled for removal in Umbraco 19.")]
         public Task SetInstallStatusAsync(bool isCompleted, string errorMsg) => Task.CompletedTask;
     }
 }

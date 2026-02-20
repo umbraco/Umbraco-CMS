@@ -3,17 +3,28 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+///     Implements <see cref="IValueEditorCache" /> to cache <see cref="IDataValueEditor" /> instances.
+/// </summary>
+/// <remarks>
+///     This cache stores value editors keyed by data editor alias and data type ID to avoid
+///     repeatedly creating value editor instances during request processing.
+/// </remarks>
 public class ValueEditorCache : IValueEditorCache
 {
     private readonly Lock _dictionaryLocker;
     private readonly Dictionary<string, Dictionary<int, IDataValueEditor>> _valueEditorCache;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ValueEditorCache" /> class.
+    /// </summary>
     public ValueEditorCache()
     {
         _valueEditorCache = new Dictionary<string, Dictionary<int, IDataValueEditor>>();
         _dictionaryLocker = new Lock();
     }
 
+    /// <inheritdoc />
     public IDataValueEditor GetValueEditor(IDataEditor editor, IDataType dataType)
     {
         // Lock just in case multiple threads uses the cache at the same time.
@@ -41,6 +52,7 @@ public class ValueEditorCache : IValueEditorCache
         }
     }
 
+    /// <inheritdoc />
     public void ClearCache(IEnumerable<int> dataTypeIds)
     {
         lock (_dictionaryLocker)

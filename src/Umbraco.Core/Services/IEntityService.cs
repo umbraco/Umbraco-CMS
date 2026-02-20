@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for working with entities across Umbraco, including content, media, members, and other entity types.
+/// </summary>
 public interface IEntityService
 {
     /// <summary>
@@ -237,6 +240,12 @@ public interface IEntityService
     /// <param name="objectType">The object type of the children.</param>
     IEnumerable<IEntitySlim> GetChildren(int id, UmbracoObjectTypes objectType);
 
+    /// <summary>
+    ///     Gets the children of an entity.
+    /// </summary>
+    /// <param name="key">The unique key of the parent entity, or null for root level entities.</param>
+    /// <param name="objectType">The object type of the children.</param>
+    /// <returns>An enumerable collection of child entities.</returns>
     IEnumerable<IEntitySlim> GetChildren(Guid? key, UmbracoObjectTypes objectType)
     {
         return Array.Empty<IEntitySlim>();
@@ -255,6 +264,17 @@ public interface IEntityService
     /// <param name="objectType">The object type of the descendants.</param>
     IEnumerable<IEntitySlim> GetDescendants(int id, UmbracoObjectTypes objectType);
 
+    /// <summary>
+    ///     Gets children of an entity with paging support.
+    /// </summary>
+    /// <param name="parentKey">The unique key of the parent entity, or null for root level entities.</param>
+    /// <param name="childObjectType">The object type of the children.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    /// <param name="totalRecords">Outputs the total number of records.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
+    /// <param name="ordering">The ordering to apply to the children.</param>
+    /// <returns>An enumerable collection of child entities.</returns>
     IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         UmbracoObjectTypes childObjectType,
@@ -273,6 +293,18 @@ public interface IEntityService
             filter,
             ordering);
 
+    /// <summary>
+    ///     Gets children of an entity with paging support, filtering by parent object types.
+    /// </summary>
+    /// <param name="parentKey">The unique key of the parent entity, or null for root level entities.</param>
+    /// <param name="parentObjectTypes">The object types of the parent entities.</param>
+    /// <param name="childObjectType">The object type of the children.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    /// <param name="totalRecords">Outputs the total number of records.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
+    /// <param name="ordering">The ordering to apply to the children.</param>
+    /// <returns>An enumerable collection of child entities.</returns>
     IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         IEnumerable<UmbracoObjectTypes> parentObjectTypes,
@@ -287,6 +319,19 @@ public interface IEntityService
         return Array.Empty<IEntitySlim>();
     }
 
+    /// <summary>
+    ///     Gets children of an entity with paging support, filtering by parent and child object types and trashed state.
+    /// </summary>
+    /// <param name="parentKey">The unique key of the parent entity, or null for root level entities.</param>
+    /// <param name="parentObjectTypes">The object types of the parent entities.</param>
+    /// <param name="childObjectTypes">The object types of the children.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    /// <param name="trashed">A value indicating whether to include trashed entities.</param>
+    /// <param name="totalRecords">Outputs the total number of records.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
+    /// <param name="ordering">The ordering to apply to the children.</param>
+    /// <returns>An enumerable collection of child entities.</returns>
     IEnumerable<IEntitySlim> GetPagedChildren(
         Guid? parentKey,
         IEnumerable<UmbracoObjectTypes> parentObjectTypes,
