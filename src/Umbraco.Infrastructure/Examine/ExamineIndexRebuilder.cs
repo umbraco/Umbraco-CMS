@@ -78,7 +78,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
                     // Do not flow AsyncLocal to the child thread
                     using (ExecutionContext.SuppressFlow())
                     {
-                        Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken));
+                        Task.Run(() => RebuildIndexCoreAsync(indexName, delay.Value, cancellationToken));
 
                         // immediately return so the queue isn't waiting.
                         return Task.CompletedTask;
@@ -87,48 +87,41 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         }
         else
         {
-            RebuildIndex(indexName, delay.Value, CancellationToken.None);
+            RebuildIndexCoreAsync(indexName, delay.Value, CancellationToken.None).GetAwaiter().GetResult();
         }
     }
 
     /// <inheritdoc/>
-    public virtual Task<Attempt<IndexRebuildResult>> RebuildIndexAsync(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
+    public virtual async Task<Attempt<IndexRebuildResult>> RebuildIndexAsync(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
         if (!CanRun())
         {
-            return Task.FromResult(Attempt.Fail(IndexRebuildResult.NotAllowedToRun));
+            return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
         if (!_examineManager.TryGetIndex(indexName, out IIndex index))
         {
-            return Task.FromResult(Attempt.Fail(IndexRebuildResult.Unknown));
+            return Attempt.Fail(IndexRebuildResult.Unknown);
         }
 
         if (!HasRegisteredPopulator(index))
         {
-            return Task.FromResult(Attempt.Fail(IndexRebuildResult.Unknown));
+            return Attempt.Fail(IndexRebuildResult.Unknown);
         }
 
         if (useBackgroundThread)
         {
             _logger.LogInformation("Starting async background thread for rebuilding index {indexName}.", indexName);
 
-            _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
-            {
-                if (delay > TimeSpan.Zero)
-                {
-                    await Task.Delay(delay.Value, cancellationToken);
-                }
-
-                RebuildIndex(indexName, TimeSpan.Zero, cancellationToken);
-            });
+            _backgroundTaskQueue.QueueBackgroundWorkItem(
+                ct => RebuildIndexCoreAsync(indexName, delay ?? TimeSpan.Zero, ct));
         }
         else
         {
-            RebuildIndex(indexName, delay ?? TimeSpan.Zero, CancellationToken.None);
+            await RebuildIndexCoreAsync(indexName, delay ?? TimeSpan.Zero, CancellationToken.None);
         }
 
-        return Task.FromResult(Attempt.Succeed(IndexRebuildResult.Success));
+        return Attempt.Succeed(IndexRebuildResult.Success);
     }
 
     /// <inheritdoc/>
@@ -160,7 +153,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
                     {
                         // This is a fire/forget task spawned by the background thread queue (which means we
                         // don't need to worry about ExecutionContext flowing).
-                        Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
+                        Task.Run(() => RebuildIndexesCoreAsync(onlyEmptyIndexes, delay.Value, cancellationToken));
 
                         // immediately return so the queue isn't waiting.
                         return Task.CompletedTask;
@@ -169,41 +162,34 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         }
         else
         {
-            RebuildIndexes(onlyEmptyIndexes, delay.Value, CancellationToken.None);
+            RebuildIndexesCoreAsync(onlyEmptyIndexes, delay.Value, CancellationToken.None).GetAwaiter().GetResult();
         }
     }
 
     /// <inheritdoc/>
-    public virtual Task<Attempt<IndexRebuildResult>> RebuildIndexesAsync(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
+    public virtual async Task<Attempt<IndexRebuildResult>> RebuildIndexesAsync(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
         if (!CanRun())
         {
-            return Task.FromResult(Attempt.Fail(IndexRebuildResult.NotAllowedToRun));
+            return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
         if (useBackgroundThread)
         {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug($"Queuing background job for {nameof(RebuildIndexes)}.");
             }
 
-            _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
-            {
-                if (delay > TimeSpan.Zero)
-                {
-                    await Task.Delay(delay.Value, cancellationToken);
-                }
-
-                RebuildIndexes(onlyEmptyIndexes, TimeSpan.Zero, cancellationToken);
-            });
+            _backgroundTaskQueue.QueueBackgroundWorkItem(
+                ct => RebuildIndexesCoreAsync(onlyEmptyIndexes, delay ?? TimeSpan.Zero, ct));
         }
         else
         {
-            RebuildIndexes(onlyEmptyIndexes, delay ?? TimeSpan.Zero, CancellationToken.None);
+            await RebuildIndexesCoreAsync(onlyEmptyIndexes, delay ?? TimeSpan.Zero, CancellationToken.None);
         }
 
-        return Task.FromResult(Attempt.Succeed(IndexRebuildResult.Success));
+        return Attempt.Succeed(IndexRebuildResult.Success);
     }
 
     /// <inheritdoc/>
@@ -212,11 +198,11 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
-    private void RebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
+    private async Task RebuildIndexCoreAsync(string indexName, TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
-            Thread.Sleep(delay);
+            await Task.Delay(delay, cancellationToken);
         }
 
         if (!_rebuilding.TryAdd(indexName, 0))
@@ -249,11 +235,11 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         }
     }
 
-    private void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
+    private async Task RebuildIndexesCoreAsync(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
-            Thread.Sleep(delay);
+            await Task.Delay(delay, cancellationToken);
         }
 
         if (!_rebuilding.TryAdd(RebuildAllKey, 0))
