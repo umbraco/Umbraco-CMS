@@ -1,5 +1,7 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
+using WebhookDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
@@ -41,6 +44,10 @@ public class UmbracoDbContext : DbContext
     { }
 
     public required DbSet<WebhookDto> Webhooks { get; set; }
+
+    public required DbSet<LastSyncedDto> LastSynced { get; set; }
+
+    public required DbSet<CacheInstructionDto> CacheInstructions { get; set; }
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
@@ -100,5 +107,25 @@ public class UmbracoDbContext : DbContext
         base.OnConfiguring(optionsBuilder);
 
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    }
+
+    /// <summary>
+    /// A Update or Insert helper. If there's nothing to update, this method inserts.
+    /// </summary>
+    /// <param name="dto">The specific DTO to be Upserted.</param>
+    /// <param name="updateMethod">The specific update method, should return an int of rows affected.</param>
+    /// <typeparam name="TDto">The DTO Type.</typeparam>
+    public async Task UpsertAsync<TDto>(
+        TDto dto,
+        Func<Task<int>> updateMethod)
+        where TDto : class
+    {
+        var rowsAffected = await updateMethod();
+
+        if (rowsAffected == 0)
+        {
+            await Set<TDto>().AddAsync(dto);
+            await SaveChangesAsync();
+        }
     }
 }

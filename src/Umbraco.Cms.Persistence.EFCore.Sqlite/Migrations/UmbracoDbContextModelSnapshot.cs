@@ -225,6 +225,61 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.ToTable("umbracoOpenIddictTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.CacheInstructionDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<int>("InstructionCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1)
+                        .HasColumnName("instructionCount");
+
+                    b.Property<string>("Instructions")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("jsonInstruction");
+
+                    b.Property<string>("OriginIdentity")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("originated");
+
+                    b.Property<DateTime>("UtcStamp")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("utcStamp");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("umbracoCacheInstruction", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LastSyncedDto", b =>
+                {
+                    b.Property<string>("MachineId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("machineId");
+
+                    b.Property<DateTime>("LastSyncedDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("lastSyncedDate");
+
+                    b.Property<int?>("LastSyncedExternalId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("LastSyncedInternalId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("lastSyncedInternalId");
+
+                    b.HasKey("MachineId");
+
+                    b.ToTable("umbracoLastSynced", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
                 {
                     b.Property<int>("WebhookId")

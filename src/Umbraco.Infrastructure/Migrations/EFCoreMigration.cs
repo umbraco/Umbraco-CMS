@@ -7,4 +7,5 @@ public enum EFCoreMigration
     UpdateOpenIddictToV5 = 2,
     UpdateOpenIddictToV7 = 3,
     AddWebhookDto = 4,
+    AddLastSyncedDto = 5,
 }

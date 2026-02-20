@@ -1,106 +1,110 @@
-using NPoco;
+using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <inheritdoc cref="ILastSyncedRepository"/>
-public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
+public class LastSyncedRepository : AsyncRepositoryBase, ILastSyncedRepository
 {
     private readonly IMachineInfoFactory _machineInfoFactory;
 
-    public LastSyncedRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, IMachineInfoFactory machineInfoFactory)
-        : base(scopeAccessor, appCaches)
-    {
+    public LastSyncedRepository(IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor, AppCaches appCaches, IMachineInfoFactory machineInfoFactory)
+        : base(scopeAccessor, appCaches) =>
         _machineInfoFactory = machineInfoFactory;
-    }
 
 
     /// <inheritdoc />
     public async Task<int?> GetInternalIdAsync()
     {
-        string machineName = _machineInfoFactory.GetMachineIdentifier();
+        string machineId = _machineInfoFactory.GetMachineIdentifier();
 
-        Sql<ISqlContext> sql = Database.SqlContext.Sql()
-            .Select<LastSyncedDto>(x => x.LastSyncedInternalId)
-            .From<LastSyncedDto>()
-            .Where<LastSyncedDto>(x => x.MachineId == machineName);
-
-        return await Database.ExecuteScalarAsync<int?>(sql);
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            return await db.LastSynced
+                .Where(x => x.MachineId == machineId)
+                .Select(x => x.LastSyncedInternalId)
+                .FirstOrDefaultAsync();
+        });
     }
 
     /// <inheritdoc />
     public async Task<int?> GetExternalIdAsync()
     {
-        string machineName = _machineInfoFactory.GetMachineIdentifier();
+        string machineId = _machineInfoFactory.GetMachineIdentifier();
 
-        Sql<ISqlContext> sql = Database.SqlContext.Sql()
-            .Select<LastSyncedDto>(x => x.LastSyncedExternalId)
-            .From<LastSyncedDto>()
-            .Where<LastSyncedDto>(x => x.MachineId == machineName);
-
-        return await Database.ExecuteScalarAsync<int?>(sql);
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            return await db.LastSynced
+                .Where(x => x.MachineId == machineId)
+                .Select(x => x.LastSyncedExternalId)
+                .FirstOrDefaultAsync();
+        });
     }
 
     /// <inheritdoc />
     public async Task SaveInternalIdAsync(int id)
     {
-        LastSyncedDto dto = new LastSyncedDto()
+        var dto = new LastSyncedDto
         {
             MachineId = _machineInfoFactory.GetMachineIdentifier(),
             LastSyncedInternalId = id,
             LastSyncedDate = DateTime.Now,
         };
 
-        await Database.InsertOrUpdateAsync(
-            dto,
-            $"SET {QuoteColumnName("lastSyncedInternalId")}=@LastSyncedInternalId, {QuoteColumnName("lastSyncedDate")}=@LastSyncedDate WHERE {QuoteColumnName("machineId")}=@MachineId",
-            new
-            {
-                dto.LastSyncedInternalId,
-                dto.LastSyncedDate,
-                dto.MachineId,
-            });
+        await AmbientScope.ExecuteWithContextAsync<LastSyncedDto>(async db =>
+        {
+            await db.UpsertAsync(dto, () =>
+                db.LastSynced
+                    .Where(x => x.MachineId == dto.MachineId)
+                    .ExecuteUpdateAsync(setter => setter
+                        .SetProperty(x => x.LastSyncedInternalId, dto.LastSyncedInternalId)
+                        .SetProperty(x => x.LastSyncedDate, dto.LastSyncedDate)));
+        });
     }
 
     /// <inheritdoc />
     public async Task SaveExternalIdAsync(int id)
     {
-        LastSyncedDto dto = new LastSyncedDto()
+        var dto = new LastSyncedDto
         {
             MachineId = _machineInfoFactory.GetMachineIdentifier(),
             LastSyncedExternalId = id,
             LastSyncedDate = DateTime.Now,
         };
 
-        await Database.InsertOrUpdateAsync(
-            dto,
-            $"SET {QuoteColumnName("lastSyncedExternalId")}=@LastSyncedExternalId, {QuoteColumnName("lastSyncedDate")}=@LastSyncedDate WHERE {QuoteColumnName("machineId")}=@MachineId",
-            new
-            {
-                dto.LastSyncedExternalId,
-                dto.LastSyncedDate,
-                dto.MachineId,
-            });
+        await AmbientScope.ExecuteWithContextAsync<LastSyncedDto>(async db =>
+        {
+            await db.UpsertAsync(dto, () =>
+                db.LastSynced
+                    .Where(x => x.MachineId == dto.MachineId)
+                    .ExecuteUpdateAsync(setter => setter
+                        .SetProperty(x => x.LastSyncedExternalId, dto.LastSyncedExternalId)
+                        .SetProperty(x => x.LastSyncedDate, dto.LastSyncedDate)));
+        });
     }
 
     /// <inheritdoc />
     public async Task DeleteEntriesOlderThanAsync(DateTime pruneDate)
     {
-        Sql<ISqlContext> maxIdSql = Database.SqlContext.Sql()
-                .SelectMax<CacheInstructionDto>(x => x.Id)
-                .From<CacheInstructionDto>();
-        var maxId = await Database.ExecuteScalarAsync<int>(maxIdSql);
+        await AmbientScope.ExecuteWithContextAsync<LastSyncedDto>(async db =>
+        {
+            int maxId = await db.CacheInstructions
+                .Select(x => x.Id)
+                .DefaultIfEmpty()
+                .MaxAsync();
 
-        Sql sql =
-            new Sql().Append(
-                @$"DELETE FROM {QuoteTableName("umbracoLastSynced")} WHERE {QuoteColumnName("lastSyncedDate")} < @pruneDate OR {QuoteColumnName("lastSyncedInternalId")} > @maxId AND {QuoteColumnName("lastSyncedExternalId")} > @maxId;",
-                new { pruneDate, maxId });
-
-        await Database.ExecuteAsync(sql);
+            await db.LastSynced
+                .Where(x =>
+                    x.LastSyncedDate < pruneDate ||
+                    (x.LastSyncedInternalId > maxId &&
+                    x.LastSyncedExternalId > maxId))
+                .ExecuteDeleteAsync();
+        });
     }
 }
