@@ -164,7 +164,6 @@ public sealed class BlockEditorVarianceHandler
     public void AlignExposeVariance(BlockValue blockValue)
     {
         var contentDataToAlign = new List<BlockItemData>();
-        var validContentKeys = blockValue.ContentData.Select(cd => cd.Key).ToHashSet();
         var elementTypesByKey = blockValue
             .ContentData
             .Select(cd => cd.ContentTypeKey)
@@ -186,30 +185,31 @@ public sealed class BlockEditorVarianceHandler
                 continue;
             }
 
-            if (variation.Culture is not null == elementType.VariesByCulture())
+            if ((variation.Culture is not null) == elementType.VariesByCulture())
             {
                 continue;
             }
 
-            if((variation.Culture is null && contentData.Values.Any(v => v.Culture is not null))
-                   || (variation.Culture is not null && contentData.Values.All(v => v.Culture is null)))
+            if ((variation.Culture is null && contentData.Values.Any(v => v.Culture is not null)) ||
+                (variation.Culture is not null && contentData.Values.All(v => v.Culture is null)))
             {
                 contentDataToAlign.Add(contentData);
             }
         }
 
-        // Remove expose entries that don't have matching ContentData
+        // Remove expose entries that don't have matching entries in the block value's content data.
+        var validContentKeys = blockValue.ContentData.Select(cd => cd.Key).ToHashSet();
         blockValue.Expose.RemoveAll(v => validContentKeys.Contains(v.ContentKey) is false);
 
-        if (contentDataToAlign.Any())
+        if (contentDataToAlign.Count > 0)
         {
             blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
             foreach (BlockItemData contentData in contentDataToAlign)
             {
                 var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
                 foreach (BlockPropertyValue value in contentData.Values
-                             .Where(v => omitNullCulture is false || v.Culture is not null)
-                             .DistinctBy(v => v.Culture + v.Segment))
+                    .Where(v => omitNullCulture is false || v.Culture is not null)
+                    .DistinctBy(v => v.Culture + v.Segment))
                 {
                     blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
                 }
