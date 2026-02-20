@@ -79,6 +79,6 @@ public class RichTextPropertyIndexValueFactoryTests
         // assert that index the value is created correctly (it might contain a trailing whitespace, but that's OK)
         var expectedIndexValue = indexValue.Values.SingleOrDefault() as string;
         Assert.IsNotNull(expectedIndexValue);
-        Assert.AreEqual(expected, expectedIndexValue.TrimEnd());
+        Assert.AreEqual(expected, expectedIndexValue);
     }
 }

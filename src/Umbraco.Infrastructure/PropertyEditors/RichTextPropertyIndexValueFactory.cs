@@ -141,8 +141,7 @@ internal sealed partial class RichTextPropertyIndexValueFactory : BlockValueProp
     private static partial Regex MultipleSpacesRegex { get; }
 
     /// <summary>
-    /// Strips HTML tags from content while preserving whitespace from line breaks.
-    /// This addresses the issue where &lt;br&gt; tags don't create word boundaries when HTML is stripped.
+    /// Strips HTML tags from content, replacing them with spaces to preserve word boundaries for indexing.
     /// </summary>
     /// <param name="html">The HTML content to strip</param>
     /// <returns>Plain text with proper word boundaries</returns>
@@ -154,7 +153,6 @@ internal sealed partial class RichTextPropertyIndexValueFactory : BlockValueProp
         }
 
         //Replace all HTML tags with a space to preserve word boundaries. This can result in multiple spaces, which we then collapse into a single space.
-        var stripped = StringHtmlRegex.Replace(html, " ");
-        return MultipleSpacesRegex.Replace(stripped, " ").Trim();
+        return html.StripHtml(" ");
     }
 }
