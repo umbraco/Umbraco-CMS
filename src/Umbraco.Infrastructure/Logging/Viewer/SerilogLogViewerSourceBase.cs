@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
-[Obsolete("Use ILogViewerService instead. Scheduled removal in Umbraco 18.")]
+[Obsolete("Use ILogViewerService instead. Scheduled for removal in Umbraco 18.")]
 public abstract class SerilogLogViewerSourceBase : ILogViewer
 {
     private readonly ILogLevelLoader _logLevelLoader;

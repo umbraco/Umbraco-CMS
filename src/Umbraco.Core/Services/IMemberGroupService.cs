@@ -12,7 +12,7 @@ public interface IMemberGroupService : IService
     ///     Gets all member groups.
     /// </summary>
     /// <returns>An enumerable collection of all <see cref="IMemberGroup"/> objects.</returns>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in v15.")]
+    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
     IEnumerable<IMemberGroup> GetAll();
 
     /// <summary>
@@ -20,7 +20,7 @@ public interface IMemberGroupService : IService
     /// </summary>
     /// <param name="id">The integer id of the member group.</param>
     /// <returns>The <see cref="IMemberGroup"/> if found; otherwise, <c>null</c>.</returns>
-    [Obsolete("Please use Guid instead of Int id. Scheduled for removal in v15.")]
+    [Obsolete("Please use Guid instead of Int id. Scheduled for removal in Umbraco 18.")]
     IMemberGroup? GetById(int id);
 
     /// <summary>
@@ -28,7 +28,7 @@ public interface IMemberGroupService : IService
     /// </summary>
     /// <param name="id">The <see cref="Guid"/> key of the member group.</param>
     /// <returns>The <see cref="IMemberGroup"/> if found; otherwise, <c>null</c>.</returns>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in v15.")]
+    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
     IMemberGroup? GetById(Guid id);
 
     /// <summary>
@@ -36,7 +36,7 @@ public interface IMemberGroupService : IService
     /// </summary>
     /// <param name="ids">An enumerable collection of integer ids.</param>
     /// <returns>An enumerable collection of <see cref="IMemberGroup"/> objects.</returns>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in v15.")]
+    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
     IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids);
 
     /// <summary>
@@ -50,14 +50,14 @@ public interface IMemberGroupService : IService
     ///     Saves a member group.
     /// </summary>
     /// <param name="memberGroup">The <see cref="IMemberGroup"/> to save.</param>
-    [Obsolete("Please use the respective CreateAsync/UpdateAsync for you save operations. Scheduled for removal in v15.")]
+    [Obsolete("Please use the respective CreateAsync/UpdateAsync for your save operations. Scheduled for removal in Umbraco 18.")]
     void Save(IMemberGroup memberGroup);
 
     /// <summary>
     ///     Deletes a member group.
     /// </summary>
     /// <param name="memberGroup">The <see cref="IMemberGroup"/> to delete.</param>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in v15.")]
+    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
     void Delete(IMemberGroup memberGroup);
 
     /// <summary>

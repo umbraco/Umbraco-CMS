@@ -46,3 +46,11 @@ export interface UmbWithThumbnailModel {
 export interface UmbWithOptionalThumbnailModel {
 	thumbnail?: UmbThumbnailModel | null;
 }
+
+export interface UmbWithDescriptionModel {
+	description: string | null;
+}
+
+export interface UmbWithOptionalDescriptionModel {
+	description?: string | null;
+}

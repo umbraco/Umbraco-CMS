@@ -27,6 +27,8 @@ public class RootMediaTypeTreeController : MediaTypeTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of media type items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of media type items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<MediaTypeTreeItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

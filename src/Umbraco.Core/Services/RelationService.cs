@@ -69,7 +69,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <param name="relationTypeRepository">The repository for relation type data access.</param>
     /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelationService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -103,7 +103,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <param name="auditService">The audit service for recording audit entries.</param>
     /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelationService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,

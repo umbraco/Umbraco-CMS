@@ -16,7 +16,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-[Obsolete("This controller is temporary and will be removed in a future release (planned for v20). A more permanent solution will follow.")]
+[Obsolete("This controller is temporary. A more permanent solution will follow. Scheduled for removal in Umbraco 20.")]
 [ApiVersion("1.0")]
 public class AvailableSegmentsController : DocumentControllerBase
 {
@@ -38,6 +38,8 @@ public class AvailableSegmentsController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SegmentResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets available segments.")]
+    [EndpointDescription("Gets a collection of available content segments for the system.")]
     public async Task<IActionResult> GetAvailableSegmentOptions(
         Guid id,
         CancellationToken cancellationToken,
