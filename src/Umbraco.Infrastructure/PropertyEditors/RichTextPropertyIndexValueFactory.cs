@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -9,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal sealed partial class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
+internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RichTextPropertyIndexValueFactory> _logger;
