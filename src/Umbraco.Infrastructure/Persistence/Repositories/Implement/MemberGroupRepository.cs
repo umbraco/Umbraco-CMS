@@ -56,8 +56,8 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
                 return result.FirstOrDefault();
             },
 
-            // cache for 5 mins since that is the default in the Runtime app cache
-            TimeSpan.FromMinutes(5),
+            // use sliding cache with default repository duration
+            RepositoryCacheConstants.DefaultCacheDuration,
 
             // sliding is true
             true);
