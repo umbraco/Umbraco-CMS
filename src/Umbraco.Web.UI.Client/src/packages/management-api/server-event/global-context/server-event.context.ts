@@ -56,11 +56,14 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this.#serverContext = context;
+			this.#observeIsAuthorized();
 		});
 	}
 
 	#observeIsAuthorized() {
-		this.observe(this.#authContext?.isAuthorized, (isAuthorized) => {
+		if (!this.#authContext || !this.#serverContext) return;
+
+		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
 			if (isAuthorized === undefined) return;
 
 			if (isAuthorized) {
