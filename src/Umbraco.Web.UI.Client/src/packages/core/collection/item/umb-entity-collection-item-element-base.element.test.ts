@@ -213,6 +213,38 @@ describe('UmbEntityCollectionItemElementBase', () => {
 		});
 	});
 
+	describe('entity context boundary', () => {
+		it('does not receive an outer UMB_ENTITY_CONTEXT when the inner context is provided later', async () => {
+			// Set up: an outer host element provides UMB_ENTITY_CONTEXT with distinct values.
+			// A collection item is nested inside. When the item is set (triggering its own context),
+			// the inner component must receive its own context — not the outer ancestor's.
+			const outerHost = await fixture<UmbTestCollectionItemFallbackElement>(
+				html`<umb-test-collection-item-fallback>
+					<umb-test-entity-collection-item></umb-test-entity-collection-item>
+				</umb-test-collection-item-fallback>`,
+			);
+
+			const { UmbEntityContext } = await import('@umbraco-cms/backoffice/entity');
+			const outerContext = new UmbEntityContext(outerHost);
+			outerContext.setEntityType('outer-entity-type');
+			outerContext.setUnique('outer-unique');
+
+			// Set item on the inner collection item — this triggers #createController and
+			// creates its own UmbEntityContext *after* the outer context already exists.
+			const inner = outerHost.querySelector('umb-test-entity-collection-item') as UmbTestEntityCollectionItemElement;
+			inner.item = makeItem('inner-entity-type', 'inner-unique');
+			await aTimeout(0);
+			await elementUpdated(inner);
+
+			const innerComponent = inner['_component'] as UmbTestCollectionItemFallbackElement;
+			const context = await innerComponent.getContext(UMB_ENTITY_CONTEXT);
+			expect(context!.getEntityType()).to.equal('inner-entity-type');
+			expect(context!.getUnique()).to.equal('inner-unique');
+
+			outerContext.destroy();
+		});
+	});
+
 	describe('event handling', () => {
 		const itemUnique = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
