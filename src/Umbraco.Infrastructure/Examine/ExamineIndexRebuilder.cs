@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Concurrent;
 using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -13,12 +14,14 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 
 internal class ExamineIndexRebuilder : IIndexRebuilder
 {
+    private const string RebuildAllKey = "__rebuild_all__";
+
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly ConcurrentDictionary<string, byte> _rebuilding = new();
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ExamineIndexRebuilder> _logger;
     private readonly IMainDom _mainDom;
     private readonly IEnumerable<IIndexPopulator> _populators;
-    private readonly object _rebuildLocker = new();
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
@@ -106,7 +109,25 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return Task.FromResult(Attempt.Fail(IndexRebuildResult.Unknown));
         }
 
-        RebuildIndex(indexName, delay, useBackgroundThread);
+        if (useBackgroundThread)
+        {
+            _logger.LogInformation("Starting async background thread for rebuilding index {indexName}.", indexName);
+
+            _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
+            {
+                if (delay > TimeSpan.Zero)
+                {
+                    await Task.Delay(delay.Value, cancellationToken);
+                }
+
+                RebuildIndex(indexName, TimeSpan.Zero, cancellationToken);
+            });
+        }
+        else
+        {
+            RebuildIndex(indexName, delay ?? TimeSpan.Zero, CancellationToken.None);
+        }
+
         return Task.FromResult(Attempt.Succeed(IndexRebuildResult.Success));
     }
 
@@ -160,9 +181,34 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return Task.FromResult(Attempt.Fail(IndexRebuildResult.NotAllowedToRun));
         }
 
-        RebuildIndexes(onlyEmptyIndexes, delay, useBackgroundThread);
+        if (useBackgroundThread)
+        {
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug($"Queuing background job for {nameof(RebuildIndexes)}.");
+            }
+
+            _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
+            {
+                if (delay > TimeSpan.Zero)
+                {
+                    await Task.Delay(delay.Value, cancellationToken);
+                }
+
+                RebuildIndexes(onlyEmptyIndexes, TimeSpan.Zero, cancellationToken);
+            });
+        }
+        else
+        {
+            RebuildIndexes(onlyEmptyIndexes, delay ?? TimeSpan.Zero, CancellationToken.None);
+        }
+
         return Task.FromResult(Attempt.Succeed(IndexRebuildResult.Success));
     }
+
+    /// <inheritdoc/>
+    public Task<bool> IsRebuildingAsync(string indexName)
+        => Task.FromResult(_rebuilding.ContainsKey(indexName) || _rebuilding.ContainsKey(RebuildAllKey));
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
@@ -173,37 +219,33 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             Thread.Sleep(delay);
         }
 
+        if (!_rebuilding.TryAdd(indexName, 0))
+        {
+            _logger.LogWarning("Call was made to RebuildIndex but a rebuild for {IndexName} is already running", indexName);
+            return;
+        }
+
         try
         {
-            if (!Monitor.TryEnter(_rebuildLocker))
+            if (!_examineManager.TryGetIndex(indexName, out IIndex index))
             {
-                _logger.LogWarning("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
+                throw new InvalidOperationException($"No index found with name {indexName}");
             }
-            else
+
+            index.CreateIndex(); // clear the index
+            foreach (IIndexPopulator populator in _populators)
             {
-                if (!_examineManager.TryGetIndex(indexName, out IIndex index))
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    throw new InvalidOperationException($"No index found with name {indexName}");
+                    return;
                 }
 
-                index.CreateIndex(); // clear the index
-                foreach (IIndexPopulator populator in _populators)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    populator.Populate(index);
-                }
+                populator.Populate(index);
             }
         }
         finally
         {
-            if (Monitor.IsEntered(_rebuildLocker))
-            {
-                Monitor.Exit(_rebuildLocker);
-            }
+            _rebuilding.TryRemove(indexName, out _);
         }
     }
 
@@ -214,56 +256,52 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             Thread.Sleep(delay);
         }
 
+        if (!_rebuilding.TryAdd(RebuildAllKey, 0))
+        {
+            _logger.LogWarning($"Call was made to {nameof(RebuildIndexes)} but the task runner for rebuilding is already running");
+            return;
+        }
+
         try
         {
-            if (!Monitor.TryEnter(_rebuildLocker))
-            {
-                _logger.LogWarning($"Call was made to {nameof(RebuildIndexes)} but the task runner for rebuilding is already running");
-            }
-            else
-            {
-                // If an index exists but it has zero docs we'll consider it empty and rebuild
-                IIndex[] indexes = (onlyEmptyIndexes
-                    ? _examineManager.Indexes.Where(ShouldRebuild)
-                    : _examineManager.Indexes)
-                    .Where(HasRegisteredPopulator)
-                    .ToArray();
+            // If an index exists but it has zero docs we'll consider it empty and rebuild
+            IIndex[] indexes = (onlyEmptyIndexes
+                ? _examineManager.Indexes.Where(ShouldRebuild)
+                : _examineManager.Indexes)
+                .Where(HasRegisteredPopulator)
+                .ToArray();
 
-                if (indexes.Length == 0)
+            if (indexes.Length == 0)
+            {
+                return;
+            }
+
+            foreach (IIndex index in indexes)
+            {
+                index.CreateIndex(); // clear the index
+            }
+
+            // run each populator over the indexes
+            foreach (IIndexPopulator populator in _populators)
+            {
+                if (cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }
 
-                foreach (IIndex index in indexes)
+                try
                 {
-                    index.CreateIndex(); // clear the index
+                    populator.Populate(indexes);
                 }
-
-                // run each populator over the indexes
-                foreach (IIndexPopulator populator in _populators)
+                catch (Exception e)
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    try
-                    {
-                        populator.Populate(indexes);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
-                    }
+                    _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
                 }
             }
         }
         finally
         {
-            if (Monitor.IsEntered(_rebuildLocker))
-            {
-                Monitor.Exit(_rebuildLocker);
-            }
+            _rebuilding.TryRemove(RebuildAllKey, out _);
         }
     }
 
