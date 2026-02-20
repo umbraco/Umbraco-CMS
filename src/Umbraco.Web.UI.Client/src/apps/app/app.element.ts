@@ -18,7 +18,7 @@ import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
@@ -122,20 +122,9 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'logout',
-			resolve: () => {
+			component: () => import('../../packages/core/auth/components/umb-auth-view.element.js'),
+			setup: () => {
 				this.#authContext?.clearTokenStorage();
-				this.#authController.makeAuthorizationRequest('loggedOut');
-
-				// Listen for the user to be authorized
-				this.#authContext?.isAuthorized
-					.pipe(
-						filter((x) => !!x),
-						first(),
-					)
-					.subscribe(() => {
-						// Redirect to the root
-						history.replaceState(null, '', '');
-					});
 			},
 		},
 		{
