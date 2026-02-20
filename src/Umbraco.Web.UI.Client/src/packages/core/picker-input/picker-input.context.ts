@@ -32,8 +32,15 @@ export class UmbPickerInputContext<
 	public readonly statuses;
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
+	#modalRouteRegistered = false;
 	#modalRoute = new UmbStringState<string | undefined>(undefined);
-	public readonly modalRoute = this.#modalRoute.asObservable();
+	public get modalRoute() {
+		if (!this.#modalRouteRegistered) {
+			this.#modalRouteRegistered = true;
+			this.#createPickerModalRoute();
+		}
+		return this.#modalRoute.asObservable();
+	}
 
 	#modalData?: Partial<PickerModalConfigType>;
 
@@ -108,7 +115,9 @@ export class UmbPickerInputContext<
 	 */
 	setModalAlias(modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>) {
 		this.modalAlias = modalAlias;
-		this.#createPickerModalRoute();
+		if (this.#modalRouteRegistered) {
+			this.#createPickerModalRoute();
+		}
 	}
 
 	/**
@@ -187,7 +196,6 @@ export class UmbPickerInputContext<
 		}
 
 		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias)
-			.addUniquePaths(['picker'])
 			.onSetup(() => {
 				return {
 					data: this.#getPickerModalDataArgs(),

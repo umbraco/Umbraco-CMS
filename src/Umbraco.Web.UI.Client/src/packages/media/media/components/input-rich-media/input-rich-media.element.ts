@@ -116,7 +116,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	@property({ type: Array })
-	allowedContentTypeIds?: string[] | undefined;
+	allowedContentTypeIds?: string[];
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;

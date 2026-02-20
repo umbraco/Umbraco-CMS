@@ -87,7 +87,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
     /// </summary>
-    [Obsolete("Scheduled for removal in Umbraco 18")]
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     public UmbracoRouteValueTransformer(
         ILogger<UmbracoRouteValueTransformer> logger,
         IUmbracoContextAccessor umbracoContextAccessor,

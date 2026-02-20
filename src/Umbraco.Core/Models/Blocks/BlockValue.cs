@@ -55,7 +55,7 @@ public abstract class BlockValue
     /// <returns>
     ///     <c>true</c> if the specified block layout alias is supported; otherwise, <c>false</c>.
     /// </returns>
-    [Obsolete("Will be removed in V18.")]
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     public virtual bool SupportsBlockLayoutAlias(string alias) => alias.Equals(PropertyEditorAlias);
 }
 

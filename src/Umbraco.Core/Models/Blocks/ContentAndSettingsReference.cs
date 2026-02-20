@@ -13,7 +13,7 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
     /// </summary>
     /// <param name="contentUdi">The content UDI.</param>
     /// <param name="settingsUdi">The settings UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
     public ContentAndSettingsReference(Udi? contentUdi, Udi? settingsUdi)
         : this(
             (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
@@ -42,7 +42,7 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
     /// <value>
     ///     The content UDI.
     /// </value>
-    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi ContentUdi { get; }
 
     /// <summary>
@@ -51,7 +51,7 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
     /// <value>
     ///     The settings UDI.
     /// </value>
-    [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
     public Udi? SettingsUdi { get; }
 
     /// <summary>

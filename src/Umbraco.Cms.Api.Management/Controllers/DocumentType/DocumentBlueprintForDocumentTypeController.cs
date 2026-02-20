@@ -31,6 +31,8 @@ public class DocumentBlueprintForDocumentTypeController : DocumentTypeController
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeBlueprintItemResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets document blueprints for a document type.")]
+    [EndpointDescription("Gets a collection of document blueprints available for the specified document type.")]
     public async Task<IActionResult> DocumentBlueprintByDocumentTypeKey(
         CancellationToken cancellationToken,
         Guid id,
