@@ -8,10 +8,6 @@
   },
   "symbolInfo": [
     {
-      "id": "UmbracoVersion",
-      "isVisible": false
-    },
-    {
       "id": "UseHttpsRedirect",
       "isVisible": true,
       "persistenceScope": "templateGroup",

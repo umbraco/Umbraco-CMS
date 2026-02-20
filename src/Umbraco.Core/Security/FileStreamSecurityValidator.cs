@@ -1,9 +1,17 @@
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Default implementation of <see cref="IFileStreamSecurityValidator" /> that validates file streams
+///     using registered <see cref="IFileStreamSecurityAnalyzer" /> instances.
+/// </summary>
 public class FileStreamSecurityValidator : IFileStreamSecurityValidator
 {
     private readonly IEnumerable<IFileStreamSecurityAnalyzer> _fileAnalyzers;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="FileStreamSecurityValidator" /> class.
+    /// </summary>
+    /// <param name="fileAnalyzers">The collection of file stream security analyzers to use for validation.</param>
     public FileStreamSecurityValidator(IEnumerable<IFileStreamSecurityAnalyzer> fileAnalyzers)
     {
         _fileAnalyzers = fileAnalyzers;

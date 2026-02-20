@@ -17,6 +17,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing and sending notifications to users
+///     when content is modified.
+/// </summary>
 public class NotificationService : INotificationService
 {
     // manage notifications
@@ -34,6 +38,19 @@ public class NotificationService : INotificationService
     private readonly ICoreScopeProvider _uowProvider;
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NotificationService" /> class.
+    /// </summary>
+    /// <param name="provider">The scope provider for unit of work operations.</param>
+    /// <param name="userService">The user service for retrieving user information.</param>
+    /// <param name="contentService">The content service for accessing content versions.</param>
+    /// <param name="localizationService">The localization service for language operations.</param>
+    /// <param name="logger">The logger for diagnostic output.</param>
+    /// <param name="ioHelper">The IO helper for resolving paths.</param>
+    /// <param name="notificationsRepository">The repository for notification data access.</param>
+    /// <param name="globalSettings">The global settings options.</param>
+    /// <param name="contentSettings">The content settings options.</param>
+    /// <param name="emailSender">The email sender for delivering notifications.</param>
     public NotificationService(
         ICoreScopeProvider provider,
         IUserService userService,
@@ -597,8 +614,18 @@ public class NotificationService : INotificationService
         }
     }
 
+    /// <summary>
+    ///     Represents a notification request to be processed.
+    /// </summary>
     private sealed class NotificationRequest
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="NotificationRequest" /> class.
+        /// </summary>
+        /// <param name="mail">The email message to send.</param>
+        /// <param name="action">The action that triggered the notification.</param>
+        /// <param name="userName">The name of the user receiving the notification.</param>
+        /// <param name="email">The email address of the user receiving the notification.</param>
         public NotificationRequest(EmailMessage mail, string? action, string? userName, string? email)
         {
             Mail = mail;
@@ -607,12 +634,24 @@ public class NotificationService : INotificationService
             Email = email;
         }
 
+        /// <summary>
+        ///     Gets the email message to send.
+        /// </summary>
         public EmailMessage Mail { get; }
 
+        /// <summary>
+        ///     Gets the action that triggered the notification.
+        /// </summary>
         public string? Action { get; }
 
+        /// <summary>
+        ///     Gets the name of the user receiving the notification.
+        /// </summary>
         public string? UserName { get; }
 
+        /// <summary>
+        ///     Gets the email address of the user receiving the notification.
+        /// </summary>
         public string? Email { get; }
     }
 

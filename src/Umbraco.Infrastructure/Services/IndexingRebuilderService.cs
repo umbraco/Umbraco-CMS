@@ -21,7 +21,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         _logger = logger;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public IndexingRebuilderService(
         AppCaches runtimeCache,
         IIndexRebuilder indexRebuilder,
@@ -35,7 +35,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     public bool CanRebuild(string indexName) => _indexRebuilder.CanRebuild(indexName);
 
     /// <inheritdoc />
-    [Obsolete("Use TryRebuildAsync instead. Scheduled for removal in V19.")]
+    [Obsolete("Use TryRebuildAsync instead. Scheduled for removal in Umbraco 19.")]
     public bool TryRebuild(IIndex index, string indexName)
         => TryRebuildAsync(index, indexName).GetAwaiter().GetResult();
 
@@ -55,7 +55,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use IsRebuildingAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use IsRebuildingAsync() instead. Scheduled for removal in Umbraco 19.")]
     public bool IsRebuilding(string indexName)
         => IsRebuildingAsync(indexName).GetAwaiter().GetResult();
 

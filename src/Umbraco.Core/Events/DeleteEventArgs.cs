@@ -1,5 +1,9 @@
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Represents event data for delete operations.
+/// </summary>
+/// <typeparam name="TEntity">The type of the entity being deleted.</typeparam>
 [SupersedeEvent(typeof(SaveEventArgs<>))]
 [SupersedeEvent(typeof(PublishEventArgs<>))]
 [SupersedeEvent(typeof(MoveEventArgs<>))]
@@ -93,9 +97,16 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     /// </summary>
     public List<string> MediaFilesToDelete { get; }
 
+    /// <summary>
+    ///     Determines whether two <see cref="DeleteEventArgs{TEntity}" /> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(DeleteEventArgs<TEntity> left, DeleteEventArgs<TEntity> right) =>
         Equals(left, right);
 
+    /// <inheritdoc />
     public bool Equals(DeleteEventArgs<TEntity>? other)
     {
         if (ReferenceEquals(null, other))
@@ -111,6 +122,7 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
         return base.Equals(other) && MediaFilesToDelete.SequenceEqual(other.MediaFilesToDelete);
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -131,6 +143,7 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
         return Equals((DeleteEventArgs<TEntity>)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -139,20 +152,44 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
         }
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="DeleteEventArgs{TEntity}" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(DeleteEventArgs<TEntity> left, DeleteEventArgs<TEntity> right) =>
         !Equals(left, right);
 }
 
+/// <summary>
+///     Represents event data for delete operations with an identifier.
+/// </summary>
 public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DeleteEventArgs" /> class.
+    /// </summary>
+    /// <param name="id">The identifier of the object being deleted.</param>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
+    /// <param name="eventMessages">The event messages.</param>
     public DeleteEventArgs(int id, bool canCancel, EventMessages eventMessages)
         : base(canCancel, eventMessages) =>
         Id = id;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DeleteEventArgs" /> class.
+    /// </summary>
+    /// <param name="id">The identifier of the object being deleted.</param>
+    /// <param name="canCancel">A value indicating whether the event can be cancelled.</param>
     public DeleteEventArgs(int id, bool canCancel)
         : base(canCancel) =>
         Id = id;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DeleteEventArgs" /> class with cancellation enabled.
+    /// </summary>
+    /// <param name="id">The identifier of the object being deleted.</param>
     public DeleteEventArgs(int id) => Id = id;
 
     /// <summary>
@@ -160,8 +197,15 @@ public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
     /// </summary>
     public int Id { get; }
 
+    /// <summary>
+    ///     Determines whether two <see cref="DeleteEventArgs" /> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(DeleteEventArgs left, DeleteEventArgs right) => Equals(left, right);
 
+    /// <inheritdoc />
     public bool Equals(DeleteEventArgs? other)
     {
         if (ReferenceEquals(null, other))
@@ -177,6 +221,7 @@ public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
         return base.Equals(other) && Id == other.Id;
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -197,6 +242,7 @@ public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
         return Equals((DeleteEventArgs)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -205,5 +251,11 @@ public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
         }
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="DeleteEventArgs" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(DeleteEventArgs left, DeleteEventArgs right) => !Equals(left, right);
 }

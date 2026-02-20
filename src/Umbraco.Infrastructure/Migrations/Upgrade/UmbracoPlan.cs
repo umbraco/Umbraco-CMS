@@ -152,6 +152,8 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_2_0.AddDocumentUrlAlias>("{A7B8C9D0-E1F2-4A5B-8C7D-9E0F1A2B3C4D}");
 
         // To 17.3.0
+        To<V_17_3_0.IncreaseSizeOfLongRunningOperationTypeColumn>("{B2F4A1C3-8D5E-4F6A-9B7C-3E1D2A4F5B6C}");
+        To<V_17_3_0.RetrustForeignKeyAndCheckConstraints>("{0638E0E0-D914-4ACA-8A4B-9551A3AAB91F}");
         To<V_17_3_0.AddSortableValueToPropertyData>("{9DBDB5CD-8679-4BB0-BF83-E8D508073CE0}");
         To<V_17_3_0.PopulateSortableValueForDatePropertyData>("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
 

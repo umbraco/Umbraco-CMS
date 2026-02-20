@@ -836,7 +836,8 @@ export default {
 		reset: 'Resetuj',
 	},
 	rollback: {
-		diffHelp: '<del>Czerwony tekst</del> zostanie usunięty w wybranej wersji, <ins>zielony tekst</ins> zostanie dodany.',
+		diffHelp:
+			'<del>Czerwony tekst</del> zostanie usunięty w wybranej wersji, <ins>zielony tekst</ins> zostanie dodany.',
 		showDiff: 'Pokaż różnice między bieżącą (wersją roboczą) a wybraną wersją.',
 		documentRolledBack: 'Dokument został przywrócony',
 		htmlHelp:
@@ -1296,7 +1297,8 @@ export default {
 		emptyDictionaryTree: 'Brak elementów słownika do wyboru',
 	},
 	textbox: {
-		characters_left: 'pozostało znaków',
+		characters_left: 'Pozostało <strong>%0%</strong> znaków.',
+		characters_exceed: 'Maksymalnie %0% znaków, <strong>%1%</strong> za dużo.',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Zaznacz wszystko',

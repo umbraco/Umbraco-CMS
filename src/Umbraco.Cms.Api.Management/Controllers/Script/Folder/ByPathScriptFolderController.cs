@@ -26,6 +26,8 @@ public class ByPathScriptFolderController : ScriptFolderControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ScriptFolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a script folder by path.")]
+    [EndpointDescription("Gets a script folder identified by the provided file path.")]
     public async Task<IActionResult> ByPath(CancellationToken cancellationToken, string path)
     {
         path = DecodePath(path).VirtualPathToSystemPath();

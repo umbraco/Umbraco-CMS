@@ -1377,7 +1377,8 @@ export default {
 		changes: 'Alterações',
 		created: 'Criado',
 		currentVersion: 'Versão atual',
-		diffHelp: '<del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado.',
+		diffHelp:
+			'<del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado.',
 		showDiff: 'Mostrar diferenças entre a versão atual (rascunho) e a versão selecionada.',
 		noDiff: 'Não existem diferenças entre a versão atual (rascunho) e a versão selecionada.',
 		documentRolledBack: 'O documento foi revertido',

@@ -19,6 +19,8 @@ public class SiblingsMediaRecycleBinController : MediaRecycleBinControllerBase
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<MediaRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets sibling media in the recycle bin.")]
+    [EndpointDescription("Gets a collection of sibling media items in the recycle bin at the same level as the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<MediaRecycleBinItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
         => await GetSiblings(target, before, after);
 }

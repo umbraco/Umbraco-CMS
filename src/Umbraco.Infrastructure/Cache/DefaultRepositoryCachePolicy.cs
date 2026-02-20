@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Cache;
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
 /// <typeparam name="TId">The type of the identifier.</typeparam>
 /// <remarks>
-///     <para>The default cache policy caches entities with a 5 minutes sliding expiration.</para>
+///     <para>The default cache policy caches entities with a sliding expiration (see <see cref="RepositoryCacheConstants.DefaultCacheDuration"/>).</para>
 ///     <para>Each entity is cached individually.</para>
 ///     <para>If options.GetAllCacheAllowZeroCount then a 'zero-count' array is cached when GetAll finds nothing.</para>
 ///     <para>If options.GetAllCacheValidateCount then we check against the db when getting many entities.</para>
@@ -67,7 +67,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             // just to be safe, we cannot cache an item without an identity
             if (entity.HasIdentity)
             {
-                Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
             }
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -102,7 +102,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             // just to be safe, we cannot cache an item without an identity
             if (entity.HasIdentity)
             {
-                Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
             }
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -295,7 +295,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     }
 
     protected virtual void InsertEntity(string cacheKey, TEntity entity)
-        => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+        => Cache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
 
     protected virtual void InsertNull(string cacheKey)
     {
@@ -303,7 +303,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         // a value that does exist but isn't yet cached, or a value that has been explicitly cached with a null value.
         // Both would return null when we retrieve from the cache and we couldn't distinguish between the two.
         // So we cache a special value that represents null, and then we can check for that value when we retrieve from the cache.
-        Cache.Insert(cacheKey, () => Constants.Cache.NullRepresentationInCache, TimeSpan.FromMinutes(5), true);
+        Cache.Insert(cacheKey, () => Constants.Cache.NullRepresentationInCache, RepositoryCacheConstants.DefaultCacheDuration, true);
     }
 
     protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
@@ -323,7 +323,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
                 foreach (TEntity entity in entities)
                 {
                     TEntity capture = entity;
-                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, RepositoryCacheConstants.DefaultCacheDuration, true);
                 }
             }
         }

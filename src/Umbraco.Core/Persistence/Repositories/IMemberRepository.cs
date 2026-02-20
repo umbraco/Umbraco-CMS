@@ -5,10 +5,23 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="IMember" /> entities.
+/// </summary>
 public interface IMemberRepository : IContentRepository<int, IMember>
 {
+    /// <summary>
+    ///     Gets member identifiers by their names.
+    /// </summary>
+    /// <param name="names">The names of the members.</param>
+    /// <returns>An array of member identifiers.</returns>
     int[] GetMemberIds(string[] names);
 
+    /// <summary>
+    ///     Gets a member by their username.
+    /// </summary>
+    /// <param name="username">The username of the member.</param>
+    /// <returns>The member if found; otherwise, <c>null</c>.</returns>
     IMember? GetByUsername(string? username);
 
     /// <summary>
@@ -41,6 +54,14 @@ public interface IMemberRepository : IContentRepository<int, IMember>
     /// <returns></returns>
     int GetCountByQuery(IQuery<IMember>? query);
 
+    /// <summary>
+    ///     Gets paged members matching the specified filter.
+    /// </summary>
+    /// <param name="memberFilter">The filter to apply.</param>
+    /// <param name="skip">The number of records to skip.</param>
+    /// <param name="take">The number of records to take.</param>
+    /// <param name="ordering">The ordering to apply, or <c>null</c> for default ordering.</param>
+    /// <returns>A paged model of members.</returns>
     Task<PagedModel<IMember>> GetPagedByFilterAsync(MemberFilter memberFilter,int skip, int take, Ordering? ordering = null);
 
     /// <summary>

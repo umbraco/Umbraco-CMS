@@ -26,6 +26,8 @@ public class ByKeyTemplateController : TemplateControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a template.")]
+    [EndpointDescription("Gets a template identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         ITemplate? template = await _templateService.GetAsync(id);

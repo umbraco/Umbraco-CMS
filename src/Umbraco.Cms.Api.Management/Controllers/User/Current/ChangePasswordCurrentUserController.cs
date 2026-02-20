@@ -29,6 +29,8 @@ public class ChangePasswordCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Changes the current user's password.")]
+    [EndpointDescription("Changes the password for the currently authenticated user.")]
     public async Task<IActionResult> ChangePassword(
         CancellationToken cancellationToken,
         ChangePasswordCurrentUserRequestModel model)

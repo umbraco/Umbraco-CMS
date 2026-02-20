@@ -31,6 +31,9 @@ public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProvide
         BlobColumnDefinition = "VARBINARY(MAX)";
     }
 
+    public override string CreateForeignKeyConstraint =>
+        "ALTER TABLE {0} WITH CHECK ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
+
     public override string RenameTable => "sp_rename '{0}', '{1}'";
 
     public override string AddColumn => "ALTER TABLE {0} ADD {1}";
