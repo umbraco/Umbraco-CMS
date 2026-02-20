@@ -14,7 +14,6 @@ export * from './guard-manager/index.js';
 export * from './is-test-environment.function.js';
 export * from './math/math.js';
 export * from './media/image-size.function.js';
-export * from './object/deep-equal.function.js';
 export * from './object/deep-merge.function.js';
 export * from './pagination-manager/pagination.manager.js';
 export * from './pagination/index.js';

@@ -6,8 +6,7 @@ import type {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbMergeContentVariantDataController } from '@umbraco-cms/backoffice/content';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { umbDeepEqual } from '@umbraco-cms/backoffice/utils';
+import { jsonStringComparison, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Manages the pending changes for a published document.
@@ -54,10 +53,7 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 			mergedDataClone.template = null;
 			publishedDataClone.template = null;
 
-			// The detail and published endpoints can return value objects with different key ordering,
-			// which causes false positives with a plain JSON.stringify comparison. So we use a deep equal
-			// comparison that sorts object keys.
-			const hasChanges = umbDeepEqual(mergedDataClone, publishedDataClone) === false;
+			const hasChanges = jsonStringComparison(mergedDataClone, publishedDataClone) === false;
 
 			if (hasChanges) {
 				return { variantId };
