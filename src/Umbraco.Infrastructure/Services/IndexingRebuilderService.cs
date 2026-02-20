@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Services;
 /// <inheritdoc />
 public class IndexingRebuilderService : IIndexingRebuilderService
 {
-    private const string OperationType = "ExamineIndexRebuild";
+    private const string OperationTypePrefix = "ExamineIndexRebuild";
 
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly ILogger<IndexingRebuilderService> _logger;
@@ -46,6 +46,8 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     {
     }
 
+    private static string GetOperationType(string indexName) => $"{OperationTypePrefix}:{indexName}";
+
     // Only use database tracking on servers with write access.
     // Subscriber servers have read-only DB access and don't serve the backoffice.
     private bool UseDatabaseOperationTracking =>
@@ -73,7 +75,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
             Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueResult =
                 await _longRunningOperationService.RunAsync(
-                    OperationType,
+                    GetOperationType(indexName),
                     async ct =>
                     {
                         // useBackgroundThread: false because ILongRunningOperationService already handles backgrounding.
@@ -120,7 +122,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         {
             PagedModel<LongRunningOperation> activeOps =
                 await _longRunningOperationService.GetByTypeAsync(
-                    OperationType,
+                    GetOperationType(indexName),
                     skip: 0,
                     take: 0);
 
