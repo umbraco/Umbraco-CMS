@@ -146,7 +146,7 @@ internal sealed partial class RichTextPropertyIndexValueFactory : BlockValueProp
             return string.Empty;
         }
 
-        //Replace all HTML tags with a space to preserve word boundaries. This can result in multiple spaces, which we then collapse into a single space.
+        // Replace all HTML tags with a space to preserve word boundaries. This can result in multiple spaces, which we then collapse into a single space.
         return html.StripHtml(" ");
     }
 }
