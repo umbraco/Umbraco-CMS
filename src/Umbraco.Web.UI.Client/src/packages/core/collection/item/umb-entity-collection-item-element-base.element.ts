@@ -14,9 +14,9 @@ import { UmbContextBoundaryController } from '@umbraco-cms/backoffice/context-ap
 export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 	constructor() {
 		super();
-		// Prevent any UMB_ENTITY_CONTEXT from leaking out of each collection item.
-		// Each item provides its own context, and consumers inside should never
-		// accidentally receive a context from a sibling or ancestor item.
+		// Prevent any outer/ancestor UMB_ENTITY_CONTEXT from leaking into this collection item.
+		// Each item provides its own entity context, and consumers inside should never
+		// accidentally receive a context from an ancestor or sibling before this item supplies its own.
 		new UmbContextBoundaryController(this, UMB_ENTITY_CONTEXT);
 	}
 
