@@ -134,12 +134,6 @@ internal sealed partial class RichTextPropertyIndexValueFactory : BlockValueProp
     protected override IEnumerable<RawDataItem> GetDataItems(RichTextEditorValue input, bool published)
         => GetDataItems(input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
 
-    [GeneratedRegex(@"<[a-zA-Z/!][\s\S]*?>")]
-    private static partial Regex StringHtmlRegex { get; }
-
-    [GeneratedRegex(@"\s{2,}")]
-    private static partial Regex MultipleSpacesRegex { get; }
-
     /// <summary>
     /// Strips HTML tags from content, replacing them with spaces to preserve word boundaries for indexing.
     /// </summary>
