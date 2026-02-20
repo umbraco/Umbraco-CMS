@@ -169,10 +169,9 @@ export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 				this._component?.remove();
 				const component = extensionControllers[0]?.component || this.createFallbackElement();
 
-				const entityContext = new UmbEntityContext(component);
-				entityContext.setEntityType(entityType);
-				entityContext.setUnique(this.item?.unique ?? null);
-				this.#entityContext = entityContext;
+				this.#entityContext = new UmbEntityContext(component);
+				this.#entityContext.setEntityType(entityType);
+				this.#entityContext.setUnique(this.item?.unique ?? null);
 
 				// TODO: I would say this code can use feature of the UmbExtensionsElementInitializer, to set properties and get a fallback element. [NL]
 				// assign the properties to the component
