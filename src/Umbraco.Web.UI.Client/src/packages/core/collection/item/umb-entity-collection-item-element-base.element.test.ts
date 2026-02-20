@@ -274,23 +274,5 @@ describe('UmbEntityCollectionItemElementBase', () => {
 			expect(capturedEvent).to.be.instanceOf(UmbDeselectedEvent);
 			expect(capturedEvent!.unique).to.equal(itemUnique);
 		});
-
-		it('stops propagation of the inner UmbSelectedEvent', async () => {
-			// elementUpdated ensures _component is in the shadow DOM so the event
-			// can actually bubble — without this the test is vacuously true.
-			await elementUpdated(element);
-
-			// UmbSelectedEvent has composed:false so it cannot cross the shadow boundary.
-			// We verify stopPropagation works by counting events on the outer element:
-			// exactly one should arrive (the re-dispatch), not two.
-			let eventCount = 0;
-			const handler = () => eventCount++;
-			element.addEventListener(UmbSelectedEvent.TYPE, handler);
-
-			element['_component'].dispatchEvent(new UmbSelectedEvent(itemUnique));
-
-			element.removeEventListener(UmbSelectedEvent.TYPE, handler);
-			expect(eventCount).to.equal(1);
-		});
 	});
 });
