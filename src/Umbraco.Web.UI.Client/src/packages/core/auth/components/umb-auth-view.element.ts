@@ -1,6 +1,6 @@
-import type { ManifestAuthProvider } from '../auth-provider.extension.js';
-import { UmbTextStyles } from '../../style/text-style.style.js';
 import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
+import type { ManifestAuthProvider } from '../auth-provider.extension.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbAuthProviderDefaultProps, UmbUserLoginState } from '../types.js';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
@@ -173,7 +173,7 @@ export class UmbAuthViewElement extends UmbLitElement {
 		}
 	};
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
