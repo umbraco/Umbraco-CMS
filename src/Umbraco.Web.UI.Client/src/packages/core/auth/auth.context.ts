@@ -453,14 +453,14 @@ export class UmbAuthContext extends UmbContextBase {
 			return false;
 		}
 
-		// Use ifAvailable so we don't queue — if another tab is already refreshing,
-		// we return true immediately. The BroadcastChannel sessionUpdate will arrive
-		// shortly and the session timeout controller will reschedule.
-		return navigator.locks.request('umb:token-refresh', { ifAvailable: true }, async (lock) => {
-			if (!lock) {
-				// Another tab holds the lock — it's already refreshing.
-				return true;
-			}
+		// Exclusive lock: tabs queue instead of skipping. After acquiring the lock,
+		// check if the session is still valid — a tab that refreshed before us will
+		// have broadcast a sessionUpdate, so our session state is already fresh.
+		// This prevents sequential /token calls when tabs' timers fire slightly offset
+		// (ifAvailable would miss these because the lock is released before the next
+		// tab's timer fires).
+		return navigator.locks.request('umb:token-refresh', async () => {
+			if (this.isSessionValid()) return true;
 
 			const response = await this.#client.refreshToken();
 			if (response) {
