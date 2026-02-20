@@ -36,7 +36,10 @@ fetch(swaggerUrl).then(async (response) => {
     output: 'src/api',
     plugins: [
       ...defaultPlugins,
-      '@hey-api/client-fetch',
+      {
+        name: '@hey-api/client-fetch',
+        runtimeConfigPath: './src/hey-api.ts',
+      },
       {
         name: '@hey-api/sdk',
         asClass: true,
