@@ -25,7 +25,8 @@ internal class ContentVersionCleanupTest
         [Frozen] Mock<IMainDom> mainDom,
         [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
         [Frozen] Mock<IRuntimeState> runtimeState,
-        [Frozen] Mock<IContentVersionService> cleanupService,
+        [Frozen] Mock<IContentVersionService> contentVersionService,
+        [Frozen] Mock<IElementVersionService> elementVersionService,
         ContentVersionCleanupJob sut)
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
@@ -38,7 +39,8 @@ internal class ContentVersionCleanupTest
 
         await sut.ExecuteAsync();
 
-        cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
+        contentVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
+        elementVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
     }
 
     [Test]
@@ -48,7 +50,8 @@ internal class ContentVersionCleanupTest
         [Frozen] Mock<IMainDom> mainDom,
         [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
         [Frozen] Mock<IRuntimeState> runtimeState,
-        [Frozen] Mock<IContentVersionService> cleanupService,
+        [Frozen] Mock<IContentVersionService> contentVersionService,
+        [Frozen] Mock<IElementVersionService> elementVersionService,
         ContentVersionCleanupJob sut)
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
@@ -62,6 +65,7 @@ internal class ContentVersionCleanupTest
 
         await sut.ExecuteAsync();
 
-        cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
+        contentVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
+        elementVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
     }
 }
