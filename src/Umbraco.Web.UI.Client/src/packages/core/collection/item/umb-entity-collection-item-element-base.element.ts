@@ -8,9 +8,18 @@ import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/ev
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UmbContextBoundaryController } from '@umbraco-cms/backoffice/context-api';
 
 export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
+	constructor() {
+		super();
+		// Prevent any UMB_ENTITY_CONTEXT from leaking out of each collection item.
+		// Each item provides its own context, and consumers inside should never
+		// accidentally receive a context from a sibling or ancestor item.
+		new UmbContextBoundaryController(this, UMB_ENTITY_CONTEXT);
+	}
+
 	#extensionsController?: UmbExtensionsElementInitializer<any>;
 	#entityContext?: UmbEntityContext;
 	#item?: UmbCollectionItemModel;
