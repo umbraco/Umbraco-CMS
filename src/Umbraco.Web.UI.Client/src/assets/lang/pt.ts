@@ -2012,6 +2012,7 @@ export default {
 		noLockouts: 'não foi bloqueado',
 		noPasswordChange: 'A palavra-passe não foi alterada',
 		confirmNewPassword: 'Confirmar nova palavra-passe',
+		confirmPassword: 'Confirmar palavra-passe',
 		changePasswordDescription:
 			"Pode alterar a sua palavra-passe para aceder ao backoffice do Umbraco preenchendo o formulário abaixo e clicando no botão 'Alterar Palavra-passe'",
 		contentChannel: 'Canal de Conteúdo',
