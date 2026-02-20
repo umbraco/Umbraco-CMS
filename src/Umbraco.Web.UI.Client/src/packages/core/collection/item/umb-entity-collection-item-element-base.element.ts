@@ -39,6 +39,7 @@ export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 		if (this._component && value.entityType === oldValue?.entityType) {
 			this._component.item = value;
 			this.#entityContext?.setUnique(value.unique ?? null);
+			this.#pathAddendum.setAddendum(this.getPathAddendum(value.entityType, value.unique));
 			return;
 		}
 
