@@ -453,17 +453,12 @@ export class UmbAuthContext extends UmbContextBase {
 			return false;
 		}
 
-		// Capture the access token expiry before acquiring the lock so we can detect
-		// if another tab refreshed while we waited.
-		const expiryBeforeLock = this.#session.getValue()?.accessTokenExpiresAt;
-
-		return navigator.locks.request('umb:token-refresh', async () => {
-			// If the session's expiry changed while we waited, another tab already refreshed.
-			// This also works when expiryBeforeLock is undefined (first load): if another tab
-			// set a session via BroadcastChannel, currentExpiry becomes truthy and differs
-			// from undefined, so we correctly skip the redundant refresh.
-			const currentExpiry = this.#session.getValue()?.accessTokenExpiresAt;
-			if (currentExpiry && currentExpiry !== expiryBeforeLock) {
+		// Use ifAvailable so we don't queue — if another tab is already refreshing,
+		// we return true immediately. The BroadcastChannel sessionUpdate will arrive
+		// shortly and the session timeout controller will reschedule.
+		return navigator.locks.request('umb:token-refresh', { ifAvailable: true }, async (lock) => {
+			if (!lock) {
+				// Another tab holds the lock — it's already refreshing.
 				return true;
 			}
 
