@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -224,6 +225,123 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         retrievedDataType = repository.Get(dataType.Key);
         Assert.IsNull(retrievedDataType);
+    }
+
+    [Test]
+    public void GetAll_After_GetAll_Is_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        CreateDataType(repository);
+
+        // Clear the isolated cache so the next GetAll hits the database.
+        realCache.IsolatedCaches.ClearCache<IDataType>();
+
+        database.EnableSqlCount = true;
+
+        // First GetAll should hit the database and populate the cache.
+        var first = repository.GetMany().ToArray();
+        Assert.IsNotEmpty(first);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Second GetAll should serve data from cache. The DefaultRepositoryCachePolicy still
+        // runs a SELECT COUNT(*) validation query (GetAllCacheValidateCount is enabled by default),
+        // so we expect exactly 1 SQL query for the count check.
+        // This verifies that GUID-keyed cache entries (under a separate prefix) do not
+        // pollute the int-keyed repository's prefix search and count validation.
+        // Before the fix for #21756, GUID entries inflated the prefix-based count, causing
+        // validation to fail and triggering a full re-query from the database (SqlCount >> 1).
+        var second = repository.GetMany().ToArray();
+        Assert.IsNotEmpty(second);
+        Assert.AreEqual(1, database.SqlCount);
+    }
+
+    /// <summary>
+    /// Verifies that retrieving all data types from the GUID-based repository returns all items when the cache is
+    /// populated.
+    /// </summary>
+    /// <remarks>
+    /// Verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/21756 as this test fails before
+    /// the fix is applied.
+    /// </remarks>
+    [Test]
+    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    {
+        // Saving a data type populates both the int-keyed and GUID-keyed isolated
+        // caches (they share the same IAppPolicyCache keyed by typeof(IDataType)).
+        // When GetMany is then called via the GUID-based IReadRepository with no
+        // keys, it should return all data types regardless of cache state.
+
+        var realCache = CreateAppCaches();
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        // Save populates the cache for both int and GUID lookups.
+        var dataType = CreateDataType(repository);
+
+        // Cast to the GUID-based read interface (same path as DataTypeService.GetAllAsync).
+        var guidRepo = (IReadRepository<Guid, IDataType>)repository;
+
+        // GetMany should return the saved data type without throwing.
+        var result = guidRepo.GetMany().ToArray();
+        Assert.IsNotEmpty(result);
+        Assert.That(result.Any(dt => dt.Key == dataType.Key));
+    }
+
+    [Test]
+    public void Retrieval_By_Guid_After_GetMany_By_Guid_Is_Cached()
+    {
+        var realCache = CreateAppCaches();
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var dataType = CreateDataType(repository);
+
+        // Clear the isolated cache so the next retrieval hits the database.
+        realCache.IsolatedCaches.ClearCache<IDataType>();
+
+        var guidRepo = (IReadRepository<Guid, IDataType>)repository;
+
+        database.EnableSqlCount = true;
+
+        // GetMany with specific GUIDs should hit the database and populate the GUID cache.
+        var result = guidRepo.GetMany(dataType.Key).ToArray();
+        Assert.IsNotEmpty(result);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent Get by the same GUID should be served from the GUID cache.
+        var cached = guidRepo.Get(dataType.Key);
+        Assert.IsNotNull(cached);
+        Assert.AreEqual(dataType.Key, cached!.Key);
+        Assert.AreEqual(0, database.SqlCount);
     }
 
     private static AppCaches CreateAppCaches() =>
