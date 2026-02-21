@@ -354,6 +354,36 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Rebuild_Does_Not_Create_Untrusted_Foreign_Key_Constraints()
+    {
+        if (BaseTestDatabase.IsSqlServer() is false)
+        {
+            Assert.Ignore("This test only applies to SQL Server (SQLite has no constraint trust concept).");
+        }
+
+        // Arrange - publish content so the rebuild inserts both draft and published rows.
+        ContentService.Publish(Textpage, ["*"]);
+
+        // Act - Rebuild the cache (uses SqlBulkCopy internally).
+        DocumentCacheService.Rebuild([ContentType.Id]);
+
+        // Assert - Verify no untrusted FK constraints exist on the cmsContentNu table.
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var untrustedCount = ScopeAccessor.AmbientScope!.Database.ExecuteScalar<int>(
+            @"SELECT COUNT(*)
+                  FROM sys.foreign_keys
+                  WHERE is_not_trusted = 1
+                    AND OBJECT_NAME(parent_object_id) = @0",
+            "cmsContentNu");
+
+        Assert.That(
+            untrustedCount,
+            Is.EqualTo(0),
+            "FK constraints on cmsContentNu should be trusted after rebuild. " +
+            "SqlBulkCopy with SqlBulkCopyOptions.Default causes constraints to become untrusted.");
+    }
+
     [GeneratedRegex(@"""dt"":""[^""]+""")]
     private static partial Regex RemoveDatesFromJsonSerialization();
 }
