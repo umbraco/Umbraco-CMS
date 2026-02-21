@@ -120,15 +120,6 @@ public class BlockEditorVarianceHandlerTests
             owner);
     }
 
-    private static BlockListValue CreateBlockListValue(Guid contentDataKey, Guid contentTypeKey, List<BlockPropertyValue> values, List<BlockItemVariation> expose)
-    {
-        return new BlockListValue
-        {
-            ContentData = [new() { Key = contentDataKey, ContentTypeKey = contentTypeKey, Values = values }],
-            Expose = expose
-        };
-    }
-
     [Test]
     public void AlignExposeVariance_Removes_Exposed_Keys_When_Not_In_ContentData()
     {
@@ -234,23 +225,6 @@ public class BlockEditorVarianceHandlerTests
     {
         var subject = BlockEditorVarianceHandler("da-DK", owner);
         return await subject.AlignedExposeVarianceAsync(blockValue, owner, element);
-    }
-
-
-    private static List<BlockItemVariation> CreateBlockItemVariations(params (Guid contentKey, string? culture, string? segment)[] configs)
-    {
-        return configs.Select(c => new BlockItemVariation 
-        { 
-            ContentKey = c.contentKey,
-            Culture = c.culture, 
-            Segment = c.segment
-        }).ToList();
-    }
-
-    private static void ExecuteAlignExposeVariance(IPublishedElement owner, BlockListValue blockValue)
-    {
-        var subject = BlockEditorVarianceHandler("da-DK", owner);
-        subject.AlignExposeVariance(blockValue);
     }
 
     private static IPublishedPropertyType PublishedPropertyType(ContentVariation variation)
