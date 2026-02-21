@@ -79,6 +79,7 @@ public class BlockEditorVarianceHandlerTests
             var alignedExpose = blockValue.Expose.First();
             Assert.AreEqual("en-US", alignedExpose.Culture);
             Assert.AreEqual("segment-one", alignedExpose.Segment);
+        });
     }
 
     [Test]
