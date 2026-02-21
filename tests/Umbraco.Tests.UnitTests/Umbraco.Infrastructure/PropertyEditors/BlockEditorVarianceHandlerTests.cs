@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
+
+internal record BlockPropertyValueConfig(string Alias, string? Culture, string? Segment, object? Value);
+
 [TestFixture]
 public class BlockEditorVarianceHandlerTests
 {
@@ -51,7 +54,7 @@ public class BlockEditorVarianceHandlerTests
     {
         var owner = PublishedElement(ContentVariation.Nothing);
         var contentDataKey = Guid.NewGuid();
-        var values = CreateBlockPropertyValues(("one", null, null, "Value one"));
+        var values = CreateBlockPropertyValues(new BlockPropertyValueConfig("one", null, null, "Value one"));
         var expose = CreateBlockItemVariations((contentDataKey, "da-DK", null));
         var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
 
@@ -65,7 +68,7 @@ public class BlockEditorVarianceHandlerTests
     {
         var owner = PublishedElement(ContentVariation.CultureAndSegment);
         var contentDataKey = Guid.NewGuid();
-        var values = CreateBlockPropertyValues(("one", "en-US", "segment-one", "Value one"));
+        var values = CreateBlockPropertyValues(new BlockPropertyValueConfig("one", "en-US", "segment-one", "Value one"));
         var expose = CreateBlockItemVariations((contentDataKey, null, null));
         var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
 
@@ -83,7 +86,7 @@ public class BlockEditorVarianceHandlerTests
     {
         var owner = PublishedElement(ContentVariation.Culture);
         var contentDataKey = Guid.NewGuid();
-        var values = CreateBlockPropertyValues(("one", null, null, "Value one"));
+        var values = CreateBlockPropertyValues(new BlockPropertyValueConfig("one", null, null, "Value one"));
         var expose = CreateBlockItemVariations((contentDataKey, "da-DK", null));
         var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
 
@@ -95,13 +98,13 @@ public class BlockEditorVarianceHandlerTests
     [Test]
     public async Task AlignPropertyVarianceAsync_Removes_NonDefault_Culture_Values()
     {
-        var owner = PublishedElement(ContentVariation.Culture);
-        var contentDataKey = Guid.NewGuid();
-        var values = CreateBlockPropertyValues(("one", null, null, "Value one"));
-        var expose = CreateBlockItemVariations((contentDataKey, "da-DK", null));
-        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
-
-        ExecuteAlignExposeVariance(owner, blockValue);
+        var propertyValues = CreatePropertyValues(
+            (ContentVariation.Nothing, "da-DK"),
+            (ContentVariation.Nothing, "en-US"));
+        var result = await ExecuteAlignPropertyVarianceAsync(ContentVariation.Nothing, propertyValues, null);
+        Assert.AreEqual(1, result.Count);
+        Assert.IsNull(result.First().Culture);
+    }
 
     private static async Task<BlockPropertyValue?> ExecuteAlignedPropertyVarianceAsync(
         ContentVariation ownerVariation,
@@ -144,8 +147,8 @@ public class BlockEditorVarianceHandlerTests
         var owner = PublishedElement(ContentVariation.Culture);
         var contentDataKey = Guid.NewGuid();
         var values = CreateBlockPropertyValues(
-            ("one", "da-DK", null, "Value one"),
-            ("two", "da-DK", null, "Value two"));
+            new BlockPropertyValueConfig("one", "da-DK", null, "Value one"),
+            new BlockPropertyValueConfig("two", "da-DK", null, "Value two"));
         var expose = CreateBlockItemVariations(
             (contentDataKey, "da-DK", null),
             (contentDataKey, "da-DK", null));
@@ -160,7 +163,7 @@ public class BlockEditorVarianceHandlerTests
         var owner = PublishedElement(ContentVariation.Culture);
         var contentDataKey = Guid.NewGuid();
         var unknownContentTypeKey = Guid.NewGuid();
-        var values = CreateBlockPropertyValues(("one", "da-DK", null, "Value one"));
+        var values = CreateBlockPropertyValues(new BlockPropertyValueConfig("one", "da-DK", null, "Value one"));
         var expose = CreateBlockItemVariations((contentDataKey, null, null));
         var blockValue = CreateBlockListValue(contentDataKey, unknownContentTypeKey, values, expose);
         ExecuteAlignExposeVariance(owner, blockValue);
@@ -174,8 +177,8 @@ public class BlockEditorVarianceHandlerTests
         var owner = PublishedElement(ContentVariation.Culture);
         var contentDataKey1 = Guid.NewGuid();
         var contentDataKey2 = Guid.NewGuid();
-        var values1 = CreateBlockPropertyValues(("one", "da-DK", null, "Value one"));
-        var values2 = CreateBlockPropertyValues(("two", "en-US", null, "Value two"));
+        var values1 = CreateBlockPropertyValues(new BlockPropertyValueConfig("one", "da-DK", null, "Value one"));
+        var values2 = CreateBlockPropertyValues(new BlockPropertyValueConfig("two", "en-US", null, "Value two"));
         var expose = CreateBlockItemVariations(
             (contentDataKey1, null, null),
             (contentDataKey2, null, null));
@@ -232,16 +235,6 @@ public class BlockEditorVarianceHandlerTests
         return await subject.AlignedExposeVarianceAsync(blockValue, owner, element);
     }
 
-    private static List<BlockPropertyValue> CreateBlockPropertyValues(params (string alias, string? culture, string? segment, object? value)[] configs)
-    {
-        return configs.Select(c => new BlockPropertyValue 
-        { 
-            Alias = c.alias,
-            Culture = c.culture, 
-            Segment = c.segment,
-            Value = c.value
-        }).ToList();
-    }
 
     private static List<BlockItemVariation> CreateBlockItemVariations(params (Guid contentKey, string? culture, string? segment)[] configs)
     {
@@ -307,13 +300,13 @@ public class BlockEditorVarianceHandlerTests
         return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object);
     }
 
-    private static List<BlockPropertyValue> CreateBlockPropertyValues(params (string alias, string? culture, string? segment, object? value)[] configs) =>
+    private static List<BlockPropertyValue> CreateBlockPropertyValues(params BlockPropertyValueConfig[] configs) =>
         configs.Select(c => new BlockPropertyValue
         {
-            Alias = c.alias,
-            Culture = c.culture,
-            Segment = c.segment,
-            Value = c.value,
+            Alias = c.Alias,
+            Culture = c.Culture,
+            Segment = c.Segment,
+            Value = c.Value,
         }).ToList();
 
     private static List<BlockItemVariation> CreateBlockItemVariations(params (Guid contentKey, string? culture, string? segment)[] configs) =>
