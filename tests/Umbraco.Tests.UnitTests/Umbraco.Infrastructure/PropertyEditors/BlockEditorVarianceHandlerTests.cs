@@ -298,7 +298,11 @@ public class BlockEditorVarianceHandlerTests
             {
                 return elementType.Object;
             }
-            return null!; // Return null for unknown content types
+            // Return null for unknown content types - this simulates real behavior where
+            // IContentTypeService.Get() can return null for non-existent content types.
+            // The production code handles this with .WhereNotNull() (see BlockEditorVarianceHandler.cs:172).
+            // This is tested by AlignExposeVariance_Skips_When_ElementType_Not_Found.
+            return null!;
         });
         return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object);
     }
