@@ -89,6 +89,20 @@ public class BlockEditorVarianceHandlerTests
 
         ExecuteAlignExposeVariance(owner, blockValue);
 
+        Assert.AreEqual("da-DK", blockValue.Expose.First().Culture);
+    }
+
+    [Test]
+    public async Task AlignPropertyVarianceAsync_Removes_NonDefault_Culture_Values()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var contentDataKey = Guid.NewGuid();
+        var values = CreateBlockPropertyValues(("one", null, null, "Value one"));
+        var expose = CreateBlockItemVariations((contentDataKey, "da-DK", null));
+        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
+
+        ExecuteAlignExposeVariance(owner, blockValue);
+
     private static async Task<BlockPropertyValue?> ExecuteAlignedPropertyVarianceAsync(
         ContentVariation ownerVariation,
         ContentVariation propertyTypeVariation,
