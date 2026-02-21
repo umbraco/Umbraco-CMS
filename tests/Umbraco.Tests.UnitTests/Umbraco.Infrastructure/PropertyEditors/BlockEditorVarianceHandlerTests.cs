@@ -251,7 +251,6 @@ public class BlockEditorVarianceHandlerTests
     {
         var subject = BlockEditorVarianceHandler("da-DK", owner);
         subject.AlignExposeVariance(blockValue);
->>>>>>> 39bb437394 (refactor: consistently use CreateBlockListValue helper in all tests)
     }
 
     private static IPublishedPropertyType PublishedPropertyType(ContentVariation variation)
