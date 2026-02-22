@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -22,6 +24,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     private readonly ILongRunningOperationService _longRunningOperationService;
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
+    [ActivatorUtilitiesConstructor]
     public IndexingRebuilderService(
         IIndexRebuilder indexRebuilder,
         ILogger<IndexingRebuilderService> logger,
@@ -32,6 +35,19 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         _logger = logger;
         _longRunningOperationService = longRunningOperationService;
         _serverRoleAccessor = serverRoleAccessor;
+    }
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public IndexingRebuilderService(
+        AppCaches appCaches,
+        IIndexRebuilder indexRebuilder,
+        ILogger<IndexingRebuilderService> logger)
+        : this(
+            indexRebuilder,
+            logger,
+            StaticServiceProvider.Instance.GetRequiredService<ILongRunningOperationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
+    {
     }
 
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
