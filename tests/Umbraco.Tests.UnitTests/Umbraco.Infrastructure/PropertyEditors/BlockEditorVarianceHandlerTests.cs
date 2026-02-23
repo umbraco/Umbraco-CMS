@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -12,11 +8,11 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
-internal record BlockPropertyValueConfig(string Alias, string? Culture, string? Segment, object? Value);
-
 [TestFixture]
 public class BlockEditorVarianceHandlerTests
 {
+    private record BlockPropertyValueConfig(string Alias, string? Culture, string? Segment, object? Value);
+
     [Test]
     public async Task Assigns_Default_Culture_When_Culture_Variance_Is_Enabled()
     {
@@ -36,7 +32,7 @@ public class BlockEditorVarianceHandlerTests
             ContentVariation.Nothing,
             new BlockPropertyValue { Culture = "da-DK" });
         Assert.IsNotNull(result);
-        Assert.AreEqual(null, result.Culture);
+        Assert.IsNull(result.Culture);
     }
 
     [Test]
@@ -187,44 +183,21 @@ public class BlockEditorVarianceHandlerTests
         Assert.IsTrue(blockValue.Expose.Any(e => e.Culture == "en-US"));
     }
 
-    private static List<BlockPropertyValue> CreatePropertyValues(params (ContentVariation variation, string? culture)[] configs)
-    {
-        return configs.Select(c => new BlockPropertyValue 
-        { 
-            Culture = c.culture, 
-            PropertyType = CreatePropertyType(c.variation) 
+    private static List<BlockPropertyValue> CreatePropertyValues(params (ContentVariation variation, string? culture)[] configs) =>
+        configs.Select(c => new BlockPropertyValue
+        {
+            Culture = c.culture,
+            PropertyType = CreatePropertyType(c.variation),
         }).ToList();
-    }
 
     private static async Task<IList<BlockPropertyValue>> ExecuteAlignPropertyVarianceAsync(
-        ContentVariation ownerVariation, 
-        List<BlockPropertyValue> propertyValues, 
+        ContentVariation ownerVariation,
+        List<BlockPropertyValue> propertyValues,
         string? culture)
     {
         var owner = PublishedElement(ownerVariation);
         var subject = BlockEditorVarianceHandler("da-DK", owner);
         return await subject.AlignPropertyVarianceAsync(propertyValues, culture);
-    }
-
-    private static (IPublishedElement owner, IPublishedElement element, BlockListValue blockValue) SetupAlignedExposeTest(
-        ContentVariation ownerVariation,
-        ContentVariation elementVariation,
-        Func<Guid, List<BlockItemVariation>> createExpose)
-    {
-        var owner = PublishedElement(ownerVariation);
-        var element = PublishedElement(elementVariation);
-        var elementKey = element.Key;
-        var blockValue = CreateBlockListValue(elementKey, owner.ContentType.Key, [], createExpose(elementKey));
-        return (owner, element, blockValue);
-    }
-
-    private static async Task<IEnumerable<BlockItemVariation>> ExecuteAlignedExposeVarianceAsync(
-        IPublishedElement owner,
-        IPublishedElement element,
-        BlockListValue blockValue)
-    {
-        var subject = BlockEditorVarianceHandler("da-DK", owner);
-        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element);
     }
 
     private static IPublishedPropertyType PublishedPropertyType(ContentVariation variation)
