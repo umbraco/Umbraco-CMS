@@ -63,4 +63,19 @@ public static class DbContextRegistrationExtensions
         DbContextRegistration registration = builder.Services.GetDbContextRegistration();
         registration.AddRegistrar(builder.Services, registrar);
     }
+
+    /// <summary>
+    /// Registers a provider-specific EF Core model customizer that will be applied during
+    /// <see cref="Microsoft.EntityFrameworkCore.DbContext" /> model creation.
+    /// </summary>
+    /// <typeparam name="TCustomizer">
+    /// The type of <see cref="IEFCoreModelCustomizer"/> to register.
+    /// </typeparam>
+    /// <param name="builder">The Umbraco builder.</param>
+    public static IUmbracoBuilder AddEFCoreModelCustomizer<TCustomizer>(this IUmbracoBuilder builder)
+        where TCustomizer : class, IEFCoreModelCustomizer
+    {
+        builder.Services.AddSingleton<IEFCoreModelCustomizer, TCustomizer>();
+        return builder;
+    }
 }
