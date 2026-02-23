@@ -46,6 +46,145 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
+    public async Task AlignedExposeVarianceAsync_Returns_Empty_When_No_Matching_Variations()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = Guid.NewGuid(), Culture = "da-DK" }],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
+
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Assigns_Default_Culture_When_Variations_Are_Invariant()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = null, Segment = null }],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(element.Key, variation.ContentKey);
+            Assert.AreEqual("da-DK", variation.Culture);
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Removes_Default_Culture_When_Expected_Invariant()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = "da-DK" }],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(element.Key, variation.ContentKey);
+            Assert.IsNull(variation.Culture);
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Filters_NonDefault_Culture_When_Expected_Invariant()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose =
+            [
+                new() { ContentKey = element.Key, Culture = "da-DK" },
+                new() { ContentKey = element.Key, Culture = "en-US" },
+            ],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(element.Key, variation.ContentKey);
+            Assert.IsNull(variation.Culture);
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Returns_Unchanged_When_Already_Variant()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = "da-DK" }],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(element.Key, variation.ContentKey);
+            Assert.AreEqual("da-DK", variation.Culture);
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Returns_Unchanged_When_Already_Invariant()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = null }],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(element.Key, variation.ContentKey);
+            Assert.IsNull(variation.Culture);
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Preserves_Segment_When_Assigning_Culture()
+    {
+        var owner = PublishedElement(ContentVariation.CultureAndSegment);
+        var element = PublishedElement(ContentVariation.CultureAndSegment);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = null, Segment = "my-segment" }],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("da-DK", variation.Culture);
+            Assert.AreEqual("my-segment", variation.Segment);
+        });
+    }
+
+    [Test]
     public void AlignExposeVariance_Can_Align_Invariance()
     {
         var owner = PublishedElement(ContentVariation.Nothing);
@@ -192,12 +331,22 @@ public class BlockEditorVarianceHandlerTests
             owner);
     }
 
+    private static async Task<IEnumerable<BlockItemVariation>> ExecuteAlignedExposeVarianceAsync(
+        IPublishedElement owner,
+        IPublishedElement element,
+        BlockListValue blockValue)
+    {
+        var subject = BlockEditorVarianceHandler("da-DK", element);
+        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element);
+    }
+
     private static IPublishedElement PublishedElement(ContentVariation variation)
     {
         var contentTypeMock = new Mock<IPublishedContentType>();
         contentTypeMock.SetupGet(m => m.Variations).Returns(variation);
         contentTypeMock.SetupGet(m => m.Key).Returns(Guid.NewGuid());
         var elementMock = new Mock<IPublishedElement>();
+        elementMock.SetupGet(m => m.Key).Returns(Guid.NewGuid());
         elementMock.SetupGet(m => m.ContentType).Returns(contentTypeMock.Object);
         return elementMock.Object;
     }
@@ -216,6 +365,7 @@ public class BlockEditorVarianceHandlerTests
             {
                 return elementType.Object;
             }
+
             // Return null for unknown content types - this simulates real behavior where
             // IContentTypeService.Get() can return null for non-existent content types.
             // The production code handles this with .WhereNotNull() (see BlockEditorVarianceHandler.cs:172).
