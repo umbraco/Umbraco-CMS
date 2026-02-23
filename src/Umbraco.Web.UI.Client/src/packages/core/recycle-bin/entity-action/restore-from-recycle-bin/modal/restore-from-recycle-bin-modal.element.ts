@@ -60,9 +60,10 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		// This is a temp solution to show something in the UI.
 		if (unique === null) {
 			this._destinationItemName = 'Root';
+			this._destinationItem = null;
 
 			this.#setDestinationValue({
-				unique: null,
+				unique,
 				entityType: this.data?.destinationRootEntityType ?? this.data?.entityType ?? 'unknown',
 			});
 
@@ -185,7 +186,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			<h4>Cannot automatically restore this item.</h4>
 			<p>There is no location where this item can be automatically restored. You can select a new location below.</p>
 			<h5>Restore to:</h5>
-			${this._destinationItem && this._destinationItemName
+			${this._destinationItem !== undefined && this._destinationItemName
 				? html`
 						<uui-ref-node name=${this._destinationItemName}>
 							<uui-action-bar slot="actions">
