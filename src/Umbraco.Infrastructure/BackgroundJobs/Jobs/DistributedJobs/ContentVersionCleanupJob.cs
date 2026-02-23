@@ -65,11 +65,11 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
 
         if (deletedVersions.Count > 0)
         {
-            _logger.LogInformation("Deleted {count} {entityType} version(s)", deletedVersions.Count, entityType);
+            _logger.LogInformation("Deleted {Count} {EntityType} version(s)", deletedVersions.Count, entityType);
         }
         else
         {
-            _logger.LogDebug("Cleanup complete for {entityType} versions, no items were deleted", entityType);
+            _logger.LogDebug("Cleanup complete for {EntityType} versions, no items were deleted", entityType);
         }
     }
 }
