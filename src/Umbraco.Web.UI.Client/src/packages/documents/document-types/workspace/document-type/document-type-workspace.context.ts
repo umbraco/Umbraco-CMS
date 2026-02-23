@@ -92,6 +92,10 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ allowedAtRoot });
 	}
 
+	setAllowedInLibrary(allowedInLibrary: boolean) {
+		this.structure.updateOwnerContentType({ allowedInLibrary });
+	}
+
 	setVariesByCulture(variesByCulture: boolean) {
 		this.structure.updateOwnerContentType({ variesByCulture });
 	}
