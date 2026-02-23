@@ -7,6 +7,8 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbCollectionItemModel } from './types.js';
 
 // Minimal fallback element used by the concrete test implementation.
+// Extends UmbElementMixin so it can host the UmbEntityContext
+// and respond to getContext() calls from tests.
 @customElement('umb-test-collection-item-fallback')
 class UmbTestCollectionItemFallbackElement extends UmbElementMixin(HTMLElement) {
 	item: UmbCollectionItemModel | undefined;
@@ -126,24 +128,27 @@ describe('UmbEntityCollectionItemElementBase', () => {
 			await elementUpdated(el);
 		}
 
-		it('provides UMB_ENTITY_CONTEXT on the host element', async () => {
+		it('provides UMB_ENTITY_CONTEXT on the inner component', async () => {
 			await setItemAndFlush(element, makeItem('test-entity', 'item-1'));
 
-			const context = await element.getContext(UMB_ENTITY_CONTEXT);
+			const component = element['_component'] as UmbTestCollectionItemFallbackElement;
+			const context = await component.getContext(UMB_ENTITY_CONTEXT);
 			expect(context).to.not.be.undefined;
 		});
 
 		it('sets entity type on the context', async () => {
 			await setItemAndFlush(element, makeItem('test-entity', 'item-1'));
 
-			const context = await element.getContext(UMB_ENTITY_CONTEXT);
+			const component = element['_component'] as UmbTestCollectionItemFallbackElement;
+			const context = await component.getContext(UMB_ENTITY_CONTEXT);
 			expect(context!.getEntityType()).to.equal('test-entity');
 		});
 
 		it('sets unique on the context', async () => {
 			await setItemAndFlush(element, makeItem('test-entity', 'item-1'));
 
-			const context = await element.getContext(UMB_ENTITY_CONTEXT);
+			const component = element['_component'] as UmbTestCollectionItemFallbackElement;
+			const context = await component.getContext(UMB_ENTITY_CONTEXT);
 			expect(context!.getUnique()).to.equal('item-1');
 		});
 
@@ -151,18 +156,22 @@ describe('UmbEntityCollectionItemElementBase', () => {
 			await setItemAndFlush(element, makeItem('test-entity', 'item-1'));
 			await setItemAndFlush(element, makeItem('test-entity', 'item-2'));
 
-			const context = await element.getContext(UMB_ENTITY_CONTEXT);
+			const component = element['_component'] as UmbTestCollectionItemFallbackElement;
+			const context = await component.getContext(UMB_ENTITY_CONTEXT);
 			expect(context!.getUnique()).to.equal('item-2');
 		});
 
-		it('updates entity type on the context when entity type changes', async () => {
+		it('creates a fresh context when entity type changes', async () => {
 			await setItemAndFlush(element, makeItem('test-entity', 'item-1'));
-
-			const context = await element.getContext(UMB_ENTITY_CONTEXT);
-			expect(context!.getEntityType()).to.equal('test-entity');
+			const firstComponent = element['_component'] as UmbTestCollectionItemFallbackElement;
+			const firstContext = await firstComponent.getContext(UMB_ENTITY_CONTEXT);
 
 			await setItemAndFlush(element, makeItem('other-entity', 'item-1'));
-			expect(context!.getEntityType()).to.equal('other-entity');
+			const secondComponent = element['_component'] as UmbTestCollectionItemFallbackElement;
+			const secondContext = await secondComponent.getContext(UMB_ENTITY_CONTEXT);
+
+			expect(secondContext).to.not.equal(firstContext);
+			expect(secondContext!.getEntityType()).to.equal('other-entity');
 		});
 	});
 
