@@ -35,13 +35,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 /// </remarks>
 public class UmbracoDbContext : DbContext
 {
+    private readonly IEFCoreModelCustomizer[] _modelCustomizers;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoDbContext"/> class.
     /// </summary>
     /// <param name="options">The options to be used by the DbContext.</param>
-    public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
+    /// <param name="modelCustomizers">Provider-specific model customizers to apply during model creation.</param>
+    public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options, IEnumerable<IEFCoreModelCustomizer> modelCustomizers)
         : base(ConfigureOptions(options))
-    { }
+        => _modelCustomizers = modelCustomizers.ToArray();
 
     public required DbSet<WebhookDto> Webhooks { get; set; }
 
@@ -91,6 +94,11 @@ public class UmbracoDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        foreach (IEFCoreModelCustomizer customizer in _modelCustomizers)
+        {
+            customizer.Apply(modelBuilder);
+        }
 
         foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
         {
