@@ -1102,6 +1102,8 @@ export type ElementValueResponseModel = {
 export type ElementVariantItemResponseModel = {
     name: string;
     culture?: string | null;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
 };
 
@@ -1121,6 +1123,8 @@ export type ElementVariantResponseModel = {
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
+    readonly id: string;
+    flags: Array<FlagModel>;
 };
 
 export type ElementVersionItemResponseModel = {
@@ -3353,6 +3357,26 @@ export type DocumentVariantItemResponseModelWritable = {
 };
 
 export type DocumentVariantResponseModelWritable = {
+    culture?: string | null;
+    segment?: string | null;
+    name: string;
+    createDate: string;
+    updateDate: string;
+    state: DocumentVariantStateModel;
+    publishDate?: string | null;
+    scheduledPublishDate?: string | null;
+    scheduledUnpublishDate?: string | null;
+    flags: Array<FlagModel>;
+};
+
+export type ElementVariantItemResponseModelWritable = {
+    name: string;
+    culture?: string | null;
+    flags: Array<FlagModel>;
+    state: DocumentVariantStateModel;
+};
+
+export type ElementVariantResponseModelWritable = {
     culture?: string | null;
     segment?: string | null;
     name: string;

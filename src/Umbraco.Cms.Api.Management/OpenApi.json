@@ -47285,6 +47285,8 @@
       },
       "ElementVariantItemResponseModel": {
         "required": [
+          "flags",
+          "id",
           "name",
           "state"
         ],
@@ -47296,6 +47298,21 @@
           "culture": {
             "type": "string",
             "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
           },
           "state": {
             "$ref": "#/components/schemas/DocumentVariantStateModel"
@@ -47327,6 +47344,8 @@
       "ElementVariantResponseModel": {
         "required": [
           "createDate",
+          "flags",
+          "id",
           "name",
           "state",
           "updateDate"
@@ -47370,6 +47389,21 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false

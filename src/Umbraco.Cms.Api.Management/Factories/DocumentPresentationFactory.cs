@@ -114,7 +114,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
-        PopulateFlagsOnDocuments(responseModel);
+        PopulateFlags(responseModel);
 
         return responseModel;
     }
@@ -143,7 +143,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 Culture = null,
             };
 
-            PopulateFlagsOnVariants(model);
+            PopulateFlags(model);
             yield return model;
             yield break;
         }
@@ -157,7 +157,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
             };
 
-            PopulateFlagsOnVariants(model);
+            PopulateFlags(model);
             yield return model;
         }
     }
@@ -212,19 +212,12 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
 
-    private void PopulateFlagsOnDocuments(DocumentItemResponseModel model)
+    private void PopulateFlags<TItem>(TItem model)
+        where TItem : IHasFlags
     {
-        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
+        foreach (IFlagProvider flagProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<TItem>()))
         {
-            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
-        }
-    }
-
-    private void PopulateFlagsOnVariants(DocumentVariantItemResponseModel model)
-    {
-        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentVariantItemResponseModel>()))
-        {
-            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
+            flagProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
         }
     }
 }
