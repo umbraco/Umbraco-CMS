@@ -34,5 +34,12 @@ public interface IEFCoreModelCustomizer<TEntity> : IEFCoreModelCustomizer
     Type IEFCoreModelCustomizer.EntityType => typeof(TEntity);
 
     void IEFCoreModelCustomizer.Apply(ModelBuilder modelBuilder)
-        => Customize(modelBuilder.Entity<TEntity>());
+    {
+        if (modelBuilder.Model.FindEntityType(typeof(TEntity)) is null)
+        {
+            throw new InvalidOperationException("The context does not contain the entity type " + typeof(TEntity).FullName);
+        }
+
+        Customize(modelBuilder.Entity<TEntity>());
+    }
 }
