@@ -54,8 +54,13 @@ public class UpdateDocumentTypeController : DocumentTypeControllerBase
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
+        var start = DateTime.UtcNow;
+        Console.WriteLine("### Update starting at: {0}", start);
         ContentTypeUpdateModel model = _documentTypeEditingPresentationFactory.MapUpdateModel(requestModel);
         Attempt<IContentType?, ContentTypeOperationStatus> result = await _contentTypeEditingService.UpdateAsync(contentType, model, CurrentUserKey(_backOfficeSecurityAccessor));
+        var finished  = DateTime.UtcNow;
+        Console.WriteLine("### Update finished at: {0}", finished);
+        Console.WriteLine("### Update time in seconds: {0}", (start - finished).TotalSeconds);
 
         return result.Success
             ? Ok()
