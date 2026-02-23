@@ -126,7 +126,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Show the provider selection screen
-		const authModalKey = 'umbAuthModal';
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		if (!modalManager) {
 			throw new Error('[Fatal] Modal manager is not available');
@@ -140,7 +139,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 						userLoginState,
 					},
 					modal: {
-						key: authModalKey,
 						backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
 					},
 				})
