@@ -209,7 +209,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IExamineManager>(),
                 factory.GetRequiredService<IPublishedContentCache>(),
                 factory.GetRequiredService<IPublishedMediaCache>(),
-                factory.GetRequiredService<IDocumentNavigationQueryService>());
+                factory.GetRequiredService<IDocumentNavigationQueryService>(),
+                factory.GetRequiredService<IMediaNavigationQueryService>());
         });
 
         // register accessors for cultures
