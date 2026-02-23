@@ -39,7 +39,7 @@ public enum ContentTypeChangeTypes : byte
     ///     - Changes to name, description, icon etc.
     ///     - Changes to other content type settings, i.e. allowed child types and version cleanup.
     /// </remarks>
-    RefreshOther = 4, // changed, other change
+    RefreshOther = 4,
 
     /// <summary>
     ///     Content type was removed
