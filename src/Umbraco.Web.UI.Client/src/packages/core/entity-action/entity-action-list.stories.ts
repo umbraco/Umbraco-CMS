@@ -2,7 +2,9 @@ import type { UmbEntityActionListElement } from './entity-action-list.element.js
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import '@umbraco-cms/backoffice/context-api';
+
 import './entity-action-list.element.js';
 
 const meta: Meta<UmbEntityActionListElement> = {
@@ -12,7 +14,7 @@ const meta: Meta<UmbEntityActionListElement> = {
 		(story) =>
 			html`<umb-context-provider
 				.key=${UMB_ENTITY_CONTEXT}
-				.create=${(host: any) => {
+				.create=${(host: UmbControllerHost) => {
 					const context = new UmbEntityContext(host);
 					context.setEntityType('document');
 					context.setUnique('1234');
