@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -8,9 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Tests.Scheduling;
