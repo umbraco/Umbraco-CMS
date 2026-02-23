@@ -31,7 +31,7 @@ public class SearchMediaItemController : MediaItemControllerBase
         _dataTypeService = dataTypeService;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead, will be removed in Umbraco 18.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory)

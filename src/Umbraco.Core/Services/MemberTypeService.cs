@@ -81,7 +81,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     /// <param name="eventAggregator">The event aggregator for publishing notifications.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
     /// <param name="contentTypeFilters">The collection of content type filters.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public MemberTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -124,7 +124,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     /// <param name="eventAggregator">The event aggregator for publishing notifications.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
     /// <param name="contentTypeFilters">The collection of content type filters.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public MemberTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

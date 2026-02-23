@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     Checks user access to media
 /// </summary>
-[Obsolete($"Please use {nameof(IMediaPermissionService)} instead, scheduled for removal in V15.")]
+[Obsolete($"Please use {nameof(IMediaPermissionService)} instead. Scheduled for removal in Umbraco 18.")]
 public class MediaPermissions
 {
     private readonly AppCaches _appCaches;

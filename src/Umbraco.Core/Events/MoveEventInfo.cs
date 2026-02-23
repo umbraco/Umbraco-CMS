@@ -33,7 +33,7 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
     /// <summary>
     ///     Gets or sets the identifier of the new parent.
     /// </summary>
-    [Obsolete("Please use NewParentKey instead, scheduled for removal in V15")]
+    [Obsolete("Please use NewParentKey instead. Scheduled for removal in Umbraco 18.")]
     public int NewParentId { get; set; }
 
     /// <summary>

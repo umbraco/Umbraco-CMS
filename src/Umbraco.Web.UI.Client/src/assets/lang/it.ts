@@ -1739,6 +1739,7 @@ export default {
 		noLockouts: 'non è stato bloccato',
 		noPasswordChange: 'La password non è stata modificata',
 		confirmNewPassword: 'Conferma la nuova password',
+		confirmPassword: 'Conferma password',
 		changePasswordDescription:
 			"È possibile modificare la password di accesso al backoffice Umbraco compilando il form sottostante e clicca sul pulsante 'Modifica password'",
 		contentChannel: 'Contenuto del canale',

@@ -13,17 +13,19 @@ public class UserGroup2GranularPermissionDto
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string UniqueIdColumnName = Constants.DatabaseSchema.Columns.UniqueIdName;
 
+    private const string UserGroupKeyColumnName = "userGroupKey";
+
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_umbracoUserGroup2GranularPermissionDto", AutoIncrement = true)]
     public int Id { get; set; }
 
-    [Column("userGroupKey")]
+    [Column(UserGroupKeyColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId", IncludeColumns = UniqueIdColumnName)]
     [ForeignKey(typeof(UserGroupDto), Column = UserGroupDto.KeyColumnName)]
     public Guid UserGroupKey { get; set; }
 
     [Column(UniqueIdColumnName)]
-    [ForeignKey(typeof(NodeDto), Column = UniqueIdColumnName)]
+    [ForeignKey(typeof(NodeDto), Column = NodeDto.KeyColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UniqueId")]
     public Guid? UniqueId { get; set; }

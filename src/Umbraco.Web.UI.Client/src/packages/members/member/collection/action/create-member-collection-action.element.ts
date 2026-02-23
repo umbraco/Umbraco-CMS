@@ -69,6 +69,7 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 				label=${this.localize.term('general_create')}
 				@click=${this.#onButtonClick}
 				look="outline"
+				data-mark="action:create"
 				popovertarget="create-popover"></uui-button>
 			<uui-popover-container id="create-popover">
 				<div id="popover-content">${until(this.#renderOptions(), html`<uui-loader></uui-loader>`)}</div>

@@ -36,18 +36,18 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
-        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in V16.")]
+        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 18.")]
         public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
 
         /// <inheritdoc />
-        [Obsolete("Not supported for members, scheduled for removal in v17")]
+        [Obsolete("Not supported for members. Scheduled for removal in Umbraco 18.")]
         public abstract int Level { get; }
 
         /// <inheritdoc />
-        [Obsolete("Not supported for members, scheduled for removal in v17")]
+        [Obsolete("Not supported for members. Scheduled for removal in Umbraco 18.")]
         public abstract string Path { get; }
 
         /// <inheritdoc />
@@ -78,11 +78,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract bool IsPublished(string? culture = null);
 
         /// <inheritdoc />
-        [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+        [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
         public abstract IPublishedContent? Parent { get; }
 
         /// <inheritdoc />
-        [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+        [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
         public virtual IEnumerable<IPublishedContent> Children => GetChildren();
 
 
