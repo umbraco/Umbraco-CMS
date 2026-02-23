@@ -797,7 +797,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                                       ?? new PropertyType(_shortStringHelper, dataType)
                                       {
                                           // We are demanding a property type key in the model, so we should probably
-                                          // ensure that it's the on that's actually used.
+                                          // ensure that it's the one that's actually used.
                                           Key = property.Key
                                       };
 
