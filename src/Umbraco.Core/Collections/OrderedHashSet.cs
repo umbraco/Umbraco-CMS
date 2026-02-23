@@ -13,8 +13,16 @@ public class OrderedHashSet<T> : KeyedCollection<T, T>
 {
     private readonly bool _keepOldest;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="OrderedHashSet{T}" /> class.
+    /// </summary>
+    /// <param name="keepOldest">
+    ///     When <c>true</c>, the oldest item is kept when a duplicate is added;
+    ///     when <c>false</c>, the newest item replaces the oldest.
+    /// </param>
     public OrderedHashSet(bool keepOldest = true) => _keepOldest = keepOldest;
 
+    /// <inheritdoc />
     protected override void InsertItem(int index, T item)
     {
         if (Dictionary == null)
@@ -42,5 +50,6 @@ public class OrderedHashSet<T> : KeyedCollection<T, T>
         }
     }
 
+    /// <inheritdoc />
     protected override T GetKeyForItem(T item) => item;
 }

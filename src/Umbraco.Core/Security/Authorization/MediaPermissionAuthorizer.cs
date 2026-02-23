@@ -9,6 +9,10 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 {
     private readonly IMediaPermissionService _mediaPermissionService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaPermissionAuthorizer" /> class.
+    /// </summary>
+    /// <param name="mediaPermissionService">The media permission service.</param>
     public MediaPermissionAuthorizer(IMediaPermissionService mediaPermissionService) =>
         _mediaPermissionService = mediaPermissionService;
 

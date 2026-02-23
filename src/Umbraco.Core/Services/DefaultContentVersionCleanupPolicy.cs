@@ -7,12 +7,23 @@ using ContentVersionCleanupPolicySettings = Umbraco.Cms.Core.Models.ContentVersi
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Default implementation of the content version cleanup policy that determines which content versions
+/// should be cleaned up based on configuration settings and per-content-type overrides.
+/// </summary>
 public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
 {
     private readonly IOptions<ContentSettings> _contentSettings;
     private readonly IDocumentVersionRepository _documentVersionRepository;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultContentVersionCleanupPolicy"/> class.
+    /// </summary>
+    /// <param name="contentSettings">The content settings options.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
+    /// <param name="documentVersionRepository">The document version repository.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
     public DefaultContentVersionCleanupPolicy(
         IOptions<ContentSettings> contentSettings,
         ICoreScopeProvider scopeProvider,
@@ -24,6 +35,7 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
                                      throw new ArgumentNullException(nameof(documentVersionRepository));
     }
 
+    /// <inheritdoc />
     public IEnumerable<ContentVersionMeta> Apply(DateTime asAtDate, IEnumerable<ContentVersionMeta> items)
     {
         // Note: Not checking global enable flag, that's handled in the scheduled job.

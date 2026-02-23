@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for the <see cref="IContentTypeService"/> interface.
+/// </summary>
 public static class ContentTypeServiceExtensions
 {
     /// <summary>
@@ -140,6 +143,12 @@ public static class ContentTypeServiceExtensions
         return new ContentTypeAvailableCompositionsResults(ancestors, result);
     }
 
+    /// <summary>
+    /// Gets all ancestor content types for the specified content type.
+    /// </summary>
+    /// <param name="ctype">The content type to get ancestors for.</param>
+    /// <param name="allContentTypes">All available content types.</param>
+    /// <returns>An array of ancestor content types.</returns>
     private static IContentTypeComposition[] GetAncestors(
         IContentTypeComposition? ctype,
         IContentTypeComposition[] allContentTypes)
@@ -169,10 +178,10 @@ public static class ContentTypeServiceExtensions
     }
 
     /// <summary>
-    ///     Get those that we use directly
+    /// Gets all content type compositions that are used directly or indirectly by the specified content type.
     /// </summary>
-    /// <param name="ctype"></param>
-    /// <returns></returns>
+    /// <param name="ctype">The content type to get compositions for.</param>
+    /// <returns>A collection of direct and indirect content type compositions.</returns>
     private static IEnumerable<IContentTypeComposition> GetDirectOrIndirect(IContentTypeComposition? ctype)
     {
         if (ctype == null)

@@ -26,6 +26,8 @@ public class AncestorsDictionaryTreeController : DictionaryTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor dictionary items.")]
+    [EndpointDescription("Gets a collection of dictionary items that are ancestors to the provided Id.")]
     public async Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> Ancestors(CancellationToken cancellationToken, Guid descendantId)
         => await GetAncestors(descendantId);
 }

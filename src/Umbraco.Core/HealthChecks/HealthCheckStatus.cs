@@ -3,12 +3,16 @@ using System.Runtime.Serialization;
 namespace Umbraco.Cms.Core.HealthChecks;
 
 /// <summary>
-///     The status returned for a health check when it performs it check
-///     TODO: This model will be used in the WebApi result so needs attributes for JSON usage
+///     The status returned for a health check when it performs its check.
+///     TODO: This model will be used in the WebApi result so needs attributes for JSON usage.
 /// </summary>
 [DataContract(Name = "healthCheckStatus", Namespace = "")]
 public class HealthCheckStatus
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HealthCheckStatus" /> class.
+    /// </summary>
+    /// <param name="message">The status message.</param>
     public HealthCheckStatus(string message)
     {
         Message = message;

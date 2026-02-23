@@ -33,10 +33,21 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         Indecies = new Dictionary<TKey, int>(equalityComparer);
     }
 
+    /// <summary>
+    ///     Gets the dictionary mapping keys to their indices in the collection.
+    /// </summary>
     protected Dictionary<TKey, int> Indecies { get; }
 
+    /// <summary>
+    ///     Gets the function used to extract a key from a value.
+    /// </summary>
     protected Func<TValue, TKey> KeySelector { get; }
 
+    /// <summary>
+    ///     Removes the element with the specified key from the dictionary.
+    /// </summary>
+    /// <param name="key">The key of the element to remove.</param>
+    /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
     public bool Remove(TKey key)
     {
         if (!Indecies.TryGetValue(key, out int index))
@@ -48,12 +59,14 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         return true;
     }
 
+    /// <inheritdoc />
     event NotifyCollectionChangedEventHandler? INotifyCollectionChanged.CollectionChanged
     {
         add => _changed += value;
         remove => _changed -= value;
     }
 
+    /// <inheritdoc />
     public bool ContainsKey(TKey key) => Indecies.ContainsKey(key);
 
     /// <summary>
@@ -112,6 +125,11 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         return true;
     }
 
+    /// <summary>
+    ///     Replaces all elements in the dictionary with the specified values.
+    /// </summary>
+    /// <param name="values">The values to replace the current elements with.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="values" /> is <c>null</c>.</exception>
     public void ReplaceAll(IEnumerable<TValue> values)
     {
         if (values == null)
@@ -150,6 +168,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
     #region Protected Methods
 
+    /// <inheritdoc />
     protected override void InsertItem(int index, TValue item)
     {
         TKey key = KeySelector(item);
@@ -170,12 +189,14 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         Indecies[key] = index;
     }
 
+    /// <inheritdoc />
     protected override void ClearItems()
     {
         base.ClearItems();
         Indecies.Clear();
     }
 
+    /// <inheritdoc />
     protected override void RemoveItem(int index)
     {
         TValue item = this[index];
@@ -195,6 +216,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
     #region IDictionary and IReadOnlyDictionary implementation
 
+    /// <inheritdoc />
     public bool TryGetValue(TKey key, out TValue val)
     {
         if (Indecies.TryGetValue(key, out var index))
@@ -217,13 +239,16 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
     /// </summary>
     public IEnumerable<TValue> Values => Items;
 
+    /// <inheritdoc />
     ICollection<TKey> IDictionary<TKey, TValue>.Keys => Indecies.Keys;
 
-    // this will never be used
+    /// <inheritdoc />
     ICollection<TValue> IDictionary<TKey, TValue>.Values => Values.ToList();
 
+    /// <inheritdoc />
     bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
+    /// <inheritdoc />
     IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
     {
         foreach (TValue i in Values)
@@ -233,15 +258,20 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         }
     }
 
+    /// <inheritdoc />
     void IDictionary<TKey, TValue>.Add(TKey key, TValue value) => Add(value);
 
+    /// <inheritdoc />
     void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item) => Add(item.Value);
 
+    /// <inheritdoc />
     bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item) => ContainsKey(item.Key);
 
+    /// <inheritdoc />
     void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) =>
         throw new NotImplementedException();
 
+    /// <inheritdoc />
     bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item) => Remove(item.Key);
 
     #endregion

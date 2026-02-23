@@ -233,7 +233,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		}
 
 		// Loading:
-		return html`<uui-loader-bar style="margin-top:10px;"></uui-loader-bar>`;
+		return html`<uui-loader-bar id="loader"></uui-loader-bar>`;
 	}
 
 	override destroy(): void {
@@ -247,6 +247,18 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			:host {
 				display: block;
 				position: relative;
+			}
+
+			#loader {
+				margin-top: 10px;
+				opacity: 0;
+				animation: show-loader 0s 120ms forwards;
+			}
+
+			@keyframes show-loader {
+				to {
+					opacity: 1;
+				}
 			}
 
 			:host::after {

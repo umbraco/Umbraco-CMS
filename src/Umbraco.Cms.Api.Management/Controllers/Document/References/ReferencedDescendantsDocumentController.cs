@@ -55,6 +55,8 @@ public class ReferencedDescendantsDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets document descendants that are referenced.")]
+    [EndpointDescription("Gets a paginated collection of descendant documents that are referenced by other content.")]
     public async Task<IActionResult> ReferencedDescendants2(
         CancellationToken cancellationToken,
         Guid id,

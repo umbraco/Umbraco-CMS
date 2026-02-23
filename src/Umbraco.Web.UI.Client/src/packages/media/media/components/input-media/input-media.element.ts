@@ -111,7 +111,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	@property({ type: Array })
-	allowedContentTypeIds?: Array<string> | undefined;
+	allowedContentTypeIds?: Array<string>;
 
 	@property({ type: Boolean, attribute: 'include-trashed' })
 	includeTrashed = false;

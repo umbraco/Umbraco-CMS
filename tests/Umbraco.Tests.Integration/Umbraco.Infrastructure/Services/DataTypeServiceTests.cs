@@ -15,7 +15,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 /// <summary>
-///     Tests covering the DataTypeService
+///     Tests covering the DataTypeService.
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -31,7 +31,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
@@ -145,10 +145,10 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText);
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var doctype =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentTypeService.Save(doctype);
+        await ContentTypeService.CreateAsync(doctype, Constants.Security.SuperUserKey);
 
         // validate the assumptions used for assertions later in this test
         var contentType = ContentTypeService.Get(doctype.Id);
@@ -406,7 +406,9 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             };
 
         // Act & Assert
+#pragma warning disable CS0618 // Type or member is obsolete
         Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [Test]
@@ -454,10 +456,10 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         IEnumerable<IDataType> dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText);
 
         IContentType documentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Text Page");
-        ContentTypeService.Save(documentType);
+        await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
 
         IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbMediaItem", "Media Item");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         documentType = ContentTypeService.Get(documentType.Id);
         Assert.IsNotNull(documentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));

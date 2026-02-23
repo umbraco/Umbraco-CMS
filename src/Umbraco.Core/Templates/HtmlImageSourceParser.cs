@@ -1,9 +1,12 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Templates;
 
+/// <summary>
+///     Utility class used to parse and update image sources in HTML content based on Umbraco media references.
+/// </summary>
 public sealed class HtmlImageSourceParser
 {
     private static readonly Regex ResolveImgPattern = new(
@@ -22,8 +25,16 @@ public sealed class HtmlImageSourceParser
 
     private Func<Guid, string?>? _getMediaUrl;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
+    /// </summary>
+    /// <param name="getMediaUrl">A function that retrieves the media URL for a given GUID.</param>
     public HtmlImageSourceParser(Func<Guid, string> getMediaUrl) => _getMediaUrl = getMediaUrl;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider for resolving media URLs.</param>
     public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider) =>
         _publishedUrlProvider = publishedUrlProvider;
 

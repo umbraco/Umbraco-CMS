@@ -9,6 +9,10 @@ internal sealed class UserGroupPermissionAuthorizer : IUserGroupPermissionAuthor
 {
     private readonly IUserGroupPermissionService _userGroupPermissionService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserGroupPermissionAuthorizer" /> class.
+    /// </summary>
+    /// <param name="userGroupPermissionService">The user group permission service.</param>
     public UserGroupPermissionAuthorizer(IUserGroupPermissionService userGroupPermissionService) =>
         _userGroupPermissionService = userGroupPermissionService;
 

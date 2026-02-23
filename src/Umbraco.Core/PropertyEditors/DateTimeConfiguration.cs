@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+///     Represents the configuration for the DateTime property editor.
+/// </summary>
 public class DateTimeConfiguration
 {
     /// <summary>
@@ -13,6 +16,9 @@ public class DateTimeConfiguration
     [ConfigurationField("timeZones")]
     public TimeZonesConfiguration? TimeZones { get; set; }
 
+    /// <summary>
+    /// Represents the time zone configuration options for the DateTime property editor.
+    /// </summary>
     public class TimeZonesConfiguration
     {
         /// <summary>
@@ -26,6 +32,9 @@ public class DateTimeConfiguration
         public List<string> TimeZones { get; set; } = [];
     }
 
+    /// <summary>
+    /// Specifies the time zone display mode for the DateTime property editor.
+    /// </summary>
     public enum TimeZoneMode
     {
         /// <summary>
