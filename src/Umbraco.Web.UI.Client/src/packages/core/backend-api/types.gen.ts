@@ -934,12 +934,12 @@ export type DocumentVariantResponseModel = {
     name: string;
     createDate: string;
     updateDate: string;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
-    readonly id: string;
-    flags: Array<FlagModel>;
 };
 
 export enum DocumentVariantStateModel {
@@ -1119,12 +1119,12 @@ export type ElementVariantResponseModel = {
     name: string;
     createDate: string;
     updateDate: string;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
-    readonly id: string;
-    flags: Array<FlagModel>;
 };
 
 export type ElementVersionItemResponseModel = {
@@ -3362,11 +3362,11 @@ export type DocumentVariantResponseModelWritable = {
     name: string;
     createDate: string;
     updateDate: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
-    flags: Array<FlagModel>;
 };
 
 export type ElementVariantItemResponseModelWritable = {
@@ -3382,11 +3382,11 @@ export type ElementVariantResponseModelWritable = {
     name: string;
     createDate: string;
     updateDate: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
-    flags: Array<FlagModel>;
 };
 
 export type PackageDefinitionResponseModelWritable = {

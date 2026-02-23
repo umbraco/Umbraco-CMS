@@ -46518,6 +46518,21 @@
             "type": "string",
             "format": "date-time"
           },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
           "state": {
             "$ref": "#/components/schemas/DocumentVariantStateModel"
           },
@@ -46535,21 +46550,6 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "flags": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/FlagModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -47372,6 +47372,21 @@
             "type": "string",
             "format": "date-time"
           },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
           "state": {
             "$ref": "#/components/schemas/DocumentVariantStateModel"
           },
@@ -47389,21 +47404,6 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "flags": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/FlagModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
