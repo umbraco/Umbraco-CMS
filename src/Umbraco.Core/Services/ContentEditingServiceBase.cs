@@ -115,9 +115,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="newParentId">The new parent identifier.</param>
     /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>The copied content, or null if the operation failed.</returns>
-    protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId);
+    protected abstract Task<TContent?> CopyAsync(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
 
     /// <summary>
     /// Moves content to the recycle bin.
@@ -473,8 +473,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
-        var userId = await GetUserIdAsync(userKey);
-        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
+        TContent? copy = await CopyAsync(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userKey);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
