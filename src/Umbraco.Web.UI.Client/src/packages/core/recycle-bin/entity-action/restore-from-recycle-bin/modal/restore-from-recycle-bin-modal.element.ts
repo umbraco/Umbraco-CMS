@@ -69,20 +69,23 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			this._destinationItem = await this.#requestDestinationItem(unique);
 			if (!this._destinationItem) throw new Error('Cant find destination item.');
 
-			const resolverCtor = this.data?.destinationItemDataResolver ?? this.data?.itemDataResolver;
-			if (resolverCtor) {
-				const resolver = new resolverCtor(this);
-				resolver.setData(this._destinationItem);
-				this._destinationItemName = await resolver.getName();
-			} else {
-				this._destinationItemName = this._destinationItem.name;
-			}
+			this._destinationItemName = await this.#resolveDestinationItemName(this._destinationItem);
 
 			this.#setDestinationValue({
 				unique: this._destinationItem.unique,
 				entityType: this._destinationItem.entityType,
 			});
 		}
+	}
+
+	async #resolveDestinationItemName(item: any): Promise<string> {
+		const resolverCtor = this.data?.destinationItemDataResolver ?? this.data?.itemDataResolver;
+		if (resolverCtor) {
+			const resolver = new resolverCtor(this);
+			resolver.setData(item);
+			return (await resolver.getName()) ?? item.name;
+		}
+		return item.name;
 	}
 
 	async #requestAutomaticRestoreDestination(): Promise<string | null | undefined> {
