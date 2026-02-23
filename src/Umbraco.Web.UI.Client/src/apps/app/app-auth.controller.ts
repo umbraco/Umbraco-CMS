@@ -1,4 +1,9 @@
-import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, type UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
+import {
+	UMB_AUTH_CONTEXT,
+	UMB_MODAL_APP_AUTH,
+	type UmbModalAppAuthValue,
+	type UmbUserLoginState,
+} from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -127,24 +132,23 @@ export class UmbAppAuthController extends UmbControllerBase {
 			throw new Error('[Fatal] Modal manager is not available');
 		}
 
-		const selected = await modalManager
-			.open(this._host, UMB_MODAL_APP_AUTH, {
-				data: {
-					userLoginState,
-				},
-				modal: {
-					key: authModalKey,
-					backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
-				},
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		let selected: UmbModalAppAuthValue | undefined;
+		do {
+			selected = await modalManager
+				.open(this._host, UMB_MODAL_APP_AUTH, {
+					data: {
+						userLoginState,
+					},
+					modal: {
+						key: authModalKey,
+						backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
+					},
+				})
+				.onSubmit()
+				.catch(() => undefined);
+		} while (!selected?.success && userLoginState === 'timedOut');
 
-		if (!selected?.success) {
-			return false;
-		}
-
-		return true;
+		return selected?.success ?? false;
 	}
 
 	#updateState() {
