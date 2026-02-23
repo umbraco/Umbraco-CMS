@@ -4,6 +4,9 @@ import type { AllowedDocumentTypeModel } from '@umbraco-cms/backoffice/external/
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
  *
@@ -15,8 +18,29 @@ export class UmbDocumentTypeStructureServerDataSource extends UmbContentTypeStru
 	AllowedDocumentTypeModel,
 	UmbAllowedDocumentTypeModel
 > {
+	#host: UmbControllerHost;
+
 	constructor(host: UmbControllerHost) {
 		super(host, { getAllowedChildrenOf, mapper });
+		this.#host = host;
+	}
+
+	async getAllowedParents(documentTypeId: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>> {
+		const { data, error } = await tryExecute(
+			this.#host,
+			DocumentTypeService.getDocumentTypeByIdAllowedParents({
+				path: { id: documentTypeId },
+			}),
+		);
+		if (error) {
+			throw new Error('Failed to fetch allowed parents');
+		}
+		const mappedData =
+			data?.allowedParentIds.map((item) => ({
+				unique: item.id,
+				entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			})) ?? [];
+		return { data: mappedData };
 	}
 }
 

@@ -7,6 +7,10 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
+	protected async _getPickableFilter(unique: string): Promise<((item: any) => boolean) | undefined> {
+		return undefined;
+	}
+
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
@@ -15,18 +19,12 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
 		if (!moveRepository) throw new Error('Move Repository is not available');
 
-		// 2. Get the filter if the repository provides one
-		const customFilter = moveRepository.getSelectableFilter
-			? await moveRepository.getSelectableFilter(this.args.unique)
-			: undefined;
-
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
-				pickableFilter: (treeItem) =>
-					treeItem.unique !== this.args.unique && (customFilter ? customFilter(treeItem) : true),
+				pickableFilter: await this._getPickableFilter(this.args.unique),
 			},
 		});
 

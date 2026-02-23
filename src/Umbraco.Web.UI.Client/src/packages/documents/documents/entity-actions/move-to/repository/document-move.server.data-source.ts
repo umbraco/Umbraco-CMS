@@ -42,13 +42,4 @@ export class UmbMoveDocumentServerDataSource implements UmbMoveDataSource {
 			{ disableNotifications: true },
 		);
 	}
-
-	async getAllowedParents(documentTypeId: string) {
-		return tryExecute(
-			this.#host,
-			DocumentTypeService.getDocumentTypeByIdAllowedParents({
-				path: { id: documentTypeId },
-			}),
-		);
-	}
 }
