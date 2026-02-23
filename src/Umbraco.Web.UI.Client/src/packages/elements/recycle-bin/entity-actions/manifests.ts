@@ -1,12 +1,14 @@
 import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/constants.js';
-import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../../folder/repository/constants.js';
+import { UMB_ELEMENT_FOLDER_ITEM_REPOSITORY_ALIAS } from '../../folder/repository/item/constants.js';
 import { UMB_ELEMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import {
 	UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
 	UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 	UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 } from '../constants.js';
+import { UMB_ELEMENT_PICKER_MODAL } from '../../modals/constants.js';
 import { UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
 import {
 	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
@@ -99,6 +101,20 @@ const folderActions: Array<UmbExtensionManifest> = [
 			},
 			{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS },
 		],
+	},
+	{
+		type: 'entityAction',
+		kind: 'restoreFromRecycleBin',
+		alias: 'Umb.EntityAction.Element.Folder.RecycleBin.Restore',
+		name: 'Restore Element Folder From Recycle Bin Entity Action',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			itemRepositoryAlias: UMB_ELEMENT_FOLDER_ITEM_REPOSITORY_ALIAS,
+			recycleBinRepositoryAlias: UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
+			pickerModal: UMB_ELEMENT_PICKER_MODAL,
+			destinationRootEntityType: UMB_ELEMENT_ROOT_ENTITY_TYPE,
+		},
+		conditions: [{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS }],
 	},
 ];
 
