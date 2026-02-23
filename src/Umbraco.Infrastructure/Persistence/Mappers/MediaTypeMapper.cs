@@ -34,6 +34,7 @@ public sealed class MediaTypeMapper : BaseMapper
         DefineMap<MediaType, ContentTypeDto>(nameof(MediaType.Icon), nameof(ContentTypeDto.Icon));
         DefineMap<MediaType, ContentTypeDto>(nameof(MediaType.ListView), nameof(ContentTypeDto.ListView));
         DefineMap<MediaType, ContentTypeDto>(nameof(MediaType.IsElement), nameof(ContentTypeDto.IsElement));
+        DefineMap<MediaType, ContentTypeDto>(nameof(MediaType.AllowedInLibrary), nameof(ContentTypeDto.AllowedInLibrary));
         DefineMap<MediaType, ContentTypeDto>(nameof(MediaType.Thumbnail), nameof(ContentTypeDto.Thumbnail));
     }
 }

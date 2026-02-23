@@ -15,6 +15,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public class MediaControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "media";
+
     protected IActionResult MediaNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder

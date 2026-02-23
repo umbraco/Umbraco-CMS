@@ -124,6 +124,7 @@ public class ContentTypeBuilder
         contentType.ListView = GetListView();
         contentType.IsElement = _isElement ?? false;
         contentType.AllowedAsRoot = GetAllowedAtRoot();
+        contentType.AllowedInLibrary = GetAllowedInLibrary();
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;
@@ -176,6 +177,7 @@ public class ContentTypeBuilder
             .WithAlias(alias)
             .WithName(name)
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .Build();
     }
 
@@ -209,7 +211,7 @@ public class ContentTypeBuilder
         (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupAlias, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
 
     public static IContentType CreateSimpleElementType(string alias = "elementType", string name = "Element Type")
-        => CreateSimpleContentTypeHelper(alias, name).WithIsElement(true).Build();
+        => CreateSimpleContentTypeHelper(alias, name).WithIsElement(true).WithAllowedInLibrary(true).Build();
 
     public static ContentTypeBuilder CreateSimpleContentTypeHelper(
         string alias = null,

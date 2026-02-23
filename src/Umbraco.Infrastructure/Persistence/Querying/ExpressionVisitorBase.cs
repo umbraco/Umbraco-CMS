@@ -519,6 +519,8 @@ internal abstract class ExpressionVisitorBase
             case nameof(SqlExpressionExtensions.SqlEndsWith):
             case nameof(SqlExpressionExtensions.SqlContains):
             case nameof(SqlExpressionExtensions.SqlEquals):
+            case nameof(SqlExpressionExtensions.SqlLessThan):
+            case nameof(SqlExpressionExtensions.SqlGreaterThan):
             case nameof(StringExtensions.InvariantStartsWith):
             case nameof(StringExtensions.InvariantEndsWith):
             case nameof(StringExtensions.InvariantContains):
@@ -828,6 +830,18 @@ internal abstract class ExpressionVisitorBase
                 return Visited
                     ? string.Empty
                     : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+
+            case nameof(SqlExpressionExtensions.SqlLessThan):
+                SqlParameters.Add(RemoveQuote(val)!);
+                return Visited
+                    ? string.Empty
+                    : $"({col} < @{SqlParameters.Count - 1})";
+
+            case nameof(SqlExpressionExtensions.SqlGreaterThan):
+                SqlParameters.Add(RemoveQuote(val)!);
+                return Visited
+                    ? string.Empty
+                    : $"({col} > @{SqlParameters.Count - 1})";
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(verb));

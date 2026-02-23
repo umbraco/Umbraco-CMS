@@ -46,6 +46,7 @@ export class UmbMediaTypeDetailServerDataSource implements UmbDetailDataSource<U
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
+			allowedInLibrary: false,
 			properties: [],
 			containers: [],
 			allowedContentTypes: [],
@@ -84,6 +85,7 @@ export class UmbMediaTypeDetailServerDataSource implements UmbDetailDataSource<U
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
+			allowedInLibrary: data.allowedInLibrary,
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,
@@ -148,6 +150,7 @@ export class UmbMediaTypeDetailServerDataSource implements UmbDetailDataSource<U
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
+			allowedInLibrary: model.allowedInLibrary,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -215,6 +218,7 @@ export class UmbMediaTypeDetailServerDataSource implements UmbDetailDataSource<U
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
+			allowedInLibrary: model.allowedInLibrary,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,

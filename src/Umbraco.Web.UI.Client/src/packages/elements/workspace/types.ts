@@ -1,1 +1,1 @@
-export type * from './element-workspace.context.js';
+export type { UmbElementWorkspaceContext } from './element-workspace.context.js';
