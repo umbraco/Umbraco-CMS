@@ -1672,7 +1672,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     /// <inheritdoc />
     public void ClearSchedule(DateTime date)
     {
-        Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>().Where<ContentScheduleDto>(x => x.Date <= date);
+        Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>()
+            .Where<ContentScheduleDto>(x => x.Date <= date)
+            .WhereIn<ContentScheduleDto>(x => x.NodeId, Sql()
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId));
         Database.Execute(sql);
     }
 
@@ -1681,7 +1686,11 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     {
         var a = action.ToString();
         Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>()
-            .Where<ContentScheduleDto>(x => x.Date <= date && x.Action == a);
+            .Where<ContentScheduleDto>(x => x.Date <= date && x.Action == a)
+            .WhereIn<ContentScheduleDto>(x => x.NodeId, Sql()
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId));
         Database.Execute(sql);
     }
 
@@ -1692,10 +1701,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             tsql => tsql
                 .SelectCount()
                 .From<ContentScheduleDto>()
+                .InnerJoin<NodeDto>().On<ContentScheduleDto, NodeDto>((cs, n) => cs.NodeId == n.NodeId)
                 .Where<ContentScheduleDto>(x =>
-                    x.Action == SqlTemplate.Arg<string>("action") && x.Date <= SqlTemplate.Arg<DateTime>("date")));
+                    x.Action == SqlTemplate.Arg<string>("action") && x.Date <= SqlTemplate.Arg<DateTime>("date"))
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));
 
-        Sql<ISqlContext> sql = template.Sql(action.ToString(), date);
+        Sql<ISqlContext> sql = template.Sql(action.ToString(), date, NodeObjectTypeId);
         return sql;
     }
 
