@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -11,6 +11,7 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count.js';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement
@@ -89,7 +90,25 @@ export class UmbPropertyEditorUITextBoxElement
 		const newValue = (e.target as HTMLInputElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
+
+		// Show exceed validation instantly when limit is reached
+		if (isCharacterLimitExceeded(this._maxChars, newValue.length)) {
+			const input = this.shadowRoot?.querySelector('uui-input');
+			if (input) {
+				input.pristine = false;
+			}
+			this.pristine = false;
+		}
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#renderCharacterCount() {
+		if (!this._maxChars || this.readonly) return nothing;
+
+		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
+		if (!visible) return nothing;
+
+		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
 	}
 
 	override render() {
@@ -107,6 +126,7 @@ export class UmbPropertyEditorUITextBoxElement
 				?required=${this.mandatory}
 				@input=${this.#onInput}>
 			</uui-input>
+			${this.#renderCharacterCount()}
 		`;
 	}
 
@@ -114,6 +134,14 @@ export class UmbPropertyEditorUITextBoxElement
 		css`
 			uui-input {
 				width: 100%;
+			}
+
+			.char-count {
+				color: var(--uui-color-text-alt);
+			}
+
+			:host(:not(:focus-within)) .char-count {
+				display: none;
 			}
 		`,
 	];

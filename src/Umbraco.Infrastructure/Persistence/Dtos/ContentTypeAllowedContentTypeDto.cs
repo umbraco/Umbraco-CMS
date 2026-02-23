@@ -5,25 +5,27 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey([IdKeyColumnName, AllowedIdColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class ContentTypeAllowedContentTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentChildType;
 
-    // To avoid any risk of casing bugs caused by inconsistencies between upgraded and new installs, we keep the casing "Id" here even though in other tables the usual casing is lower-case ("id").
-    public const string PrimaryKeyColumnName = "Id";
+    // To avoid any risk of casing bugs caused by inconsistencies between upgraded and new installs, we keep the casing "Id" here
+    // even though in other tables the usual casing is lower-case ("id").
+    public const string IdKeyColumnName = "Id";
+
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     public const string SortOrderColumnName = "SortOrder";
     public const string AllowedIdColumnName = "AllowedId";
 
-    [Column(PrimaryKeyColumnName)]
-    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = NodeIdColumnName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType", OnColumns = $"{PrimaryKeyColumnName}, {AllowedIdColumnName}")]
+    [Column(IdKeyColumnName)]
+    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = ContentTypeDto.NodeIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType", OnColumns = $"{IdKeyColumnName}, {AllowedIdColumnName}")]
     public int Id { get; set; }
 
     [Column(AllowedIdColumnName)]
-    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1", Column = NodeIdColumnName)]
+    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1", Column = ContentTypeDto.NodeIdColumnName)]
     public int AllowedId { get; set; }
 
     [Column(SortOrderColumnName)]
