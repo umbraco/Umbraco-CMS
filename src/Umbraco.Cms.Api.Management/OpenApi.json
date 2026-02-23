@@ -1528,6 +1528,57 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/data-type/ancestors": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "summary": "Gets ancestors for a collection of data type items.",
+        "description": "Gets the ancestor chains for data type items identified by the provided Ids.",
+        "operationId": "GetItemDataTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/data-type/search": {
       "get": {
         "tags": [
@@ -6763,6 +6814,57 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/document-type/ancestors": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets ancestors for a collection of document type items.",
+        "description": "Gets the ancestor chains for document type items identified by the provided Ids.",
+        "operationId": "GetItemDocumentTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/document-type/search": {
       "get": {
         "tags": [
@@ -10900,6 +11002,57 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/document/ancestors": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Gets ancestors for a collection of document items.",
+        "description": "Gets the ancestor chains for document items identified by the provided Ids.",
+        "operationId": "GetItemDocumentAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/document/search": {
       "get": {
         "tags": [
@@ -14577,6 +14730,57 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/media-type/ancestors": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "summary": "Gets ancestors for a collection of media type items.",
+        "description": "Gets the ancestor chains for media type items identified by the provided Ids.",
+        "operationId": "GetItemMediaTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/media-type/folders": {
       "get": {
         "tags": [
@@ -17083,6 +17287,57 @@
                     "oneOf": [
                       {
                         "$ref": "#/components/schemas/MediaItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/media/ancestors": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Gets ancestors for a collection of media items.",
+        "description": "Gets the ancestor chains for media items identified by the provided Ids.",
+        "operationId": "GetItemMediaAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
                       }
                     ]
                   }
@@ -20267,6 +20522,57 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/member-type/ancestors": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets ancestors for a collection of member type items.",
+        "description": "Gets the ancestor chains for member type items identified by the provided Ids.",
+        "operationId": "GetItemMemberTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/member-type/search": {
       "get": {
         "tags": [
@@ -22511,6 +22817,57 @@
                     "oneOf": [
                       {
                         "$ref": "#/components/schemas/MemberItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/member/ancestors": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "summary": "Gets ancestors for a collection of member items.",
+        "description": "Gets the ancestor chains for member items identified by the provided Ids.",
+        "operationId": "GetItemMemberAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
                       }
                     ]
                   }
@@ -30601,6 +30958,57 @@
                     "oneOf": [
                       {
                         "$ref": "#/components/schemas/TemplateItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/template/ancestors": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "summary": "Gets ancestors for a collection of template items.",
+        "description": "Gets the ancestor chains for template items identified by the provided Ids.",
+        "operationId": "GetItemTemplateAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
                       }
                     ]
                   }
@@ -42965,6 +43373,30 @@
           "message": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
