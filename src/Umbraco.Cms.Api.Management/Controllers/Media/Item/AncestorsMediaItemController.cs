@@ -29,7 +29,7 @@ public class AncestorsMediaItemController : MediaItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<MediaItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of media items.")]
     [EndpointDescription("Gets the ancestor chains for media items identified by the provided Ids.")]
-    public IActionResult Ancestors(
+    public async Task<IActionResult> Ancestors(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
@@ -38,13 +38,14 @@ public class AncestorsMediaItemController : MediaItemControllerBase
             return Ok(Enumerable.Empty<ItemAncestorsResponseModel<MediaItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<MediaItemResponseModel>> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<MediaItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
             UmbracoObjectTypes.Media,
             null,
             ids,
-            ancestors => ancestors
-                .OfType<IMediaEntitySlim>()
-                .ToDictionary(e => e.Key, _mediaPresentationFactory.CreateItemResponseModel));
+            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, MediaItemResponseModel>>(
+                ancestors
+                    .OfType<IMediaEntitySlim>()
+                    .ToDictionary(e => e.Key, _mediaPresentationFactory.CreateItemResponseModel)));
 
         return Ok(result);
     }

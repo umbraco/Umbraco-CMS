@@ -20,11 +20,11 @@ internal sealed class ItemAncestorService : IItemAncestorService
         => _entityService = entityService;
 
     /// <inheritdoc />
-    public IEnumerable<ItemAncestorsResponseModel<TAncestorItem>> GetAncestors<TAncestorItem>(
+    public async Task<IEnumerable<ItemAncestorsResponseModel<TAncestorItem>>> GetAncestorsAsync<TAncestorItem>(
         UmbracoObjectTypes itemObjectType,
         UmbracoObjectTypes? folderObjectType,
         ISet<Guid> entityKeys,
-        Func<IEnumerable<IEntitySlim>, IReadOnlyDictionary<Guid, TAncestorItem>> ancestorMapper)
+        Func<IEnumerable<IEntitySlim>, Task<IReadOnlyDictionary<Guid, TAncestorItem>>> ancestorMapper)
         where TAncestorItem : ItemResponseModelBase
     {
         // Batch fetch all requested entities by Guid key (trying both item + folder types).
@@ -82,7 +82,7 @@ internal sealed class ItemAncestorService : IItemAncestorService
         }
 
         // Call the mapping delegate with all ancestor entities to produce rich models.
-        IReadOnlyDictionary<Guid, TAncestorItem> mappedAncestors = ancestorMapper(ancestorById.Values);
+        IReadOnlyDictionary<Guid, TAncestorItem> mappedAncestors = await ancestorMapper(ancestorById.Values);
 
         // Map per-entity: entity key -> ordered ancestor chain (root-first).
         return entities.Select(entity =>

@@ -21,7 +21,7 @@ public class AncestorsMemberTypeItemController : MemberTypeItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<MemberTypeItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of member type items.")]
     [EndpointDescription("Gets the ancestor chains for member type items identified by the provided Ids.")]
-    public IActionResult Ancestors(
+    public async Task<IActionResult> Ancestors(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
@@ -30,13 +30,14 @@ public class AncestorsMemberTypeItemController : MemberTypeItemControllerBase
             return Ok(Enumerable.Empty<ItemAncestorsResponseModel<MemberTypeItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<MemberTypeItemResponseModel>> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<MemberTypeItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
             UmbracoObjectTypes.MemberType,
             UmbracoObjectTypes.MemberTypeContainer,
             ids,
-            ancestors => ancestors.ToDictionary(
-                a => a.Key,
-                a => new MemberTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty }));
+            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, MemberTypeItemResponseModel>>(
+                ancestors.ToDictionary(
+                    a => a.Key,
+                    a => new MemberTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
 
         return Ok(result);
     }

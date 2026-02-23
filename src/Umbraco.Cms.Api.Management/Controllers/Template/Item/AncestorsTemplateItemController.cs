@@ -32,7 +32,7 @@ public class AncestorsTemplateItemController : TemplateItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<TemplateItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of template items.")]
     [EndpointDescription("Gets the ancestor chains for template items identified by the provided Ids.")]
-    public IActionResult Ancestors(
+    public async Task<IActionResult> Ancestors(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
@@ -41,14 +41,14 @@ public class AncestorsTemplateItemController : TemplateItemControllerBase
             return Ok(Enumerable.Empty<ItemAncestorsResponseModel<TemplateItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<TemplateItemResponseModel>> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<TemplateItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync<TemplateItemResponseModel>(
             UmbracoObjectTypes.Template,
             null,
             ids,
-            ancestors =>
+            async ancestors =>
             {
                 Guid[] ancestorKeys = ancestors.Select(a => a.Key).ToArray();
-                IEnumerable<ITemplate> templates = _templateService.GetAllAsync(ancestorKeys).GetAwaiter().GetResult();
+                IEnumerable<ITemplate> templates = await _templateService.GetAllAsync(ancestorKeys);
                 return _umbracoMapper.MapEnumerable<ITemplate, TemplateItemResponseModel>(templates)
                     .ToDictionary(t => t.Id);
             });

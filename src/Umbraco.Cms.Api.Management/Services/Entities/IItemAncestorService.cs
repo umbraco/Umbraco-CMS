@@ -24,10 +24,10 @@ public interface IItemAncestorService
     /// A collection of <see cref="ItemAncestorsResponseModel{TAncestorItem}"/> containing the ancestor chain for each found entity.
     /// Ancestors are ordered root-first (ascending level). Entities not found are silently omitted.
     /// </returns>
-    IEnumerable<ItemAncestorsResponseModel<TAncestorItem>> GetAncestors<TAncestorItem>(
+    Task<IEnumerable<ItemAncestorsResponseModel<TAncestorItem>>> GetAncestorsAsync<TAncestorItem>(
         UmbracoObjectTypes itemObjectType,
         UmbracoObjectTypes? folderObjectType,
         ISet<Guid> entityKeys,
-        Func<IEnumerable<IEntitySlim>, IReadOnlyDictionary<Guid, TAncestorItem>> ancestorMapper)
+        Func<IEnumerable<IEntitySlim>, Task<IReadOnlyDictionary<Guid, TAncestorItem>>> ancestorMapper)
         where TAncestorItem : ItemResponseModelBase;
 }

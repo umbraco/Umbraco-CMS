@@ -21,7 +21,7 @@ public class AncestorsDataTypeItemController : DatatypeItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<DataTypeItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of data type items.")]
     [EndpointDescription("Gets the ancestor chains for data type items identified by the provided Ids.")]
-    public IActionResult Ancestors(
+    public async Task<IActionResult> Ancestors(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
@@ -30,13 +30,14 @@ public class AncestorsDataTypeItemController : DatatypeItemControllerBase
             return Ok(Enumerable.Empty<ItemAncestorsResponseModel<DataTypeItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<DataTypeItemResponseModel>> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<DataTypeItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
             ids,
-            ancestors => ancestors.ToDictionary(
-                a => a.Key,
-                a => new DataTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty }));
+            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, DataTypeItemResponseModel>>(
+                ancestors.ToDictionary(
+                    a => a.Key,
+                    a => new DataTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
 
         return Ok(result);
     }

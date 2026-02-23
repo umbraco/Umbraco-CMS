@@ -21,7 +21,7 @@ public class AncestorsDocumentTypeItemController : DocumentTypeItemControllerBas
     [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<DocumentTypeItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of document type items.")]
     [EndpointDescription("Gets the ancestor chains for document type items identified by the provided Ids.")]
-    public IActionResult Ancestors(
+    public async Task<IActionResult> Ancestors(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
@@ -30,13 +30,14 @@ public class AncestorsDocumentTypeItemController : DocumentTypeItemControllerBas
             return Ok(Enumerable.Empty<ItemAncestorsResponseModel<DocumentTypeItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<DocumentTypeItemResponseModel>> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<DocumentTypeItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
             UmbracoObjectTypes.DocumentType,
             UmbracoObjectTypes.DocumentTypeContainer,
             ids,
-            ancestors => ancestors.ToDictionary(
-                a => a.Key,
-                a => new DocumentTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty }));
+            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, DocumentTypeItemResponseModel>>(
+                ancestors.ToDictionary(
+                    a => a.Key,
+                    a => new DocumentTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
 
         return Ok(result);
     }
