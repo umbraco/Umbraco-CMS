@@ -25,10 +25,22 @@ public class EFCoreModelCustomizerTests
     {
         var customizer = new TestCustomizer();
         var modelBuilder = new ModelBuilder();
+        modelBuilder.Entity<TestEntity>();
 
         ((IEFCoreModelCustomizer)customizer).Apply(modelBuilder);
 
         Assert.That(customizer.CustomizeWasCalled, Is.True);
+    }
+
+    [Test]
+    public void Apply_ThrowsWhenEntityTypeNotInModel()
+    {
+        var customizer = new TestCustomizer();
+        var modelBuilder = new ModelBuilder();
+
+        Assert.That(
+            () => ((IEFCoreModelCustomizer)customizer).Apply(modelBuilder),
+            Throws.TypeOf<InvalidOperationException>());
     }
 
     [Test]
