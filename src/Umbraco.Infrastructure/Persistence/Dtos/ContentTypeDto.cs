@@ -53,6 +53,10 @@ internal class ContentTypeDto
     [Constraint(Default = "0")]
     public bool IsElement { get; set; }
 
+    [Column("allowedInLibrary")]
+    [Constraint(Default = "0")]
+    public bool AllowedInLibrary { get; set; }
+
     [Column("allowAtRoot")]
     [Constraint(Default = "0")]
     public bool AllowAtRoot { get; set; }

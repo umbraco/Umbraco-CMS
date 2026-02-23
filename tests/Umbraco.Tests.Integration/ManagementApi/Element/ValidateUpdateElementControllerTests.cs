@@ -27,6 +27,7 @@ public class ValidateUpdateElementControllerTests : ManagementApiUserGroupTestBa
             .WithAlias(Guid.NewGuid().ToString())
             .WithName("Test Element")
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .Build();
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
