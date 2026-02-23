@@ -53,9 +53,8 @@ internal class NodeDtoConfiguration : IEntityTypeConfiguration<NodeDto>
             .HasColumnName(NodeDto.CreateDateColumnName)
             .IsRequired();
 
-        // TODO: Figure out how to add included columns
-        // https://learn.microsoft.com/en-us/ef/core/modeling/indexes?tabs=fluent-api#included-columns
         // IX_umbracoNode_UniqueId
+        // Note: SQL Server included columns are added by SqlServerNodeDtoModelCustomizer.
         builder.HasIndex(x => x.UniqueId)
             .IsUnique()
             .HasDatabaseName($"IX_{NodeDto.TableName}_UniqueId");
