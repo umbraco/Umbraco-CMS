@@ -5,6 +5,7 @@ export * from './conditions/index.js';
 export * from './controller/index.js';
 export * from './component/modal-base.element.js';
 export * from './component/modal.element.js';
+export { default as UmbPersistentModalDialogElement } from './component/umb-persistent-modal-dialog.element.js';
 export * from './context/index.js';
 export * from './token/index.js';
 export type * from './types.js';
