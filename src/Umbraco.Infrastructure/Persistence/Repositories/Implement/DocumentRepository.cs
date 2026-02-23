@@ -1891,6 +1891,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
     {
         var contentScheduleDtos = documentIds
+            .Distinct()
             .InGroupsOf(Constants.Sql.MaxParameterCount)
             .SelectMany(group =>
             {
