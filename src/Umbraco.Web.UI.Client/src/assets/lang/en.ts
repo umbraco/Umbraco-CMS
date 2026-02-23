@@ -1773,6 +1773,8 @@ export default {
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
 		allowAtRootDescription: 'Allow editors to create content of this type in the root of the content tree.',
+		allowInLibraryHeading: 'Allow in library',
+		allowInLibraryDescription: 'Allow editors to create elements of this type in the library section.',
 		childNodesHeading: 'Allowed child node types',
 		childNodesDescription: 'Allow content of the specified types to be created underneath content of this type.',
 		chooseChildNode: 'Choose child node',
