@@ -49,7 +49,7 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
             // Fall back to reading the invariant value.
             if (string.IsNullOrWhiteSpace(source) && culture is not null
                 && content.Properties.TryGetValue(Constants.Conventions.Content.UrlName, out IProperty? urlNameProperty)
-                && !urlNameProperty.PropertyType.VariesByCulture())
+                && urlNameProperty.PropertyType.VariesByCulture() is false)
             {
                 source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture: null, published: published) ?? string.Empty).Trim();
             }
