@@ -45,8 +45,8 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
             source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture, published: published) ?? string.Empty).Trim();
 
             // When a culture is requested but the umbracoUrlName property is invariant,
-            // Property.GetValue rejects non-null culture
-            // values for invariant properties and returns null. Fall back to reading the invariant value.
+            // Property.GetValue return null because it rejects non-null culture values.
+            // Fall back to reading the invariant value.
             if (string.IsNullOrWhiteSpace(source) && culture is not null
                 && content.Properties.TryGetValue(Constants.Conventions.Content.UrlName, out IProperty? urlNameProperty)
                 && !urlNameProperty.PropertyType.VariesByCulture())
