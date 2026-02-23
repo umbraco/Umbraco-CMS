@@ -1560,7 +1560,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelDataTypeItemResponseModel"
                       }
                     ]
                   }
@@ -6846,7 +6846,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelDocumentTypeItemResponseModel"
                       }
                     ]
                   }
@@ -11034,7 +11034,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelDocumentItemResponseModel"
                       }
                     ]
                   }
@@ -14762,7 +14762,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMediaTypeItemResponseModel"
                       }
                     ]
                   }
@@ -17337,7 +17337,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMediaItemResponseModel"
                       }
                     ]
                   }
@@ -20554,7 +20554,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMemberTypeItemResponseModel"
                       }
                     ]
                   }
@@ -22867,7 +22867,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMemberItemResponseModel"
                       }
                     ]
                   }
@@ -31008,7 +31008,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelTemplateItemResponseModel"
                       }
                     ]
                   }
@@ -43377,7 +43377,7 @@
         },
         "additionalProperties": false
       },
-      "ItemAncestorsResponseModel": {
+      "ItemAncestorsResponseModelDataTypeItemResponseModel": {
         "required": [
           "ancestors",
           "id"
@@ -43393,7 +43393,175 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                  "$ref": "#/components/schemas/DataTypeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelDocumentItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelDocumentTypeItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelMediaItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelMediaTypeItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelMemberItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelMemberTypeItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberTypeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelTemplateItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TemplateItemResponseModel"
                 }
               ]
             }

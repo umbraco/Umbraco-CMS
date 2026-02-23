@@ -1,4 +1,3 @@
-using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
@@ -21,10 +20,12 @@ internal sealed class ItemAncestorService : IItemAncestorService
         => _entityService = entityService;
 
     /// <inheritdoc />
-    public IEnumerable<ItemAncestorsResponseModel> GetAncestors(
+    public IEnumerable<ItemAncestorsResponseModel<TAncestorItem>> GetAncestors<TAncestorItem>(
         UmbracoObjectTypes itemObjectType,
         UmbracoObjectTypes? folderObjectType,
-        ISet<Guid> entityKeys)
+        ISet<Guid> entityKeys,
+        Func<IEnumerable<IEntitySlim>, IReadOnlyDictionary<Guid, TAncestorItem>> ancestorMapper)
+        where TAncestorItem : ItemResponseModelBase
     {
         // Batch fetch all requested entities by Guid key (trying both item + folder types).
         IEntitySlim[] entities = _entityService
@@ -58,46 +59,50 @@ internal sealed class ItemAncestorService : IItemAncestorService
         if (allAncestorIds.Length == 0)
         {
             // All entities are root-level - return empty ancestor chains.
-            return entities.Select(e => new ItemAncestorsResponseModel { Id = e.Key });
+            return entities.Select(e => new ItemAncestorsResponseModel<TAncestorItem> { Id = e.Key });
         }
 
-        // Batch fetch ancestor entities by int IDs.
-        var ancestorIdToKey = _entityService
+        // Batch fetch ancestor entities by int IDs, storing the full IEntitySlim objects.
+        var ancestorById = _entityService
             .GetAll(itemObjectType, allAncestorIds)
-            .ToDictionary(a => a.Id, a => a.Key);
+            .ToDictionary(a => a.Id);
 
         // For folder types: also fetch container ancestors (one-by-one, as EntityService.GetAll
         // doesn't work with container types).
         if (folderObjectType.HasValue)
         {
-            foreach (var ancestorId in allAncestorIds.Where(id => !ancestorIdToKey.ContainsKey(id)))
+            foreach (var ancestorId in allAncestorIds.Where(id => !ancestorById.ContainsKey(id)))
             {
                 IEntitySlim? container = _entityService.Get(ancestorId, folderObjectType.Value);
                 if (container is not null)
                 {
-                    ancestorIdToKey[container.Id] = container.Key;
+                    ancestorById[container.Id] = container;
                 }
             }
         }
 
-        // Map per-entity: entity key -> ordered ancestor Guid chain (root-first).
+        // Call the mapping delegate with all ancestor entities to produce rich models.
+        IReadOnlyDictionary<Guid, TAncestorItem> mappedAncestors = ancestorMapper(ancestorById.Values);
+
+        // Map per-entity: entity key -> ordered ancestor chain (root-first).
         return entities.Select(entity =>
         {
             var ancestorIds = entity.AncestorIds();
-            var ancestorKeys = new List<ReferenceByIdModel>(ancestorIds.Length);
+            var ancestors = new List<TAncestorItem>(ancestorIds.Length);
 
             foreach (var ancestorId in ancestorIds)
             {
-                if (ancestorIdToKey.TryGetValue(ancestorId, out Guid ancestorKey))
+                if (ancestorById.TryGetValue(ancestorId, out IEntitySlim? ancestorEntity)
+                    && mappedAncestors.TryGetValue(ancestorEntity.Key, out TAncestorItem? mapped))
                 {
-                    ancestorKeys.Add(new ReferenceByIdModel(ancestorKey));
+                    ancestors.Add(mapped);
                 }
             }
 
-            return new ItemAncestorsResponseModel
+            return new ItemAncestorsResponseModel<TAncestorItem>
             {
                 Id = entity.Key,
-                Ancestors = ancestorKeys,
+                Ancestors = ancestors,
             };
         });
     }

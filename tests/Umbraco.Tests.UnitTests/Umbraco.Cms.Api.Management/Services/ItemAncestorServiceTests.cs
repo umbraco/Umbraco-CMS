@@ -24,10 +24,11 @@ internal class ItemAncestorServiceTests
     [Test]
     public void Empty_Ids_Returns_Empty_Result()
     {
-        IEnumerable<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid>());
+            new HashSet<Guid>(),
+            TestMapper);
 
         Assert.IsEmpty(result);
     }
@@ -41,10 +42,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.IsAny<Guid[]>()))
             .Returns([]);
 
-        IEnumerable<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { unknownKey });
+            new HashSet<Guid> { unknownKey },
+            TestMapper);
 
         Assert.IsEmpty(result);
     }
@@ -59,10 +61,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, new[] { entityKey }))
             .Returns([entity]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { entityKey }).ToList();
+            new HashSet<Guid> { entityKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(entityKey, result[0].Id);
@@ -88,10 +91,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.Is<int[]>(ids => ids.SequenceEqual(new[] { 100, 200 }))))
             .Returns([grandparent, parent]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { entityKey }).ToList();
+            new HashSet<Guid> { entityKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(entityKey, result[0].Id);
@@ -124,15 +128,16 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.Is<int[]>(ids => ids.Contains(100))))
             .Returns([sharedParent]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { entity1Key, entity2Key }).ToList();
+            new HashSet<Guid> { entity1Key, entity2Key },
+            TestMapper).ToList();
 
         Assert.AreEqual(2, result.Count);
 
-        ItemAncestorsResponseModel result1 = result.First(r => r.Id == entity1Key);
-        ItemAncestorsResponseModel result2 = result.First(r => r.Id == entity2Key);
+        ItemAncestorsResponseModel<TestItemResponseModel> result1 = result.First(r => r.Id == entity1Key);
+        ItemAncestorsResponseModel<TestItemResponseModel> result2 = result.First(r => r.Id == entity2Key);
 
         Assert.AreEqual(1, result1.Ancestors.Count());
         Assert.AreEqual(sharedParentKey, result1.Ancestors.First().Id);
@@ -167,10 +172,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(100, UmbracoObjectTypes.DataTypeContainer))
             .Returns(folderAncestor);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { entityKey }).ToList();
+            new HashSet<Guid> { entityKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(entityKey, result[0].Id);
@@ -212,10 +218,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(100, UmbracoObjectTypes.DataTypeContainer))
             .Returns(parentFolder);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { folderKey }).ToList();
+            new HashSet<Guid> { folderKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(folderKey, result[0].Id);
@@ -237,10 +244,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.IsAny<Guid[]>()))
             .Returns([foundEntity]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { foundKey, notFoundKey }).ToList();
+            new HashSet<Guid> { foundKey, notFoundKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(foundKey, result[0].Id);
@@ -263,10 +271,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.Is<int[]>(ids => ids.SequenceEqual(new[] { 100 }))))
             .Returns([parent]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { entityKey }).ToList();
+            new HashSet<Guid> { entityKey },
+            TestMapper).ToList();
 
         var ancestors = result[0].Ancestors.ToList();
         Assert.AreEqual(1, ancestors.Count);
@@ -295,10 +304,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.Is<int[]>(ids => ids.Length == 3)))
             .Returns([level1, level2, level3]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { entityKey }).ToList();
+            new HashSet<Guid> { entityKey },
+            TestMapper).ToList();
 
         var ancestors = result[0].Ancestors.ToList();
         Assert.AreEqual(3, ancestors.Count);
@@ -322,13 +332,14 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Media, It.IsAny<Guid[]>()))
             .Returns([entity1, entity2, entity3]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Media,
             null,
-            new HashSet<Guid> { key1, key2, key3 }).ToList();
+            new HashSet<Guid> { key1, key2, key3 },
+            TestMapper).ToList();
 
         Assert.AreEqual(3, result.Count);
-        Assert.That(result, Has.All.Property(nameof(ItemAncestorsResponseModel.Ancestors)).Empty);
+        Assert.That(result, Has.All.Property(nameof(ItemAncestorsResponseModel<TestItemResponseModel>.Ancestors)).Empty);
     }
 
     [Test]
@@ -350,15 +361,16 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.Is<int[]>(ids => ids.SequenceEqual(new[] { 200 }))))
             .Returns([parent]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { rootEntityKey, childEntityKey }).ToList();
+            new HashSet<Guid> { rootEntityKey, childEntityKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(2, result.Count);
 
-        ItemAncestorsResponseModel rootResult = result.First(r => r.Id == rootEntityKey);
-        ItemAncestorsResponseModel childResult = result.First(r => r.Id == childEntityKey);
+        ItemAncestorsResponseModel<TestItemResponseModel> rootResult = result.First(r => r.Id == rootEntityKey);
+        ItemAncestorsResponseModel<TestItemResponseModel> childResult = result.First(r => r.Id == childEntityKey);
 
         Assert.IsEmpty(rootResult.Ancestors);
         Assert.AreEqual(1, childResult.Ancestors.Count());
@@ -385,10 +397,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.DataType, It.Is<int[]>(ids => ids.SequenceEqual(new[] { 100 }))))
             .Returns([parent]);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { entityKey }).ToList();
+            new HashSet<Guid> { entityKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(1, result.Count);
         var ancestors = result[0].Ancestors.ToList();
@@ -430,10 +443,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(It.IsAny<int>(), UmbracoObjectTypes.DataTypeContainer))
             .Returns((IEntitySlim?)null);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { entityKey }).ToList();
+            new HashSet<Guid> { entityKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(entityKey, result[0].Id);
@@ -465,7 +479,8 @@ internal class ItemAncestorServiceTests
         _sut.GetAncestors(
             UmbracoObjectTypes.Document,
             null,
-            new HashSet<Guid> { entity1Key, entity2Key }).ToList();
+            new HashSet<Guid> { entity1Key, entity2Key },
+            TestMapper).ToList();
 
         // Verify GetAll(int[]) was called with deduplicated IDs (2 unique: 100, 200).
         _entityServiceMock.Verify(
@@ -487,10 +502,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(unknownKey, UmbracoObjectTypes.DataTypeContainer))
             .Returns((IEntitySlim?)null);
 
-        IEnumerable<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { unknownKey });
+            new HashSet<Guid> { unknownKey },
+            TestMapper);
 
         Assert.IsEmpty(result);
     }
@@ -514,10 +530,11 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(folderKey, UmbracoObjectTypes.DataTypeContainer))
             .Returns(folder);
 
-        List<ItemAncestorsResponseModel> result = _sut.GetAncestors(
+        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = _sut.GetAncestors(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { itemKey, folderKey }).ToList();
+            new HashSet<Guid> { itemKey, folderKey },
+            TestMapper).ToList();
 
         Assert.AreEqual(2, result.Count);
 
@@ -528,5 +545,55 @@ internal class ItemAncestorServiceTests
         _entityServiceMock.Verify(
             x => x.Get(itemKey, UmbracoObjectTypes.DataTypeContainer),
             Times.Never);
+    }
+
+    [Test]
+    public void Mapper_Receives_All_Ancestor_Entities()
+    {
+        var entityKey = Guid.NewGuid();
+        var parentKey = Guid.NewGuid();
+        var grandparentKey = Guid.NewGuid();
+
+        var entity = new EntitySlim { Id = 300, Key = entityKey, Path = "-1,100,200,300" };
+        var grandparent = new EntitySlim { Id = 100, Key = grandparentKey, Path = "-1,100" };
+        var parent = new EntitySlim { Id = 200, Key = parentKey, Path = "-1,100,200" };
+
+        _entityServiceMock
+            .Setup(x => x.GetAll(UmbracoObjectTypes.Document, new[] { entityKey }))
+            .Returns([entity]);
+
+        _entityServiceMock
+            .Setup(x => x.GetAll(UmbracoObjectTypes.Document, It.Is<int[]>(ids => ids.SequenceEqual(new[] { 100, 200 }))))
+            .Returns([grandparent, parent]);
+
+        IEnumerable<IEntitySlim>? receivedAncestors = null;
+
+        _sut.GetAncestors(
+            UmbracoObjectTypes.Document,
+            null,
+            new HashSet<Guid> { entityKey },
+            ancestors =>
+            {
+                receivedAncestors = ancestors.ToList();
+                return TestMapper(receivedAncestors);
+            }).ToList();
+
+        Assert.IsNotNull(receivedAncestors);
+        var ancestorList = receivedAncestors!.ToList();
+        Assert.AreEqual(2, ancestorList.Count);
+        Assert.That(ancestorList.Select(a => a.Key), Is.EquivalentTo(new[] { grandparentKey, parentKey }));
+    }
+
+    /// <summary>
+    /// Simple test mapper that creates a <see cref="TestItemResponseModel"/> from each ancestor entity.
+    /// </summary>
+    private static IReadOnlyDictionary<Guid, TestItemResponseModel> TestMapper(IEnumerable<IEntitySlim> ancestors)
+        => ancestors.ToDictionary(a => a.Key, a => new TestItemResponseModel { Id = a.Key });
+
+    /// <summary>
+    /// Concrete test implementation of <see cref="ItemResponseModelBase"/> for use in tests.
+    /// </summary>
+    private class TestItemResponseModel : ItemResponseModelBase
+    {
     }
 }

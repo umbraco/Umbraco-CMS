@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Services.Entities;
 
@@ -11,15 +12,22 @@ public interface IItemAncestorService
     /// <summary>
     /// Gets the ancestor chains for a collection of entities identified by their keys.
     /// </summary>
+    /// <typeparam name="TAncestorItem">The ancestor item response model type.</typeparam>
     /// <param name="itemObjectType">The object type of the entities.</param>
     /// <param name="folderObjectType">The optional folder (container) object type, if the entity type supports folders.</param>
     /// <param name="entityKeys">The unique keys of the entities to retrieve ancestors for.</param>
+    /// <param name="ancestorMapper">
+    /// A delegate that receives the complete set of ancestor <see cref="IEntitySlim"/> entities
+    /// and returns a dictionary mapping each ancestor's <see cref="Guid"/> key to a rich item response model.
+    /// </param>
     /// <returns>
-    /// A collection of <see cref="ItemAncestorsResponseModel"/> containing the ancestor chain for each found entity.
+    /// A collection of <see cref="ItemAncestorsResponseModel{TAncestorItem}"/> containing the ancestor chain for each found entity.
     /// Ancestors are ordered root-first (ascending level). Entities not found are silently omitted.
     /// </returns>
-    IEnumerable<ItemAncestorsResponseModel> GetAncestors(
+    IEnumerable<ItemAncestorsResponseModel<TAncestorItem>> GetAncestors<TAncestorItem>(
         UmbracoObjectTypes itemObjectType,
         UmbracoObjectTypes? folderObjectType,
-        ISet<Guid> entityKeys);
+        ISet<Guid> entityKeys,
+        Func<IEnumerable<IEntitySlim>, IReadOnlyDictionary<Guid, TAncestorItem>> ancestorMapper)
+        where TAncestorItem : ItemResponseModelBase;
 }

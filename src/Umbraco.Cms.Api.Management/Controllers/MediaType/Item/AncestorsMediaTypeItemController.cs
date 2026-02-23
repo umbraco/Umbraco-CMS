@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
+using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Item;
@@ -17,7 +18,7 @@ public class AncestorsMediaTypeItemController : MediaTypeItemControllerBase
 
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<MediaTypeItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of media type items.")]
     [EndpointDescription("Gets the ancestor chains for media type items identified by the provided Ids.")]
     public IActionResult Ancestors(
@@ -26,13 +27,16 @@ public class AncestorsMediaTypeItemController : MediaTypeItemControllerBase
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<ItemAncestorsResponseModel>());
+            return Ok(Enumerable.Empty<ItemAncestorsResponseModel<MediaTypeItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<MediaTypeItemResponseModel>> result = _itemAncestorService.GetAncestors(
             UmbracoObjectTypes.MediaType,
             UmbracoObjectTypes.MediaTypeContainer,
-            ids);
+            ids,
+            ancestors => ancestors.ToDictionary(
+                a => a.Key,
+                a => new MediaTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty }));
 
         return Ok(result);
     }

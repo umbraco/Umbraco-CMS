@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services.Entities;
+using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core.Models;
 
@@ -17,7 +18,7 @@ public class AncestorsDataTypeItemController : DatatypeItemControllerBase
 
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<DataTypeItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of data type items.")]
     [EndpointDescription("Gets the ancestor chains for data type items identified by the provided Ids.")]
     public IActionResult Ancestors(
@@ -26,13 +27,16 @@ public class AncestorsDataTypeItemController : DatatypeItemControllerBase
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<ItemAncestorsResponseModel>());
+            return Ok(Enumerable.Empty<ItemAncestorsResponseModel<DataTypeItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<DataTypeItemResponseModel>> result = _itemAncestorService.GetAncestors(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            ids);
+            ids,
+            ancestors => ancestors.ToDictionary(
+                a => a.Key,
+                a => new DataTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty }));
 
         return Ok(result);
     }

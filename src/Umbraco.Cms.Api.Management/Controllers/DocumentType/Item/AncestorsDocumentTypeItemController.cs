@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services.Entities;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core.Models;
 
@@ -17,7 +18,7 @@ public class AncestorsDocumentTypeItemController : DocumentTypeItemControllerBas
 
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<DocumentTypeItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of document type items.")]
     [EndpointDescription("Gets the ancestor chains for document type items identified by the provided Ids.")]
     public IActionResult Ancestors(
@@ -26,13 +27,16 @@ public class AncestorsDocumentTypeItemController : DocumentTypeItemControllerBas
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<ItemAncestorsResponseModel>());
+            return Ok(Enumerable.Empty<ItemAncestorsResponseModel<DocumentTypeItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel> result = _itemAncestorService.GetAncestors(
+        IEnumerable<ItemAncestorsResponseModel<DocumentTypeItemResponseModel>> result = _itemAncestorService.GetAncestors(
             UmbracoObjectTypes.DocumentType,
             UmbracoObjectTypes.DocumentTypeContainer,
-            ids);
+            ids,
+            ancestors => ancestors.ToDictionary(
+                a => a.Key,
+                a => new DocumentTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty }));
 
         return Ok(result);
     }
