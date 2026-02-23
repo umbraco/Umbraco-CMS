@@ -16,14 +16,12 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
     public string Name => "ContentVersionCleanupJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromHours(1); }
-
+    public TimeSpan Period => TimeSpan.FromHours(1);
 
     private readonly ILogger<ContentVersionCleanupJob> _logger;
     private readonly IContentVersionService _contentVersionService;
     private readonly IElementVersionService _elementVersionService;
     private readonly IOptionsMonitor<ContentSettings> _settingsMonitor;
-
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentVersionCleanupJob" /> class.
@@ -61,7 +59,7 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
 
     private void CleanupVersions(string entityType, Func<IReadOnlyCollection<ContentVersionMeta>> cleanup)
     {
-        var deletedVersions = cleanup();
+        IReadOnlyCollection<ContentVersionMeta> deletedVersions = cleanup();
 
         if (deletedVersions.Count > 0)
         {
