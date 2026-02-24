@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_LINK_PICKER_MODAL } from '../document-link-picker-modal/document-link-picker-modal.token.js';
 import type { UmbLinkPickerLink } from './types.js';
 import type {
 	UmbLinkPickerConfig,
@@ -10,7 +11,7 @@ import {
 	UmbObserveValidationStateController,
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
-import { umbConfirmModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbDocumentItemDataResolver,
 	UmbDocumentItemRepository,
@@ -18,7 +19,6 @@ import {
 	UmbDocumentUrlsDataResolver,
 } from '@umbraco-cms/backoffice/document';
 import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
-import type { UmbInputDocumentVariantElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -39,9 +39,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	@state()
 	private _missingType = false;
-
-	@query('umb-input-document-variant')
-	private _documentPickerVariantElement?: UmbInputDocumentVariantElement;
 
 	@query('umb-input-media')
 	private _mediaPickerElement?: UmbInputMediaElement;
@@ -147,9 +144,13 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	async #onPickerSelection(event: UmbInputPickerEvent, type: 'document' | 'media') {
-		let icon, name, url;
 		const unique = event.target.value;
 		const culture = event.target.culture;
+		this.#pickerSelect(type, unique, culture);
+	}
+
+	async #pickerSelect(type: 'document' | 'media', unique?: string, culture?: string) {
+		let icon, name, url;
 
 		if (unique) {
 			switch (type) {
@@ -251,8 +252,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		}
 	}
 
-	#triggerDocumentPicker() {
-		this._documentPickerVariantElement?.shadowRoot?.querySelector('#btn-add')?.dispatchEvent(new Event('click'));
+	async #triggerDocumentLinkPicker() {
+		const value = await umbOpenModal(this, UMB_DOCUMENT_LINK_PICKER_MODAL, {});
+		this.#pickerSelect('document', value.unique, value.culture);
 	}
 
 	#triggerMediaPicker() {
@@ -312,7 +314,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 						look="placeholder"
 						label=${this.localize.term('general_content')}
 						.color=${this._missingType ? 'invalid' : 'default'}
-						@click=${this.#triggerDocumentPicker}></uui-button>
+						@click=${this.#triggerDocumentLinkPicker}></uui-button>
 					<uui-button
 						data-mark="action:media"
 						look="placeholder"
@@ -336,13 +338,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				?hidden=${!this.value.link.unique || this.value.link.type !== 'document'}
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('general_content')}>
-				<umb-input-document-variant
-					slot="editor"
-					.max=${1}
-					.value=${this.value.link.unique && this.value.link.type === 'document' ? this.value.link.unique : ''}
-					.culture=${this.value.link.culture}
-					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'document')}>
-				</umb-input-document-variant>
+				<div slot="editor">
+					<div>Render picked document here</div>
+				</div>
 			</umb-property-layout>
 		`;
 	}
