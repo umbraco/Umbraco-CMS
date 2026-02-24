@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -135,8 +134,7 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
         => GetDataItems(input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
 
     /// <summary>
-    /// Strips HTML tags from content while preserving whitespace from line breaks.
-    /// This addresses the issue where &lt;br&gt; tags don't create word boundaries when HTML is stripped.
+    /// Strips HTML tags from content, replacing them with spaces to preserve word boundaries for indexing.
     /// </summary>
     /// <param name="html">The HTML content to strip</param>
     /// <returns>Plain text with proper word boundaries</returns>
@@ -147,13 +145,7 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
             return string.Empty;
         }
 
-        // Replace <br> and <br/> tags (with any amount of whitespace and attributes) with spaces
-        // This regex matches:
-        // - <br> (with / without spaces or attributes)
-        // - <br /> (with / without spaces or attributes)
-        html = Regex.Replace(html, @"<br\b[^>]*/?>\s*", " ", RegexOptions.IgnoreCase);
-
-        // Use the existing Microsoft StripHtml function for everything else
-        return html.StripHtml();
+        // Replace all HTML tags with a space to preserve word boundaries. This can result in multiple spaces, which we then collapse into a single space.
+        return html.StripHtml(" ");
     }
 }
