@@ -7,21 +7,10 @@ export default class UmbInputUploadFieldImageElement extends UmbLitElement imple
 	@property({ type: String })
 	path = '';
 
-	@property({ attribute: false })
-	file?: File;
-
-	get #fileName(): string {
-		if (this.file?.name) return this.file.name;
-		return this.path.split('/').pop() ?? '';
-	}
-
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
-		const label = this.#fileName;
-		return html`
-			<img src=${this.path} alt=${label} loading="lazy" />
-			<span id="filename" title=${label}>${label}</span>
-		`;
+		const label = this.path.split('/').pop() ?? '';
+		return html`<img src=${this.path} alt=${label} loading="lazy" />`;
 	}
 
 	static override readonly styles = [
@@ -42,14 +31,6 @@ export default class UmbInputUploadFieldImageElement extends UmbLitElement imple
 				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
 				background-repeat: repeat;
 				background-size: 10px 10px;
-			}
-
-			#filename {
-				display: block;
-				margin-top: var(--uui-size-space-2);
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
 			}
 		`,
 	];

@@ -7,22 +7,14 @@ export default class UmbInputUploadFieldVideoElement extends UmbLitElement imple
 	@property({ type: String })
 	path = '';
 
-	@property({ attribute: false })
-	file?: File;
-
-	get #fileName(): string {
-		if (this.file?.name) return this.file.name;
-		return this.path.split('/').pop() ?? '';
-	}
-
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
+		const label = this.path.split('/').pop() ?? '';
 		return html`
-			<video controls title=${this.#fileName}>
+			<video controls title=${label}>
 				<source src=${this.path} />
 				Video format not supported
 			</video>
-			<span id="filename" title=${this.#fileName}>${this.#fileName}</span>
 		`;
 	}
 
@@ -33,14 +25,6 @@ export default class UmbInputUploadFieldVideoElement extends UmbLitElement imple
 				max-height: 500px;
 				width: 100%;
 				max-width: 800px;
-			}
-
-			#filename {
-				display: block;
-				margin-top: var(--uui-size-space-2);
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
 			}
 		`,
 	];

@@ -7,40 +7,22 @@ export default class UmbInputUploadFieldAudioElement extends UmbLitElement imple
 	@property({ type: String })
 	path = '';
 
-	@property({ attribute: false })
-	file?: File;
-
-	get #fileName(): string {
-		if (this.file?.name) return this.file.name;
-		return this.path.split('/').pop() ?? '';
-	}
-
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
-		return html`
-			<audio controls src=${this.path} title=${this.#fileName}></audio>
-			<span id="filename" title=${this.#fileName}>${this.#fileName}</span>
-		`;
+		const label = this.path.split('/').pop() ?? '';
+		return html`<audio controls src=${this.path} title=${label}></audio>`;
 	}
 
 	static override readonly styles = [
 		css`
 			:host {
 				display: flex;
-				flex-direction: column;
 				width: 999px;
 				max-width: 100%;
 			}
 
 			audio {
 				width: 100%;
-			}
-
-			#filename {
-				margin-top: var(--uui-size-space-2);
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
 			}
 		`,
 	];

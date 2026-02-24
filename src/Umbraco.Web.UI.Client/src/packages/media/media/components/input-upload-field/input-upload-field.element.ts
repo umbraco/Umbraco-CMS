@@ -1,4 +1,5 @@
 import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -8,15 +9,16 @@ import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extens
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
 	UmbDropzoneChangeEvent,
 	UmbInputDropzoneElement,
 	UmbUploadableFile,
 } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValueType, typeof UmbLitElement>(
@@ -161,7 +163,19 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
 		this.value = { src: blobUrl };
 
+		void this.#ensureMediaNameFromFile(this.temporaryFile.file);
+
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	async #ensureMediaNameFromFile(file: File) {
+		const datasetContext = await this.getContext(UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT);
+		if (!datasetContext || datasetContext.getEntityType() !== UMB_MEDIA_ENTITY_TYPE) return;
+
+		const currentName = datasetContext.getName();
+		if (currentName && currentName.trim() !== '') return;
+
+		datasetContext.setName(file.name);
 	}
 
 	override render() {
@@ -187,30 +201,29 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 	}
 
 	#renderFile(src: string) {
-		if (!src.startsWith('blob:')) {
-			src = this._serverUrl + src;
-		}
+		const isBlob = src.startsWith('blob:');
+		const fullUrl = isBlob ? src : this._serverUrl + src;
+		const fileName = isBlob ? this.temporaryFile?.file?.name : src.split('/').pop();
 
 		return html`
 			<div id="wrapper">
-				<div id="wrapperInner">
-					<umb-extension-slot
-						type="fileUploadPreview"
-						.props=${{ path: src, file: this.temporaryFile?.file }}
-						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
-					</umb-extension-slot>
+				<umb-extension-slot
+					type="fileUploadPreview"
+					.props=${{ path: fullUrl, file: this.temporaryFile?.file }}
+					.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
+				</umb-extension-slot>
+				<div id="file-info">
+					${fileName
+						? isBlob
+							? html`<span id="file-name" title=${fileName}>${fileName}</span>`
+							: html`<a id="file-name" href=${fullUrl} target="_blank" title=${fileName}>${fileName}</a>`
+						: nothing}
+					<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
+						<uui-icon name="icon-trash"></uui-icon>
+						<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
+					</uui-button>
 				</div>
 			</div>
-			${this.#renderButtonRemove()}
-		`;
-	}
-
-	#renderButtonRemove() {
-		return html`
-			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>
-				<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
-			</uui-button>
 		`;
 	}
 
@@ -240,29 +253,42 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 			:host {
 				position: relative;
 			}
+
 			uui-icon {
 				vertical-align: sub;
 				margin-right: var(--uui-size-space-4);
 			}
 
 			#wrapper {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-				gap: var(--uui-size-space-4);
-				box-sizing: border-box;
-				margin-bottom: var(--uui-size-space-3);
+				display: flex;
+				flex-direction: column;
 			}
 
-			#wrapper:has(umb-input-upload-field-file) {
-				padding: var(--uui-size-space-4);
+			#file-info {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
+				padding: 0 var(--uui-size-space-4);
+				margin-top: var(--uui-size-space-3);
 			}
 
-			#wrapperInner {
-				position: relative;
-				display: flex;
-				width: 100%;
+			#file-name {
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+			}
+
+			a#file-name {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			a#file-name:hover {
+				text-decoration: underline;
 			}
 		`,
 	];

@@ -7,20 +7,10 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement impleme
 	@property({ type: String })
 	path = '';
 
-	@property({ attribute: false })
-	file?: File;
-
-	get #fileName(): string {
-		if (this.file?.name) return this.file.name;
-		return this.path.split('/').pop() ?? '';
-	}
-
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
-		return html`
-			<img src=${this.path} alt=${this.#fileName} loading="lazy" />
-			<span id="filename" title=${this.#fileName}>${this.#fileName}</span>
-		`;
+		const label = this.path.split('/').pop() ?? '';
+		return html`<img src=${this.path} alt=${label} loading="lazy" />`;
 	}
 
 	static override readonly styles = [
@@ -44,14 +34,6 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement impleme
 				background-repeat: repeat;
 				background-size: 10px 10px;
 				max-width: 100%;
-			}
-
-			#filename {
-				display: block;
-				margin-top: var(--uui-size-space-2);
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
 			}
 		`,
 	];
