@@ -172,8 +172,6 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setup() {
-		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
-
 		this.#authContext = new UmbAuthContext(
 			this,
 			this.serverUrl,
@@ -182,6 +180,8 @@ export class UmbAppElement extends UmbLitElement {
 			this.keepUserLoggedIn,
 		);
 		this.#authContext.configureClient(umbHttpClient);
+
+		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
 		new UmbServerContext(this, {
 			backofficePath: this.backofficePath,
 			serverUrl: this.serverUrl,
