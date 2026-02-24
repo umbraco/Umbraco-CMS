@@ -96,7 +96,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
 
             nodeIds = [.. publishedDtos.Select(d => d.NodeId)];
             Assert.That(nodeIds, Does.Contain(Textpage.Id), "Textpage should have published cache entry");
-            Assert.That(nodeIds, Has.No.Member(Subpage.Id), "Subpage should have not have published cache entry");
+            Assert.That(nodeIds, Has.No.Member(Subpage.Id), "Subpage should not have published cache entry");
 
             // Verify cache data is not empty
             var textpageDto = draftDtos.Single(d => d.NodeId == Textpage.Id);
@@ -396,7 +396,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
 
             nodeIds = [.. publishedDtos.Select(d => d.NodeId)];
             Assert.That(nodeIds, Does.Contain(Textpage.Id), "Textpage should have published cache entry");
-            Assert.That(nodeIds, Has.No.Member(Subpage.Id), "Subpage should have not have published cache entry");
+            Assert.That(nodeIds, Has.No.Member(Subpage.Id), "Subpage should not have published cache entry");
 
             // Verify cache data is not empty
             var textpageDto = draftDtos.Single(d => d.NodeId == Textpage.Id);

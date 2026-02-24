@@ -1005,9 +1005,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             Sql<ISqlContext> allTypesSql = Sql()
                 .Select<ContentTypeDto>(x => x.NodeId)
                 .From<ContentTypeDto>();
-            effectiveContentTypeIds = Database.Fetch<ContentTypeVariationDto>(allTypesSql)
-                .Select(x => x.NodeId)
-                .ToList();
+            effectiveContentTypeIds = Database.Fetch<int>(allTypesSql);
 
             if (effectiveContentTypeIds.Count == 0)
             {
