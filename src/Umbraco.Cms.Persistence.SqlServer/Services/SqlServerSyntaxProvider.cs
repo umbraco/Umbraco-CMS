@@ -88,10 +88,10 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
 
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
         {
-            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, DatabaseType.SqlServer2012, fromSettings ? "settings" : "detected");
+            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, nameof(UmbracoSqlServerDatabaseType), fromSettings ? "settings" : "detected");
         }
 
-        return DatabaseType.SqlServer2012;
+        return new UmbracoSqlServerDatabaseType();
     }
 
     private static VersionName MapProductVersion(string productVersion)

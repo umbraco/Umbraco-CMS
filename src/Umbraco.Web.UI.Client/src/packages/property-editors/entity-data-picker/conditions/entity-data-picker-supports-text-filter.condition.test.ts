@@ -178,6 +178,41 @@ describe('UmbEntityDataPickerSupportsTextFilterCondition', () => {
 		});
 	});
 
+	it('should clean up observers of previous data source if switching to non-collection', (done) => {
+		const context = new UmbEntityDataPickerDataSourceApiContext(hostElement);
+		const collectionMock = createCollectionDataSourceMock(true);
+		context.setDataSourceApi(collectionMock as any);
+
+		let callbackCount = 0;
+		condition = new UmbEntityDataPickerSupportsTextFilterCondition(childElement, {
+			host: childElement,
+			config: { alias: UMB_ENTITY_DATA_PICKER_SUPPORTS_TEXT_FILTER_CONDITION_ALIAS },
+			onChange: () => {
+				callbackCount++;
+				if (callbackCount === 1) {
+					expect(condition.permitted).to.be.true;
+					setTimeout(() => {
+						context.setDataSourceApi(createNonCollectionDataSourceMock() as any);
+					}, 0);
+				}
+				if (callbackCount === 2) {
+					expect(condition.permitted).to.be.false;
+					setTimeout(() => {
+						// Emit on the OLD data source — must not affect permitted.
+						// Two setValue calls needed because UmbDeepState deduplicates same-value emissions.
+						collectionMock._supportsTextFilter.setValue({ enabled: false });
+						collectionMock._supportsTextFilter.setValue({ enabled: true });
+						setTimeout(() => {
+							expect(condition.permitted).to.be.false;
+							condition.hostDisconnected();
+							done();
+						}, 0);
+					}, 0);
+				}
+			},
+		});
+	});
+
 	it('should react when data source api changes', (done) => {
 		const context = new UmbEntityDataPickerDataSourceApiContext(hostElement);
 		const mock = createCollectionDataSourceMock(true);
