@@ -54,16 +54,16 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             throw new NotSupportedException();
         }
 
-        var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
+        var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds)>();
 
         foreach (ContentTypeCacheRefresher.JsonPayload payload in (ContentTypeCacheRefresher.JsonPayload[])args
                      .MessageObject)
         {
             if (!changedIds.TryGetValue(
                 payload.ItemType,
-                out (List<int> removedIds, List<int> refreshedIds, List<int> otherIds) idLists))
+                out (List<int> removedIds, List<int> refreshedIds) idLists))
             {
-                idLists = (removedIds: new List<int>(), refreshedIds: new List<int>(), otherIds: new List<int>());
+                idLists = (removedIds: new List<int>(), refreshedIds: new List<int>());
                 changedIds.Add(payload.ItemType, idLists);
             }
 
@@ -75,28 +75,24 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             {
                 idLists.refreshedIds.Add(payload.Id);
             }
-            else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
-            {
-                idLists.otherIds.Add(payload.Id);
-            }
         }
 
-        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)> ci in
+        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds)> ci in
                  changedIds)
         {
-            if (ci.Value.refreshedIds.Count > 0 || ci.Value.otherIds.Count > 0)
+            if (ci.Value.refreshedIds.Count > 0)
             {
                 switch (ci.Key)
                 {
                     case var itemType when itemType == typeof(IContentType).Name:
-                        RefreshContentOfContentTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct()
+                        RefreshContentOfContentTypes(ci.Value.refreshedIds.Distinct()
                             .ToArray());
                         break;
                     case var itemType when itemType == typeof(IMediaType).Name:
-                        RefreshMediaOfMediaTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct().ToArray());
+                        RefreshMediaOfMediaTypes(ci.Value.refreshedIds.Distinct().ToArray());
                         break;
                     case var itemType when itemType == typeof(IMemberType).Name:
-                        RefreshMemberOfMemberTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct()
+                        RefreshMemberOfMemberTypes(ci.Value.refreshedIds.Distinct()
                             .ToArray());
                         break;
                 }
