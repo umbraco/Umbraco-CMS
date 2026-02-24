@@ -14,6 +14,9 @@ import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
+/**
+ * @deprecated Scheduled for removal in Umbraco 19. Replaced by the shared 'auditLog' kind element (UmbContentAuditLogWorkspaceInfoAppElement).
+ */
 @customElement('umb-document-history-workspace-info-app')
 export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	#allowedActions = new Set(['Umb.EntityAction.Document.Rollback']);
