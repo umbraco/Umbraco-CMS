@@ -273,6 +273,26 @@ internal sealed class MediaCacheService : IMediaCacheService
         }
     }
 
+    public void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds)
+    {
+        // Use lightweight query to get only keys - avoids loading all serialized data.
+        IReadOnlyList<Guid> mediaKeys;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        {
+            mediaKeys = _databaseCacheRepository.GetMediaKeysByContentTypeKeys(
+                mediaTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType).Result)).ToList();
+            scope.Complete();
+        }
+
+        // Only clear the in-memory converted content cache (_publishedContentCache).
+        // The HybridCache entries (ContentCacheNode) remain valid since they only store ContentTypeId.
+        // When media is next accessed, it will be re-converted with the updated media type.
+        foreach (Guid key in mediaKeys)
+        {
+            _publishedContentCache.Remove(GetCacheKey(key, false), out _);
+        }
+    }
+
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();

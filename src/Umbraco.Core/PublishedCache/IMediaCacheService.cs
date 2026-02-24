@@ -94,4 +94,17 @@ public interface IMediaCacheService
     /// <param name="contentType">The published content type to filter by.</param>
     /// <returns>A collection of published media items of the specified type.</returns>
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
+
+    /// <summary>
+    /// Clears only the converted IPublishedContent cache for media of the specified types,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this for non-structural media type changes (e.g., name, icon, description changes)
+    /// where the underlying media data doesn't need rebuilding. The ContentCacheNode entries
+    /// in HybridCache only store ContentTypeId, so the updated media type will be looked up
+    /// fresh when media is next converted to IPublishedContent.
+    /// </remarks>
+    /// <param name="mediaTypeIds">The IDs of the media types whose media should have their converted cache cleared.</param>
+    void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds);
 }

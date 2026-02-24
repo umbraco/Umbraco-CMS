@@ -374,6 +374,31 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         }
     }
 
+    public void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds)
+    {
+        // Use lightweight query to get only keys and draft status - avoids loading all serialized data.
+        IReadOnlyList<(Guid Key, bool IsDraft)> contentKeys;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        {
+            contentKeys = _databaseCacheRepository.GetDocumentKeysWithPublishedStatus(
+                contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result)).ToList();
+            scope.Complete();
+        }
+
+        // Only clear the in-memory converted content cache (_publishedContentCache).
+        // The HybridCache entries (ContentCacheNode) remain valid since they only store ContentTypeId.
+        // When content is next accessed, it will be re-converted with the updated content type.
+        foreach ((Guid key, bool isDraft) in contentKeys)
+        {
+            _publishedContentCache.Remove(GetCacheKey(key, true), out _);
+
+            if (isDraft is false)
+            {
+                _publishedContentCache.Remove(GetCacheKey(key, false), out _);
+            }
+        }
+    }
+
     private async Task ClearPublishedCacheAsync(Guid key)
     {
         var cacheKey = GetCacheKey(key, false);

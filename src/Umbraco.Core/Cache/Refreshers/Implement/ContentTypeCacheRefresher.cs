@@ -175,11 +175,54 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         _publishedContentTypeFactory.NotifyDataTypeChanges();
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
         {
-            IEnumerable<int> documentTypeIds = payloads.Where(x => x.ItemType == nameof(IContentType)).Select(x => x.Id);
-            IEnumerable<int> mediaTypeIds = payloads.Where(x => x.ItemType == nameof(IMediaType)).Select(x => x.Id);
+            // Separate structural changes (RefreshMain) from non-structural changes (RefreshOther).
+            // Structural changes require a full memory cache rebuild, while non-structural changes
+            // only need the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
+            var structuralDocumentTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Select(x => x.Id)
+                .ToArray();
 
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
-            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
+            var nonStructuralDocumentTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IContentType)
+                            && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther)
+                            && !x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Select(x => x.Id)
+                .ToArray();
+
+            var structuralMediaTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Select(x => x.Id)
+                .ToArray();
+
+            var nonStructuralMediaTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IMediaType)
+                            && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther)
+                            && !x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Select(x => x.Id)
+                .ToArray();
+
+            // Full memory cache rebuild only for structural changes
+            if (structuralDocumentTypeIds.Length > 0)
+            {
+                _documentCacheService.RebuildMemoryCacheByContentTypeAsync(structuralDocumentTypeIds).GetAwaiter().GetResult();
+            }
+
+            if (structuralMediaTypeIds.Length > 0)
+            {
+                _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(structuralMediaTypeIds).GetAwaiter().GetResult();
+            }
+
+            // For non-structural changes, just clear the converted content cache
+            if (nonStructuralDocumentTypeIds.Length > 0)
+            {
+                _documentCacheService.ClearConvertedContentCache(nonStructuralDocumentTypeIds);
+            }
+
+            if (nonStructuralMediaTypeIds.Length > 0)
+            {
+                _mediaCacheService.ClearConvertedContentCache(nonStructuralMediaTypeIds);
+            }
         });
 
         // now we can trigger the event

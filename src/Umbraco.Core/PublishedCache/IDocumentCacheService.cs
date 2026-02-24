@@ -97,4 +97,17 @@ public interface IDocumentCacheService
     /// <param name="contentTypeIds">The collection of content type identifiers to rebuild in memory cache.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds);
+
+    /// <summary>
+    /// Clears only the converted IPublishedContent cache for content of the specified types,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this for non-structural content type changes (e.g., name, icon, description changes)
+    /// where the underlying content data doesn't need rebuilding. The ContentCacheNode entries
+    /// in HybridCache only store ContentTypeId, so the updated content type will be looked up
+    /// fresh when content is next converted to IPublishedContent.
+    /// </remarks>
+    /// <param name="contentTypeIds">The IDs of the content types whose content should have their converted cache cleared.</param>
+    void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds);
 }
