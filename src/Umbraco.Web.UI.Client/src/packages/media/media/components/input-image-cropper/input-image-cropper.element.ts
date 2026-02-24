@@ -1,6 +1,6 @@
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';

@@ -1,7 +1,7 @@
 import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
