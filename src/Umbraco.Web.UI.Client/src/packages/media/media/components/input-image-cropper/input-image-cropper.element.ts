@@ -18,6 +18,8 @@ import './image-cropper-field.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper.element.js';
+import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 
 const DefaultFocalPoint = { left: 0.5, top: 0.5 };
 const DefaultValue: UmbImageCropperPropertyEditorValue = {
@@ -96,11 +98,26 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 		this._file = file;
 
+		const underlyingFile = file.temporaryFile?.file;
+		if (underlyingFile) {
+			void this.#ensureMediaNameFromFile(underlyingFile);
+		}
+
 		this.value = assignToFrozenObject(this.value ?? DefaultValue, {
 			temporaryFileId: file.temporaryFile?.temporaryUnique,
 		});
 
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	async #ensureMediaNameFromFile(file: File) {
+		const datasetContext = await this.getContext(UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT);
+		if (datasetContext.getEntityType() !== UMB_MEDIA_ENTITY_TYPE) return;
+
+		const currentName = datasetContext.getName();
+		if (currentName?.trim()) return;
+
+		datasetContext.setName(file.name);
 	}
 
 	#onRemove = () => {
