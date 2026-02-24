@@ -59,7 +59,12 @@ export class UmbAuthClient {
 	#codeVerifier?: string;
 	#state?: string;
 
-	constructor(endpoints: UmbAuthClientEndpoints, redirectUri: string, clientId = 'umbraco-back-office', scope = 'offline_access') {
+	constructor(
+		endpoints: UmbAuthClientEndpoints,
+		redirectUri: string,
+		clientId = 'umbraco-back-office',
+		scope = 'offline_access',
+	) {
 		this.#endpoints = endpoints;
 		this.#redirectUri = redirectUri;
 		this.#clientId = clientId;

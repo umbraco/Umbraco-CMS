@@ -453,14 +453,16 @@ export class UmbAuthContext extends UmbContextBase {
 			return false;
 		}
 
-		// Exclusive lock: tabs queue instead of skipping. After acquiring the lock,
-		// check if the session is still valid — a tab that refreshed before us will
-		// have broadcast a sessionUpdate, so our session state is already fresh.
-		// This prevents sequential /token calls when tabs' timers fire slightly offset
-		// (ifAvailable would miss these because the lock is released before the next
-		// tab's timer fires).
+		// Capture the session before entering the lock queue. Inside the lock we check
+		// if the session object was replaced — that means another tab broadcast a
+		// sessionUpdate while we were waiting, so we can skip our own /token call.
+		// We compare object references (not expiresAt) because keepUserLoggedIn triggers
+		// a proactive refresh *before* the access token expires; an expiresAt-based check
+		// would incorrectly skip the refresh when the session is still technically valid.
+		const sessionBefore = this.#session.getValue();
+
 		return navigator.locks.request('umb:token-refresh', async () => {
-			if (this.isSessionValid()) return true;
+			if (this.#session.getValue() !== sessionBefore && this.isSessionValid()) return true;
 
 			const response = await this.#client.refreshToken();
 			if (response) {
