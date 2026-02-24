@@ -61,13 +61,8 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         HashSet<UrlInfo> urlInfos = [];
         var isInvariant = !content.ContentType.VariesByCulture();
 
-        // For all content, iterate all cultures.
-        // For invariant content, cultures without a matching domain will return "#"
-        // and be silently skipped, naturally filtering to only relevant URLs.
-        var defaultIsoCode = await _languageService.GetDefaultIsoCodeAsync();
-        IEnumerable<string> cultures = await _languageService.GetAllIsoCodesAsync();
+        IEnumerable<string> cultures = await GetCulturesForUrlLookupAsync(content);
 
-        // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
         foreach (var culture in cultures)
         {
             var url = _publishedUrlProvider.GetUrl(content.Key, culture: culture);
@@ -98,39 +93,6 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             urlInfos.Add(UrlInfo.AsUrl(url, UrlProviderAlias, culture));
         }
 
-        // For invariant content, only show URLs for cultures that have a domain.
-        // When domains exist, the default culture may produce a fallback URL using the
-        // request's base URL — this is not a real routable URL and should be removed.
-        // When no domains exist, deduplicate by URL string since multiple cultures
-        // resolve to the same path.
-        if (isInvariant)
-        {
-            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var domainHosts = umbracoContext.Domains
-                .GetAll(false)
-                .Select(d => DomainUtilities.ParseUriFromDomainName(d.Name, umbracoContext.CleanedUmbracoUrl).Host)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-            var hasDomainUrls = urlInfos.Any(u => u.Url is { IsAbsoluteUri: true } && domainHosts.Contains(u.Url.Host));
-
-            if (hasDomainUrls)
-            {
-                urlInfos.RemoveWhere(u => u.Url is not null && (!u.Url.IsAbsoluteUri || !domainHosts.Contains(u.Url.Host)));
-            }
-
-            // Deduplicate by URL string, preferring the default culture's label.
-            // Register default-culture URLs first, then remove non-default duplicates.
-            var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (UrlInfo urlInfo in urlInfos.Where(u => u.Url is not null && string.Equals(u.Culture, defaultIsoCode, StringComparison.OrdinalIgnoreCase)))
-            {
-                seenUrls.Add(urlInfo.Url!.ToString());
-            }
-
-            urlInfos.RemoveWhere(u => u.Url is not null
-                && !string.Equals(u.Culture, defaultIsoCode, StringComparison.OrdinalIgnoreCase)
-                && !seenUrls.Add(u.Url.ToString()));
-        }
-
         // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
         if (content.Trashed)
         {
@@ -145,6 +107,33 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         }
 
         return urlInfos;
+    }
+
+    /// <summary>
+    /// Gets the cultures to query URLs for.
+    /// For invariant content, returns only cultures that have a domain assigned to the content
+    /// or one of its ancestors. If no domains exist, returns only the default culture.
+    /// For variant content, returns all cultures.
+    /// </summary>
+    private async Task<IEnumerable<string>> GetCulturesForUrlLookupAsync(IContent content)
+    {
+        if (content.ContentType.VariesByCulture())
+        {
+            return await _languageService.GetAllIsoCodesAsync();
+        }
+
+        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+        var ancestorOrSelfIds = content.AncestorIds().Append(content.Id).ToHashSet();
+        var domainCultures = umbracoContext.Domains.GetAll(true)
+            .Where(d => ancestorOrSelfIds.Contains(d.ContentId))
+            .Select(d => d.Culture)
+            .WhereNotNull()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return domainCultures.Count > 0
+            ? domainCultures
+            : [await _languageService.GetDefaultIsoCodeAsync()];
     }
 
     private async Task<Attempt<UrlInfo?>> VerifyCollisionAsync(IContent content, string url, string culture)
