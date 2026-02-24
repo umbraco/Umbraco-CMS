@@ -80,6 +80,7 @@ public class ExtendedContentPublishedWebhookEvent : ExtendedContentWebhookEventB
             deliveryContent.Name,
             deliveryContent.CreateDate,
             deliveryContent.UpdateDate,
+            deliveryContent.Properties,
             Cultures = cultures,
         };
     }
