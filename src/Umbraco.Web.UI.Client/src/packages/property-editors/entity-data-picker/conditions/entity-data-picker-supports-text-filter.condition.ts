@@ -26,6 +26,7 @@ export class UmbEntityDataPickerSupportsTextFilterCondition
 						'_observeSupportsTextFilter',
 					);
 				} else {
+					this.removeUmbControllerByAlias('_observeSupportsTextFilter');
 					this.permitted = false;
 				}
 			});
