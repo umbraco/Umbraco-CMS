@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
-namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
+namespace Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 
 /// <summary>
 ///     Applies SQL Server-specific model configuration for <see cref="NodeDto" />.
