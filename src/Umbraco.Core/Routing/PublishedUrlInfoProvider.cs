@@ -62,6 +62,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         // For all content, iterate all cultures.
         // For invariant content, cultures without a matching domain will return "#"
         // and be silently skipped, naturally filtering to only relevant URLs.
+        var defaultIsoCode = await _languageService.GetDefaultIsoCodeAsync();
         IEnumerable<string> cultures = await _languageService.GetAllIsoCodesAsync();
 
         // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
@@ -115,8 +116,17 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
                 urlInfos.RemoveWhere(u => u.Url is not null && (!u.Url.IsAbsoluteUri || !domainHosts.Contains(u.Url.Host)));
             }
 
-            var seenUrls = new HashSet<string>();
-            urlInfos.RemoveWhere(u => u.Url is not null && !seenUrls.Add(u.Url.ToString()));
+            // Deduplicate by URL string, preferring the default culture's label.
+            // Register default-culture URLs first, then remove non-default duplicates.
+            var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (UrlInfo urlInfo in urlInfos.Where(u => u.Url is not null && string.Equals(u.Culture, defaultIsoCode, StringComparison.OrdinalIgnoreCase)))
+            {
+                seenUrls.Add(urlInfo.Url!.ToString());
+            }
+
+            urlInfos.RemoveWhere(u => u.Url is not null
+                && !string.Equals(u.Culture, defaultIsoCode, StringComparison.OrdinalIgnoreCase)
+                && !seenUrls.Add(u.Url.ToString()));
         }
 
         // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
