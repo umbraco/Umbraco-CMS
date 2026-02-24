@@ -1,3 +1,4 @@
+export * from './collection/constants.js';
 export * from './entity-actions/constants.js';
 export * from './entity-bulk-actions/constants.js';
 export * from './folder/constants.js';

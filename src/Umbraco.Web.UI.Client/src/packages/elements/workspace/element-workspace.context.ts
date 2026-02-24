@@ -1,11 +1,12 @@
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
-import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/constants.js';
 import type { UmbElementDetailRepository } from '../repository/index.js';
 import type { UmbElementDetailModel, UmbElementVariantModel } from '../types.js';
-import { UMB_ELEMENT_COLLECTION_ALIAS } from '../collection/constants.js';
 import { UmbElementValidationRepository } from '../repository/validation/index.js';
 import {
+	UMB_ELEMENT_COLLECTION_ALIAS,
+	UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
+	UMB_ELEMENT_SAVE_MODAL,
 	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_CREATE,
 	UMB_USER_PERMISSION_ELEMENT_UPDATE,
@@ -67,7 +68,7 @@ export class UmbElementWorkspaceContext
 			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
-			// TODO: Add a save modal token for Element workspace [LK]
+			saveModalToken: UMB_ELEMENT_SAVE_MODAL,
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
