@@ -97,17 +97,22 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 
         // For invariant content, only show URLs for cultures that have a domain.
         // When domains exist, the default culture may produce a fallback URL using the
-        // request's base URL (CleanedUmbracoUrl) — this is not a real routable URL and
-        // should be removed. When no domains exist, de-duplicate by URL string since
-        // multiple cultures resolve to the same path.
+        // request's base URL — this is not a real routable URL and should be removed.
+        // When no domains exist, deduplicate by URL string since multiple cultures
+        // resolve to the same path.
         if (isInvariant)
         {
-            Uri cleanedUrl = _umbracoContextAccessor.GetRequiredUmbracoContext().CleanedUmbracoUrl;
-            var hasDomainUrls = urlInfos.Any(u => u.Url is { IsAbsoluteUri: true } && !u.Url.Host.Equals(cleanedUrl.Host, StringComparison.OrdinalIgnoreCase));
+            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            HashSet<string> domainHosts = umbracoContext.Domains
+                .GetAll(false)
+                .Select(d => DomainUtilities.ParseUriFromDomainName(d.Name, umbracoContext.CleanedUmbracoUrl).Host)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var hasDomainUrls = urlInfos.Any(u => u.Url is { IsAbsoluteUri: true } && domainHosts.Contains(u.Url.Host));
 
             if (hasDomainUrls)
             {
-                urlInfos.RemoveWhere(u => u.Url is not null && (!u.Url.IsAbsoluteUri || u.Url.Host.Equals(cleanedUrl.Host, StringComparison.OrdinalIgnoreCase)));
+                urlInfos.RemoveWhere(u => u.Url is not null && (!u.Url.IsAbsoluteUri || !domainHosts.Contains(u.Url.Host)));
             }
 
             var seenUrls = new HashSet<string>();
