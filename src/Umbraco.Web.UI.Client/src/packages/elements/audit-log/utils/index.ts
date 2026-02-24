@@ -12,7 +12,6 @@ export type UmbElementAuditLogType =
 	| 'UnpublishVariant'
 	| 'Move'
 	| 'Copy'
-	| 'Sort'
 	| 'RollBack'
 	| 'ContentVersionPreventCleanup'
 	| 'ContentVersionEnableCleanup'
@@ -32,7 +31,6 @@ export const UmbElementAuditLog = Object.freeze({
 	ROLL_BACK: 'RollBack',
 	SAVE_VARIANT: 'SaveVariant',
 	SAVE: 'Save',
-	SORT: 'Sort',
 	SYSTEM: 'System',
 	UNPUBLISH_VARIANT: 'UnpublishVariant',
 	UNPUBLISH: 'Unpublish',
