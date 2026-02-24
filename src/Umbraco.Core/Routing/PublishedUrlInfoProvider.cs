@@ -22,7 +22,6 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     private readonly ILocalizedTextService _localizedTextService;
     private readonly ILogger<PublishedUrlInfoProvider> _logger;
     private readonly UriUtility _uriUtility;
-    private readonly IVariationContextAccessor _variationContextAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedUrlInfoProvider" /> class.
@@ -43,7 +42,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         ILocalizedTextService localizedTextService,
         ILogger<PublishedUrlInfoProvider> logger,
         UriUtility uriUtility,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor) // TODO (V18): Remove this unused parameter.
     {
         _publishedUrlProvider = publishedUrlProvider;
         _languageService = languageService;
@@ -52,19 +51,18 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         _localizedTextService = localizedTextService;
         _logger = logger;
         _uriUtility = uriUtility;
-        _variationContextAccessor = variationContextAccessor;
     }
 
     /// <inheritdoc />
     public async Task<ISet<UrlInfo>> GetAllAsync(IContent content)
     {
         HashSet<UrlInfo> urlInfos = [];
+        var isInvariant = !content.ContentType.VariesByCulture();
 
-        // For invariant content, only return the URL for the default language.
-        // Invariant content doesn't vary by culture, so it only has one URL.
-        IEnumerable<string> cultures = content.ContentType.VariesByCulture()
-            ? await _languageService.GetAllIsoCodesAsync()
-            : [(await _languageService.GetDefaultIsoCodeAsync())];
+        // For all content, iterate all cultures.
+        // For invariant content, cultures without a matching domain will return "#"
+        // and be silently skipped, naturally filtering to only relevant URLs.
+        IEnumerable<string> cultures = await _languageService.GetAllIsoCodesAsync();
 
         // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
         foreach (var culture in cultures)
@@ -74,6 +72,13 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             // Handle "could not get URL"
             if (url is "#" or "#ex")
             {
+                // For invariant content, a missing URL just means there's no domain
+                // for this culture — not a problem worth reporting.
+                if (isInvariant)
+                {
+                    continue;
+                }
+
                 urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
                 continue;
             }
@@ -88,6 +93,25 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             }
 
             urlInfos.Add(UrlInfo.AsUrl(url, UrlProviderAlias, culture));
+        }
+
+        // For invariant content, only show URLs for cultures that have a domain.
+        // When domains exist, the default culture may produce a fallback URL using the
+        // request's base URL (CleanedUmbracoUrl) — this is not a real routable URL and
+        // should be removed. When no domains exist, de-duplicate by URL string since
+        // multiple cultures resolve to the same path.
+        if (isInvariant)
+        {
+            Uri cleanedUrl = _umbracoContextAccessor.GetRequiredUmbracoContext().CleanedUmbracoUrl;
+            var hasDomainUrls = urlInfos.Any(u => u.Url is { IsAbsoluteUri: true } && !u.Url.Host.Equals(cleanedUrl.Host, StringComparison.OrdinalIgnoreCase));
+
+            if (hasDomainUrls)
+            {
+                urlInfos.RemoveWhere(u => u.Url is not null && (!u.Url.IsAbsoluteUri || u.Url.Host.Equals(cleanedUrl.Host, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            var seenUrls = new HashSet<string>();
+            urlInfos.RemoveWhere(u => u.Url is not null && !seenUrls.Add(u.Url.ToString()));
         }
 
         // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
