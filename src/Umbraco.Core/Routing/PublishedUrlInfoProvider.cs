@@ -42,7 +42,9 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         ILocalizedTextService localizedTextService,
         ILogger<PublishedUrlInfoProvider> logger,
         UriUtility uriUtility,
+#pragma warning disable IDE0060 // Remove unused parameter
         IVariationContextAccessor variationContextAccessor) // TODO (V18): Remove this unused parameter.
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         _publishedUrlProvider = publishedUrlProvider;
         _languageService = languageService;
@@ -104,7 +106,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         if (isInvariant)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            HashSet<string> domainHosts = umbracoContext.Domains
+            var domainHosts = umbracoContext.Domains
                 .GetAll(false)
                 .Select(d => DomainUtilities.ParseUriFromDomainName(d.Name, umbracoContext.CleanedUmbracoUrl).Host)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
