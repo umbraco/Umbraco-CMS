@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Hosting;
 
+namespace Umbraco.Cms.Tests.Integration.TestServerTest;
+
 public class TestDatabaseHostedLifecycleService : IHostedLifecycleService
 {
     private readonly Action _action;
