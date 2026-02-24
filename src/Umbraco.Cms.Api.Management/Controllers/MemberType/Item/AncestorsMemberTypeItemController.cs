@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
-using Umbraco.Cms.Api.Management.ViewModels.MemberType.Item;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Item;
@@ -18,7 +17,7 @@ public class AncestorsMemberTypeItemController : MemberTypeItemControllerBase
 
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<MemberTypeItemResponseModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<NamedItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of member type items.")]
     [EndpointDescription("Gets the ancestor chains for member type items identified by the provided Ids.")]
     public async Task<IActionResult> Ancestors(
@@ -27,17 +26,17 @@ public class AncestorsMemberTypeItemController : MemberTypeItemControllerBase
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<ItemAncestorsResponseModel<MemberTypeItemResponseModel>>());
+            return Ok(Enumerable.Empty<ItemAncestorsResponseModel<NamedItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<MemberTypeItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
+        IEnumerable<ItemAncestorsResponseModel<NamedItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
             UmbracoObjectTypes.MemberType,
             UmbracoObjectTypes.MemberTypeContainer,
             ids,
-            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, MemberTypeItemResponseModel>>(
+            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, NamedItemResponseModel>>(
                 ancestors.ToDictionary(
                     a => a.Key,
-                    a => new MemberTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
+                    a => new NamedItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
 
         return Ok(result);
     }

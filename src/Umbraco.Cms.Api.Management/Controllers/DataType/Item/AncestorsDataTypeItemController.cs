@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services.Entities;
-using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core.Models;
 
@@ -18,7 +17,7 @@ public class AncestorsDataTypeItemController : DatatypeItemControllerBase
 
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<DataTypeItemResponseModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ItemAncestorsResponseModel<NamedItemResponseModel>>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets ancestors for a collection of data type items.")]
     [EndpointDescription("Gets the ancestor chains for data type items identified by the provided Ids.")]
     public async Task<IActionResult> Ancestors(
@@ -27,17 +26,17 @@ public class AncestorsDataTypeItemController : DatatypeItemControllerBase
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<ItemAncestorsResponseModel<DataTypeItemResponseModel>>());
+            return Ok(Enumerable.Empty<ItemAncestorsResponseModel<NamedItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<DataTypeItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
+        IEnumerable<ItemAncestorsResponseModel<NamedItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
             ids,
-            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, DataTypeItemResponseModel>>(
+            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, NamedItemResponseModel>>(
                 ancestors.ToDictionary(
                     a => a.Key,
-                    a => new DataTypeItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
+                    a => new NamedItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
 
         return Ok(result);
     }

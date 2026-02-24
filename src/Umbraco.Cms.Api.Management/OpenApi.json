@@ -1560,7 +1560,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModelDataTypeItemResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
                       }
                     ]
                   }
@@ -6846,7 +6846,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModelDocumentTypeItemResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
                       }
                     ]
                   }
@@ -14762,7 +14762,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMediaTypeItemResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
                       }
                     ]
                   }
@@ -20554,7 +20554,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMemberTypeItemResponseModel"
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
                       }
                     ]
                   }
@@ -43377,30 +43377,6 @@
         },
         "additionalProperties": false
       },
-      "ItemAncestorsResponseModelDataTypeItemResponseModel": {
-        "required": [
-          "ancestors",
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "ancestors": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DataTypeItemResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "ItemAncestorsResponseModelDocumentItemResponseModel": {
         "required": [
           "ancestors",
@@ -43418,30 +43394,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/DocumentItemResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "ItemAncestorsResponseModelDocumentTypeItemResponseModel": {
-        "required": [
-          "ancestors",
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "ancestors": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentTypeItemResponseModel"
                 }
               ]
             }
@@ -43473,30 +43425,6 @@
         },
         "additionalProperties": false
       },
-      "ItemAncestorsResponseModelMediaTypeItemResponseModel": {
-        "required": [
-          "ancestors",
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "ancestors": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/MediaTypeItemResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "ItemAncestorsResponseModelMemberItemResponseModel": {
         "required": [
           "ancestors",
@@ -43521,7 +43449,7 @@
         },
         "additionalProperties": false
       },
-      "ItemAncestorsResponseModelMemberTypeItemResponseModel": {
+      "ItemAncestorsResponseModelNamedItemResponseModel": {
         "required": [
           "ancestors",
           "id"
@@ -43537,7 +43465,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MemberTypeItemResponseModel"
+                  "$ref": "#/components/schemas/NamedItemResponseModel"
                 }
               ]
             }
@@ -45793,6 +45721,34 @@
               }
             ],
             "nullable": true
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NamedItemResponseModel": {
+        "required": [
+          "flags",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
           "flags": {
             "type": "array",
