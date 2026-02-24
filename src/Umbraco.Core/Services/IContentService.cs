@@ -519,13 +519,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns><c>true</c> if the document was sent to publication; otherwise, <c>false</c>.</returns>
     bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Publishes and unpublishes scheduled documents.
-    /// </summary>
-    /// <param name="date">The date to use for determining scheduled actions.</param>
-    /// <returns>The publish results.</returns>
-    IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
-
     #endregion
 
     #region Permissions
