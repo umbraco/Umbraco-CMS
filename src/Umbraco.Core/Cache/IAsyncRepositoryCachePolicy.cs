@@ -20,9 +20,10 @@ public interface IAsyncRepositoryCachePolicy<TEntity, TId>
     /// </summary>
     /// <param name="id">The identifier.</param>
     /// <param name="performGet">The repository PerformGet method.</param>
+    /// <param name="performGetAll">The repository PerformGetAll method.</param>
     /// <returns>The entity with the specified identifier, if it exists, else null.</returns>
     /// <remarks>First considers the cache then the repository.</remarks>
-    Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet);
+    Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <summary>
     ///     Gets an entity from the cache.
@@ -37,9 +38,10 @@ public interface IAsyncRepositoryCachePolicy<TEntity, TId>
     /// </summary>
     /// <param name="id">The identifier.</param>
     /// <param name="performExists">The repository PerformExists method.</param>
+    /// <param name="performGetAll">The repository PerformGetAll method.</param>
     /// <returns>A value indicating whether an entity with the specified identifier exists.</returns>
     /// <remarks>First considers the cache then the repository.</remarks>
-    Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists);
+    Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <summary>
     ///     Creates an entity.
@@ -76,10 +78,12 @@ public interface IAsyncRepositoryCachePolicy<TEntity, TId>
     /// <summary>
     ///     Gets many entities.
     /// </summary>
+    /// <param name="ids">The identifiers of the entities to retrieve.</param>
     /// <param name="performGetMany">The repository PerformGetMany method.</param>
-    /// <returns> Returns entities from the list of <param name="ids"></param>.</returns>
+    /// <param name="performGetAll">The repository PerformGetAll method.</param>
+    /// <returns>The entities matching the specified identifiers.</returns>
     /// <remarks>Get the entities. Either from the cache or the repository depending on the implementation.</remarks>
-    Task<TEntity[]> GetManyAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetMany);
+    Task<TEntity[]> GetManyAsync(TId[] ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <summary>
     ///     Clears the entire cache.

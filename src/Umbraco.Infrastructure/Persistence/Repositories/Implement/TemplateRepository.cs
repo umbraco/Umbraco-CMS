@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Cache;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -143,8 +144,8 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
     }
 
-    protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ITemplate, int>(
+    protected override IAsyncRepositoryCachePolicy<ITemplate, Guid> CreateCachePolicy() =>
+        new AsyncFullDataSetRepositoryCachePolicy<ITemplate, Guid>(
             GlobalIsolatedCache,
             ScopeAccessor,
             RepositoryCacheVersionService,
