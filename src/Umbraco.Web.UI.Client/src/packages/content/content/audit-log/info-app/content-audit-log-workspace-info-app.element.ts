@@ -99,7 +99,9 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 		if (!this.#auditLogRepository) return;
 
 		const unique = this.#workspaceContext.getUnique();
-		if (!unique) return;
+		if (!unique) {
+			throw new Error('Workspace entity unique is required');
+		}
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
 			unique,
