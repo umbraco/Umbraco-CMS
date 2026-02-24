@@ -48,3 +48,5 @@ export class UmbDocumentAuditLogRepository
 		return getDocumentHistoryTagStyleAndText(logType as UmbDocumentAuditLogType);
 	}
 }
+
+export { UmbDocumentAuditLogRepository as api };

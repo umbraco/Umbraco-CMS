@@ -48,3 +48,5 @@ export class UmbMediaAuditLogRepository
 		return getMediaHistoryTagStyleAndText(logType as UmbMediaAuditLogType);
 	}
 }
+
+export { UmbMediaAuditLogRepository as api };
