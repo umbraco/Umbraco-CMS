@@ -183,7 +183,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					? html`
 							<umb-input-media
 								slot="editor"
-								folder-filter="foldersOnly"
+								folder-filter="filesAndFolders"
 								.selection=${this._mediaStartNodeUniques.map((reference) => reference.unique)}
 								@change=${this.#onMediaStartNodeChange}></umb-input-media>
 						`
