@@ -54,6 +54,12 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<TemplateDto> Templates { get; set; }
 
+    public required DbSet<User2NodeNotifyDto> User2NodeNotifies { get; set; }
+
+    public required DbSet<DocumentVersionDto> DocumentVersions { get; set; }
+
+    public required DbSet<ContentTypeTemplateDto> ContentTypeTemplates { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var extensions = options.Extensions.FirstOrDefault() as Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension;

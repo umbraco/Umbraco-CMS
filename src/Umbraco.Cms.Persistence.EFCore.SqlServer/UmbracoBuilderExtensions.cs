@@ -23,8 +23,12 @@ public static class UmbracoBuilderExtensions
 
         builder.AddDbContextRegistrar<SqlServerDbContextServiceRegistrar>();
 
-        builder.AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>();
+        AddCustomizers(builder);
 
         return builder;
     }
+
+    private static void AddCustomizers(IUmbracoBuilder builder) =>
+        builder.AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerDocumentVersionDtoModelCustomizer>();
 }
