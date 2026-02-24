@@ -8,10 +8,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 /// </summary>
 public interface IEFCoreModelCustomizer
 {
-    /// <summary>Gets the entity type this customizer applies to.</summary>
+    /// <summary>
+    /// Gets the entity type this customizer applies to.
+    /// </summary>
     Type EntityType { get; }
 
-    /// <summary>Applies provider-specific model configuration.</summary>
+    /// <summary>
+    /// Applies provider-specific model configuration.
+    /// </summary>
     void Apply(ModelBuilder modelBuilder);
 }
 
@@ -27,12 +31,23 @@ public interface IEFCoreModelCustomizer
 public interface IEFCoreModelCustomizer<TEntity> : IEFCoreModelCustomizer
     where TEntity : class
 {
-    /// <summary>Applies provider-specific configuration for the entity type.</summary>
+    /// <summary>
+    /// Applies provider-specific configuration for the entity type.
+    /// </summary>
     void Customize(EntityTypeBuilder<TEntity> builder);
 
     // Default implementations — providers do not override these
+    /// <inheritdoc/>
     Type IEFCoreModelCustomizer.EntityType => typeof(TEntity);
 
+    /// <inheritdoc/>
     void IEFCoreModelCustomizer.Apply(ModelBuilder modelBuilder)
-        => Customize(modelBuilder.Entity<TEntity>());
+    {
+        if (modelBuilder.Model.FindEntityType(typeof(TEntity)) is null)
+        {
+            throw new InvalidOperationException("The context does not contain the entity type " + typeof(TEntity).FullName);
+        }
+
+        Customize(modelBuilder.Entity<TEntity>());
+    }
 }

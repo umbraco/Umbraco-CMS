@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
@@ -69,7 +69,7 @@ public static class DbContextRegistrationExtensions
     /// <see cref="Microsoft.EntityFrameworkCore.DbContext" /> model creation.
     /// </summary>
     /// <typeparam name="TCustomizer">
-    /// The type of <see cref="IEFCoreModelCustomizer"/> to register.
+    /// The type of <see cref="IEFCoreModelCustomizer{TEntity}"/> to register.
     /// </typeparam>
     /// <param name="builder">The Umbraco builder.</param>
     public static IUmbracoBuilder AddEFCoreModelCustomizer<TCustomizer>(this IUmbracoBuilder builder)
