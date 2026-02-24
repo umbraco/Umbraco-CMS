@@ -2,8 +2,7 @@ import type { UmbMediaAuditLogModel } from '../types.js';
 import type { UmbMediaAuditLogType } from '../utils/index.js';
 import { getMediaHistoryTagStyleAndText } from '../info-app/utils.js';
 import { UmbMediaAuditLogServerDataSource } from './media-audit-log.server.data-source.js';
-import type { UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
-import type { UmbAuditLogHistoryRepository, UmbAuditLogTagData } from '@umbraco-cms/backoffice/content';
+import type { UmbAuditLogRepository, UmbAuditLogRequestArgs, UmbAuditLogTagData } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
@@ -14,7 +13,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  */
 export class UmbMediaAuditLogRepository
 	extends UmbRepositoryBase
-	implements UmbAuditLogHistoryRepository<UmbMediaAuditLogModel>
+	implements UmbAuditLogRepository<UmbMediaAuditLogModel>
 {
 	#dataSource: UmbMediaAuditLogServerDataSource;
 

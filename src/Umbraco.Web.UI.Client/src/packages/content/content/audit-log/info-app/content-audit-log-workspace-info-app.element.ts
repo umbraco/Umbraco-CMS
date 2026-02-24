@@ -1,4 +1,3 @@
-import type { UmbAuditLogHistoryRepository } from '../audit-log-history-repository.interface.js';
 import type { ManifestWorkspaceInfoAppAuditLogKind } from './types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -10,7 +9,7 @@ import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbAuditLogModel } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbAuditLogModel, UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -44,7 +43,7 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
-	#auditLogRepository?: UmbAuditLogHistoryRepository;
+	#auditLogRepository?: UmbAuditLogRepository;
 
 	#pagination = new UmbPaginationManager();
 
@@ -81,7 +80,7 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 			throw new Error('Audit log repository alias is required');
 		}
 
-		this.#auditLogRepository = await createExtensionApiByAlias<UmbAuditLogHistoryRepository>(
+		this.#auditLogRepository = await createExtensionApiByAlias<UmbAuditLogRepository>(
 			this,
 			auditLogRepositoryAlias,
 		);
@@ -176,7 +175,7 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	#renderHistoryItem(item: UmbAuditLogModel) {
-		const tagData = this.#auditLogRepository?.getTagStyleAndText(item.logType);
+		const tagData = this.#auditLogRepository?.getTagStyleAndText?.(item.logType);
 		const user = this.#userMap.get(item.user.unique);
 
 		return html`

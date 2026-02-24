@@ -1,19 +1,6 @@
 import type { ManifestWorkspaceInfoApp, MetaWorkspaceInfoApp } from '@umbraco-cms/backoffice/workspace';
 
-export interface UmbAuditLogTagStyleMap {
-	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';
-	color: 'default' | 'danger' | 'warning' | 'positive';
-}
-
-export interface UmbAuditLogTagLocalizeKeys {
-	label: string;
-	desc: string;
-}
-
-export interface UmbAuditLogTagData {
-	style: UmbAuditLogTagStyleMap;
-	text: UmbAuditLogTagLocalizeKeys;
-}
+export type { UmbAuditLogTagData, UmbAuditLogTagLocalizeKeys, UmbAuditLogTagStyleMap } from '@umbraco-cms/backoffice/audit-log';
 
 export interface MetaWorkspaceInfoAppAuditLogKind extends MetaWorkspaceInfoApp {
 	auditLogRepositoryAlias: string;
