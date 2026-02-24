@@ -1,3 +1,4 @@
+export type * from './audit-log/index.js';
 export * from './collection/index.js';
 export * from './components/index.js';
 export * from './constants.js';

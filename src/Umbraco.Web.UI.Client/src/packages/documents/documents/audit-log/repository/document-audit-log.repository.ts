@@ -1,6 +1,9 @@
 import type { UmbDocumentAuditLogModel } from '../types.js';
+import type { UmbDocumentAuditLogType } from '../utils/index.js';
+import { getDocumentHistoryTagStyleAndText } from '../info-app/utils.js';
 import { UmbDocumentAuditLogServerDataSource } from './document-audit-log.server.data-source.js';
-import type { UmbAuditLogRepository, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbAuditLogHistoryRepository, UmbAuditLogTagData } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
@@ -11,7 +14,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  */
 export class UmbDocumentAuditLogRepository
 	extends UmbRepositoryBase
-	implements UmbAuditLogRepository<UmbDocumentAuditLogModel>
+	implements UmbAuditLogHistoryRepository<UmbDocumentAuditLogModel>
 {
 	#dataSource: UmbDocumentAuditLogServerDataSource;
 
@@ -33,5 +36,15 @@ export class UmbDocumentAuditLogRepository
 	 */
 	async requestAuditLog(args: UmbAuditLogRequestArgs) {
 		return this.#dataSource.getAuditLog(args);
+	}
+
+	/**
+	 * Get the tag style and localization data for a given audit log type
+	 * @param {string} logType
+	 * @returns {UmbAuditLogTagData}
+	 * @memberof UmbDocumentAuditLogRepository
+	 */
+	getTagStyleAndText(logType: string): UmbAuditLogTagData {
+		return getDocumentHistoryTagStyleAndText(logType as UmbDocumentAuditLogType);
 	}
 }
