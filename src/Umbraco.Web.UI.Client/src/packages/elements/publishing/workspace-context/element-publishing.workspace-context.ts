@@ -2,6 +2,7 @@ import { UMB_ELEMENT_WORKSPACE_CONTEXT } from '../../workspace/element-workspace
 import type { UmbElementDetailModel, UmbElementVariantOptionModel } from '../../types.js';
 import { UmbElementVariantState } from '../../types.js';
 import { UmbElementPublishingRepository } from '../repository/index.js';
+import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
 import { UMB_ELEMENT_PUBLISH_MODAL } from '../publish/constants.js';
 import { UMB_ELEMENT_UNPUBLISH_MODAL } from '../unpublish/constants.js';
@@ -11,7 +12,9 @@ import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
 import { UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT } from './element-publishing.workspace-context.token.js';
 import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -19,13 +22,22 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbElementPublishingWorkspaceContext extends UmbContextBase implements UmbPublishableWorkspaceContext {
+	/**
+	 * Manages the pending changes for the published element.
+	 * @memberof UmbElementPublishingWorkspaceContext
+	 */
+	public readonly publishedPendingChanges = new UmbElementPublishedPendingChangesManager(this);
+
 	#init: Promise<unknown>;
 	#elementWorkspaceContext?: typeof UMB_ELEMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#publishingRepository = new UmbElementPublishingRepository(this);
+	#publishedElementData?: UmbElementDetailModel;
+	#currentUnique?: UmbEntityUnique;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
 
@@ -48,6 +60,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 					modifier: true,
 					action: () => this.saveAndPublish(),
 				});
+				this.#initPendingChanges();
 			})
 				.asPromise({ preventTimeout: true })
 				.catch(() => {
@@ -150,7 +163,10 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				data: { message: this.#localize.term('speechBubbles_editElementUnpublishedHeader') },
 			});
 
+			this.#clear();
+
 			await this.#elementWorkspaceContext?.reload();
+			await this.#loadAndProcessLastPublished();
 
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			this.#eventContext?.dispatchEvent(event);
@@ -340,8 +356,15 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				data: { message: this.#localize.term('speechBubbles_editElementPublishedHeader') },
 			});
 
+			// Clear stale published data and pending changes state so the
+			// persistedData observer does not run a comparison against outdated
+			// data during reload, which would briefly show a false-positive
+			// "pending changes" state.
+			this.#clear();
+
 			// reload the element so all states are updated after the publish operation
 			await this.#elementWorkspaceContext.reload();
+			await this.#loadAndProcessLastPublished();
 
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			this.#eventContext?.dispatchEvent(event);
@@ -399,6 +422,80 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		);
 
 		return [...new Set(selected)];
+	}
+
+	async #initPendingChanges() {
+		if (!this.#elementWorkspaceContext) {
+			return;
+		}
+
+		this.observe(
+			observeMultiple([this.#elementWorkspaceContext.unique, this.#elementWorkspaceContext.isNew]),
+			([unique, isNew]) => {
+				// We have loaded in a new element, so we need to clear the states
+				if (unique !== this.#currentUnique) {
+					this.#clear();
+				}
+
+				this.#currentUnique = unique;
+
+				if (isNew === false && unique) {
+					this.#loadAndProcessLastPublished();
+				}
+			},
+			'uniqueObserver',
+		);
+
+		this.observe(
+			this.#elementWorkspaceContext.persistedData,
+			() => this.#processPendingChanges(),
+			'umbPersistedDataObserver',
+		);
+	}
+
+	#hasPublishedVariant() {
+		const variants = this.#elementWorkspaceContext?.getVariants();
+		return (
+			variants?.some(
+				(variant) =>
+					variant.state === DocumentVariantStateModel.PUBLISHED ||
+					variant.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
+			) ?? false
+		);
+	}
+
+	async #loadAndProcessLastPublished() {
+		if (!this.#elementWorkspaceContext) throw new Error('Element workspace context is missing');
+
+		// No need to check pending changes for new elements
+		if (this.#elementWorkspaceContext.getIsNew()) return;
+
+		const unique = this.#elementWorkspaceContext.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		// Only load the published data if the element is already published or has been published before
+		const hasPublishedVariant = this.#hasPublishedVariant();
+		if (!hasPublishedVariant) return;
+
+		// TODO: Implement once ElementService.getElementByIdPublished endpoint exists [LK]
+		// const { data } = await this.#publishingRepository.published(unique);
+		// this.#publishedElementData = data;
+		// this.#processPendingChanges();
+	}
+
+	#processPendingChanges() {
+		if (!this.#elementWorkspaceContext) throw new Error('Element workspace context is missing');
+
+		const persistedData = this.#elementWorkspaceContext.getPersistedData();
+		const publishedData = this.#publishedElementData;
+		if (!persistedData || !publishedData) return;
+
+		this.publishedPendingChanges.process({ persistedData, publishedData });
+	}
+
+	#clear() {
+		this.#publishedElementData = undefined;
+		this.publishedPendingChanges.clear();
 	}
 }
 
