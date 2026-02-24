@@ -19,7 +19,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: 2,
+  retries: 1,
   // We don't want to run parallel, as tests might differ in state
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -56,7 +56,7 @@ export default defineConfig({
     },
     {
       name: 'extensionRegistry',
-      testMatch: 'ExtensionRegistry/*.spec.ts',
+      testMatch: 'ExtensionRegistry/**/*.spec.ts',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
