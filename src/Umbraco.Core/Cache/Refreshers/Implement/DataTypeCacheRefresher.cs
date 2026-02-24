@@ -182,6 +182,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             if (dataTypeCache.Success)
             {
                 dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
+                dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetGuidKey<IDataType>(payload.Key));
             }
         }
 

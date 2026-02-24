@@ -8,6 +8,7 @@ import {
 	css,
 	customElement,
 	classMap,
+	eventOptions,
 	ifDefined,
 	html,
 	nothing,
@@ -138,7 +139,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		this._coords.y = this.imageElement.clientHeight / 2;
 	}
 
-	#handleGridDrag(event: PointerEvent) {
+	@eventOptions({ passive: false })
+	private _handleGridDrag(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
 		if (event.button !== 0) {
 			// This is not a primary mouse button click, so lets not do anything.
@@ -239,8 +241,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			<div
 				id="wrapper"
 				@click=${this.#changeFocalPoint}
-				@mousedown=${this.#handleGridDrag}
-				@touchstart=${this.#handleGridDrag}>
+				@mousedown=${this._handleGridDrag}
+				@touchstart=${this._handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"

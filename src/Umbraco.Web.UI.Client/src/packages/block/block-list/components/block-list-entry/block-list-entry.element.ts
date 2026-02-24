@@ -460,7 +460,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 					label="edit"
 					look="secondary"
 					color=${this._contentInvalid ? 'invalid' : ''}
-					href=${this._workspaceEditContentPath}>
+					href=${this._workspaceEditContentPath}
+					title=${this.localize.term('general_edit')}>
 					<uui-icon name=${this._exposed === false && this._isReadOnly === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
 						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
@@ -483,7 +484,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						label="Edit settings"
 						look="secondary"
 						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}>
+						href=${this._workspaceEditSettingsPath}
+						title=${this.localize.term('general_settings')}>
 						<uui-icon name="icon-settings"></uui-icon>
 						${this._settingsInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
@@ -495,7 +497,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderDeleteAction() {
 		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
+		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()} title=${this.localize.term('general_delete')}>
 			<uui-icon name="icon-remove"></uui-icon>
 		</uui-button>`;
 	}
@@ -505,7 +507,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			<uui-button
 				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
 				look="secondary"
-				@click=${() => this.#copyToClipboard()}>
+				@click=${() => this.#copyToClipboard()}
+				title=${this.localize.term('general_copy')}>
 				<uui-icon name="icon-clipboard-copy"></uui-icon>
 			</uui-button>
 		`;
