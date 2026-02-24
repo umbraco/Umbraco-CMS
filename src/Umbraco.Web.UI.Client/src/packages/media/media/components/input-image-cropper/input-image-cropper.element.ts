@@ -1,10 +1,12 @@
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -18,8 +20,6 @@ import './image-cropper-field.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper.element.js';
-import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 
 const DefaultFocalPoint = { left: 0.5, top: 0.5 };
 const DefaultValue: UmbImageCropperPropertyEditorValue = {

@@ -1,6 +1,7 @@
 import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -8,17 +9,16 @@ import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extens
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
 	UmbDropzoneChangeEvent,
 	UmbInputDropzoneElement,
 	UmbUploadableFile,
 } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValueType, typeof UmbLitElement>(
