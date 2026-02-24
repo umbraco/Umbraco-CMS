@@ -5,8 +5,14 @@ import type { UmbElementDetailRepository } from '../repository/index.js';
 import type { UmbElementDetailModel, UmbElementVariantModel } from '../types.js';
 import { UMB_ELEMENT_COLLECTION_ALIAS } from '../collection/constants.js';
 import { UmbElementValidationRepository } from '../repository/validation/index.js';
+import {
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+	UMB_USER_PERMISSION_ELEMENT_UPDATE,
+} from '../constants.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from './constants.js';
 import { UmbElementWorkspacePropertyDatasetContext } from './property-dataset-context/element-workspace-property-dataset-context.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import {
@@ -40,6 +46,8 @@ export class UmbElementWorkspaceContext
 	implements UmbContentWorkspaceContext<ContentModel, UmbDocumentTypeDetailModel, UmbElementVariantModel>
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
+
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
 
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
@@ -78,6 +86,25 @@ export class UmbElementWorkspaceContext
 			null,
 		);
 
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				if (isNew === undefined) return;
+				if (isNew) {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_ELEMENT_CREATE,
+						'You do not have permission to create elements.',
+					);
+				} else {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_ELEMENT_UPDATE,
+						'You do not have permission to update elements.',
+					);
+				}
+			},
+			null,
+		);
+
 		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
 		this.routes.setRoutes([
@@ -104,6 +131,22 @@ export class UmbElementWorkspaceContext
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
+				},
+			},
+		]);
+	}
+
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
+
+		createExtensionApiByAlias(this, UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [verb],
+				},
+				onChange: (permitted: boolean) => {
+					this.#handleUserPermissionChange(verb, permitted, message);
 				},
 			},
 		]);
@@ -137,9 +180,33 @@ export class UmbElementWorkspaceContext
 		return new UmbElementWorkspacePropertyDatasetContext(host, this, variantId);
 	}
 
+	protected override async _handleSave() {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
+		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
+		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
+		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
+		await super._handleSave();
+	}
+
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
+	}
+
+	async #handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
+		if (permitted) {
+			this.readOnlyGuard?.removeRule(identifier);
+			return;
+		}
+
+		this.readOnlyGuard?.addRule({
+			unique: identifier,
+			message,
+			/* This guard is a bit backwards. The rule is permitted to be read-only.
+			If the user does not have permission, we set it to true = permitted to be read-only. */
+			permitted: true,
+		});
 	}
 
 	#addEventListeners() {
