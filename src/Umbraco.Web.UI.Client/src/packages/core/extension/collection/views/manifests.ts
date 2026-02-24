@@ -1,11 +1,9 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
-export const UMB_EXTENSION_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Extension.Table';
-
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
-		alias: UMB_EXTENSION_TABLE_COLLECTION_VIEW_ALIAS,
+		alias: 'Umb.CollectionView.Extension.Table',
 		name: 'Extension Table Collection View',
 		element: () => import('./table/extension-table-collection-view.element.js'),
 		meta: {
