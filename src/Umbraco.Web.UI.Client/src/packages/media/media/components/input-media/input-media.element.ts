@@ -1,5 +1,5 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
-import { UmbMediaPickerInputContext } from './input-media.context.js';
+import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
 import {
 	css,
 	customElement,
@@ -116,6 +116,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: Boolean, attribute: 'include-trashed' })
 	includeTrashed = false;
 
+	@property({ type: String, attribute: 'folder-filter' })
+	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY;
+
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
@@ -227,6 +230,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 				})),
 				includeTrashed: this.includeTrashed,
+				folderFilter: this.folderFilter,
 			},
 		);
 	}
