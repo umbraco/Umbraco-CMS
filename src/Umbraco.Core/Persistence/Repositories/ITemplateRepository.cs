@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="ITemplate" /> entities.
 /// </summary>
-public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>, IFileRepository, IReadRepository<Guid, ITemplate>
+public interface ITemplateRepository : IFileRepository
 {
     /// <summary>
     ///     Gets a template by its alias.

@@ -13,27 +13,29 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
-///     Represents the Template Repository
+///     Represents the Template Repository.
 /// </summary>
-internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITemplateRepository
+internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemplate>, ITemplateRepository
 {
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+
     public TemplateRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
         ILogger<TemplateRepository> logger,
-        ILoggerFactory loggerFactory,
         FileSystems fileSystems,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
@@ -51,31 +53,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
         _runtimeSettings = runtimeSettings;
-    }
-
-    [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
-    public TemplateRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        ILogger<TemplateRepository> logger,
-        FileSystems fileSystems,
-        IShortStringHelper shortStringHelper,
-        IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings,
-        IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
-        : this(
-            scopeAccessor,
-            cache,
-            logger,
-            Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance,
-            fileSystems,
-            shortStringHelper,
-            viewHelper,
-            runtimeSettings,
-            repositoryCacheVersionService,
-            cacheSyncService)
-    {
     }
 
     // GUID-based lookups delegate to GetMany() which is served from FullDataSetRepositoryCachePolicy.
@@ -151,6 +128,16 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             CacheSyncService,
             GetEntityId,
             /*expires:*/ false);
+
+    protected override Task<ITemplate?> PerformGetAsync(Guid id) => throw new NotImplementedException();
+
+    protected override Task<IEnumerable<ITemplate>?> PerformGetAllAsync() => throw new NotImplementedException();
+
+    protected override Task<IEnumerable<ITemplate>?> PerformGetManyAsync(Guid[]? ids) => throw new NotImplementedException();
+
+    protected override Task PersistNewItemAsync(ITemplate item) => throw new NotImplementedException();
+
+    protected override Task PersistUpdatedItemAsync(ITemplate item) => throw new NotImplementedException();
 
     private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
     {
