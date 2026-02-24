@@ -167,31 +167,33 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 				${repeat(
 					this._items,
 					(item) => item.timestamp,
-					(item) => {
-						const tagData = this.#auditLogRepository?.getTagStyleAndText(item.logType);
-						const user = this.#userMap.get(item.user.unique);
-
-						return html`
-							<umb-history-item
-								.name=${user?.name ?? 'Unknown'}
-								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
-								<umb-user-avatar
-									slot="avatar"
-									.name=${user?.name}
-									.kind=${user?.kind}
-									.imgUrls=${user?.avatarUrls ?? []}>
-								</umb-user-avatar>
-								<div class="log-type">
-									<uui-tag look=${tagData?.style.look ?? 'placeholder'} color=${tagData?.style.color ?? 'default'}>
-										${this.localize.term(tagData?.text.label ?? item.logType, item.parameters)}
-									</uui-tag>
-									<span>${this.localize.term(tagData?.text.desc ?? '', item.parameters)}</span>
-								</div>
-							</umb-history-item>
-						`;
-					},
+					(item) => this.#renderHistoryItem(item),
 				)}
 			</umb-history-list>
+		`;
+	}
+
+	#renderHistoryItem(item: UmbAuditLogModel) {
+		const tagData = this.#auditLogRepository?.getTagStyleAndText(item.logType);
+		const user = this.#userMap.get(item.user.unique);
+
+		return html`
+			<umb-history-item
+				.name=${user?.name ?? 'Unknown'}
+				.detail=${this.localize.date(item.timestamp, TimeOptions)}>
+				<umb-user-avatar
+					slot="avatar"
+					.name=${user?.name}
+					.kind=${user?.kind}
+					.imgUrls=${user?.avatarUrls ?? []}>
+				</umb-user-avatar>
+				<div class="log-type">
+					<uui-tag look=${tagData?.style.look ?? 'placeholder'} color=${tagData?.style.color ?? 'default'}>
+						${this.localize.term(tagData?.text.label ?? item.logType, item.parameters)}
+					</uui-tag>
+					<span>${this.localize.term(tagData?.text.desc ?? '', item.parameters)}</span>
+				</div>
+			</umb-history-item>
 		`;
 	}
 
