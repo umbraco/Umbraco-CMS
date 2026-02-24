@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using Microsoft.Extensions.Logging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Composing;
 
@@ -168,7 +169,9 @@ internal sealed class ReferenceResolver
     }
 
     private static IEnumerable<string?> GetAssemblyFolders(IEnumerable<Assembly> assemblies) =>
-        assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x))).Distinct();
+        assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x)))
+            .Where(path => path.IsNullOrWhiteSpace() is false)
+            .Distinct();
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/ApplicationParts/RelatedAssemblyAttribute.cs
     private static string GetAssemblyLocation(Assembly assembly)
