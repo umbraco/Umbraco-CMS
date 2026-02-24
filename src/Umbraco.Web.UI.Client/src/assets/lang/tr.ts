@@ -1568,6 +1568,7 @@ export default {
 		noLockouts: 'kilitlenmedi',
 		noPasswordChange: 'Şifre değiştirilmedi',
 		confirmNewPassword: 'Yeni şifreyi onaylayın',
+		confirmPassword: 'Şifreyi onayla',
 		changePasswordDescription:
 			"Aşağıdaki formu doldurarak ve 'Şifreyi Değiştir' düğmesini tıklayarak Umbraco Arka Ofisine erişim şifrenizi değiştirebilirsiniz",
 		contentChannel: 'İçerik Kanalı',
