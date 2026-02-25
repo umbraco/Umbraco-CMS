@@ -147,7 +147,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            [Obsolete("Use the non-obsolete version instead. Scheduled for removal in Umbraco 18.")]
+            [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,
