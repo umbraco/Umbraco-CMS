@@ -1,5 +1,5 @@
 import { UmbMoveToEntityAction } from 'src/packages/core/tree/entity-actions/move/move-to.action';
-import { UmbDocumentItemRepository } from '../../item';
+import { UmbDocumentItemRepository } from '../../item/index.js';
 import {
 	UmbDocumentTypeDetailRepository,
 	UmbDocumentTypeStructureRepository,

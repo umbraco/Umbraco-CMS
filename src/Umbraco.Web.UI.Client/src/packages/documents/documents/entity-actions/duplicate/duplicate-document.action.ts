@@ -4,6 +4,11 @@ import { UmbDuplicateDocumentRepository } from './repository/index.js';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDocumentItemRepository } from '../../item/index.js';
+import {
+	UmbDocumentTypeDetailRepository,
+	UmbDocumentTypeStructureRepository,
+} from '@umbraco-cms/backoffice/document-type';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
@@ -11,7 +16,7 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
 		const duplicateRepository = new UmbDuplicateDocumentRepository(this);
-		const selectableFilter = await duplicateRepository.getSelectableFilterByDocumentUnique(this.args.unique);
+		const selectableFilter = await this.#getSelectableFilterByDocumentUnique(this.args.unique);
 
 		const value = await umbOpenModal(this, UMB_DUPLICATE_DOCUMENT_MODAL, {
 			data: {
@@ -36,6 +41,37 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		}
 
 		this.#reloadMenu(destinationUnique);
+	}
+
+	async #getSelectableFilterByDocumentUnique(documentUnique: string) {
+		// 1. Get the document to find its type
+		const itemRepository = new UmbDocumentItemRepository(this);
+		const { data } = await itemRepository.requestItems([documentUnique]);
+		const item = data?.[0];
+
+		if (!item) {
+			return () => false;
+		}
+
+		const documentTypeUnique = item.documentType.unique;
+
+		const structureRepository = new UmbDocumentTypeStructureRepository(this);
+		const { data: allowedParents } = await structureRepository.requestAllowedParentsOf(documentTypeUnique);
+
+		const typeDetailRepository = new UmbDocumentTypeDetailRepository(this);
+		const { data: documentType } = await typeDetailRepository.requestByUnique(documentTypeUnique);
+		const isAllowedAtRoot = documentType?.allowedAtRoot ?? false;
+
+		if (allowedParents) {
+			return (treeItem: any) => {
+				if (treeItem.unique === null) {
+					return isAllowedAtRoot;
+				}
+				return allowedParents.some((parent) => parent.unique === treeItem.documentType?.unique);
+			};
+		}
+
+		return undefined;
 	}
 
 	async #reloadMenu(destinationUnique: string | null) {
