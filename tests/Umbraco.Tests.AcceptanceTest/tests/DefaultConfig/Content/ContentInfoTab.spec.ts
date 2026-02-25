@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can see correct information when published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const notPublishContentLink = 'Not created';
+  const notPublishContentLink = 'This item is not published';
   const dataTypeName = 'Textstring';
   const contentText = 'This is test content text';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
