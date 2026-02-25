@@ -1890,12 +1890,19 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// <inheritdoc />
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentScheduleDto>()
-            .From<ContentScheduleDto>()
-            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, documentIds);
+        var contentScheduleDtos = documentIds
+            .Distinct()
+            .InGroupsOf(Constants.Sql.MaxParameterCount)
+            .SelectMany(group =>
+            {
+                Sql<ISqlContext> sql = Sql()
+                    .Select<ContentScheduleDto>()
+                    .From<ContentScheduleDto>()
+                    .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, group);
 
-        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
+                return Database.Fetch<ContentScheduleDto>(sql);
+            })
+            .ToList();
 
         IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
             .GroupBy(contentSchedule => contentSchedule.NodeId)
