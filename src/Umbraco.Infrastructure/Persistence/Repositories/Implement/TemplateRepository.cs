@@ -144,8 +144,8 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
     }
 
-    protected override IAsyncRepositoryCachePolicy<ITemplate, Guid> CreateCachePolicy() =>
-        new AsyncFullDataSetRepositoryCachePolicy<ITemplate, Guid>(
+    protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
+        new FullDataSetRepositoryCachePolicy<ITemplate, int>(
             GlobalIsolatedCache,
             ScopeAccessor,
             RepositoryCacheVersionService,
