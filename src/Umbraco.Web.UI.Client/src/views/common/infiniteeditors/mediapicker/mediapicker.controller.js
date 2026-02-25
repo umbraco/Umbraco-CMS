@@ -261,7 +261,9 @@ angular.module("umbraco")
                           $scope.path = _.filter(anc, function (f) {
                               return f.path.indexOf($scope.startNodeId) !== -1;
                           });
-                          folder.path = $scope.path[0].path;
+                          if ($scope.path.length > 0) {
+                              folder.path = $scope.path[0].path;
+                          }
                       })
                   : Promise.resolve().then(function () {
                         $scope.path = [];
