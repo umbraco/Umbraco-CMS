@@ -37,10 +37,8 @@ test('can schedule the publishing of invariant unpublished content', {tag: '@smo
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is unpublished
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -64,10 +62,8 @@ test('can schedule the publishing of invariant published content', async ({umbra
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -89,10 +85,8 @@ test('can schedule the publishing of variant unpublished content', async ({umbra
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Unpublished
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -116,10 +110,8 @@ test('can schedule the publishing of variant published content', async ({umbraco
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -145,10 +137,8 @@ test('can schedule the publishing of invariant unpublished child content', async
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Unpublished
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -174,10 +164,8 @@ test('can schedule the publishing of variant unpublished child content', async (
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Unpublished
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -204,10 +192,8 @@ test('can schedule the publishing of invariant published child content', async (
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -234,10 +220,8 @@ test('can schedule the publishing of variant published child content', async ({u
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
@@ -289,10 +273,8 @@ test('can schedule the publishing of multiple culture variants content', async (
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Unpublished
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
-  // verify the value of "Publish At"
   await umbracoUi.content.doesPublishAtContainText(firstPublishedTime);
 
   // Clean
@@ -380,10 +362,8 @@ test('can schedule the unpublishing of invariant published content', async ({umb
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before unpublishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
 });
 
@@ -408,10 +388,8 @@ test('can schedule the unpublishing of variant published content', async ({umbra
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before unpublishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
 });
 
@@ -438,10 +416,8 @@ test('can schedule the unpublishing of invariant published child content', async
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before unpublishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
 });
 
@@ -468,9 +444,7 @@ test('can schedule the unpublishing of variant published child content', async (
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before unpublishing is Published (pending changes)
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Published (pending changes)');
-  // verify the value of "Remove At"
   await umbracoUi.content.doesRemoveAtContainText(unpublishedTime);
 });
