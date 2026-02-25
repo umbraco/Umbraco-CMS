@@ -86,44 +86,48 @@ internal sealed class ElementEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
     {
         IElement? content = _elementService.GetById(key);
-        return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(
-                updateModel,
-                content.ContentType.Key,
-                updateModel.Cultures,
-                userKey)
-            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        }
+
+        ContentEditingOperationStatus contentTypeStatus = ValidateContentTypeForUpdate(content.ContentType.Key);
+        if (contentTypeStatus is not ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(contentTypeStatus, new ContentValidationResult());
+        }
+
+        return await ValidateCulturesAndPropertiesAsync(
+            updateModel,
+            content.ContentType.Key,
+            updateModel.Cultures,
+            userKey);
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
-        => await ValidateCulturesAndPropertiesAsync(
+    {
+        ContentEditingOperationStatus contentTypeStatus = ValidateContentTypeForCreate(createModel.ContentTypeKey);
+        if (contentTypeStatus is not ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(contentTypeStatus, new ContentValidationResult());
+        }
+
+        return await ValidateCulturesAndPropertiesAsync(
             createModel,
             createModel.ContentTypeKey,
             createModel.Variants.Select(variant => variant.Culture),
             userKey);
-
-    protected override IContentType? TryGetAndValidateContentType(
-        Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase,
-        out ContentEditingOperationStatus operationStatus)
-    {
-        IContentType? contentType = base.TryGetAndValidateContentType(contentTypeKey, contentEditingModelBase, out operationStatus);
-        if (contentType is null)
-        {
-            return null;
-        }
-
-        if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
-        {
-            operationStatus = ContentEditingOperationStatus.NotAllowed;
-            return null;
-        }
-
-        return contentType;
     }
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
+        ContentEditingOperationStatus contentTypeStatus = ValidateContentTypeForCreate(createModel.ContentTypeKey);
+        if (contentTypeStatus is not ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(contentTypeStatus, new ElementCreateResult());
+        }
+
         if (await ValidateCulturesAsync(createModel) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ElementCreateResult());
@@ -156,6 +160,12 @@ internal sealed class ElementEditingService
         if (element is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ElementUpdateResult());
+        }
+
+        ContentEditingOperationStatus contentTypeStatus = ValidateContentTypeForUpdate(element.ContentType.Key);
+        if (contentTypeStatus is not ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(contentTypeStatus, new ElementUpdateResult { Content = element });
         }
 
         if (await ValidateCulturesAsync(updateModel) is false)
@@ -474,6 +484,30 @@ internal sealed class ElementEditingService
 
     // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
     protected override OperationResult? Move(IElement element, int newParentId, int userId) => throw new NotImplementedException();
+
+    private ContentEditingOperationStatus ValidateContentTypeForCreate(Guid contentTypeKey)
+    {
+        IContentType? contentType = ContentTypeService.Get(contentTypeKey);
+        if (contentType is null)
+        {
+            return ContentEditingOperationStatus.ContentTypeNotFound;
+        }
+
+        if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
+        {
+            return ContentEditingOperationStatus.NotAllowed;
+        }
+
+        return ContentEditingOperationStatus.Success;
+    }
+
+    private ContentEditingOperationStatus ValidateContentTypeForUpdate(Guid contentTypeKey)
+    {
+        IContentType? contentType = ContentTypeService.Get(contentTypeKey);
+        return contentType is null
+            ? ContentEditingOperationStatus.ContentTypeNotFound
+            : ContentEditingOperationStatus.Success;
+    }
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
     {
