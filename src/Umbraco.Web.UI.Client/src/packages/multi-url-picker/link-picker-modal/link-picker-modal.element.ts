@@ -97,7 +97,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this.#loadPickedDocumentItem(unique);
 		}
 
-		if (type == 'document' && culture) {
+		if (type === 'document' && culture) {
 			this.#variantContext.setCulture(culture);
 		}
 	}
