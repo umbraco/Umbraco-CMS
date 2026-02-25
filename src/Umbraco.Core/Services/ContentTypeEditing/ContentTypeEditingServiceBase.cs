@@ -688,6 +688,18 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // This ensures we correctly handle property types that may have been filtered out from groups.
         var existingPropertyTypes = contentType.PropertyTypes.ToList();
 
+        // To ensure correct change tracking, we must explicitly inform the content type of any
+        // existing properties that have been removed.
+        var removedPropertyTypeAliases = existingPropertyTypes
+            .Select(pt => pt.Alias)
+            .Except(model.Properties.Select(p => p.Alias))
+            .ToArray();
+
+        foreach (var removedPropertyTypeAlias in removedPropertyTypeAliases)
+        {
+            contentType.RemovePropertyType(removedPropertyTypeAlias);
+        }
+
         // handle properties in groups
         PropertyGroup[] propertyGroups = model.Containers.Select(container =>
             {
@@ -781,11 +793,14 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // get the current property type (if it exists)
-        IPropertyType propertyType = existingPropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
-                                     ?? new PropertyType(_shortStringHelper, dataType);
+        IPropertyType propertyType = existingPropertyTypes.FirstOrDefault(pt => pt.Alias == property.Alias)
+                                      ?? new PropertyType(_shortStringHelper, dataType)
+                                      {
+                                          // We are demanding a property type key in the model, so we should probably
+                                          // ensure that it's the one that's actually used.
+                                          Key = property.Key
+                                      };
 
-        // We are demanding a property type key in the model, so we should probably ensure that it's the on that's actually used.
-        propertyType.Key = property.Key;
         propertyType.Name = property.Name;
         propertyType.DataTypeId = dataType.Id;
         propertyType.DataTypeKey = dataType.Key;

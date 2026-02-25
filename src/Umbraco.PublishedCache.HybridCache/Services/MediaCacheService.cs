@@ -245,6 +245,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
+        _publishedContentCache.Clear();
         await _hybridCache.RemoveByTagAsync(Constants.Cache.Tags.Media, cancellationToken);
 
         // We have to run seeding again after the cache is cleared

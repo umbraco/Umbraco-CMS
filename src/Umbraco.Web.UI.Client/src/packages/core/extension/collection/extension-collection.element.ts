@@ -28,7 +28,7 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 
 	#onChange(event: UUISelectEvent) {
 		const extensionType = event.target.value as string;
-		this.#collectionContext?.setFilter({ type: extensionType });
+		this.#collectionContext?.setFilter({ extensionTypes: extensionType ? [extensionType] : undefined });
 	}
 
 	protected override renderToolbar() {

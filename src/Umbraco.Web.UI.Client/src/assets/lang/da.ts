@@ -2025,6 +2025,7 @@ export default {
 		noLockouts: 'er ikke blevet låst ude',
 		noPasswordChange: 'Kodeordet er ikke blevet ændret',
 		confirmNewPassword: 'Gentag dit nye kodeord',
+		confirmPassword: 'Bekræft kodeord',
 		changePasswordDescription:
 			"Du kan ændre dit kodeord, som giver dig adgang til Umbraco backoffice ved at\n      udfylde formularen og klikke på knappen 'Skift dit kodeord'\n    ",
 		contentChannel: 'Indholdskanal',
