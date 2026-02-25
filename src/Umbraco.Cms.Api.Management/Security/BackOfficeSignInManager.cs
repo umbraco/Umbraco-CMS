@@ -59,10 +59,10 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     /// <summary>
     ///     Custom ExternalLoginSignInAsync overload for handling external sign in with auto-linking
     /// </summary>
-    /// <param name="loginInfo"></param>
-    /// <param name="isPersistent"></param>
-    /// <param name="bypassTwoFactor"></param>
-    /// <returns></returns>
+    /// <param name="loginInfo">The external login information.</param>
+    /// <param name="isPersistent">Whether the sign-in should be persistent.</param>
+    /// <param name="bypassTwoFactor">Whether to bypass two-factor authentication.</param>
+    /// <returns>The sign-in result.</returns>
     public async Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
@@ -127,10 +127,10 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     /// <summary>
     ///     Overridden to deal with events/notificiations
     /// </summary>
-    /// <param name="user"></param>
-    /// <param name="username"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
+    /// <param name="user">The user being signed in.</param>
+    /// <param name="username">The username.</param>
+    /// <param name="result">The sign-in result from the base implementation.</param>
+    /// <returns>The sign-in result after handling notifications.</returns>
     protected override async Task<SignInResult> HandleSignIn(BackOfficeIdentityUser? user, string? username, SignInResult result)
     {
         result = await base.HandleSignIn(user, username, result);
@@ -164,9 +164,9 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     /// <summary>
     ///     Used for auto linking/creating user accounts for external logins
     /// </summary>
-    /// <param name="loginInfo"></param>
-    /// <param name="autoLinkOptions"></param>
-    /// <returns></returns>
+    /// <param name="loginInfo">The external login information.</param>
+    /// <param name="autoLinkOptions">The auto-link options for external accounts.</param>
+    /// <returns>The sign-in result.</returns>
     private async Task<SignInResult> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, ExternalSignInAutoLinkOptions? autoLinkOptions)
     {
         // If there are no autolink options then the attempt is failed (user does not exist)

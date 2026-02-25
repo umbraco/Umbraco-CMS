@@ -54,6 +54,20 @@ public abstract class BlockListPropertyEditorBase : DataEditor
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockListEditorPropertyValueEditor"/> class.
         /// </summary>
+        /// <param name="attribute">The data editor attribute that defines metadata for the property editor.</param>
+        /// <param name="blockEditorDataConverter">The converter used for block editor data values and layouts.</param>
+        /// <param name="propertyEditors">A collection of available property editors.</param>
+        /// <param name="dataValueReferenceFactories">A collection of factories for creating data value references.</param>
+        /// <param name="dataTypeConfigurationCache">The cache for data type configurations.</param>
+        /// <param name="elementTypeCache">The cache for block editor element types.</param>
+        /// <param name="textService">The service for retrieving localized text.</param>
+        /// <param name="logger">The logger for diagnostic and error messages.</param>
+        /// <param name="shortStringHelper">Helper for generating and manipulating short strings.</param>
+        /// <param name="jsonSerializer">The serializer for JSON operations.</param>
+        /// <param name="propertyValidationService">Service for validating property values.</param>
+        /// <param name="blockEditorVarianceHandler">Handler for managing block editor variance.</param>
+        /// <param name="languageService">Service for managing languages.</param>
+        /// <param name="ioHelper">Helper for IO operations.</param>
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
             BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> blockEditorDataConverter,
@@ -89,10 +103,24 @@ public abstract class BlockListPropertyEditorBase : DataEditor
         {
             private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockEditorValues;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MinMaxValidator"/> class for validating block editor values against minimum and maximum constraints.
+            /// </summary>
+            /// <param name="blockEditorValues">The collection of block editor values to be validated.</param>
+            /// <param name="textService">The service used to provide localized validation messages.</param>
             public MinMaxValidator(BlockEditorValues<BlockListValue, BlockListLayoutItem> blockEditorValues, ILocalizedTextService textService)
                 : base(textService) =>
                 _blockEditorValues = blockEditorValues;
 
+            /// <summary>
+            /// Validates whether the number of blocks in the provided value falls within the minimum and maximum limits defined in the data type configuration.
+            /// Returns validation errors if the number of blocks is outside the allowed range.
+            /// </summary>
+            /// <param name="value">The value to validate, typically representing the block list data.</param>
+            /// <param name="valueType">The type of the value, if applicable.</param>
+            /// <param name="dataTypeConfiguration">The configuration object containing validation limits for the block list.</param>
+            /// <param name="validationContext">The context for property validation, providing additional information for validation.</param>
+            /// <returns>An enumerable of <see cref="ValidationResult"/> objects indicating any validation errors related to the number of blocks.</returns>
             public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
             {
                 var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;

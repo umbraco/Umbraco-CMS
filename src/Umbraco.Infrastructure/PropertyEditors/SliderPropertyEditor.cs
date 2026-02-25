@@ -30,6 +30,8 @@ public class SliderPropertyEditor : DataEditor
     /// <summary>
     ///     Initializes a new instance of the <see cref="SliderPropertyEditor" /> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for the slider property editor.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as file and path handling.</param>
     public SliderPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
@@ -191,8 +193,9 @@ public class SliderPropertyEditor : DataEditor
         internal sealed class RangeValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
+            /// Initializes a new instance of the <see cref="RangeValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
             public RangeValidator(ILocalizedTextService localizedTextService)
                 : base(localizedTextService)
             {
@@ -235,6 +238,7 @@ public class SliderPropertyEditor : DataEditor
             /// <summary>
             /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">Service used to provide localized text for validation messages.</param>
             public MinMaxValidator(ILocalizedTextService localizedTextService)
                 : base(localizedTextService)
             {

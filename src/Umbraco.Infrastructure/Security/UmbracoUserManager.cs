@@ -271,6 +271,15 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         return await base.IsLockedOutAsync(user);
     }
 
+    /// <summary>
+    /// Asynchronously validates the specified user's credentials by checking the username, password, and user approval status.
+    /// </summary>
+    /// <param name="username">The username of the user whose credentials are to be validated.</param>
+    /// <param name="password">The password to validate for the specified user.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result is <c>true</c> if the credentials are valid and the user is approved; otherwise, <c>false</c>.
+    /// </returns>
+    /// <exception cref="NotSupportedException">Thrown if the underlying user store does not support password validation.</exception>
     public async Task<bool> ValidateCredentialsAsync(string username, string password)
     {
         TUser? user = await FindByNameAsync(username);
@@ -292,6 +301,11 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the valid two-factor authentication providers for the specified user.
+    /// </summary>
+    /// <param name="user">The user whose valid two-factor providers are to be retrieved.</param>
+    /// <returns>A task representing the asynchronous operation, containing a list of valid two-factor provider names.</returns>
     public virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
     {
         IList<string>? results = await base.GetValidTwoFactorProvidersAsync(user);

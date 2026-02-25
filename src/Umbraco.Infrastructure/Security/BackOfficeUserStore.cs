@@ -46,6 +46,19 @@ public class BackOfficeUserStore :
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
     /// </summary>
+    /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
+    /// <param name="entityService">Service for managing Umbraco entities.</param>
+    /// <param name="externalLoginService">Handles external login providers with key support.</param>
+    /// <param name="globalSettings">The global configuration settings for Umbraco.</param>
+    /// <param name="mapper">Maps between domain and view models in Umbraco.</param>
+    /// <param name="describer">Provides error descriptions for back office user operations.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    /// <param name="twoFactorLoginService">Service for managing two-factor authentication for users.</param>
+    /// <param name="userGroupService">Service for managing user groups in the back office.</param>
+    /// <param name="userRepository">Repository for accessing and persisting user data.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
+    /// <param name="logger">Logger instance for logging operations related to the user store.</param>
     [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
@@ -246,6 +259,11 @@ public class BackOfficeUserStore :
         return SaveAsync(user);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves a user by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to retrieve.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the <see cref="IUser"/> if found; otherwise, <c>null</c>.</returns>
     public Task<IUser?> GetAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -270,6 +288,13 @@ public class BackOfficeUserStore :
         }
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the users with the specified IDs.
+    /// </summary>
+    /// <param name="ids">An array of user IDs to retrieve. If null or empty, an empty collection is returned.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified IDs.
+    /// </returns>
     public Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids)
     {
         if (ids is null || ids.Length <= 0)
@@ -289,6 +314,13 @@ public class BackOfficeUserStore :
         return Task.FromResult(users);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the users with the specified IDs.
+    /// </summary>
+    /// <param name="ids">An array of user IDs to retrieve. If <c>null</c> or empty, an empty collection is returned.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified IDs.
+    /// </returns>
     public Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys)
     {
         if (keys is null || keys.Length <= 0)
@@ -611,11 +643,14 @@ public class BackOfficeUserStore :
     }
 
     /// <summary>
-    ///     Lists all users of a given role.
+    ///     Returns all users that belong to the specified role.
     /// </summary>
     /// <remarks>
-    ///     Identity Role names are equal to Umbraco UserGroup alias.
+    ///     Identity role names correspond to Umbraco UserGroup aliases.
     /// </remarks>
+    /// <param name="normalizedRoleName">The normalized name of the role (UserGroup alias) whose users are to be listed.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="BackOfficeIdentityUser"/> objects in the specified role.</returns>
     public override async Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(
         string normalizedRoleName,
         CancellationToken cancellationToken = default)

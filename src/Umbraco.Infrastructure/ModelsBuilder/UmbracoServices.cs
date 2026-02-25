@@ -8,6 +8,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
 
+/// <summary>
+/// Provides access to core services used by the Umbraco ModelsBuilder infrastructure,
+/// facilitating operations such as model generation and synchronization within the Umbraco CMS.
+/// </summary>
 public sealed class UmbracoServices
 {
     private readonly IContentTypeService _contentTypeService;
@@ -19,6 +23,11 @@ public sealed class UmbracoServices
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoServices" /> class.
     /// </summary>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="memberTypeService">Service for managing member types.</param>
+    /// <param name="publishedContentTypeFactory">Factory for creating published content types.</param>
+    /// <param name="shortStringHelper">Helper for handling short string operations.</param>
     public UmbracoServices(
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
@@ -33,6 +42,13 @@ public sealed class UmbracoServices
         _shortStringHelper = shortStringHelper;
     }
 
+    /// <summary>
+    /// Converts the specified alias to a CLR-compliant name using the provided short string helper.
+    /// </summary>
+    /// <param name="shortStringHelper">The helper used to clean and convert the alias string.</param>
+    /// <param name="name">An optional name parameter (currently unused).</param>
+    /// <param name="alias">The alias to convert to a CLR-compliant name.</param>
+    /// <returns>The alias converted to a CLR-compliant name as a string.</returns>
     public static string GetClrName(IShortStringHelper shortStringHelper, string? name, string alias) =>
 
         // ModelsBuilder's legacy - but not ideal
@@ -40,6 +56,12 @@ public sealed class UmbracoServices
 
     #region Services
 
+    /// <summary>
+    /// Retrieves all content, media, and member type models from the respective Umbraco services.
+    /// </summary>
+    /// <returns>
+    /// A list of <see cref="Umbraco.Cms.Infrastructure.ModelsBuilder.TypeModel"/> objects representing all content, media, and member types defined in the system.
+    /// </returns>
     public IList<TypeModel> GetAllTypes()
     {
         var types = new List<TypeModel>();
@@ -61,18 +83,32 @@ public sealed class UmbracoServices
         return EnsureDistinctAliases(types);
     }
 
+    /// <summary>
+    /// Retrieves a list of content type models defined in the Umbraco CMS.
+    /// </summary>
+    /// <returns>
+    /// A list of <see cref="TypeModel"/> instances, each representing a content type available in the system.
+    /// </returns>
     public IList<TypeModel> GetContentTypes()
     {
         IContentTypeComposition[] contentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
         return GetTypes(PublishedItemType.Content, contentTypes); // aliases have to be unique here
     }
 
+    /// <summary>
+    /// Retrieves all media type models available in the system.
+    /// </summary>
+    /// <returns>A list of <see cref="TypeModel"/> objects, each representing a media type defined in Umbraco.</returns>
     public IList<TypeModel> GetMediaTypes()
     {
         IContentTypeComposition[] contentTypes = _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
         return GetTypes(PublishedItemType.Media, contentTypes); // aliases have to be unique here
     }
 
+    /// <summary>
+    /// Retrieves all member types defined in the system.
+    /// </summary>
+    /// <returns>A list of <see cref="TypeModel"/> objects representing the member types.</returns>
     public IList<TypeModel> GetMemberTypes()
     {
         IContentTypeComposition[] memberTypes = _memberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();

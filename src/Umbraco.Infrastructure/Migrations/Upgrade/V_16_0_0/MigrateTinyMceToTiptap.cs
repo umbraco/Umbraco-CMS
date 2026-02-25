@@ -8,11 +8,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_0_0;
 
+/// <summary>
+/// Migration that converts content data stored using the TinyMCE rich text editor to the Tiptap editor format during the upgrade process.
+/// </summary>
 public class MigrateTinyMceToTiptap : AsyncMigrationBase
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly TinyMceToTiptapMigrationSettings _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrateTinyMceToTiptap"/> class.
+    /// </summary>
+    /// <param name="context">The migration context used for the upgrade process.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="options">The configuration settings for migrating from TinyMCE to Tiptap.</param>
     public MigrateTinyMceToTiptap(IMigrationContext context, IDataTypeService dataTypeService, IOptions<TinyMceToTiptapMigrationSettings> options) : base(context)
     {
         _dataTypeService = dataTypeService;

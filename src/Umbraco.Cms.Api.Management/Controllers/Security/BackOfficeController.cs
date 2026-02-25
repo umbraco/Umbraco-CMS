@@ -324,8 +324,8 @@ public class BackOfficeController : SecurityControllerBase
     /// <summary>
     ///     Called when a user links an external login provider in the back office
     /// </summary>
-    /// <param name="requestModel"></param>
-    /// <returns></returns>
+    /// <param name="requestModel">The link login request containing provider and link key.</param>
+    /// <returns>An action result indicating success or failure.</returns>
     // This method is marked as AllowAnonymous and protected with a secret (linkKey) inside the model for the following reasons
     // - when a js client uses the fetch api (or old ajax requests) they can send a bearer token
     //   but since this method returns a redirect (after middleware intervenes) to another domain

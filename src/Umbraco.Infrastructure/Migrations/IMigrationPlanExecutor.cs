@@ -2,6 +2,9 @@ using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Core.Migrations;
 
+/// <summary>
+/// Represents a service responsible for executing migration plans within the Umbraco CMS.
+/// </summary>
 public interface IMigrationPlanExecutor
 {
     /// <summary>

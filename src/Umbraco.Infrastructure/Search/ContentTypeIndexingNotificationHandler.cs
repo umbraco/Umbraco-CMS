@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Handles notifications related to the indexing of Umbraco content types.
+/// </summary>
 public sealed class ContentTypeIndexingNotificationHandler : INotificationHandler<ContentTypeCacheRefresherNotification>
 {
     private readonly IContentService _contentService;
@@ -18,6 +21,14 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     private readonly IMemberTypeService _memberTypeService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeIndexingNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="umbracoIndexingHandler">The handler responsible for managing Umbraco content indexing operations.</param>
+    /// <param name="contentService">Service used to manage and query content items.</param>
+    /// <param name="memberService">Service used to manage and query member entities.</param>
+    /// <param name="mediaService">Service used to manage and query media items.</param>
+    /// <param name="memberTypeService">Service used to manage and query member types.</param>
     public ContentTypeIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
         IContentService contentService,
@@ -36,7 +47,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     /// <summary>
     ///     Updates indexes based on content type changes
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">The content type cache refresher notification.</param>
     public void Handle(ContentTypeCacheRefresherNotification args)
     {
         if (!_umbracoIndexingHandler.Enabled)

@@ -19,6 +19,8 @@ public class TextboxPropertyEditor : DataEditor
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextboxPropertyEditor" /> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for property values.</param>
+    /// <param name="ioHelper">Helper for IO operations such as path resolution and file access.</param>
     public TextboxPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {

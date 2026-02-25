@@ -8,10 +8,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Provides methods for managing and persisting URLs associated with documents in the Umbraco CMS.
+/// This repository handles storage, retrieval, and manipulation of document URL data in the persistence layer.
+/// </summary>
 public class DocumentUrlRepository : IDocumentUrlRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlRepository"/> class, providing access to document URL persistence operations.
+    /// </summary>
+    /// <param name="scopeAccessor">An accessor for the current database scope, used to manage transactional operations within the repository.</param>
     public DocumentUrlRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     private IUmbracoDatabase Database
@@ -26,6 +34,11 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             return _scopeAccessor.AmbientScope.Database;
         }
     }
+
+    /// <summary>
+    /// Saves a collection of published document URL segments to the repository, updating existing entries and removing obsolete ones as needed.
+    /// </summary>
+    /// <param name="publishedDocumentUrlSegments">The collection of <see cref="PublishedDocumentUrlSegment"/> instances to save.</param>
 
     public void Save(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
     {
@@ -74,6 +87,12 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         Database.InsertBulk(toInsert.Values);
     }
 
+    /// <summary>
+    /// Retrieves all published document URL segments from the database.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="IEnumerable{T}"/> of <see cref="PublishedDocumentUrlSegment"/> objects representing all published document URL segments.
+    /// </returns>
     public IEnumerable<PublishedDocumentUrlSegment> GetAll()
     {
         List<DocumentUrlDto>? dtos = Database.Fetch<DocumentUrlDto>(Database.SqlContext.Sql().Select<DocumentUrlDto>().From<DocumentUrlDto>());
@@ -81,6 +100,10 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         return dtos.Select(BuildModel);
     }
 
+    /// <summary>
+    /// Deletes all document URLs associated with the specified document keys.
+    /// </summary>
+    /// <param name="documentKeys">A collection of document keys whose URLs should be deleted.</param>
     public void DeleteByDocumentKey(IEnumerable<Guid> documentKeys)
     {
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
