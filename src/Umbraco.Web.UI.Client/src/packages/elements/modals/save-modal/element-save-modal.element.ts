@@ -17,7 +17,7 @@ export class UmbElementSaveModalElement extends UmbModalBaseElement<UmbElementSa
 
 	#pickableFilter = (option: UmbElementVariantOptionModel) => {
 		if (!option.variant) {
-			// If not data present, then its not pickable.
+			// If no data is present, then it's not pickable.
 			return false;
 		}
 		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
