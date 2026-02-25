@@ -282,7 +282,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const value = await umbOpenModal(this, UMB_DOCUMENT_LINK_PICKER_MODAL, {});
 
 		// If a culture is selected for the document, we need to set the variant context to make sure we get the correct name and url for the document.
-		// This will make a local varriant context for the link picker when a Document with a culture is selected,
+		// This will make a local variant context for the link picker when a Document with a culture is selected,
 		// and will inherit the values from the parent context (if any), but will override the culture with the one selected for the document.
 		if (value.culture) {
 			this.#variantContext.setCulture(value.culture);
