@@ -36,22 +36,22 @@ export class BlockGridSpecifiedAllowanceBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    let values: any = {};
 
     if (this.elementTypeKey !== undefined) {
-      values.push({elementTypeKey: this.elementTypeKey});
+      values.elementTypeKey = this.elementTypeKey;
     }
 
     if (this.groupKey !== undefined) {
-      values.push({groupKey: this.groupKey});
+      values.groupKey = this.groupKey;
     }
 
     if (this.minAllowed !== undefined) {
-      values.push({minAllowed: this.minAllowed});
+      values.minAllowed = this.minAllowed;
     }
 
     if (this.maxAllowed !== undefined) {
-      values.push({maxAllowed: this.maxAllowed});
+      values.maxAllowed = this.maxAllowed;
     }
 
     return values;

@@ -9,6 +9,7 @@ export class MediaValueDataBuilder {
 
   constructor(parentBuilder: MediaValueBuilder) {
     this.parentBuilder = parentBuilder;
+    this.crops = [];
   }
 
   withTemporaryFileId(temporaryFileId: string) {

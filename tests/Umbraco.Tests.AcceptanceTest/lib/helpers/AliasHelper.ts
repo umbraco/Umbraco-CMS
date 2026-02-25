@@ -24,10 +24,10 @@ export class AliasHelper {
   }
 
   /**
-   * Capatilze a string
+   * Capitalize a string
    *
    * @param  {string} text Input string
-   * @returns {string} A capatilized string, of the first character only
+   * @returns {string} A capitalized string, of the first character only
    */
   static capitalize(text: string): string {
     if (typeof text !== 'string') return '';
