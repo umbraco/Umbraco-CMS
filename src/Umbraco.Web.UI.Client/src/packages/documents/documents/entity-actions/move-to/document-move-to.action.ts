@@ -1,4 +1,3 @@
-import { UmbMoveToEntityAction } from 'src/packages/core/tree/entity-actions/move/move-to.action';
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import {
 	UmbDocumentTypeDetailRepository,
@@ -6,6 +5,7 @@ import {
 } from '@umbraco-cms/backoffice/document-type';
 import type { UmbDocumentTreeItemModel } from '../../types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbMoveToEntityAction } from '@umbraco-cms/backoffice/tree';
 
 class UmbDocumentMoveToEntityAction extends UmbMoveToEntityAction {
 	protected override async _getPickableFilter(unique: string): Promise<((item: any) => boolean) | undefined> {
