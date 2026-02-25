@@ -14,7 +14,6 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 
 	#variantContext?: UmbVariantContext;
 	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
-	#defaultLanguageUnique: string | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -28,10 +27,7 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 
 	async setCulture(culture: string | null) {
 		this.#culture.setValue(culture);
-
-		// If culture is set to null, we should fallback to default language in the variant context
-		const cultureForContext = culture || this.#defaultLanguageUnique;
-		await this.#variantContext?.setCulture(cultureForContext);
+		await this.#variantContext?.setCulture(culture);
 	}
 
 	async getCulture(): Promise<string | null> {
