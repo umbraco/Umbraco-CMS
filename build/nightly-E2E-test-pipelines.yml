@@ -8,9 +8,9 @@ schedules:
     displayName: Daily midnight build
     branches:
       include:
-        - v15/dev
         - v16/dev
         - main
+        - 18/dev
 
 parameters:
   - name: skipIntegrationTests
