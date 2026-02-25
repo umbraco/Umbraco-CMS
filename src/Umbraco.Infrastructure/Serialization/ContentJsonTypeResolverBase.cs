@@ -45,7 +45,7 @@ public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
 
         foreach (Type derivedType in derivedTypes)
         {
-            jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType));
+            jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType, derivedType.Name));
         }
     }
 }
