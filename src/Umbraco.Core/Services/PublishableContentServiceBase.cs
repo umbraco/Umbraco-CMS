@@ -284,7 +284,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
     {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, UmbracoObjectTypes.Document);
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, ContentObjectType);
         if (idAttempt.Success is false)
         {
             return new ContentScheduleCollection();
