@@ -28,10 +28,11 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 		return this._dataSource.getAllowedChildrenOf(unique, parentContentUnique);
 	}
 
-	requestAllowedParentsOf(unique: string) {
-		if (!this._dataSource.getAllowedParents) {
-			throw new Error('getAllowedParents is not implemented on this data source');
+	async requestAllowedParentsOf(unique: string) {
+		if (!this._dataSource.getAllowedParentsOf) {
+			//Should this be undefined instead of an empty array? EL
+			return { data: [] };
 		}
-		return this._dataSource.getAllowedParents(unique);
+		return this._dataSource.getAllowedParentsOf(unique);
 	}
 }

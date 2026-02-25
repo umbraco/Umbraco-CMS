@@ -7,5 +7,5 @@ export interface UmbContentTypeStructureRepository<ItemType> {
 		parentContentUnique: string | null,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>>;
 
-	getAllowedParents?(unique: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>>;
+	requestAllowedParentsOf?(unique: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>>;
 }

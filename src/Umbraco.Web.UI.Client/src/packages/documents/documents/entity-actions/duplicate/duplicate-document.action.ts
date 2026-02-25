@@ -49,9 +49,7 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		const { data } = await itemRepository.requestItems([documentUnique]);
 		const item = data?.[0];
 
-		if (!item) {
-			return () => false;
-		}
+		if (!item) throw new Error('Item is not available');
 
 		const documentTypeUnique = item.documentType.unique;
 

@@ -25,7 +25,7 @@ export class UmbDocumentTypeStructureServerDataSource extends UmbContentTypeStru
 		this.#host = host;
 	}
 
-	async getAllowedParents(documentTypeId: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>> {
+	async getAllowedParentsOf(documentTypeId: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeByIdAllowedParents({

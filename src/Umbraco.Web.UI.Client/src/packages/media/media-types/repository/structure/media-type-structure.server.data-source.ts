@@ -28,7 +28,7 @@ export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructu
 		return getAllowedMediaTypesOfFolders({ skip, take });
 	}
 
-	async getAllowedParents(mediaTypeId: string) {
+	async getAllowedParentsOf(mediaTypeId: string) {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getMediaTypeByIdAllowedParents({

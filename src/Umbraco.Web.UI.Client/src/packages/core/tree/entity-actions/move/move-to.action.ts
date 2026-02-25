@@ -7,7 +7,7 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
-	protected async _getPickableFilter(unique: string): Promise<((item: any) => boolean) | undefined> {
+	protected async _getPickableFilter(_unique: string): Promise<((item: any) => boolean) | undefined> {
 		return undefined;
 	}
 
