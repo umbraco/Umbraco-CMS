@@ -340,6 +340,9 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Copy.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.CopyWithBlocks.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Move.cs">
       <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
     </Compile>
