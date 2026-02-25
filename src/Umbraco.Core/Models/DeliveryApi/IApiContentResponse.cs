@@ -1,8 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 /// <summary>
 ///     Represents a content response in the Delivery API that includes culture-specific routes.
 /// </summary>
+[JsonDerivedType(typeof(ApiContentResponse), nameof(ApiContentResponse))]
 public interface IApiContentResponse : IApiContent
 {
     /// <summary>
