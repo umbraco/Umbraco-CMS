@@ -89,7 +89,13 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 return null;
             }
 
-            return string.Join(_newLine, value);
+            var nonEmptyValues = value.Where(x => string.IsNullOrWhiteSpace(x) is false).ToArray();
+            if (nonEmptyValues.Length == 0)
+            {
+                return null;
+            }
+
+            return string.Join(_newLine, nonEmptyValues);
         }
 
         /// <inheritdoc/>
@@ -123,6 +129,11 @@ public class MultipleTextStringPropertyEditor : DataEditor
             var textStringValidator = new RegexValidator();
             foreach (var textString in textStrings)
             {
+                if (string.IsNullOrWhiteSpace(textString))
+                {
+                    continue;
+                }
+
                 var validationResults = textStringValidator.ValidateFormat(textString, valueType, format).ToList();
                 if (validationResults.Any())
                 {
@@ -157,9 +168,10 @@ public class MultipleTextStringPropertyEditor : DataEditor
             // Handle both a newline delimited string and an IEnumerable<string> as the value (see: https://github.com/umbraco/Umbraco-CMS/pull/18936).
             // If we have a null value, treat as a string count of zero for minimum number validation.
             var stringCount = value is string stringValue
-                ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue).Length
+                ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue)
+                    .Count(s => string.IsNullOrWhiteSpace(s) is false)
                 : value is IEnumerable<string> strings
-                    ? strings.Count()
+                    ? strings.Count(s => string.IsNullOrWhiteSpace(s) is false)
                     : 0;
 
             if (stringCount < multipleTextStringConfiguration.Min)
