@@ -22,11 +22,6 @@ export interface UmbTreePickerModalData<
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;
 	startNode?: UmbTreeStartNode;
 	foldersOnly?: boolean;
-	isVariant?: boolean;
-	/** Optional list of available languages. If not provided, will be fetched automatically when isVariant is true. */
-	availableLanguages?: Array<UmbTreePickerLanguageOption>;
-	/** Optional initial culture to select. If not provided, will use app language context. */
-	initialCulture?: string;
 }
 
 export type UmbPickerVariantModalValue = UmbPickerModalValue;
