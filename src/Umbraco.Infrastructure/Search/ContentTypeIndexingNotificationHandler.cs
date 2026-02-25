@@ -1,10 +1,15 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
@@ -16,14 +21,36 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     private readonly IMediaService _mediaService;
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
+    private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
+    private IndexingSettings _indexingSettings;
 
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public ContentTypeIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
         IContentService contentService,
         IMemberService memberService,
         IMediaService mediaService,
         IMemberTypeService memberTypeService)
+        : this(
+            umbracoIndexingHandler,
+            contentService,
+            memberService,
+            mediaService,
+            memberTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
+    {
+    }
+
+    public ContentTypeIndexingNotificationHandler(
+        IUmbracoIndexingHandler umbracoIndexingHandler,
+        IContentService contentService,
+        IMemberService memberService,
+        IMediaService mediaService,
+        IMemberTypeService memberTypeService,
+        IPublishStatusQueryService publishStatusQueryService,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
     {
         _umbracoIndexingHandler =
             umbracoIndexingHandler ?? throw new ArgumentNullException(nameof(umbracoIndexingHandler));
@@ -31,6 +58,13 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
         _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+        _publishStatusQueryService = publishStatusQueryService;
+        _indexingSettings = indexingSettings.CurrentValue;
+
+        indexingSettings.OnChange(change =>
+        {
+            _indexingSettings = change;
+        });
     }
 
     /// <summary>
@@ -105,7 +139,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshMemberOfMemberTypes(int[] memberTypeIds)
     {
-        const int pageSize = 500;
+        var pageSize = _indexingSettings.BatchSize;
 
         IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(memberTypeIds);
         foreach (IMemberType memberType in memberTypes)
@@ -134,7 +168,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshMediaOfMediaTypes(int[] mediaTypeIds)
     {
-        const int pageSize = 500;
+        var pageSize = _indexingSettings.BatchSize;
         var page = 0;
         var total = long.MaxValue;
         while (page * pageSize < total)
@@ -158,7 +192,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshContentOfContentTypes(int[] contentTypeIds)
     {
-        const int pageSize = 500;
+        var pageSize = _indexingSettings.BatchSize;
         var page = 0;
         var total = long.MaxValue;
         while (page * pageSize < total)
@@ -186,7 +220,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
                     if (!publishChecked.TryGetValue(c.ParentId, out isPublished))
                     {
                         // nothing by parent id, so query the service and cache the result for the next child to check against
-                        isPublished = _contentService.IsPathPublished(c);
+                        isPublished = _publishStatusQueryService.HasPublishedAncestorPath(c.Key);
                         publishChecked[c.Id] = isPublished;
                     }
                 }
