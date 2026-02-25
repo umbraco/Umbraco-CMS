@@ -2,7 +2,7 @@ import UmbMoveToEntityAction from 'src/packages/core/tree/entity-actions/move/mo
 import { UmbMediaTypeDetailRepository, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbMediaTreeItemModel } from '../../types';
+import type { UmbMediaTreeItemModel } from '../../types.js';
 
 class UmbMediaMoveToEntityAction extends UmbMoveToEntityAction {
 	protected override async _getPickableFilter(unique: string): Promise<((item: any) => boolean) | undefined> {
