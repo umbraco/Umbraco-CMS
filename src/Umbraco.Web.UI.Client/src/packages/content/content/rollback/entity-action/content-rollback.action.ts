@@ -1,15 +1,23 @@
-import { UMB_ROLLBACK_MODAL } from '../constants.js';
+import type { UmbRollbackModalData, UmbRollbackModalValue } from '../modal/types.js';
+import type { MetaEntityActionRollbackKind } from './types.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-/** @deprecated Use the rollback entity action kind from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
-export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<never> {
+export class UmbContentRollbackEntityAction extends UmbEntityActionBase<MetaEntityActionRollbackKind> {
 	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
-		await umbOpenModal(this, UMB_ROLLBACK_MODAL, {});
+		const token = new UmbModalToken<UmbRollbackModalData, UmbRollbackModalValue>(this.args.meta.rollbackModalAlias, {
+			modal: {
+				type: 'sidebar',
+				size: 'full',
+			},
+		});
+
+		await umbOpenModal(this, token, {});
+
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		if (!notificationContext) {
 			throw new Error('Notification context not found');
@@ -20,4 +28,4 @@ export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<never> 
 	}
 }
 
-export { UmbRollbackDocumentEntityAction as api };
+export { UmbContentRollbackEntityAction as api };

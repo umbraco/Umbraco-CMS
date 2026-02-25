@@ -1,10 +1,16 @@
-import { UMB_ROLLBACK_MODAL_ALIAS } from './constants.js';
+import { UMB_DOCUMENT_ROLLBACK_REPOSITORY_ALIAS } from '../repository/constants.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/constants.js';
+import { UMB_DOCUMENT_ROLLBACK_MODAL_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
-		alias: UMB_ROLLBACK_MODAL_ALIAS,
+		kind: 'rollback',
+		alias: UMB_DOCUMENT_ROLLBACK_MODAL_ALIAS,
 		name: 'Document Rollback Modal',
-		element: () => import('./rollback-modal.element.js'),
+		meta: {
+			rollbackRepositoryAlias: UMB_DOCUMENT_ROLLBACK_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+		},
 	},
 ];
