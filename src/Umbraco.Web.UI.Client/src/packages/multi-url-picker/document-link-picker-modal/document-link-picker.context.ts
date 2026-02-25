@@ -6,12 +6,6 @@ import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentLinkPickerContext extends UmbPickerContext {
-	/*
-	public readonly expansion = new UmbTreeItemPickerExpansionManager(this, {
-		interactionMemoryManager: this.interactionMemory,
-	});
-	*/
-
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public languages = this.#languages.asObservable();
 
