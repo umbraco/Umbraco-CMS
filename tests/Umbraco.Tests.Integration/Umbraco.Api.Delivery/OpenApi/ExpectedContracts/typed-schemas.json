@@ -1791,6 +1791,9 @@
         "additionalProperties": false
       },
       "IApiContentResponseModel": {
+        "required": [
+          "$type"
+        ],
         "discriminator": {
           "propertyName": "contentType"
         }

@@ -1156,6 +1156,9 @@
   "components": {
     "schemas": {
       "IApiContentResponseModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "anyOf": [
           {
@@ -1163,7 +1166,10 @@
           }
         ],
         "discriminator": {
-          "propertyName": "$type"
+          "propertyName": "$type",
+          "mapping": {
+            "ApiContentResponse": "#/components/schemas/IApiContentResponseModelApiContentResponseModel"
+          }
         }
       },
       "IApiContentResponseModelApiContentResponseModel": {
@@ -1175,9 +1181,16 @@
           "route",
           "id",
           "properties",
-          "cultures"
+          "cultures",
+          "$type"
         ],
         "properties": {
+          "$type": {
+            "enum": [
+              "ApiContentResponse"
+            ],
+            "type": "string"
+          },
           "contentType": {
             "type": "string"
           },

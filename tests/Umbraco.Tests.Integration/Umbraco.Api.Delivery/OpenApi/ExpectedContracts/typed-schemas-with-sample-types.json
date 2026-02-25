@@ -1853,6 +1853,9 @@
         "additionalProperties": false
       },
       "IApiContentModel": {
+        "required": [
+          "$type"
+        ],
         "oneOf": [
           {
             "$ref": "#/components/schemas/ArticlePageContentModel"
@@ -1870,6 +1873,9 @@
         }
       },
       "IApiContentResponseModel": {
+        "required": [
+          "$type"
+        ],
         "oneOf": [
           {
             "required": [
@@ -2015,6 +2021,9 @@
         }
       },
       "IApiElementModel": {
+        "required": [
+          "$type"
+        ],
         "oneOf": [
           {
             "required": [
@@ -2919,6 +2928,9 @@
               "type": "object",
               "properties": {
                 "content": {
+                  "required": [
+                    "$type"
+                  ],
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/TestElementElementModel"
@@ -2932,6 +2944,9 @@
                   }
                 },
                 "settings": {
+                  "required": [
+                    "$type"
+                  ],
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/TestElementElementModel"
