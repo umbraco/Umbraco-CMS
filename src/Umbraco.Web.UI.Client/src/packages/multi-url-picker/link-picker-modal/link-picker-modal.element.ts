@@ -88,6 +88,20 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.populateLinkUrl();
 	}
 
+	override firstUpdated() {
+		const type = this.value.link?.type;
+		const unique = this.value.link?.unique;
+		const culture = this.value.link?.culture;
+
+		if (type === 'document' && unique) {
+			this.#loadPickedDocumentItem(unique);
+		}
+
+		if (type == 'document' && culture) {
+			this.#variantContext.setCulture(culture);
+		}
+	}
+
 	async populateLinkUrl() {
 		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
 		// the user sees when they selected it initially.
@@ -174,9 +188,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (unique) {
 			switch (type) {
 				case 'document': {
-					const documentRepository = new UmbDocumentItemRepository(this);
-					const { data: documentItems } = await documentRepository.requestItems([unique]);
-					this._documentItem = documentItems?.[0];
+					await this.#loadPickedDocumentItem(unique);
 					if (this._documentItem) {
 						this.#documentItemDataResolver = new UmbDocumentItemDataResolver(this);
 						this.#documentItemDataResolver.setData(this._documentItem);
@@ -215,6 +227,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		};
 
 		this.#partialUpdateLink(link);
+	}
+
+	async #loadPickedDocumentItem(unique: string) {
+		const documentRepository = new UmbDocumentItemRepository(this);
+		const { data: documentItems } = await documentRepository.requestItems([unique]);
+		this._documentItem = documentItems?.[0];
 	}
 
 	async #getUrlForDocument(unique: string) {
@@ -353,7 +371,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#renderDocumentPicker() {
 		return html`
 			<umb-property-layout
-				?hidden=${!this.value.link.unique || this.value.link.type !== 'document'}
+				?hidden=${!this.value.link.unique || this.value.link.type !== 'document' || !this._documentItem}
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('general_content')}>
 				<umb-entity-item-ref slot="editor" .item=${this._documentItem} ${ref(this.#entityItemRef)} standalone>
