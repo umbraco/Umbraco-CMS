@@ -997,17 +997,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// </summary>
     private Dictionary<int, List<PropertyTypeInfo>> GetPropertyInfoByContentType(IReadOnlyCollection<int> contentTypeIds)
     {
+        // When contentTypeIds is empty (full rebuild), we need to fetch ALL content type IDs
+        // so that property variation info and compositions are correctly resolved.
+        IReadOnlyCollection<int> effectiveContentTypeIds = contentTypeIds;
         if (contentTypeIds.Count == 0)
         {
-            return new Dictionary<int, List<PropertyTypeInfo>>();
+            Sql<ISqlContext> allTypesSql = Sql()
+                .Select<ContentTypeDto>(x => x.NodeId)
+                .From<ContentTypeDto>();
+            effectiveContentTypeIds = Database.Fetch<int>(allTypesSql);
+
+            if (effectiveContentTypeIds.Count == 0)
+            {
+                return new Dictionary<int, List<PropertyTypeInfo>>();
+            }
         }
 
         // Get the composition hierarchy: which content types compose which other content types.
         // The cmsContentType2ContentType table stores: ParentId = composed type, ChildId = composing type.
-        Dictionary<int, HashSet<int>> compositionsByChild = GetCompositionHierarchy(contentTypeIds);
+        Dictionary<int, HashSet<int>> compositionsByChild = GetCompositionHierarchy(effectiveContentTypeIds);
 
         // Build set of all content type IDs we need properties for (including all compositions).
-        var allContentTypeIds = new HashSet<int>(contentTypeIds);
+        var allContentTypeIds = new HashSet<int>(effectiveContentTypeIds);
         foreach (HashSet<int> compositions in compositionsByChild.Values)
         {
             allContentTypeIds.UnionWith(compositions);
@@ -1033,7 +1044,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         // Build the final result: for each requested content type, include its own properties
         // plus all properties from its compositions.
         var result = new Dictionary<int, List<PropertyTypeInfo>>();
-        foreach (var contentTypeId in contentTypeIds)
+        foreach (var contentTypeId in effectiveContentTypeIds)
         {
             var allProperties = new Dictionary<string, PropertyTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
@@ -1099,8 +1110,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .ToDictionary(g => g.Key, g => g.Select(x => x.ParentId).ToHashSet());
 
         // For each requested content type, recursively resolve all compositions.
+        // When contentTypeIds is empty (full rebuild), resolve for all child IDs in the composition table.
+        IEnumerable<int> idsToResolve = contentTypeIds.Count > 0 ? contentTypeIds : directParents.Keys;
         var result = new Dictionary<int, HashSet<int>>();
-        foreach (var contentTypeId in contentTypeIds)
+        foreach (var contentTypeId in idsToResolve)
         {
             result[contentTypeId] = GetAllCompositionsRecursive(contentTypeId, directParents);
         }

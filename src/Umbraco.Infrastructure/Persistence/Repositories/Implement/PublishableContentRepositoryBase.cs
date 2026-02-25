@@ -1741,12 +1741,19 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     /// <inheritdoc />
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] contentIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentScheduleDto>()
-            .From<ContentScheduleDto>()
-            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, contentIds);
+        var contentScheduleDtos = contentIds
+            .Distinct()
+            .InGroupsOf(Constants.Sql.MaxParameterCount)
+            .SelectMany(group =>
+            {
+                Sql<ISqlContext> sql = Sql()
+                    .Select<ContentScheduleDto>()
+                    .From<ContentScheduleDto>()
+                    .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, group);
 
-        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
+                return Database.Fetch<ContentScheduleDto>(sql);
+            })
+            .ToList();
 
         IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
             .GroupBy(contentSchedule => contentSchedule.NodeId)
