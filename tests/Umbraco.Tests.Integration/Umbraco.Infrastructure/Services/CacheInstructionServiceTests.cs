@@ -21,27 +21,9 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
     private const string LocalIdentity = "localIdentity";
     private const string AlternateIdentity = "alternateIdentity";
 
-    private int? _lastSyncedExternalId;
-
     private CancellationToken CancellationToken => CancellationToken.None;
 
     private CacheRefresherCollection CacheRefreshers => GetRequiredService<CacheRefresherCollection>();
-
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
-        _lastSyncedExternalId = null;
-
-        var lastSyncedManagerMock = new Mock<ILastSyncedManager>();
-        lastSyncedManagerMock.Setup(x => x.GetLastSyncedExternalAsync())
-            .Returns(() => Task.FromResult(_lastSyncedExternalId));
-        lastSyncedManagerMock.Setup(x => x.SaveLastSyncedExternalAsync(It.IsAny<int>()))
-            .Callback<int>(id => _lastSyncedExternalId = id)
-            .Returns(Task.CompletedTask);
-        lastSyncedManagerMock.Setup(x => x.SaveLastSyncedInternalAsync(It.IsAny<int>()))
-            .Returns(Task.CompletedTask);
-
-        builder.Services.AddUnique(lastSyncedManagerMock.Object);
-    }
 
     [Test]
     public void Confirms_Cold_Boot_Required_When_Instructions_Exist_And_None_Have_Been_Synced()
@@ -174,7 +156,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(3, result.LastId); // 3 records found.
-            Assert.AreEqual(3, result.NumberOfInstructionsProcessed); // 3 records processed (one skipped as local but still counted).
+            Assert.AreEqual(2, result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
         });
     }
 
@@ -213,7 +195,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(3, result.LastId); // 3 records found.
-            Assert.AreEqual(3, result.NumberOfInstructionsProcessed); // 3 records processed (one skipped as local but still counted).
+            Assert.AreEqual(2, result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
         });
 
         // ProcessAllInstructions persists the last synced ID via ILastSyncedManager,
@@ -274,8 +256,37 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(4, secondResult.LastId);
-            Assert.AreEqual(1, secondResult.NumberOfInstructionsProcessed); // 1 record processed (skipped as local but still counted).
+            Assert.AreEqual(0, secondResult.NumberOfInstructionsProcessed);
         });
+    }
+
+    [Test]
+    public async Task Local_Instructions_Trigger_LastId_Update()
+    {
+        var sut = GetRequiredService<ICacheInstructionService>();
+        var lastSyncedManager = GetRequiredService<ILastSyncedManager>();
+
+        var instructions = CreateInstructions();
+        sut.DeliverInstructions(instructions, LocalIdentity);
+        sut.DeliverInstructions(instructions, LocalIdentity);
+
+        var lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
+        Assert.IsNull(lastSynced);
+
+        var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
+
+        Assert.Multiple(() =>
+        {
+            // 2 records found.
+            Assert.AreEqual(2, result.LastId);
+
+            // local instructions do not count against number of processed instructions.
+            Assert.AreEqual(0, result.NumberOfInstructionsProcessed);
+        });
+
+        lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
+        Assert.AreEqual(2, lastSynced);
+        var debug = true;
     }
 
     private void CreateAndDeliveryMultipleInstructions(CacheInstructionService sut)

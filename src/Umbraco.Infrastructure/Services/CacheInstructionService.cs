@@ -176,9 +176,10 @@ namespace Umbraco.Cms
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                        if (numberOfInstructionsProcessed > 0)
+                        if (lastId > 0 && lastId != previousLastId)
                         {
                             _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
@@ -203,9 +204,10 @@ namespace Umbraco.Cms
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                        if (numberOfInstructionsProcessed > 0)
+                        if (lastId > 0 && lastId != previousLastId)
                         {
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
                         }
@@ -278,7 +280,6 @@ namespace Umbraco.Cms
                     {
                         // Just skip that local one but update lastId nevertheless.
                         lastId = instruction.Id;
-                        numberOfInstructionsProcessed++;
                         continue;
                     }
 
@@ -286,7 +287,6 @@ namespace Umbraco.Cms
                     if (TryDeserializeInstructions(instruction, out JsonDocument? jsonInstructions) is false && jsonInstructions is null)
                     {
                         lastId = instruction.Id; // skip
-                        numberOfInstructionsProcessed++;
                         continue;
                     }
 
