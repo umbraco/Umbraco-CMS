@@ -112,7 +112,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderLanguageSelector() {
-		if (this._languages.length === 1) return nothing;
+		if (this._languages.length <= 1) return nothing;
 
 		const selectedLanguage = this._languages.find((lang) => lang.unique === this._selectedCulture);
 
