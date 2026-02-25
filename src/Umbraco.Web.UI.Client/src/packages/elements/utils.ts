@@ -26,7 +26,7 @@ function compareDefault(a: VariantType, b: VariantType) {
 	return (a.language?.isDefault ? -1 : 1) - (b.language?.isDefault ? -1 : 1);
 }
 
-// Make sure mandatory variants goes on top, unless they are published, cause then they already goes to the top and then we want to mix them with other published variants.
+// Make sure mandatory variants go on top, unless they are published, cause then they already go to the top and then we want to mix them with other published variants.
 // eslint-disable-next-line jsdoc/require-jsdoc
 function compareMandatory(a: VariantType, b: VariantType) {
 	return a.variant?.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES ||
