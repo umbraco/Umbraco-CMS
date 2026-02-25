@@ -1293,6 +1293,7 @@ export default {
 		noLockouts: 'no ha sido bloqueado',
 		noPasswordChange: 'La contraseña no se ha cambiado',
 		confirmNewPassword: 'Confirma nueva contraseña',
+		confirmPassword: 'Confirmar contraseña',
 		changePasswordDescription:
 			"Puedes cambiar tu contraseña para acceder al 'back office' de Umbraco rellenando el siguiente formulario y haciendo clic en el botón 'Cambiar contraseña'",
 		contentChannel: 'Canal de contenido',

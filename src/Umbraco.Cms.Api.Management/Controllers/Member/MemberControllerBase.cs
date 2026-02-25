@@ -17,6 +17,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
 public class MemberControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "member";
+
     protected IActionResult MemberNotFound() => OperationStatusResult(MemberEditingOperationStatus.MemberNotFound, MemberNotFound);
 
     protected IActionResult MemberEditingStatusResult(MemberEditingStatus status)

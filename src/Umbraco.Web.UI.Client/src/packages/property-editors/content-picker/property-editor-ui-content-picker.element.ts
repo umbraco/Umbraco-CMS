@@ -61,7 +61,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _maxMessage = '';
 
 	@state()
-	private _allowedContentTypeUniques?: string | null;
+	private _allowedContentTypeUniques?: string;
 
 	@state()
 	private _rootUnique?: string | null;
@@ -208,7 +208,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				.max=${this._max}
 				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
-				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
+				.allowedContentTypeIds=${this._allowedContentTypeUniques}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}

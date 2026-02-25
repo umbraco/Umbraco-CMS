@@ -13,8 +13,6 @@ public class ContentDto
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     public const string ContentTypeIdColumnName = "contentTypeId";
 
-    internal const string ReferenceMemberName = "NodeId"; // should be ContentVersionDto.NodeIdColumnName, but for database compatibility we keep it like this
-
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(NodeDto))]
@@ -32,6 +30,6 @@ public class ContentDto
     // they can only be loaded one by one (as several content),
     // so this here is a OneToOne reference
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ReferenceMemberName)]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentVersionDto.NodeId))]
     public ContentVersionDto ContentVersionDto { get; set; } = null!;
 }

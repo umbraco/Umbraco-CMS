@@ -19,6 +19,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecycleBinItemResponseModel>
 {
+    protected override string EntityName => "media";
+
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
     public MediaRecycleBinControllerBase(IEntityService entityService, IMediaPresentationFactory mediaPresentationFactory)
