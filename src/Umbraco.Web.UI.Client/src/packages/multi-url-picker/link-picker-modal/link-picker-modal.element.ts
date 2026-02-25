@@ -59,8 +59,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	@state()
 	private _documentItem?: UmbDocumentItemModel;
 
-	#variantContext?: UmbVariantContext;
-	#documentItemDataResolver?: UmbDocumentItemDataResolver;
+	#variantContext = new UmbVariantContext(this).inherit();
+	#documentItemDataResolver?: UmbDocumentItemDataResolver<UmbDocumentItemModel>;
 
 	constructor() {
 		super();
@@ -96,7 +96,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		let url: string | undefined = undefined;
 		switch (this.value.link.type) {
 			case 'document': {
-				url = await this.#getUrlForDocument(this.value.link.unique, this.value.link.culture ?? undefined);
+				url = await this.#getUrlForDocument(this.value.link.unique);
 				break;
 			}
 			case 'media': {
@@ -267,7 +267,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		// This will make a local varriant context for the link picker when a Document with a culture is selected,
 		// and will inherit the values from the parent context (if any), but will override the culture with the one selected for the document.
 		if (value.culture) {
-			this.#variantContext = new UmbVariantContext(this).inherit();
 			this.#variantContext.setCulture(value.culture);
 		}
 
@@ -379,9 +378,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		});
 
 		this.#pickerSelect('document', undefined, undefined);
-		this.#variantContext?.destroy();
-		this.#variantContext = undefined;
-		this.#documentItemDataResolver.destroy();
+		this.#documentItemDataResolver?.destroy();
 		this.#documentItemDataResolver = undefined;
 		this._documentItem = undefined;
 	}

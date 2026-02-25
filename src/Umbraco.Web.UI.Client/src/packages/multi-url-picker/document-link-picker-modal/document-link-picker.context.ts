@@ -51,15 +51,8 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 		this.#languages.setValue(languages);
 
 		if (languages.length > 0) {
-			// Create variant context only when we have languages
-			// This prevents overriding parent context when not needed
-			this.#variantContext = new UmbVariantContext(this);
-
-			// Set default/fallback language (first language in the list)
-			const defaultLanguage = languages.find((language) => language.isDefault) || languages[0];
-			this.#defaultLanguageUnique = defaultLanguage.unique;
-			await this.#variantContext.setFallbackCulture(this.#defaultLanguageUnique);
-			await this.#variantContext.setCulture(this.#defaultLanguageUnique);
+			// Create variant context only when we have languages available
+			this.#variantContext = new UmbVariantContext(this).inherit();
 		} else {
 			// No languages available - ensure variant context is not set
 			this.#variantContext?.destroy();
