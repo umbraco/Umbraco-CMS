@@ -1,24 +1,23 @@
 import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from '../types.js';
 import { UMB_EXTENSION_ENTITY_TYPE } from '../../entity.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 
 export class UmbExtensionCollectionRepository
 	extends UmbRepositoryBase
 	implements UmbCollectionRepository<UmbExtensionCollectionItemModel, UmbExtensionCollectionFilterModel>
 {
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-
 	async requestCollection(query: UmbExtensionCollectionFilterModel) {
 		let extensions: Array<UmbExtensionCollectionItemModel> = umbExtensionsRegistry
 			.getAllExtensions()
 			.map((manifest) => {
 				return {
 					unique: manifest.alias,
+					name: manifest.name,
+					description: manifest.alias,
+					icon: 'icon-plugin',
 					entityType: UMB_EXTENSION_ENTITY_TYPE,
 					manifest: {
 						type: manifest.type,
@@ -41,7 +40,16 @@ export class UmbExtensionCollectionRepository
 		}
 
 		if (query.type) {
-			extensions = extensions.filter((x) => x.manifest.type === query.type);
+			new UmbDeprecation({
+				deprecated: 'UmbExtensionCollectionFilterModel .type property.',
+				removeInVersion: '19',
+				solution: 'Use the .extensionTypes property instead.',
+			}).warn();
+		}
+
+		const types = query.extensionTypes ?? (query.type ? [query.type] : undefined);
+		if (types?.length) {
+			extensions = extensions.filter((x) => types.includes(x.manifest.type));
 		}
 
 		extensions.sort(
