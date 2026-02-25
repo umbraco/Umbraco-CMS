@@ -121,19 +121,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		}
 	}
 
-	#culture?: string;
-	@property({ type: String })
-	public get culture() {
-		return this.#culture;
-	}
-	public set culture(value: string | undefined) {
-		this.#culture = value;
-
-		if (this._component) {
-			this._component.culture = this.#culture;
-		}
-	}
-
 	@property({ type: Boolean })
 	error?: boolean;
 
