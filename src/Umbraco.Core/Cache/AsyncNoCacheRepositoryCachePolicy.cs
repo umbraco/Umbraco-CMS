@@ -27,14 +27,14 @@ public class AsyncNoCacheRepositoryCachePolicy<TEntity, TId> : IAsyncRepositoryC
     public static AsyncNoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new();
 
     /// <inheritdoc />
-    public async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet) =>
+    public async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet,  Func<Task<IEnumerable<TEntity>?>> performGetAll) =>
         await performGet(id);
 
     /// <inheritdoc />
     public Task<TEntity?> GetCachedAsync(TId id) => Task.FromResult<TEntity?>(null);
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists) =>
+    public async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists,  Func<Task<IEnumerable<TEntity>?>> performGetAll) =>
         await performExists(id);
 
     /// <inheritdoc />
@@ -51,7 +51,7 @@ public class AsyncNoCacheRepositoryCachePolicy<TEntity, TId> : IAsyncRepositoryC
         (await performGetAll())?.ToArray() ?? Array.Empty<TEntity>();
 
     /// <inheritdoc />
-    public async Task<TEntity[]> GetManyAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetMany) =>
+    public async Task<TEntity[]> GetManyAsync(TId[] ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetMany,  Func<Task<IEnumerable<TEntity>?>> performGetAll) =>
         (await performGetMany(ids))?.ToArray() ?? Array.Empty<TEntity>();
 
     /// <inheritdoc />
