@@ -107,11 +107,11 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 
 	/**
 	 * Get the display culture or fallback culture
-	 * @returns {string | null | undefined} The culture to use
+	 * @returns {string | null | undefined} The display culture or fallback culture
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	getCulture(): string | null | undefined {
-		return this.#displayCulture ?? this.#fallbackCulture;
+		return this.#displayCulture || this.#fallbackCulture;
 	}
 
 	/**
