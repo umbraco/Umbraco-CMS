@@ -31,6 +31,7 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 		this.#init = Promise.all([
 			this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 				this.#variantId = await context?.getVariantId();
+				this.#setCultureAwareValues();
 			}).asPromise(),
 		]);
 	}
