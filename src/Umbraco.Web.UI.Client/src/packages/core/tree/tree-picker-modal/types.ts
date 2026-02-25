@@ -24,13 +24,5 @@ export interface UmbTreePickerModalData<
 	foldersOnly?: boolean;
 }
 
-export type UmbPickerVariantModalValue = UmbPickerModalValue;
-
-export interface UmbTreePickerModalValue extends UmbPickerVariantModalValue {
-	culture?: string;
-}
-
-export interface UmbTreePickerLanguageOption {
-	unique: string;
-	name: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
