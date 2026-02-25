@@ -71,7 +71,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 		this.value = {
 			unique: selectedItemUnique,
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
-			culture: await this.#pickerContext.getCulture(),
+			culture: (await this.#pickerContext.getCulture()) || undefined,
 		};
 
 		this._submitModal();
