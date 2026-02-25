@@ -1,14 +1,14 @@
 import type { UmbElementReferenceModel } from '../types.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { ElementReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IReferenceResponseModelElementReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 
 export class UmbElementReferenceResponseManagementApiDataMapping
 	extends UmbControllerBase
-	implements UmbDataSourceDataMapping<ElementReferenceResponseModel, UmbElementReferenceModel>
+	implements UmbDataSourceDataMapping<IReferenceResponseModelElementReferenceResponseModel, UmbElementReferenceModel>
 {
-	async map(data: ElementReferenceResponseModel): Promise<UmbElementReferenceModel> {
+	async map(data: IReferenceResponseModelElementReferenceResponseModel): Promise<UmbElementReferenceModel> {
 		return {
 			documentType: {
 				alias: data.documentType.alias!,
