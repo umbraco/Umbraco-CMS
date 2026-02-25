@@ -177,7 +177,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				component.selectable = this.selectable;
 				component.selected = this.selected;
 				component.disabled = this.disabled;
-				component.culture = this.culture;
 
 				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
 				component.addEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
