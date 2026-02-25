@@ -10,7 +10,7 @@ schedules:
       include:
         - v16/dev
         - main
-        - 18/dev
+        - v18/dev
 
 parameters:
   - name: skipIntegrationTests
