@@ -1,5 +1,4 @@
 import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {expect} from "@playwright/test";
 
 let dataTypeId = '';
 const contentName = 'TestContent';
@@ -21,8 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can schedule the publishing of invariant unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
+test('can schedule the publishing of invariant unpublished content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoUi.goToBackOffice();
@@ -35,12 +33,11 @@ test('can schedule the publishing of invariant unpublish content', {tag: '@smoke
   const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
   const publishedTime = await umbracoApi.convertDateFormat(publishDateTime);
   await umbracoUi.content.enterPublishTime(publishDateTime);
-  console.log('Published at: ' + publishDateTime);
   await umbracoUi.content.clickSchedulePublishModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
-  // verify the status of content before publishing is Unpublished
+  // verify the status of content before publishing is unpublished
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
   // verify the value of "Publish At"
@@ -74,7 +71,7 @@ test('can schedule the publishing of invariant published content', async ({umbra
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
-test('can schedule the publishing of variant unpublish content', async ({umbracoApi, umbracoUi}) => {
+test('can schedule the publishing of variant unpublished content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
@@ -126,7 +123,7 @@ test('can schedule the publishing of variant published content', async ({umbraco
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
-test('can schedule the publishing of invariant unpublish child content', async ({umbracoApi, umbracoUi}) => {
+test('can schedule the publishing of invariant unpublished child content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
@@ -155,7 +152,7 @@ test('can schedule the publishing of invariant unpublish child content', async (
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
-test('can schedule the publishing of variant unpublish child content', async ({umbracoApi, umbracoUi}) => {
+test('can schedule the publishing of variant unpublished child content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
@@ -302,7 +299,7 @@ test('can schedule the publishing of multiple culture variants content', async (
   await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
-test('publish time cannot be in the past', async ({umbracoApi, umbracoUi}) => {
+test('cannot schedule publishing with a publish time in the past', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const warningMessage = 'The release date cannot be in the past';
   const pastDateTime = '2024-03-09T10:00';
@@ -322,7 +319,7 @@ test('publish time cannot be in the past', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.doesPublishAtValidationMessageContainText(warningMessage);
 });
 
-test('unpublish time cannot be in the past', async ({umbracoApi, umbracoUi}) => {
+test('cannot schedule unpublishing with an unpublish time in the past', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const warningMessage = 'The expire date cannot be in the past';
   const pastDateTime = '2024-03-09T10:00';
@@ -342,7 +339,7 @@ test('unpublish time cannot be in the past', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.doesUnpublishAtValidationMessageContainText(warningMessage);
 });
 
-test('unpublish time cannot be before publish time', async ({umbracoApi, umbracoUi}) => {
+test('cannot schedule unpublishing with an unpublish time before the publish time', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const warningMessage = 'The expire date cannot be before the release date';
   const publishDateTime = '2040-03-09T10:00';
