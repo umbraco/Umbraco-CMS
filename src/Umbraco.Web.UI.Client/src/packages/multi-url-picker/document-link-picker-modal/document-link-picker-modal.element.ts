@@ -79,7 +79,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Pick Document">
+			<umb-body-layout headline=${this.localize.term('general_choose')}>
 				${this.#renderLanguageSelector()} ${this.#renderSearch()}
 				<uui-box>
 					<umb-tree
