@@ -8,7 +8,7 @@ using Umbraco.Cms.Api.Delivery.Controllers;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.DeliveryApi.OpenApi;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Api.Delivery.OpenApi;
 
 /// <summary>
 /// Tests the Delivery API OpenAPI contract for correctness and consistency.
