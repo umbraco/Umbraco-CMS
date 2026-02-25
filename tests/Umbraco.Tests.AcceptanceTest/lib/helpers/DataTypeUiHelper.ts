@@ -141,6 +141,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly timeZoneDropDown: Locator;
   private readonly dataSourceChooseBtn: Locator;
   private readonly blockThumbnailRemoveBtn: Locator;
+  private readonly dynamicRootComponent: Locator;
+  private readonly dynamicRootPlaceholderBtn: Locator;
+  private readonly dynamicRootOriginPickerModal: Locator;
+  private readonly dynamicRootQueryStepPickerModal: Locator;
+  private readonly closeDynamicRootOriginPickerModalBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -322,6 +327,13 @@ export class DataTypeUiHelper extends UiBaseLocators {
     
     // Entity Picker Source
     this.dataSourceChooseBtn = page.locator('[label="Data Source"]').locator(this.chooseBtn);
+
+    // Dynamic Root
+    this.dynamicRootComponent = page.locator('umb-input-content-picker-document-root');
+    this.dynamicRootPlaceholderBtn = this.dynamicRootComponent.locator('uui-button[look="placeholder"]');
+    this.dynamicRootOriginPickerModal = page.locator('umb-dynamic-root-origin-picker-modal');
+    this.dynamicRootQueryStepPickerModal = page.locator('umb-dynamic-root-query-step-picker-modal');
+    this.closeDynamicRootOriginPickerModalBtn = this.dynamicRootOriginPickerModal.getByLabel('Close');
   }
 
   async clickActionsMenuForDataType(name: string) {
@@ -1193,5 +1205,45 @@ export class DataTypeUiHelper extends UiBaseLocators {
   async doesBlockHaveNoThumbnailImage(blockName: string) {
     const blockCardLocator = this.blockTypeCard.filter({hasText: blockName});
     await expect(blockCardLocator.locator('img')).toHaveCount(0);
+  }
+
+  // Dynamic Root
+  async clickDefineDynamicRootButton() {
+    await this.click(this.dynamicRootPlaceholderBtn);
+  }
+
+  async chooseDynamicRootOrigin(originName: string) {
+    await expect(this.dynamicRootOriginPickerModal).toBeVisible();
+    await this.click(this.dynamicRootOriginPickerModal.locator(`umb-ref-item[name="${originName}"]`));
+  }
+
+  async clickEditDynamicRootOriginButton(originName: string) {
+    const editButton = this.dynamicRootComponent.locator(`uui-ref-node[name="${originName}"]`).locator('uui-action-bar uui-button');
+    await this.click(editButton);
+  }
+
+  async clickAddDynamicRootQueryStepButton() {
+    await this.click(this.dynamicRootPlaceholderBtn);
+  }
+
+  async chooseDynamicRootQueryStep(stepName: string) {
+    await expect(this.dynamicRootQueryStepPickerModal).toBeVisible();
+    await this.click(this.dynamicRootQueryStepPickerModal.locator(`umb-ref-item[name="${stepName}"]`));
+  }
+
+  async isDynamicRootOriginPickerModalVisible() {
+    await this.isVisible(this.dynamicRootOriginPickerModal);
+  }
+
+  async isDynamicRootOriginInPickerModal(originName: string, detail?: string) {
+    const item = this.dynamicRootOriginPickerModal.locator(`umb-ref-item[name="${originName}"]`);
+    await this.isVisible(item);
+    if (detail) {
+      await this.hasAttribute(item, 'detail', detail);
+    }
+  }
+
+  async closeDynamicRootOriginPickerModal() {
+    await this.click(this.closeDynamicRootOriginPickerModalBtn);
   }
 }

@@ -1999,4 +1999,43 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
+
+  async createDefaultContentPickerSourceDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createContentPickerSourceDataTypeWithDynamicRoot(name: string, originAlias: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .addStartNode()
+        .withType('content')
+        .withOriginAlias(originAlias)
+        .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async doesContentPickerHaveDynamicRoot(dataTypeName: string, originAlias: string) {
+    const dataType = await this.getByName(dataTypeName);
+    const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
+    if (!startNodeValue?.value?.dynamicRoot) {
+      return false;
+    }
+    return startNodeValue.value.dynamicRoot.originAlias === originAlias;
+  }
+
+  async getContentPickerDynamicRoot(dataTypeName: string) {
+    const dataType = await this.getByName(dataTypeName);
+    const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
+    return startNodeValue?.value?.dynamicRoot;
+  }
 }
