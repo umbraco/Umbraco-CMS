@@ -8089,6 +8089,40 @@ export type PutElementByIdResponses = {
     200: unknown;
 };
 
+export type GetElementByIdAuditLogData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        orderDirection?: DirectionModel;
+        sinceDate?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/element/{id}/audit-log';
+};
+
+export type GetElementByIdAuditLogErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetElementByIdAuditLogResponses = {
+    /**
+     * OK
+     */
+    200: PagedAuditLogResponseModel;
+};
+
+export type GetElementByIdAuditLogResponse = GetElementByIdAuditLogResponses[keyof GetElementByIdAuditLogResponses];
+
 export type PostElementByIdCopyData = {
     body?: CopyElementRequestModel;
     path: {
