@@ -19,6 +19,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<DocumentRecycleBinItemResponseModel>
 {
+    protected override string EntityName => "document";
+
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
     public DocumentRecycleBinControllerBase(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)

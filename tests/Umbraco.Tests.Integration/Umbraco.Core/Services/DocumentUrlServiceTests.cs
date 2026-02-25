@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -26,6 +27,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IDomainService DomainService => GetRequiredService<IDomainService>();
+
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -173,7 +176,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     public async Task<string?> GetDocumentKeyByUri_With_Domains_Returns_Expected_DocumentKey(string path, string domain, string rootUrl)
     {
         var template = TemplateBuilder.CreateTextPageTemplate("variantPageTemplate", "Variant Page Template");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantPage")
@@ -182,7 +185,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             .WithAllowAsRoot(true)
             .WithDefaultTemplateId(template.Id)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var rootPage = new ContentBuilder()
             .WithKey(Guid.Parse(VariantRootPageKey))
@@ -378,6 +381,153 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Act & Assert - should not throw, just return gracefully
         Assert.DoesNotThrowAsync(async () =>
             await DocumentUrlService.CreateOrUpdateUrlSegmentsAsync(nonExistentKey));
+    }
+
+    [Test]
+    public async Task GetUrlSegment_CultureVariantContent_WithInvariantUrlName_UsesUrlName()
+    {
+        // Arrange - create a culture-variant content type with an invariant umbracoUrlName property
+        // (simulates umbracoUrlName coming from a composition that does not vary by culture)
+        var template = TemplateBuilder.CreateTextPageTemplate("variantWithUrlNameTemplate", "Variant With UrlName Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantWithUrlName")
+            .WithName("Variant With UrlName")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Nothing)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My English Page")
+            .Build();
+
+        content.SetValue(Constants.Conventions.Content.UrlName, "custom-url");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US"]);
+
+        // Act
+        var urlSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
+
+        // Assert - should use the invariant umbracoUrlName, not the culture name
+        Assert.That(urlSegment, Is.EqualTo("custom-url"));
+    }
+
+    [Test]
+    public async Task GetUrlSegment_CultureVariantContent_WithCultureVariantUrlName_ResolvesPerCulture()
+    {
+        // Arrange - create a second language
+        var danishLanguage = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+
+        // Create a culture-variant content type with a culture-variant umbracoUrlName property
+        var template = TemplateBuilder.CreateTextPageTemplate("variantPerCultureTemplate", "Variant Per Culture Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantPerCulture")
+            .WithName("Variant Per Culture")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Culture)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My English Page")
+            .WithCultureName("da-DK", "Min Danske Side")
+            .Build();
+
+        content.SetValue(Constants.Conventions.Content.UrlName, "english-custom-url", culture: "en-US");
+        content.SetValue(Constants.Conventions.Content.UrlName, "dansk-custom-url", culture: "da-DK");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US", "da-DK"]);
+
+        // Act
+        var englishSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
+        var danishSegment = DocumentUrlService.GetUrlSegment(content.Key, "da-DK", false);
+
+        // Assert - each culture should resolve its own umbracoUrlName value
+        Assert.Multiple(() =>
+        {
+            Assert.That(englishSegment, Is.EqualTo("english-custom-url"));
+            Assert.That(danishSegment, Is.EqualTo("dansk-custom-url"));
+        });
+    }
+
+    [Test]
+    public async Task GetUrlSegment_CultureVariantContent_WithEmptyUrlName_FallsBackToContentName()
+    {
+        // Arrange - create a culture-variant content type with an invariant umbracoUrlName property
+        var template = TemplateBuilder.CreateTextPageTemplate("emptyUrlNameTemplate", "Empty UrlName Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("emptyUrlName")
+            .WithName("Empty UrlName")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Nothing)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My Fallback Page Name")
+            .Build();
+
+        // Set umbracoUrlName to empty string
+        content.SetValue(Constants.Conventions.Content.UrlName, string.Empty);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US"]);
+
+        // Act
+        var urlSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
+
+        // Assert - should fall back to the culture name since umbracoUrlName is empty
+        Assert.That(urlSegment, Is.EqualTo("my-fallback-page-name"));
     }
 
     //TODO test cases:

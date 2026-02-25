@@ -21,6 +21,8 @@ public class RootElementRecycleBinController : ElementRecycleBinControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ElementRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets elements at the root of the recycle bin.")]
+    [EndpointDescription("Gets a paginated collection of elements at the root level of the recycle bin.")]
     public async Task<ActionResult<PagedViewModel<ElementRecycleBinItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

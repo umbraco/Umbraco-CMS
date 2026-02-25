@@ -5,26 +5,22 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(INodeDto.NodeIdColumnName, AutoIncrement = false)]
+[PrimaryKey(IPublishableContentDto<DocumentVersionDto>.Columns.NodeId, AutoIncrement = false)]
 [ExplicitColumns]
-public class DocumentDto : INodeDto
+public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
 
-
-    // Public constants to bind properties between DTOs
-    public const string PublishedColumnName = "published";
-
-    [Column(INodeDto.NodeIdColumnName)]
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.NodeId)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
 
-    [Column(PublishedColumnName)]
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Published)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 
-    [Column("edited")]
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Edited)]
     public bool Edited { get; set; }
 
     // [Column("publishDate")]
@@ -43,7 +39,7 @@ public class DocumentDto : INodeDto
     // [NullSetting(NullSetting = NullSettings.Null)] // is documentVersionDto.TemplateId for the published version
     // public int? PublishTemplateId { get; set; }
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = ContentDto.ReferenceMemberName)]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentDto.NodeId))]
     public ContentDto ContentDto { get; set; } = null!;
 
     // although a content has many content versions,
@@ -51,7 +47,7 @@ public class DocumentDto : INodeDto
     // so this here is a OneToOne reference
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]
-    public DocumentVersionDto DocumentVersionDto { get; set; } = null!;
+    public DocumentVersionDto ContentVersionDto { get; set; } = null!;
 
     // same
     [ResultColumn]

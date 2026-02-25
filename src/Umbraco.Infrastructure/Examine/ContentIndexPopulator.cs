@@ -31,7 +31,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// </summary>
     private IQuery<IContent>? _publishedQuery;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         IContentService contentService,
@@ -54,7 +54,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         bool publishedValuesOnly,

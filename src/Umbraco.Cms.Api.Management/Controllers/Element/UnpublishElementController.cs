@@ -36,6 +36,8 @@ public class UnpublishElementController : ElementControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Unpublishes an element.")]
+    [EndpointDescription("Unpublishes an element identified by the provided Id.")]
     public async Task<IActionResult> Unpublish(CancellationToken cancellationToken, Guid id, UnpublishElementRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
@@ -57,7 +59,6 @@ public class UnpublishElementController : ElementControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            : BadRequest();
+            : ElementPublishingOperationStatusResult(attempt.Result);
     }
 }

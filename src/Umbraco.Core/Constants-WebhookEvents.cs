@@ -94,6 +94,56 @@ public static partial class Constants
             public const string ContentUnpublish = "Umbraco.ContentUnpublish";
 
             /// <summary>
+            /// Webhook event alias for element saved.
+            /// </summary>
+            public const string ElementSaved = "Umbraco.ElementSaved";
+
+            /// <summary>
+            /// Webhook event alias for element publish.
+            /// </summary>
+            public const string ElementPublish = "Umbraco.ElementPublish";
+
+            /// <summary>
+            /// Webhook event alias for element delete.
+            /// </summary>
+            public const string ElementDelete = "Umbraco.ElementDelete";
+
+            /// <summary>
+            /// Webhook event alias for element unpublish.
+            /// </summary>
+            public const string ElementUnpublish = "Umbraco.ElementUnpublish";
+
+            /// <summary>
+            /// Webhook event alias for element copied.
+            /// </summary>
+            public const string ElementCopied = "Umbraco.ElementCopied";
+
+            /// <summary>
+            /// Webhook event alias for element moved.
+            /// </summary>
+            public const string ElementMoved = "Umbraco.ElementMoved";
+
+            /// <summary>
+            /// Webhook event alias for element moved into the recycle bin.
+            /// </summary>
+            public const string ElementMovedToRecycleBin = "Umbraco.ElementMovedToRecycleBin";
+
+            /// <summary>
+            /// Webhook event alias for element emptied recycle bin.
+            /// </summary>
+            public const string ElementEmptiedRecycleBin = "Umbraco.ElementEmptiedRecycleBin";
+
+            /// <summary>
+            /// Webhook event alias for element rolled back.
+            /// </summary>
+            public const string ElementRolledBack = "Umbraco.ElementRolledBack";
+
+            /// <summary>
+            /// Webhook event alias for element versions deleted.
+            /// </summary>
+            public const string ElementDeletedVersions = "Umbraco.ElementDeletedVersions";
+
+            /// <summary>
             /// Webhook event alias for media delete.
             /// </summary>
             public const string MediaDelete = "Umbraco.MediaDelete";
@@ -423,6 +473,11 @@ public static partial class Constants
             /// Webhook event type for content.
             /// </summary>
             public const string Content = "Content";
+
+            /// <summary>
+            /// Webhook event type for element.
+            /// </summary>
+            public const string Element = "Element";
 
             /// <summary>
             /// Webhook event type for content media.

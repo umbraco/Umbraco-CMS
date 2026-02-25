@@ -28,7 +28,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(1, GetFolderChildren(childContainerKey).Length);
@@ -64,7 +64,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(2, GetAtRoot().Length);
@@ -115,7 +115,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(2, GetAtRoot().Length);
@@ -181,7 +181,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(1, GetAtRoot().Length);
@@ -252,7 +252,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         Assert.AreEqual(2, GetAtRoot().Length);
@@ -291,7 +291,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         var rootContainer = await ElementContainerService.GetAsync(setup.RootContainerKey);
@@ -342,7 +342,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         var childContainer = await ElementContainerService.GetAsync(setup.ChildContainerKey);
@@ -426,7 +426,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         var rootContainer = await ElementContainerService.GetAsync(rootContainerKey);
@@ -450,7 +450,7 @@ public partial class ElementContainerServiceTests
     }
 
     [Test]
-    public async Task Restoring_Trashed_Container_Performs_Explicit_Unpublish_Of_All_Descendant_Elements()
+    public async Task Moving_Trashed_Container_Performs_Explicit_Unpublish_Of_All_Descendant_Elements()
     {
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
@@ -498,7 +498,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
         });
 
         childElement = await ElementEditingService.GetAsync(childElement.Key);
@@ -544,7 +544,7 @@ public partial class ElementContainerServiceTests
 
             var result = await ElementContainerService.MoveAsync(secondContainerKey, firstContainerKey, Constants.Security.SuperUserKey);
 
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Result);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(movingWasCalled);
             Assert.IsTrue(movedWasCalled);
@@ -589,7 +589,7 @@ public partial class ElementContainerServiceTests
 
             var result = await ElementContainerService.MoveAsync(secondContainerKey, firstContainerKey, Constants.Security.SuperUserKey);
 
-            Assert.AreEqual(EntityContainerOperationStatus.CancelledByNotification, result.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.CancelledByNotification, result.Result);
             Assert.IsFalse(result.Success);
             Assert.IsTrue(movingWasCalled);
             Assert.IsFalse(movedWasCalled);
@@ -614,7 +614,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Result);
         });
     }
 
@@ -631,7 +631,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Result);
         });
     }
 
@@ -651,7 +651,7 @@ public partial class ElementContainerServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Status);
+            Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Result);
         });
     }
 }

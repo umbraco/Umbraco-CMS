@@ -34,6 +34,7 @@ public sealed class MemberTypeMapper : BaseMapper
         DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.Icon), nameof(ContentTypeDto.Icon));
         DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.ListView), nameof(ContentTypeDto.ListView));
         DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.IsElement), nameof(ContentTypeDto.IsElement));
+        DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.AllowedInLibrary), nameof(ContentTypeDto.AllowedInLibrary));
         DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.Thumbnail), nameof(ContentTypeDto.Thumbnail));
     }
 }

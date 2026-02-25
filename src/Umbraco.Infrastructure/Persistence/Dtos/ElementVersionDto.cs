@@ -11,14 +11,14 @@ public sealed class ElementVersionDto : IContentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ElementVersion;
 
-    [Column("id")]
+    [Column(IContentVersionDto.Columns.Id)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = "id,published")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{IContentVersionDto.Columns.Id},{IContentVersionDto.Columns.Published}")]
     public int Id { get; set; }
 
-    [Column("published")]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = "published", IncludeColumns = "id")]
+    [Column(IContentVersionDto.Columns.Published)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = IContentVersionDto.Columns.Published, IncludeColumns = IContentVersionDto.Columns.Id)]
     public bool Published { get; set; }
 
     [ResultColumn]

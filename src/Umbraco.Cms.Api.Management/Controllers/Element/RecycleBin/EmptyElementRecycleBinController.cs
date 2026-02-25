@@ -38,6 +38,8 @@ public class EmptyElementRecycleBinController : ElementRecycleBinControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Empties the element recycle bin.")]
+    [EndpointDescription("Permanently deletes all elements in the recycle bin. This operation cannot be undone.")]
     public async Task<IActionResult> EmptyRecycleBin(CancellationToken cancellationToken)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

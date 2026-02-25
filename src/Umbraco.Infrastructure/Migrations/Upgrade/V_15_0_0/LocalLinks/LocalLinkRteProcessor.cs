@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
 {
     public Type PropertyEditorValueType => typeof(RichTextEditorValue);
@@ -65,7 +65,7 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
     }
 }
 
-[Obsolete("Will be removed in V18")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public static partial class RteBlockHelper
 {
     [GeneratedRegex("<umb-rte-block.*(?<attribute>data-content-udi)=\"(?<udi>.[^\"]*)\".*<\\/umb-rte-block")]

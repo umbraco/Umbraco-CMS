@@ -243,6 +243,7 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
             .WithName("TestElement")
             .WithAlias("testElement")
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .AddPropertyType()
                 .WithAlias("elementPicker")
                 .WithName("ElementPicker")

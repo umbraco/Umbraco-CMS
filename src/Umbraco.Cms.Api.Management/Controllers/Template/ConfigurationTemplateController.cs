@@ -16,6 +16,8 @@ public class ConfigurationTemplateController : TemplateControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the template configuration.")]
+    [EndpointDescription("Gets the configuration settings for templates.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var responseModel = new TemplateConfigurationResponseModel

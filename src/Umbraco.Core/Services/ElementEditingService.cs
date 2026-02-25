@@ -25,6 +25,7 @@ internal sealed class ElementEditingService
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IAuditService _auditService;
+    private readonly IRelationService _relationService;
 
     public ElementEditingService(
         IElementService elementService,
@@ -68,7 +69,12 @@ internal sealed class ElementEditingService
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
         _auditService = auditService;
+        _relationService = relationService;
     }
+
+    /// <inheritdoc/>
+    protected override string RelateParentOnDeleteAlias
+        => Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias;
 
     public Task<IElement?> GetAsync(Guid key)
     {
@@ -96,6 +102,25 @@ internal sealed class ElementEditingService
             createModel.ContentTypeKey,
             createModel.Variants.Select(variant => variant.Culture),
             userKey);
+
+    protected override IContentType? TryGetAndValidateContentType(
+        Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase,
+        out ContentEditingOperationStatus operationStatus)
+    {
+        IContentType? contentType = base.TryGetAndValidateContentType(contentTypeKey, contentEditingModelBase, out operationStatus);
+        if (contentType is null)
+        {
+            return null;
+        }
+
+        if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
+        {
+            operationStatus = ContentEditingOperationStatus.NotAllowed;
+            return null;
+        }
+
+        return contentType;
+    }
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
@@ -180,55 +205,32 @@ internal sealed class ElementEditingService
             : (null, ContentEditingOperationStatus.ParentNotFound);
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
-    {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ElementTree);
+        => await HandleElementMoveAsync(key, containerKey, userKey);
 
-        var parentId = Constants.System.Root;
-        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
-        {
-            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
-            if (container is null)
-            {
-                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
-            }
-
-            if (container.Trashed)
-            {
-                // cannot move to a trashed container
-                return Attempt.Fail(ContentEditingOperationStatus.InTrash);
-            }
-
-            parentId = container.Id;
-        }
-
-        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
-            scope,
-            key,
-            parentId,
-            false,
-            userKey,
-            (element, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
-                return new ElementMovingNotification(moveEventInfo, eventMessages);
-            },
-            (element, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
-                return new ElementMovedNotification(moveEventInfo, eventMessages);
-            });
-
-        scope.Complete();
-
-        return moveResult;
-    }
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? containerKey, Guid userKey)
+        => await HandleElementMoveAsync(key, containerKey, userKey, mustBeInRecycleBin: true);
 
     public async Task<Attempt<ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
+
+        IElement? element = await GetAsync(key);
+        if (element is null)
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        if (ContentSettings.DisableUnpublishWhenReferenced
+            && _relationService.IsRelated(element.Id, RelationDirectionFilter.Child, null))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
+        }
 
         var originalPath = string.Empty;
         Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
@@ -252,6 +254,70 @@ internal sealed class ElementEditingService
         scope.Complete();
 
         return moveResult;
+    }
+
+    private async Task<Attempt<ContentEditingOperationStatus>> HandleElementMoveAsync(
+        Guid key,
+        Guid? containerKey,
+        Guid userKey,
+        bool mustBeInRecycleBin = false)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        IElement? element = await GetAsync(key);
+        if (element is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        if (mustBeInRecycleBin && element.Trashed is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotInTrash);
+        }
+
+        var parentId = Constants.System.Root;
+        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        {
+            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
+            if (container is null)
+            {
+                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
+            }
+
+            if (container.Trashed)
+            {
+                return Attempt.Fail(ContentEditingOperationStatus.InTrash);
+            }
+
+            parentId = container.Id;
+        }
+
+        var originalPath = element.Path;
+        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
+            scope,
+            key,
+            parentId,
+            false,
+            userKey,
+            (elem, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                return new ElementMovingNotification(moveEventInfo, eventMessages);
+            },
+            (elem, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                return new ElementMovedNotification(moveEventInfo, eventMessages);
+            });
+
+        if (!moveResult.Success)
+        {
+            return moveResult;
+        }
+
+        scope.Complete();
+        return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
@@ -342,7 +408,7 @@ internal sealed class ElementEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    protected override IElement? Copy(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override async Task<IElement?> CopyAsync(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         Guid? newParentKey;
         if (newParentId is Constants.System.Root)
@@ -369,7 +435,7 @@ internal sealed class ElementEditingService
         copy.ParentId = newParentId;
 
         var copyingNotification = new ElementCopyingNotification(element, copy, newParentId, newParentKey, eventMessages);
-        if (scope.Notifications.PublishCancelable(copyingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(copyingNotification))
         {
             scope.Complete();
             return null;
@@ -379,6 +445,7 @@ internal sealed class ElementEditingService
         copy.Published = false;
 
         // update creator and writer IDs
+        var userId = await GetUserIdAsync(userKey);
         copy.CreatorId = userId;
         copy.WriterId = userId;
 
@@ -391,6 +458,8 @@ internal sealed class ElementEditingService
         scope.Notifications.Publish(
             new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
+
+        await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());
 
         scope.Complete();
 

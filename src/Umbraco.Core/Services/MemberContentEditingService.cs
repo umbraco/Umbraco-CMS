@@ -116,7 +116,7 @@ internal sealed class MemberContentEditingService
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
-    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override Task<IMember?> CopyAsync(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />
