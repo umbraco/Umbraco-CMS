@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
@@ -20,9 +21,15 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
 {
     private static AsyncRepositoryCachePolicyOptions? _defaultOptions;
 
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AsyncEntityRepositoryBase{TId, TEntity}"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">The EF Core scope accessor.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
     public AsyncEntityRepositoryBase(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -31,16 +38,25 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         ICacheSyncService cacheSyncService)
         : base(scopeAccessor, appCaches)
     {
-        _logger = logger;
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
+        Logger = logger;
+        RepositoryCacheVersionService = repositoryCacheVersionService;
+        CacheSyncService = cacheSyncService;
     }
 
     /// <summary>
     ///     Gets the logger
     /// </summary>
-    protected ILogger<AsyncEntityRepositoryBase<TId, TEntity>> _logger { get;  }
+    protected ILogger<AsyncEntityRepositoryBase<TId, TEntity>> Logger { get; }
 
+    /// <summary>
+    ///    Gets the repository cache version service.
+    /// </summary>
+    protected IRepositoryCacheVersionService RepositoryCacheVersionService { get; }
+
+    /// <summary>
+    /// Gets the cache synchronization service.
+    /// </summary>
+    protected ICacheSyncService CacheSyncService { get; }
 
     /// <summary>
     ///     Gets the isolated cache for the <typeparamref name="TEntity"/>
@@ -107,6 +123,11 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         }
     }
 
+    /// <summary>
+    ///     Adds or updates an entity, backed by the repository cache policy.
+    /// </summary>
+    /// <param name="entity">The entity to save.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task SaveAsync(TEntity entity, CancellationToken cancellationToken)
     {
         if (entity.HasIdentity == false)
@@ -119,12 +140,29 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         }
     }
 
+    /// <summary>
+    ///     Deletes the passed in entity.
+    /// </summary>
+    /// <param name="entity">The entity to delete.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken) =>
         await CachePolicy.DeleteAsync(entity, PersistDeletedItemAsync);
 
+    /// <summary>
+    ///     Gets an entity by its identifier, utilizing the repository cache policy.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The entity, or <see langword="null"/> if not found.</returns>
     public async Task<TEntity?> GetAsync(TId? id, CancellationToken cancellationToken) =>
-        await CachePolicy.GetAsync(id, PerformGetAsync);
+        await CachePolicy.GetAsync(id, PerformGetAsync, PerformGetAllAsync);
 
+    /// <summary>
+    ///     Gets all entities of type <typeparamref name="TEntity"/>, or a subset matching the passed identifiers.
+    /// </summary>
+    /// <param name="ids">The identifiers to retrieve, or <see langword="null"/> to get all.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The matching entities.</returns>
     public async Task<IEnumerable<TEntity>> GetManyAsync(TId[]? ids, CancellationToken cancellationToken)
     {
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
@@ -145,34 +183,77 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         var entities = new List<TEntity>();
         foreach (IEnumerable<TId> group in ids.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
         {
-            TEntity[] groups = await CachePolicy.GetManyAsync(group.ToArray(), PerformGetManyAsync);
+            TEntity[] groups = await CachePolicy.GetManyAsync(group.ToArray(), PerformGetManyAsync, PerformGetAllAsync);
             entities.AddRange(groups);
         }
 
         return entities;
     }
 
+    /// <summary>
+    ///     Returns a value indicating whether an entity with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><see langword="true"/> if an entity with the identifier exists; otherwise <see langword="false"/>.</returns>
     public async Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken)
-        => await CachePolicy.ExistsAsync(id, PerformExistsAsync);
+        => await CachePolicy.ExistsAsync(id, PerformExistsAsync, PerformGetAllAsync);
 
+    /// <summary>
+    ///     Get the entity id for the <typeparamref name="TEntity"/>.
+    /// </summary>
+    protected virtual TId GetEntityId(TEntity entity) // TODO: change TId into Guid, as all entities should be using Guid keys
+        => (TId)(object)entity.Key;
+
+    /// <summary>
+    ///     Creates the repository cache policy.
+    /// </summary>
+    /// <returns>The cache policy to use for this repository.</returns>
     protected virtual IAsyncRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
         => new AsyncDefaultRepositoryCachePolicy<TEntity, TId>(
             GlobalIsolatedCache,
             ScopeAccessor,
             DefaultOptions,
-            _repositoryCacheVersionService,
-            _cacheSyncService);
+            RepositoryCacheVersionService,
+            CacheSyncService);
 
+    /// <summary>
+    ///     Performs the actual get operation against the data store.
+    /// </summary>
+    /// <param name="id">The identifier of the entity to retrieve.</param>
+    /// <returns>The entity, or <see langword="null"/> if not found.</returns>
     protected abstract Task<TEntity?> PerformGetAsync(TId? id);
 
+    /// <summary>
+    ///     Performs the actual get-all operation against the data store.
+    /// </summary>
+    /// <returns>All entities, or <see langword="null"/>.</returns>
     protected abstract Task<IEnumerable<TEntity>?> PerformGetAllAsync();
 
+    /// <summary>
+    ///     Performs the actual get-many operation against the data store.
+    /// </summary>
+    /// <param name="ids">The identifiers of the entities to retrieve.</param>
+    /// <returns>The matching entities, or <see langword="null"/>.</returns>
     protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TId[]? ids);
 
+    /// <summary>
+    ///     Persists a new entity to the data store.
+    /// </summary>
+    /// <param name="item">The entity to persist.</param>
     protected abstract Task PersistNewItemAsync(TEntity item);
 
+    /// <summary>
+    ///     Persists an updated entity to the data store.
+    /// </summary>
+    /// <param name="item">The entity to persist.</param>
     protected abstract Task PersistUpdatedItemAsync(TEntity item);
 
+    /// <summary>
+    ///     Performs the actual exists check against the data store.
+    /// </summary>
+    /// <param name="id">The identifier to check.</param>
+    /// <returns><see langword="true"/> if an entity with the identifier exists; otherwise <see langword="false"/>.</returns>
     protected virtual Task<bool> PerformExistsAsync(TId id)
         => AmbientScope.ExecuteWithContextAsync(async db =>
         {
@@ -184,6 +265,10 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
             return await db.Set<TEntity>().AnyAsync(e => e.Key == key);
         });
 
+    /// <summary>
+    ///     Deletes an entity from the data store.
+    /// </summary>
+    /// <param name="entity">The entity to delete.</param>
     protected virtual async Task PersistDeletedItemAsync(TEntity entity)
     {
         await AmbientScope.ExecuteWithContextAsync(async db =>

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Sqlite;
@@ -193,6 +195,25 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         services.AddUnique<IRepositoryCacheVersionAccessor, RepositoryCacheVersionAccessor>();
 
         builder.Build();
+
+        // EF Core caches compiled models globally in a static ServiceProviderCache keyed on DbContextOptions.
+        // In a test process where many fixtures share the same connection strings, a model built by an earlier
+        // test (without model customizers) can be returned as a cache hit, causing OnModelCreating to be skipped.
+        // Disabling service-provider caching forces EF Core to build a fresh model per pool lifetime
+        // (i.e. per test DI container), so each test always gets the model its own customizers produce.
+        ServiceDescriptor? dbContextOptionsDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(DbContextOptions<UmbracoDbContext>));
+        if (dbContextOptionsDescriptor?.ImplementationFactory is not null)
+        {
+            Func<IServiceProvider, object> originalFactory = dbContextOptionsDescriptor.ImplementationFactory;
+            services.Remove(dbContextOptionsDescriptor);
+            services.AddSingleton<DbContextOptions<UmbracoDbContext>>(serviceProvider =>
+            {
+                var options = (DbContextOptions<UmbracoDbContext>)originalFactory(serviceProvider);
+                return new DbContextOptionsBuilder<UmbracoDbContext>(options)
+                    .EnableServiceProviderCaching(false)
+                    .Options;
+            });
+        }
     }
 
     private void ExecuteBuilderAttributes(IUmbracoBuilder builder)
