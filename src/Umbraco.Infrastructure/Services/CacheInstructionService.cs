@@ -278,6 +278,7 @@ namespace Umbraco.Cms
                     {
                         // Just skip that local one but update lastId nevertheless.
                         lastId = instruction.Id;
+                        numberOfInstructionsProcessed++;
                         continue;
                     }
 
@@ -285,6 +286,7 @@ namespace Umbraco.Cms
                     if (TryDeserializeInstructions(instruction, out JsonDocument? jsonInstructions) is false && jsonInstructions is null)
                     {
                         lastId = instruction.Id; // skip
+                        numberOfInstructionsProcessed++;
                         continue;
                     }
 
