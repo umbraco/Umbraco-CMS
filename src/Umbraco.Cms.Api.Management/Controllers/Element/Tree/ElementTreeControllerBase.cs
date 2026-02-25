@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -24,6 +25,7 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IElementPresentationFactory _elementPresentationFactory;
+    private readonly IElementPermissionFilterService _elementPermissionFilterService;
 
     public ElementTreeControllerBase(
         IEntityService entityService,
@@ -32,12 +34,14 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
         IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IElementPresentationFactory elementPresentationFactory)
+        IElementPresentationFactory elementPresentationFactory,
+        IElementPermissionFilterService elementPermissionFilterService)
         : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _appCaches = appCaches;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _elementPresentationFactory = elementPresentationFactory;
+        _elementPermissionFilterService = elementPermissionFilterService;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Element;
@@ -79,4 +83,18 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
         viewModel.NoAccess = true;
         return viewModel;
     }
+
+    /// <inheritdoc/>
+    protected override Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(
+        IEntitySlim[] entities,
+        long totalItems)
+        => _elementPermissionFilterService.FilterAsync(entities, totalItems);
+
+    /// <inheritdoc/>
+    protected override Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(
+        Guid targetKey,
+        IEntitySlim[] entities,
+        long totalBefore,
+        long totalAfter)
+        => _elementPermissionFilterService.FilterAsync(targetKey, entities, totalBefore, totalAfter);
 }
