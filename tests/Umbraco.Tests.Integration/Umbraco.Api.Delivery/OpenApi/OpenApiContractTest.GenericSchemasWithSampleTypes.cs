@@ -26,22 +26,22 @@ internal sealed class OpenApiContractTestGenericSchemasWithSampleTypes : OpenApi
     [Test]
     public async Task OpenApiDocument_IsValid()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        await ValidateOpenApiSpecAsync(openApiContract);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateOpenApiSpecAsync(openApiSpec);
     }
 
     [Test]
     public async Task OpenApiContract_MatchesExpected()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        await ValidateContractAsync(openApiContract, ExpectedContractFileName);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateContractAsync(openApiSpec, ExpectedContractFileName);
     }
 
     [Test]
     public async Task OpenApiContract_HasExpectedSchemas()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        var openApiDocument = ParseOpenApiContract(openApiContract);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        var openApiDocument = ParseOpenApiSpec(openApiSpec);
 
         // Verify sample document type schemas are NOT present when disabled
         AssertSchemaDoesNotExist(openApiDocument, "ArticlePageContentResponseModel");

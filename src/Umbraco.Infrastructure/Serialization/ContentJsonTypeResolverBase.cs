@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 

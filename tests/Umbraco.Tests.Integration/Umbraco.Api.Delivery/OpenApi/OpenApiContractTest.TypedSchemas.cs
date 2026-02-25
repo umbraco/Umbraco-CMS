@@ -23,22 +23,22 @@ internal sealed class OpenApiContractTestTypedSchemas : OpenApiContractTestBase
     [Test]
     public async Task OpenApiDocument_IsValid()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        await ValidateOpenApiSpecAsync(openApiContract);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateOpenApiSpecAsync(openApiSpec);
     }
 
     [Test]
     public async Task OpenApiContract_MatchesExpected()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        await ValidateContractAsync(openApiContract, ExpectedContractFileName);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateContractAsync(openApiSpec, ExpectedContractFileName);
     }
 
     [Test]
     public async Task OpenApiContract_HasExpectedSchemas()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        var openApiDocument = ParseOpenApiContract(openApiContract);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        var openApiDocument = ParseOpenApiSpec(openApiSpec);
 
         // Verify built-in media types are present in the schema
         AssertSchemaExists(openApiDocument, "ImageMediaWithCropsResponseModel");

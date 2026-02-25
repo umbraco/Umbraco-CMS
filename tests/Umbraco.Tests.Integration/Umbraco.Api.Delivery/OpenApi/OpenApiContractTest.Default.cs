@@ -5,13 +5,13 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Api.Delivery.OpenApi;
 
 /// <summary>
-/// Tests the OpenAPI contract with <see cref="DeliveryApiSettings.OpenApiSettings.GenerateContentTypeSchemas"/> disabled.
+/// Tests the default OpenAPI contract with <see cref="DeliveryApiSettings.OpenApiSettings.GenerateContentTypeSchemas"/> disabled.
 /// This produces generic schemas without type-specific response models.
 /// </summary>
 [TestFixture]
-internal sealed class OpenApiContractTestGenericSchemas : OpenApiContractTestBase
+internal sealed class OpenApiContractTestDefault : OpenApiContractTestBase
 {
-    private const string ExpectedContractFileName = "generic-schemas.json";
+    private const string ExpectedContractFileName = "default.json";
 
     public override void Setup()
     {
@@ -23,22 +23,22 @@ internal sealed class OpenApiContractTestGenericSchemas : OpenApiContractTestBas
     [Test]
     public async Task OpenApiDocument_IsValid()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        await ValidateOpenApiSpecAsync(openApiContract);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateOpenApiSpecAsync(openApiSpec);
     }
 
     [Test]
     public async Task OpenApiContract_MatchesExpected()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        await ValidateContractAsync(openApiContract, ExpectedContractFileName);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateContractAsync(openApiSpec, ExpectedContractFileName);
     }
 
     [Test]
     public async Task OpenApiContract_HasExpectedSchemas()
     {
-        var openApiContract = await FetchOpenApiContractAsync();
-        var openApiDocument = ParseOpenApiContract(openApiContract);
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        var openApiDocument = ParseOpenApiSpec(openApiSpec);
 
         // Verify built-in media type schemas are NOT present when disabled
         AssertSchemaDoesNotExist(openApiDocument, "ImageMediaWithCropsResponseModel");

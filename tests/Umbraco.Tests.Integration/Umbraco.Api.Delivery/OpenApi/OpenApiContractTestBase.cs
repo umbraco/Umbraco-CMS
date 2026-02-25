@@ -1,29 +1,21 @@
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Delivery.Controllers;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Api.Delivery.OpenApi;
 
 /// <summary>
 /// Base class for OpenAPI contract tests with shared test logic.
 /// </summary>
-internal abstract class OpenApiContractTestBase : UmbracoTestServerTestBase
+internal abstract class OpenApiContractTestBase : OpenApiTestBase
 {
-    private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
-
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
@@ -33,111 +25,6 @@ internal abstract class OpenApiContractTestBase : UmbracoTestServerTestBase
     private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
-
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddMvcAndRazor(mvcBuilder =>
-        {
-            // Adds Umbraco.Cms.Api.Delivery
-            mvcBuilder.AddApplicationPart(typeof(DeliveryApiControllerBase).Assembly);
-        });
-
-    /// <summary>
-    /// Fetches the generated OpenAPI contract from the Delivery API endpoint.
-    /// </summary>
-    protected async Task<string> FetchOpenApiContractAsync()
-    {
-        var backOfficePath = HostingEnvironment.GetBackOfficePath();
-        var openApiPath = $"{backOfficePath}/openapi/delivery.json";
-        return await Client.GetStringAsync(openApiPath);
-    }
-
-    /// <summary>
-    /// Known OpenAPI validation issues that are expected and should be ignored.
-    /// These are tracked issues that don't prevent the API from functioning correctly.
-    /// </summary>
-    private static readonly string[] _knownValidationIssues =
-    [
-        // These path signature warnings occur because the Delivery API has multiple endpoints
-        // that resolve to the same path pattern (e.g., get by id vs get by path)
-        "The path signature '/umbraco/delivery/api/v2/content/item/{}' MUST be unique.",
-        "The path signature '/umbraco/delivery/api/v2/media/item/{}' MUST be unique.",
-    ];
-
-    /// <summary>
-    /// Validates that the OpenAPI document is well-formed and compliant with the OpenAPI specification.
-    /// Known issues are logged as warnings but don't fail the test. Unexpected issues will fail the test.
-    /// </summary>
-    /// <param name="openApiJson">The OpenAPI document as JSON string.</param>
-    protected static async Task ValidateOpenApiSpecAsync(string openApiJson)
-    {
-        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(openApiJson));
-        var result = await OpenApiDocument.LoadAsync(stream, "json");
-
-        Assert.That(result.Document, Is.Not.Null, "Failed to parse OpenAPI document.");
-
-        var allErrors = result.Diagnostic?.Errors ?? [];
-        var knownIssues = allErrors.Where(e => _knownValidationIssues.Contains(e.Message)).ToList();
-
-        // Log known issues as warnings (test still passes but warnings are visible in reports)
-        foreach (var issue in knownIssues)
-        {
-            Assert.Warn($"(Known) {issue.Message}");
-        }
-
-        // Fail on unexpected errors (each error reported individually)
-        Assert.Multiple(() =>
-        {
-            foreach (var error in allErrors.Except(knownIssues))
-            {
-                Assert.Fail($"(Error) {error.Message}");
-            }
-        });
-    }
-
-    /// <summary>
-    /// Validates that the generated OpenAPI contract matches the expected contract file.
-    /// If the expected contract file doesn't exist, saves the generated contract to that location.
-    /// </summary>
-    /// <param name="generatedContract">The generated OpenAPI contract JSON.</param>
-    /// <param name="expectedContractFileName">The file name of the expected contract in the ExpectedContracts folder.</param>
-    /// <returns>The parsed OpenAPI document as a JsonNode for additional assertions.</returns>
-    protected static async Task<JsonNode> ValidateContractAsync(string generatedContract, string expectedContractFileName)
-    {
-        var expectedContractPath = GetExpectedContractPath(expectedContractFileName);
-        if (!System.IO.File.Exists(expectedContractPath))
-        {
-            // Expected contract doesn't exist - save the generated one
-            Directory.CreateDirectory(Path.GetDirectoryName(expectedContractPath)!);
-            await System.IO.File.WriteAllTextAsync(expectedContractPath, generatedContract);
-            Assert.Inconclusive($"Expected contract file did not exist. Generated contract saved to: {expectedContractPath}");
-            return null!;
-        }
-
-        // Compare against existing expected contract
-        var expectedContract = await System.IO.File.ReadAllTextAsync(expectedContractPath);
-        var generatedOpenApiJson = JsonNode.Parse(generatedContract);
-        var expectedOpenApiJson = JsonNode.Parse(expectedContract);
-
-        Assert.NotNull(generatedOpenApiJson);
-        Assert.NotNull(expectedOpenApiJson);
-
-        Assert.AreEqual(
-            expectedOpenApiJson.ToJsonString(),
-            generatedOpenApiJson.ToJsonString(),
-            "Generated API does not respect the contract.");
-
-        return generatedOpenApiJson!;
-    }
-
-    /// <summary>
-    /// Parses the OpenAPI contract JSON into a JsonNode for assertions.
-    /// </summary>
-    protected static JsonNode ParseOpenApiContract(string openApiJson)
-    {
-        var document = JsonNode.Parse(openApiJson);
-        Assert.That(document, Is.Not.Null, "Failed to parse OpenAPI contract JSON.");
-        return document!;
-    }
 
     /// <summary>
     /// Asserts that the specified schema exists in the OpenAPI document.
@@ -306,12 +193,5 @@ internal abstract class OpenApiContractTestBase : UmbracoTestServerTestBase
 
         await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
         return dataType;
-    }
-
-    private static string GetExpectedContractPath(string fileName, [CallerFilePath] string callerFilePath = "")
-    {
-        // Use the source directory (where this file lives) so that saved files go to source control
-        var sourceDirectory = Path.GetDirectoryName(callerFilePath)!;
-        return Path.Combine(sourceDirectory, "ExpectedContracts", fileName);
     }
 }
