@@ -189,6 +189,16 @@ stages:
               nodeVersion: ${{ variables.nodeVersion }}
               npm_config_cache: ${{ variables.npm_config_cache }}
           - bash: |
+              echo "##[command]Install nbgv"
+              dotnet tool install --tool-path . nbgv
+              echo "##[command]Running nbgv get-version"
+              PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
+              echo "##[command]Running npm version"
+              echo "##[debug]Version: $PACKAGE_VERSION"
+              cd tests/Umbraco.Tests.AcceptanceTest
+              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
+            displayName: Set NPM Version
+          - bash: |
               echo "##[command]Running npm pack"
               mkdir $(Build.ArtifactStagingDirectory)/npm-testhelpers
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm-testhelpers
