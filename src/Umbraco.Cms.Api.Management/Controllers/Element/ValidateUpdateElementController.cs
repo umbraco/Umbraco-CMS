@@ -36,6 +36,8 @@ public class ValidateUpdateElementController : UpdateElementControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates updating an element.")]
+    [EndpointDescription("Validates the request model for updating an element without actually updating it.")]
     public async Task<IActionResult> Validate(CancellationToken cancellationToken, Guid id, ValidateUpdateElementRequestModel requestModel)
         => await HandleRequest(id, requestModel, async () =>
         {

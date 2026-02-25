@@ -260,7 +260,108 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 5. Project-Specific Notes
+## 5. Avoiding Breaking Changes
+
+No binary breaking changes are allowed within a major version. Three patterns are used:
+
+### 5.1 Obsolete Constructor + StaticServiceProvider
+
+When a public class needs new dependencies, obsolete the existing constructor and add a new one. The old constructor delegates to the new one, resolving missing deps via `StaticServiceProvider`.
+
+```csharp
+[Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+public MyService(IDependencyA depA)
+    : this(
+        depA,
+        StaticServiceProvider.Instance.GetRequiredService<IDependencyB>())
+{
+}
+
+public MyService(IDependencyA depA, IDependencyB depB)
+{
+    _depA = depA;
+    _depB = depB;
+}
+```
+
+**Examples**:
+- `ContentCollectionPresentationFactory` - added `FlagProviderCollection`
+- `CacheInstructionService` - added `ILastSyncedManager`, `IRepositoryCacheVersionService`
+- `DocumentPresentationFactory` - added `FlagProviderCollection`
+
+**Rules**:
+- Old constructor marked `[Obsolete("... Scheduled for removal in Umbraco {current-major+2}.")]`
+- Old constructor calls new constructor via `: this(...)`
+- Uses `StaticServiceProvider.Instance.GetRequiredService<T>()` for new params only
+- DI registration must use the NEW constructor (old is for external consumers only)
+
+### 5.2 Obsolete Method + New Overload
+
+When a public method signature needs to change, add the new method/overload and obsolete the old. The obsolete method should call the new one with suitable defaults.
+
+```csharp
+[Obsolete("Use the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+public void DoThing(string name)
+    => DoThing(name, extraParam: null);
+
+public void DoThing(string name, string? extraParam)
+{
+    // Real implementation here
+}
+```
+
+**Rules**:
+- Old method marked `[Obsolete]` with removal schedule
+- DRY: old method calls new method, providing defaults for new parameters
+- All internal callers must be updated to use the new method
+- No callers should remain on the obsolete method within the codebase
+
+### 5.3 Default Interface Implementation
+
+When adding methods to a public interface, provide a default implementation so existing external implementations don't break.
+
+```csharp
+public interface IMyService
+{
+    // Existing method
+    void ExistingMethod();
+
+    // New method with default implementation
+    void NewMethod(string param)
+        => ExistingMethod(); // delegate to existing if possible
+}
+```
+
+**Strategies for the default** (in order of preference):
+1. **Use existing interface methods** to satisfy the contract (even if not optimal)
+2. **Return a sensible default** like empty collection, null, etc.
+3. **Throw `NotImplementedException`** if no reasonable default exists
+
+**Example**: `IContentService.SaveBlueprint` - new overload with `IContent? createdFromContent` has a default impl that calls the old method (ignoring the new param).
+
+**Example**: `IDocumentPresentationFactory.CreateCulturePublishScheduleModels` - full default implementation with logic, uses `StaticServiceProvider` for dependency resolution within the interface.
+
+**Rules**:
+- Add `// TODO (V{next-major}): Remove the default implementation when {obsolete method} is removed.` comment
+- Default impl should be functionally correct even if not optimal
+- If using `StaticServiceProvider` in a default impl, note this is temporary
+
+### 5.4 General Rules
+
+- **Removal policy**: Obsoleted members must remain for at least one full major version before removal. If obsoleted in version N, the earliest removal is version N+2. For example, something obsoleted in v17 is scheduled for removal in v19 (giving the whole of v18 as a deprecation period).
+- All `[Obsolete]` attributes must include **"Scheduled for removal in Umbraco {current+2}"**
+- Read `version.json` to determine the current major version
+- Suppress `CS0618` warnings where obsolete members must call each other:
+  ```csharp
+  #pragma warning disable CS0618 // Type or member is obsolete
+      => OldMethod(param);
+  #pragma warning restore CS0618 // Type or member is obsolete
+  ```
+- Update ALL internal callers to use the new API - no internal code should use obsolete members
+
+---
+
+## 6. Project-Specific Notes
 
 ### Centralized Package Management
 
@@ -314,6 +415,65 @@ APIs use `Asp.Versioning.Mvc`:
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
 - OpenAPI docs: `/umbraco/openapi/management.json`, `/umbraco/openapi/delivery.json`
 - Swagger UI: `/umbraco/openapi/`
+
+### Backoffice npm Package Structure
+
+The backoffice (`Umbraco.Web.UI.Client`) is published to npm as **`@umbraco-cms/backoffice`** with a plugin architecture:
+
+#### Architecture Overview
+
+- **Multi-workspace structure**: Subprojects in `src/libs/*`, `src/packages/*`, `src/external/*`
+- **Export model**: All exports defined in root `package.json` → `./exports` field
+- **Importmap-driven runtime**: Dependencies provided at runtime via importmap (single source of truth)
+- **Build-time types**: TypeScript types come from npm peerDependencies
+- **Plugin model**: Developers create plugins that import from `@umbraco-cms/backoffice/*` exports
+
+#### Dependency Hoisting Strategy
+
+When building for npm (`npm pack`), the `cleanse-pkg.js` script hoists subproject dependencies to root `peerDependencies` with intelligent version range conversion:
+
+**Version Range Logic** (uses `semver` package):
+
+1. **Pre-release (0.x.y)**: Convert to explicit range
+   - Input: `^0.85.0` or `0.85.0`
+   - Output: `>=0.85.0 <1.0.0`
+   - Rationale: Pre-release caret only allows patch updates, explicit range allows minor upgrades within 0.x.x
+   - Example: Plugin can use `@hey-api/openapi-ts@0.91.1` while backoffice uses `0.85.0`
+
+2. **Stable with caret (^X.Y.Z where X ≥ 1)**: Keep as-is
+   - Input: `^3.3.1`
+   - Output: `^3.3.1` (unchanged)
+   - Rationale: Caret already implements correct semantics for stable versions
+
+3. **Stable exact versions (X.Y.Z where X ≥ 1)**: Add caret
+   - Input: `3.16.0`
+   - Output: `^3.16.0`
+   - Rationale: Normalizes to conventional semver format
+
+#### Key Dependencies
+
+**Runtime via importmap** (types available from peerDependencies):
+- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework
+- `monaco-editor`, `@tiptap/*` - Feature-specific editors
+- `@hey-api/openapi-ts` - HTTP client type generation
+
+**Build-time only** (not hoisted):
+- `vite`, `typescript`, `eslint` - Dev tooling
+
+#### Plugin Development Implications
+
+Plugin developers should:
+- **Declare explicit dependencies** in their own `package.json` (avoid relying on transitive deps)
+- **Understand the version ranges**: `>=0.85.0 <1.0.0` means they can use newer pre-release versions
+- **Know that types match npm ranges**, but runtime comes from importmap (managed by backoffice)
+- **When `@hey-api` hits 1.0.0**: Published constraint will automatically become `^1.0.0`
+
+#### Implementation Details
+
+- Script location: `src/Umbraco.Web.UI.Client/devops/publish/cleanse-pkg.js`
+- Runs as `prepack` hook before npm pack
+- Uses `semver.minVersion()` for robust version range parsing
+- Generates single source of truth for importmap versions
 
 ### Known Limitations
 

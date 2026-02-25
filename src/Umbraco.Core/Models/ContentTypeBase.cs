@@ -31,6 +31,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     private string? _icon = "icon-folder";
     private Guid? _listView;
     private bool _isElement;
+    private bool _allowedInLibrary;
     private PropertyGroupCollection _propertyGroups;
     private string? _thumbnail = "folder.png";
     private ContentVariation _variations;
@@ -219,6 +220,14 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
         get => _isElement;
         set => SetPropertyValueAndDetectChanges(value, ref _isElement, nameof(IsElement));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public bool AllowedInLibrary
+    {
+        get => _allowedInLibrary;
+        set => SetPropertyValueAndDetectChanges(value, ref _allowedInLibrary, nameof(AllowedInLibrary));
     }
 
     /// <summary>
@@ -529,8 +538,8 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event arguments.</param>
-    protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-
+    protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
         // enable this to detect duplicate property aliases. We do want this, however making this change in a
         // patch release might be a little dangerous
         ////detect if there are any duplicate aliases - this cannot be allowed
@@ -545,6 +554,11 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         //    }
         // }
         OnPropertyChanged(nameof(PropertyTypes));
+
+        // Also mark NoGroupPropertyTypes as dirty so the persistence layer
+        // detects changes to properties without containers (tabs/groups).
+        OnPropertyChanged(nameof(NoGroupPropertyTypes));
+    }
 
     /// <inheritdoc />
     protected override void PerformDeepClone(object clone)

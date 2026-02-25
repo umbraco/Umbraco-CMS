@@ -24,6 +24,8 @@ public class WebhookLogController : WebhookLogControllerBase
     [HttpGet("{id:guid}/logs")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<WebhookLogResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of webhook logs for a specific webhook.")]
+    [EndpointDescription("Gets a paginated collection of webhook logs for the webhook identified by the provided Id.")]
     public async Task<IActionResult> Logs(CancellationToken cancellationToken, Guid id, int skip = 0, int take = 100)
     {
         PagedModel<WebhookLog> logs = await _webhookLogService.Get(id, skip, take);

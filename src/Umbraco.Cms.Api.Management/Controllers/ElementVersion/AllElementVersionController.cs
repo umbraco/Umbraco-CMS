@@ -31,6 +31,8 @@ public class AllElementVersionController : ElementVersionControllerBase
     [ProducesResponseType(typeof(PagedViewModel<ElementVersionItemResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets a paginated collection of versions for a specific element.")]
+    [EndpointDescription("Gets a paginated collection of versions for a specific element and optional culture. Each result describes the version and includes details of the element type, editor, version date, and published status.")]
     public async Task<IActionResult> All(
         CancellationToken cancellationToken,
         [Required] Guid elementId,

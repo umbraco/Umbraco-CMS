@@ -4,14 +4,12 @@ import { css, customElement, html, nothing, state, when } from '@umbraco-cms/bac
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbInputEntityDataElement } from '@umbraco-cms/backoffice/entity-data-picker';
 import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/user-group-entity-type-permission-groups.element.js';
-import '@umbraco-cms/backoffice/entity-data-picker';
 
 @customElement('umb-user-group-details-workspace-view')
 export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -150,7 +148,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 		this.#workspaceContext?.updateProperty('elementStartNode', null);
 	}
 
-	#onElementStartNodeChange(event: CustomEvent & { target: UmbInputEntityDataElement }) {
+	#onElementStartNodeChange(event: CustomEvent & { target: { selection: Array<string> } }) {
 		event.stopPropagation();
 		// TODO: get back to this when elements have been decoupled from users.
 		const target = event.target;
@@ -272,14 +270,13 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 				${when(
 					this._elementRootAccess === false,
 					() => html`
-						<umb-input-entity-data
+						<umb-input-element
 							slot="editor"
 							max="1"
 							.selection=${this._elementStartNode?.unique ? [this._elementStartNode.unique] : []}
-							.dataSourceAlias=${'Umb.PropertyEditorDataSource.ElementFolder'}
-							.dataSourceConfig=${[]}
+							?folderOnly=${true}
 							@change=${this.#onElementStartNodeChange}>
-						</umb-input-entity-data>
+						</umb-input-element>
 					`,
 				)}
 			</umb-property-layout>

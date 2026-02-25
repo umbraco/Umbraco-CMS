@@ -67,6 +67,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Icon = source.Icon;
         target.IsElement = source.IsElement;
+        target.AllowedInLibrary = source.AllowedInLibrary;
         target.Description = source.Description;
     }
 

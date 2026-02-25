@@ -42,6 +42,8 @@ public class PublishElementController : ElementControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Publishes an element.")]
+    [EndpointDescription("Publishes an element identified by the provided Id.")]
     public async Task<IActionResult> Publish(CancellationToken cancellationToken, Guid id, PublishElementRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
@@ -65,8 +67,7 @@ public class PublishElementController : ElementControllerBase
 
         if (modelResult.Success is false)
         {
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            return BadRequest();
+            return ElementPublishingOperationStatusResult(modelResult.Status);
         }
 
         Attempt<ContentPublishingResult, ContentPublishingOperationStatus> attempt = await _elementPublishingService.PublishAsync(
@@ -75,7 +76,6 @@ public class PublishElementController : ElementControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            : BadRequest();
+            : ElementPublishingOperationStatusResult(attempt.Status, attempt.Result.InvalidPropertyAliases);
     }
 }

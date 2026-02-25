@@ -21,6 +21,8 @@ public class SiblingsElementRecycleBinController : ElementRecycleBinControllerBa
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<ElementRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets sibling elements in the recycle bin.")]
+    [EndpointDescription("Gets a collection of sibling elements in the recycle bin at the same level as the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<ElementRecycleBinItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
         => await GetSiblings(target, before, after);
 }

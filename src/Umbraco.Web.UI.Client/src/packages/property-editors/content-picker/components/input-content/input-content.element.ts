@@ -42,13 +42,13 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	startNode?: UmbTreeStartNode;
 
 	@property()
-	public set allowedContentTypeIds(value: string) {
-		this.#allowedContentTypeIds = value ? value.split(',') : [];
+	public set allowedContentTypeIds(value: string | undefined) {
+		this.#allowedContentTypeIds = value ? value.split(',') : undefined;
 	}
-	public get allowedContentTypeIds(): string {
-		return this.#allowedContentTypeIds.join(',');
+	public get allowedContentTypeIds(): string | undefined {
+		return this.#allowedContentTypeIds?.join(',');
 	}
-	#allowedContentTypeIds: Array<string> = [];
+	#allowedContentTypeIds?: Array<string>;
 
 	@property({ type: Array })
 	public set selection(values: Array<UmbReferenceByUniqueAndType>) {

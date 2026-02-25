@@ -24,7 +24,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly string _authorizeCallbackPathName;
     private readonly string _authorizeCallbackLogoutPathName;
 
-    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v19")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,

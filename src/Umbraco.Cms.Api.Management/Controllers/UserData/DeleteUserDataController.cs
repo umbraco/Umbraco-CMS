@@ -28,6 +28,8 @@ public class DeleteUserDataController : UserDataControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Deletes user data.")]
+    [EndpointDescription("Deletes user data identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         IUserData? data = await _userDataService.GetAsync(id);

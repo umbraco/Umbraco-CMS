@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessElements)]
 public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementRecycleBinItemResponseModel>
 {
+    protected override string EntityName => "element";
+
     private readonly IEntityService _entityService;
     private readonly IElementPresentationFactory _elementPresentationFactory;
 
