@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Scoping.EFCore;
 
@@ -19,6 +20,8 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     private readonly IScopeAccessor _scopeAccessor;
     private readonly IRepositoryCacheVersionService _cacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
+
+    protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     protected AsyncRepositoryCachePolicyBase(
         IAppPolicyCache globalCache,
@@ -97,4 +100,21 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     /// Registers a change in the cache.
     /// </summary>
     protected async Task RegisterCacheChangeAsync() => await _cacheVersionService.SetCacheUpdatedAsync<TEntity>();
+
+    protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
+
+    protected string GetEntityCacheKey(TId? id)
+    {
+        if (EqualityComparer<TId>.Default.Equals(id, default))
+        {
+            return string.Empty;
+        }
+
+        if (typeof(TId).IsValueType)
+        {
+            return EntityTypeCacheKey + id;
+        }
+
+        return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
+    }
 }
