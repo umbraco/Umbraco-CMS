@@ -271,9 +271,6 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProvider_hidetoplevel_false.cs">
-      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
-    </Compile>
     <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProviderTests.cs">
       <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
     </Compile>
@@ -341,6 +338,9 @@
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Copy.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.CopyWithBlocks.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Move.cs">
