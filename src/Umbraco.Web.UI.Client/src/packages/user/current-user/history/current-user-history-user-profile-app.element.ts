@@ -1,6 +1,6 @@
 import type { UmbCurrentUserHistoryItem, UmbCurrentUserHistoryStore } from './current-user-history.store.js';
 import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
-import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -72,7 +72,11 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		return html`
 			<uui-box headline=${this.localize.term('user_yourHistory')}>
 				<uui-ref-list>
-					${this.#getCurrentPageItems().map((item) => this.#renderItem(item))}
+					${repeat(
+						this.#getCurrentPageItems(),
+						(item) => item.unique,
+						(item) => this.#renderItem(item),
+					)}
 				</uui-ref-list>
 				${this.#renderPagination()}
 			</uui-box>
