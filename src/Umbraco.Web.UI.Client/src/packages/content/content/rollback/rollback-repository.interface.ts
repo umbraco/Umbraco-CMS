@@ -1,13 +1,13 @@
-import type { UmbRollbackVersionDetailModel, UmbRollbackVersionItemModel } from './types.js';
+import type { UmbContentRollbackVersionDetailModel, UmbContentRollbackVersionItemModel } from './types.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbRollbackRepository extends UmbApi {
+export interface UmbContentRollbackRepository extends UmbApi {
 	requestVersionsByEntityId(
 		id: string,
 		culture?: string,
-	): Promise<{ data?: { items: Array<UmbRollbackVersionItemModel>; total: number }; error?: unknown }>;
+	): Promise<{ data?: { items: Array<UmbContentRollbackVersionItemModel>; total: number }; error?: unknown }>;
 
-	requestVersionById(id: string): Promise<{ data?: UmbRollbackVersionDetailModel; error?: unknown }>;
+	requestVersionById(id: string): Promise<{ data?: UmbContentRollbackVersionDetailModel; error?: unknown }>;
 
 	setPreventCleanup(versionId: string, preventCleanup: boolean): Promise<{ error?: unknown }>;
 

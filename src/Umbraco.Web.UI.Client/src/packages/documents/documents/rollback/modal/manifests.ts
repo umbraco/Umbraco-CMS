@@ -5,7 +5,7 @@ import { UMB_DOCUMENT_ROLLBACK_MODAL_ALIAS } from './constants.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
-		kind: 'rollback',
+		kind: 'contentRollback',
 		alias: UMB_DOCUMENT_ROLLBACK_MODAL_ALIAS,
 		name: 'Document Rollback Modal',
 		meta: {

@@ -1,6 +1,6 @@
-import type { UmbRollbackRepository } from '../rollback-repository.interface.js';
+import type { UmbContentRollbackRepository } from '../rollback-repository.interface.js';
 import type { UmbContentDetailModel } from '../../types.js';
-import type { ManifestModalRollbackKind, UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
+import type { ManifestModalContentRollbackKind, UmbContentRollbackModalData, UmbContentRollbackModalValue } from './types.js';
 import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -26,9 +26,9 @@ type ContentVersion = {
 
 @customElement('umb-content-rollback-modal')
 export class UmbContentRollbackModalElement extends UmbModalBaseElement<
-	UmbRollbackModalData,
-	UmbRollbackModalValue,
-	ManifestModalRollbackKind
+	UmbContentRollbackModalData,
+	UmbContentRollbackModalValue,
+	ManifestModalContentRollbackKind
 > {
 	@state()
 	private _versions: Array<ContentVersion> = [];
@@ -60,7 +60,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	@state()
 	private _showDiff = false;
 
-	#rollbackRepository?: UmbRollbackRepository;
+	#rollbackRepository?: UmbContentRollbackRepository;
 	#userItemRepository = new UmbUserItemRepository(this);
 
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
@@ -133,7 +133,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				this._availableVariants = [];
 			}
 
-			this.#rollbackRepository = await createExtensionApiByAlias<UmbRollbackRepository>(
+			this.#rollbackRepository = await createExtensionApiByAlias<UmbContentRollbackRepository>(
 				this,
 				this.manifest.meta.rollbackRepositoryAlias,
 			);

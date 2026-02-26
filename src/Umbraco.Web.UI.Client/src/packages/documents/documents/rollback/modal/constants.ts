@@ -1,9 +1,9 @@
-import type { UmbRollbackModalData, UmbRollbackModalValue } from '@umbraco-cms/backoffice/content';
+import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from '@umbraco-cms/backoffice/content';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_DOCUMENT_ROLLBACK_MODAL_ALIAS = 'Umb.Modal.Document.Rollback';
 
-export const UMB_DOCUMENT_ROLLBACK_MODAL = new UmbModalToken<UmbRollbackModalData, UmbRollbackModalValue>(
+export const UMB_DOCUMENT_ROLLBACK_MODAL = new UmbModalToken<UmbContentRollbackModalData, UmbContentRollbackModalValue>(
 	UMB_DOCUMENT_ROLLBACK_MODAL_ALIAS,
 	{
 		modal: {

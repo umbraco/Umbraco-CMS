@@ -1,13 +1,13 @@
 import { UmbRollbackServerDataSource } from './rollback.server.data-source.js';
 import type {
-	UmbRollbackRepository,
-	UmbRollbackVersionDetailModel,
-	UmbRollbackVersionItemModel,
+	UmbContentRollbackRepository,
+	UmbContentRollbackVersionDetailModel,
+	UmbContentRollbackVersionItemModel,
 } from '@umbraco-cms/backoffice/content';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentRollbackRepository extends UmbControllerBase implements UmbRollbackRepository {
+export class UmbDocumentRollbackRepository extends UmbControllerBase implements UmbContentRollbackRepository {
 	#dataSource: UmbRollbackServerDataSource;
 
 	constructor(host: UmbControllerHost) {
@@ -19,7 +19,7 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 	async requestVersionsByEntityId(
 		id: string,
 		culture?: string,
-	): Promise<{ data?: { items: Array<UmbRollbackVersionItemModel>; total: number }; error?: unknown }> {
+	): Promise<{ data?: { items: Array<UmbContentRollbackVersionItemModel>; total: number }; error?: unknown }> {
 		const { data, error } = await this.#dataSource.getVersionsByDocumentId(id, culture);
 
 		if (data) {
@@ -41,7 +41,7 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 		return { error };
 	}
 
-	async requestVersionById(id: string): Promise<{ data?: UmbRollbackVersionDetailModel; error?: unknown }> {
+	async requestVersionById(id: string): Promise<{ data?: UmbContentRollbackVersionDetailModel; error?: unknown }> {
 		const { data, error } = await this.#dataSource.getVersionById(id);
 
 		if (data) {

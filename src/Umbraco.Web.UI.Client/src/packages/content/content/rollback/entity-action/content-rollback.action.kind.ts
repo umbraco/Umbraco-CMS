@@ -3,13 +3,13 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 
 export const UMB_ENTITY_ACTION_ROLLBACK_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.EntityAction.Rollback',
-	matchKind: 'rollback',
+	alias: 'Umb.Kind.EntityAction.ContentRollback',
+	matchKind: 'contentRollback',
 	matchType: 'entityAction',
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
-		kind: 'rollback',
+		kind: 'contentRollback',
 		api: () => import('./content-rollback.action.js'),
 		weight: 450,
 		forEntityTypes: [],

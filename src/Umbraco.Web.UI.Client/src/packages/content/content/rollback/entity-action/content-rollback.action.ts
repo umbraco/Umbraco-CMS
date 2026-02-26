@@ -1,15 +1,15 @@
-import type { UmbRollbackModalData, UmbRollbackModalValue } from '../modal/types.js';
-import type { MetaEntityActionRollbackKind } from './types.js';
+import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from '../modal/types.js';
+import type { MetaEntityActionContentRollbackKind } from './types.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbModalToken, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbContentRollbackEntityAction extends UmbEntityActionBase<MetaEntityActionRollbackKind> {
+export class UmbContentRollbackEntityAction extends UmbEntityActionBase<MetaEntityActionContentRollbackKind> {
 	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
-		const token = new UmbModalToken<UmbRollbackModalData, UmbRollbackModalValue>(this.args.meta.rollbackModalAlias, {
+		const token = new UmbModalToken<UmbContentRollbackModalData, UmbContentRollbackModalValue>(this.args.meta.rollbackModalAlias, {
 			modal: {
 				type: 'sidebar',
 				size: 'full',

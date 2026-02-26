@@ -1,16 +1,16 @@
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 
-export interface ManifestEntityActionRollbackKind extends ManifestEntityAction<MetaEntityActionRollbackKind> {
+export interface ManifestEntityActionContentRollbackKind extends ManifestEntityAction<MetaEntityActionContentRollbackKind> {
 	type: 'entityAction';
-	kind: 'rollback';
+	kind: 'contentRollback';
 }
 
-export interface MetaEntityActionRollbackKind extends MetaEntityActionDefaultKind {
+export interface MetaEntityActionContentRollbackKind extends MetaEntityActionDefaultKind {
 	rollbackModalAlias: string;
 }
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbEntityActionRollbackKind: ManifestEntityActionRollbackKind;
+		umbEntityActionContentRollbackKind: ManifestEntityActionContentRollbackKind;
 	}
 }

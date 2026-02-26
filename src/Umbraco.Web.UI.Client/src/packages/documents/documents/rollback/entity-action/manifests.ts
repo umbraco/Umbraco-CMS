@@ -9,7 +9,7 @@ import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffi
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
-		kind: 'rollback',
+		kind: 'contentRollback',
 		alias: 'Umb.EntityAction.Document.Rollback',
 		name: 'Rollback Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],

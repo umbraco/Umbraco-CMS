@@ -1,24 +1,24 @@
 import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
-export interface ManifestModalRollbackKind extends ManifestModal {
+export interface ManifestModalContentRollbackKind extends ManifestModal {
 	type: 'modal';
-	kind: 'rollback';
-	meta: MetaModalRollbackKind;
+	kind: 'contentRollback';
+	meta: MetaModalContentRollbackKind;
 }
 
-export interface MetaModalRollbackKind {
+export interface MetaModalContentRollbackKind {
 	rollbackRepositoryAlias: string;
 	detailRepositoryAlias: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbRollbackModalData {}
+export interface UmbContentRollbackModalData {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbRollbackModalValue {}
+export interface UmbContentRollbackModalValue {}
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbModalRollbackKind: ManifestModalRollbackKind;
+		umbModalContentRollbackKind: ManifestModalContentRollbackKind;
 	}
 }
