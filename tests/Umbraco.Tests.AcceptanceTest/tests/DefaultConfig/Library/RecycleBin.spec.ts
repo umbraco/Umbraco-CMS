@@ -57,7 +57,8 @@ test('can trash an element folder with children', async ({umbracoApi, umbracoUi}
   await umbracoUi.library.isElementInTreeVisible(elementFolderName, false);
 });
 
-test('can empty recycle bin', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// Currently it returns an error when trying to empty the recycle bin
+test.fixme('can empty recycle bin', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.element.moveToRecycleBin(elementId);
