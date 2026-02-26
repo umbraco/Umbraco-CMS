@@ -1,5 +1,5 @@
 import { UmbEntityCollectionItemElementBase } from './umb-entity-collection-item-element-base.element.js';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { expect, fixture, html, aTimeout, elementUpdated } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -41,6 +41,19 @@ class UmbTestEntityCollectionItemElement extends UmbEntityCollectionItemElementB
 
 	override render() {
 		return this._component ?? null;
+	}
+}
+
+// Outer host element that provides an ancestor UMB_ENTITY_CONTEXT,
+// used to verify the context boundary blocks it from leaking in.
+@customElement('umb-test-outer-host')
+class UmbTestOuterHostElement extends UmbElementMixin(HTMLElement) {
+	entityContext = new UmbEntityContext(this);
+
+	constructor() {
+		super();
+		this.entityContext.setEntityType('outer-entity');
+		this.entityContext.setUnique('outer-unique');
 	}
 }
 
@@ -172,6 +185,59 @@ describe('UmbEntityCollectionItemElementBase', () => {
 
 			expect(secondContext).to.not.equal(firstContext);
 			expect(secondContext!.getEntityType()).to.equal('other-entity');
+		});
+	});
+
+	describe('entity context boundary', () => {
+		let outerHost: UmbTestOuterHostElement;
+		let innerElement: UmbTestEntityCollectionItemElement;
+
+		beforeEach(async () => {
+			outerHost = await fixture(
+				html`<umb-test-outer-host>
+					<umb-test-entity-collection-item></umb-test-entity-collection-item>
+				</umb-test-outer-host>`,
+			);
+			innerElement = outerHost.querySelector('umb-test-entity-collection-item') as UmbTestEntityCollectionItemElement;
+		});
+
+		afterEach(() => {
+			innerElement.destroy();
+			outerHost.destroy();
+		});
+
+		it('blocks the outer entity context from being consumed before the inner context is provided', async () => {
+			// The fallback component has not been created yet (no item set), so
+			// no inner UMB_ENTITY_CONTEXT exists. The boundary should still
+			// prevent the outer ancestor context from being consumed.
+			// When blocked, the context API rejects the promise because the
+			// context cannot be found — proving the outer context did not leak through.
+			const fallback = new UmbTestCollectionItemFallbackElement();
+			innerElement.shadowRoot!.appendChild(fallback);
+			await elementUpdated(innerElement);
+
+			let rejected = false;
+			try {
+				await fallback.getContext(UMB_ENTITY_CONTEXT);
+			} catch {
+				rejected = true;
+			}
+
+			expect(rejected).to.be.true;
+			fallback.remove();
+		});
+
+		it('provides the correct inner entity context once the item is set', async () => {
+			innerElement.item = makeItem('inner-entity', 'inner-unique');
+			await aTimeout(0);
+			await elementUpdated(innerElement);
+
+			const component = innerElement['_component'] as UmbTestCollectionItemFallbackElement;
+			const context = await component.getContext(UMB_ENTITY_CONTEXT);
+
+			// The inner context should reflect the item, not the outer ancestor.
+			expect(context.getEntityType()).to.equal('inner-entity');
+			expect(context.getUnique()).to.equal('inner-unique');
 		});
 	});
 
