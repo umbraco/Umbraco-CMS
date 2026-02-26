@@ -32,7 +32,7 @@ test('can create an element picker data type', async ({umbracoApi, umbracoUi}) =
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
   expect(dataTypeData.editorAlias).toBe(editorAlias);
   expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
-   expect(dataTypeData.values).toEqual([]);
+  expect(dataTypeData.values).toEqual([]);
 });
 
 test('can set minimum amount', async ({umbracoApi, umbracoUi}) => {

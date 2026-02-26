@@ -37,23 +37,6 @@ test('can trash an element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
 });
 
-test('can trash an element folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.element.createDefaultElementFolder(elementFolderName);
-  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeTruthy();
-  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
-
-  // Act
-  await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
-  await umbracoUi.library.clickTrashActionMenuOption();
-  await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementFolderToBeTrashed();
-
-  // Assert
-  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeFalsy();
-  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeTruthy();
-  await umbracoUi.library.isElementInTreeVisible(elementFolderName, false);
-});
-
 test('can trash an element folder with children', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
@@ -103,7 +86,7 @@ test('can see trashed element in recycle bin', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
 });
 
-test('can delete element permanently from recycle bin', async ({umbracoApi, umbracoUi}) => {
+test('can delete element from recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.element.moveToRecycleBin(elementId);

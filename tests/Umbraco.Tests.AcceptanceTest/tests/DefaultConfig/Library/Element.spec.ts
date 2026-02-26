@@ -38,6 +38,7 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
   expect(elementData.variants[0].state).toBe(expectedState);
+  await umbracoUi.library.isElementInTreeVisible(elementName);
 });
 
 test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -96,8 +97,8 @@ test('can rename element', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeUpdated();
 
   // Assert
-  const updatedelementData = await umbracoApi.element.get(elementId);
-  expect(updatedelementData.variants[0].name).toEqual(elementName);
+  const updatedElementData = await umbracoApi.element.get(elementId);
+  expect(updatedElementData.variants[0].name).toEqual(elementName);
 });
 
 test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -113,8 +114,8 @@ test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeUpdated();
 
   // Assert
-  const updatedelementData = await umbracoApi.element.getByName(elementName);
-  expect(updatedelementData.values[0].value).toBe(elementText);
+  const updatedElementData = await umbracoApi.element.getByName(elementName);
+  expect(updatedElementData.values[0].value).toBe(elementText);
 });
 
 test('can unpublish element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -166,7 +167,7 @@ test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => 
 test('can duplicate a element node to other parent', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementFolderName = 'TestElementFolder';
-  await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
@@ -181,7 +182,13 @@ test('can duplicate a element node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
   await umbracoUi.library.isElementInTreeVisible(elementName);
   await umbracoUi.library.isElementInTreeVisible(elementFolderName);
-  await umbracoUi.library.goToElementWithName(elementFolderName);
+  await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
+  await umbracoUi.library.clickReloadChildrenActionMenuOption();
+  await umbracoUi.library.isCaretButtonVisibleForElementName(elementFolderName, true);
+  await umbracoUi.library.openElementCaretButtonForName(elementFolderName);
+  await umbracoUi.library.isChildElementInTreeVisible(elementFolderName, elementName, true);
+  await umbracoUi.library.isCaretButtonVisibleForElementName(elementName, false);
+  expect(await umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(elementFolderName);

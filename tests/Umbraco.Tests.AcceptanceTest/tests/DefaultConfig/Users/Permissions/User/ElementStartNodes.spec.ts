@@ -91,7 +91,7 @@ test.fixme('see no-access view when deep-linking to restricted element', async (
 
   // Assert
   await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.page.goto(`${umbracoUi.page.url().replace('/collection', '')}/workspace/element/edit/${rootFolderId!}`);
+  await umbracoUi.page.goto(`${umbracoUi.page.url().replace('/collection', '')}/workspace/element/edit/${childElementOneId!}`);
   await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal); // Wait for workspace to load
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
