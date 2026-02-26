@@ -6,8 +6,13 @@ export class ConsoleErrorHelper {
     const filePath = process.env.CONSOLE_ERRORS_PATH;
     if (filePath) {
       try {
-        const jsonString = fs.readFileSync(filePath, 'utf-8');
-        const data = JSON.parse(jsonString);
+        let data = { consoleErrors: [] };
+        if (fs.existsSync(filePath)) {
+          data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+          if (!Array.isArray(data.consoleErrors)) {
+            data.consoleErrors = [];
+          }
+        }
 
         // Checks if the error already exists in the file for the specific test, and if it does. We increment the error count instead of adding it again.
         const duplicateError = data.consoleErrors.find(item => (item.testTitle === error.testTitle) && (item.errorText === error.errorText));
