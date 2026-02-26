@@ -209,15 +209,35 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
                 _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(structuralMediaTypeIds).GetAwaiter().GetResult();
             }
 
-            // For non-structural changes, just clear the converted content cache
-            if (nonStructuralDocumentTypeIds.Length > 0)
-            {
-                _documentCacheService.ClearConvertedContentCache(nonStructuralDocumentTypeIds);
-            }
+            // Clear the converted content cache for non-structural changes (HybridCache entries remain valid).
+            // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
+            // model types, so we must clear all entries to prevent stale instances of other types
+            // (e.g. Model.Parent<T>()) from being returned. In non-auto modes, only affected types need clearing.
+            var isAutoFactory = _publishedModelFactory is IAutoPublishedModelFactory;
 
-            if (nonStructuralMediaTypeIds.Length > 0)
+            if (isAutoFactory)
             {
-                _mediaCacheService.ClearConvertedContentCache(nonStructuralMediaTypeIds);
+                if (structuralDocumentTypeIds.Length > 0 || nonStructuralDocumentTypeIds.Length > 0)
+                {
+                    _documentCacheService.ClearConvertedContentCache();
+                }
+
+                if (structuralMediaTypeIds.Length > 0 || nonStructuralMediaTypeIds.Length > 0)
+                {
+                    _mediaCacheService.ClearConvertedContentCache();
+                }
+            }
+            else
+            {
+                if (nonStructuralDocumentTypeIds.Length > 0)
+                {
+                    _documentCacheService.ClearConvertedContentCache(nonStructuralDocumentTypeIds);
+                }
+
+                if (nonStructuralMediaTypeIds.Length > 0)
+                {
+                    _mediaCacheService.ClearConvertedContentCache(nonStructuralMediaTypeIds);
+                }
             }
         });
 

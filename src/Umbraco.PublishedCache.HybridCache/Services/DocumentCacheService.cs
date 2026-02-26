@@ -359,18 +359,16 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         var contentTypeIdTags = contentTypeIdsAsArray.Select(ContentTypeIdTag).ToArray();
         await _hybridCache.RemoveByTagAsync(contentTypeIdTags);
 
-        // Clear the in-memory converted content cache, so the entries are re-converted when they're
-        // requested again (triggers a repopulation of the hybrid cache entries).
+        // Clear converted content for the affected types so entries are re-converted when next requested.
         ClearConvertedContentCache(contentTypeIdsAsArray);
     }
 
+    public void ClearConvertedContentCache() => _publishedContentCache.Clear();
+
     public void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds)
     {
-        // Only clear the in-memory converted content cache (_publishedContentCache).
-        // The hybrid cache entries (ContentCacheNode) remain valid since they only store ContentTypeId.
-        // When content is next accessed, it will be re-converted with the updated content type.
-        var contentTypeIdsAsArray = contentTypeIds as int[] ?? contentTypeIds.ToArray();
-        _publishedContentCache.RemoveAll(content => contentTypeIdsAsArray.Contains(content.Value.ContentType.Id));
+        var ids = contentTypeIds as int[] ?? contentTypeIds.ToArray();
+        _publishedContentCache.RemoveAll(content => ids.Contains(content.Value.ContentType.Id));
     }
 
     private async Task ClearPublishedCacheAsync(Guid key)

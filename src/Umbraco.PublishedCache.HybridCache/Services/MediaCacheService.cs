@@ -271,18 +271,16 @@ internal sealed class MediaCacheService : IMediaCacheService
         var mediaTypeIdTags = mediaTypeIdsAsArray.Select(MediaTypeIdTag).ToArray();
         await _hybridCache.RemoveByTagAsync(mediaTypeIdTags);
 
-        // Clear the in-memory converted media cache, so the entries are re-converted when they're
-        // requested again (triggers a repopulation of the hybrid cache entries).
+        // Clear converted media for the affected types so entries are re-converted when next requested.
         ClearConvertedContentCache(mediaTypeIdsAsArray);
     }
 
+    public void ClearConvertedContentCache() => _publishedContentCache.Clear();
+
     public void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds)
     {
-        // Only clear the in-memory converted media cache (_publishedContentCache).
-        // The hybrid cache entries (ContentCacheNode) remain valid since they only store ContentTypeId.
-        // When media is next accessed, it will be re-converted with the updated media type.
-        var mediaTypeIdsAsArray = mediaTypeIds as int[] ?? mediaTypeIds.ToArray();
-        _publishedContentCache.RemoveAll(content => mediaTypeIdsAsArray.Contains(content.Value.ContentType.Id));
+        var ids = mediaTypeIds as int[] ?? mediaTypeIds.ToArray();
+        _publishedContentCache.RemoveAll(content => ids.Contains(content.Value.ContentType.Id));
     }
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)

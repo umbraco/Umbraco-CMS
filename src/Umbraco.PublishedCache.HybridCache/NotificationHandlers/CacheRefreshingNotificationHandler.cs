@@ -87,7 +87,8 @@ internal sealed class CacheRefreshingNotificationHandler :
         }
 
         // For non-structural changes (name, icon, description, new property added),
-        // just clear the converted content cache - HybridCache entries remain valid
+        // just clear the converted content cache - HybridCache entries remain valid.
+        // Selective clearing is safe here because no model factory reset occurs in this handler.
         if (nonStructuralChangeIds.Length > 0)
         {
             _documentCacheService.ClearConvertedContentCache(nonStructuralChangeIds);
@@ -134,7 +135,8 @@ internal sealed class CacheRefreshingNotificationHandler :
         }
 
         // For non-structural changes (name, icon, description, new property added),
-        // just clear the converted content cache - HybridCache entries remain valid
+        // just clear the converted content cache - HybridCache entries remain valid.
+        // Selective clearing is safe here because no model factory reset occurs in this handler.
         if (nonStructuralChangeIds.Length > 0)
         {
             _mediaCacheService.ClearConvertedContentCache(nonStructuralChangeIds);

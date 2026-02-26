@@ -99,16 +99,25 @@ public interface IDocumentCacheService
     Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds);
 
     /// <summary>
-    /// Clears only the converted IPublishedContent cache for content of the specified types,
+    /// Clears all converted IPublishedContent entries from the in-memory cache,
     /// without rebuilding the underlying database cache or HybridCache entries.
     /// </summary>
     /// <remarks>
-    /// Use this for non-structural content type changes (e.g., name, icon, description changes)
-    /// where the underlying content data doesn't need rebuilding. The ContentCacheNode entries
-    /// in HybridCache only store ContentTypeId, so the updated content type will be looked up
-    /// fresh when content is next converted to IPublishedContent.
+    /// Use this when the published model factory is reset (e.g. InMemoryAuto mode), which
+    /// invalidates all compiled model types and makes cached instances of any type stale.
     /// </remarks>
-    /// <param name="contentTypeIds">The IDs of the content types whose content should have their converted cache cleared.</param>
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache() { }
+
+    /// <summary>
+    /// Clears converted IPublishedContent entries for the specified content types from the in-memory cache,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this when the published model factory is NOT reset (e.g. SourceCodeAuto/SourceCodeManual modes),
+    /// so only the affected content types need their converted cache cleared.
+    /// </remarks>
+    /// <param name="contentTypeIds">The IDs of the content types whose converted entries should be cleared.</param>
     // TODO (V18): Remove default implementation.
     void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds) { }
 }

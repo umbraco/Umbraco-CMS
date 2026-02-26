@@ -96,16 +96,25 @@ public interface IMediaCacheService
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 
     /// <summary>
-    /// Clears only the converted IPublishedContent cache for media of the specified types,
+    /// Clears all converted IPublishedContent entries from the in-memory cache,
     /// without rebuilding the underlying database cache or HybridCache entries.
     /// </summary>
     /// <remarks>
-    /// Use this for non-structural media type changes (e.g., name, icon, description changes)
-    /// where the underlying media data doesn't need rebuilding. The ContentCacheNode entries
-    /// in HybridCache only store ContentTypeId, so the updated media type will be looked up
-    /// fresh when media is next converted to IPublishedContent.
+    /// Use this when the published model factory is reset (e.g. InMemoryAuto mode), which
+    /// invalidates all compiled model types and makes cached instances of any type stale.
     /// </remarks>
-    /// <param name="mediaTypeIds">The IDs of the media types whose media should have their converted cache cleared.</param>
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache() { }
+
+    /// <summary>
+    /// Clears converted IPublishedContent entries for the specified media types from the in-memory cache,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this when the published model factory is NOT reset (e.g. SourceCodeAuto/SourceCodeManual modes),
+    /// so only the affected media types need their converted cache cleared.
+    /// </remarks>
+    /// <param name="mediaTypeIds">The IDs of the media types whose converted entries should be cleared.</param>
     // TODO (V18): Remove default implementation.
     void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds) { }
 }
