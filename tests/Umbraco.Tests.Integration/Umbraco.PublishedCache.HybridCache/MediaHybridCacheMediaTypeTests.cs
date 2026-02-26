@@ -23,6 +23,7 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 

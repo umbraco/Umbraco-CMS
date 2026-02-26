@@ -18,6 +18,7 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
@@ -29,7 +30,8 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
     public async Task Can_Get_Draft_Content_By_Id()
     {
         // Act
-        await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
+        var oldTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
+        Assert.IsNotNull(oldTextPage.Value("title"));
 
         ContentType.RemovePropertyType("title");
         await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
