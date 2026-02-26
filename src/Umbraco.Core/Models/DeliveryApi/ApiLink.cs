@@ -5,7 +5,20 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 /// </summary>
 public sealed class ApiLink
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    /// <summary>
+    ///     Creates a link to content.
+    /// </summary>
+    /// <param name="title">The title of the link.</param>
+    /// <param name="queryString">The query string of the link.</param>
+    /// <param name="target">The target attribute of the link (e.g., "_blank").</param>
+    /// <param name="destinationId">The unique identifier of the destination content.</param>
+    /// <param name="destinationType">The content type alias of the destination.</param>
+    /// <param name="route">The route information for the destination content.</param>
+    /// <param name="culture">The optional culture for the link.</param>
+    /// <returns>A new <see cref="ApiLink" /> instance representing a content link.</returns>
+    public static ApiLink Content(string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route, string? culture = null)
+       => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route, culture);
+
     /// <summary>
     ///     Creates a link to content.
     /// </summary>
@@ -16,10 +29,9 @@ public sealed class ApiLink
     /// <param name="destinationType">The content type alias of the destination.</param>
     /// <param name="route">The route information for the destination content.</param>
     /// <returns>A new <see cref="ApiLink" /> instance representing a content link.</returns>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public static ApiLink Content(string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route)
         => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route);
-    public static ApiLink Content(string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route, string? culture = null)
-       => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route, culture);
 
     /// <summary>
     ///     Creates a link to media.
@@ -98,5 +110,8 @@ public sealed class ApiLink
     /// </summary>
     public LinkType LinkType { get; }
 
+    /// <summary>
+    ///     Gets or sets the (optional) culture of the link.
+    /// </summary>
     public string? Culture { get; }
 }

@@ -23,9 +23,10 @@ public sealed partial class HtmlLocalLinkParser
     [GeneratedRegex("""type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetTypePattern();
 
-    [GeneratedRegex("""culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
-                                                              
+    [GeneratedRegex("""data-culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
+
     private static partial Regex GetCulturePattern();
+
     /// <summary>
     ///     Regex pattern to match local link tags with type and href attributes.
     /// </summary>
@@ -57,7 +58,7 @@ public sealed partial class HtmlLocalLinkParser
     [GeneratedRegex(@"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetLocalLinkPattern();
 
-    [GeneratedRegex(@"(<a\b(?=[^>]*data-culture=['""](?<culture>[a-zA-Z0-9-_]+)['""])(?=[^>]*href=['""])[^>]*href=['""])[^""']*[""']", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
+    [GeneratedRegex(@"(<a\b(?=[^>]*data-culture=['""](?<culture>[a-zA-Z0-9-_]+)['""])(?=[^>]*href=['""])[^>]*href=['""])(?<href>[^""']*)(?<closequote>[""'])", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
     private static partial Regex GetLinkPattern();
 
     private static readonly Regex _localLinkTagPattern = GetLocalLinkTagPattern();
@@ -69,6 +70,7 @@ public sealed partial class HtmlLocalLinkParser
     private static readonly Regex _culturePattern = GetCulturePattern();
 
     private static readonly Regex _linkPattern = GetLinkPattern();
+
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
     /// <summary>
@@ -146,9 +148,10 @@ public sealed partial class HtmlLocalLinkParser
         {
             return _linkPattern.Replace(text, match =>
             {
-                if (match.Groups["culture"].Value.Equals(culture, StringComparison.OrdinalIgnoreCase))
+                if (match.Groups["culture"].Value.Equals(culture, StringComparison.OrdinalIgnoreCase)
+                    && match.Groups["href"].Value == tagHref)
                 {
-                    return match.Groups[1].Value + newLink + "\"";
+                    return match.Groups[1].Value + newLink + match.Groups["closequote"].Value;
                 }
                 return match.Value;
             });

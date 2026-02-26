@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 
@@ -529,6 +528,70 @@ public class HtmlLocalLinkParserTests
             var publishedUrlProvider = CreatePublishedUrlProvider(
                 contentUrlProvider,
                 mediaUrlProvider,
+                umbracoContextAccessor);
+
+            var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
+
+            // Act
+            var output = linkParser.EnsureInternalLinks(input);
+
+            // Assert
+            Assert.AreEqual(expected, output);
+        }
+    }
+
+    [Test]
+    public void EnsureInternalLinks_WithCultureAttribute_PassesCultureToUrlProvider()
+    {
+        // Arrange - two links to the same document with different cultures
+        var input =
+            "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"en-US\" title=\"english\">english</a>" +
+            "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"da-DK\" title=\"danish\">danish</a>";
+
+        var expected =
+            "<a href=\"/en-us/my-page\" data-culture=\"en-US\" title=\"english\">english</a>" +
+            "<a href=\"/da-dk/min-side\" data-culture=\"da-DK\" title=\"danish\">danish</a>";
+
+        var contentUrlProvider = new Mock<IUrlProvider>();
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<UrlMode>(),
+                "en-US",
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.AsUrl("/en-us/my-page", "Test Provider"));
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<UrlMode>(),
+                "da-DK",
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.AsUrl("/da-dk/min-side", "Test Provider"));
+
+        var contentType = new PublishedContentType(
+            Guid.NewGuid(),
+            666,
+            "alias",
+            PublishedItemType.Content,
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<PublishedPropertyType>(),
+            ContentVariation.Nothing);
+        var publishedContent = new Mock<IPublishedContent>();
+        publishedContent.Setup(x => x.Id).Returns(1234);
+        publishedContent.Setup(x => x.ContentType).Returns(contentType);
+
+        var umbracoContextAccessor = new TestUmbracoContextAccessor();
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(
+            umbracoContextAccessor: umbracoContextAccessor);
+
+        using (var reference = umbracoContextFactory.EnsureUmbracoContext())
+        {
+            var contentCache = Mock.Get(reference.UmbracoContext.Content);
+            contentCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(publishedContent.Object);
+
+            var publishedUrlProvider = CreatePublishedUrlProvider(
+                contentUrlProvider,
+                new Mock<IMediaUrlProvider>(),
                 umbracoContextAccessor);
 
             var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
