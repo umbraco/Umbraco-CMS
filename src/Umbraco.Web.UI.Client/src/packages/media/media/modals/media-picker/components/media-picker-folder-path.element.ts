@@ -90,7 +90,6 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		requestAnimationFrame(() => {
 			const element = this.getHostElement().shadowRoot!.querySelector('#new-folder') as UUIInputElement;
 			element.focus();
-			element.select();
 		});
 	}
 
@@ -136,7 +135,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onKeypress(e: UUIInputEvent) {
+	#onKeypress(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
 			requestAnimationFrame(() => {
 				const element = this.getHostElement().shadowRoot!.querySelector('#new-folder') as UUIInputElement;
@@ -161,14 +160,13 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				? html`<uui-input
 						id="new-folder"
 						label="enter a name"
-						value="new folder name"
+						placeholder="New folder name"
 						@blur=${this.#addFolder}
 						@keypress=${this.#onKeypress}
-						style="margin-left: var(--uui-size-2);"
 						auto-width></uui-input>`
 				: html`<uui-button label="add folder" compact @click=${this.#focusFolderInput}>
-				<uui-icon name="icon-add" style="--uui-icon-color:inherit;"></uui-icon>
-			</uui-button>`}
+						<uui-icon name="icon-add"></uui-icon>
+					</uui-button>`}
 		</div>`;
 	}
 
@@ -184,6 +182,14 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			}
 			#path uui-input {
 				height: 100%;
+			}
+
+			#new-folder {
+				margin-left: var(--uui-size-2);
+			}
+
+			#path uui-button uui-icon {
+				--uui-icon-color: inherit;
 			}
 		`,
 	];
