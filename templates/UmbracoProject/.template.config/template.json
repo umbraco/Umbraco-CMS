@@ -86,6 +86,28 @@
         ]
       }
     },
+    "PackageManagement": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Central",
+      "displayName": "Package Version Management",
+      "description": "Choose how to manage NuGet package versions",
+      "choices": [
+        {
+          "choice": "PerProject",
+          "displayName": "Per project",
+          "description": "Versions in .csproj (recommended when adding to existing projects)"
+        },
+        {
+          "choice": "Central",
+          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
+        }
+      ]
+    },
+    "UseCPM": {
+      "type": "computed",
+      "value": "(PackageManagement == \"Central\")"
+    },
     "DotnetVersion": {
       "type": "generated",
       "generator": "switch",
@@ -422,27 +444,6 @@
       },
       "replaces": "TELEMETRYID_FROM_TEMPLATE"
     },
-    "PackageManagement": {
-      "type": "parameter",
-      "datatype": "choice",
-      "defaultValue": "Central",
-      "displayName": "Package Version Management",
-      "description": "Choose how to manage NuGet package versions",
-      "choices": [
-        {
-          "choice": "PerProject",
-          "description": "Versions in .csproj (recommended when adding to existing projects)"
-        },
-        {
-          "choice": "Central",
-          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
-        }
-      ]
-    },
-    "UseCPM": {
-      "type": "computed",
-      "value": "(PackageManagement == \"Central\")"
-    }
   },
   "primaryOutputs": [
     {
