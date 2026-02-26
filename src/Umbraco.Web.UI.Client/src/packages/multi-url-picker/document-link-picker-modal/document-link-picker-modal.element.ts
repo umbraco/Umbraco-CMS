@@ -25,6 +25,9 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 	private _selectedCulture?: string | null;
 
 	@state()
+	private _hasSelection = false;
+
+	@state()
 	private _isLanguageDropdownOpen = false;
 
 	@state()
@@ -49,6 +52,10 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 		this.observe(this.#pickerContext.culture, (culture) => {
 			this._selectedCulture = culture;
 		});
+
+		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
+			this._hasSelection = hasSelection;
+		});
 	}
 
 	// Tree Selection
@@ -64,9 +71,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 
 	async #onSubmitModal() {
 		const selectedItemUnique = this.#pickerContext.selection.getSelection()[0];
-		if (!selectedItemUnique) {
-			throw new Error('No item selected');
-		}
+		if (!selectedItemUnique) return;
 
 		this.value = {
 			unique: selectedItemUnique,
@@ -97,6 +102,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 					<uui-button
 						color="positive"
 						look="primary"
+						?disabled=${!this._hasSelection}
 						label=${this.localize.term('general_choose')}
 						@click=${this.#onSubmitModal}></uui-button>
 				</div>
