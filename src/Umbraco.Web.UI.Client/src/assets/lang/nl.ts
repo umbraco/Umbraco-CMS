@@ -1674,6 +1674,7 @@ export default {
 		noLockouts: 'is niet gedeblokkeerd',
 		noPasswordChange: 'Het wachtwoord is niet gewijzigd',
 		confirmNewPassword: 'Bevestig nieuw wachtwoord',
+		confirmPassword: 'Bevestig wachtwoord',
 		changePasswordDescription:
 			"Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en\n      op de knop 'Verander wachtwoord' te klikken\n    ",
 		contentChannel: 'Inhoudskanaal',
