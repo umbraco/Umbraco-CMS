@@ -358,8 +358,8 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	#getResolvedItemUrl(link: UmbLinkPickerLink): string {
 		const baseUrl = link.culture
-			? link.url
-			: (this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? '');
+			? (link.url ?? '')
+			: (this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '');
 		return baseUrl + (link.queryString || '');
 	}
 
