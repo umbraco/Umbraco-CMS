@@ -147,7 +147,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            [Obsolete("Use the non-obsolete version instead. Scheduled for removal in Umbraco 18.")]
+            [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,
@@ -176,9 +176,10 @@ namespace Umbraco.Cms
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                        if (numberOfInstructionsProcessed > 0)
+                        if (lastId > 0 && lastId != previousLastId)
                         {
                             _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
@@ -203,9 +204,10 @@ namespace Umbraco.Cms
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                        if (numberOfInstructionsProcessed > 0)
+                        if (lastId > 0 && lastId != previousLastId)
                         {
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
                         }
