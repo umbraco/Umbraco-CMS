@@ -27,10 +27,14 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
     /// <param name="allowConcurrentLogins">Whether concurrent logins are allowed.</param>
     public static void ConfigureOptions(SecurityStampValidatorOptions options, bool allowConcurrentLogins)
     {
-        // When concurrent logins are not allowed, validate the security stamp on every
-        // cookie-authenticated request so that a second login immediately invalidates
-        // the first session's cookie. Without this, the previous 30-second window allowed
-        // silent re-authentication via the OpenIddict /authorize endpoint.
+        // When concurrent logins are not allowed, set the validation interval to zero
+        // so the security stamp is checked on every cookie-authenticated request. This
+        // ensures a second login immediately invalidates the first session's cookie.
+        // Without this, the default 30-minute interval allows silent re-authentication
+        // via the OpenIddict /authorize endpoint.
+        // Note: ConfigureMemberSecurityStampValidatorOptions overrides this to 30 seconds
+        // for members, since they authenticate directly via cookies with no silent
+        // re-authentication mechanism.
         if (allowConcurrentLogins is false && options.ValidationInterval == new SecurityStampValidatorOptions().ValidationInterval)
         {
             options.ValidationInterval = TimeSpan.Zero;
