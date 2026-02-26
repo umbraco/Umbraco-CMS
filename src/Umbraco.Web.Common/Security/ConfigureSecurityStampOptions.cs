@@ -28,12 +28,13 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
     /// <param name="securitySettings">The <see cref="SecuritySettings" /> options.</param>
     public static void ConfigureOptions(SecurityStampValidatorOptions options, SecuritySettings securitySettings)
     {
-        // Adjust the security stamp validation interval to a shorter duration
-        // when concurrent logins are not allowed and the duration has the default interval value
-        // (currently defaults to 30 minutes), ensuring quicker re-validation.
+        // When concurrent logins are not allowed, validate the security stamp on every
+        // cookie-authenticated request so that a second login immediately invalidates
+        // the first session's cookie. Without this, the previous 30-second window allowed
+        // silent re-authentication via the OpenIddict /authorize endpoint.
         if (securitySettings.AllowConcurrentLogins is false && options.ValidationInterval == new SecurityStampValidatorOptions().ValidationInterval)
         {
-            options.ValidationInterval = TimeSpan.FromSeconds(30);
+            options.ValidationInterval = TimeSpan.Zero;
         }
 
         // When refreshing the principal, ensure custom claims that
