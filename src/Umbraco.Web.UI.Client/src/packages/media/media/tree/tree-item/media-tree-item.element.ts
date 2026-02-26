@@ -1,10 +1,9 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
 import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
-import { css, html, customElement, nothing, classMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, classMap, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
-const elementName = 'umb-media-tree-item';
-@customElement(elementName)
+@customElement('umb-media-tree-item')
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
 	public override set api(value: UmbMediaTreeItemContext | undefined) {
 		// Observe noAccess from context and update base class property (_noAccess).
@@ -14,14 +13,13 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	override renderIconContainer() {
-		const icon = this.item?.mediaType.icon;
-
 		return html`
 			<div id="icon-container" slot="icon">
 				<umb-entity-sign-bundle .entityType=${this._item?.entityType} .entityFlags=${this._flags}>
-					${icon
-						? html`<umb-icon id="icon" name="${this._getIconToRender(icon)}"></umb-icon>`
-						: nothing}
+					${when(
+						this.item?.mediaType.icon,
+						(icon) => html`<umb-icon id="icon" name=${this._getIconToRender(icon)}></umb-icon>`,
+					)}
 				</umb-entity-sign-bundle>
 				${this.#renderStateIcon()}
 			</div>
@@ -82,6 +80,6 @@ export { UmbMediaTreeItemElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbMediaTreeItemElement;
+		'umb-media-tree-item': UmbMediaTreeItemElement;
 	}
 }
