@@ -11,7 +11,7 @@ public interface IMetricsConsentService
     ///     Gets the current telemetry consent level.
     /// </summary>
     /// <returns>The current <see cref="TelemetryLevel"/> configured for the system.</returns>
-    TelemetryLevel GetConsentLevel();
+    Task<TelemetryLevel> GetConsentLevel();
 
     /// <summary>
     ///     Sets the telemetry consent level asynchronously.

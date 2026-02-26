@@ -11,5 +11,5 @@ public interface IUsageInformationService
     /// Gets detailed usage information about the Umbraco installation.
     /// </summary>
     /// <returns>A collection of <see cref="UsageInformation"/> objects, or <c>null</c> if unavailable.</returns>
-    IEnumerable<UsageInformation>? GetDetailed();
+    Task<IEnumerable<UsageInformation>?> GetDetailed();
 }

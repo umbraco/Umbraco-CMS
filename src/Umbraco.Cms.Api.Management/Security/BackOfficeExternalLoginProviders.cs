@@ -77,9 +77,9 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
     }
 
     /// <inheritdoc />
-    public void InvalidateSessionsIfExternalLoginProvidersChanged()
+    public async Task InvalidateSessionsIfExternalLoginProvidersChanged()
     {
-        var previousExternalLoginProvidersValue = _keyValueService.GetValue(ExternalLoginProvidersKey);
+        var previousExternalLoginProvidersValue = await _keyValueService.GetValue(ExternalLoginProvidersKey);
         var currentExternalLoginProvidersValue = string.Join("|", _externalLogins.Keys.OrderBy(key => key));
 
         if ((previousExternalLoginProvidersValue ?? string.Empty) != currentExternalLoginProvidersValue)
@@ -89,11 +89,11 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
 
             _externalLoginWithKeyService.PurgeLoginsForRemovedProviders(_externalLogins.Keys);
 
-            _keyValueService.SetValue(ExternalLoginProvidersKey, currentExternalLoginProvidersValue);
+            await _keyValueService.SetValue(ExternalLoginProvidersKey, currentExternalLoginProvidersValue);
         }
         else if (previousExternalLoginProvidersValue is null)
         {
-            _keyValueService.SetValue(ExternalLoginProvidersKey, string.Empty);
+            await _keyValueService.SetValue(ExternalLoginProvidersKey, string.Empty);
         }
     }
 }

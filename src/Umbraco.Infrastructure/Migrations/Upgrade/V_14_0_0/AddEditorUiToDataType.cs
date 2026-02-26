@@ -26,7 +26,7 @@ public class AddEditorUiToDataType : MigrationBase
 
     protected override void Migrate()
     {
-        var dataEditorSplitCollectionData = _keyValueService.GetValue("migrateDataEditorSplitCollectionData");
+        var dataEditorSplitCollectionData = _keyValueService.GetValue("migrateDataEditorSplitCollectionData").GetAwaiter().GetResult();
         DataTypeEditorAliasMigrationData[]? migrationData = dataEditorSplitCollectionData.IsNullOrWhiteSpace() is false
             ? _jsonSerializer.Deserialize<DataTypeEditorAliasMigrationData[]>(dataEditorSplitCollectionData)
             : null;

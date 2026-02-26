@@ -58,7 +58,7 @@ public class Upgrader
             throw new ArgumentNullException(nameof(keyValueService));
         }
 
-        string initialState = GetInitialState(scopeProvider, keyValueService);
+        string initialState = await GetInitialState(scopeProvider, keyValueService);
 
         ExecutedMigrationPlan result = await migrationPlanExecutor.ExecutePlanAsync(Plan, initialState).ConfigureAwait(false);
 
@@ -80,10 +80,10 @@ public class Upgrader
         return result;
     }
 
-    private string GetInitialState(ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
+    private async Task<string> GetInitialState(ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
     {
         using ICoreScope scope = scopeProvider.CreateCoreScope();
-        var currentState = keyValueService.GetValue(StateValueKey);
+        var currentState = await keyValueService.GetValue(StateValueKey);
         scope.Complete();
 
         if (currentState is null || Plan.IgnoreCurrentState)

@@ -56,22 +56,22 @@ public class DatabaseUpgradeStep : StepBase, IInstallStep, IUpgradeStep
 
     public Task<bool> RequiresExecutionAsync() => ShouldExecute();
 
-    private Task<bool> ShouldExecute()
+    private async Task<bool> ShouldExecute()
     {
         // Don't do anything if RunTimeLevel is not Install/Upgrade
         if (_runtime.Level == RuntimeLevel.Run)
         {
-            return Task.FromResult(false);
+            return await Task.FromResult(false);
         }
 
         // Check the upgrade state, if it matches we dont have to upgrade.
         var plan = new UmbracoPlan(_umbracoVersion);
-        var currentState = _keyValueService.GetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name);
+        var currentState = await _keyValueService.GetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name);
         if (currentState != plan.FinalState)
         {
-            return Task.FromResult(true);
+            return await Task.FromResult(true);
         }
 
-        return Task.FromResult(false);
+        return await Task.FromResult(false);
     }
 }

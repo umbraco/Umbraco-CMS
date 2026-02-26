@@ -40,9 +40,9 @@ public class MetricsConsentService : IMetricsConsentService
     }
 
     /// <inheritdoc />
-    public TelemetryLevel GetConsentLevel()
+    public async Task<TelemetryLevel> GetConsentLevel()
     {
-        var analyticsLevelString = _keyValueService.GetValue(Key);
+        var analyticsLevelString = await _keyValueService.GetValue(Key);
 
         if (analyticsLevelString is null ||
             Enum.TryParse(analyticsLevelString, out TelemetryLevel analyticsLevel) is false)
