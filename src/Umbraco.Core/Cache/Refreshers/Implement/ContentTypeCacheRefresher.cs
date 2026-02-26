@@ -179,26 +179,22 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             // Structural changes require a full memory cache rebuild, while non-structural changes
             // only need the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
             var structuralDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsStructuralChange())
                 .Select(x => x.Id)
                 .ToArray();
 
             var nonStructuralDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType)
-                            && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther)
-                            && !x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsNonStructuralChange())
                 .Select(x => x.Id)
                 .ToArray();
 
             var structuralMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsStructuralChange())
                 .Select(x => x.Id)
                 .ToArray();
 
             var nonStructuralMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType)
-                            && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther)
-                            && !x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsNonStructuralChange())
                 .Select(x => x.Id)
                 .ToArray();
 

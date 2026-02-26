@@ -65,13 +65,12 @@ internal sealed class CacheRefreshingNotificationHandler :
         // Structural changes require a full rebuild, while non-structural changes only need
         // the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
         var structuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+            .Where(x => x.ChangeTypes.IsStructuralChange())
             .Select(x => x.Item.Id)
             .ToArray();
 
         var nonStructuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther)
-                        && !x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+            .Where(x => x.ChangeTypes.IsNonStructuralChange())
             .Select(x => x.Item.Id)
             .ToArray();
 
@@ -113,13 +112,12 @@ internal sealed class CacheRefreshingNotificationHandler :
         // Structural changes require a full rebuild, while non-structural changes only need
         // the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
         var structuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+            .Where(x => x.ChangeTypes.IsStructuralChange())
             .Select(x => x.Item.Id)
             .ToArray();
 
         var nonStructuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther)
-                        && !x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+            .Where(x => x.ChangeTypes.IsNonStructuralChange())
             .Select(x => x.Item.Id)
             .ToArray();
 
