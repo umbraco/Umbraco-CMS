@@ -443,7 +443,7 @@
         "defaultFormat": "d"
       },
       "replaces": "TELEMETRYID_FROM_TEMPLATE"
-    },
+    }
   },
   "primaryOutputs": [
     {

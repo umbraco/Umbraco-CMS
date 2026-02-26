@@ -112,7 +112,7 @@
       "datatype": "string",
       "defaultValue": "https://localhost:5000",
       "replaces": "https://localhost:44339"
-    },
+    }
   },
   "forms": {
     "removePunctuation": {
