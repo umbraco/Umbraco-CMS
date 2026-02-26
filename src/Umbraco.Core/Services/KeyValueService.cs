@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -11,14 +12,14 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class KeyValueService : IKeyValueService
 {
     private readonly IKeyValueRepository _repository;
-    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IScopeProvider _scopeProvider;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="KeyValueService" /> class.
     /// </summary>
     /// <param name="scopeProvider">The core scope provider.</param>
     /// <param name="repository">The key-value repository.</param>
-    public KeyValueService(ICoreScopeProvider scopeProvider, IKeyValueRepository repository)
+    public KeyValueService(IScopeProvider scopeProvider, IKeyValueRepository repository)
     {
         _scopeProvider = scopeProvider;
         _repository = repository;
@@ -27,7 +28,7 @@ internal sealed class KeyValueService : IKeyValueService
     /// <inheritdoc />
     public async Task<string?> GetValue(string key)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateScope();
 
         IKeyValue? value = await _repository.GetAsync(key, CancellationToken.None);
         return value?.Value;
@@ -36,7 +37,7 @@ internal sealed class KeyValueService : IKeyValueService
     /// <inheritdoc />
     public async Task<Attempt<IReadOnlyDictionary<string, string?>?, KeyValueOperationStatus>> FindByKeyPrefix(string keyPrefix)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateScope();
 
         IReadOnlyDictionary<string, string?>? dict = await _repository.FindByKeyPrefix(keyPrefix);
         return Attempt.SucceedWithStatus(KeyValueOperationStatus.Success, dict);
@@ -45,7 +46,7 @@ internal sealed class KeyValueService : IKeyValueService
     /// <inheritdoc />
     public async Task<Attempt<KeyValueOperationStatus>> SetValue(string key, string value)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         scope.WriteLock(Constants.Locks.KeyValues);
 
         IKeyValue? keyValue = await _repository.GetAsync(key, CancellationToken.None);
@@ -80,7 +81,7 @@ internal sealed class KeyValueService : IKeyValueService
     /// <inheritdoc />
     public async Task<Attempt<bool, KeyValueOperationStatus>> TrySetValue(string key, string originalValue, string newValue)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateScope();
         scope.WriteLock(Constants.Locks.KeyValues);
 
         IKeyValue? keyValue = await _repository.GetAsync(key, CancellationToken.None);
