@@ -37,11 +37,11 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTestBase
     {
-        private static readonly Dictionary<string, WebApplicationFactory<UmbracoTestServerTestBase>> _factoryCache = new();
+        private static readonly Dictionary<string, IWebApplicationFactoryAdapter> _factoryCache = new();
 
         protected HttpClient Client { get; private set; }
 
-        protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
+        protected IWebApplicationFactoryAdapter Factory { get; private set; }
 
         protected IServiceProvider Services => Factory?.Services;
 
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             });
         }
 
-        private WebApplicationFactory<UmbracoTestServerTestBase> CreateNewFactory()
+        private IWebApplicationFactoryAdapter CreateNewFactory()
         {
             /*
              * It's worth noting that our usage of WebApplicationFactory is non-standard,
@@ -120,7 +120,13 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              *
              * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
              */
-            return new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder)
+
+            var adapterType = typeof(WebApplicationFactoryAdapter<>);
+            var genericAdapterType = adapterType.MakeGenericType(GetType());
+            var factoryCtor = genericAdapterType.GetConstructor([typeof(Func<IHostBuilder>), typeof(Action<IWebHostBuilder>)])!;
+
+            /*
+            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder)
                 .WithWebHostBuilder(builder =>
                 {
                     builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
@@ -130,6 +136,21 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                         CustomTestAuthSetup(services);
                     });
                 });
+            */
+
+            Func<IHostBuilder> createHostBuilder = CreateHostBuilder;
+
+            Action<IWebHostBuilder> webHostConfig = builder =>
+            {
+                builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
+                    CustomTestAuthSetup(services);
+                });
+            };
+
+            return (IWebApplicationFactoryAdapter)factoryCtor.Invoke([createHostBuilder, webHostConfig]);
         }
 
         [TearDown]
