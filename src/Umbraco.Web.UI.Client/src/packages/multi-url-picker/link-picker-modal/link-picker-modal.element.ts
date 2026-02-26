@@ -5,18 +5,7 @@ import type {
 	UmbLinkPickerModalData,
 	UmbLinkPickerModalValue,
 } from './link-picker-modal.token.js';
-import {
-	createRef,
-	css,
-	customElement,
-	html,
-	nothing,
-	query,
-	ref,
-	state,
-	when,
-	type Ref,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import {
 	umbBindToValidation,
 	UmbObserveValidationStateController,
@@ -373,15 +362,13 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		`;
 	}
 
-	#entityItemRef: Ref<HTMLInputElement> = createRef();
-
 	#renderDocumentPicker() {
 		return html`
 			<umb-property-layout
 				?hidden=${!this.value.link.unique || this.value.link.type !== 'document' || !this._documentItem}
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('general_content')}>
-				<umb-entity-item-ref slot="editor" .item=${this._documentItem} ${ref(this.#entityItemRef)} standalone>
+				<umb-entity-item-ref slot="editor" .item=${this._documentItem} standalone>
 					<uui-action-bar slot="actions">
 						<uui-button
 							label=${this.localize.term('general_remove')}

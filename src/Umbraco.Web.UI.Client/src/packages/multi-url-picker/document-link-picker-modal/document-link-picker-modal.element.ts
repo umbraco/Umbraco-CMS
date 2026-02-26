@@ -5,8 +5,7 @@ import type {
 import { UmbDocumentLinkPickerContext } from './document-link-picker.context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
-import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
@@ -141,7 +140,6 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 		const target = event.target as any;
 		const value = target?.value as string;
 		this.#pickerContext.setCulture(!value || value === EMPTY_VALUE ? null : value);
-		this._languagePopoverElement?.hidePopover();
 	}
 
 	static override styles = [
