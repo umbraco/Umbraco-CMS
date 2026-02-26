@@ -205,8 +205,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add($"DELETE FROM {QuoteTableName(ContentVersionCleanupPolicyDto.TableName)} WHERE {QuoteColumnName(ContentVersionCleanupPolicyDto.PrimaryKeyName)} = @id");
-        l.Add($"DELETE FROM {QuoteTableName(ContentTypeTemplateDto.TableName)} WHERE {QuoteColumnName(ContentTypeTemplateDto.PrimaryKeyName)} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentVersionCleanupPolicyDto.TableName)} WHERE {QuoteColumnName(ContentVersionCleanupPolicyDto.PrimaryKeyColumnName)} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentTypeTemplateDto.TableName)} WHERE {QuoteColumnName(ContentTypeTemplateDto.ContentTypeNodeIdColumnName)} = @id");
         l.Add($"DELETE FROM {QuoteTableName(ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeDto.NodeIdColumnName)} = @id");
         l.Add($"DELETE FROM {QuoteTableName(NodeDto.TableName)} WHERE {QuoteColumnName(NodeDto.PrimaryKeyColumnName)} = @id");
         return l;

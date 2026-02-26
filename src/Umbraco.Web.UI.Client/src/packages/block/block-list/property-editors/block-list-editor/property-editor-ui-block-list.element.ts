@@ -483,7 +483,8 @@ export class UmbPropertyEditorUIBlockListElement
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
-				?disabled=${this.readonly}>
+				?disabled=${this.readonly}
+				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
