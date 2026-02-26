@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
@@ -10,9 +11,11 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    partial class UmbracoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260226121558_AddKeyValueDto")]
+    partial class AddKeyValueDto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.2");

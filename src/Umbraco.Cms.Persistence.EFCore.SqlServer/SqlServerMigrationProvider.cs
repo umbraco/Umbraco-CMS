@@ -46,6 +46,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.UpdateOpenIddictToV7 => typeof(Migrations.UpdateOpenIddictToV7),
             EFCoreMigration.AddWebhookDto => typeof(Migrations.AddWebhookDto),
             EFCoreMigration.AddLastSyncedDto => typeof(Migrations.AddLastSyncedDto),
+            EFCoreMigration.AddKeyValueDto => typeof(Migrations.AddKeyValueDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }
