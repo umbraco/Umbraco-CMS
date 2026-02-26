@@ -203,15 +203,35 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
         {
-            IEnumerable<int> documentTypeIds = removedContentTypes
+            var documentTypeIds = removedContentTypes
                 .Where(x => x.ItemType == PublishedItemType.Content)
-                .Select(x => x.Id);
+                .Select(x => x.Id)
+                .ToArray();
             _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
 
-            IEnumerable<int> mediaTypeIds = removedContentTypes
+            var mediaTypeIds = removedContentTypes
                 .Where(x => x.ItemType == PublishedItemType.Media)
-                .Select(x => x.Id);
+                .Select(x => x.Id)
+                .ToArray();
             _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
+
+            // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
+            // model types, so we must clear all converted content entries — not just the rebuilt types —
+            // to prevent stale instances of other types (e.g. Model.Parent<T>()) from being returned.
+            // RebuildMemoryCacheByContentTypeAsync already clears selectively for the affected types,
+            // but the full clear is needed for all other types whose models were also invalidated.
+            if (_publishedModelFactory is IAutoPublishedModelFactory)
+            {
+                if (documentTypeIds.Length > 0)
+                {
+                    _documentCacheService.ClearConvertedContentCache();
+                }
+
+                if (mediaTypeIds.Length > 0)
+                {
+                    _mediaCacheService.ClearConvertedContentCache();
+                }
+            }
         });
         base.Refresh(payloads);
     }
