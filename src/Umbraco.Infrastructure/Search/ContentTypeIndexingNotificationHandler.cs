@@ -23,7 +23,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     private readonly IMemberTypeService _memberTypeService;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
-    private IndexingSettings _indexingSettings;
+    private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
 
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public ContentTypeIndexingNotificationHandler(
@@ -59,12 +59,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
         _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         _publishStatusQueryService = publishStatusQueryService;
-        _indexingSettings = indexingSettings.CurrentValue;
-
-        indexingSettings.OnChange(change =>
-        {
-            _indexingSettings = change;
-        });
+        _indexingSettings = indexingSettings;
     }
 
     /// <summary>
@@ -139,7 +134,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshMemberOfMemberTypes(int[] memberTypeIds)
     {
-        var pageSize = _indexingSettings.BatchSize;
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
 
         IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(memberTypeIds);
         foreach (IMemberType memberType in memberTypes)
@@ -168,7 +163,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshMediaOfMediaTypes(int[] mediaTypeIds)
     {
-        var pageSize = _indexingSettings.BatchSize;
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
         var page = 0;
         var total = long.MaxValue;
         while (page * pageSize < total)
@@ -192,7 +187,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshContentOfContentTypes(int[] contentTypeIds)
     {
-        var pageSize = _indexingSettings.BatchSize;
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
         var page = 0;
         var total = long.MaxValue;
         while (page * pageSize < total)
