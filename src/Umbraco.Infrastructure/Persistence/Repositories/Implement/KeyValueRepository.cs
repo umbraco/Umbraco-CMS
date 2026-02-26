@@ -96,10 +96,12 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
             KeyValueDto? dto = Map(entity);
             if (dto is not null)
             {
-                db.KeyValue
-                    .Update(dto);
-
-                await db.SaveChangesAsync();
+                await db.UpsertAsync(dto, () =>
+                    db.KeyValue
+                        .Where(x => x.Key == dto.Key)
+                        .ExecuteUpdateAsync(setter => setter
+                            .SetProperty(x => x.Value, dto.Value)
+                            .SetProperty(x => x.UpdateDate, dto.UpdateDate)));
             }
         });
 
