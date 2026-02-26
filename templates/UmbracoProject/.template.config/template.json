@@ -94,13 +94,13 @@
       "description": "Choose how to manage NuGet package versions",
       "choices": [
         {
+          "choice": "Central",
+          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
+        },
+        {
           "choice": "PerProject",
           "displayName": "Per project",
           "description": "Versions in .csproj (recommended when adding to existing projects)"
-        },
-        {
-          "choice": "Central",
-          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
         }
       ]
     },
