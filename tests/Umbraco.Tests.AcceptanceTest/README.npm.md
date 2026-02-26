@@ -10,6 +10,37 @@ This package provides API helpers, UI helpers, and JSON model builders to simpli
 npm install -D @umbraco/acceptance-test-helpers
 ```
 
+## Configuration
+
+The test helpers need to know how to connect and authenticate with your Umbraco instance. Set these environment variables before running your tests:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `URL` | No | `https://localhost:44339` | Base URL of the Umbraco instance |
+| `UMBRACO_USER_LOGIN` | Yes | — | Backoffice superadmin email |
+| `UMBRACO_USER_PASSWORD` | Yes | — | Backoffice superadmin password |
+| `STORAGE_STATE_PATH` | Recommended | — | Path to Playwright auth storage state JSON (should match `storageState` in your `playwright.config`). The API helpers read tokens from this file for REST calls. Without it, tokens are extracted from the live page context, which is slower and less reliable. |
+| `CONSOLE_ERRORS_PATH` | No | — | Path to a JSON file where browser console errors are collected during test runs. |
+
+You can set them via a `.env` file in your project root (loaded with [dotenv](https://www.npmjs.com/package/dotenv) or similar):
+
+```env
+URL=https://localhost:44339
+UMBRACO_USER_LOGIN=admin@example.com
+UMBRACO_USER_PASSWORD=your-password
+STORAGE_STATE_PATH=./playwright/.auth/user.json
+CONSOLE_ERRORS_PATH=./console-errors.json
+```
+
+Or pass them directly in CI:
+
+```yaml
+env:
+  URL: https://localhost:44339
+  UMBRACO_USER_LOGIN: $(TestUserEmail)
+  UMBRACO_USER_PASSWORD: $(TestUserPassword)
+```
+
 ## Usage
 
 The package exports a custom Playwright `test` fixture that provides two main helper categories:
