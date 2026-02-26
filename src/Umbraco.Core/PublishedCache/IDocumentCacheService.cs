@@ -109,5 +109,6 @@ public interface IDocumentCacheService
     /// fresh when content is next converted to IPublishedContent.
     /// </remarks>
     /// <param name="contentTypeIds">The IDs of the content types whose content should have their converted cache cleared.</param>
-    void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds);
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds) { }
 }

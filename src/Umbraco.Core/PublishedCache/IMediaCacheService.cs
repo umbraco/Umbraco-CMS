@@ -106,5 +106,6 @@ public interface IMediaCacheService
     /// fresh when media is next converted to IPublishedContent.
     /// </remarks>
     /// <param name="mediaTypeIds">The IDs of the media types whose media should have their converted cache cleared.</param>
-    void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds);
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds) { }
 }
