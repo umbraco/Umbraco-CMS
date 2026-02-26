@@ -326,6 +326,28 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("validation_outOfRangeSingleItemMinimum", result.First().ErrorMessage);
     }
 
+    [Test]
+    public void Required_Validator_Fails_When_All_Strings_Are_Empty()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        var value = new[] { string.Empty, "  " };
+        var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
+        Assert.IsNotEmpty(result);
+    }
+
+    [Test]
+    public void Required_Validator_Passes_When_Non_Empty_Strings_Present()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        var value = new[] { string.Empty, "valid@email.com" };
+        var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
+    }
+
     private static object? FromEditor(object? value, int max = 0)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
 

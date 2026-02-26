@@ -73,6 +73,14 @@ public class MultipleTextStringPropertyEditor : DataEditor
         public override IValueFormatValidator FormatValidator => new MultipleTextStringFormatValidator();
 
         /// <summary>
+        /// A custom <see cref="IValueRequiredValidator" /> is used to evaluate "required" against the count of non-empty
+        /// strings, consistent with how <see cref="FromEditor"/> filters empty/whitespace strings before persistence.
+        /// Without this, the default <see cref="RequiredValidator"/> would call <c>ToString()</c> on the array
+        /// (yielding <c>"System.String[]"</c>) and incorrectly pass the required check.
+        /// </summary>
+        public override IValueRequiredValidator RequiredValidator => new MultipleTextStringRequiredValidator();
+
+        /// <summary>
         /// The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the
         /// string.
         /// </summary>
@@ -142,6 +150,27 @@ public class MultipleTextStringPropertyEditor : DataEditor
             }
 
             return [];
+        }
+    }
+
+    /// <summary>
+    /// A custom <see cref="IValueRequiredValidator" /> that treats an array of empty/whitespace-only strings as "no value",
+    /// consistent with how <see cref="MultipleTextStringPropertyValueEditor.FromEditor"/> filters them before persistence.
+    /// </summary>
+    internal sealed class MultipleTextStringRequiredValidator : IValueRequiredValidator
+    {
+        private static readonly RequiredValidator _defaultValidator = new();
+
+        /// <inheritdoc/>
+        public IEnumerable<ValidationResult> ValidateRequired(object? value, string valueType)
+        {
+            if (value is IEnumerable<string> strings && strings.Any(s => string.IsNullOrWhiteSpace(s) is false) is false)
+            {
+                // All strings are empty/whitespace — treat as no value.
+                return _defaultValidator.ValidateRequired(null, valueType);
+            }
+
+            return _defaultValidator.ValidateRequired(value, valueType);
         }
     }
 
