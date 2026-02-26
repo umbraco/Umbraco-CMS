@@ -39,7 +39,7 @@
   <!--#endif -->
 
   <ItemGroup>
-    <!-- Dont include the client folder as part of packaging nuget build -->
+    <!-- Don't include the client folder as part of packaging nuget build -->
     <Content Remove="Client\**" />
 
     <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->
