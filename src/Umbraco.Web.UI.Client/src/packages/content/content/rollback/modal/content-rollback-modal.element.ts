@@ -96,9 +96,17 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				throw new Error('Entity unique is not set');
 			}
 
+			if (!this.manifest?.meta?.detailRepositoryAlias) {
+				throw new Error('detailRepositoryAlias is not configured in the modal manifest meta.');
+			}
+
+			if (!this.manifest?.meta?.rollbackRepositoryAlias) {
+				throw new Error('rollbackRepositoryAlias is not configured in the modal manifest meta.');
+			}
+
 			const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<UmbContentDetailModel>>(
 				this,
-				this.manifest!.meta.detailRepositoryAlias,
+				this.manifest.meta.detailRepositoryAlias,
 			);
 
 			const { data } = await detailRepository.requestByUnique(unique);
@@ -127,7 +135,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 			this.#rollbackRepository = await createExtensionApiByAlias<UmbRollbackRepository>(
 				this,
-				this.manifest!.meta.rollbackRepositoryAlias,
+				this.manifest.meta.rollbackRepositoryAlias,
 			);
 
 			this.#requestVersions();
