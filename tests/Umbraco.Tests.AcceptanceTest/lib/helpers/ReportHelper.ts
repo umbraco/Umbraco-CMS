@@ -1,6 +1,5 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {TestInfo} from "@playwright/test";
-import fetch from "node-fetch";
 
 export class ReportHelper {
   api: ApiHelpers

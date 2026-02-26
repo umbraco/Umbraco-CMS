@@ -1,16 +1,14 @@
-import camelize from 'camelize';
-
 export class AliasHelper {
   /**
-   * Uses Camelize npm library to generate a safe alias from a string
-   * that may contain spaces and dashes etc
+   * Generates a safe alias from a string that may contain spaces and dashes etc.
+   * Camelizes the input and wraps it with 'a' prefix and suffix.
    *
    * @param  {string} text Input string
    * @returns {string} A camelcased string that starts with 'a' and ends with 'a'
-   * @see {@link https://www.npmjs.com/package/camelize}
    */
   static toSafeAlias(text: string): string {
-    return 'a' + camelize(text) + 'a';
+    const camelized = text.replace(/[_.\-](\w|$)/g, (_, c) => c.toUpperCase());
+    return 'a' + camelized + 'a';
   }
 
   /**
