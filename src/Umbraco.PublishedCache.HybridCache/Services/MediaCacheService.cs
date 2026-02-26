@@ -290,15 +290,6 @@ internal sealed class MediaCacheService : IMediaCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _databaseCacheRepository.Rebuild(mediaTypeIds: contentTypeIds.ToList());
         scope.Complete();
-
-        // TODO KJA: this should be removed? it is also called by ContentTypeCacheRefresher, so it executes twice (on the publisher instance)
-        // RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
-
-        // Clear the entire published content cache.
-        // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a media item,
-        // an elements within the media item, an ancestor, or a composition.
-        // TODO KJA: this should be removed? RebuildMemoryCacheByContentTypeAsync flushes for each content type
-        // _publishedContentCache.Clear();
     }
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
