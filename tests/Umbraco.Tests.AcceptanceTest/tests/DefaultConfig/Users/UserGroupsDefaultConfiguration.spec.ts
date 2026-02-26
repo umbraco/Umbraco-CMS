@@ -192,7 +192,7 @@ test('the default configuration of Translators data is correct', {tag: '@release
     "Umb.Document.Read",
   ];
   const fallbackElementPermissions = [
-    "Umb.Document.Update",
+    "Umb.Element.Update",
     "Umb.Element.Read",
   ];
   const granularPermissions: string[] = [];
