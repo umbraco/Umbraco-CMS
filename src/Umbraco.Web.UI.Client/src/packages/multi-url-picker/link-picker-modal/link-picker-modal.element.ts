@@ -61,6 +61,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	#variantContext = new UmbVariantContext(this).inherit();
 	#documentItemDataResolver?: UmbDocumentItemDataResolver<UmbDocumentItemModel>;
+	#documentItemRepository?: UmbDocumentItemRepository;
+	#documentUrlRepository?: UmbDocumentUrlRepository;
+	#documentUrlsDataResolver?: UmbDocumentUrlsDataResolver;
+	#mediaItemRepository?: UmbMediaItemRepository;
+	#mediaUrlRepository?: UmbMediaUrlRepository;
 
 	constructor() {
 		super();
@@ -190,6 +195,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				case 'document': {
 					await this.#loadPickedDocumentItem(unique);
 					if (this._documentItem) {
+						this.#documentItemDataResolver?.destroy();
 						this.#documentItemDataResolver = new UmbDocumentItemDataResolver(this);
 						this.#documentItemDataResolver.setData(this._documentItem);
 						icon = await this.#documentItemDataResolver.getIcon();
@@ -199,8 +205,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					break;
 				}
 				case 'media': {
-					const mediaRepository = new UmbMediaItemRepository(this);
-					const { data: mediaData } = await mediaRepository.requestItems([unique]);
+					this.#mediaItemRepository ??= new UmbMediaItemRepository(this);
+					const { data: mediaData } = await this.#mediaItemRepository.requestItems([unique]);
 					const mediaItem = mediaData?.[0];
 					if (mediaItem) {
 						icon = mediaItem.mediaType.icon;
@@ -230,25 +236,26 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	async #loadPickedDocumentItem(unique: string) {
-		const documentRepository = new UmbDocumentItemRepository(this);
-		const { data: documentItems } = await documentRepository.requestItems([unique]);
+		this.#documentItemRepository ??= new UmbDocumentItemRepository(this);
+		const { data: documentItems } = await this.#documentItemRepository.requestItems([unique]);
 		this._documentItem = documentItems?.[0];
 	}
 
 	async #getUrlForDocument(unique: string) {
-		const documentUrlRepository = new UmbDocumentUrlRepository(this);
-		const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
+		this.#documentUrlRepository ??= new UmbDocumentUrlRepository(this);
+		const { data: documentUrlData } = await this.#documentUrlRepository.requestItems([unique]);
 		const urlsItem = documentUrlData?.[0];
 
-		const dataResolver = new UmbDocumentUrlsDataResolver(this);
-		dataResolver.setData(urlsItem?.urls);
-		const resolvedUrls = await dataResolver.getUrls();
+		this.#documentUrlsDataResolver?.destroy();
+		this.#documentUrlsDataResolver = new UmbDocumentUrlsDataResolver(this);
+		this.#documentUrlsDataResolver.setData(urlsItem?.urls);
+		const resolvedUrls = await this.#documentUrlsDataResolver.getUrls();
 		return resolvedUrls?.[0]?.url ?? '';
 	}
 
 	async #getUrlForMedia(unique: string) {
-		const mediaUrlRepository = new UmbMediaUrlRepository(this);
-		const { data: mediaUrlData } = await mediaUrlRepository.requestItems([unique]);
+		this.#mediaUrlRepository ??= new UmbMediaUrlRepository(this);
+		const { data: mediaUrlData } = await this.#mediaUrlRepository.requestItems([unique]);
 		return mediaUrlData?.[0].url ?? '';
 	}
 
