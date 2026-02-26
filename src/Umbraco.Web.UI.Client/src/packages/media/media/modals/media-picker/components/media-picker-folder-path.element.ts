@@ -159,12 +159,15 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			)}${this._typingNewFolder
 				? html`<uui-input
 						id="new-folder"
-						label="enter a name"
-						placeholder="New folder name"
+						label=${this.localize.term('create_enterFolderName')}
+						placeholder=${this.localize.term('create_enterFolderName')}
 						@blur=${this.#addFolder}
 						@keypress=${this.#onKeypress}
 						auto-width></uui-input>`
-				: html`<uui-button label="add folder" compact @click=${this.#focusFolderInput}>
+				: html`<uui-button
+						label=${this.localize.term('visuallyHiddenTexts_createNewFolder')}
+						compact
+						@click=${this.#focusFolderInput}>
 						<uui-icon name="icon-add"></uui-icon>
 					</uui-button>`}
 		</div>`;
