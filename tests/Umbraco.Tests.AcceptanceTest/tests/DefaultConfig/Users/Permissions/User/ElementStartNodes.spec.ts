@@ -96,7 +96,7 @@ test.fixme('see no-access view when deep-linking to restricted element', async (
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-test('can not see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
