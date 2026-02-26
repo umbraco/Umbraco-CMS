@@ -218,6 +218,11 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <returns>The operation status indicating the result of the validation.</returns>
     private async Task<TemplateOperationStatus> ValidateCreateAsync(ITemplate templateToCreate)
     {
+        if (IsProductionMode)
+        {
+            return TemplateOperationStatus.NotAllowedInProductionMode;
+        }
+
         ITemplate? existingTemplate = await GetAsync(templateToCreate.Alias);
         if (existingTemplate is not null)
         {
@@ -549,11 +554,6 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <returns>An attempt result containing the template and operation status.</returns>
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey, string? contentTypeAlias)
     {
-        if (IsProductionMode)
-        {
-            return Attempt.FailWithStatus(TemplateOperationStatus.NotAllowedInProductionMode, template);
-        }
-
         if (IsValidAlias(template.Alias) is false)
         {
             return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
