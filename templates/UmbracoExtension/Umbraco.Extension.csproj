@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <!--#if (UseCPM) -->
-  <!-- Central Package Management - No versions -->
+  <!-- Central package management - no versions -->
   <ItemGroup>
     <PackageReference Include="Umbraco.Cms.Api.Common" />
     <PackageReference Include="Umbraco.Cms.Api.Management" />
@@ -29,7 +29,7 @@
   <!--#endif -->
 
   <!--#if (!UseCPM) -->
-  <!-- Per-project - With versions -->
+  <!-- Per-project - with versions -->
   <ItemGroup>
     <PackageReference Include="Umbraco.Cms.Api.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageReference Include="Umbraco.Cms.Api.Management" Version="UMBRACO_VERSION_FROM_TEMPLATE" />

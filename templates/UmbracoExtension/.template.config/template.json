@@ -39,12 +39,13 @@
       "choices": [
         {
           "choice": "Central",
+          "displayName": "Central package management",
           "description": "Use Directory.Packages.props (recommended for new standalone projects)"
         },
         {
           "choice": "PerProject",
           "displayName": "Per project",
-          "description": "Versions in .csproj (recommended when adding to existing projects)"
+          "description": "Use versions in .csproj (recommended when adding to existing projects)"
         }
       ]
     },
