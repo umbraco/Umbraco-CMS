@@ -276,6 +276,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
 			}
+			umb-badge {
+				--uui-badge-inset: 0 0 auto auto;
+			}
 		`,
 	];
 }

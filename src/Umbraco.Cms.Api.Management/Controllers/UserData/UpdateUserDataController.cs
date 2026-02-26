@@ -33,6 +33,8 @@ public class UpdateUserDataController : UserDataControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Updates user data.")]
+    [EndpointDescription("Updates user-specific data for the current authenticated user.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, UpdateUserDataRequestModel model)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);

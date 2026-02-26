@@ -31,6 +31,8 @@ public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerB
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SavedLogSearchResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of saved log searches.")]
+    [EndpointDescription("Gets a collection of saved log searches defined in the Umbraco installation.")]
     public async Task<ActionResult<PagedViewModel<SavedLogSearchResponseModel>>> AllSavedSearches(
         CancellationToken cancellationToken,
         int skip = 0,

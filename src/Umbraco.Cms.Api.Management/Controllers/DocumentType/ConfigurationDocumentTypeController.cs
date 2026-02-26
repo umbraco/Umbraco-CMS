@@ -20,6 +20,8 @@ public class ConfigurationDocumentTypeController : DocumentTypeControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentTypeConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the document type configuration.")]
+    [EndpointDescription("Gets the configuration settings for document types.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         DocumentTypeConfigurationResponseModel responseModel = _configurationPresentationFactory.CreateDocumentTypeConfigurationResponseModel();

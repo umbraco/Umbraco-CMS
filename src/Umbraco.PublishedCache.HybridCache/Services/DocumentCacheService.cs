@@ -169,6 +169,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
+        _publishedContentCache.Clear();
         await _hybridCache.RemoveByTagAsync(Constants.Cache.Tags.Content, cancellationToken);
 
         // We have to run seeding again after the cache is cleared

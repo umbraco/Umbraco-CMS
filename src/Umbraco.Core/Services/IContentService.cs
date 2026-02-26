@@ -97,7 +97,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <returns>The created content.</returns>
     /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
     /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -374,8 +374,15 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <param name="keys">The content keys.</param>
     /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
+    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 
+    /// <summary>
+    ///     Gets a dictionary of content keys and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
+    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys) => ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
 
     #endregion
 

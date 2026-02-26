@@ -15,9 +15,9 @@ public interface IRequestSegmentService
 ///     Defines a service that retrieves the requested segment from the current HTTP request.
 /// </summary>
 /// <remarks>
-///     This interface is misspelled and will be removed in Umbraco 18. Please use the correct one <see cref="IRequestSegmentService"/>.
+///     This interface is misspelled. Please use the correct one <see cref="IRequestSegmentService"/>. Scheduled for removal in Umbraco 18.
 /// </remarks>
-[Obsolete("This interface is misspelled and will be removed in Umbraco 18. Please use the correct one IRequestSegmentService")]
+[Obsolete("This interface is misspelled. Please use the correct one IRequestSegmentService. Scheduled for removal in Umbraco 18.")]
 public interface IRequestSegmmentService
 {
     /// <summary>

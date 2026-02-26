@@ -83,7 +83,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -1048,7 +1048,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name for the new content type.</param>
     /// <param name="parentId">The parent identifier for the new content type. Use -1 for root.</param>
     /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     public TItem Copy(TItem original, string alias, string name, int parentId = -1)
     {
         TItem? parent = null;
@@ -1071,7 +1071,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name for the new content type.</param>
     /// <param name="parent">The parent content type for the new content type. Use null for root.</param>
     /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     public TItem Copy(TItem original, string alias, string name, TItem? parent)
     {
         if (original == null)
@@ -1132,7 +1132,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="copying">The content type to copy.</param>
     /// <param name="containerId">The identifier of the target container. Use -1 for root.</param>
     /// <returns>An attempt result containing the operation status and the copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1270,7 +1270,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="moving">The content type to move.</param>
     /// <param name="containerId">The identifier of the target container. Use -1 for root.</param>
     /// <returns>An attempt result containing the operation status.</returns>
-    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
+    [Obsolete("Please use MoveAsync. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1467,7 +1467,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name of the container.</param>
     /// <param name="userId">The identifier of the user creating the container.</param>
     /// <returns>An attempt result containing the operation status and the created container.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1514,7 +1514,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="container">The container to save.</param>
     /// <param name="userId">The identifier of the user saving the container.</param>
     /// <returns>An attempt result containing the operation status.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1561,7 +1561,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="containerId">The integer identifier of the container.</param>
     /// <returns>The entity container if found; otherwise, null.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public EntityContainer? GetContainer(int containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1575,7 +1575,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="containerId">The GUID identifier of the container.</param>
     /// <returns>The entity container if found; otherwise, null.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public EntityContainer? GetContainer(Guid containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1589,7 +1589,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="containerIds">The array of container identifiers.</param>
     /// <returns>A collection of entity containers.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1603,7 +1603,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="item">The content type item to get ancestor containers for.</param>
     /// <returns>A collection of ancestor entity containers.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<EntityContainer> GetContainers(TItem item)
     {
         var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
@@ -1620,7 +1620,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name of the containers to find.</param>
     /// <param name="level">The level of the containers in the hierarchy.</param>
     /// <returns>A collection of entity containers matching the criteria.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<EntityContainer> GetContainers(string name, int level)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1635,7 +1635,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="containerId">The identifier of the container to delete.</param>
     /// <param name="userId">The identifier of the user deleting the container.</param>
     /// <returns>An attempt result containing the operation status.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1682,7 +1682,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The new name for the container.</param>
     /// <param name="userId">The identifier of the user renaming the container.</param>
     /// <returns>An attempt result containing the operation status and the renamed container.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();

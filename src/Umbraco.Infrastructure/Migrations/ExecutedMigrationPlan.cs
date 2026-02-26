@@ -61,6 +61,6 @@ public class ExecutedMigrationPlan
     /// </summary>
     public required IReadOnlyList<MigrationPlan.Transition> CompletedTransitions { get; init; }
 
-    [Obsolete("This will be removed in the V13, and replaced with UmbracoPlanExecutedNotification")]
+    [Obsolete("Use UmbracoPlanExecutedNotification instead. Scheduled for removal in Umbraco 18.")]
     internal IReadOnlyList<IMigrationContext> ExecutedMigrationContexts { get; init; } = Array.Empty<IMigrationContext>();
 }

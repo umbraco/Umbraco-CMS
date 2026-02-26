@@ -28,6 +28,8 @@ public class VerifyInviteUserController : UserControllerBase
     [ProducesResponseType(typeof(VerifyInviteUserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Verifies a user invitation.")]
+    [EndpointDescription("Verifies that the invitation token is valid for creating a new user account.")]
     public async Task<IActionResult> Invite(CancellationToken cancellationToken, VerifyInviteUserRequestModel model)
     {
         Attempt<UserOperationStatus> result = await _userService.VerifyInviteAsync(model.User.Id, model.Token);

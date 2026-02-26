@@ -31,6 +31,8 @@ public class CopyMemberTypeController : MemberTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Copies a member type.")]
+    [EndpointDescription("Creates a duplicate of an existing member type identified by the provided Id.")]
     public async Task<IActionResult> Copy(
         CancellationToken cancellationToken,
         Guid id,

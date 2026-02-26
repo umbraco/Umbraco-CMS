@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 public class GettyImages : OEmbedProviderBase
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="GettyImages"/> class.
+    /// Initializes a new instance of the <see cref="GettyImages"/> class.
     /// </summary>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     public GettyImages(IJsonSerializer jsonSerializer)
@@ -16,19 +16,24 @@ public class GettyImages : OEmbedProviderBase
     {
     }
 
-    /// <inheritdoc />
-    public override string ApiEndpoint => "http://embed.gettyimages.com/oembed";
+    /// <inheritdoc/>
+    public override string ApiEndpoint => "https://embed.gettyimages.com/oembed";
 
-    // http://gty.im/74917285
-    // http://www.gettyimages.com/detail/74917285
+    /// <inheritdoc/>
+    /// <example>
+    /// https://gty.im/74917285
+    /// https://www.gettyimages.com/detail/74917285
+    /// </example>
+    public override string[] UrlSchemeRegex =>
+    [
+        @"^https?:\/\/(www\.)?gty\.im\/",
+        @"^https?:\/\/(www\.)?gettyimages\.com\/detail\/",
+    ];
 
-    /// <inheritdoc />
-    public override string[] UrlSchemeRegex => new[] { @"gty\.im/*", @"gettyimages.com\/detail\/*" };
+    /// <inheritdoc/>
+    public override Dictionary<string, string> RequestParams => [];
 
-    /// <inheritdoc />
-    public override Dictionary<string, string> RequestParams => new();
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
         => await GetJsonBasedMarkupAsync(url, maxWidth, maxHeight, cancellationToken);
 }

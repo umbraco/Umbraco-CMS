@@ -718,7 +718,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         return new List<string>
         {
-            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName(User2NodeNotifyDto.NodeIdColumnName)} = @id",
             $"DELETE FROM {QuoteTableName("umbracoUserGroup2Permission")} WHERE {QuoteColumnName("userGroupKey")} {inClause}",
             $"DELETE FROM {QuoteTableName("umbracoUserGroup2GranularPermission")} WHERE {QuoteColumnName("userGroupKey")} {inClause}",
             $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("parentId")} = @id",
@@ -726,7 +726,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             $"DELETE FROM {QuoteTableName("cmsTagRelationship")} WHERE {QuoteColumnName("nodeId")} = @id",
             $"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName("versionId")}" +
                 $" IN (SELECT id FROM {QuoteTableName(ContentVersionDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id)",
-            $"DELETE FROM {QuoteTableName(ExternalLoginToken.TableName)} WHERE {QuoteColumnName("externalLoginId")} =" +
+            $"DELETE FROM {QuoteTableName(ExternalLoginToken.TableName)} WHERE {QuoteColumnName("externalLoginId")} IN" +
                 $" (SELECT id FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
                 $" (SELECT {QuoteColumnName("uniqueId")} from {QuoteTableName(NodeDto.TableName)} where id = @id))",
             $"DELETE FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
