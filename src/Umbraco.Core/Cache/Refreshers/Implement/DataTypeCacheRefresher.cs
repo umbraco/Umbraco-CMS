@@ -207,13 +207,21 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
                 .Where(x => x.ItemType == PublishedItemType.Content)
                 .Select(x => x.Id)
                 .ToArray();
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
 
             var mediaTypeIds = removedContentTypes
                 .Where(x => x.ItemType == PublishedItemType.Media)
                 .Select(x => x.Id)
                 .ToArray();
-            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
+
+            if (documentTypeIds.Length > 0)
+            {
+                _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
+            }
+
+            if (mediaTypeIds.Length > 0)
+            {
+                _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
+            }
 
             // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
             // model types, so we must clear all converted content entries — not just the rebuilt types —
