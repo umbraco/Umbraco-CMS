@@ -49,9 +49,9 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		const result = !query
 			? this._propertyEditorUIs
 			: this._propertyEditorUIs.filter(
-				(propertyEditorUI) =>
-					propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query),
-			);
+					(propertyEditorUI) =>
+						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query),
+				);
 
 		this.#groupPropertyEditorUIs(result);
 	}
@@ -96,13 +96,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	#renderGrid() {
 		return html`
 			${repeat(
-			this._groupedPropertyEditorUIs,
-			(group) => group.key,
-			(group) => html`
+				this._groupedPropertyEditorUIs,
+				(group) => group.key,
+				(group) => html`
 					<h4>${group.key}</h4>
 					${this.#renderGroupItems(group.items)}
 				`,
-		)}
+			)}
 		`;
 	}
 
@@ -110,11 +110,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<ul id="item-grid">
 				${repeat(
-			groupItems,
-			(propertyEditorUI) => propertyEditorUI.alias,
-			(propertyEditorUI) => {
-				const label = this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name);
-				return html`
+					groupItems,
+					(propertyEditorUI) => propertyEditorUI.alias,
+					(propertyEditorUI) => {
+						const label = this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name);
+						return html`
 							<li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
 								<button type="button" @click=${() => this.#handleClick(propertyEditorUI)}>
 									<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
@@ -122,8 +122,8 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 								</button>
 							</li>
 						`;
-			},
-		)}
+					},
+				)}
 			</ul>
 		`;
 	}
@@ -219,7 +219,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 				max-width: 100%;
 				display: -webkit-box;
 				-webkit-line-clamp: 2;
-				-webkit-box-orient: vertical;  
+				-webkit-box-orient: vertical;
 				overflow: hidden;
 			}
 		`,

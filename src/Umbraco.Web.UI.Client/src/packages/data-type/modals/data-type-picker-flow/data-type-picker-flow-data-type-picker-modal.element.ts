@@ -173,6 +173,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				width: 100%;
 				word-break: break-word;
 			}
+
 			.icon {
 				font-size: 2em;
 				margin-bottom: var(--uui-size-space-2);
@@ -187,6 +188,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				width: 100%;
 				height: 100%;
 			}
+
 			#create-button .content {
 				text-align: center;
 				box-sizing: border-box;
@@ -195,17 +197,20 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 				display: grid;
 				grid-template-rows: 40px 1fr;
+
 				height: 100%;
 				width: 100%;
 			}
+
 			#create-button:not(:first-child) {
 				margin-top: var(--uui-size-layout-1);
 			}
+
 			#item-grid .item .label {
 				max-width: 100%;
 				display: -webkit-box;
 				-webkit-line-clamp: 2;
-				-webkit-box-orient: vertical;  
+				-webkit-box-orient: vertical;
 				overflow: hidden;
 			}
 		`,

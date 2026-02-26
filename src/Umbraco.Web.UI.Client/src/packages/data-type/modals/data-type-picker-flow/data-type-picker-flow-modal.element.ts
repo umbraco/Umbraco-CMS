@@ -480,6 +480,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				font-size: 2em;
 				margin-bottom: var(--uui-size-space-2);
 			}
+
 			#item-grid .item .label {
 				max-width: 100%;
 				min-width: 0;
@@ -488,6 +489,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				-webkit-box-orient: vertical;
 				overflow: hidden;
 			}
+
 			.category-name {
 				text-transform: capitalize;
 			}
