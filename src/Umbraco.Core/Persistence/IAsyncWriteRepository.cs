@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core.Persistence;
-
-namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
+﻿namespace Umbraco.Cms.Core.Persistence;
 
 public interface IAsyncWriteRepository<in TEntity> : IRepository
 {
