@@ -316,7 +316,7 @@ export class ApiHelpers {
   }
 
   async readLocalBearerToken() {
-    const filePath = process.env.STORAGE_STAGE_PATH;
+    const filePath = process.env.STORAGE_STATE_PATH;
     if (!filePath) {
       return await this.getBearerToken();
     }
@@ -333,7 +333,7 @@ export class ApiHelpers {
   }
 
   async getLocalIssuedAtTokenTime() {
-    const filePath = process.env.STORAGE_STAGE_PATH;
+    const filePath = process.env.STORAGE_STATE_PATH;
     if (!filePath) {
       return await this.getTokenIssuedTime();
     }
@@ -349,7 +349,7 @@ export class ApiHelpers {
   }
 
   async readLocalCookie() {
-    const filePath = process.env.STORAGE_STAGE_PATH;
+    const filePath = process.env.STORAGE_STATE_PATH;
     if (!filePath) {
       return await this.getCookie();
     }
@@ -409,7 +409,7 @@ export class ApiHelpers {
       }
 
       // Write to file if path exists
-      const filePath = process.env.STORAGE_STAGE_PATH;
+      const filePath = process.env.STORAGE_STATE_PATH;
       if (filePath) {
         const fs = require('fs');
         const fileData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
