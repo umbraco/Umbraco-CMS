@@ -10,7 +10,6 @@ import {
 	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
 	type UmbCollectionItemPickerModalData,
 	type UmbCollectionItemPickerModalValue,
-	type UmbCollectionLayoutConfiguration,
 } from '@umbraco-cms/backoffice/collection';
 import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 import {

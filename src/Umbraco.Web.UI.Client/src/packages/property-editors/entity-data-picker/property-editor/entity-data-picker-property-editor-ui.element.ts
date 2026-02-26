@@ -13,7 +13,6 @@ import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbCollectionLayoutConfiguration } from '@umbraco-cms/backoffice/collection';
 
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
