@@ -1,15 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 
@@ -32,10 +25,6 @@ public interface IWebApplicationFactoryAdapter : IDisposable, IAsyncDisposable
     HttpClient CreateDefaultClient(params DelegatingHandler[] handlers);
 
     HttpClient CreateDefaultClient(Uri baseAddress, params DelegatingHandler[] handlers);
-
-    void Dispose();
-
-    ValueTask DisposeAsync();
 
     TestServer Server { get; }
 
