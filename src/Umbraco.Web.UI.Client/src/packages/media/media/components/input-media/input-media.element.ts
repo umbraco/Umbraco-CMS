@@ -275,6 +275,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		const href = this.readonly ? undefined : `${this._editMediaPath}edit/${item.unique}`;
 		return html`
 			<uui-card-media
+				title=${ifDefined(item.name === null ? undefined : item.name)}
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				data-mark="${item.entityType}:${item.unique}"
 				href="${ifDefined(href)}"

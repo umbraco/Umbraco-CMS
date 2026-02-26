@@ -97,7 +97,7 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	@state()
-	private _createButtonLabel = this.localize.term('content_createEmpty');
+	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -483,7 +483,8 @@ export class UmbPropertyEditorUIBlockListElement
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
-				?disabled=${this.readonly}>
+				?disabled=${this.readonly}
+				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;

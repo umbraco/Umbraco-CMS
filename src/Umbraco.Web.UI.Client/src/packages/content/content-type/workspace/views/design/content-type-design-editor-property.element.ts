@@ -166,7 +166,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			return html`
 				<div id="header">
 					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
-					<p>${this.property.description}</p>
+					<p>${this.property.description ?? ''}</p>
 				</div>
 				<div id="editor">
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
@@ -215,7 +215,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 							data-mark="input:description"
 							id="description-input"
 							placeholder=${this.localize.term('placeholders_enterDescription')}
-							.value=${this.property.description}
+							.value=${this.property.description ?? ''}
 							@input=${(e: CustomEvent) => {
 								if (e.target) this.#singleValueUpdate('description', (e.target as HTMLInputElement).value);
 							}}
