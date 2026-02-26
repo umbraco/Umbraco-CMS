@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -13,5 +12,5 @@ public interface IKeyValueRepository : IAsyncReadWriteRepository<string, IKeyVal
     /// </summary>
     /// <param name="keyPrefix"></param>
     /// <returns></returns>
-    Task<IReadOnlyDictionary<Guid, string?>?> FindByKeyPrefix(string keyPrefix);
+    Task<IReadOnlyDictionary<string, string?>?> FindByKeyPrefix(string keyPrefix);
 }

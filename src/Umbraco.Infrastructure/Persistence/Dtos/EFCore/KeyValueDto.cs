@@ -10,7 +10,7 @@ public class KeyValueDto
     public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
 
-    public Guid Key { get; set; }
+    public required string Key { get; set; }
 
     public string? Value { get; set; }
 

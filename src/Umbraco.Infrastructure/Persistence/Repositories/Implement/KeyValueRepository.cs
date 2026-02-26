@@ -28,12 +28,12 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyDictionary<Guid, string?>?> FindByKeyPrefix(string keyPrefix)
+    public async Task<IReadOnlyDictionary<string, string?>?> FindByKeyPrefix(string keyPrefix)
     {
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            Dictionary<Guid, string?> result = await db.KeyValue
-                .Where(x => x.Key.ToString().StartsWith(keyPrefix))
+            Dictionary<string, string?> result = await db.KeyValue
+                .Where(x => x.Key.StartsWith(keyPrefix))
                 .ToDictionaryAsync(x => x.Key, x => x.Value);
 
             return result;
@@ -114,7 +114,7 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
             return null;
         }
 
-        return new KeyValueDto { Key = Guid.Parse(keyValue.Identifier), Value = keyValue.Value, UpdateDate = keyValue.UpdateDate };
+        return new KeyValueDto { Key = keyValue.Identifier, Value = keyValue.Value, UpdateDate = keyValue.UpdateDate };
     }
 
     private static IKeyValue? Map(KeyValueDto? dto)
@@ -124,7 +124,7 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
             return null;
         }
 
-        return new KeyValue { Identifier = dto.Key.ToString(), Value = dto.Value, UpdateDate = dto.UpdateDate };
+        return new KeyValue { Identifier = dto.Key, Value = dto.Value, UpdateDate = dto.UpdateDate };
     }
 
     #endregion
