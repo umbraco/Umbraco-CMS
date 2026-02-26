@@ -150,8 +150,9 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 // which breaks AllowConcurrentLogins enforcement.
                 if (ctx.ShouldRenew)
                 {
-                    ctx.Properties.IssuedUtc = _timeProvider.GetUtcNow();
-                    ctx.Properties.ExpiresUtc = _timeProvider.GetUtcNow().Add(_globalSettings.TimeOut);
+                    DateTimeOffset now = _timeProvider.GetUtcNow();
+                    ctx.Properties.IssuedUtc = now;
+                    ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
                 }
             },
             OnSigningIn = ctx =>

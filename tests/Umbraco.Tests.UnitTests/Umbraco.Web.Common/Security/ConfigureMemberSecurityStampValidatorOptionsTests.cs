@@ -51,6 +51,20 @@ public class ConfigureMemberSecurityStampValidatorOptionsTests
     }
 
     [Test]
+    public void Preserves_Zero_Interval_When_Explicitly_Set_By_Developer()
+    {
+        // A developer may intentionally set TimeSpan.Zero for per-request validation.
+        // This should not be overridden to 30 seconds.
+        var securitySettings = new SecuritySettings { AllowConcurrentLogins = false };
+        var sut = new ConfigureMemberSecurityStampValidatorOptions(Options.Create(securitySettings));
+        var options = new MemberSecurityStampValidatorOptions { ValidationInterval = TimeSpan.Zero };
+
+        sut.Configure(options);
+
+        Assert.That(options.ValidationInterval, Is.EqualTo(TimeSpan.Zero));
+    }
+
+    [Test]
     public void Configures_OnRefreshingPrincipal_Callback()
     {
         var securitySettings = new SecuritySettings();
