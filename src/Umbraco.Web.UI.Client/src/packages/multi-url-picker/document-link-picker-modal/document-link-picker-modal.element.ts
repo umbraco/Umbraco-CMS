@@ -28,17 +28,11 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 	private _hasSelection = false;
 
 	@state()
-	private _isLanguageDropdownOpen = false;
-
-	@state()
 	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
 		multiple: false,
 		selectable: true,
 		selection: [],
 	};
-
-	@query('#language-dropdown-popover')
-	private _languagePopoverElement?: UUIPopoverContainerElement;
 
 	#pickerContext = new UmbDocumentLinkPickerContext(this);
 
