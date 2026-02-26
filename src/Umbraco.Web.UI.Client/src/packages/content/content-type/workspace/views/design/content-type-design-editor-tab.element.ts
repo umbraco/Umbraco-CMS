@@ -259,7 +259,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	override render() {
 		return html`
 			${
-				this.#containerId
+				this.#containerId !== undefined
 					? html`
 							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
 								<umb-content-type-design-editor-properties
@@ -297,6 +297,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			<uui-button
 				id="btn-add"
 				label=${this.localize.term('contentTypeEditor_addGroup')}
+				data-mark="action:add-group"
 				look="placeholder"
 				@click=${this.#onAddGroup}></uui-button>
 		`;

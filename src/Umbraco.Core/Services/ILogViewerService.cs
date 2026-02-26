@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for viewing and managing application log entries.
+/// </summary>
 public interface ILogViewerService : IService
 {
     /// <summary>

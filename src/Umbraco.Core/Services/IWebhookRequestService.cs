@@ -1,7 +1,14 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing webhook requests.
+/// </summary>
+/// <remarks>
+///     Webhook requests are queued when events occur and are processed asynchronously
+///     to send HTTP callbacks to configured webhook endpoints.
+/// </remarks>
 public interface IWebhookRequestService
 {
     /// <summary>

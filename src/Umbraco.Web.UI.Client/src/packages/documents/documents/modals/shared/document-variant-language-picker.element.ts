@@ -1,4 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import { sortVariants } from '../../utils.js';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
@@ -19,7 +20,13 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	#selectionManager!: UmbSelectionManager<string>;
 
 	@property({ type: Array, attribute: false })
-	variantLanguageOptions: Array<UmbDocumentVariantOptionModel> = [];
+	public get variantLanguageOptions(): Array<UmbDocumentVariantOptionModel> {
+		return this.#variantLanguageOptions;
+	}
+	public set variantLanguageOptions(value: Array<UmbDocumentVariantOptionModel>) {
+		this.#variantLanguageOptions = [...value].sort(sortVariants);
+	}
+	#variantLanguageOptions: Array<UmbDocumentVariantOptionModel> = [];
 
 	@property({ attribute: false })
 	set selectionManager(value: UmbSelectionManager<string>) {

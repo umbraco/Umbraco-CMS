@@ -2,6 +2,9 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains constants related to HttpContext usage.
+    /// </summary>
     public static class HttpContext
     {
         /// <summary>

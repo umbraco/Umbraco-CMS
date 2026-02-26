@@ -15,11 +15,20 @@ public class Stylesheet : File, IStylesheet
 {
     private Lazy<List<StylesheetProperty>>? _properties;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Stylesheet" /> class with a file path.
+    /// </summary>
+    /// <param name="path">The path to the stylesheet file.</param>
     public Stylesheet(string path)
         : this(path, null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Stylesheet" /> class with a file path and content provider.
+    /// </summary>
+    /// <param name="path">The path to the stylesheet file.</param>
+    /// <param name="getFileContent">A function to retrieve the file content lazily.</param>
     public Stylesheet(string path, Func<File, string?>? getFileContent)
         : base(string.IsNullOrEmpty(path) ? path : path.EnsureEndsWith(".css"), getFileContent) =>
         InitializeProperties();
@@ -90,6 +99,9 @@ public class Stylesheet : File, IStylesheet
         }
     }
 
+    /// <summary>
+    /// Initializes or reinitializes the collection of stylesheet properties from the content.
+    /// </summary>
     private void InitializeProperties()
     {
         // if the value is already created, we need to be created and update the collection according to

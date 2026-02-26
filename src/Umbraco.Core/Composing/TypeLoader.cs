@@ -61,7 +61,7 @@ public sealed class TypeLoader
     ///     <para>This is for unit tests.</para>
     /// </remarks>
     // internal for tests
-    [Obsolete("This will be removed in a future version.")]
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     public IEnumerable<Assembly> AssembliesToScan => _assemblies ??= TypeFinder.AssembliesToScan;
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class TypeLoader
     /// </summary>
     /// <remarks>For unit tests.</remarks>
     // internal for tests
-    [Obsolete("This will be removed in a future version.")]
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     public IEnumerable<TypeList> TypeLists => _types.Values;
 
     #region Get Assembly Attributes

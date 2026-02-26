@@ -1103,7 +1103,8 @@ export default {
 	},
 	rollback: {
 		headline: 'Sélectionnez une version à comparer avec la version actuelle',
-		diffHelp: "<del>Le texte rouge</del> sera supprimé dans la version sélectionnée, <ins>le texte vert</ins> sera ajouté.",
+		diffHelp:
+			'<del>Le texte rouge</del> sera supprimé dans la version sélectionnée, <ins>le texte vert</ins> sera ajouté.',
 		showDiff: 'Afficher les différences entre la version actuelle (brouillon) et la version sélectionnée.',
 		documentRolledBack: 'Le document a été restauré à une version antérieure',
 		htmlHelp:
@@ -1612,6 +1613,7 @@ export default {
 		noLockouts: "n'a pas été bloqué",
 		noPasswordChange: "Le mot de passe n'a pas été modifié",
 		confirmNewPassword: 'Confirmez votre nouveau mot de passe',
+		confirmPassword: 'Confirmer le mot de passe',
 		changePasswordDescription:
 			'Vous pouvez changer votre mot de passe d\'accès au backoffice Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"',
 		contentChannel: 'Canal de contenu',

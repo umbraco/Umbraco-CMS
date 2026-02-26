@@ -29,6 +29,8 @@ public class ExportDocumentTypeController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Exports a document type.")]
+    [EndpointDescription("Exports the document type identified by the provided Id to a downloadable format.")]
     public IActionResult Export(
         CancellationToken cancellationToken,
         Guid id)

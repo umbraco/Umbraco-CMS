@@ -31,6 +31,8 @@ public class RenameScriptController : ScriptControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Renames a script.")]
+    [EndpointDescription("Renames a script file to the specified new name.")]
     public async Task<IActionResult> Rename(
         CancellationToken cancellationToken,
         string path,

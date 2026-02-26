@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents the base model for updating a text file's content.
+/// </summary>
 public abstract class TextFileUpdateModel
 {
     /// <summary>
