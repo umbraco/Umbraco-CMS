@@ -40,7 +40,9 @@ internal sealed class HideBackOfficeTokensHandler
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
+#pragma warning disable CS0618 // Type or member is obsolete
     private readonly BackOfficeTokenCookieSettings _backOfficeTokenCookieSettings;
+#pragma warning restore CS0618 // Type or member is obsolete
     private readonly GlobalSettings _globalSettings;
 
     /// <summary>
@@ -53,7 +55,9 @@ internal sealed class HideBackOfficeTokensHandler
     public HideBackOfficeTokensHandler(
         IHttpContextAccessor httpContextAccessor,
         IDataProtectionProvider dataProtectionProvider,
+#pragma warning disable CS0618 // Type or member is obsolete
         IOptions<BackOfficeTokenCookieSettings> backOfficeTokenCookieSettings,
+#pragma warning restore CS0618 // Type or member is obsolete
         IOptions<GlobalSettings> globalSettings)
     {
         _httpContextAccessor = httpContextAccessor;
@@ -173,22 +177,21 @@ internal sealed class HideBackOfficeTokensHandler
 
         HttpContext httpContext = GetHttpContext();
 
-        if (context.Request.Token == RedactedTokenValue)
-        {
-            // Determine which cookie to read based on the token type hint.
-            var cookieName = context.Request.TokenTypeHint == "refresh_token"
-                ? RefreshTokenCookieName
-                : AccessTokenCookieName;
+        // Determine which cookie to read based on the token type hint.
+        var cookieName = context.Request.TokenTypeHint == "refresh_token"
+            ? RefreshTokenCookieName
+            : AccessTokenCookieName;
 
-            if (TryGetCookie(httpContext, cookieName, out var token))
-            {
-                context.Request.Token = token;
-            }
+        if (context.Request.Token == RedactedTokenValue
+            && TryGetCookie(httpContext, cookieName, out var token))
+        {
+            context.Request.Token = token;
         }
         else
         {
-            // Tokens should always be redacted. If we got here, someone might be trying to pass a raw token.
-            // For security reasons, explicitly discard the token (if any) to be on the safe side.
+            // If we got here, either the token was not redacted, or nothing was found in the expected cookie.
+            // If OpenIddict found a token, it could be an old token that is potentially still valid. For security
+            // reasons, we cannot accept that; at this point, we expect the tokens to be explicitly redacted.
             context.Request.Token = null;
         }
 

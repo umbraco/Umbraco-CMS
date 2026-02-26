@@ -536,6 +536,23 @@ internal class HideBackOfficeTokensHandlerTests
         Assert.AreEqual(AccessTokenValue, context.Request.Token);
     }
 
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_RedactedTokenButCookieMissing_NullsToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false); // no cookies
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should be nullified to prevent IDX10400 errors downstream
+        Assert.IsNull(context.Request.Token);
+    }
+
     [TestCase(true, false, TestName = "ExtractRevocationRequest_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
     [TestCase(true, true, TestName = "ExtractRevocationRequest_UseHttpsTrue_HttpsRequest_UsesSecurePrefix")]
     [TestCase(false, true, TestName = "ExtractRevocationRequest_UseHttpsFalse_HttpsRequest_UsesSecurePrefix")]
