@@ -2881,6 +2881,8 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
+		selectLanguageHint: 'Select the language for the link',
+		selectLanguageDefault: "Viewer's language",
 	},
 	missingEditor: {
 		title: 'This property type is no longer available.',
