@@ -223,7 +223,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			type: unique ? type : undefined,
 			unique,
 			url: url ?? this.value.link.url,
-			culture: culture ?? this.value.link.culture,
+			culture,
 		};
 
 		this.#partialUpdateLink(link);
