@@ -18,19 +18,19 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
     private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
 
     [Test]
-    public void Can_Query_For_Key_Prefix()
+    public async Task Can_Query_For_Key_Prefix()
     {
         // Arrange
-        KeyValueService.SetValue("test1", "hello1");
-        KeyValueService.SetValue("test2", "hello2");
-        KeyValueService.SetValue("test3", "hello3");
-        KeyValueService.SetValue("test4", "hello4");
-        KeyValueService.SetValue("someotherprefix1", "helloagain1");
+        await KeyValueService.SetValue("test1", "hello1");
+        await KeyValueService.SetValue("test2", "hello2");
+        await KeyValueService.SetValue("test3", "hello3");
+        await KeyValueService.SetValue("test4", "hello4");
+        await KeyValueService.SetValue("someotherprefix1", "helloagain1");
         // Act
-        var value = KeyValueService.FindByKeyPrefix("test");
+        var attempt = await KeyValueService.FindByKeyPrefix("test");
+        var value = attempt.Result;
 
         // Assert
-
         Assert.AreEqual(4, value.Count);
         Assert.AreEqual("hello1", value["test1"]);
         Assert.AreEqual("hello2", value["test2"]);
@@ -74,13 +74,13 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TrySetValue_ForExistingKeyWithProvidedValue_ReturnsTrueAndSetsValue()
+    public async Task TrySetValue_ForExistingKeyWithProvidedValue_ReturnsTrueAndSetsValue()
     {
         KeyValueService.SetValue("foo", "bar");
 
         // Act
-        var result = KeyValueService.TrySetValue("foo", "bar", "buzz");
-        var value = KeyValueService.GetValue("foo");
+        var result = await KeyValueService.TrySetValue("foo", "bar", "buzz");
+        var value = await KeyValueService.GetValue("foo");
 
         // Assert
         Assert.IsTrue(result);
@@ -88,13 +88,13 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TrySetValue_ForExistingKeyWithoutProvidedValue_ReturnsFalseAndDoesNotSetValue()
+    public async Task TrySetValue_ForExistingKeyWithoutProvidedValue_ReturnsFalseAndDoesNotSetValue()
     {
-        KeyValueService.SetValue("foo", "bar");
+        await KeyValueService.SetValue("foo", "bar");
 
         // Act
-        var result = KeyValueService.TrySetValue("foo", "bang", "buzz");
-        var value = KeyValueService.GetValue("foo");
+        var result = await KeyValueService.TrySetValue("foo", "bang", "buzz");
+        var value = await KeyValueService.GetValue("foo");
 
         // Assert
         Assert.IsFalse(result);
