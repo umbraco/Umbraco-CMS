@@ -25,6 +25,7 @@ internal sealed class HideBackOfficeTokensHandler
     : IOpenIddictServerHandler<OpenIddictServerEvents.ApplyTokenResponseContext>,
         IOpenIddictServerHandler<OpenIddictServerEvents.ApplyAuthorizationResponseContext>,
         IOpenIddictServerHandler<OpenIddictServerEvents.ExtractTokenRequestContext>,
+        IOpenIddictServerHandler<OpenIddictServerEvents.ExtractRevocationRequestContext>,
         IOpenIddictValidationHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>,
         INotificationHandler<UserLogoutSuccessNotification>
 {
@@ -154,6 +155,41 @@ internal sealed class HideBackOfficeTokensHandler
             // If OpenIddict found a refresh token, it could be an old token that is potentially still valid. For security
             // reasons, we cannot accept that; at this point, we expect the refresh tokens to be explicitly redacted.
             context.Request.RefreshToken = null;
+        }
+
+        return ValueTask.CompletedTask;
+    }
+
+    /// <summary>
+    /// This is invoked when a token revocation request is received.
+    /// </summary>
+    public ValueTask HandleAsync(OpenIddictServerEvents.ExtractRevocationRequestContext context)
+    {
+        if (context.Request?.ClientId != Constants.OAuthClientIds.BackOffice)
+        {
+            // Only ever handle the back-office client.
+            return ValueTask.CompletedTask;
+        }
+
+        HttpContext httpContext = GetHttpContext();
+
+        if (context.Request.Token == RedactedTokenValue)
+        {
+            // Determine which cookie to read based on the token type hint.
+            var cookieName = context.Request.TokenTypeHint == "refresh_token"
+                ? RefreshTokenCookieName
+                : AccessTokenCookieName;
+
+            if (TryGetCookie(httpContext, cookieName, out var token))
+            {
+                context.Request.Token = token;
+            }
+        }
+        else
+        {
+            // Tokens should always be redacted. If we got here, someone might be trying to pass a raw token.
+            // For security reasons, explicitly discard the token (if any) to be on the safe side.
+            context.Request.Token = null;
         }
 
         return ValueTask.CompletedTask;
