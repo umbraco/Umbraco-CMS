@@ -57,7 +57,8 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		return this._history.slice(skip, skip + PAGE_SIZE);
 	}
 
-	#truncate(input: string, length: number, separator = '...'): string {
+	#truncate(input: string | undefined, length: number, separator = '...'): string {
+		if (!input) return '';
 		if (input.length <= length) return input;
 
 		const separatorLength = separator.length;
@@ -84,8 +85,9 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbCurrentUserHistoryItem) {
+		const label = Array.isArray(item.label) ? item.label[0] : item.label;
 		return html`
-			<uui-ref-node name=${item.label} detail=${this.#truncate(item.displayPath, 50)} href=${item.path}>
+			<uui-ref-node name=${label} detail=${this.#truncate(item.displayPath, 50)} href=${item.path}>
 				<uui-icon slot="icon" name="icon-link"></uui-icon>
 			</uui-ref-node>
 		`;

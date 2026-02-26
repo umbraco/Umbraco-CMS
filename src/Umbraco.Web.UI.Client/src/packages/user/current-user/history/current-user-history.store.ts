@@ -4,11 +4,17 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
+export type UmbModelType = 'dialog' | 'sidebar';
+
 export type UmbCurrentUserHistoryItem = {
 	unique: string;
 	path: string;
-	displayPath: string;
-	label: string;
+	/** @deprecated `label` type will be changed to `string` only in Umbraco 19. [LK] */
+	label: string | Array<string>;
+	/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
+	icon?: string;
+	displayPath?: string;
 };
 
 export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHistoryItem> {
