@@ -37,6 +37,8 @@ public class UnpublishDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Unpublishes a document.")]
+    [EndpointDescription("Unpublishes a document identified by the provided Id.")]
     public async Task<IActionResult> Unpublish(CancellationToken cancellationToken, Guid id, UnpublishDocumentRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

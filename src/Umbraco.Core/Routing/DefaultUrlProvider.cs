@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <summary>
 ///     Provides urls.
 /// </summary>
-[Obsolete("Use NewDefaultUrlProvider instead. Scheduled for removal in V18.")]
+[Obsolete("Use NewDefaultUrlProvider instead. Scheduled for removal in Umbraco 18.")]
 public class DefaultUrlProvider : IUrlProvider
 {
     private readonly ILocalizationService _localizationService;
@@ -76,7 +76,7 @@ public class DefaultUrlProvider : IUrlProvider
     /// <param name="localizationService">The localization service.</param>
     /// <param name="navigationQueryService">The document navigation query service.</param>
     /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
-    [Obsolete("Use the other constructor - Scheduled for removal in V18")]
+    [Obsolete("Use the other constructor - Scheduled for removal in Umbraco 18.")]
     public DefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         ILogger<DefaultUrlProvider> logger,
@@ -186,6 +186,16 @@ public class DefaultUrlProvider : IUrlProvider
         return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
     }
 
+    /// <summary>
+    ///     Gets a URL info from a route string.
+    /// </summary>
+    /// <param name="route">The route string.</param>
+    /// <param name="umbracoContext">The Umbraco context.</param>
+    /// <param name="id">The content ID.</param>
+    /// <param name="current">The current URI.</param>
+    /// <param name="mode">The URL mode.</param>
+    /// <param name="culture">The culture.</param>
+    /// <returns>The URL info, or null if the route could not be resolved.</returns>
     internal UrlInfo? GetUrlFromRoute(
         string? route,
         IUmbracoContext umbracoContext,

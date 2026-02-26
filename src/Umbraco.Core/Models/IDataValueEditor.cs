@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
@@ -75,7 +75,17 @@ public interface IDataValueEditor
     /// <returns></returns>
     XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
+    /// <summary>
+    ///     Converts a database value to a string representation.
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <param name="value">The database value.</param>
+    /// <returns>A string representation of the value.</returns>
     string ConvertDbToString(IPropertyType propertyType, object? value);
 
+    /// <summary>
+    ///     Gets the keys of configured element types (for block-based editors).
+    /// </summary>
+    /// <returns>A collection of element type keys.</returns>
     IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 }

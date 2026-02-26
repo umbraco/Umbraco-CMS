@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -85,6 +85,9 @@ public abstract class BeingDirtyBase : IRememberBeingDirty
     /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    ///     Clears all event handlers attached to the <see cref="PropertyChanged" /> event.
+    /// </summary>
     protected void ClearPropertyChangedEvents() => PropertyChanged = null;
 
     /// <summary>

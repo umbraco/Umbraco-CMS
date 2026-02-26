@@ -10,9 +10,14 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
 {
     private readonly IShortStringHelper _shortStringHelper;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DefaultUrlSegmentProvider"/> class.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper used to convert strings to URL segments.</param>
     public DefaultUrlSegmentProvider(IShortStringHelper shortStringHelper) => _shortStringHelper = shortStringHelper;
 
 
+    /// <inheritdoc />
     public virtual string? GetUrlSegment(IContentBase content, bool published, string? culture = null) =>
         GetUrlSegmentSource(content, culture, published)?.ToUrlSegment(_shortStringHelper, culture);
 
@@ -25,12 +30,29 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     public virtual string? GetUrlSegment(IContentBase content, string? culture = null) =>
         GetUrlSegmentSource(content, culture, true)?.ToUrlSegment(_shortStringHelper, culture);
 
+    /// <summary>
+    ///     Gets the source string to use for the URL segment.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="culture">The culture.</param>
+    /// <param name="published">Whether to get the published or draft source.</param>
+    /// <returns>The source string for the URL segment.</returns>
     private static string? GetUrlSegmentSource(IContentBase content, string? culture, bool published)
     {
         string? source = null;
         if (content.HasProperty(Constants.Conventions.Content.UrlName))
         {
             source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture, published: published) ?? string.Empty).Trim();
+
+            // When a culture is requested but the umbracoUrlName property is invariant,
+            // Property.GetValue return null because it rejects non-null culture values.
+            // Fall back to reading the invariant value.
+            if (string.IsNullOrWhiteSpace(source) && culture is not null
+                && content.Properties.TryGetValue(Constants.Conventions.Content.UrlName, out IProperty? urlNameProperty)
+                && urlNameProperty.PropertyType.VariesByCulture() is false)
+            {
+                source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture: null, published: published) ?? string.Empty).Trim();
+            }
         }
 
         if (string.IsNullOrWhiteSpace(source))

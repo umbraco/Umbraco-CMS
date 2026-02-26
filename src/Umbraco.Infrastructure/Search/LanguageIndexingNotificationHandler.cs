@@ -22,7 +22,7 @@ public sealed class LanguageIndexingNotificationHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync instead. Scheduled for removal in V19.")]
+    [Obsolete("Use HandleAsync instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(LanguageCacheRefresherNotification args)
         => HandleAsync(args, CancellationToken.None).GetAwaiter().GetResult();
 

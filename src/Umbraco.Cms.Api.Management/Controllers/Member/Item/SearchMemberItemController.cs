@@ -24,6 +24,8 @@ public class SearchMemberItemController : MemberItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MemberItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches member items.")]
+    [EndpointDescription("Searches member items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, [FromQuery]IEnumerable<Guid>? allowedMemberTypes = null)
     {
         PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(UmbracoObjectTypes.Member, query, null, allowedMemberTypes, false, "*", skip, take);

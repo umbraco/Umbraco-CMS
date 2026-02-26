@@ -38,6 +38,11 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.mediaType.icon,
+					mediaType: {
+						unique: item.mediaType.id,
+						icon: item.mediaType.icon,
+						alias: item.mediaType.alias,
+					},
 					name: variant.name,
 					sortOrder: item.sortOrder,
 					updateDate: new Date(variant.updateDate),

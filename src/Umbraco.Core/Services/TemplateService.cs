@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -16,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing templates (Razor views) including CRUD operations and master template relationships.
+/// </summary>
 public class TemplateService : RepositoryService, ITemplateService
 {
     private readonly IShortStringHelper _shortStringHelper;
@@ -31,6 +33,17 @@ public class TemplateService : RepositoryService, ITemplateService
     // Revert it to:
     //   Services.AddUnique<ITemplateService, TemplateService>();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TemplateService" /> class.
+    /// </summary>
+    /// <param name="provider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="shortStringHelper">The helper for short string operations.</param>
+    /// <param name="templateRepository">The repository for template data access.</param>
+    /// <param name="auditService">The audit service for recording audit entries.</param>
+    /// <param name="templateContentParserService">The service for parsing template content.</param>
+    /// <param name="runtimeSettings">The runtime configuration settings.</param>
     [ActivatorUtilitiesConstructor]
     public TemplateService(
         ICoreScopeProvider provider,
@@ -119,7 +132,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private bool IsProductionMode => _runtimeSettings.Value.Mode == RuntimeMode.Production;
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
+    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,
@@ -198,6 +211,11 @@ public class TemplateService : RepositoryService, ITemplateService
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey)
         => await CreateAsync(template, userKey, null);
 
+    /// <summary>
+    ///     Validates that a template can be created.
+    /// </summary>
+    /// <param name="templateToCreate">The template to validate.</param>
+    /// <returns>The operation status indicating the result of the validation.</returns>
     private async Task<TemplateOperationStatus> ValidateCreateAsync(ITemplate templateToCreate)
     {
         ITemplate? existingTemplate = await GetAsync(templateToCreate.Alias);
@@ -222,16 +240,7 @@ public class TemplateService : RepositoryService, ITemplateService
     public Task<IEnumerable<ITemplate>> GetAllAsync(params Guid[] keys)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        IQuery<ITemplate> query = Query<ITemplate>();
-        if (keys.Any())
-        {
-            var keysList = keys.ToList();
-            query = query.Where(x => keysList.Contains(x.Key));
-        }
-
-        IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);
-
+        IEnumerable<ITemplate> templates = _templateRepository.GetMany(keys);
         return Task.FromResult(templates);
     }
 
@@ -265,11 +274,9 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <inheritdoc />
     public Task<ITemplate?> GetAsync(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
-            return Task.FromResult(_templateRepository.Get(query)?.SingleOrDefault());
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        ITemplate? template = _templateRepository.Get(id);
+        return Task.FromResult(template);
     }
 
     /// <inheritdoc />
@@ -289,6 +296,11 @@ public class TemplateService : RepositoryService, ITemplateService
             userKey,
             () => ValidateUpdateAsync(template));
 
+    /// <summary>
+    ///     Validates that a template can be updated.
+    /// </summary>
+    /// <param name="templateToUpdate">The template to validate.</param>
+    /// <returns>The operation status indicating the result of the validation.</returns>
     private async Task<TemplateOperationStatus> ValidateUpdateAsync(ITemplate templateToUpdate)
     {
         ITemplate? existingTemplate = await GetAsync(templateToUpdate.Alias);
@@ -318,6 +330,15 @@ public class TemplateService : RepositoryService, ITemplateService
         return TemplateOperationStatus.Success;
     }
 
+    /// <summary>
+    ///     Saves a template with validation and auditing.
+    /// </summary>
+    /// <param name="template">The template to save.</param>
+    /// <param name="auditType">The type of audit entry to create.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <param name="scopeValidator">An optional validation function to execute within the scope.</param>
+    /// <param name="contentTypeAlias">The optional content type alias for the saving notification.</param>
+    /// <returns>An attempt result containing the template and operation status.</returns>
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(
         ITemplate template,
         AuditType auditType,
@@ -422,7 +443,12 @@ public class TemplateService : RepositoryService, ITemplateService
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Sets or removes the master template for the specified template.
+    /// </summary>
+    /// <param name="template">The template to update.</param>
+    /// <param name="masterTemplate">The master template to set, or null to remove the master template.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     private async Task SetMasterTemplateAsync(ITemplate template, ITemplate? masterTemplate, Guid userKey)
     {
         if (template.MasterTemplateAlias == masterTemplate?.Alias)
@@ -478,6 +504,11 @@ public class TemplateService : RepositoryService, ITemplateService
         }
     }
 
+    /// <summary>
+    ///     Gets the content of a view file from disk.
+    /// </summary>
+    /// <param name="fileName">The file name of the view.</param>
+    /// <returns>The content of the view file, or null if empty.</returns>
     private string? GetViewContent(string? fileName)
     {
         if (fileName.IsNullOrWhiteSpace())
@@ -498,9 +529,24 @@ public class TemplateService : RepositoryService, ITemplateService
         }
     }
 
+    /// <summary>
+    ///     Records an audit entry.
+    /// </summary>
+    /// <param name="type">The type of audit.</param>
+    /// <param name="userKey">The key of the user who performed the action.</param>
+    /// <param name="objectId">The ID of the object being audited.</param>
+    /// <param name="entityType">The type of entity being audited.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     private Task Audit(AuditType type, Guid userKey, int objectId, string? entityType) =>
         _auditService.AddAsync(type, userKey, objectId, entityType);
 
+    /// <summary>
+    ///     Creates a template with optional content type association.
+    /// </summary>
+    /// <param name="template">The template to create.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <param name="contentTypeAlias">The optional content type alias to associate with the template.</param>
+    /// <returns>An attempt result containing the template and operation status.</returns>
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey, string? contentTypeAlias)
     {
         if (IsProductionMode)
@@ -526,6 +572,12 @@ public class TemplateService : RepositoryService, ITemplateService
         }
     }
 
+    /// <summary>
+    ///     Deletes a template using a function to retrieve it.
+    /// </summary>
+    /// <param name="getTemplate">A function that retrieves the template to delete.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt result containing the deleted template and operation status.</returns>
     private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, Guid userKey)
     {
         if (IsProductionMode)
@@ -567,9 +619,21 @@ public class TemplateService : RepositoryService, ITemplateService
         }
     }
 
+    /// <summary>
+    ///     Determines whether the specified alias is valid.
+    /// </summary>
+    /// <param name="alias">The alias to validate.</param>
+    /// <returns><c>true</c> if the alias is valid; otherwise, <c>false</c>.</returns>
     private static bool IsValidAlias(string alias)
         => alias.IsNullOrWhiteSpace() == false && alias.Length <= 255;
 
+    /// <summary>
+    ///     Checks if setting the master template would create a circular reference.
+    /// </summary>
+    /// <param name="parsedMasterTemplateAlias">The parsed master template alias from the template content.</param>
+    /// <param name="template">The template being updated.</param>
+    /// <param name="masterTemplate">The proposed master template.</param>
+    /// <returns><c>true</c> if a circular reference would be created; otherwise, <c>false</c>.</returns>
     private async Task<bool> HasCircularReference(string parsedMasterTemplateAlias, ITemplate template, ITemplate masterTemplate)
     {
         // quick check without extra DB calls as we already have both templates
@@ -584,6 +648,12 @@ public class TemplateService : RepositoryService, ITemplateService
         return await HasRecursiveCircularReference(processedTemplates, masterTemplate.MasterTemplateAlias);
     }
 
+    /// <summary>
+    ///     Recursively checks for circular references in the master template chain.
+    /// </summary>
+    /// <param name="referencedTemplates">The list of templates already referenced in the chain.</param>
+    /// <param name="masterTemplateAlias">The master template alias to check.</param>
+    /// <returns><c>true</c> if a circular reference is detected; otherwise, <c>false</c>.</returns>
     private async Task<bool> HasRecursiveCircularReference(List<ITemplate> referencedTemplates, string? masterTemplateAlias)
     {
         if (masterTemplateAlias is null)

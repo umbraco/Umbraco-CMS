@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Provides scoped notification publishing functionality within a transaction scope.
+/// </summary>
 public interface IScopedNotificationPublisher
 {
     /// <summary>

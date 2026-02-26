@@ -20,6 +20,7 @@ export default {
 		chooseWhereToCopy: 'Choose where to copy',
 		chooseWhereToImport: 'Choose where to import',
 		chooseWhereToMove: 'Choose where to move',
+		clear: 'Clear',
 		copy: 'Duplicate',
 		copyTo: 'Duplicate to',
 		create: 'Create',
@@ -2048,6 +2049,7 @@ export default {
 		noLockouts: "hasn't been locked out",
 		noPasswordChange: "The password hasn't been changed",
 		confirmNewPassword: 'Confirm new password',
+		confirmPassword: 'Confirm password',
 		changePasswordDescription:
 			"You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button",
 		contentChannel: 'Content Channel',
