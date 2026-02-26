@@ -20,10 +20,7 @@ public static class DeliveryApiApplicationBuilderExtensions
     /// <returns>The <see cref="IUmbracoEndpointBuilderContext" /> for chaining.</returns>
     public static IUmbracoEndpointBuilderContext UseDeliveryApiEndpoints(this IUmbracoEndpointBuilderContext builder)
     {
-        ArgumentNullException.ThrowIfNull(builder);
-
         builder.EndpointRouteBuilder.MapControllers();
-
         return builder;
     }
 }
