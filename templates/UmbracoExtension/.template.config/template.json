@@ -96,7 +96,7 @@
       "datatype": "choice",
       "defaultValue": "Central",
       "displayName": "Package Version Management",
-      "description": "Choose how to manage Nuget package versions",
+      "description": "Choose how to manage NuGet package versions",
       "choices": [
         {
           "choice": "PerProject",
