@@ -196,6 +196,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				padding: var(--uui-size-space-2);
 
 				display: grid;
+				justify-items: center;
 				grid-template-rows: 40px 1fr;
 
 				height: 100%;
