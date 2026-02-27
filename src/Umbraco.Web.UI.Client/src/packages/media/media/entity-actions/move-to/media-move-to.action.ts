@@ -16,10 +16,12 @@ class UmbMediaMoveToEntityAction extends UmbMoveToEntityAction {
 		const mediaTypeUnique = item.mediaType.unique;
 
 		const structureRepository = new UmbMediaTypeStructureRepository(this);
-		const { data: allowedParents } = await structureRepository.requestAllowedParentsOf(mediaTypeUnique);
-
 		const typeDetailRepository = new UmbMediaTypeDetailRepository(this);
-		const { data: mediaType } = await typeDetailRepository.requestByUnique(mediaTypeUnique);
+
+		const [{ data: allowedParents }, { data: mediaType }] = await Promise.all([
+			structureRepository.requestAllowedParentsOf(mediaTypeUnique),
+			typeDetailRepository.requestByUnique(mediaTypeUnique),
+		]);
 		const isAllowedAtRoot = mediaType?.allowedAtRoot ?? false;
 
 		if (!allowedParents) return undefined;

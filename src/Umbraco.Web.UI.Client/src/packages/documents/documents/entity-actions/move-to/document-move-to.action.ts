@@ -19,10 +19,12 @@ class UmbDocumentMoveToEntityAction extends UmbMoveToEntityAction {
 		const documentTypeUnique = item.documentType.unique;
 
 		const structureRepository = new UmbDocumentTypeStructureRepository(this);
-		const { data: allowedParents } = await structureRepository.requestAllowedParentsOf(documentTypeUnique);
-
 		const typeDetailRepository = new UmbDocumentTypeDetailRepository(this);
-		const { data: documentType } = await typeDetailRepository.requestByUnique(documentTypeUnique);
+
+		const [{ data: allowedParents }, { data: documentType }] = await Promise.all([
+			structureRepository.requestAllowedParentsOf(documentTypeUnique),
+			typeDetailRepository.requestByUnique(documentTypeUnique),
+		]);
 		const isAllowedAtRoot = documentType?.allowedAtRoot ?? false;
 
 		if (!allowedParents) return undefined;
