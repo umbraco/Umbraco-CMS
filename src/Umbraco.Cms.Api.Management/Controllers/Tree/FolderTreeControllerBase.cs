@@ -209,7 +209,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
     protected virtual TItem[] MapSearchTreeItemViewModels(IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(
-                FolderObjectType == UmbracoObjectTypes.Unknown
+                FolderObjectType == UmbracoObjectTypes.Unknown || entity.ParentId == -1
                     ? null
                     : IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType).Result,
                 entity))
@@ -230,17 +230,5 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         }
 
         return types.Count > 0 ? types : [ItemObjectType];
-    }
-
-    /// <summary>
-    /// Specifies the types of tree items to include in search results.
-    /// </summary>
-    [Flags]
-    public enum TreeItemKind
-    {
-        None = 0,
-        Item = 1,
-        Folder = 2,
-        All = Item | Folder
     }
 }

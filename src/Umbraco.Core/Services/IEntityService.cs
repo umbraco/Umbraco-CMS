@@ -494,8 +494,9 @@ public interface IEntityService
     /// Gets descendants of root for multiple object types.
     /// </summary>
     /// <remarks>
-    /// This method has a no-op default implementation.
+    /// This method has a no-op default implementation which is scheduled for removal in V18.
     /// </remarks>
+    // TODO (V18): Remove the default implementation.
     IEnumerable<IEntitySlim> GetPagedDescendants(
         IEnumerable<UmbracoObjectTypes> objectTypes,
         long pageIndex,
