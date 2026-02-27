@@ -243,7 +243,7 @@ export class UiBaseLocators extends BasePage {
     this.createBtn = page.getByRole('button', {name: /^Create(…)?$/});
     this.addBtn = page.getByRole('button', {name: 'Add', exact: true});
     this.updateBtn = page.getByLabel('Update');
-    this.changeBtn = page.getByLabel('Change');
+    this.changeBtn = page.getByLabel('Change', {exact: true});
     this.deleteBtn = page.getByRole('button', {name: /^Delete(…)?$/});
     this.deleteExactBtn = page.getByRole('button', {name: 'Delete', exact: true});
     this.removeExactBtn = page.getByLabel('Remove', {exact: true});
