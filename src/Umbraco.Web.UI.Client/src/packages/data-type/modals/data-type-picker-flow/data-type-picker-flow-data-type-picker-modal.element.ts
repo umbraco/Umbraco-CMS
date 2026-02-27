@@ -83,7 +83,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 							<uui-button label=${dataType.name} @click=${() => this.#handleClick(dataType)}>
 								<div class="item-content">
 									<umb-icon name=${dataType.icon ?? 'icon-circle-dotted'} class="icon"></umb-icon>
-									${dataType.name}
+									<span class="label" title=${dataType.name}>${dataType.name}</span>
 								</div>
 							</uui-button>
 						</li>
@@ -165,15 +165,18 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 				padding: var(--uui-size-space-2);
 
-				display: grid;
-				grid-template-rows: 40px 1fr;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: flex-start;
 				height: 100%;
 				width: 100%;
 				word-break: break-word;
 			}
+
 			.icon {
 				font-size: 2em;
-				margin: auto;
+				margin-bottom: var(--uui-size-space-2);
 			}
 
 			#create-button {
@@ -185,6 +188,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				width: 100%;
 				height: 100%;
 			}
+
 			#create-button .content {
 				text-align: center;
 				box-sizing: border-box;
@@ -192,12 +196,23 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				padding: var(--uui-size-space-2);
 
 				display: grid;
+				justify-items: center;
 				grid-template-rows: 40px 1fr;
+
 				height: 100%;
 				width: 100%;
 			}
+
 			#create-button:not(:first-child) {
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			#item-grid .item .label {
+				max-width: 100%;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
 			}
 		`,
 	];
