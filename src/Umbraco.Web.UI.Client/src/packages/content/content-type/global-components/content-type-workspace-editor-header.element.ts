@@ -83,7 +83,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 		return html`
 			<div id="header">
 				<uui-button id="icon" compact label="icon" look="outline" @click=${this._handleIconClick}>
-					<umb-icon name=${ifDefined(this._icon)}></umb-icon>
+					<umb-icon title=${ifDefined(this._icon)} aria="hidden" name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
 
 				<div id="editors">
