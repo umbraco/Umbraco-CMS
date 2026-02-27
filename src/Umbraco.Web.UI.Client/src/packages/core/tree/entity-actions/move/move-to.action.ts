@@ -16,10 +16,6 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		// 1. Get the repository
-		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
-		if (!moveRepository) throw new Error('Move Repository is not available');
-
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				treeAlias: this.args.meta.treeAlias,
@@ -31,6 +27,9 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
+
+		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
+		if (!moveRepository) throw new Error('Move Repository is not available');
 
 		const { error } = await moveRepository.requestMoveTo({
 			unique: this.args.unique,
