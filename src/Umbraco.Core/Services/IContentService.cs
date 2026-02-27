@@ -315,8 +315,15 @@ public interface IContentService : IPublishableContentService<IContent>
     /// </summary>
     /// <param name="keys">The content keys.</param>
     /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
+    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 
+    /// <summary>
+    ///     Gets a dictionary of content keys and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
+    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys) => ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
 
     #endregion
 
@@ -511,13 +518,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns><c>true</c> if the document was sent to publication; otherwise, <c>false</c>.</returns>
     bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Publishes and unpublishes scheduled documents.
-    /// </summary>
-    /// <param name="date">The date to use for determining scheduled actions.</param>
-    /// <returns>The publish results.</returns>
-    IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
 
     #endregion
 

@@ -70,6 +70,9 @@
     </Compile>
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Update="Umbraco.Infrastructure\Services\ContentTypeServiceTests.GetAllAllowedInLibrary.cs">
+      <DependentUpon>ContentTypeServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
@@ -268,9 +271,6 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProvider_hidetoplevel_false.cs">
-      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
-    </Compile>
     <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProviderTests.cs">
       <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
     </Compile>
@@ -325,6 +325,9 @@
     <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Publish.cs">
       <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.SchedulePublish.cs">
+      <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Unpublish.cs">
       <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
     </Compile>
@@ -335,6 +338,9 @@
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Copy.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.CopyWithBlocks.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Move.cs">
@@ -381,6 +387,15 @@
     </Compile>
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceElementTests.SiblingUserAccessEntities.cs">
       <DependentUpon>UserStartNodeEntitiesServiceElementTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.Permissions.cs">
+      <DependentUpon>UserServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentServiceTests.SchedulePublish.cs">
+      <DependentUpon>ContentServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ElementServiceTests.SchedulePublish.cs">
+      <DependentUpon>ElementServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

@@ -5969,6 +5969,63 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-type/allowed-in-library": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets document types allowed in library.",
+        "description": "Gets a collection of document types that are allowed in the library.",
+        "operationId": "GetDocumentTypeAllowedInLibrary",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document-type/available-compositions": {
       "post": {
         "tags": [
@@ -12928,6 +12985,87 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/element/{id}/audit-log": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets the audit log for an element.",
+        "description": "Gets a paginated collection of audit log entries for the element identified by the provided Id.",
+        "operationId": "GetElementByIdAuditLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "sinceDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAuditLogResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/element/{id}/copy": {
       "post": {
         "tags": [
@@ -16660,6 +16798,13 @@
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ImageCropModeModel"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -42806,6 +42951,7 @@
           "alias",
           "allowedAsRoot",
           "allowedDocumentTypes",
+          "allowedInLibrary",
           "allowedTemplates",
           "cleanup",
           "compositions",
@@ -42853,6 +42999,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -43252,6 +43401,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "allowedMediaTypes",
           "compositions",
           "containers",
@@ -43290,6 +43440,9 @@
             "type": "boolean"
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -43563,6 +43716,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "compositions",
           "containers",
           "icon",
@@ -43608,6 +43762,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -45747,6 +45904,7 @@
       },
       "DocumentTypeItemResponseModel": {
         "required": [
+          "allowedInLibrary",
           "flags",
           "id",
           "isElement",
@@ -45772,6 +45930,9 @@
             "type": "string"
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "icon": {
@@ -45961,6 +46122,7 @@
           "alias",
           "allowedAsRoot",
           "allowedDocumentTypes",
+          "allowedInLibrary",
           "allowedTemplates",
           "cleanup",
           "compositions",
@@ -46009,6 +46171,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -48896,6 +49061,7 @@
           "alias",
           "aliasCanBeChanged",
           "allowedAsRoot",
+          "allowedInLibrary",
           "allowedMediaTypes",
           "compositions",
           "containers",
@@ -48944,6 +49110,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -49787,6 +49956,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "compositions",
           "containers",
           "icon",
@@ -49833,6 +50003,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -54528,6 +54701,7 @@
           "alias",
           "allowedAsRoot",
           "allowedDocumentTypes",
+          "allowedInLibrary",
           "allowedTemplates",
           "cleanup",
           "compositions",
@@ -54575,6 +54749,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -54877,6 +55054,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "allowedMediaTypes",
           "compositions",
           "containers",
@@ -54923,6 +55101,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {
@@ -55169,6 +55350,7 @@
         "required": [
           "alias",
           "allowedAsRoot",
+          "allowedInLibrary",
           "compositions",
           "containers",
           "icon",
@@ -55214,6 +55396,9 @@
             "nullable": true
           },
           "isElement": {
+            "type": "boolean"
+          },
+          "allowedInLibrary": {
             "type": "boolean"
           },
           "properties": {

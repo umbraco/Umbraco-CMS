@@ -66,6 +66,11 @@ public enum EntityContainerOperationStatus
     NotInTrash,
 
     /// <summary>
+    ///     The container cannot be moved to the recycle bin because it has descendants that are referenced.
+    /// </summary>
+    HasReferencedDescendants,
+
+    /// <summary>
     ///     Failure for an an unknown reason.
     /// </summary>
     Unknown,

@@ -1293,6 +1293,7 @@ export default {
 		noLockouts: 'no ha sido bloqueado',
 		noPasswordChange: 'La contraseña no se ha cambiado',
 		confirmNewPassword: 'Confirma nueva contraseña',
+		confirmPassword: 'Confirmar contraseña',
 		changePasswordDescription:
 			"Puedes cambiar tu contraseña para acceder al 'back office' de Umbraco rellenando el siguiente formulario y haciendo clic en el botón 'Cambiar contraseña'",
 		contentChannel: 'Canal de contenido',
@@ -1451,7 +1452,8 @@ export default {
 		emptyDictionaryTree: 'No hay elementos de Diccionario para elegir',
 	},
 	textbox: {
-		characters_left: 'caracteres restantes',
+		characters_left: '<strong>%0%</strong> caracteres restantes.',
+		characters_exceed: 'Máximo %0% caracteres, <strong>%1%</strong> de más.',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Seleccionar todo',

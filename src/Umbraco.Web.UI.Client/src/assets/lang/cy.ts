@@ -1862,6 +1862,7 @@ export default {
 		noLockouts: 'ddim wedi cloi allan',
 		noPasswordChange: "Nid yw'r cyfrinair wedi'i newid",
 		confirmNewPassword: 'Cadarnhau cyfrinair newydd',
+		confirmPassword: 'Cadarnhau cyfrinair',
 		changePasswordDescription:
 			"Gallwch newid eich cyfrinair i gyrchu Swyddfa Gefn Umbracogan lenwi allan y ffurflen isod a chlicio'r botwm 'Newid Cyfrinair'",
 		contentChannel: 'Sianel Gynnwys',
@@ -2105,7 +2106,7 @@ export default {
 		emptyDictionaryTree: 'Dim eitemau Geiriadur i ddewis ohonynt',
 	},
 	textbox: {
-		characters_left: 'o nodau ar ôl',
+		characters_left: '<strong>%0%</strong> o nodau ar ôl.',
 		characters_exceed: 'Uchafswm o %0% nodau cyfrannol, <strong>%1%</strong> gormod.',
 	},
 	recycleBin: {
