@@ -13,26 +13,26 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 /// Provides an API controller for retrieving the full details for multiple member types by key.
 /// </summary>
 [ApiVersion("1.0")]
-public class FetchMemberTypesController : MemberTypeControllerBase
+public class BatchMemberTypesController : MemberTypeControllerBase
 {
     private readonly IMemberTypeService _memberTypeService;
     private readonly IMemberTypePresentationFactory _memberTypePresentationFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FetchMemberTypesController"/> class.
+    /// Initializes a new instance of the <see cref="BatchMemberTypesController"/> class.
     /// </summary>
     /// <param name="memberTypeService">The member type service.</param>
     /// <param name="memberTypePresentationFactory">The member type presentation factory.</param>
-    public FetchMemberTypesController(IMemberTypeService memberTypeService, IMemberTypePresentationFactory memberTypePresentationFactory)
+    public BatchMemberTypesController(IMemberTypeService memberTypeService, IMemberTypePresentationFactory memberTypePresentationFactory)
     {
         _memberTypeService = memberTypeService;
         _memberTypePresentationFactory = memberTypePresentationFactory;
     }
 
-    [HttpGet("fetch")]
+    [HttpGet("batch")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FetchResponseModel<MemberTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Fetch(
+    [ProducesResponseType(typeof(BatchResponseModel<MemberTypeResponseModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Batch(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] Guid[] ids)
     {
@@ -40,7 +40,7 @@ public class FetchMemberTypesController : MemberTypeControllerBase
 
         if (requestedIds.Length == 0)
         {
-            return Ok(new FetchResponseModel<MemberTypeResponseModel>());
+            return Ok(new BatchResponseModel<MemberTypeResponseModel>());
         }
 
         IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(requestedIds);
@@ -51,7 +51,7 @@ public class FetchMemberTypesController : MemberTypeControllerBase
         IEnumerable<Task<MemberTypeResponseModel>> mappingTasks = ordered.Select(mt => _memberTypePresentationFactory.CreateResponseModelAsync(mt));
         MemberTypeResponseModel[] responseModels = await Task.WhenAll(mappingTasks);
 
-        return Ok(new FetchResponseModel<MemberTypeResponseModel>
+        return Ok(new BatchResponseModel<MemberTypeResponseModel>
         {
             Total = responseModels.Length,
             Items = responseModels,

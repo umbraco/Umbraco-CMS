@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.DocumentType;
+using Umbraco.Cms.Api.Management.Controllers.MediaType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType;
 
-public class FetchDocumentTypesControllerTests : ManagementApiUserGroupTestBase<FetchDocumentTypesController>
+public class BatchMediaTypesControllerTests : ManagementApiUserGroupTestBase<BatchMediaTypesController>
 {
-    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
 
     private Guid _key1;
     private Guid _key2;
@@ -20,12 +20,12 @@ public class FetchDocumentTypesControllerTests : ManagementApiUserGroupTestBase<
     {
         _key1 = Guid.NewGuid();
         _key2 = Guid.NewGuid();
-        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key1, Name = "Type1", Alias = "type1" }, Constants.Security.SuperUserKey);
-        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key2, Name = "Type2", Alias = "type2" }, Constants.Security.SuperUserKey);
+        await MediaTypeEditingService.CreateAsync(new MediaTypeCreateModel { Key = _key1, Name = "MediaType1", Alias = "mediaType1" }, Constants.Security.SuperUserKey);
+        await MediaTypeEditingService.CreateAsync(new MediaTypeCreateModel { Key = _key2, Name = "MediaType2", Alias = "mediaType2" }, Constants.Security.SuperUserKey);
     }
 
-    protected override Expression<Func<FetchDocumentTypesController, object>> MethodSelector =>
-        x => x.Fetch(CancellationToken.None, Array.Empty<Guid>());
+    protected override Expression<Func<BatchMediaTypesController, object>> MethodSelector =>
+        x => x.Batch(CancellationToken.None, Array.Empty<Guid>());
 
     protected override async Task<HttpResponseMessage> ClientRequest()
         => await Client.GetAsync($"{Url}?id={_key1}&id={_key2}");
@@ -52,7 +52,7 @@ public class FetchDocumentTypesControllerTests : ManagementApiUserGroupTestBase<
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

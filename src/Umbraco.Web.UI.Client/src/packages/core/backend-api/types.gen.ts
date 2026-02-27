@@ -77,6 +77,26 @@ export type AvailableMemberTypeCompositionResponseModel = {
     isCompatible: boolean;
 };
 
+export type BatchResponseModelDataTypeResponseModel = {
+    total: number;
+    items: Array<DataTypeResponseModel>;
+};
+
+export type BatchResponseModelDocumentTypeResponseModel = {
+    total: number;
+    items: Array<DocumentTypeResponseModel>;
+};
+
+export type BatchResponseModelMediaTypeResponseModel = {
+    total: number;
+    items: Array<MediaTypeResponseModel>;
+};
+
+export type BatchResponseModelMemberTypeResponseModel = {
+    total: number;
+    items: Array<MemberTypeResponseModel>;
+};
+
 export type CalculatedUserStartNodesResponseModel = {
     id: string;
     documentStartNodeIds: Array<ReferenceByIdModel>;
@@ -3487,6 +3507,35 @@ export type GetDataTypeByIdReferencedByResponses = {
 
 export type GetDataTypeByIdReferencedByResponse = GetDataTypeByIdReferencedByResponses[keyof GetDataTypeByIdReferencedByResponses];
 
+export type GetDataTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/data-type/batch';
+};
+
+export type GetDataTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDataTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelDataTypeResponseModel;
+};
+
+export type GetDataTypeBatchResponse = GetDataTypeBatchResponses[keyof GetDataTypeBatchResponses];
+
 export type GetDataTypeConfigurationData = {
     body?: never;
     path?: never;
@@ -5332,6 +5381,35 @@ export type PostDocumentTypeAvailableCompositionsResponses = {
 };
 
 export type PostDocumentTypeAvailableCompositionsResponse = PostDocumentTypeAvailableCompositionsResponses[keyof PostDocumentTypeAvailableCompositionsResponses];
+
+export type GetDocumentTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/document-type/batch';
+};
+
+export type GetDocumentTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelDocumentTypeResponseModel;
+};
+
+export type GetDocumentTypeBatchResponse = GetDocumentTypeBatchResponses[keyof GetDocumentTypeBatchResponses];
 
 export type GetDocumentTypeConfigurationData = {
     body?: never;
@@ -9070,6 +9148,35 @@ export type PostMediaTypeAvailableCompositionsResponses = {
 
 export type PostMediaTypeAvailableCompositionsResponse = PostMediaTypeAvailableCompositionsResponses[keyof PostMediaTypeAvailableCompositionsResponses];
 
+export type GetMediaTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/media-type/batch';
+};
+
+export type GetMediaTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetMediaTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelMediaTypeResponseModel;
+};
+
+export type GetMediaTypeBatchResponse = GetMediaTypeBatchResponses[keyof GetMediaTypeBatchResponses];
+
 export type GetMediaTypeConfigurationData = {
     body?: never;
     path?: never;
@@ -11037,6 +11144,35 @@ export type PostMemberTypeAvailableCompositionsResponses = {
 };
 
 export type PostMemberTypeAvailableCompositionsResponse = PostMemberTypeAvailableCompositionsResponses[keyof PostMemberTypeAvailableCompositionsResponses];
+
+export type GetMemberTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/member-type/batch';
+};
+
+export type GetMemberTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetMemberTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelMemberTypeResponseModel;
+};
+
+export type GetMemberTypeBatchResponse = GetMemberTypeBatchResponses[keyof GetMemberTypeBatchResponses];
 
 export type GetMemberTypeConfigurationData = {
     body?: never;

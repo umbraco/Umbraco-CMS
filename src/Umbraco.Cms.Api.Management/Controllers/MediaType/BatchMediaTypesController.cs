@@ -13,26 +13,26 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 /// Provides an API controller for retrieving the full details for multiple media types by key.
 /// </summary>
 [ApiVersion("1.0")]
-public class FetchMediaTypesController : MediaTypeControllerBase
+public class BatchMediaTypesController : MediaTypeControllerBase
 {
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FetchMediaTypesController"/> class.
+    /// Initializes a new instance of the <see cref="BatchMediaTypesController"/> class.
     /// </summary>
     /// <param name="mediaTypeService">The media type service.</param>
     /// <param name="umbracoMapper">The presentation model mapper.</param>
-    public FetchMediaTypesController(IMediaTypeService mediaTypeService, IUmbracoMapper umbracoMapper)
+    public BatchMediaTypesController(IMediaTypeService mediaTypeService, IUmbracoMapper umbracoMapper)
     {
         _mediaTypeService = mediaTypeService;
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet("fetch")]
+    [HttpGet("batch")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FetchResponseModel<MediaTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Fetch(
+    [ProducesResponseType(typeof(BatchResponseModel<MediaTypeResponseModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Batch(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] Guid[] ids)
     {
@@ -40,7 +40,7 @@ public class FetchMediaTypesController : MediaTypeControllerBase
 
         if (requestedIds.Length == 0)
         {
-            return Ok(new FetchResponseModel<MediaTypeResponseModel>());
+            return Ok(new BatchResponseModel<MediaTypeResponseModel>());
         }
 
         IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(requestedIds);
@@ -49,7 +49,7 @@ public class FetchMediaTypesController : MediaTypeControllerBase
 
         var responseModels = ordered.Select(mt => _umbracoMapper.Map<MediaTypeResponseModel>(mt)!).ToList();
 
-        return Ok(new FetchResponseModel<MediaTypeResponseModel>
+        return Ok(new BatchResponseModel<MediaTypeResponseModel>
         {
             Total = responseModels.Count,
             Items = responseModels,
