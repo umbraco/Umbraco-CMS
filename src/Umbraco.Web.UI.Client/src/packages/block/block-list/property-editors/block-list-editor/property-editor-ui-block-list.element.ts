@@ -497,19 +497,8 @@ export class UmbPropertyEditorUIBlockListElement
 
 	static override readonly styles = [
 		css`
-			:host {
-				display: grid;
-				align-content: start;
-				gap: 1px;
-			}
-			> div {
-				display: flex;
-				flex-direction: column;
-				align-items: stretch;
-			}
-
 			uui-button-group {
-				padding-top: 1px;
+				margin-top: 1px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}

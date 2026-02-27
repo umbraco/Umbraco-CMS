@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 
 /**
  * Verifies variant blocks deep inside invariant wrappers correctly receive culture context.
