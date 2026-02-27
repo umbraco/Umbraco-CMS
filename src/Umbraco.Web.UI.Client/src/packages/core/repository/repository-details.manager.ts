@@ -152,13 +152,15 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	addEntry(data: DetailType): void {
 		const unique = data.unique;
 		this.#entries.appendOne(data);
-		this.#uniques.appendOne(unique);
+		// Add status BEFORE unique to prevent #requestNewDetails from trying to fetch
+		// (the observation callback on #uniques checks #statuses to skip already-loaded entries)
 		this.#statuses.appendOne({
 			state: {
 				type: 'success',
 			},
 			unique,
 		});
+		this.#uniques.appendOne(unique);
 		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
 	}
 
@@ -192,9 +194,74 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			return !item;
 		});
 
-		newRequestedUniques.forEach((unique) => {
-			this.#requestDetails(unique);
-		});
+		if (newRequestedUniques.length === 0) return;
+
+		// Use bulk endpoint when available, fall back to individual requests
+		if (this.repository.requestByUniques) {
+			this.#requestDetailsBulk(newRequestedUniques);
+		} else {
+			newRequestedUniques.forEach((unique) => {
+				this.#requestDetails(unique);
+			});
+		}
+	}
+
+	async #requestDetailsBulk(uniques: Array<DetailType['unique']>): Promise<void> {
+		await this.#init;
+		if (!this.repository?.requestByUniques) throw new Error('Repository does not support requestByUniques');
+
+		for (const unique of uniques) {
+			this.#setStatus(unique, 'loading');
+		}
+
+		const { data, error, asObservable } = await this.repository.requestByUniques(uniques);
+
+		if (error) {
+			for (const unique of uniques) {
+				this.#setError(unique);
+			}
+			return;
+		}
+
+		if (data) {
+			const currentUniques = this.getUniques();
+
+			for (const unique of uniques) {
+				// Check it still exists in uniques (may have been removed while request was in flight)
+				if (!currentUniques.includes(unique)) {
+					this.#statuses.removeOne(unique);
+					continue;
+				}
+
+				const item = data.find((d) => d.unique === unique);
+				if (item) {
+					this.#setSuccess(unique, item);
+				} else {
+					// Item was requested but not returned — treat as not found
+					this.#setError(unique);
+				}
+			}
+
+			// Set up per-item store observation for reactivity
+			const successUniques = uniques.filter((u) => currentUniques.includes(u) && data.some((d) => d.unique === u));
+			for (const unique of successUniques) {
+				const observable = asObservable?.();
+				if (observable) {
+					this.observe(
+						observable,
+						(items) => {
+							const item = items?.find((d) => d.unique === unique);
+							if (item) {
+								this.#entries.updateOne(unique, item);
+							} else {
+								this.#entries.removeOne(unique);
+							}
+						},
+						'observeEntry_' + unique,
+					);
+				}
+			}
+		}
 	}
 
 	async #reloadDetails(unique: string): Promise<void> {
@@ -205,57 +272,67 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
-		this.#statuses.appendOne({
-			state: {
-				type: 'loading',
-			},
-			unique,
-		});
+		this.#setStatus(unique, 'loading');
 
 		const { data, error, asObservable } = await this.repository.requestByUnique(unique);
 
 		if (error) {
-			this.#statuses.appendOne({
-				state: {
-					type: 'error',
-					error: '#general_notFound',
-				},
-				unique,
-			} as UmbRepositoryRequestStatus);
-			this.#entries.removeOne(unique);
-			this.removeUmbControllerByAlias('observeEntry_' + unique);
+			this.#setError(unique);
 		}
 
 		if (data) {
-			//Check it still exists in uniques:
+			// Check it still exists in uniques:
 			const uniques = this.getUniques();
 			if (!uniques.includes(unique)) {
 				this.#statuses.removeOne(unique);
 				return;
 			}
-			this.#entries.appendOne(data);
 
-			this.#statuses.appendOne({
-				state: {
-					type: 'success',
-				},
-				unique,
-			});
+			this.#setSuccess(unique, data);
 
-			if (asObservable) {
-				this.observe(
-					asObservable(),
-					(data) => {
-						if (data) {
-							this.#entries.updateOne(unique, data);
-						} else {
-							this.#entries.removeOne(unique);
-						}
-					},
-					'observeEntry_' + unique,
-				);
+			const observable = asObservable?.();
+			if (observable) {
+				this.#observeEntry(unique, observable);
 			}
 		}
+	}
+
+	#setStatus(unique: string, type: 'success' | 'error' | 'loading'): void {
+		this.#statuses.appendOne({
+			state: { type },
+			unique,
+		});
+	}
+
+	#setError(unique: string): void {
+		this.#statuses.appendOne({
+			state: {
+				type: 'error',
+				error: '#general_notFound',
+			},
+			unique,
+		} as UmbRepositoryRequestStatus);
+		this.#entries.removeOne(unique);
+		this.removeUmbControllerByAlias('observeEntry_' + unique);
+	}
+
+	#setSuccess(unique: string, data: DetailType): void {
+		this.#entries.appendOne(data);
+		this.#setStatus(unique, 'success');
+	}
+
+	#observeEntry(unique: string, observable: Observable<DetailType | undefined>): void {
+		this.observe(
+			observable,
+			(data) => {
+				if (data) {
+					this.#entries.updateOne(unique, data);
+				} else {
+					this.#entries.removeOne(unique);
+				}
+			},
+			'observeEntry_' + unique,
+		);
 	}
 
 	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
