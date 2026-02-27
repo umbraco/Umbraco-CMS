@@ -26,7 +26,7 @@ export class UmbManagementApiMediaTypeDetailDataRequestManager extends UmbManage
 			update: (id: string, body: UpdateMediaTypeRequestModel) =>
 				MediaTypeService.putMediaTypeById({ path: { id }, body }),
 			delete: (id: string) => MediaTypeService.deleteMediaTypeById({ path: { id } }),
-			readMany: (ids: Array<string>) => MediaTypeService.getMediaTypeFetch({ query: { id: ids } }),
+			readMany: (ids: Array<string>) => MediaTypeService.getMediaTypeBatch({ query: { id: ids } }),
 			dataCache: mediaTypeDetailCache,
 			inflightRequestCache: UmbManagementApiMediaTypeDetailDataRequestManager.#inflightRequestCache,
 		});

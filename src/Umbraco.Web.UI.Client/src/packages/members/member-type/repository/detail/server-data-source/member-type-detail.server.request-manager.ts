@@ -26,7 +26,7 @@ export class UmbManagementApiMemberTypeDetailDataRequestManager extends UmbManag
 			update: (id: string, body: UpdateMemberTypeRequestModel) =>
 				MemberTypeService.putMemberTypeById({ path: { id }, body }),
 			delete: (id: string) => MemberTypeService.deleteMemberTypeById({ path: { id } }),
-			readMany: (ids: Array<string>) => MemberTypeService.getMemberTypeFetch({ query: { id: ids } }),
+			readMany: (ids: Array<string>) => MemberTypeService.getMemberTypeBatch({ query: { id: ids } }),
 			dataCache: memberTypeDetailCache,
 			inflightRequestCache: UmbManagementApiMemberTypeDetailDataRequestManager.#inflightRequestCache,
 		});
