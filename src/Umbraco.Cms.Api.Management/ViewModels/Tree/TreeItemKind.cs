@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 [Flags]
 public enum TreeItemKind
 {
-    None = 0,
     Item = 1,
     Folder = 2,
     All = Item | Folder

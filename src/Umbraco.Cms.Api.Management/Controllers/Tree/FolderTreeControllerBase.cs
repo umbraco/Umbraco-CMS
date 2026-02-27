@@ -249,6 +249,6 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             types.Add(FolderObjectType);
         }
 
-        return types.Count > 0 ? types : [ItemObjectType];
+        return types;
     }
 }
