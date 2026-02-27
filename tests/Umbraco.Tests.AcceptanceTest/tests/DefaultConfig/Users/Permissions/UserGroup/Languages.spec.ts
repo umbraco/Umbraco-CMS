@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
