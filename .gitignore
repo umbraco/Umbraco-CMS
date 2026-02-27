@@ -102,6 +102,7 @@ tools/docfx/
 /BenchmarkDotNet.Artifacts/
 playwright-report
 .playwright-mcp
+.claude/worktrees
 trace.zip
 /tests/Umbraco.Tests.AcceptanceTest/results
 
