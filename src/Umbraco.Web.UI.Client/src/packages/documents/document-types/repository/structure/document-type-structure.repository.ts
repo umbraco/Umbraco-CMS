@@ -8,14 +8,12 @@ export class UmbDocumentTypeStructureRepository extends UmbContentTypeStructureR
 		super(host, UmbDocumentTypeStructureServerDataSource);
 	}
 
-	async requestAllowedParentsOf(unique: string) {
-		// We expect the Document Type Structure Data Source to always have the getAllowedParentsOf method,
-		//  but it is optional in the interface, so we check just to be safe.
-		if (!this._dataSource.getAllowedParentsOf) {
-			throw new Error('Data source does not support fetching allowed parents');
-		}
+	get #documentTypeDataSource() {
+		return this._dataSource as UmbDocumentTypeStructureServerDataSource;
+	}
 
-		return this._dataSource.getAllowedParentsOf(unique);
+	async requestAllowedParentsOf(unique: string) {
+		return this.#documentTypeDataSource.getAllowedParentsOf(unique);
 	}
 }
 
