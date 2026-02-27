@@ -3,6 +3,8 @@ import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collectio
 
 export interface UmbMemberCollectionFilterModel extends UmbCollectionFilterModel {
 	memberTypeId?: string;
+	orderBy?: string;
+	orderDirection?: 'asc' | 'desc';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
