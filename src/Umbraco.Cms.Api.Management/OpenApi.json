@@ -898,49 +898,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/data-type/configuration": {
+    "/umbraco/management/api/v1/data-type/batch": {
       "get": {
         "tags": [
           "Data Type"
         ],
-        "summary": "Gets the data type configuration.",
-        "description": "Gets the configuration settings for data types.",
-        "operationId": "GetDataTypeConfiguration",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/DatatypeConfigurationResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/data-type/fetch": {
-      "get": {
-        "tags": [
-          "Data Type"
-        ],
-        "operationId": "GetDataTypeFetch",
+        "operationId": "GetDataTypeBatch",
         "parameters": [
           {
             "name": "id",
@@ -962,7 +925,44 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FetchResponseModelDataTypeResponseModel"
+                      "$ref": "#/components/schemas/BatchResponseModelDataTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/data-type/configuration": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "summary": "Gets the data type configuration.",
+        "description": "Gets the configuration settings for data types.",
+        "operationId": "GetDataTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DatatypeConfigurationResponseModel"
                     }
                   ]
                 }
@@ -6112,49 +6112,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/document-type/configuration": {
+    "/umbraco/management/api/v1/document-type/batch": {
       "get": {
         "tags": [
           "Document Type"
         ],
-        "summary": "Gets the document type configuration.",
-        "description": "Gets the configuration settings for document types.",
-        "operationId": "GetDocumentTypeConfiguration",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/DocumentTypeConfigurationResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/document-type/fetch": {
-      "get": {
-        "tags": [
-          "Document Type"
-        ],
-        "operationId": "GetDocumentTypeFetch",
+        "operationId": "GetDocumentTypeBatch",
         "parameters": [
           {
             "name": "id",
@@ -6176,7 +6139,44 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FetchResponseModelDocumentTypeResponseModel"
+                      "$ref": "#/components/schemas/BatchResponseModelDocumentTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/configuration": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets the document type configuration.",
+        "description": "Gets the configuration settings for document types.",
+        "operationId": "GetDocumentTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentTypeConfigurationResponseModel"
                     }
                   ]
                 }
@@ -16116,49 +16116,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/media-type/configuration": {
+    "/umbraco/management/api/v1/media-type/batch": {
       "get": {
         "tags": [
           "Media Type"
         ],
-        "summary": "Gets the media type configuration.",
-        "description": "Gets the configuration settings for media types.",
-        "operationId": "GetMediaTypeConfiguration",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MediaTypeConfigurationResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/media-type/fetch": {
-      "get": {
-        "tags": [
-          "Media Type"
-        ],
-        "operationId": "GetMediaTypeFetch",
+        "operationId": "GetMediaTypeBatch",
         "parameters": [
           {
             "name": "id",
@@ -16180,7 +16143,44 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FetchResponseModelMediaTypeResponseModel"
+                      "$ref": "#/components/schemas/BatchResponseModelMediaTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media-type/configuration": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "summary": "Gets the media type configuration.",
+        "description": "Gets the configuration settings for media types.",
+        "operationId": "GetMediaTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MediaTypeConfigurationResponseModel"
                     }
                   ]
                 }
@@ -21593,49 +21593,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/member-type/configuration": {
+    "/umbraco/management/api/v1/member-type/batch": {
       "get": {
         "tags": [
           "Member Type"
         ],
-        "summary": "Gets the member type configuration.",
-        "description": "Gets the configuration settings for member types.",
-        "operationId": "GetMemberTypeConfiguration",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MemberTypeConfigurationResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/member-type/fetch": {
-      "get": {
-        "tags": [
-          "Member Type"
-        ],
-        "operationId": "GetMemberTypeFetch",
+        "operationId": "GetMemberTypeBatch",
         "parameters": [
           {
             "name": "id",
@@ -21657,7 +21620,44 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FetchResponseModelMemberTypeResponseModel"
+                      "$ref": "#/components/schemas/BatchResponseModelMemberTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/configuration": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets the member type configuration.",
+        "description": "Gets the configuration settings for member types.",
+        "operationId": "GetMemberTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MemberTypeConfigurationResponseModel"
                     }
                   ]
                 }
@@ -38250,6 +38250,102 @@
         },
         "additionalProperties": false
       },
+      "BatchResponseModelDataTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelDocumentTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelMediaTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelMemberTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "CalculatedUserStartNodesResponseModel": {
         "required": [
           "documentStartNodeIds",
@@ -42616,102 +42712,6 @@
           "Warning"
         ],
         "type": "string"
-      },
-      "FetchResponseModelDataTypeResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DataTypeResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "FetchResponseModelDocumentTypeResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentTypeResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "FetchResponseModelMediaTypeResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/MediaTypeResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "FetchResponseModelMemberTypeResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/MemberTypeResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
       },
       "FieldPresentationModel": {
         "required": [
