@@ -219,7 +219,7 @@ public class PackagingService : IPackagingService
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
-        var attempt = await _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        var attempt = await _keyValueService.FindByKeyPrefixAsync(Constants.Conventions.Migrations.KeyValuePrefix);
         IReadOnlyDictionary<string, string?>? keyValues = attempt.Result;
 
         var installedPackages = new List<InstalledPackage>();
@@ -332,7 +332,7 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public async Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
-        var attempt = await _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        var attempt = await _keyValueService.FindByKeyPrefixAsync(Constants.Conventions.Migrations.KeyValuePrefix);
 
         IReadOnlyDictionary<string, string?> keyValues =
             attempt.Result ?? new Dictionary<string, string?>();

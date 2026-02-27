@@ -19,5 +19,5 @@ public class GetTelemetryController : TelemetryControllerBase
     [EndpointSummary("Gets telemetry information.")]
     [EndpointDescription("Gets the current telemetry configuration and consent level.")]
     public async Task<TelemetryRepresentationBase> Get(CancellationToken cancellationToken)
-        => new TelemetryResponseModel { TelemetryLevel = await _metricsConsentService.GetConsentLevel() };
+        => new TelemetryResponseModel { TelemetryLevel = await _metricsConsentService.GetConsentLevelAsync() };
 }

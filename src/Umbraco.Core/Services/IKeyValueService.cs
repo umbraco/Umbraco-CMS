@@ -11,19 +11,19 @@ public interface IKeyValueService
     ///     Gets a value.
     /// </summary>
     /// <remarks>Returns <c>null</c> if no value was found for the key.</remarks>
-    Task<string?> GetValue(string key);
+    Task<string?> GetValueAsync(string key);
 
     /// <summary>
     ///     Returns key/value pairs for all keys with the specified prefix.
     /// </summary>
     /// <param name="keyPrefix"></param>
     /// <returns></returns>
-    Task<Attempt<IReadOnlyDictionary<string, string?>?, KeyValueOperationStatus>> FindByKeyPrefix(string keyPrefix);
+    Task<Attempt<IReadOnlyDictionary<string, string?>?, KeyValueOperationStatus>> FindByKeyPrefixAsync(string keyPrefix);
 
     /// <summary>
     ///     Sets a value.
     /// </summary>
-    Task<Attempt<KeyValueOperationStatus>> SetValue(string key, string value);
+    Task<Attempt<KeyValueOperationStatus>> SetValueAsync(string key, string value);
 
     /// <summary>
     ///     Sets a value.
@@ -33,7 +33,7 @@ public interface IKeyValueService
     ///     and returns a success status. In other words, ensures that the value has not changed
     ///     before setting it.
     /// </remarks>
-    Task<Attempt<KeyValueOperationStatus>> SetValue(string key, string originValue, string newValue);
+    Task<Attempt<KeyValueOperationStatus>> SetValueAsync(string key, string originValue, string newValue);
 
     /// <summary>
     ///     Tries to set a value.
@@ -43,5 +43,5 @@ public interface IKeyValueService
     ///     and returns a success status; otherwise returns a failed status. In other words, ensures that the value has not changed
     ///     before setting it.
     /// </remarks>
-    Task<Attempt<bool, KeyValueOperationStatus>> TrySetValue(string key, string originValue, string newValue);
+    Task<Attempt<bool, KeyValueOperationStatus>> TrySetValueAsync(string key, string originValue, string newValue);
 }

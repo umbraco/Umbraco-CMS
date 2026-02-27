@@ -26,7 +26,7 @@ internal sealed class KeyValueService : IKeyValueService
     }
 
     /// <inheritdoc />
-    public async Task<string?> GetValue(string key)
+    public async Task<string?> GetValueAsync(string key)
     {
         using ICoreScope scope = _scopeProvider.CreateScope();
 
@@ -37,18 +37,18 @@ internal sealed class KeyValueService : IKeyValueService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IReadOnlyDictionary<string, string?>?, KeyValueOperationStatus>> FindByKeyPrefix(string keyPrefix)
+    public async Task<Attempt<IReadOnlyDictionary<string, string?>?, KeyValueOperationStatus>> FindByKeyPrefixAsync(string keyPrefix)
     {
         using ICoreScope scope = _scopeProvider.CreateScope();
 
-        IReadOnlyDictionary<string, string?>? dict = await _repository.FindByKeyPrefix(keyPrefix);
+        IReadOnlyDictionary<string, string?>? dict = await _repository.FindByKeyPrefixAsync(keyPrefix);
 
         scope.Complete();
         return Attempt.SucceedWithStatus(KeyValueOperationStatus.Success, dict);
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<KeyValueOperationStatus>> SetValue(string key, string value)
+    public async Task<Attempt<KeyValueOperationStatus>> SetValueAsync(string key, string value)
     {
         using ICoreScope scope = _scopeProvider.CreateScope();
         scope.WriteLock(Constants.Locks.KeyValues);
@@ -72,9 +72,9 @@ internal sealed class KeyValueService : IKeyValueService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<KeyValueOperationStatus>> SetValue(string key, string originValue, string newValue)
+    public async Task<Attempt<KeyValueOperationStatus>> SetValueAsync(string key, string originValue, string newValue)
     {
-        Attempt<bool, KeyValueOperationStatus> attempt = await TrySetValue(key, originValue, newValue);
+        Attempt<bool, KeyValueOperationStatus> attempt = await TrySetValueAsync(key, originValue, newValue);
         if (!attempt.Result)
         {
             return Attempt.Fail(KeyValueOperationStatus.NoValueSet);
@@ -84,7 +84,7 @@ internal sealed class KeyValueService : IKeyValueService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<bool, KeyValueOperationStatus>> TrySetValue(string key, string originalValue, string newValue)
+    public async Task<Attempt<bool, KeyValueOperationStatus>> TrySetValueAsync(string key, string originalValue, string newValue)
     {
         using ICoreScope scope = _scopeProvider.CreateScope();
         scope.WriteLock(Constants.Locks.KeyValues);

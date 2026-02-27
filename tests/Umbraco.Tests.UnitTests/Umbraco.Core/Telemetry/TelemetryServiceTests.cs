@@ -51,7 +51,7 @@ public class TelemetryServiceTests
         var version = CreateUmbracoVersion(9, 1, 1, "-rc", "-ad2f4k2d");
 
         var metricsConsentService = new Mock<IMetricsConsentService>();
-        metricsConsentService.Setup(x => x.GetConsentLevel()).ReturnsAsync(TelemetryLevel.Detailed);
+        metricsConsentService.Setup(x => x.GetConsentLevelAsync()).ReturnsAsync(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
             Mock.Of<IPackagingService>(),
             version,
@@ -80,7 +80,7 @@ public class TelemetryServiceTests
         };
         var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
-        metricsConsentService.Setup(x => x.GetConsentLevel()).ReturnsAsync(TelemetryLevel.Detailed);
+        metricsConsentService.Setup(x => x.GetConsentLevelAsync()).ReturnsAsync(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
             packagingService,
             version,
@@ -117,7 +117,7 @@ public class TelemetryServiceTests
         };
         var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
-        metricsConsentService.Setup(x => x.GetConsentLevel()).ReturnsAsync(TelemetryLevel.Detailed);
+        metricsConsentService.Setup(x => x.GetConsentLevelAsync()).ReturnsAsync(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
             packagingService,
             version,

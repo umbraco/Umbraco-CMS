@@ -94,7 +94,7 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         string? currentSerializerValue;
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            currentSerializerValue = await _keyValueService.GetValue(NuCacheSerializerKey);
+            currentSerializerValue = await _keyValueService.GetValueAsync(NuCacheSerializerKey);
         }
 
         if (Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) && serializer == currentSerializer)
@@ -119,11 +119,11 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         _databaseCacheRepository.Rebuild([], [], []);
 
         // If the serializer type has changed, we also need to update it in the key value store.
-        var currentSerializerValue = await _keyValueService.GetValue(NuCacheSerializerKey);
+        var currentSerializerValue = await _keyValueService.GetValueAsync(NuCacheSerializerKey);
         if (!Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) ||
             _nucacheSettings.Value.NuCacheSerializerType != currentSerializer)
         {
-            await _keyValueService.SetValue(NuCacheSerializerKey, _nucacheSettings.Value.NuCacheSerializerType.ToString());
+            await _keyValueService.SetValueAsync(NuCacheSerializerKey, _nucacheSettings.Value.NuCacheSerializerType.ToString());
         }
 
         scope.Complete();

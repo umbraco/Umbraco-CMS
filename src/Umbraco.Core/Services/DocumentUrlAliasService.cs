@@ -361,7 +361,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             _documentUrlAliasRepository.Save(toSave);
         }
 
-        _keyValueService.SetValue(RebuildKey, CurrentRebuildValue);
+        await _keyValueService.SetValueAsync(RebuildKey, CurrentRebuildValue);
 
         // Clear and repopulate the in-memory cache
         _aliasCache.Clear();
@@ -439,7 +439,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
     private async Task<bool> ShouldRebuildAliases()
     {
-        var persistedValue = await _keyValueService.GetValue(RebuildKey);
+        var persistedValue = await _keyValueService.GetValueAsync(RebuildKey);
         return string.Equals(persistedValue, CurrentRebuildValue, StringComparison.Ordinal) is false;
     }
 

@@ -70,7 +70,7 @@ public class DatabaseUpgradeStep : StepBase, IInstallStep, IUpgradeStep
 
         // Check the upgrade state, if it matches we dont have to upgrade.
         var plan = new UmbracoPlan(_umbracoVersion);
-        var currentState = await _keyValueService.GetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name);
+        var currentState = await _keyValueService.GetValueAsync(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name);
         if (currentState != plan.FinalState)
         {
             return true;

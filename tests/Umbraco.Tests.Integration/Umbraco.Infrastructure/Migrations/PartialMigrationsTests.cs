@@ -54,7 +54,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         var upgrader = new Upgrader(plan);
 
         var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
-        var stateValueKey = await KeyValueService.GetValue(upgrader.StateValueKey);
+        var stateValueKey = await KeyValueService.GetValueAsync(upgrader.StateValueKey);
 
         Assert.Multiple(() =>
         {
@@ -77,7 +77,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         ErrorMigration.ShouldExplode = false;
         upgrader = new Upgrader(plan);
         result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
-        stateValueKey = await KeyValueService.GetValue(upgrader.StateValueKey);
+        stateValueKey = await KeyValueService.GetValueAsync(upgrader.StateValueKey);
         Assert.Multiple(() =>
         {
             Assert.AreEqual("a", result.InitialState);
@@ -124,7 +124,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         var upgrader = new Upgrader(plan);
         var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
-        var stateValueKey = await KeyValueService.GetValue(upgrader.StateValueKey);
+        var stateValueKey = await KeyValueService.GetValueAsync(upgrader.StateValueKey);
 
         Assert.Multiple(() =>
         {

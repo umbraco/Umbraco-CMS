@@ -83,7 +83,7 @@ public class Upgrader
     private async Task<string> GetInitialState(ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
     {
         using ICoreScope scope = scopeProvider.CreateCoreScope();
-        var currentState = await keyValueService.GetValue(StateValueKey);
+        var currentState = await keyValueService.GetValueAsync(StateValueKey);
         scope.Complete();
 
         if (currentState is null || Plan.IgnoreCurrentState)

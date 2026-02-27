@@ -49,18 +49,18 @@ internal sealed class TelemetryService : ITelemetryService
             Id = telemetryId,
             Version = await GetVersion(),
             Packages = await GetPackageTelemetryAsync().ConfigureAwait(false),
-            Detailed = await _usageInformationService.GetDetailed(),
+            Detailed = await _usageInformationService.GetDetailedAsync(),
         };
     }
 
     private async Task<string?> GetVersion()
-        => await _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+        => await _metricsConsentService.GetConsentLevelAsync() == TelemetryLevel.Minimal
         ? null
         : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
 
     private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
-        if (await _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+        if (await _metricsConsentService.GetConsentLevelAsync() == TelemetryLevel.Minimal)
         {
             return null;
         }

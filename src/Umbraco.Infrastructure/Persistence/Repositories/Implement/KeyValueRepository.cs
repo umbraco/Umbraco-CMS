@@ -28,7 +28,7 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyDictionary<string, string?>?> FindByKeyPrefix(string keyPrefix)
+    public async Task<IReadOnlyDictionary<string, string?>?> FindByKeyPrefixAsync(string keyPrefix)
     {
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
@@ -69,22 +69,22 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
     /// <inheritdoc/>
     protected override async Task<IEnumerable<IKeyValue>?> PerformGetManyAsync(string[]? ids)
     {
-        if (ids is not null)
+        if (ids is null)
         {
-            await AmbientScope.ExecuteWithContextAsync(async db =>
-            {
-                List<KeyValueDto> dtos = await db.KeyValue
-                    .Where(x => ids.Any(id => id == x.Key))
-                    .ToListAsync();
-
-                return dtos
-                    .Select(Map)
-                    .WhereNotNull()
-                    .AsEnumerable();
-            });
+            return null;
         }
 
-        return null;
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<KeyValueDto> dtos = await db.KeyValue
+                .Where(x => ids.Any(id => id == x.Key))
+                .ToListAsync();
+
+            return dtos
+                .Select(Map)
+                .WhereNotNull()
+                .AsEnumerable();
+        });
     }
 
     /// <inheritdoc/>

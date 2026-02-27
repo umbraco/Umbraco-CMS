@@ -272,7 +272,7 @@ public class DocumentUrlService : IDocumentUrlService
         return string.Equals(persistedValue, currentValue) is false;
     }
 
-    private async Task<string?> GetPersistedRebuildValue() => await _keyValueService.GetValue(RebuildKey);
+    private async Task<string?> GetPersistedRebuildValue() => await _keyValueService.GetValueAsync(RebuildKey);
 
     private string GetCurrentRebuildValue() => string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
 
@@ -286,7 +286,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
 
-        _keyValueService.SetValue(RebuildKey, GetCurrentRebuildValue());
+        await _keyValueService.SetValueAsync(RebuildKey, GetCurrentRebuildValue());
 
         scope.Complete();
     }

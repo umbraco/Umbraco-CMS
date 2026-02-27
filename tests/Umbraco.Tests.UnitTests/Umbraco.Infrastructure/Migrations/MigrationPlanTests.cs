@@ -93,21 +93,21 @@ public class MigrationPlanTests
             .To<NoopMigration>("VERSION.33");
 
         var kvs = Mock.Of<IKeyValueService>();
-        Mock.Get(kvs).Setup(x => x.GetValue(It.IsAny<string>()))
+        Mock.Get(kvs).Setup(x => x.GetValueAsync(It.IsAny<string>()))
             .ReturnsAsync((string k) => k == "Umbraco.Tests.MigrationPlan" ? string.Empty : null);
 
         string state;
         using (var s = scopeProvider.CreateScope())
         {
             // read current state
-            var sourceState = await kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
+            var sourceState = await kvs.GetValueAsync("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
             // execute plan
             var result = await executor.ExecutePlanAsync(plan, sourceState).ConfigureAwait(false);
             state = result.FinalState;
 
             // save new state
-            kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);
+            await kvs.SetValueAsync("Umbraco.Tests.MigrationPlan", sourceState, state);
 
             s.Complete();
         }

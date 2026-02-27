@@ -12,5 +12,5 @@ public interface IKeyValueRepository : IAsyncReadWriteRepository<string, IKeyVal
     /// </summary>
     /// <param name="keyPrefix"></param>
     /// <returns></returns>
-    Task<IReadOnlyDictionary<string, string?>?> FindByKeyPrefix(string keyPrefix);
+    Task<IReadOnlyDictionary<string, string?>?> FindByKeyPrefixAsync(string keyPrefix);
 }

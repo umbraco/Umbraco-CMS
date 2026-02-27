@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
-public class AddEditorUiToDataType : MigrationBase
+public class AddEditorUiToDataType : AsyncMigrationBase
 {
     private readonly IKeyValueService _keyValueService;
     private readonly IJsonSerializer _jsonSerializer;
@@ -24,9 +24,10 @@ public class AddEditorUiToDataType : MigrationBase
         _logger = logger;
     }
 
-    protected override void Migrate()
+    protected override async Task MigrateAsync()
     {
-        var dataEditorSplitCollectionData = _keyValueService.GetValue("migrateDataEditorSplitCollectionData").GetAwaiter().GetResult();
+        var dataEditorSplitCollectionData =
+            await _keyValueService.GetValueAsync("migrateDataEditorSplitCollectionData");
         DataTypeEditorAliasMigrationData[]? migrationData = dataEditorSplitCollectionData.IsNullOrWhiteSpace() is false
             ? _jsonSerializer.Deserialize<DataTypeEditorAliasMigrationData[]>(dataEditorSplitCollectionData)
             : null;
