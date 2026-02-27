@@ -437,9 +437,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
 				// Use the structure manager's bulk-loaded data type details instead of individual requests.
-				const dataType = await firstValueFrom(
-					this.structure.contentTypeDataTypeDetailOf(property.dataType.unique).pipe(filter((x) => x !== undefined)),
-				);
+				const dataType = await this.observe(
+					this.structure.contentTypeDataTypeDetailOf(property.dataType.unique),
+				).asPromise();
 				if (!dataType.editorUiAlias) {
 					throw new Error(`DataType of "${property.dataType.unique}" did not have a editorUiAlias.`);
 				}
