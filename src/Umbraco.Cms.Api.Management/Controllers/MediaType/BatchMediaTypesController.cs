@@ -32,6 +32,8 @@ public class BatchMediaTypesController : MediaTypeControllerBase
     [HttpGet("batch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(BatchResponseModel<MediaTypeResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets multiple media types.")]
+    [EndpointDescription("Gets multiple media types identified by the provided Ids.")]
     public async Task<IActionResult> Batch(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] Guid[] ids)

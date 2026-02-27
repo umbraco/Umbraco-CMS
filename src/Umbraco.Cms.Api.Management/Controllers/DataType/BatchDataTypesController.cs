@@ -32,11 +32,13 @@ public class BatchDataTypesController : DataTypeControllerBase
     [HttpGet("batch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(BatchResponseModel<DataTypeResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets multiple data types.")]
+    [EndpointDescription("Gets multiple data types identified by the provided Ids.")]
     public async Task<IActionResult> Batch(
         CancellationToken cancellationToken,
-        [FromQuery(Name = "id")] Guid[] ids)
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
-        Guid[] requestedIds = [.. ids.Distinct()];
+        Guid[] requestedIds = [.. ids];
 
         if (requestedIds.Length == 0)
         {

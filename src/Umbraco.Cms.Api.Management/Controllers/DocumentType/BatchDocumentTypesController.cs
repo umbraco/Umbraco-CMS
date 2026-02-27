@@ -32,6 +32,8 @@ public class BatchDocumentTypesController : DocumentTypeControllerBase
     [HttpGet("batch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(BatchResponseModel<DocumentTypeResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets multiple document types.")]
+    [EndpointDescription("Gets multiple document types identified by the provided Ids.")]
     public async Task<IActionResult> Batch(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] Guid[] ids)

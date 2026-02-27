@@ -32,6 +32,8 @@ public class BatchMemberTypesController : MemberTypeControllerBase
     [HttpGet("batch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(BatchResponseModel<MemberTypeResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets multiple member types.")]
+    [EndpointDescription("Gets multiple member types identified by the provided Ids.")]
     public async Task<IActionResult> Batch(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] Guid[] ids)
