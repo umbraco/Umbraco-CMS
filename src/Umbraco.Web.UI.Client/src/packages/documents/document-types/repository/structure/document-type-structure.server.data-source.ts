@@ -33,7 +33,7 @@ export class UmbDocumentTypeStructureServerDataSource
 			}),
 		);
 		if (error) {
-			throw new Error('Failed to fetch allowed parents');
+			return { error };
 		}
 		const mappedData =
 			data?.allowedParentIds.map((item) => ({
