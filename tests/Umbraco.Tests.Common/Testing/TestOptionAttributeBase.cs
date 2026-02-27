@@ -31,7 +31,9 @@ public abstract class TestOptionAttributeBase : Attribute
         var test = TestContext.CurrentContext.Test;
         var type = TestExecutionContext.CurrentContext.TestObject.GetType();
 
-        var methodInfo = type.GetMethod(test.MethodName ?? string.Empty); // what about overloads?
+        var methodInfo = test.MethodName is not null
+            ? type.GetMethod(test.MethodName)
+            : null;
         if (methodInfo is not null)
         {
             var options = GetTestOptions<TOptions>(methodInfo);
