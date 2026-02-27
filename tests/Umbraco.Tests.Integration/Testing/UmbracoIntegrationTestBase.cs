@@ -30,8 +30,9 @@ public abstract class UmbracoIntegrationTestBase
     protected static int TestCount = 1;
 
     private readonly List<Action> _fixtureTeardown = new();
-    private readonly Queue<Action> _testTeardown = new();
-    private bool _firstTestInFixture = true;
+
+    protected readonly Queue<Action> TeardownQueue = new();
+    protected bool IsFirstTestInFixture = true;
 
     protected Dictionary<string, string> InMemoryConfiguration { get; } = new();
 
@@ -41,33 +42,27 @@ public abstract class UmbracoIntegrationTestBase
 
     protected TestHelper TestHelper { get; } = new();
 
-    protected void AddOnTestTearDown(Action tearDown) => _testTeardown.Enqueue(tearDown);
+    protected void AddOnTestTearDown(Action tearDown) => TeardownQueue.Enqueue(tearDown);
 
     protected void AddOnFixtureTearDown(Action tearDown) => _fixtureTeardown.Add(tearDown);
 
-    [SetUp]
-    public virtual void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
-
-    [TearDown]
-    public void TearDown_Logging() =>
-        TestContext.Out.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
-
-    [OneTimeTearDown]
-    public void FixtureTearDown()
+    /// <summary>
+    /// Intended to be called from a test fixture [TearDown] or a setup fixture [OneTimeTearDown]
+    /// </summary>
+    protected void ExecuteTearDownQueue()
     {
-        foreach (var a in _fixtureTeardown)
+        IsFirstTestInFixture = false;
+
+        while (TeardownQueue.TryDequeue(out var a))
         {
             a();
         }
     }
 
-    [TearDown]
-    public void TearDown()
+    [OneTimeTearDown]
+    public void FixtureTearDown()
     {
-        _firstTestInFixture = false;
-
-        while (_testTeardown.TryDequeue(out var a))
+        foreach (var a in _fixtureTeardown)
         {
             a();
         }
@@ -150,7 +145,7 @@ public abstract class UmbracoIntegrationTestBase
 
     private TestDbMeta SetupPerFixtureDatabase(ITestDatabase db, bool withSchema)
     {
-        if (_firstTestInFixture)
+        if (IsFirstTestInFixture)
         {
             _fixtureDbMeta = withSchema ? db.AttachSchema() : db.AttachEmpty();
             AddOnFixtureTearDown(() => db.Detach(_fixtureDbMeta));
