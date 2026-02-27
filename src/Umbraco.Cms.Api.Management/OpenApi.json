@@ -49148,7 +49148,6 @@
       },
       "TreeItemKindModel": {
         "enum": [
-          "None",
           "Item",
           "Folder",
           "All"
