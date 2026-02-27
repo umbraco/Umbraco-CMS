@@ -32,16 +32,27 @@ public class AllIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(PagedViewModel<IndexResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of indexers.")]
     [EndpointDescription("Gets a collection of configured search indexers in the Umbraco installation.")]
-    public Task<PagedViewModel<IndexResponseModel>> All(
+    public async Task<PagedViewModel<IndexResponseModel>> All(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
     {
-        IndexResponseModel[] indexes = _examineManager.Indexes
-            .Select(_indexPresentationFactory.Create)
-            .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
+        var indexes = new List<IndexResponseModel>();
 
-        var viewModel = new PagedViewModel<IndexResponseModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
-        return Task.FromResult(viewModel);
+        foreach (IIndex index in _examineManager.Indexes)
+        {
+            indexes.Add(await _indexPresentationFactory.CreateAsync(index));
+        }
+
+        indexes.Sort((a, b) =>
+            string.Compare(a.Name.TrimEnd("Indexer"), b.Name.TrimEnd("Indexer"), StringComparison.Ordinal));
+
+        var viewModel = new PagedViewModel<IndexResponseModel>
+        {
+            Items = indexes.Skip(skip).Take(take),
+            Total = indexes.Count,
+        };
+
+        return viewModel;
     }
 }

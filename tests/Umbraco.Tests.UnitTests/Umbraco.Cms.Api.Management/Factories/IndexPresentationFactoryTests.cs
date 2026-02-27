@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 public class IndexPresentationFactoryTests
 {
     [Test]
-    public void Create_Should_Set_HealthStatusMessage_On_Diagnostics_Failure()
+    public async Task Create_Should_Set_HealthStatusMessage_On_Diagnostics_Failure()
     {
         var indexDiagnosticsFailureMessage = "something is wrong";
         // arrange
@@ -46,8 +46,8 @@ public class IndexPresentationFactoryTests
 
         var indexRebuilderServiceMock = new Mock<IIndexingRebuilderService>();
         indexRebuilderServiceMock
-            .Setup(rebuilder => rebuilder.IsRebuilding(It.IsAny<string>()))
-            .Returns(false);
+            .Setup(rebuilder => rebuilder.IsRebuildingAsync(It.IsAny<string>()))
+            .ReturnsAsync(false);
 
         var factory = new IndexPresentationFactory(
             indexDiagnosticsFactoryMock.Object,
@@ -57,7 +57,7 @@ public class IndexPresentationFactoryTests
 
 
         // act
-        var responseModel = factory.Create(indexMock.Object);
+        var responseModel = await factory.CreateAsync(indexMock.Object);
 
         // assert
         Assert.AreEqual(indexDiagnosticsFailureMessage, responseModel.HealthStatus.Message);
