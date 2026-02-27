@@ -208,12 +208,32 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     }
 
     protected virtual TItem[] MapSearchTreeItemViewModels(IEntitySlim[] entities)
-        => entities.Select(entity => MapTreeItemViewModel(
-                FolderObjectType == UmbracoObjectTypes.Unknown || entity.ParentId == Constants.System.Root
-                    ? null
-                    : IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType).Result,
-                entity))
-            .ToArray();
+        => entities.Select(entity => MapTreeItemViewModel(GetSearchResultParentKey(entity), entity)).ToArray();
+
+    private Guid? GetSearchResultParentKey(IEntitySlim entity)
+    {
+        if (entity.ParentId == Constants.System.Root)
+        {
+            return null;
+        }
+
+        if (FolderObjectType != UmbracoObjectTypes.Unknown)
+        {
+            Attempt<Guid> getKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType);
+            if (getKeyAttempt.Success)
+            {
+                return getKeyAttempt.Result;
+            }
+        }
+
+        Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, ItemObjectType);
+        if (itemKeyAttempt.Success)
+        {
+            return itemKeyAttempt.Result;
+        }
+
+        return null;
+    }
 
     private IEnumerable<UmbracoObjectTypes> GetItemObjectTypes(TreeItemKind itemKind)
     {
