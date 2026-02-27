@@ -97,4 +97,27 @@ public interface IDocumentCacheService
     /// <param name="contentTypeIds">The collection of content type identifiers to rebuild in memory cache.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds);
+
+    /// <summary>
+    /// Clears all converted IPublishedContent entries from the in-memory cache,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this when the published model factory is reset (e.g. InMemoryAuto mode), which
+    /// invalidates all compiled model types and makes cached instances of any type stale.
+    /// </remarks>
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache() { }
+
+    /// <summary>
+    /// Clears converted IPublishedContent entries for the specified content types from the in-memory cache,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this when the published model factory is NOT reset (e.g. SourceCodeAuto/SourceCodeManual modes),
+    /// so only the affected content types need their converted cache cleared.
+    /// </remarks>
+    /// <param name="contentTypeIds">The IDs of the content types whose converted entries should be cleared.</param>
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds) { }
 }

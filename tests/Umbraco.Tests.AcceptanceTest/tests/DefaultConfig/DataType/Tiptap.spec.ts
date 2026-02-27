@@ -1,4 +1,4 @@
-import {test} from "@umbraco/playwright-testhelpers";
+import {test} from "@umbraco/acceptance-test-helpers";
 import {expect} from "@playwright/test";
 
 const tipTapName = 'TestTiptap';
