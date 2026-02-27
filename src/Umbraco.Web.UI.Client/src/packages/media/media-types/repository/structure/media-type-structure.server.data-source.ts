@@ -28,11 +28,11 @@ export class UmbMediaTypeStructureServerDataSource
 		return getAllowedMediaTypesOfFolders({ skip, take });
 	}
 
-	async getAllowedParentsOf(mediaTypeId: string) {
+	async getAllowedParentsOf(unique: string) {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getMediaTypeByIdAllowedParents({
-				path: { id: mediaTypeId },
+				path: { id: unique },
 			}),
 		);
 		if (error) {

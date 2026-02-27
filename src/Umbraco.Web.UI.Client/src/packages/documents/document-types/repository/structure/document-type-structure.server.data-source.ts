@@ -25,11 +25,11 @@ export class UmbDocumentTypeStructureServerDataSource
 		this.#host = host;
 	}
 
-	async getAllowedParentsOf(documentTypeId: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>> {
+	async getAllowedParentsOf(unique: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeByIdAllowedParents({
-				path: { id: documentTypeId },
+				path: { id: unique },
 			}),
 		);
 		if (error) {
