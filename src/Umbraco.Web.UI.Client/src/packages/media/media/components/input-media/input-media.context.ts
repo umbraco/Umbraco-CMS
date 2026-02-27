@@ -23,6 +23,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 > {
 	#mediaTypeStructureRepository;
 	#folderTypeUniques = new Set<string>();
+	#folderTypesPromise: Promise<void> | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
@@ -62,9 +63,12 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	}
 
 	async #loadFolderTypes() {
-		if (this.#folderTypeUniques.size > 0) return;
-		const folderTypes = await this.#mediaTypeStructureRepository.requestMediaTypesOfFolders();
-		this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
+		if (!this.#folderTypesPromise) {
+			this.#folderTypesPromise = this.#mediaTypeStructureRepository.requestMediaTypesOfFolders().then((folderTypes) => {
+				this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
+			});
+		}
+		return this.#folderTypesPromise;
 	}
 
 	#pickableFilter = (

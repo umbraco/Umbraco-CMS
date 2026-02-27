@@ -157,11 +157,11 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 		const newName = e.target.value as string;
 		this._typingNewFolder = false;
-		if (!newName || !this.#selectedFolderType) return;
+		if (!newName || !this.#selectedFolderType?.unique) return;
 
 		const newUnique = UmbId.new();
 		const parentUnique = this._paths[this._paths.length - 1].unique;
-		const folderTypeUnique = this.#selectedFolderType.unique!;
+		const folderTypeUnique = this.#selectedFolderType.unique;
 
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: newUnique,
