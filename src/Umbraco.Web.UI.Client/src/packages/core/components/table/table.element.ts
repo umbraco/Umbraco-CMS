@@ -320,6 +320,7 @@ export class UmbTableElement extends UmbLitElement {
 					this.config.allowSelection && this.config.allowSelectAll !== false,
 					() => html`
 						<uui-checkbox
+							label="\u200B"
 							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
@@ -365,6 +366,7 @@ export class UmbTableElement extends UmbLitElement {
 					this.config.allowSelection && isItemSelectable,
 					() => html`
 						<uui-checkbox
+							label="\u200B"
 							aria-label=${this.localize.term('buttons_select')}
 							@click=${(e: PointerEvent) => e.stopPropagation()}
 							@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
@@ -482,6 +484,11 @@ export class UmbTableElement extends UmbLitElement {
 
 			uui-table-cell umb-icon {
 				vertical-align: top;
+			}
+
+			uui-table-cell uui-checkbox,
+			uui-table-head-cell uui-checkbox {
+				--uui-size-3: 0;
 			}
 		`,
 	];
