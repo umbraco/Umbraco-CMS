@@ -1,9 +1,9 @@
 import { UmbDocumentItemRepository } from '../../item/index.js';
+import type { UmbDocumentTreeItemModel } from '../../types.js';
 import {
 	UmbDocumentTypeDetailRepository,
 	UmbDocumentTypeStructureRepository,
 } from '@umbraco-cms/backoffice/document-type';
-import type { UmbDocumentTreeItemModel } from '../../types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbMoveToEntityAction } from '@umbraco-cms/backoffice/tree';
 
