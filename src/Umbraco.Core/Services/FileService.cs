@@ -515,7 +515,7 @@ public class FileService : RepositoryService, IFileService
     /// <param name="name"></param>
     /// <param name="alias"></param>
     /// <param name="content"></param>
-    /// <param name="masterTemplate"></param>
+    /// <param name="layoutTemplate"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
@@ -523,7 +523,7 @@ public class FileService : RepositoryService, IFileService
         string? name,
         string? alias,
         string? content,
-        ITemplate? masterTemplate = null,
+        ITemplate? layoutTemplate = null,
         int userId = Constants.Security.SuperUserId)
     {
         // mimic old service behavior
@@ -552,8 +552,8 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
-        => _templateService.GetChildrenAsync(masterTemplateId).GetAwaiter().GetResult();
+    public IEnumerable<ITemplate> GetTemplates(int layoutTemplateId)
+        => _templateService.GetChildrenAsync(layoutTemplateId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
@@ -585,11 +585,11 @@ public class FileService : RepositoryService, IFileService
     /// <summary>
     ///     Gets the template descendants
     /// </summary>
-    /// <param name="masterTemplateId"></param>
+    /// <param name="layoutTemplateId"></param>
     /// <returns></returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
-        => _templateService.GetDescendantsAsync(masterTemplateId).GetAwaiter().GetResult();
+    public IEnumerable<ITemplate> GetTemplateDescendants(int layoutTemplateId)
+        => _templateService.GetDescendantsAsync(layoutTemplateId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a <see cref="Template" />

@@ -1825,24 +1825,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var dependencies = new List<string>();
                 XElement elementCopy = tempElement;
 
-                //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.'
-                var masterTemplate = _templateContentParserService.MasterTemplateAlias(tempElement.Value);
-                if (masterTemplate is not null && templateElements.Any(x => (string?)x.Element("Alias") == masterTemplate))
+                //Ensure that the Layout of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.'
+                var layoutTemplate = _templateContentParserService.LayoutTemplateAlias(tempElement.Value);
+                if (layoutTemplate is not null && templateElements.Any(x => (string?)x.Element("Alias") == layoutTemplate))
                 {
-                    dependencies.Add(masterTemplate);
+                    dependencies.Add(layoutTemplate);
                 }
                 else
                 {
                     _logger.LogInformation(
-                        "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
+                        "Template '{TemplateAlias}' has an invalid Layout '{TemplateLayout}', so the reference has been ignored.",
                         (string?)elementCopy.Element("Alias"),
-                        masterTemplate);
+                        layoutTemplate);
                 }
 
                 graph.AddItem(TopoGraph.CreateNode((string)elementCopy.Element("Alias")!, elementCopy, dependencies));
             }
 
-            //Sort templates by dependencies to a potential master template
+            //Sort templates by dependencies to a potential layout template
             IEnumerable<TopoGraph.Node<string, XElement>> sorted = graph.GetSortedItems();
             foreach (TopoGraph.Node<string, XElement>? item in sorted)
             {
@@ -1851,7 +1851,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var templateName = templateElement.Element("Name")?.Value;
                 var alias = templateElement.Element("Alias")!.Value;
                 var design = templateElement.Element("Design")?.Value;
-                XElement? masterElement = templateElement.Element("Master");
 
                 var existingTemplate = await _templateService.GetAsync(alias) as Template;
 
@@ -1864,16 +1863,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
 
                 template.Content = design;
-
-                if (masterElement != null && string.IsNullOrEmpty((string)masterElement) == false)
-                {
-                    template.MasterTemplateAlias = masterElement.Value;
-                    ITemplate? masterTemplate = templates.FirstOrDefault(x => x.Alias == masterElement.Value);
-                    if (masterTemplate != null)
-                    {
-                        template.MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
-                    }
-                }
 
                 templates.Add(template);
             }
@@ -1892,6 +1881,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             return templates;
         }
+
 
         #endregion
     }

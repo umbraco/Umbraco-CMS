@@ -378,7 +378,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var template2 = new Template(ShortStringHelper, "test2", "test2");
-            template2.SetMasterTemplate(template);
+            template2.LayoutTemplateAlias = template.Alias;
+            template2.LayoutTemplateId = new Lazy<int>(() => template.Id);
             repository.Save(template2);
 
             // Assert
@@ -570,10 +571,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             };
             var child = new Template(ShortStringHelper, "child", "child") { Content = @"<%@ Master Language=""C#"" %>" };
             var baby = new Template(ShortStringHelper, "baby", "baby") { Content = @"<%@ Master Language=""C#"" %>" };
-            child.MasterTemplateAlias = parent.Alias;
-            child.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            baby.MasterTemplateAlias = child.Alias;
-            baby.MasterTemplateId = new Lazy<int>(() => child.Id);
+            child.LayoutTemplateAlias = parent.Alias;
+            child.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            baby.LayoutTemplateAlias = child.Alias;
+            baby.LayoutTemplateId = new Lazy<int>(() => child.Id);
             repository.Save(parent);
             repository.Save(child);
             repository.Save(baby);
@@ -698,22 +699,22 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var toddler4 = new Template(ShortStringHelper, "toddler4", "toddler4");
             var baby2 = new Template(ShortStringHelper, "baby2", "baby2");
 
-            child1.MasterTemplateAlias = parent.Alias;
-            child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            child2.MasterTemplateAlias = parent.Alias;
-            child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            toddler1.MasterTemplateAlias = child1.Alias;
-            toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
-            toddler2.MasterTemplateAlias = child1.Alias;
-            toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
-            toddler3.MasterTemplateAlias = child2.Alias;
-            toddler3.MasterTemplateId = new Lazy<int>(() => child2.Id);
-            toddler4.MasterTemplateAlias = child2.Alias;
-            toddler4.MasterTemplateId = new Lazy<int>(() => child2.Id);
-            baby1.MasterTemplateAlias = toddler2.Alias;
-            baby1.MasterTemplateId = new Lazy<int>(() => toddler2.Id);
-            baby2.MasterTemplateAlias = toddler4.Alias;
-            baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
+            child1.LayoutTemplateAlias = parent.Alias;
+            child1.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            child2.LayoutTemplateAlias = parent.Alias;
+            child2.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            toddler1.LayoutTemplateAlias = child1.Alias;
+            toddler1.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+            toddler2.LayoutTemplateAlias = child1.Alias;
+            toddler2.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+            toddler3.LayoutTemplateAlias = child2.Alias;
+            toddler3.LayoutTemplateId = new Lazy<int>(() => child2.Id);
+            toddler4.LayoutTemplateAlias = child2.Alias;
+            toddler4.LayoutTemplateId = new Lazy<int>(() => child2.Id);
+            baby1.LayoutTemplateAlias = toddler2.Alias;
+            baby1.LayoutTemplateId = new Lazy<int>(() => toddler2.Id);
+            baby2.LayoutTemplateAlias = toddler4.Alias;
+            baby2.LayoutTemplateId = new Lazy<int>(() => toddler4.Id);
 
             // Act
             repository.Save(parent);
@@ -756,14 +757,14 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var toddler1 = new Template(ShortStringHelper, "toddler1", "toddler1");
             var toddler2 = new Template(ShortStringHelper, "toddler2", "toddler2");
 
-            child1.MasterTemplateAlias = parent.Alias;
-            child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            child2.MasterTemplateAlias = parent.Alias;
-            child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            toddler1.MasterTemplateAlias = child1.Alias;
-            toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
-            toddler2.MasterTemplateAlias = child1.Alias;
-            toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
+            child1.LayoutTemplateAlias = parent.Alias;
+            child1.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            child2.LayoutTemplateAlias = parent.Alias;
+            child2.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            toddler1.LayoutTemplateAlias = child1.Alias;
+            toddler1.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+            toddler2.LayoutTemplateAlias = child1.Alias;
+            toddler2.LayoutTemplateId = new Lazy<int>(() => child1.Id);
 
             repository.Save(parent);
             repository.Save(child1);
@@ -772,7 +773,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(toddler2);
 
             // Act
-            toddler2.SetMasterTemplate(child2);
+            toddler2.LayoutTemplateAlias = child2.Alias;
+            toddler2.LayoutTemplateId = new Lazy<int>(() => child2.Id);
             repository.Save(toddler2);
 
             // Assert
@@ -793,15 +795,16 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var parent = new Template(ShortStringHelper, "parent", "parent");
             var child1 = new Template(ShortStringHelper, "child1", "child1")
             {
-                MasterTemplateAlias = parent.Alias,
-                MasterTemplateId = new Lazy<int>(() => parent.Id)
+                LayoutTemplateAlias = parent.Alias,
+                LayoutTemplateId = new Lazy<int>(() => parent.Id)
             };
 
             repository.Save(parent);
             repository.Save(child1);
 
             // Act
-            child1.SetMasterTemplate(null);
+            child1.LayoutTemplateAlias = null;
+            child1.LayoutTemplateId = new Lazy<int>(() => -1);
             repository.Save(child1);
 
             // Assert
@@ -848,26 +851,26 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         };
         var baby2 = new Template(ShortStringHelper, "baby2", "baby2") { Content = @"<%@ Master Language=""C#"" %>" };
 
-        child1.MasterTemplateAlias = parent.Alias;
-        child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
-        child2.MasterTemplateAlias = parent.Alias;
-        child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
+        child1.LayoutTemplateAlias = parent.Alias;
+        child1.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+        child2.LayoutTemplateAlias = parent.Alias;
+        child2.LayoutTemplateId = new Lazy<int>(() => parent.Id);
 
-        toddler1.MasterTemplateAlias = child1.Alias;
-        toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
-        toddler2.MasterTemplateAlias = child1.Alias;
-        toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
+        toddler1.LayoutTemplateAlias = child1.Alias;
+        toddler1.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+        toddler2.LayoutTemplateAlias = child1.Alias;
+        toddler2.LayoutTemplateId = new Lazy<int>(() => child1.Id);
 
-        toddler3.MasterTemplateAlias = child2.Alias;
-        toddler3.MasterTemplateId = new Lazy<int>(() => child2.Id);
-        toddler4.MasterTemplateAlias = child2.Alias;
-        toddler4.MasterTemplateId = new Lazy<int>(() => child2.Id);
+        toddler3.LayoutTemplateAlias = child2.Alias;
+        toddler3.LayoutTemplateId = new Lazy<int>(() => child2.Id);
+        toddler4.LayoutTemplateAlias = child2.Alias;
+        toddler4.LayoutTemplateId = new Lazy<int>(() => child2.Id);
 
-        baby1.MasterTemplateAlias = toddler2.Alias;
-        baby1.MasterTemplateId = new Lazy<int>(() => toddler2.Id);
+        baby1.LayoutTemplateAlias = toddler2.Alias;
+        baby1.LayoutTemplateId = new Lazy<int>(() => toddler2.Id);
 
-        baby2.MasterTemplateAlias = toddler4.Alias;
-        baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
+        baby2.LayoutTemplateAlias = toddler4.Alias;
+        baby2.LayoutTemplateId = new Lazy<int>(() => toddler4.Id);
 
         repository.Save(parent);
         repository.Save(child1);

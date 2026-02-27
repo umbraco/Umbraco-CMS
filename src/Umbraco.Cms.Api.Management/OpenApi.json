@@ -54228,13 +54228,22 @@
             "type": "string",
             "format": "uuid"
           },
-          "masterTemplate": {
+          "layoutTemplate": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
+          },
+          "masterTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true,
+            "deprecated": true
           }
         },
         "additionalProperties": false

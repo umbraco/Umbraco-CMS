@@ -29,10 +29,10 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
             Content = template.Content
         };
 
-        if (template.MasterTemplateAlias is not null)
+        if (template.LayoutTemplateAlias is not null)
         {
-            ITemplate? parentTemplate = await _templateService.GetAsync(template.MasterTemplateAlias);
-            responseModel.MasterTemplate = ReferenceByIdModel.ReferenceOrNull(parentTemplate?.Key);
+            ITemplate? parentTemplate = await _templateService.GetAsync(template.LayoutTemplateAlias);
+            responseModel.LayoutTemplate = ReferenceByIdModel.ReferenceOrNull(parentTemplate?.Key);
         }
 
         return responseModel;

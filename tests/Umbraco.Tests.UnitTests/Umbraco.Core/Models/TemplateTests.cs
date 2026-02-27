@@ -29,13 +29,13 @@ public class TemplateTests
         Assert.AreNotSame(clone, template);
         Assert.AreEqual(clone, template);
         Assert.AreEqual(clone.Path, template.Path);
-        Assert.AreEqual(clone.IsMasterTemplate, template.IsMasterTemplate);
+        Assert.AreEqual(clone.IsLayoutTemplate, template.IsLayoutTemplate);
         Assert.AreEqual(clone.CreateDate, template.CreateDate);
         Assert.AreEqual(clone.Alias, template.Alias);
         Assert.AreEqual(clone.Id, template.Id);
         Assert.AreEqual(clone.Key, template.Key);
-        Assert.AreEqual(clone.MasterTemplateAlias, template.MasterTemplateAlias);
-        Assert.AreEqual(clone.MasterTemplateId.Value, ((Template)template).MasterTemplateId.Value);
+        Assert.AreEqual(clone.LayoutTemplateAlias, template.LayoutTemplateAlias);
+        Assert.AreEqual(clone.LayoutTemplateId.Value, ((Template)template).LayoutTemplateId.Value);
         Assert.AreEqual(clone.Name, template.Name);
         Assert.AreEqual(clone.UpdateDate, template.UpdateDate);
 
@@ -72,6 +72,6 @@ public class TemplateTests
             .WithUpdateDate(DateTime.UtcNow)
             .WithKey(Guid.NewGuid())
             .WithContent("blah")
-            .AsMasterTemplate("master", 88)
+            .AsLayoutTemplate("master", 88)
             .Build();
 }

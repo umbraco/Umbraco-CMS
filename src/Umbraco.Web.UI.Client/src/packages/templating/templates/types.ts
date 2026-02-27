@@ -6,5 +6,9 @@ export interface UmbTemplateDetailModel {
 	name: string;
 	alias: string;
 	content: string | null;
-	masterTemplate: { unique: string } | null;
+	layoutTemplate: { unique: string } | null;
+	/**
+	 * @deprecated Use layoutTemplate instead. Scheduled for removal in Umbraco 20.
+	 */
+	masterTemplate?: { unique: string } | null;
 }

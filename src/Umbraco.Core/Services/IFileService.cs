@@ -241,7 +241,7 @@ public interface IFileService : IService
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
+    IEnumerable<ITemplate> GetTemplates(int layoutTemplateId);
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
@@ -270,10 +270,10 @@ public interface IFileService : IService
     /// <summary>
     ///     Gets the template descendants
     /// </summary>
-    /// <param name="masterTemplateId"></param>
+    /// <param name="layoutTemplateId"></param>
     /// <returns></returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId);
+    IEnumerable<ITemplate> GetTemplateDescendants(int layoutTemplateId);
 
     /// <summary>
     ///     Saves a <see cref="ITemplate" />
@@ -304,11 +304,11 @@ public interface IFileService : IService
     /// <param name="name">The name of the template.</param>
     /// <param name="alias">The alias of the template.</param>
     /// <param name="content">The content/markup of the template.</param>
-    /// <param name="masterTemplate">Optional master template.</param>
+    /// <param name="layoutTemplate">Optional layout template.</param>
     /// <param name="userId">Optional id of the user creating the template.</param>
     /// <returns>The created <see cref="ITemplate" />.</returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
+    ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? layoutTemplate = null, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a template by its alias
