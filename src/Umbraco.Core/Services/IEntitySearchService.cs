@@ -24,6 +24,7 @@ public interface IEntitySearchService
     /// <remarks>
     /// This method has a no-op default implementation.
     /// </remarks>
+    // TODO (V18): Remove the default implementation.
     PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, string query, int skip = 0, int take = 100)
         => new() { Items = [], Total = 0 };
 
@@ -33,6 +34,7 @@ public interface IEntitySearchService
     /// <remarks>
     /// This method has a no-op default implementation.
     /// </remarks>
+    // TODO (V18): Remove the default implementation.
     PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, int skip = 0, int take = 100)
         => new() { Items = [], Total = 0 };
 }
