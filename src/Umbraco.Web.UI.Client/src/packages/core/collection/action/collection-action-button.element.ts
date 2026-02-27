@@ -3,12 +3,23 @@ import type { UmbCollectionAction } from './collection-action-base.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-collection-action-button')
 export class UmbCollectionActionButtonElement extends UmbLitElement {
 	#api?: UmbCollectionAction;
+
+	public set api(api: UmbCollectionAction | undefined) {
+		this.#api = api;
+
+		this.#api?.getHref?.().then((href) => {
+			this._href = href ?? this.manifest?.meta.href;
+		});
+
+		this.#api?.hasAddionalOptions?.().then((additionalOptions) => {
+			this._additionalOptions = additionalOptions ?? this.manifest?.meta.additionalOptions;
+		});
+	}
 
 	@property({ type: Object, attribute: false })
 	public get manifest() {
@@ -20,20 +31,10 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 			this._manifest = value;
 			this._href = this.manifest?.meta.href;
 			this._additionalOptions = this.manifest?.meta.additionalOptions;
-			this.#createApi();
 			this.requestUpdate('manifest', oldValue);
 		}
 	}
 	private _manifest?: ManifestCollectionAction;
-
-	async #createApi() {
-		if (!this._manifest) throw new Error('No manifest defined');
-		if (!this._manifest.api) return;
-		this.#api = await createExtensionApi<UmbCollectionAction>(this, this._manifest, [this._manifest]);
-
-		this._href = (await this.#api?.getHref?.()) ?? this.manifest?.meta.href;
-		this._additionalOptions = (await this.#api?.hasAddionalOptions?.()) ?? this.manifest?.meta.additionalOptions;
-	}
 
 	@state()
 	private _buttonState?: UUIButtonState;
