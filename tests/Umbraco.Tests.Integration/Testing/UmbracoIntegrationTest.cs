@@ -47,6 +47,9 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     /// </summary>
     protected IScopeProvider ScopeProvider => Services.GetRequiredService<IScopeProvider>();
 
+    /// <summary>
+    ///     Gets the <see cref="IEFCoreScopeProvider{TDbContext}"/>
+    /// </summary>
     protected IEFCoreScopeProvider<UmbracoDbContext> NewScopeProvider => Services.GetRequiredService<IEFCoreScopeProvider<UmbracoDbContext>>();
 
     /// <summary>

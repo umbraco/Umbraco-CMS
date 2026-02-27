@@ -30,7 +30,7 @@ public interface IKeyValueService
     /// </summary>
     /// <remarks>
     ///     Sets the value to <paramref name="newValue" /> if the value is <paramref name="originValue" />,
-    ///     and returns true; otherwise throws an exception. In other words, ensures that the value has not changed
+    ///     and returns a success status. In other words, ensures that the value has not changed
     ///     before setting it.
     /// </remarks>
     Task<Attempt<KeyValueOperationStatus>> SetValue(string key, string originValue, string newValue);
@@ -40,7 +40,7 @@ public interface IKeyValueService
     /// </summary>
     /// <remarks>
     ///     Sets the value to <paramref name="newValue" /> if the value is <paramref name="originValue" />,
-    ///     and returns true; otherwise returns false. In other words, ensures that the value has not changed
+    ///     and returns a success status; otherwise returns a failed status. In other words, ensures that the value has not changed
     ///     before setting it.
     /// </remarks>
     Task<Attempt<bool, KeyValueOperationStatus>> TrySetValue(string key, string originValue, string newValue);

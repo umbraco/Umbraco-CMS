@@ -28,7 +28,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var keyValue = new KeyValue { Identifier = "foo", Value = "bar", UpdateDate = DateTime.UtcNow };
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             await repo.SaveAsync(keyValue, CancellationToken.None);
             scope.Complete();
         }
@@ -36,7 +36,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
         // Retrieve key/value
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             var keyValue = await repo.GetAsync("foo", CancellationToken.None);
             scope.Complete();
 
@@ -46,7 +46,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
         // Update value
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             var keyValue = await repo.GetAsync("foo", CancellationToken.None);
             keyValue.Value = "buzz";
             keyValue.UpdateDate = DateTime.UtcNow;
@@ -57,7 +57,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
         // Retrieve key/value again
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             var keyValue = await repo.GetAsync("foo", CancellationToken.None);
             scope.Complete();
 
@@ -65,6 +65,6 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
         }
     }
 
-    private IKeyValueRepository CreateRepository(IEFCoreScopeProvider<UmbracoDbContext> provider) =>
+    private IKeyValueRepository CreateRepository() =>
         new KeyValueRepository(GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(), LoggerFactory.CreateLogger<KeyValueRepository>(),  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

@@ -13,7 +13,8 @@ public class KeyValueDtoConfiguration : IEntityTypeConfiguration<KeyValueDto>
 
         builder.Property(x => x.Key)
             .HasColumnName(KeyValueDto.PrimaryKeyColumnName)
-            .ValueGeneratedOnAdd();
+            .HasMaxLength(256)
+            .ValueGeneratedNever();
 
         builder.Property(x => x.Value)
             .HasColumnName("value");

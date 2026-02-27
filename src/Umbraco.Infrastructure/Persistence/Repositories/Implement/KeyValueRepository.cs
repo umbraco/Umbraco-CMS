@@ -42,16 +42,18 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
 
     #region Overrides of AsyncEntityRepositoryBase<string, IKeyValue>
 
+    /// <inheritdoc/>
     protected override async Task<IKeyValue?> PerformGetAsync(string? id) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             KeyValueDto? dto = await db.KeyValue
-                .Where(x => x.Key.ToString() == id)
+                .Where(x => x.Key == id)
                 .FirstOrDefaultAsync();
 
             return dto is null ? null : Map(dto);
         });
 
+    /// <inheritdoc/>
     protected override async Task<IEnumerable<IKeyValue>?> PerformGetAllAsync() =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
@@ -64,19 +66,28 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
                 .AsEnumerable();
         });
 
-    protected override async Task<IEnumerable<IKeyValue>?> PerformGetManyAsync(string[]? ids) =>
-        await AmbientScope.ExecuteWithContextAsync(async db =>
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<IKeyValue>?> PerformGetManyAsync(string[]? ids)
+    {
+        if (ids is not null)
         {
-            List<KeyValueDto> dtos = await db.KeyValue
-                .Where(x => ids!.Contains(x.Key.ToString()))
-                .ToListAsync();
+            await AmbientScope.ExecuteWithContextAsync(async db =>
+            {
+                List<KeyValueDto> dtos = await db.KeyValue
+                    .Where(x => ids.Any(id => id == x.Key))
+                    .ToListAsync();
 
-            return dtos
-                .Select(Map)
-                .WhereNotNull()
-                .AsEnumerable();
-        });
+                return dtos
+                    .Select(Map)
+                    .WhereNotNull()
+                    .AsEnumerable();
+            });
+        }
 
+        return null;
+    }
+
+    /// <inheritdoc/>
     protected override async Task PersistNewItemAsync(IKeyValue entity) =>
         await AmbientScope.ExecuteWithContextAsync<KeyValueDto>(async db =>
         {
@@ -90,6 +101,7 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
             }
         });
 
+    /// <inheritdoc/>
     protected override async Task PersistUpdatedItemAsync(IKeyValue entity) =>
         await AmbientScope.ExecuteWithContextAsync<KeyValueDto>(async db =>
         {

@@ -31,6 +31,8 @@ internal sealed class KeyValueService : IKeyValueService
         using ICoreScope scope = _scopeProvider.CreateScope();
 
         IKeyValue? value = await _repository.GetAsync(key, CancellationToken.None);
+
+        scope.Complete();
         return value?.Value;
     }
 
@@ -40,6 +42,8 @@ internal sealed class KeyValueService : IKeyValueService
         using ICoreScope scope = _scopeProvider.CreateScope();
 
         IReadOnlyDictionary<string, string?>? dict = await _repository.FindByKeyPrefix(keyPrefix);
+
+        scope.Complete();
         return Attempt.SucceedWithStatus(KeyValueOperationStatus.Success, dict);
     }
 
@@ -70,7 +74,8 @@ internal sealed class KeyValueService : IKeyValueService
     /// <inheritdoc />
     public async Task<Attempt<KeyValueOperationStatus>> SetValue(string key, string originValue, string newValue)
     {
-        if (!TrySetValue(key, originValue, newValue).Result)
+        Attempt<bool, KeyValueOperationStatus> attempt = await TrySetValue(key, originValue, newValue);
+        if (!attempt.Result)
         {
             return Attempt.Fail(KeyValueOperationStatus.NoValueSet);
         }

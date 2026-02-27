@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -28,6 +29,8 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         await KeyValueService.SetValue("someotherprefix1", "helloagain1");
         // Act
         var attempt = await KeyValueService.FindByKeyPrefix("test");
+
+        Assert.AreEqual(attempt.Status, KeyValueOperationStatus.Success);
         var value = attempt.Result;
 
         // Assert
@@ -39,35 +42,35 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetValue_ForMissingKey_ReturnsNull()
+    public async Task GetValue_ForMissingKey_ReturnsNull()
     {
         // Act
-        var value = KeyValueService.GetValue("foo");
+        var value = await KeyValueService.GetValue("foo");
 
         // Assert
         Assert.IsNull(value);
     }
 
     [Test]
-    public void GetValue_ForExistingKey_ReturnsValue()
+    public async Task GetValue_ForExistingKey_ReturnsValue()
     {
-        KeyValueService.SetValue("foo", "bar");
+        await KeyValueService.SetValue("foo", "bar");
 
         // Act
-        var value = KeyValueService.GetValue("foo");
+        var value = await KeyValueService.GetValue("foo");
 
         // Assert
         Assert.AreEqual("bar", value);
     }
 
     [Test]
-    public void SetValue_ForExistingKey_SavesValue()
+    public async Task SetValue_ForExistingKey_SavesValue()
     {
-        KeyValueService.SetValue("foo", "bar");
+        await KeyValueService.SetValue("foo", "bar");
 
         // Act
-        KeyValueService.SetValue("foo", "buzz");
-        var value = KeyValueService.GetValue("foo");
+        await KeyValueService.SetValue("foo", "buzz");
+        var value = await KeyValueService.GetValue("foo");
 
         // Assert
         Assert.AreEqual("buzz", value);
@@ -79,11 +82,11 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         KeyValueService.SetValue("foo", "bar");
 
         // Act
-        var result = await KeyValueService.TrySetValue("foo", "bar", "buzz");
+        var attempt = await KeyValueService.TrySetValue("foo", "bar", "buzz");
         var value = await KeyValueService.GetValue("foo");
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.AreEqual(attempt.Status, KeyValueOperationStatus.Success);
         Assert.AreEqual("buzz", value);
     }
 
@@ -93,11 +96,11 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         await KeyValueService.SetValue("foo", "bar");
 
         // Act
-        var result = await KeyValueService.TrySetValue("foo", "bang", "buzz");
+        var attempt = await KeyValueService.TrySetValue("foo", "bang", "buzz");
         var value = await KeyValueService.GetValue("foo");
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.AreEqual(attempt.Status, KeyValueOperationStatus.NoValueSet);
         Assert.AreEqual("bar", value);
     }
 }
