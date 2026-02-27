@@ -107,8 +107,10 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		const parentUnique = currentPath?.unique ?? null;
 
 		// Fetch allowed children of the current parent's media type
-		const { data: allowedChildrenData } =
-			await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(mediaTypeUnique, parentUnique);
+		const { data: allowedChildrenData } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(
+			mediaTypeUnique,
+			parentUnique,
+		);
 		const allowedChildren = allowedChildrenData?.items ?? [];
 
 		// Fetch all folder media types
@@ -237,8 +239,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 					(ft) => ft.unique,
 					(ft) =>
 						html`<uui-button compact look="outline" .label=${ft.name} @click=${() => this.#focusFolderInput(ft)}>
-							${ft.icon ? html`<umb-icon name=${ft.icon}></umb-icon>` : nothing}
-							${ft.name}
+							${ft.icon ? html`<umb-icon name=${ft.icon}></umb-icon>` : nothing} ${ft.name}
 						</uui-button>`,
 				)}
 				<uui-button compact .label=${this.localize.term('general_cancel')} @click=${this.#cancelFolderTypeSelection}>

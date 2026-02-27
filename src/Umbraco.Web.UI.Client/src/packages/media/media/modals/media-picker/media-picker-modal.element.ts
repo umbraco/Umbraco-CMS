@@ -152,7 +152,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 		}
 
-		this.#loadFolderTypes();
+		await this.#loadFolderTypes();
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
