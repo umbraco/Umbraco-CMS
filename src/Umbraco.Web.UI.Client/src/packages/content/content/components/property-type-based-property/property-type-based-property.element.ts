@@ -80,18 +80,18 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		super.willUpdate(changedProperties);
 
 		if (changedProperties.has('property') || changedProperties.has('dataTypeDetail')) {
-			const dataTypeUnique = this.property?.dataType.unique;
+			const propertyDataTypeUnique = this.property?.dataType.unique;
 
-			if (dataTypeUnique !== this.#lastDataTypeUnique || changedProperties.has('dataTypeDetail')) {
-				this.#lastDataTypeUnique = dataTypeUnique;
+			if (propertyDataTypeUnique !== this.#lastDataTypeUnique || changedProperties.has('dataTypeDetail')) {
+				this.#lastDataTypeUnique = propertyDataTypeUnique;
 
-				if (this.dataTypeDetail && dataTypeUnique && this.dataTypeDetail.unique === dataTypeUnique) {
+				if (this.dataTypeDetail && propertyDataTypeUnique && this.dataTypeDetail.unique === propertyDataTypeUnique) {
 					// Use provided data type detail directly — no API call needed
 					this._dataTypeObserver?.destroy();
 					this.#applyDataType(this.dataTypeDetail);
-				} else if (dataTypeUnique) {
+				} else if (propertyDataTypeUnique) {
 					// Fall back to individual loading
-					this.#observeDataType(dataTypeUnique);
+					this.#observeDataType(propertyDataTypeUnique);
 				}
 			}
 		}
