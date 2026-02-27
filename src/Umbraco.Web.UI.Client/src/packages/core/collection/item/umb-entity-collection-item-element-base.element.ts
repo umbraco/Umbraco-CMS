@@ -8,9 +8,20 @@ import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/ev
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UmbContextBoundaryController } from '@umbraco-cms/backoffice/context-api';
 
 export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
+	constructor() {
+		super();
+		// Prevent any outer/ancestor UMB_ENTITY_CONTEXT from leaking into this collection item.
+		// Each item provides its own entity context, and consumers inside should never
+		// accidentally receive a context from an ancestor or sibling before this item supplies its own.
+		new UmbContextBoundaryController(this, UMB_ENTITY_CONTEXT);
+	}
+
 	#extensionsController?: UmbExtensionsElementInitializer<any>;
+	#entityContext?: UmbEntityContext;
 	#item?: UmbCollectionItemModel;
 
 	@state()
@@ -27,6 +38,8 @@ export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 		// If the component is already created and the entity type is the same, we can just update the item.
 		if (this._component && value.entityType === oldValue?.entityType) {
 			this._component.item = value;
+			this.#entityContext?.setUnique(value.unique ?? null);
+			this.#pathAddendum.setAddendum(this.getPathAddendum(value.entityType, value.unique));
 			return;
 		}
 
@@ -145,6 +158,8 @@ export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 		if (this.#extensionsController) {
 			this.#extensionsController.destroy();
 		}
+		this.#entityContext?.destroy();
+		this.#entityContext = undefined;
 
 		this.#extensionsController = new UmbExtensionsElementInitializer(
 			this,
@@ -154,6 +169,10 @@ export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 			(extensionControllers) => {
 				this._component?.remove();
 				const component = extensionControllers[0]?.component || this.createFallbackElement();
+
+				this.#entityContext = new UmbEntityContext(component);
+				this.#entityContext.setEntityType(entityType);
+				this.#entityContext.setUnique(this.item?.unique ?? null);
 
 				// TODO: I would say this code can use feature of the UmbExtensionsElementInitializer, to set properties and get a fallback element. [NL]
 				// assign the properties to the component
@@ -185,6 +204,8 @@ export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 	override destroy(): void {
 		this._component?.removeEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
 		this._component?.removeEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
+		this.#entityContext?.destroy();
+		this.#entityContext = undefined;
 		super.destroy();
 	}
 

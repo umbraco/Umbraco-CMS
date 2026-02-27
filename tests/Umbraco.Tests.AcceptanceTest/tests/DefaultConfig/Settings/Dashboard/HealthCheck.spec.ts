@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
@@ -24,13 +24,13 @@ test('can perform all health checks', async ({umbracoApi, umbracoUi}) => {
     await umbracoUi.healthCheck.isHealthCheckGroupVisible(healthCheck.name);
     const resultCount = await umbracoApi.healthCheck.getResultsCountByName(healthCheck.name);
     if (resultCount.success > 0) {
-      await umbracoUi.healthCheck.doesHeathCheckGroupHaveSuccessItemsCount(healthCheck.name, resultCount.success);
+      await umbracoUi.healthCheck.doesHealthCheckGroupHaveSuccessItemsCount(healthCheck.name, resultCount.success);
     }
     if (resultCount.warning > 0) {
-      await umbracoUi.healthCheck.doesHeathCheckGroupHaveWarningItemsCount(healthCheck.name, resultCount.warning);
+      await umbracoUi.healthCheck.doesHealthCheckGroupHaveWarningItemsCount(healthCheck.name, resultCount.warning);
     }
     if (resultCount.error > 0) {
-      await umbracoUi.healthCheck.doesHeathCheckGroupHaveErrorItemsCount(healthCheck.name, resultCount.error);
+      await umbracoUi.healthCheck.doesHealthCheckGroupHaveErrorItemsCount(healthCheck.name, resultCount.error);
     }
   }
 });
@@ -44,7 +44,7 @@ test('can view the details of a health check', async ({umbracoApi, umbracoUi}) =
       const healthCheckData = await umbracoApi.healthCheck.getByName(healthCheckName);
 
       // Act
-      await umbracoUi.healthCheck.clickHeathCheckGroupByName(healthCheckName);
+      await umbracoUi.healthCheck.clickHealthCheckGroupByName(healthCheckName);
 
       // Assert
       for (const check of healthCheckData.checks) {
