@@ -10,11 +10,12 @@ const elementPickerName = 'TestElementPicker';
 const elementTypeName = 'TestElementTypeForElement';
 const elementPickerTypeName = 'TestElementTypeForElementPicker';
 
-test.beforeEach(async ({umbracoApi}) => {
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(elementPickerTypeName);
   await umbracoApi.element.ensureNameNotExists(elementName);
   await umbracoApi.element.ensureNameNotExists(elementPickerName);
+  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -30,7 +31,6 @@ test('can create element with the element picker data type', async ({umbracoApi,
   const expectedState = 'Draft';
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', elementPickerDataTypeName, elementPickerDataTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -55,7 +55,6 @@ test('can publish element with the element picker data type', async ({umbracoApi
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   const elementTypeId = await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -76,7 +75,6 @@ test('can publish element with an element picker selected', {tag: '@smoke'}, asy
   // Create element picker type and element picker
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName);
   const elementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -102,7 +100,6 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName);
   const firstElementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
   const secondElementPickerId = await umbracoApi.element.createDefaultElement(secondElementPickerName, elementPickerTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -130,7 +127,6 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   // Create element picker type and element picker
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName);
   const elementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -160,7 +156,6 @@ test.fixme('can validate minimum amount in element picker', async ({umbracoApi, 
   // Create element picker type and element picker
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName);
   await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -185,7 +180,6 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName);
   await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
   await umbracoApi.element.createDefaultElement(secondElementPickerName, elementPickerTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -209,7 +203,6 @@ test('can remove an element from the element picker in the element', async ({umb
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName);
   const elementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
   await umbracoApi.element.createElementWithElementPickers(elementName, elementTypeId, elementPickerDataTypeName, [elementPickerId]);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -233,7 +226,6 @@ test('can remove a not-found element from the element picker in the element', as
   const elementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
   await umbracoApi.element.createElementWithElementPickers(elementName, elementTypeId, elementPickerDataTypeName, [elementPickerId]);
   await umbracoApi.element.ensureNameNotExists(elementPickerName); // Delete the element to make it not-found
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
