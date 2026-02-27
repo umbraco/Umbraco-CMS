@@ -10,7 +10,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-public class FetchDataTypesControllerTests : ManagementApiUserGroupTestBase<FetchDataTypesController>
+public class BatchDataTypesControllerTests : ManagementApiUserGroupTestBase<BatchDataTypesController>
 {
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
@@ -43,8 +43,8 @@ public class FetchDataTypesControllerTests : ManagementApiUserGroupTestBase<Fetc
         _key2 = response2.Result.Key;
     }
 
-    protected override Expression<Func<FetchDataTypesController, object>> MethodSelector =>
-        x => x.Fetch(CancellationToken.None, Array.Empty<Guid>());
+    protected override Expression<Func<BatchDataTypesController, object>> MethodSelector =>
+        x => x.Batch(CancellationToken.None, new HashSet<Guid>());
 
     protected override async Task<HttpResponseMessage> ClientRequest()
         => await Client.GetAsync($"{Url}?id={_key1}&id={_key2}");
