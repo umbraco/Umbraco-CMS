@@ -97,7 +97,7 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	@state()
-	private _createButtonLabel = this.localize.term('content_createEmpty');
+	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -483,7 +483,8 @@ export class UmbPropertyEditorUIBlockListElement
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
-				?disabled=${this.readonly}>
+				?disabled=${this.readonly}
+				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
@@ -496,19 +497,8 @@ export class UmbPropertyEditorUIBlockListElement
 
 	static override readonly styles = [
 		css`
-			:host {
-				display: grid;
-				align-content: start;
-				gap: 1px;
-			}
-			> div {
-				display: flex;
-				flex-direction: column;
-				align-items: stretch;
-			}
-
 			uui-button-group {
-				padding-top: 1px;
+				margin-top: 1px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}

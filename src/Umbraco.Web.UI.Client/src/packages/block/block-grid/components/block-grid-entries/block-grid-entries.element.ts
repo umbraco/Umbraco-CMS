@@ -499,7 +499,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			:host {
 				position: relative;
 				display: grid;
-				gap: 1px;
 			}
 			:host([disallow-drop])::before {
 				content: '';
@@ -528,6 +527,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			}
 
 			#createButton {
+				margin-top: 1px;
 				grid-template-columns: 1fr auto;
 				display: grid;
 			}

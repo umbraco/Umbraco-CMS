@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						label: 'Minimum',
 						description: 'Enter the minimum amount of number to be entered',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-						config: [{ alias: 'step', value: '0.001' }],
+						config: [{ alias: 'step', value: '0.0000000001' }],
 					},
 					{
 						alias: 'max',
@@ -21,7 +21,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 						config: [
 							{ alias: 'placeholder', value: '∞' },
-							{ alias: 'step', value: '0.001' },
+							{ alias: 'step', value: '0.0000000001' },
 						],
 					},
 					{
@@ -29,7 +29,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						label: 'Step size',
 						description: 'Enter the intervals amount between each step of number to be entered',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-						config: [{ alias: 'step', value: '0.001' }],
+						config: [{ alias: 'step', value: '0.0000000001' }],
 					},
 				],
 			},
