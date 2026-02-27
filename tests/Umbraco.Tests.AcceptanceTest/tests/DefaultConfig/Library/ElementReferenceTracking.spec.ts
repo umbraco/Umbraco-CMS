@@ -20,7 +20,7 @@ const elementPickerDataTypeName = 'TestElementPickerForInfoTab';
 const textStringDataTypeName = 'Textstring';
 let elementPickerDataTypeId = '';
 
-test.beforeEach(async ({umbracoApi}) => {
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   // Create Element Picker data type
   elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   // Create target element type with Textstring property
@@ -32,6 +32,7 @@ test.beforeEach(async ({umbracoApi}) => {
   referencingDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(referencingDocumentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   // Create target element
   targetElementId = await umbracoApi.element.createDefaultElement(targetElementName, targetElementTypeId);
+  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -47,7 +48,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can see no references in info tab for an unreferenced element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -61,7 +61,6 @@ test('can see no references in info tab for an unreferenced element', async ({um
 test('can see one reference in info tab when element is referenced by one element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.createElementWithElementPickers(referencingElementName, referencingElementTypeId, elementPickerDataTypeName, [targetElementId]);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -77,7 +76,6 @@ test('can see multiple references in info tab when element is referenced by mult
   // Arrange
   await umbracoApi.element.createElementWithElementPickers(referencingElementName, referencingElementTypeId, elementPickerDataTypeName, [targetElementId]);
   await umbracoApi.element.createElementWithElementPickers(secondReferencingElementName, referencingElementTypeId, elementPickerDataTypeName, [targetElementId]);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -94,7 +92,6 @@ test('can see reference is removed in info tab after deleting the referencing el
   // Arrange
   const referencingElementId = await umbracoApi.element.createElementWithElementPickers(referencingElementName, referencingElementTypeId, elementPickerDataTypeName, [targetElementId]);
   await umbracoApi.element.delete(referencingElementId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -108,7 +105,6 @@ test('can see reference is removed in info tab after deleting the referencing el
 test('can see one reference in info tab when element is referenced by one content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDocumentWithElementPickers(referencingContentName, referencingDocumentTypeId, elementPickerDataTypeName, [targetElementId]);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -124,7 +120,6 @@ test('can see references from both content and element in info tab', async ({umb
   // Arrange
   await umbracoApi.element.createElementWithElementPickers(referencingElementName, referencingElementTypeId, elementPickerDataTypeName, [targetElementId]);
   await umbracoApi.document.createDocumentWithElementPickers(referencingContentName, referencingDocumentTypeId, elementPickerDataTypeName, [targetElementId]);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -141,7 +136,6 @@ test('can see content reference is removed in info tab after trashing the refere
   // Arrange
   const referencingContentId = await umbracoApi.document.createDocumentWithElementPickers(referencingContentName, referencingDocumentTypeId, elementPickerDataTypeName, [targetElementId]);
   await umbracoApi.document.delete(referencingContentId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
