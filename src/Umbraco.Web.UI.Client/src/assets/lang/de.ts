@@ -1741,6 +1741,7 @@ export default {
 		noLockouts: 'wurde nicht ausgeschlossen',
 		noPasswordChange: 'Das Kennwort wurde nicht geändert',
 		confirmNewPassword: 'Neues Kennwort (Bestätigung)',
+		confirmPassword: 'Kennwort bestätigen',
 		changePasswordDescription:
 			"Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf 'Kennwort ändern' klicken",
 		contentChannel: 'Schnittstelle für externe Editoren',

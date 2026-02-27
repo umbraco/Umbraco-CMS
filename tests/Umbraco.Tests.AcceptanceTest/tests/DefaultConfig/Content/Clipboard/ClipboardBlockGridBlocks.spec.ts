@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // DocumentType
 const documentTypeName = 'TestDocumentType';

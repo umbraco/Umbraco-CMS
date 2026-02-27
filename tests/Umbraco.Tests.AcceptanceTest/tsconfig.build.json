@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "lib": ["ES2017", "DOM", "DOM.Iterable"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "outDir": "./dist",
+    "rootDir": "./lib",
+    "strict": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@umbraco/acceptance-test-helpers": ["./lib/index.ts"]
+    },
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "isolatedModules": true
+  },
+  "include": ["lib/**/*.ts"],
+  "exclude": ["node_modules", "dist", "tests", "fixtures"]
+}

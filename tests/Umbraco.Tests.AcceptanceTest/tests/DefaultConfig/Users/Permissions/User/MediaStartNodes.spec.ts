@@ -1,8 +1,8 @@
-import { expect } from "@playwright/test";
-import { ConstantHelper, test } from "@umbraco/playwright-testhelpers";
+import {expect} from "@playwright/test";
+import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = { cookie: "", accessToken: "", refreshToken: "" };
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = "TestUserGroup";
 let userGroupId = null;

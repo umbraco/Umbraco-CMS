@@ -1195,6 +1195,7 @@ export default {
 		changePassword: 'Zmień hasło!',
 		newPassword: 'Nowe hasło',
 		confirmNewPassword: 'Potwierdź nowe hasło',
+		confirmPassword: 'Potwierdź hasło',
 		changePasswordDescription:
 			'Możesz zmienić swoje hasło w Umbraco backoffice przez wypełnienie formularza poniżej i kliknięcie przycisku "Zmień hasło"',
 		contentChannel: 'Kanał zawartości',

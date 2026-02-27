@@ -68,6 +68,7 @@ export class UmbMediaSearchServerDataSource
 							name: variant.name,
 						};
 					}),
+					flags: item.flags,
 				};
 			});
 
