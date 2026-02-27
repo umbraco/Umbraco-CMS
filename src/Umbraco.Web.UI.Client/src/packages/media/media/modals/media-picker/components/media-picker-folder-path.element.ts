@@ -285,6 +285,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				gap: var(--uui-size-2);
+				margin-left: var(--uui-size-2);
 			}
 
 			#folder-type-selection uui-button {
