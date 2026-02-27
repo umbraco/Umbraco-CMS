@@ -120,7 +120,7 @@ test('can see one reference in info tab when element is referenced by one conten
   await umbracoUi.library.isReferenceItemNameVisible(referencingContentName);
 });
 
-test('can see references from both content and element in info tab', {tag: '@fixme'}, async ({umbracoApi, umbracoUi}) => {
+test('can see references from both content and element in info tab', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.createElementWithElementPickers(referencingElementName, referencingElementTypeId, elementPickerDataTypeName, [targetElementId]);
   await umbracoApi.document.createDocumentWithElementPickers(referencingContentName, referencingDocumentTypeId, elementPickerDataTypeName, [targetElementId]);
