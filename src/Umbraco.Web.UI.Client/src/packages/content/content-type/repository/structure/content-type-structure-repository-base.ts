@@ -27,12 +27,4 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 	requestAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
 		return this._dataSource.getAllowedChildrenOf(unique, parentContentUnique);
 	}
-
-	async requestAllowedParentsOf(unique: string) {
-		if (!this._dataSource.getAllowedParentsOf) {
-			//Should this be undefined instead of an empty array? EL
-			return { data: [] };
-		}
-		return this._dataSource.getAllowedParentsOf(unique);
-	}
 }
