@@ -54,6 +54,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         var upgrader = new Upgrader(plan);
 
         var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
+        var stateValueKey = await KeyValueService.GetValue(upgrader.StateValueKey);
 
         Assert.Multiple(() =>
         {
@@ -65,7 +66,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
             // Ensure that the partial success is saved in the keyvalue service so next plan execution starts correctly.
             using var scope = ScopeProvider.CreateScope(autoComplete: true);
-            Assert.AreEqual("a", KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.AreEqual("a", stateValueKey);
             // Ensure that the changes from the first migration is persisted
             Assert.IsTrue(scope.Database.HasTable(TableName));
             // But that the final migration wasn't run
@@ -76,7 +77,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         ErrorMigration.ShouldExplode = false;
         upgrader = new Upgrader(plan);
         result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
-
+        stateValueKey = await KeyValueService.GetValue(upgrader.StateValueKey);
         Assert.Multiple(() =>
         {
             Assert.AreEqual("a", result.InitialState);
@@ -87,7 +88,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
             // Ensure that everything got updated in the database.
             using var scope = ScopeProvider.CreateScope(autoComplete: true);
-            Assert.AreEqual("c", KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.AreEqual("c", stateValueKey);
             Assert.IsTrue(scope.Database.HasTable(TableName));
             Assert.IsTrue(ColumnExists(TableName, ColumnName, scope));
         });
@@ -123,6 +124,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         var upgrader = new Upgrader(plan);
         var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
+        var stateValueKey = await KeyValueService.GetValue(upgrader.StateValueKey);
 
         Assert.Multiple(() =>
         {
@@ -134,7 +136,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
             Assert.AreEqual(string.Empty, result.FinalState);
 
             using var scope = ScopeProvider.CreateCoreScope();
-            Assert.IsNull(KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.IsNull(stateValueKey);
         });
     }
 

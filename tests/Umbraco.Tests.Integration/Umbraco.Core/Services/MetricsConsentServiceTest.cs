@@ -22,7 +22,7 @@ internal sealed class MetricsConsentServiceTest : UmbracoIntegrationTest
     {
         await MetricsConsentService.SetConsentLevelAsync(level);
 
-        var actual = MetricsConsentService.GetConsentLevel();
+        var actual = await MetricsConsentService.GetConsentLevel();
         Assert.IsNotNull(actual);
         Assert.AreEqual(level, actual);
     }
@@ -32,7 +32,7 @@ internal sealed class MetricsConsentServiceTest : UmbracoIntegrationTest
     {
         await MetricsConsentService.SetConsentLevelAsync(TelemetryLevel.Detailed);
 
-        var stringValue = KeyValueService.GetValue(Cms.Core.Services.MetricsConsentService.Key);
+        var stringValue = await KeyValueService.GetValue(Cms.Core.Services.MetricsConsentService.Key);
 
         Assert.AreEqual("Detailed", stringValue);
     }
