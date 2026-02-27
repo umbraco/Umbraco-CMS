@@ -25,7 +25,7 @@ public class BatchMediaTypesControllerTests : ManagementApiUserGroupTestBase<Bat
     }
 
     protected override Expression<Func<BatchMediaTypesController, object>> MethodSelector =>
-        x => x.Batch(CancellationToken.None, Array.Empty<Guid>());
+        x => x.Batch(CancellationToken.None, new HashSet<Guid>());
 
     protected override async Task<HttpResponseMessage> ClientRequest()
         => await Client.GetAsync($"{Url}?id={_key1}&id={_key2}");

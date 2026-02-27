@@ -36,9 +36,9 @@ public class BatchMediaTypesController : MediaTypeControllerBase
     [EndpointDescription("Gets multiple media types identified by the provided Ids.")]
     public async Task<IActionResult> Batch(
         CancellationToken cancellationToken,
-        [FromQuery(Name = "id")] Guid[] ids)
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
-        Guid[] requestedIds = [.. ids.Distinct()];
+        Guid[] requestedIds = [.. ids];
 
         if (requestedIds.Length == 0)
         {
