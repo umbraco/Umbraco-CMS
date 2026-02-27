@@ -7,7 +7,7 @@ import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { isMediaTreeItem } from '../../tree/utils.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { isUmbracoFolder, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeStructureRepository, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 interface UmbMediaPickerInputContextOpenArgs {
@@ -21,11 +21,17 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	UmbMediaPickerModalData,
 	UmbMediaPickerModalValue
 > {
+	#mediaTypeStructureRepository;
+	#folderTypeUniques = new Set<string>();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
+		this.#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(host);
 	}
 
 	override async openPicker(pickerData?: Partial<UmbMediaPickerModalData>, args?: UmbMediaPickerInputContextOpenArgs) {
+		// Load folder types before opening the picker so the filter is ready
+		await this.#loadFolderTypes();
 		const combinedPickerData = {
 			...pickerData,
 		};
@@ -55,6 +61,12 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		await super.openPicker(combinedPickerData);
 	}
 
+	async #loadFolderTypes() {
+		if (this.#folderTypeUniques.size > 0) return;
+		const folderTypes = await this.#mediaTypeStructureRepository.requestMediaTypesOfFolders();
+		this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
+	}
+
 	#pickableFilter = (
 		item: UmbMediaItemModel | UmbMediaTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
@@ -63,8 +75,8 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		if (isMediaTreeItem(item) && item.noAccess) {
 			return false;
 		}
-		// Exclude folders - they don't have URLs
-		if (isUmbracoFolder(item.mediaType.unique)) {
+		// Exclude folder types - they don't have URLs
+		if (this.#folderTypeUniques.has(item.mediaType.unique)) {
 			return false;
 		}
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
