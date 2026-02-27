@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
-import type { UmbAllowedDocumentTypeModel } from './types.js';
+import type { UmbAllowedDocumentTypeModel, UmbDocumentTypeStructureDataSource } from './types.js';
 import type { AllowedDocumentTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
@@ -14,10 +14,10 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
  * @class UmbDocumentTypeStructureServerDataSource
  * @augments {UmbContentTypeStructureServerDataSourceBase}
  */
-export class UmbDocumentTypeStructureServerDataSource extends UmbContentTypeStructureServerDataSourceBase<
-	AllowedDocumentTypeModel,
-	UmbAllowedDocumentTypeModel
-> {
+export class UmbDocumentTypeStructureServerDataSource
+	extends UmbContentTypeStructureServerDataSourceBase<AllowedDocumentTypeModel, UmbAllowedDocumentTypeModel>
+	implements UmbDocumentTypeStructureDataSource
+{
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {

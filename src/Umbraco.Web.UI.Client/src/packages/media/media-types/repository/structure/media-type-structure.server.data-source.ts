@@ -1,5 +1,5 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
-import type { UmbAllowedMediaTypeModel } from './types.js';
+import type { UmbAllowedMediaTypeModel, UmbMediaTypeStructureDataSource } from './types.js';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -10,10 +10,10 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * @class UmbMediaTypeStructureServerDataSource
  * @augments {UmbContentTypeStructureServerDataSourceBase}
  */
-export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructureServerDataSourceBase<
-	AllowedMediaTypeModel,
-	UmbAllowedMediaTypeModel
-> {
+export class UmbMediaTypeStructureServerDataSource
+	extends UmbContentTypeStructureServerDataSourceBase<AllowedMediaTypeModel, UmbAllowedMediaTypeModel>
+	implements UmbMediaTypeStructureDataSource
+{
 	#host: UmbControllerHost;
 	constructor(host: UmbControllerHost) {
 		super(host, { getAllowedChildrenOf, mapper });
