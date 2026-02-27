@@ -1297,7 +1297,7 @@ export default {
 		tab: 'Registerkarte',
 		tabname: 'Registerkartenbeschriftung',
 		tabs: 'Registerkarten',
-		changeIcon: 'Symbol ändern:',
+		changeIcon: 'Symbol ändern',
 		contentTypeEnabled: 'Masterdokumenttyp aktiviert',
 		contentTypeUses: 'Dieser Dokumenttyp verwendet',
 		noPropertiesDefinedOnTab:

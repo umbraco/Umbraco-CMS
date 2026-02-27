@@ -1458,7 +1458,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab Title',
 		tabs: 'Tabs',
-		changeIcon: 'Change icon:',
+		changeIcon: 'Change icon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:

@@ -73,7 +73,8 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 		return this._icon?.replace('icon-', '').replace('color-', '')?.split(' ')[0];
 	}
 	get #iconTitle(): string | undefined {
-		return this.localize.term('settings_changeIcon') + ' ' + this.#iconAlias;
+		const alias = this.#iconAlias;
+		return alias ? this.localize.term('settings_changeIcon') + ': ' + alias : undefined;
 	}
 
 	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {
@@ -88,7 +89,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="header">
-				<uui-button id="icon" compact label="icon" look="outline" aria-label=${this.#iconAlias ?? 'icon'} title=${ifDefined(this.#iconTitle)} @click=${this._handleIconClick}>
+				<uui-button id="icon" compact label=${this.#iconTitle ?? 'icon'} look="outline" title=${ifDefined(this.#iconTitle)} @click=${this._handleIconClick}>
 					<umb-icon aria-hidden="true" name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
 
