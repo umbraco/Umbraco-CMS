@@ -264,7 +264,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.KeyValueDto", b =>
                 {
                     b.Property<string>("Key")
-                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT")
                         .HasColumnName("key");
 
