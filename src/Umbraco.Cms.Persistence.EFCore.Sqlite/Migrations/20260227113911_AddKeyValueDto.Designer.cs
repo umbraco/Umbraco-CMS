@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260226121558_AddKeyValueDto")]
+    [Migration("20260227113911_AddKeyValueDto")]
     partial class AddKeyValueDto
     {
         /// <inheritdoc />

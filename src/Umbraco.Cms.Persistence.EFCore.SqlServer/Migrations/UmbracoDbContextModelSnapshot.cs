@@ -272,7 +272,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<string>("Key")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("nvarchar(256)")
                         .HasColumnName("key");
 
                     b.Property<DateTime>("UpdateDate")

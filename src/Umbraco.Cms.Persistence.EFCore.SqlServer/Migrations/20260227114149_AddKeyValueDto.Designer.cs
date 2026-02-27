@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260226122322_AddKeyValueDto")]
+    [Migration("20260227114149_AddKeyValueDto")]
     partial class AddKeyValueDto
     {
         /// <inheritdoc />
@@ -275,7 +275,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<string>("Key")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("nvarchar(256)")
                         .HasColumnName("key");
 
                     b.Property<DateTime>("UpdateDate")
