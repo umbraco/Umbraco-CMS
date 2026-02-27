@@ -1,4 +1,5 @@
 import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
+import type { UmbTreeItemModel } from '../../types.js';
 import type { UmbMoveRepository } from './move-repository.interface.js';
 import type { MetaEntityActionMoveToKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -7,8 +8,8 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
-	protected async _getPickableFilter(unique: string): Promise<((item: any) => boolean) | undefined> {
-		return (treeItem: any) => treeItem.unique !== unique;
+	protected async _getPickableFilter(unique: string): Promise<((item: UmbTreeItemModel) => boolean) | undefined> {
+		return (treeItem) => treeItem.unique !== unique;
 	}
 
 	override async execute() {

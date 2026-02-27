@@ -5,10 +5,13 @@ import {
 	UmbDocumentTypeStructureRepository,
 } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UmbMoveToEntityAction } from '@umbraco-cms/backoffice/tree';
 
 class UmbDocumentMoveToEntityAction extends UmbMoveToEntityAction {
-	protected override async _getPickableFilter(unique: string): Promise<((item: any) => boolean) | undefined> {
+	protected override async _getPickableFilter(
+		unique: string,
+	): Promise<((item: UmbTreeItemModel) => boolean) | undefined> {
 		const itemRepository = new UmbDocumentItemRepository(this);
 		const { data } = await itemRepository.requestItems([unique]);
 		const item = data?.[0];
@@ -24,7 +27,8 @@ class UmbDocumentMoveToEntityAction extends UmbMoveToEntityAction {
 
 		if (!allowedParents) return undefined;
 
-		return (treeItem: UmbDocumentTreeItemModel) => this.#isPickable(treeItem, unique, isAllowedAtRoot, allowedParents);
+		return (treeItem) =>
+			this.#isPickable(treeItem as UmbDocumentTreeItemModel, unique, isAllowedAtRoot, allowedParents);
 	}
 
 	#isPickable(

@@ -2,10 +2,13 @@ import { UmbMediaItemRepository } from '../../repository/index.js';
 import type { UmbMediaTreeItemModel } from '../../types.js';
 import { UmbMediaTypeDetailRepository, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UmbMoveToEntityAction } from '@umbraco-cms/backoffice/tree';
 
 class UmbMediaMoveToEntityAction extends UmbMoveToEntityAction {
-	protected override async _getPickableFilter(unique: string): Promise<((item: any) => boolean) | undefined> {
+	protected override async _getPickableFilter(
+		unique: string,
+	): Promise<((item: UmbTreeItemModel) => boolean) | undefined> {
 		const itemRepository = new UmbMediaItemRepository(this);
 		const { data } = await itemRepository.requestItems([unique]);
 		const item = data?.[0];
@@ -21,7 +24,7 @@ class UmbMediaMoveToEntityAction extends UmbMoveToEntityAction {
 
 		if (!allowedParents) return undefined;
 
-		return (treeItem: UmbMediaTreeItemModel) => this.#isPickable(treeItem, unique, isAllowedAtRoot, allowedParents);
+		return (treeItem) => this.#isPickable(treeItem as UmbMediaTreeItemModel, unique, isAllowedAtRoot, allowedParents);
 	}
 
 	#isPickable(
