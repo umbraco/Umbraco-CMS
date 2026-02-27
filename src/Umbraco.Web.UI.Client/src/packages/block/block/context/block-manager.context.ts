@@ -226,7 +226,10 @@ export abstract class UmbBlockManagerContext<
 		const contentTypesMap = new Map<string, UmbContentTypeModel>();
 
 		if (this.#contentTypeRepository.requestByUniques) {
-			const { data } = await this.#contentTypeRepository.requestByUniques(uniques);
+			const { error, data } = await this.#contentTypeRepository.requestByUniques(uniques);
+			if (error || !data) {
+				throw error?.message ?? 'Repository could not request Content Types by Uniques.';
+			}
 			if (data) {
 				data.forEach((item) => contentTypesMap.set(item.unique, item));
 			}
