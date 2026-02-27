@@ -209,7 +209,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
     protected virtual TItem[] MapSearchTreeItemViewModels(IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(
-                FolderObjectType == UmbracoObjectTypes.Unknown || entity.ParentId == -1
+                FolderObjectType == UmbracoObjectTypes.Unknown || entity.ParentId == Constants.System.Root
                     ? null
                     : IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType).Result,
                 entity))

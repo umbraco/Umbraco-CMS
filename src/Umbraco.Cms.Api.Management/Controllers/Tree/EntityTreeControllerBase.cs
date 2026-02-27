@@ -101,7 +101,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// Override this method to implement custom filtering logic for tree entities. The default
     /// implementation returns the input array and total items unchanged.
     /// </remarks>
-    protected virtual Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities,
+    protected virtual Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(
+        IEntitySlim[] entities,
         long totalItems)
         => Task.FromResult((entities, totalItems));
 
@@ -118,7 +119,10 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// implementation returns the input array and totals unchanged.
     /// </remarks>
     protected virtual Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(
-        Guid targetKey, IEntitySlim[] entities, long totalBefore, long totalAfter)
+        Guid targetKey,
+        IEntitySlim[] entities,
+        long totalBefore,
+        long totalAfter)
         => Task.FromResult((entities, totalBefore, totalAfter));
 
     /// <summary>
@@ -191,7 +195,11 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 ordering: ItemOrdering)
             .ToArray();
 
-    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore,
+    protected virtual IEntitySlim[] GetSiblingEntities(
+        Guid target,
+        int before,
+        int after,
+        out long totalBefore,
         out long totalAfter) =>
         EntityService
             .GetSiblings(
@@ -232,7 +240,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };
 
-    protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore,
+    protected SubsetViewModel<TItem> SubsetViewModel(
+        IEnumerable<TItem> treeItemViewModels,
+        long totalBefore,
         long totalAfter)
         => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
 }
