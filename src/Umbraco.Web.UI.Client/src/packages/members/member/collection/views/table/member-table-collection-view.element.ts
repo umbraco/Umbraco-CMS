@@ -3,10 +3,17 @@ import { UMB_MEMBER_COLLECTION_CONTEXT } from '../../member-collection.context-t
 import type { UmbMemberCollectionContext } from '../../member-collection.context.js';
 import { UmbMemberKind } from '../../../utils/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbTableColumn, UmbTableConfig, UmbTableElement, UmbTableItem, UmbTableOrderedEvent } from '@umbraco-cms/backoffice/components';
+import type {
+	UmbTableColumn,
+	UmbTableConfig,
+	UmbTableElement,
+	UmbTableItem,
+	UmbTableOrderedEvent,
+} from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
+import { UmbDirection } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-member-table-collection-view')
 export class UmbMemberTableCollectionViewElement extends UmbLitElement {
@@ -87,7 +94,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 			this._orderingDesc = orderingDesc;
 			this.#collectionContext?.setFilter({
 				orderBy,
-				orderDirection: orderingDesc ? 'desc' : 'asc',
+				orderDirection: orderingDesc ? UmbDirection.DESCENDING : UmbDirection.ASCENDING,
 			});
 		}
 	}
