@@ -342,8 +342,11 @@ internal sealed class ContentEditingService
         => ContentService.Move(content, newParentId, userId);
 
     /// <inheritdoc />
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
-        => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
+    protected override async Task<IContent?> CopyAsync(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    {
+        var userId = await GetUserIdAsync(userKey);
+        return ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
+    }
 
     /// <inheritdoc />
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);

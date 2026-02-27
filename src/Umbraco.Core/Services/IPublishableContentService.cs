@@ -126,4 +126,11 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     ///     <para>When no culture is specified, all cultures are rolled back.</para>
     /// </remarks>
     OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Publishes and unpublishes scheduled content.
+    /// </summary>
+    /// <param name="date">The date to use for determining scheduled actions.</param>
+    /// <returns>The publish results.</returns>
+    IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
 }

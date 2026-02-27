@@ -1862,6 +1862,7 @@ export default {
 		noLockouts: 'ddim wedi cloi allan',
 		noPasswordChange: "Nid yw'r cyfrinair wedi'i newid",
 		confirmNewPassword: 'Cadarnhau cyfrinair newydd',
+		confirmPassword: 'Cadarnhau cyfrinair',
 		changePasswordDescription:
 			"Gallwch newid eich cyfrinair i gyrchu Swyddfa Gefn Umbracogan lenwi allan y ffurflen isod a chlicio'r botwm 'Newid Cyfrinair'",
 		contentChannel: 'Sianel Gynnwys',
