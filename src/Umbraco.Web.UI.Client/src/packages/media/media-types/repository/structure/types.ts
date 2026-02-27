@@ -1,6 +1,6 @@
 import type { UmbContentTypeStructureDataSource } from '@umbraco-cms/backoffice/content-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbAllowedMediaTypeModel extends UmbEntityModel {
 	name: string;
