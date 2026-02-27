@@ -318,9 +318,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 				<div id="input-wrapper">
 					<div id="input-wrapper-fake-cursor" aria-hidden="true"></div>
 					<input
+						name="search-input"
 						type="text"
 						autocomplete="off"
 						placeholder=${this.localize.term('placeholders_search')}
+						aria-label=${this.localize.term('placeholders_search')}
 						value=${this._search}
 						@input=${this.#onSearchChange}
 						@blur=${() => this.#setShowFakeCursor(true)}
