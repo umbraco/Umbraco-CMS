@@ -31,6 +31,8 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(PagedViewModel<DocumentVersionItemResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets a paginated collection of versions for a specific document.")]
+    [EndpointDescription("Gets a paginated collection of versions for a specific document and optional culture. Each result describes the version and includes details of the document type, editor, version date, and published status.")]
     public async Task<IActionResult> All(
         CancellationToken cancellationToken,
         [Required] Guid documentId,

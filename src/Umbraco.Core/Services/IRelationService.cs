@@ -4,6 +4,13 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing relations and relation types between entities.
+/// </summary>
+/// <remarks>
+///     Relations allow entities like content, media, and members to be linked together
+///     through various relationship types.
+/// </remarks>
 public interface IRelationService : IService
 {
     /// <summary>
@@ -130,6 +137,12 @@ public interface IRelationService : IService
     /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
     IEnumerable<IRelation> GetByParentOrChildId(int id);
 
+    /// <summary>
+    ///     Gets a list of <see cref="IRelation" /> objects by their child or parent Id and relation type alias.
+    /// </summary>
+    /// <param name="id">Id of the child or parent to retrieve relations for.</param>
+    /// <param name="relationTypeAlias">Alias of the type of relation to retrieve.</param>
+    /// <returns>An enumerable list of <see cref="IRelation" /> objects.</returns>
     IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias);
 
     /// <summary>
@@ -355,6 +368,10 @@ public interface IRelationService : IService
     /// <param name="relation">Relation to save</param>
     void Save(IRelation relation);
 
+    /// <summary>
+    ///     Saves a collection of <see cref="IRelation" /> objects.
+    /// </summary>
+    /// <param name="relations">The collection of relations to save.</param>
     void Save(IEnumerable<IRelation> relations);
 
     /// <summary>
@@ -411,7 +428,20 @@ public interface IRelationService : IService
     /// <returns>All of the allowed <see cref="UmbracoObjectTypes"/>.</returns>
     IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
 
+    /// <summary>
+    ///     Gets a paged result of <see cref="IRelation" /> objects by child key.
+    /// </summary>
+    /// <param name="childKey">The unique key of the child entity.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    /// <param name="relationTypeAlias">Optional alias of the relation type to filter by.</param>
+    /// <returns>A paged model containing the relations.</returns>
     Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias);
+
+    /// <summary>
+    ///     Gets the total count of relation types.
+    /// </summary>
+    /// <returns>The number of relation types.</returns>
     int CountRelationTypes();
 
     /// <summary>

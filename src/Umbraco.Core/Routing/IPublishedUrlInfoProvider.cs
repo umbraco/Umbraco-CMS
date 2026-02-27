@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides URL information for published content items.
+/// </summary>
 public interface IPublishedUrlInfoProvider
 {
     /// <summary>

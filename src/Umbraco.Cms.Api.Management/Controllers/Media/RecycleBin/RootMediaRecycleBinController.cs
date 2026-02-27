@@ -19,6 +19,8 @@ public class RootMediaRecycleBinController : MediaRecycleBinControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets media at the root of the recycle bin.")]
+    [EndpointDescription("Gets a paginated collection of media items at the root level of the recycle bin.")]
     public async Task<ActionResult<PagedViewModel<MediaRecycleBinItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

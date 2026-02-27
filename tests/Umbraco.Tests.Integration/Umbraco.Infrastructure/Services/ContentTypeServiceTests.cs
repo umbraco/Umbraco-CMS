@@ -32,6 +32,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
     private ContentTypeService ContentTypeService => (ContentTypeService)GetRequiredService<IContentTypeService>();
 
+    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
@@ -2401,6 +2405,103 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var updatedContentType = ContentTypeService.Get(contentType.Key);
         Assert.That(updatedContentType!.DefaultTemplate, Is.Not.Null);
         Assert.That(updatedContentType.DefaultTemplate!.Key, Is.EqualTo(result.Result));
+    }
+
+    [Test]
+    public async Task GetAllContentTypeIds_Returns_Ids_Across_Content_Media_And_Member_Types()
+    {
+        // Arrange - Create a content type
+        var contentType = ContentTypeBuilder.CreateBasicContentType("myContentType", "My Content Type");
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // Create a media type
+        var mediaType = MediaTypeBuilder.CreateSimpleMediaType("myMediaType", "My Media Type");
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+
+        // Create a member type
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType("myMemberType", "My Member Type");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Act - Query for all three aliases
+        var result = ContentTypeService.GetAllContentTypeIds(["myContentType", "myMediaType", "myMemberType"]).ToArray();
+
+        // Assert - Should return IDs from all three type categories
+        Assert.That(result.Length, Is.EqualTo(3));
+        Assert.That(result, Contains.Item(contentType.Id));
+        Assert.That(result, Contains.Item(mediaType.Id));
+        Assert.That(result, Contains.Item(memberType.Id));
+    }
+
+    [Test]
+    public async Task GetAllowedParentKeysAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
+    {
+        // Arrange
+        var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        ContentTypeService.Save(childContentType);
+
+        var parentContentType = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
+
+        // Parent does not allow child as a child type
+        ContentTypeService.Save(parentContentType);
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAllowedParentKeysAsync_ReturnsParentKeys_WhenParentsAllowChildType()
+    {
+        // Arrange
+        var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        ContentTypeService.Save(childContentType);
+
+        var parentContentType1 = ContentTypeBuilder.CreateBasicContentType("parent1", "Parent1");
+        parentContentType1.AllowedContentTypes =
+        [
+            new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
+        ];
+        ContentTypeService.Save(parentContentType1);
+
+        var parentContentType2 = ContentTypeBuilder.CreateBasicContentType("parent2", "Parent2");
+        parentContentType2.AllowedContentTypes =
+        [
+            new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
+        ];
+        ContentTypeService.Save(parentContentType2);
+
+        // A parent that does NOT allow the child type
+        var unrelatedParentContentType = ContentTypeBuilder.CreateBasicContentType("unrelated", "Unrelated");
+        ContentTypeService.Save(unrelatedParentContentType);
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        var parentKeys = result.Result!.ToList();
+        Assert.That(parentKeys.Count, Is.EqualTo(2));
+        Assert.That(parentKeys, Does.Contain(parentContentType1.Key));
+        Assert.That(parentKeys, Does.Contain(parentContentType2.Key));
+        Assert.That(parentKeys, Does.Not.Contain(unrelatedParentContentType.Key));
+    }
+
+    [Test]
+    public async Task GetAllowedParentKeysAsync_ReturnsSuccessFalse_WhenContentTypeDoesNotExist()
+    {
+        // Arrange
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act
+        var result = await ContentTypeService.GetAllowedParentKeysAsync(nonExistentKey);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
     }
 
     private ContentType CreateComponent()

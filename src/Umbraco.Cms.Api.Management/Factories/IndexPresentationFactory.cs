@@ -29,7 +29,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
     }
 
     /// <inheritdoc />
-    [Obsolete("Use CreateAsync() instead. Scheduled for removal in v19.")]
+    [Obsolete("Use CreateAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IndexResponseModel Create(IIndex index)
         => CreateAsync(index).GetAwaiter().GetResult();
 

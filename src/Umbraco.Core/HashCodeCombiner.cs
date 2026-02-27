@@ -17,12 +17,28 @@ public class HashCodeCombiner
 {
     private long _combinedHash = 5381L;
 
+    /// <summary>
+    ///     Adds an integer value to the combined hash.
+    /// </summary>
+    /// <param name="i">The integer value to add.</param>
     public void AddInt(int i) => _combinedHash = ((_combinedHash << 5) + _combinedHash) ^ i;
 
+    /// <summary>
+    ///     Adds an object's hash code to the combined hash.
+    /// </summary>
+    /// <param name="o">The object to add.</param>
     public void AddObject(object o) => AddInt(o.GetHashCode());
 
+    /// <summary>
+    ///     Adds a DateTime value to the combined hash.
+    /// </summary>
+    /// <param name="d">The DateTime value to add.</param>
     public void AddDateTime(DateTime d) => AddInt(d.GetHashCode());
 
+    /// <summary>
+    ///     Adds a string value to the combined hash using invariant culture.
+    /// </summary>
+    /// <param name="s">The string value to add.</param>
     public void AddString(string s)
     {
         if (s != null)
@@ -31,6 +47,10 @@ public class HashCodeCombiner
         }
     }
 
+    /// <summary>
+    ///     Adds a string value to the combined hash using case-insensitive comparison.
+    /// </summary>
+    /// <param name="s">The string value to add.</param>
     public void AddCaseInsensitiveString(string s)
     {
         if (s != null)
@@ -39,6 +59,14 @@ public class HashCodeCombiner
         }
     }
 
+    /// <summary>
+    ///     Adds a file system item (file or directory) to the combined hash.
+    /// </summary>
+    /// <param name="f">The file system item to add.</param>
+    /// <remarks>
+    ///     This method adds the full name, creation time, last write time, and (for files) the length.
+    ///     For directories, all contained files and subdirectories are recursively added.
+    /// </remarks>
     public void AddFileSystemItem(FileSystemInfo f)
     {
         // if it doesn't exist, don't proceed.
@@ -71,8 +99,16 @@ public class HashCodeCombiner
         }
     }
 
+    /// <summary>
+    ///     Adds a file to the combined hash.
+    /// </summary>
+    /// <param name="f">The file to add.</param>
     public void AddFile(FileInfo f) => AddFileSystemItem(f);
 
+    /// <summary>
+    ///     Adds a folder and all its contents to the combined hash.
+    /// </summary>
+    /// <param name="d">The directory to add.</param>
     public void AddFolder(DirectoryInfo d) => AddFileSystemItem(d);
 
     /// <summary>

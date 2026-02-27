@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -26,6 +26,8 @@ public class FilterDataTypeFilterController : DataTypeFilterControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a filtered collection of data types.")]
+    [EndpointDescription("Filters data types based on the provided criteria with support for pagination.")]
     public async Task<IActionResult> Filter(
         CancellationToken cancellationToken,
         int skip = 0,

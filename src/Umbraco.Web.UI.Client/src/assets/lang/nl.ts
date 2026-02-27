@@ -1146,7 +1146,8 @@ export default {
 		created: 'Aangemaakt',
 		headline: 'Selecteer een versie om te vergelijken met de huidige versie',
 		currentVersion: 'Huidige versie',
-		diffHelp: '<del>Rode tekst</del> wordt verwijderd in de geselecteerde versie, <ins>groene tekst</ins> wordt toegevoegd.',
+		diffHelp:
+			'<del>Rode tekst</del> wordt verwijderd in de geselecteerde versie, <ins>groene tekst</ins> wordt toegevoegd.',
 		showDiff: 'Toon verschillen tussen de huidige (concept) versie en de geselecteerde versie.',
 		documentRolledBack: 'Document is teruggezet',
 		htmlHelp:
@@ -1673,6 +1674,7 @@ export default {
 		noLockouts: 'is niet gedeblokkeerd',
 		noPasswordChange: 'Het wachtwoord is niet gewijzigd',
 		confirmNewPassword: 'Bevestig nieuw wachtwoord',
+		confirmPassword: 'Bevestig wachtwoord',
 		changePasswordDescription:
 			"Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en\n      op de knop 'Verander wachtwoord' te klikken\n    ",
 		contentChannel: 'Inhoudskanaal',

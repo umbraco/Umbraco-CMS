@@ -32,6 +32,8 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PackageDefinitionResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of created packages.")]
+    [EndpointDescription("Gets a paginated collection of all created packages.")]
     public async Task<ActionResult<PagedViewModel<PackageDefinitionResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,

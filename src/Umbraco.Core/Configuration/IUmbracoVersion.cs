@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Core.Configuration;
 
+/// <summary>
+///     Defines the contract for accessing Umbraco version information.
+/// </summary>
 public interface IUmbracoVersion
 {
     /// <summary>

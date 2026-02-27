@@ -9,6 +9,10 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 {
     private readonly IContentPermissionService _contentPermissionService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPermissionAuthorizer" /> class.
+    /// </summary>
+    /// <param name="contentPermissionService">The content permission service.</param>
     public ContentPermissionAuthorizer(IContentPermissionService contentPermissionService) =>
         _contentPermissionService = contentPermissionService;
 
@@ -65,6 +69,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
+    /// <inheritdoc />
     public async Task<bool> IsDeniedForCultures(IUser currentUser, ISet<string> culturesToCheck)
     {
         ContentAuthorizationStatus result =

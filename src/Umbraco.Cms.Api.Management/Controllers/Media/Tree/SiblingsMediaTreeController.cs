@@ -41,6 +41,8 @@ public class SiblingsMediaTreeController : MediaTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<MediaTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of media tree sibling items.")]
+    [EndpointDescription("Gets a collection of media tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<MediaTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
     {
         IgnoreUserStartNodesForDataType(dataTypeId);

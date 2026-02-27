@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Service for importing media files into the Umbraco media library.
+/// </summary>
 internal sealed class MediaImportService : IMediaImportService
 {
     private readonly IShortStringHelper _shortStringHelper;
@@ -20,6 +23,17 @@ internal sealed class MediaImportService : IMediaImportService
     private readonly AppCaches _appCaches;
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaImportService" /> class.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper for file name sanitization.</param>
+    /// <param name="mediaFileManager">The media file manager.</param>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="mediaUrlGenerators">The media URL generators collection.</param>
+    /// <param name="contentTypeBaseServiceProvider">The content type base service provider.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="userService">The user service.</param>
     public MediaImportService(
         IShortStringHelper shortStringHelper,
         MediaFileManager mediaFileManager,
@@ -40,6 +54,7 @@ internal sealed class MediaImportService : IMediaImportService
         _userService = userService;
     }
 
+    /// <inheritdoc />
     public async Task<IMedia> ImportAsync(string fileName, Stream fileStream, Guid? parentId, string? mediaTypeAlias, Guid userKey)
     {
         if (fileStream.CanRead == false)
