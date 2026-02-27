@@ -1,4 +1,4 @@
-import {test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 // Content
@@ -25,6 +25,7 @@ test.describe('Content with culture and segment variations', () => {
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', true, true, false, true, true);
     await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   });
 
   test.afterEach(async ({umbracoApi}) => {
@@ -145,6 +146,7 @@ test.describe('Content with segment-only variations', () => {
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', false, false, false, true, true);
     await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   });
 
   test.afterEach(async ({umbracoApi}) => {

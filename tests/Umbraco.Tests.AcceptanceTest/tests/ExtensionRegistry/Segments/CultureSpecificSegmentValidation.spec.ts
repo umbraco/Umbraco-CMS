@@ -1,4 +1,4 @@
-import {test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 // Regression tests for https://github.com/umbraco/Umbraco-CMS/issues/21029
@@ -19,6 +19,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', true, true, true, true, true);
   await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 });
 
 test.afterEach(async ({umbracoApi}) => {
