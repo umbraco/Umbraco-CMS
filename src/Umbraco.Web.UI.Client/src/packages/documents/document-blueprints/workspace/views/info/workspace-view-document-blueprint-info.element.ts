@@ -1,0 +1,144 @@
+import type { UmbDocumentBlueprintVariantModel } from '../../../types.js';
+import { UMB_DOCUMENT_BLUEPRINT_PROPERTY_DATASET_CONTEXT } from '../../../property-dataset-context/document-blueprint-property-dataset-context.token.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from '../../constants.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+
+@customElement('umb-workspace-view-document-blueprint-info')
+export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	@state()
+	private _documentBlueprintUnique = '';
+
+	@state()
+	private _routeBuilder?: UmbModalRouteBuilder; // ???
+
+	@state()
+	private _documentTypeUnique?: string = '';
+
+	@state()
+	private _documentTypeName?: string;
+
+	@state()
+	private _documentTypeIcon?: string;
+
+	@state()
+	private _hasSettingsAccess: boolean = false;
+
+	@state()
+	private _variant?: UmbDocumentBlueprintVariantModel;
+
+	#workspaceContext?: typeof UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
+			this._documentBlueprintUnique = this.#workspaceContext?.getUnique() ?? '';
+			this.#observeContent();
+		});
+
+		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.observe(context?.currentVariant, (currentVariant) => {
+				this._variant = currentVariant;
+			});
+		});
+	}
+
+	#observeContent() {
+		if (!this.#workspaceContext) return;
+
+        this.observe(
+			this.#workspaceContext.structure.ownerContentType,
+			(documentType) => {
+				this._documentTypeName = documentType?.name;
+				this._documentTypeIcon = documentType?.icon;
+				//this._allowedTemplates = documentType?.allowedTemplates;
+			},
+			'_documentType',
+		);
+
+		this.observe(
+			this.#workspaceContext.unique,
+			(unique) => {
+				this._documentBlueprintUnique = unique!;
+			},
+			'_documentBlueprintUnique',
+		);
+	}
+
+	override render() {
+		return html`
+			<div class="container">
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
+			</div>
+			<div class="container">
+				<uui-box headline=${this.localize.term('general_general')} id="general-section">
+					${this.#renderGeneralSection()}
+				</uui-box>
+			</div>
+		`;
+	}
+
+	#renderGeneralSection() {
+		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
+
+		return html`${this.#renderCreateDate()} ${this.#renderUpdateDate()}
+
+			<div class="general-item">
+				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
+				<uui-ref-node-document-type
+					standalone
+					href=${ifDefined(
+						this._hasSettingsAccess ? editDocumentTypePath + 'edit/' + this._documentTypeUnique : undefined,
+					)}
+					?readonly=${!this._hasSettingsAccess}
+					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
+					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
+				</uui-ref-node-document-type>
+			</div>
+			<div class="general-item">
+				<strong><umb-localize key="template_id">Id</umb-localize></strong>
+				<span>${this._documentBlueprintUnique}</span>
+			</div>`;
+	}
+
+	#renderCreateDate() {
+		if (!this._variant?.createDate) return nothing;
+		return this.#renderDate(this._variant.createDate, 'content_createDate', 'Created');
+	}
+
+	#renderUpdateDate() {
+		if (!this._variant?.updateDate) return nothing;
+		return this.#renderDate(this._variant.updateDate, 'content_updateDate', 'Last edited');
+	}
+
+	#renderDate(date: string, labelKey: string, labelText: string) {
+		return html`
+			<div class="general-item">
+				<strong><umb-localize .key=${labelKey}>${labelText}</umb-localize></strong>
+				<span>
+					<umb-localize-date .date=${date} .options=${TimeOptions}></umb-localize-date>
+				</span>
+			</div>
+		`;
+	}
+}
+export default UmbWorkspaceViewDocumentBlueprintInfoElement;
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-workspace-view-document-blueprint-info': UmbWorkspaceViewDocumentBlueprintInfoElement;
+	}
+}
+
+export const TimeOptions: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric',
+};
