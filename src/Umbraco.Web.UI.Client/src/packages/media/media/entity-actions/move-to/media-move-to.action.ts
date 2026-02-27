@@ -1,7 +1,7 @@
-import { UmbMediaTypeDetailRepository, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbMediaItemRepository } from '../../repository/index.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbMediaTreeItemModel } from '../../types.js';
+import { UmbMediaTypeDetailRepository, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbMoveToEntityAction } from '@umbraco-cms/backoffice/tree';
 
 class UmbMediaMoveToEntityAction extends UmbMoveToEntityAction {
