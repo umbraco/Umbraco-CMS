@@ -1,4 +1,4 @@
-import {test} from '@umbraco/playwright-testhelpers';
+import {test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const customDataTypeName = 'Custom Content Picker Dynamic Root';
@@ -31,7 +31,6 @@ test('can change dynamic root origin from root to content root', async ({umbraco
   // Arrange
   await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
-  // Set initial origin to Root
   await umbracoUi.dataType.clickDefineDynamicRootButton();
   await umbracoUi.dataType.chooseDynamicRootOrigin('Root');
 
@@ -50,7 +49,6 @@ test('can add a query step to content root dynamic root', async ({umbracoApi, um
   await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
-  // Select Content Root origin
   await umbracoUi.dataType.clickDefineDynamicRootButton();
   await umbracoUi.dataType.chooseDynamicRootOrigin('Content Root');
 
@@ -74,7 +72,7 @@ test('can add a query step to content root dynamic root', async ({umbracoApi, um
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('content root origin is listed in the origin picker modal', async ({umbracoApi, umbracoUi}) => {
+test('can see content root origin in the origin picker modal', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
