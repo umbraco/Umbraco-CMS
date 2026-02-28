@@ -1762,6 +1762,7 @@ export default {
 		noLockouts: 'nije zaključan',
 		noPasswordChange: 'Lozinka nije promijenjena',
 		confirmNewPassword: 'Potvrdite novu lozinku',
+		confirmPassword: 'Potvrdi lozinku',
 		changePasswordDescription:
 			'Možete promijeniti svoju lozinku za pristup Umbraco Back Officeu tako da ispunite donji obrazac i kliknete gumb "Promjeni lozinku"',
 		contentChannel: 'Kanal sadržaja',

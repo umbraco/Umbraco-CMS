@@ -1185,6 +1185,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab titel',
 		tabs: 'Tabs',
+		changeIcon: 'Pictogram wijzigen',
 		contentTypeEnabled: 'Basis inhoudstype ingeschakeld',
 		contentTypeUses: 'Dit inhoudstype gebruikt',
 		noPropertiesDefinedOnTab:
@@ -1674,6 +1675,7 @@ export default {
 		noLockouts: 'is niet gedeblokkeerd',
 		noPasswordChange: 'Het wachtwoord is niet gewijzigd',
 		confirmNewPassword: 'Bevestig nieuw wachtwoord',
+		confirmPassword: 'Bevestig wachtwoord',
 		changePasswordDescription:
 			"Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en\n      op de knop 'Verander wachtwoord' te klikken\n    ",
 		contentChannel: 'Inhoudskanaal',
