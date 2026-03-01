@@ -22,13 +22,13 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
+  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('can preview published content', async ({umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPreviewButton();
-  await umbracoUi.preview.waitForPreviewPage();
+  await umbracoUi.preview.clickSaveAndPreviewButton();
 
   // Assert
   await umbracoUi.preview.isExitButtonVisible();
@@ -41,8 +41,7 @@ test('can preview published content', async ({umbracoUi}) => {
 test('can switch device in preview', async ({umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPreviewButton();
-  await umbracoUi.preview.waitForPreviewPage();
+  await umbracoUi.preview.clickSaveAndPreviewButton();
   await umbracoUi.preview.clickDeviceButton();
   await umbracoUi.preview.clickDeviceByName('Smartphone portrait');
 
@@ -57,8 +56,7 @@ test('can preview updated content before publishing', async ({umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(updatedText);
-  await umbracoUi.content.clickSaveAndPreviewButton();
-  await umbracoUi.preview.waitForPreviewPage();
+  await umbracoUi.preview.clickSaveAndPreviewButton();
 
   // Assert
   await umbracoUi.preview.doesIframeContainText(updatedText);
@@ -70,8 +68,7 @@ test('can open published URL from preview using preview button', async ({umbraco
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPreviewButton();
-  await umbracoUi.preview.waitForPreviewPage();
+  await umbracoUi.preview.clickSaveAndPreviewButton();
   await umbracoUi.preview.isPreviewWebsiteButtonVisible();
   const websitePage = await umbracoUi.preview.clickPreviewWebsiteButtonAndWaitForWebsite();
 
@@ -88,23 +85,18 @@ test('can switch culture in preview with multiple languages', async ({umbracoApi
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPreviewButton();
-  await umbracoUi.preview.waitForPreviewPage();
+  await umbracoUi.preview.clickSaveAndPreviewButton();
   await umbracoUi.preview.clickCultureButton();
   await umbracoUi.preview.clickCultureByName('Danish');
 
   // Assert
   await umbracoUi.preview.isCultureActive('Danish');
-
-  // Cleanup
-  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('can exit preview mode', async ({umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPreviewButton();
-  await umbracoUi.preview.waitForPreviewPage();
+  await umbracoUi.preview.clickSaveAndPreviewButton();
   await umbracoUi.preview.isExitButtonVisible();
   await umbracoUi.preview.clickExitButton();
 

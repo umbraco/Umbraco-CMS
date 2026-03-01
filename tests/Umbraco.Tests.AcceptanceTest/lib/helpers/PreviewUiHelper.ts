@@ -11,9 +11,11 @@ export class PreviewUiHelper extends UiBaseLocators {
   private devicePopover: Locator;
   private cultureBtn: Locator;
   private culturePopover: Locator;
+  private saveAndPreviewBtn: Locator;
 
   constructor(page: Page) {
     super(page);
+    this.saveAndPreviewBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.SaveAndPreview');
     this.exitBtn = page.locator('umb-preview-exit').locator('uui-button');
     this.previewWebsiteBtn = page.locator('umb-preview-open-website').locator('uui-button');
     this.previewIframe = page.locator('umb-preview iframe');
@@ -23,8 +25,10 @@ export class PreviewUiHelper extends UiBaseLocators {
     this.culturePopover = page.locator('umb-preview-culture').locator('uui-popover-container');
   }
 
-  async waitForPreviewPage() {
-    this.previewPage = await this.page.waitForEvent('popup');
+  async clickSaveAndPreviewButton() {
+    const popupPromise = this.page.waitForEvent('popup');
+    await this.click(this.saveAndPreviewBtn);
+    this.previewPage = await popupPromise;
     await this.previewPage.waitForLoadState('load');
     this.exitBtn = this.previewPage.locator('umb-preview-exit').locator('uui-button');
     this.previewWebsiteBtn = this.previewPage.locator('umb-preview-open-website').locator('uui-button');
@@ -61,8 +65,11 @@ export class PreviewUiHelper extends UiBaseLocators {
   }
 
   async isPreviewPageClosed() {
+    if (!this.previewPage) {
+      console.error('Preview page was never opened. Call waitForPreviewPage() first.');
+    }
     await expect(async () => {
-      expect(this.previewPage?.isClosed()).toBeTruthy();
+      expect(this.previewPage!.isClosed()).toBeTruthy();
     }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
