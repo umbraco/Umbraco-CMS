@@ -9,7 +9,6 @@ export class MultiNodeTreePickerStartNodeBuilder {
 
   constructor(parentBuilder: MultiNodeTreePickerDataTypeBuilder) {
     this.parentBuilder = parentBuilder;
-    this.startNodeQueryStepsBuilder = [];
   }
 
   withType(type: string) {

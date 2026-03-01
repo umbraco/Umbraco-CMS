@@ -59,7 +59,7 @@ export class ListViewDataTypeBuilder extends DataTypeBuilder {
     return this;
   }
 
-  withContentAppName(tabName: string) {
+  WithContentAppName(tabName: string) {
     this.tabName = tabName;
     return this;
   }

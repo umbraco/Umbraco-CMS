@@ -1,6 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
-import {BlockGridBlockBuilder} from './blockGridBuilder';
-import {BlockGridBlockGroupBuilder} from './blockGridBuilder';
+import {BlockGridBlockBuilder} from './blockGridBuiler';
+import {BlockGridBlockGroupBuilder} from './blockGridBuiler';
 
 export class BlockGridDataTypeBuilder extends DataTypeBuilder {
   blockGridBlockBuilder: BlockGridBlockBuilder[];

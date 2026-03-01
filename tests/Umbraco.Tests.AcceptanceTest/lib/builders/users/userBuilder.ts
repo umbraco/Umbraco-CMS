@@ -40,7 +40,7 @@ export class UserBuilder {
       name: this.name || this.email,
       kind: this.kind || 'Default',
       userGroupIds: this.userGroupIds,
-      userName: this.userName || this.email,
+      userName: this.email,
     };
   }
 }

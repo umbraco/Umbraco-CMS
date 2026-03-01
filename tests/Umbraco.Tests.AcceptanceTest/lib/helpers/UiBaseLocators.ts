@@ -230,6 +230,11 @@ export class UiBaseLocators extends BasePage {
   
   // Block
   public readonly blockTypeCard: Locator;
+  public readonly backofficeModalContainer: Locator;
+
+  // User & User Group
+  public readonly allowAccessToAllElementsBtn: Locator;
+  public readonly elementStartNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -243,7 +248,7 @@ export class UiBaseLocators extends BasePage {
     this.createBtn = page.getByRole('button', {name: /^Create(…)?$/});
     this.addBtn = page.getByRole('button', {name: 'Add', exact: true});
     this.updateBtn = page.getByLabel('Update');
-    this.changeBtn = page.getByLabel('Change', {exact: true});
+    this.changeBtn = page.getByLabel('Change');
     this.deleteBtn = page.getByRole('button', {name: /^Delete(…)?$/});
     this.deleteExactBtn = page.getByRole('button', {name: 'Delete', exact: true});
     this.removeExactBtn = page.getByLabel('Remove', {exact: true});
@@ -303,6 +308,7 @@ export class UiBaseLocators extends BasePage {
     this.containerChooseBtn = page.locator('#container').getByLabel('Choose');
     this.containerSaveAndPublishBtn = page.locator('#container').getByLabel('Save and Publish');
     this.createModalBtn = page.locator('uui-modal-sidebar').getByLabel('Create', {exact: true});
+    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
   
     // Document Type & Property Editor
     this.documentTypeNode = page.locator('uui-ref-node-document-type');
@@ -440,7 +446,7 @@ export class UiBaseLocators extends BasePage {
     // Reference & Entity
     this.confirmActionModalEntityReferences = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references');
     this.referenceHeadline = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references').locator('#reference-headline').first();
-    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references').locator('uui-ref-list').first().getByTestId('entity-item-ref');
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.entityItem = page.locator('umb-entity-item-ref');
   
     // Workspace & Action
@@ -461,6 +467,10 @@ export class UiBaseLocators extends BasePage {
 
     // Block
     this.blockTypeCard = page.locator('uui-card-block-type');
+
+    // User & User Group
+    this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
+    this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
   }
 
   // Helper Methods
@@ -1619,5 +1629,17 @@ export class UiBaseLocators extends BasePage {
     await this.enterText(this.searchTxt, keyword);
     await this.pressKey(this.searchTxt, 'Enter');
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
+  }
+
+  async clickAllowAccessToAllElements() {
+    await this.click(this.allowAccessToAllElementsBtn);
+  }
+
+  async clickChooseElementStartNodeButton() {
+    await this.click(this.elementStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
+    await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
   }
 }

@@ -1,6 +1,6 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
-import {DocumentBlueprintsBuilder} from "../builders";
 import {AliasHelper} from "./AliasHelper";
+import {DocumentBlueprintsBuilder} from "../builders";
 
 export class DocumentBlueprintApiHelper {
   api: ApiHelpers;

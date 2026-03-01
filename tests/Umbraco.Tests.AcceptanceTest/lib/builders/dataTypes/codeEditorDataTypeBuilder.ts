@@ -58,7 +58,7 @@ export class CodeEditorDataTypeBuilder extends DataTypeBuilder {
     });
     values.push({
       alias: 'wordWrap',
-      value: this.wordWrap !== undefined ? this.wordWrap : false
+      value: this.minimap !== undefined ? this.minimap : false
     });
     return values;
   }
