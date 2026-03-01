@@ -84,6 +84,7 @@ public class ExtendedContentSavedWebhookEvent : ExtendedContentWebhookEventBase<
             deliveryContent.Name,
             deliveryContent.CreateDate,
             deliveryContent.UpdateDate,
+            deliveryContent.Properties,
             Cultures = cultures,
         };
     }
