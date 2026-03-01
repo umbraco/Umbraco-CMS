@@ -324,7 +324,7 @@ export class UmbTableElement extends UmbLitElement {
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
 							?checked=${this.selection.length === this.items.length}
-							?indeterminate=${this._selection.length > 0 && this._selection.length < this.items.length}></uui-checkbox>
+							?indeterminate=${this.selection.length > 0 && this.selection.length < this.items.length}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>
