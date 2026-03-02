@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { ConstantHelper, test } from "@umbraco/playwright-testhelpers";
+import { ConstantHelper, test } from "@umbraco/acceptance-test-helpers";
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = { cookie: "", accessToken: "", refreshToken: "" };
@@ -26,36 +26,36 @@ test.beforeEach(async ({ umbracoApi }) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   childDocumentTypeOneId =
     await umbracoApi.documentType.createDefaultDocumentType(
-      childDocumentTypeOneName
+      childDocumentTypeOneName,
     );
   const childDocumentTypeTwoId =
     await umbracoApi.documentType.createDefaultDocumentType(
-      childDocumentTypeTwoName
+      childDocumentTypeTwoName,
     );
   rootDocumentTypeId =
     await umbracoApi.documentType.createDocumentTypeWithAllowedTwoChildNodes(
       rootDocumentTypeName,
       childDocumentTypeOneId,
-      childDocumentTypeTwoId
+      childDocumentTypeTwoId,
     );
   rootDocumentId = await umbracoApi.document.createDefaultDocument(
     rootDocumentName,
-    rootDocumentTypeId
+    rootDocumentTypeId,
   );
   childDocumentOneId =
     await umbracoApi.document.createDefaultDocumentWithParent(
       childDocumentOneName,
       childDocumentTypeOneId,
-      rootDocumentId
+      rootDocumentId,
     );
   await umbracoApi.document.createDefaultDocumentWithParent(
     childDocumentTwoName,
     childDocumentTypeTwoId,
-    rootDocumentId
+    rootDocumentId,
   );
   userGroupId =
     await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(
-      userGroupName
+      userGroupName,
     );
 });
 
@@ -64,7 +64,7 @@ test.afterEach(async ({ umbracoApi }) => {
   await umbracoApi.loginToAdminUser(
     testUserCookieAndToken.cookie,
     testUserCookieAndToken.accessToken,
-    testUserCookieAndToken.refreshToken
+    testUserCookieAndToken.refreshToken,
   );
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeOneName);
@@ -82,12 +82,12 @@ test("can see root start node and children", async ({
     testUser.email,
     testUser.password,
     userGroupId,
-    [rootDocumentId]
+    [rootDocumentId],
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 
@@ -99,11 +99,11 @@ test("can see root start node and children", async ({
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(
     rootDocumentName,
-    childDocumentOneName
+    childDocumentOneName,
   );
   await umbracoUi.content.isChildContentInTreeVisible(
     rootDocumentName,
-    childDocumentTwoName
+    childDocumentTwoName,
   );
 });
 
@@ -117,12 +117,12 @@ test("can see parent of start node but not access it", async ({
     testUser.email,
     testUser.password,
     userGroupId,
-    [childDocumentOneId]
+    [childDocumentOneId],
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 
@@ -130,14 +130,13 @@ test("can see parent of start node but not access it", async ({
   await umbracoUi.user.goToSection(ConstantHelper.sections.content, false);
 
   // Assert
-
   // Get initial URL (should be on content section)
-  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal); // Wait for workspace to load
   const initialUrl = umbracoUi.page.url();
 
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
   await umbracoUi.content.goToContentWithName(rootDocumentName);
-  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal); // Wait for workspace to load
 
   // Assert - URL should not have changed (no navigation occurred)
   const currentUrl = umbracoUi.page.url();
@@ -146,12 +145,12 @@ test("can see parent of start node but not access it", async ({
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(
     rootDocumentName,
-    childDocumentOneName
+    childDocumentOneName,
   );
   await umbracoUi.content.isChildContentInTreeVisible(
     rootDocumentName,
     childDocumentTwoName,
-    false
+    false,
   );
 });
 
@@ -165,12 +164,12 @@ test("see no-access view when deep-linking to restricted document", async ({
     testUser.email,
     testUser.password,
     userGroupId,
-    [childDocumentOneId]
+    [childDocumentOneId],
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 
@@ -180,9 +179,9 @@ test("see no-access view when deep-linking to restricted document", async ({
   // Assert
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
   await umbracoUi.page.goto(
-    `${umbracoUi.page.url()}/workspace/document/edit/${rootDocumentId!}`
+    `${umbracoUi.page.url()}/workspace/document/edit/${rootDocumentId!}`,
   );
-  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal); // Wait for workspace to load
   await umbracoUi.content.doesDocumentWorkspaceHaveText("Access denied");
 });
 
@@ -195,12 +194,12 @@ test("can not see any content when no start nodes specified", async ({
     testUser.name,
     testUser.email,
     testUser.password,
-    userGroupId
+    userGroupId,
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 
