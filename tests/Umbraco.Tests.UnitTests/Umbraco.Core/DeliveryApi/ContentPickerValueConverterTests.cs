@@ -184,4 +184,24 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
 
         Assert.Null(result);
     }
+
+    [TestCase(Constants.Conventions.Content.InternalRedirectId)]
+    [TestCase(Constants.Conventions.Content.Redirect)]
+    public void ContentPickerValueConverter_ExcludedRoutingProperty_ReturnsRawIntermediateValue(string alias)
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns(alias);
+
+        var inter = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
+
+        var valueConverter = CreateValueConverter();
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            inter,
+            false);
+
+        Assert.AreEqual(inter, result);
+    }
 }
