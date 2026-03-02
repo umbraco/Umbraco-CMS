@@ -25,6 +25,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.element.ensureNameNotExists(elementName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(elementPickerDataTypeName);
 });
 
 test('can create content with the element picker data type', async ({umbracoApi, umbracoUi}) => {
