@@ -32,7 +32,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 	private _tableRows: Array<UmbTableItem> = [];
 
 	override updated(changedProperties: any) {
-		if (changedProperties.has('_items')) {
+		if (changedProperties.has('_items') || changedProperties.has('_itemHrefs')) {
 			this.#createTableRows();
 		}
 	}
