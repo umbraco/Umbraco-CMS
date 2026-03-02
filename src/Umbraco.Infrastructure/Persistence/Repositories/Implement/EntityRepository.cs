@@ -272,7 +272,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // Order by SortOrder, and assign each a row number.
         // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
         Sql<ISqlContext> rowNumberSql = Sql()
-            .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS {"rn"}")
+            .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
             .AndSelect<NodeDto>(withAlias: false, n => n.UniqueId)
             .From<NodeDto>()
             .Where<NodeDto>(x => x.Trashed == isTrashed)
@@ -292,13 +292,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // the final query for before and after positions will increase. So we need to calculate the offset based on the provided values.
         int beforeAfterParameterIndexOffset = GetBeforeAfterParameterOffset(objectTypes, filter);
 
+        // use all lower case alias names to avoid sql syntax issues
+        string targetAlias = "target";
 
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
             .Select("rn")
-            .From().AppendSubQuery(rowNumberSql, "target")
-            .Where<NodeDto>(n => n.UniqueId == targetKey, alias: "target");
+            .From().AppendSubQuery(rowNumberSql, targetAlias)
+            .Where<NodeDto>(x => x.UniqueId == targetKey, targetAlias);
 
         // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
         // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
@@ -317,8 +319,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return Sql()
             .Select<NodeDto>("nn", n => n.UniqueId)
             .From().AppendSubQuery(rowNumberSql, "nn")
-            .Where($"{"rn"} >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
-            .Where($"{"rn"} <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
+            .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
+            .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
     }
 
@@ -355,7 +357,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         Sql<ISqlContext>? sql = Sql()
             .SelectCount()
             .From().AppendSubQuery(rowNumberSql, "nn")
-            .Where($"{"rn"} {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
+            .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
         return Database.FirstOrDefault<long>(sql);
     }
 
