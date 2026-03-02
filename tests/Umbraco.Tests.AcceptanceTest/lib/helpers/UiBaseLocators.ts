@@ -82,6 +82,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
+  public readonly propertyEditorChangeBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -319,6 +320,7 @@ export class UiBaseLocators extends BasePage {
     this.property = page.locator('umb-property');
     this.addPropertyBtn = page.getByLabel('Add property', {exact: true});
     this.labelAboveBtn = page.locator('.appearance-option').filter({hasText: 'Label above'});
+    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
   
     // Group & Tab Management
     this.addGroupBtn = page.getByLabel('Add group', {exact: true});
@@ -926,7 +928,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.clickChangeButton();
+    await this.click(this.propertyEditorChangeBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, {exact: true}));
     await this.enterAPropertyName(propertyEditorName);
