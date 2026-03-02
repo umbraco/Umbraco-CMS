@@ -25,10 +25,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </remarks>
 internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 {
-    private const string mainSiblingsSqlAlias = "nn";
-    private const string mainSiblingsSqlTargetAlias = "target";
-    private const string mainSiblingsSqlRowNumberAlias = "rn";
-
     public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
         : base(scopeAccessor, appCaches)
     {
@@ -276,7 +272,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // Order by SortOrder, and assign each a row number.
         // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
         Sql<ISqlContext> rowNumberSql = Sql()
-            .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS {mainSiblingsSqlRowNumberAlias}")
+            .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS {"rn"}")
             .AndSelect<NodeDto>(withAlias: false, n => n.UniqueId)
             .From<NodeDto>()
             .Where<NodeDto>(x => x.Trashed == isTrashed)
@@ -300,9 +296,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
-            .Select(mainSiblingsSqlRowNumberAlias)
-            .From().AppendSubQuery(rowNumberSql, mainSiblingsSqlTargetAlias)
-            .Where<NodeDto>(n => n.UniqueId == targetKey, alias: mainSiblingsSqlTargetAlias);
+            .Select("rn")
+            .From().AppendSubQuery(rowNumberSql, "target")
+            .Where<NodeDto>(n => n.UniqueId == targetKey, alias: "target");
 
         // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
         // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
@@ -319,11 +315,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         return Sql()
-            .Select<NodeDto>(mainSiblingsSqlAlias, n => n.UniqueId)
-            .From().AppendSubQuery(rowNumberSql, mainSiblingsSqlAlias)
-            .Where($"{mainSiblingsSqlRowNumberAlias} >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
-            .Where($"{mainSiblingsSqlRowNumberAlias} <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
-            .OrderBy(mainSiblingsSqlRowNumberAlias);
+            .Select<NodeDto>("nn", n => n.UniqueId)
+            .From().AppendSubQuery(rowNumberSql, "nn")
+            .Where($"{"rn"} >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
+            .Where($"{"rn"} <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
+            .OrderBy("rn");
     }
 
     private static int GetBeforeAfterParameterOffset(ISet<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
@@ -358,8 +354,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
         Sql<ISqlContext>? sql = Sql()
             .SelectCount()
-            .From().AppendSubQuery(rowNumberSql, mainSiblingsSqlAlias)
-            .Where($"{mainSiblingsSqlRowNumberAlias} {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
+            .From().AppendSubQuery(rowNumberSql, "nn")
+            .Where($"{"rn"} {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
         return Database.FirstOrDefault<long>(sql);
     }
 
