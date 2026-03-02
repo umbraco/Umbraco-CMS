@@ -245,4 +245,67 @@ public class PatchPathParserTests
     {
         Assert.That(PatchPathParser.TargetsInvariantCulture(string.Empty), Is.False);
     }
+
+    // RFC 6901 escape sequence tests
+
+    [Test]
+    public void Parse_Tilde1EscapeSequence_DecodesToSlash()
+    {
+        var segments = PatchPathParser.Parse("/a~1b");
+
+        Assert.That(segments, Has.Length.EqualTo(1));
+        Assert.That(segments[0], Is.InstanceOf<PropertySegment>());
+        Assert.That(((PropertySegment)segments[0]).Name, Is.EqualTo("a/b"));
+    }
+
+    [Test]
+    public void Parse_Tilde0EscapeSequence_DecodesToTilde()
+    {
+        var segments = PatchPathParser.Parse("/a~0b");
+
+        Assert.That(segments, Has.Length.EqualTo(1));
+        Assert.That(segments[0], Is.InstanceOf<PropertySegment>());
+        Assert.That(((PropertySegment)segments[0]).Name, Is.EqualTo("a~b"));
+    }
+
+    [Test]
+    public void Parse_Tilde01Combined_DecodesCorrectly()
+    {
+        // ~01 should decode to ~1 (not /), because ~0 decodes to ~ and the trailing 1 stays.
+        // The implementation decodes ~1 first (to /), then ~0 (to ~).
+        // So ~01 → after ~1 pass: ~01 (no match) → after ~0 pass: ~1? No...
+        // Actually: "~01" → Replace("~1", "/") has no match → Replace("~0", "~") → "~1"
+        var segments = PatchPathParser.Parse("/~01");
+
+        Assert.That(segments, Has.Length.EqualTo(1));
+        Assert.That(segments[0], Is.InstanceOf<PropertySegment>());
+        Assert.That(((PropertySegment)segments[0]).Name, Is.EqualTo("~1"));
+    }
+
+    [Test]
+    public void Parse_NoEscapeSequences_PropertyNameUnchanged()
+    {
+        var segments = PatchPathParser.Parse("/normalProperty");
+
+        Assert.That(segments, Has.Length.EqualTo(1));
+        Assert.That(((PropertySegment)segments[0]).Name, Is.EqualTo("normalProperty"));
+    }
+
+    [Test]
+    public void Parse_EscapeSequenceInMultiSegmentPath_DecodesOnlyAffectedSegment()
+    {
+        var segments = PatchPathParser.Parse("/foo/bar~1baz/qux");
+
+        Assert.That(segments, Has.Length.EqualTo(3));
+        Assert.That(((PropertySegment)segments[0]).Name, Is.EqualTo("foo"));
+        Assert.That(((PropertySegment)segments[1]).Name, Is.EqualTo("bar/baz"));
+        Assert.That(((PropertySegment)segments[2]).Name, Is.EqualTo("qux"));
+    }
+
+    [Test]
+    public void IsValid_PathWithEscapeSequence_ReturnsTrue()
+    {
+        Assert.That(PatchPathParser.IsValid("/foo~1bar"), Is.True);
+        Assert.That(PatchPathParser.IsValid("/foo~0bar"), Is.True);
+    }
 }

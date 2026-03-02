@@ -180,7 +180,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -263,7 +263,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -329,7 +329,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
@@ -393,7 +393,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -477,7 +477,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -553,7 +553,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -619,7 +619,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert - Returns BadRequest (400) because path filter matches no elements
         Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
@@ -685,7 +685,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         if (response.StatusCode != HttpStatusCode.OK)
@@ -743,7 +743,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert - Umbraco allows patching documents in recycle bin (they can be edited before permanent deletion)
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -774,7 +774,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Act
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{nonExistentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{nonExistentKey}/patch", httpContent);
 
         // Assert
         Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
@@ -941,7 +941,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         var httpContent = JsonContent.Create(patchModel);
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
-        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
         if (response.StatusCode != HttpStatusCode.OK)
@@ -986,5 +986,211 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         Assert.IsNotNull(block3Data);
         Assert.AreEqual("Block 3 Headline", block3Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
         Assert.AreEqual("Block 3 Description", block3Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+    }
+
+    [Test]
+    public async Task PatchDocument_BlockList_AddBlock_AppendsToExistingBlockList()
+    {
+        // Arrange - Authenticate as admin
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+
+        // Create element type for blocks
+        var elementType = new ContentTypeBuilder()
+            .WithAlias("heroBlock")
+            .WithName("Hero Block")
+            .AddPropertyType()
+            .WithAlias("headline")
+            .WithName("Headline")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("description")
+            .WithName("Description")
+            .WithDataTypeId(Constants.DataTypes.Textarea)
+            .Done()
+            .Build();
+        elementType.IsElement = true;
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        // Create Block List data type
+        var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();
+        var configurationEditorJsonSerializer = GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+        var blockListDataType = new UmbracoDataType(
+            propertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList],
+            configurationEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                {
+                    "blocks",
+                    new[]
+                    {
+                        new { contentElementTypeKey = elementType.Key }
+                    }
+                }
+            },
+            Name = "My Block List",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+
+        var dataTypeService = GetRequiredService<IDataTypeService>();
+        await dataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+
+        // Create content type with Block List property
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("blockListPage")
+            .WithName("Block List Page")
+            .AddPropertyType()
+            .WithAlias("contentBlocks")
+            .WithName("Content Blocks")
+            .WithDataTypeId(blockListDataType.Id)
+            .Done()
+            .Build();
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // Create two existing blocks
+        var block1Key = Guid.NewGuid();
+        var block2Key = Guid.NewGuid();
+
+        var jsonSerializer = GetRequiredService<IJsonSerializer>();
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[]
+                    {
+                        new BlockListLayoutItem { ContentKey = block1Key },
+                        new BlockListLayoutItem { ContentKey = block2Key }
+                    }
+                }
+            },
+            ContentData = new List<BlockItemData>
+            {
+                new BlockItemData
+                {
+                    Key = block1Key,
+                    ContentTypeKey = elementType.Key,
+                    ContentTypeAlias = elementType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "headline", Value = "Block 1 Headline" },
+                        new BlockPropertyValue { Alias = "description", Value = "Block 1 Description" }
+                    }
+                },
+                new BlockItemData
+                {
+                    Key = block2Key,
+                    ContentTypeKey = elementType.Key,
+                    ContentTypeAlias = elementType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "headline", Value = "Block 2 Headline" },
+                        new BlockPropertyValue { Alias = "description", Value = "Block 2 Description" }
+                    }
+                }
+            },
+            SettingsData = new List<BlockItemData>(),
+            Expose = new List<BlockItemVariation>()
+        };
+
+        var blockListJson = jsonSerializer.Serialize(blockListValue);
+
+        // Create document with Block List containing 2 blocks
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("My Blocks Document")
+            .WithCreatorId(Constants.Security.SuperUserId)
+            .Build();
+
+        content.SetValue("contentBlocks", blockListJson);
+        ContentService.Save(content);
+        var documentKey = content.Key;
+
+        // Act - Add a new block to the block list using two add operations:
+        //   1. Append block data to contentData array
+        //   2. Append layout item to layout array (so the block is rendered)
+        var newBlockKey = Guid.NewGuid();
+
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = "/values[alias=contentBlocks,culture=null,segment=null]/value/contentData/-",
+                    Value = new
+                    {
+                        key = newBlockKey,
+                        contentTypeKey = elementType.Key,
+                        contentTypeAlias = elementType.Alias,
+                        values = new[]
+                        {
+                            new { alias = "headline", value = "New Block Headline" },
+                            new { alias = "description", value = "New Block Description" }
+                        }
+                    }
+                },
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = $"/values[alias=contentBlocks,culture=null,segment=null]/value/layout/Umbraco.BlockList/-",
+                    Value = new { contentKey = newBlockKey }
+                }
+            }
+        };
+
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
+
+        // Assert
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error response: {response.StatusCode}");
+            Console.WriteLine($"Error body: {errorContent}");
+        }
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        // Verify the block list now has 3 blocks
+        var updatedContent = ContentService.GetById(documentKey);
+        Assert.IsNotNull(updatedContent);
+
+        var updatedBlockListJson = updatedContent.GetValue<string>("contentBlocks");
+        Assert.IsNotNull(updatedBlockListJson);
+
+        var updatedBlockListValue = jsonSerializer.Deserialize<BlockListValue>(updatedBlockListJson);
+        Assert.IsNotNull(updatedBlockListValue);
+
+        // Verify contentData has 3 blocks
+        Assert.AreEqual(3, updatedBlockListValue.ContentData.Count);
+
+        // Verify the new block was added with correct values
+        var newBlockData = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == newBlockKey);
+        Assert.IsNotNull(newBlockData);
+        Assert.AreEqual("New Block Headline", newBlockData.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
+        Assert.AreEqual("New Block Description", newBlockData.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+
+        // Verify original blocks were NOT changed
+        var block1Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block1Key);
+        Assert.IsNotNull(block1Data);
+        Assert.AreEqual("Block 1 Headline", block1Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
+        Assert.AreEqual("Block 1 Description", block1Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+
+        var block2Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block2Key);
+        Assert.IsNotNull(block2Data);
+        Assert.AreEqual("Block 2 Headline", block2Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
+        Assert.AreEqual("Block 2 Description", block2Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+
+        // Verify layout was also updated with the new block
+        var layoutItems = updatedBlockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].ToList();
+        Assert.AreEqual(3, layoutItems.Count);
     }
 }

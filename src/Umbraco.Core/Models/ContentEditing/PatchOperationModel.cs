@@ -11,7 +11,7 @@ public class PatchOperationModel
     public PatchOperationType Op { get; set; }
 
     /// <summary>
-    /// Gets or sets the JSONPath expression identifying the target location.
+    /// Gets or sets the patch path expression identifying the target location.
     /// </summary>
     public string Path { get; set; } = string.Empty;
 

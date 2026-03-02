@@ -469,4 +469,36 @@ public class PatchEngineTests
         Assert.That(values[1].GetProperty("value").GetString(), Is.EqualTo("200"));
         Assert.That(values[2].GetProperty("value").GetString(), Is.EqualTo("1000"));
     }
+
+    // RFC 6901 escape sequence tests
+
+    [Test]
+    public void Replace_PropertyNameContainingSlash_RequiresEscaping()
+    {
+        var json = """
+        {
+            "a/b": "original"
+        }
+        """;
+
+        var result = PatchEngine.ApplyOperation(json, PatchOperationType.Replace, "/a~1b", "updated");
+
+        var doc = JsonDocument.Parse(result);
+        Assert.That(doc.RootElement.GetProperty("a/b").GetString(), Is.EqualTo("updated"));
+    }
+
+    [Test]
+    public void Replace_PropertyNameContainingTilde_RequiresEscaping()
+    {
+        var json = """
+        {
+            "a~b": "original"
+        }
+        """;
+
+        var result = PatchEngine.ApplyOperation(json, PatchOperationType.Replace, "/a~0b", "updated");
+
+        var doc = JsonDocument.Parse(result);
+        Assert.That(doc.RootElement.GetProperty("a~b").GetString(), Is.EqualTo("updated"));
+    }
 }

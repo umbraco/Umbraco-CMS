@@ -1,15 +1,20 @@
 namespace Umbraco.Cms.Core.PropertyEditors.Patching;
 
 /// <summary>
-/// Parses Umbraco's custom patch path syntax into typed segments.
+/// Parses Umbraco's patch path syntax into typed segments.
 /// <para>
-/// Syntax is based on JSON Pointer (RFC 6901) extended with array filter expressions:
+/// The syntax is based on <see href="https://datatracker.ietf.org/doc/html/rfc6901">JSON Pointer (RFC 6901)</see>
+/// with a custom extension for array element filtering:
 /// <list type="bullet">
-///   <item><c>/property</c> — access object property</item>
-///   <item><c>[key=value,key2=null]</c> — filter array element by matching properties</item>
-///   <item><c>/0</c> — access array element by index</item>
-///   <item><c>/-</c> — append to end of array (Add operations only)</item>
+///   <item><c>/property</c> — access object property (RFC 6901 reference token)</item>
+///   <item><c>/0</c> — access array element by index (RFC 6901 numeric token)</item>
+///   <item><c>/-</c> — append to end of array (RFC 6901 past-the-end token, Add operations only)</item>
+///   <item><c>[key=value,key2=null]</c> — filter array element by matching properties (Umbraco extension, not part of RFC 6901)</item>
 /// </list>
+/// </para>
+/// <para>
+/// RFC 6901 escape sequences are supported in property name tokens:
+/// <c>~1</c> decodes to <c>/</c> and <c>~0</c> decodes to <c>~</c>.
 /// </para>
 /// <example>
 /// <c>/variants[culture=en-US,segment=null]/name</c>
@@ -227,7 +232,23 @@ public static class PatchPathParser
             return new IndexSegment(index);
         }
 
-        return new PropertySegment(token.ToString());
+        var name = UnescapeRfc6901(token.ToString());
+        return new PropertySegment(name);
+    }
+
+    /// <summary>
+    /// Decodes RFC 6901 escape sequences in a reference token.
+    /// <c>~1</c> is decoded to <c>/</c> and <c>~0</c> is decoded to <c>~</c>.
+    /// Per the RFC, <c>~1</c> must be decoded before <c>~0</c> to avoid double-decoding.
+    /// </summary>
+    private static string UnescapeRfc6901(string token)
+    {
+        if (!token.Contains('~'))
+        {
+            return token;
+        }
+
+        return token.Replace("~1", "/").Replace("~0", "~");
     }
 
     private static FilterSegment ParseFilter(ReadOnlySpan<char> filterContent)

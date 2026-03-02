@@ -94,7 +94,7 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
 
         Type layoutItemType = GetLayoutItemType(value.GetType());
 
-        writer.WriteStartObject(nameof(BlockValue.Layout));
+        writer.WriteStartObject(nameof(BlockValue.Layout).ToFirstLowerInvariant());
 
         if (blockLayoutItems.Any())
         {

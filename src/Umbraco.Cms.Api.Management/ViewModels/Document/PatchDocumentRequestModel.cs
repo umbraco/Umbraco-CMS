@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
 /// <summary>
-/// Request model for operation-based PATCH on documents using JSON Patch with JSONPath.
+/// Request model for operation-based PATCH on documents using Umbraco's extended JSON Pointer path syntax.
 /// </summary>
 public class PatchDocumentRequestModel
 {

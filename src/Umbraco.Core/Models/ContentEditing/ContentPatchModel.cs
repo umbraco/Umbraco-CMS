@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 /// <summary>
-/// Model for operation-based partial content updates (PATCH with JSONPath).
+/// Model for operation-based partial content updates using Umbraco's extended JSON Pointer path syntax.
 /// </summary>
 public class ContentPatchModel
 {
