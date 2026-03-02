@@ -263,6 +263,21 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Get_Ids_By_Aliases()
+    {
+        // Arrange
+        var contentTypeService = ContentTypeService;
+        var hierarchy = CreateContentTypeHierarchy();
+        contentTypeService.Save(hierarchy, -1); // ensure they are saved!
+
+        // Act
+        var ids = contentTypeService.GetAllContentTypeIds(["masterContentType", "childType0", "childType9"]);
+
+        // Assert
+        Assert.That(ids, Has.All.GreaterThan(0));
+    }
+
+    [Test]
     public void Get_Descendants()
     {
         // Arrange

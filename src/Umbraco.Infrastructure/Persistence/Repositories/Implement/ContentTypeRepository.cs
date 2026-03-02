@@ -104,12 +104,16 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             return Enumerable.Empty<int>();
         }
 
+        // Workaround for array/span conversion resulting in op_Implicit while visiting expressions.
+        // There's likely way better solutions (don't let alias be nullable?), but this is a quick fix to surface the bug(s).
+        var aliasesList = aliases.ToList();
+
         Sql<ISqlContext> sql = Sql()
             .Select<ContentTypeDto>(x => x.NodeId)
             .From<ContentTypeDto>()
             .InnerJoin<NodeDto>()
             .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-            .Where<ContentTypeDto>(dto => aliases.Contains(dto.Alias));
+            .Where<ContentTypeDto>(dto => dto.Alias != null && aliasesList.Contains(dto.Alias));
 
         return Database.Fetch<int>(sql);
     }
