@@ -4,24 +4,20 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.PropertyEditors.JsonPath;
+using Umbraco.Cms.Core.PropertyEditors.Patching;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Patchers;
 
 /// <summary>
-/// Applies JSON Patch operations with JSONPath to documents, converting them to update models.
+/// Applies patch operations with Umbraco's custom path syntax to documents, converting them to update models.
 /// </summary>
 public class DocumentPatcher
 {
     private readonly IContentEditingService _contentEditingService;
-    private readonly IContentTypeService _contentTypeService;
-    private readonly ILanguageService _languageService;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
-    private readonly JsonPathEvaluator _jsonPathEvaluator;
-    private readonly JsonPathCultureExtractor _cultureExtractor;
 
     public DocumentPatcher(
         IContentEditingService contentEditingService,
@@ -31,12 +27,8 @@ public class DocumentPatcher
         IDocumentEditingPresentationFactory documentEditingPresentationFactory)
     {
         _contentEditingService = contentEditingService;
-        _contentTypeService = contentTypeService;
-        _languageService = languageService;
         _jsonSerializer = jsonSerializer;
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
-        _jsonPathEvaluator = new JsonPathEvaluator();
-        _cultureExtractor = new JsonPathCultureExtractor();
     }
 
     /// <summary>
@@ -55,7 +47,7 @@ public class DocumentPatcher
         // Validate operation structure
         foreach (PatchOperationModel operation in patchModel.Operations)
         {
-            if (!_jsonPathEvaluator.IsValidExpression(operation.Path))
+            if (!PatchPathParser.IsValid(operation.Path))
             {
                 return Attempt.FailWithStatus(ContentPatchingOperationStatus.InvalidOperation, default(UpdateDocumentRequestModel)!);
             }
@@ -84,7 +76,7 @@ public class DocumentPatcher
         {
             try
             {
-                currentJsonString = _jsonPathEvaluator.ApplyOperation(
+                currentJsonString = PatchEngine.ApplyOperation(
                     currentJsonString,
                     operation.Op,
                     operation.Path,
@@ -92,7 +84,14 @@ public class DocumentPatcher
             }
             catch (InvalidOperationException)
             {
-                // JSONPath matched no elements or other operation error
+                // Path resolution failed or operation error
+                return Attempt.FailWithStatus(
+                    ContentPatchingOperationStatus.InvalidOperation,
+                    default(UpdateDocumentRequestModel)!);
+            }
+            catch (FormatException)
+            {
+                // Path syntax error
                 return Attempt.FailWithStatus(
                     ContentPatchingOperationStatus.InvalidOperation,
                     default(UpdateDocumentRequestModel)!);

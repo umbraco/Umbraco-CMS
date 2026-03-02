@@ -44,7 +44,7 @@ public abstract class PatchDocumentControllerBase : DocumentControllerBase
         {
             ContentPatchingOperationStatus.InvalidOperation => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid operation")
-                .WithDetail("One or more PATCH operations were invalid. Check operation structure, JSONPath syntax, and operation types.")
+                .WithDetail("One or more PATCH operations were invalid. Check operation structure, path syntax, and operation types.")
                 .Build()),
             ContentPatchingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid culture")

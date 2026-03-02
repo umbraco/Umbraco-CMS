@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
 /// <summary>
-/// Represents a single PATCH operation following JSON Patch (RFC 6902) semantics with JSONPath.
+/// Represents a single PATCH operation using Umbraco's path syntax.
 /// </summary>
 public class PatchOperationRequestModel
 {
@@ -14,7 +14,15 @@ public class PatchOperationRequestModel
     public string Op { get; set; } = string.Empty;
 
     /// <summary>
-    /// JSONPath expression identifying the target location (e.g., "$.values[?(@.alias == 'title' &amp;&amp; @.culture == 'en-US')].value").
+    /// Path expression identifying the target location using Umbraco's extended JSON Pointer syntax.
+    /// <para>
+    /// Examples:
+    /// <list type="bullet">
+    ///   <item><c>/variants[culture=en-US,segment=null]/name</c></item>
+    ///   <item><c>/values[alias=title,culture=en-US,segment=null]/value</c></item>
+    ///   <item><c>/values[alias=blocks,culture=null,segment=null]/value/contentData/-</c> (append to array)</item>
+    /// </list>
+    /// </para>
     /// </summary>
     [Required]
     public string Path { get; set; } = string.Empty;

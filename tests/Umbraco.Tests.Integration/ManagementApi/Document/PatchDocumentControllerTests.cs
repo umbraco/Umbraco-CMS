@@ -110,7 +110,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == null && @.segment == null)].name",
+                    Path = "/variants[culture=null,segment=null]/name",
                     Value = "Updated Name"
                 }
             }
@@ -171,7 +171,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == 'en-US' && @.segment == null)].name",
+                    Path = "/variants[culture=en-US,segment=null]/name",
                     Value = "Updated English Name"
                 }
             }
@@ -248,13 +248,13 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == 'en-US' && @.segment == null)].name",
+                    Path = "/variants[culture=en-US,segment=null]/name",
                     Value = "Updated English"
                 },
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == 'da-DK' && @.segment == null)].name",
+                    Path = "/variants[culture=da-DK,segment=null]/name",
                     Value = "Updated Danish"
                 }
             }
@@ -320,7 +320,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == 'fr-FR' && @.segment == null)].name",
+                    Path = "/variants[culture=fr-FR,segment=null]/name",
                     Value = "French Name" // fr-FR not enabled
                 }
             }
@@ -384,7 +384,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.values[?(@.alias == 'title' && @.culture == 'en-US' && @.segment == null)].value",
+                    Path = "/values[alias=title,culture=en-US,segment=null]/value",
                     Value = "Updated Title"
                 }
             }
@@ -462,13 +462,13 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.values[?(@.alias == 'title' && @.culture == 'en-US' && @.segment == null)].value",
+                    Path = "/values[alias=title,culture=en-US,segment=null]/value",
                     Value = "Updated Title"
                 },
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.values[?(@.alias == 'description' && @.culture == 'en-US' && @.segment == null)].value",
+                    Path = "/values[alias=description,culture=en-US,segment=null]/value",
                     Value = "Updated Description"
                 }
             }
@@ -538,13 +538,13 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == 'en-US' && @.segment == null)].name",
+                    Path = "/variants[culture=en-US,segment=null]/name",
                     Value = "Updated Name"
                 },
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.values[?(@.alias == 'title' && @.culture == 'en-US' && @.segment == null)].value",
+                    Path = "/values[alias=title,culture=en-US,segment=null]/value",
                     Value = "Updated Title"
                 }
             }
@@ -602,7 +602,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var documentKey = createResponse.Result.Content.Key;
 
         // Try to patch non-existent property
-        // When JSONPath matches no elements, it returns BadRequest (400) not UnprocessableEntity (422)
+        // When path filter matches no elements, it returns BadRequest (400)
         var patchModel = new PatchDocumentRequestModel
         {
             Operations = new[]
@@ -610,7 +610,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.values[?(@.alias == 'nonExistentProperty' && @.culture == 'en-US' && @.segment == null)].value",
+                    Path = "/values[alias=nonExistentProperty,culture=en-US,segment=null]/value",
                     Value = "Some Value"
                 }
             }
@@ -621,7 +621,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}", httpContent);
 
-        // Assert - Returns BadRequest (400) because JSONPath expression matches no elements
+        // Assert - Returns BadRequest (400) because path filter matches no elements
         Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
@@ -676,7 +676,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.values[?(@.alias == 'price' && @.culture == 'en-US' && @.segment == 'premium')].value",
+                    Path = "/values[alias=price,culture=en-US,segment=premium]/value",
                     Value = "200"
                 }
             }
@@ -734,7 +734,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == null && @.segment == null)].name",
+                    Path = "/variants[culture=null,segment=null]/name",
                     Value = "Updated Name"
                 }
             }
@@ -765,7 +765,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = "$.variants[?(@.culture == null && @.segment == null)].name",
+                    Path = "/variants[culture=null,segment=null]/name",
                     Value = "Updated Name"
                 }
             }
@@ -917,9 +917,8 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         ContentService.Save(content);
         var documentKey = content.Key;
 
-        // Act - Patch only the headline of block 2 using nested JSONPath
-        // This demonstrates the TARGET API contract for Phase 8 implementation
-        // The JSONPath expression navigates through the nested structure:
+        // Act - Patch only the headline of block 2 using nested path
+        // The path expression navigates through the nested structure:
         //   1. Find the property with alias 'contentBlocks'
         //   2. Navigate into its .value (the BlockListValue object)
         //   3. Navigate into .contentData array
@@ -927,7 +926,6 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         //   5. Navigate into its .values array
         //   6. Find the property with alias 'headline'
         //   7. Update its .value
-        // This enables minimal payload updates (~100 bytes) vs full replacement (~2KB)
         var patchModel = new PatchDocumentRequestModel
         {
             Operations = new[]
@@ -935,7 +933,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
                 new PatchOperationRequestModel
                 {
                     Op = "replace",
-                    Path = $"$.values[?(@.alias == 'contentBlocks' && @.culture == null && @.segment == null)].value.contentData[?(@.key == '{block2Key}')].values[?(@.alias == 'headline')].value",
+                    Path = $"/values[alias=contentBlocks,culture=null,segment=null]/value/contentData[key={block2Key}]/values[alias=headline]/value",
                     Value = "Updated Block 2 Headline"
                 }
             }

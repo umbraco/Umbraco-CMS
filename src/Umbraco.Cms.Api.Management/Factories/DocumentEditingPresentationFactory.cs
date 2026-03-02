@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.Patching;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -106,7 +107,6 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
 
     public ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel)
     {
-        var cultureExtractor = new Umbraco.Cms.Core.PropertyEditors.JsonPath.JsonPathCultureExtractor();
         var operations = requestModel.Operations.Select(op => new PatchOperationModel
         {
             Op = MapOperationType(op.Op),
@@ -114,9 +114,15 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
             Value = op.Value
         }).ToArray();
 
-        var affectedCultures = cultureExtractor.ExtractCulturesFromOperations(operations.Select(o => o.Path)).ToArray();
-        var affectedSegments = operations
-            .SelectMany(o => cultureExtractor.ExtractSegments(o.Path))
+        var paths = operations.Select(o => o.Path).ToArray();
+
+        var affectedCultures = paths
+            .SelectMany(PatchPathParser.ExtractCultures)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        var affectedSegments = paths
+            .SelectMany(PatchPathParser.ExtractSegments)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 

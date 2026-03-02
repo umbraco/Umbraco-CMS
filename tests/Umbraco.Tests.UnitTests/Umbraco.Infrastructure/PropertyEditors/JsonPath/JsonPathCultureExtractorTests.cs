@@ -15,45 +15,25 @@ public class JsonPathCultureExtractorTests
     }
 
     [Test]
-    public void ExtractCultures_SingleCultureWithSingleQuotes_ReturnsCulture()
+    public void ExtractCultures_SingleCulture_ReturnsCulture()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'title' && @.culture == 'en-US')]";
+        var path = "/values[alias=title,culture=en-US]/value";
 
-        // Act
         var cultures = _extractor.ExtractCultures(path);
 
-        // Assert
         Assert.That(cultures, Has.Count.EqualTo(1));
         Assert.That(cultures, Does.Contain("en-US"));
     }
 
     [Test]
-    public void ExtractCultures_SingleCultureWithDoubleQuotes_ReturnsCulture()
+    public void ExtractCultures_MultiplePaths_ReturnAllCultures()
     {
-        // Arrange
-        var path = """$.values[?(@.alias == "title" && @.culture == "en-US")]""";
+        var path1 = "/values[culture=en-US]/value";
+        var path2 = "/values[culture=da-DK]/value";
 
-        // Act
-        var cultures = _extractor.ExtractCultures(path);
-
-        // Assert
-        Assert.That(cultures, Has.Count.EqualTo(1));
-        Assert.That(cultures, Does.Contain("en-US"));
-    }
-
-    [Test]
-    public void ExtractCultures_MultipleCultures_ReturnsAllCultures()
-    {
-        // Arrange
-        var path1 = "$.values[?(@.culture == 'en-US')]";
-        var path2 = "$.values[?(@.culture == 'da-DK')]";
-
-        // Act
         var cultures1 = _extractor.ExtractCultures(path1);
         var cultures2 = _extractor.ExtractCultures(path2);
 
-        // Assert
         Assert.That(cultures1, Does.Contain("en-US"));
         Assert.That(cultures2, Does.Contain("da-DK"));
     }
@@ -61,36 +41,28 @@ public class JsonPathCultureExtractorTests
     [Test]
     public void ExtractCultures_NoCulture_ReturnsEmpty()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'title')]";
+        var path = "/values[alias=title]/value";
 
-        // Act
         var cultures = _extractor.ExtractCultures(path);
 
-        // Assert
         Assert.That(cultures, Is.Empty);
     }
 
     [Test]
     public void ExtractCultures_EmptyString_ReturnsEmpty()
     {
-        // Act
         var cultures = _extractor.ExtractCultures(string.Empty);
 
-        // Assert
         Assert.That(cultures, Is.Empty);
     }
 
     [Test]
     public void ExtractSegments_SingleSegment_ReturnsSegment()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'price' && @.segment == 'premium')]";
+        var path = "/values[alias=price,segment=premium]/value";
 
-        // Act
         var segments = _extractor.ExtractSegments(path);
 
-        // Assert
         Assert.That(segments, Has.Count.EqualTo(1));
         Assert.That(segments, Does.Contain("premium"));
     }
@@ -98,96 +70,75 @@ public class JsonPathCultureExtractorTests
     [Test]
     public void ExtractSegments_NoSegment_ReturnsEmpty()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'title')]";
+        var path = "/values[alias=title]/value";
 
-        // Act
         var segments = _extractor.ExtractSegments(path);
 
-        // Assert
         Assert.That(segments, Is.Empty);
     }
 
     [Test]
     public void ContainsInvariantCultureFilter_NullCulture_ReturnsTrue()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'title' && @.culture == null)]";
+        var path = "/values[alias=title,culture=null]/value";
 
-        // Act
         var containsInvariant = _extractor.ContainsInvariantCultureFilter(path);
 
-        // Assert
         Assert.That(containsInvariant, Is.True);
     }
 
     [Test]
     public void ContainsInvariantCultureFilter_CultureValue_ReturnsFalse()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'title' && @.culture == 'en-US')]";
+        var path = "/values[alias=title,culture=en-US]/value";
 
-        // Act
         var containsInvariant = _extractor.ContainsInvariantCultureFilter(path);
 
-        // Assert
         Assert.That(containsInvariant, Is.False);
     }
 
     [Test]
     public void ContainsInvariantCultureFilter_NoCultureFilter_ReturnsFalse()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'title')]";
+        var path = "/values[alias=title]/value";
 
-        // Act
         var containsInvariant = _extractor.ContainsInvariantCultureFilter(path);
 
-        // Assert
         Assert.That(containsInvariant, Is.False);
     }
 
     [Test]
     public void ContainsNullSegmentFilter_NullSegment_ReturnsTrue()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'price' && @.segment == null)]";
+        var path = "/values[alias=price,segment=null]/value";
 
-        // Act
         var containsNullSegment = _extractor.ContainsNullSegmentFilter(path);
 
-        // Assert
         Assert.That(containsNullSegment, Is.True);
     }
 
     [Test]
     public void ContainsNullSegmentFilter_SegmentValue_ReturnsFalse()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'price' && @.segment == 'premium')]";
+        var path = "/values[alias=price,segment=premium]/value";
 
-        // Act
         var containsNullSegment = _extractor.ContainsNullSegmentFilter(path);
 
-        // Assert
         Assert.That(containsNullSegment, Is.False);
     }
 
     [Test]
     public void ExtractCulturesFromOperations_MultipleOperations_ReturnsAllUniqueCultures()
     {
-        // Arrange
         var operations = new[]
         {
-            "$.values[?(@.culture == 'en-US')]",
-            "$.values[?(@.culture == 'da-DK')]",
-            "$.values[?(@.culture == 'en-US')]" // Duplicate
+            "/values[culture=en-US]/value",
+            "/values[culture=da-DK]/value",
+            "/values[culture=en-US]/value" // Duplicate
         };
 
-        // Act
         var cultures = _extractor.ExtractCulturesFromOperations(operations);
 
-        // Assert
         Assert.That(cultures, Has.Count.EqualTo(2));
         Assert.That(cultures, Does.Contain("en-US"));
         Assert.That(cultures, Does.Contain("da-DK"));
@@ -196,70 +147,46 @@ public class JsonPathCultureExtractorTests
     [Test]
     public void ExtractCulturesFromOperations_EmptyCollection_ReturnsEmpty()
     {
-        // Act
         var cultures = _extractor.ExtractCulturesFromOperations(Array.Empty<string>());
 
-        // Assert
         Assert.That(cultures, Is.Empty);
     }
 
     [Test]
     public void AnyOperationTargetsInvariantCulture_ContainsInvariant_ReturnsTrue()
     {
-        // Arrange
         var operations = new[]
         {
-            "$.values[?(@.culture == 'en-US')]",
-            "$.values[?(@.culture == null)]"
+            "/values[culture=en-US]/value",
+            "/values[culture=null]/value"
         };
 
-        // Act
         var targetsInvariant = _extractor.AnyOperationTargetsInvariantCulture(operations);
 
-        // Assert
         Assert.That(targetsInvariant, Is.True);
     }
 
     [Test]
     public void AnyOperationTargetsInvariantCulture_NoInvariant_ReturnsFalse()
     {
-        // Arrange
         var operations = new[]
         {
-            "$.values[?(@.culture == 'en-US')]",
-            "$.values[?(@.culture == 'da-DK')]"
+            "/values[culture=en-US]/value",
+            "/values[culture=da-DK]/value"
         };
 
-        // Act
         var targetsInvariant = _extractor.AnyOperationTargetsInvariantCulture(operations);
 
-        // Assert
         Assert.That(targetsInvariant, Is.False);
-    }
-
-    [Test]
-    public void ExtractCultures_CaseInsensitive_ReturnsUniqueCultures()
-    {
-        // Arrange
-        var path = "$.values[?(@.culture == 'en-US' || @.culture == 'EN-US')]";
-
-        // Act
-        var cultures = _extractor.ExtractCultures(path);
-
-        // Assert - Should return 1 unique culture (case-insensitive comparison)
-        Assert.That(cultures, Has.Count.EqualTo(1));
     }
 
     [Test]
     public void ExtractCultures_ComplexNestedPath_ExtractsCulture()
     {
-        // Arrange
-        var path = "$.values[?(@.alias == 'contentBlocks')].value.contentData[?(@.key == 'guid')].values[?(@.alias == 'headline' && @.culture == 'en-US')]";
+        var path = "/values[alias=contentBlocks]/value/contentData[key=some-guid]/values[alias=headline,culture=en-US]/value";
 
-        // Act
         var cultures = _extractor.ExtractCultures(path);
 
-        // Assert
         Assert.That(cultures, Has.Count.EqualTo(1));
         Assert.That(cultures, Does.Contain("en-US"));
     }

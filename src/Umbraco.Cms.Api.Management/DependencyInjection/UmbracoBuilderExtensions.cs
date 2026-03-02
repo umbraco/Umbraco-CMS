@@ -24,7 +24,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoApiOpenApiUI();
 
-        if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
+        if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(ConfigureUmbracoBackofficeJsonOptions)))
         {
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
                 .AddJson()

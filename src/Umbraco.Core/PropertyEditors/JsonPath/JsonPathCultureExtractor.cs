@@ -1,125 +1,80 @@
-using System.Text.RegularExpressions;
+using Umbraco.Cms.Core.PropertyEditors.Patching;
 
 namespace Umbraco.Cms.Core.PropertyEditors.JsonPath;
 
 /// <summary>
-/// Extracts culture and segment information from JSONPath expressions for authorization purposes.
-/// Parses filter expressions like "@.culture == 'en-US'" to extract the culture value.
+/// Extracts culture and segment information from patch path expressions for authorization purposes.
+/// Delegates to <see cref="PatchPathParser"/> for path parsing.
 /// </summary>
 public class JsonPathCultureExtractor
 {
-    // Regex patterns for extracting culture and segment from JSONPath filter expressions
-    // Matches: @.culture == 'value' or @.culture == "value"
-    private static readonly Regex CulturePattern = new(@"@\.culture\s*==\s*['""]([^'""]+)['""]", RegexOptions.Compiled);
-
-    // Matches: @.segment == 'value' or @.segment == "value"
-    private static readonly Regex SegmentPattern = new(@"@\.segment\s*==\s*['""]([^'""]+)['""]", RegexOptions.Compiled);
-
-    // Matches: @.culture == null
-    private static readonly Regex CultureNullPattern = new(@"@\.culture\s*==\s*null\b", RegexOptions.Compiled);
-
-    // Matches: @.segment == null
-    private static readonly Regex SegmentNullPattern = new(@"@\.segment\s*==\s*null\b", RegexOptions.Compiled);
-
     /// <summary>
-    /// Extracts all unique cultures referenced in a JSONPath expression.
+    /// Extracts all unique cultures referenced in a path expression.
     /// </summary>
-    /// <param name="pathExpression">The JSONPath expression to parse.</param>
+    /// <param name="pathExpression">The patch path expression to parse.</param>
     /// <returns>A set of culture codes (e.g., "en-US", "da-DK"), or empty set if no cultures found.</returns>
     public ISet<string> ExtractCultures(string pathExpression)
-    {
-        if (string.IsNullOrWhiteSpace(pathExpression))
-        {
-            return new HashSet<string>();
-        }
-
-        var cultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        var matches = CulturePattern.Matches(pathExpression);
-        foreach (Match match in matches)
-        {
-            if (match.Success && match.Groups.Count > 1)
-            {
-                cultures.Add(match.Groups[1].Value);
-            }
-        }
-
-        return cultures;
-    }
+        => PatchPathParser.ExtractCultures(pathExpression);
 
     /// <summary>
-    /// Extracts all unique segments referenced in a JSONPath expression.
+    /// Extracts all unique segments referenced in a path expression.
     /// </summary>
-    /// <param name="pathExpression">The JSONPath expression to parse.</param>
+    /// <param name="pathExpression">The patch path expression to parse.</param>
     /// <returns>A set of segment names, or empty set if no segments found.</returns>
     public ISet<string> ExtractSegments(string pathExpression)
+        => PatchPathParser.ExtractSegments(pathExpression);
+
+    /// <summary>
+    /// Checks if a path expression explicitly targets invariant content (culture=null).
+    /// </summary>
+    /// <param name="pathExpression">The path expression to parse.</param>
+    /// <returns>True if the expression targets invariant culture, false otherwise.</returns>
+    public bool ContainsInvariantCultureFilter(string pathExpression)
+        => PatchPathParser.TargetsInvariantCulture(pathExpression);
+
+    /// <summary>
+    /// Checks if a path expression explicitly targets null segment.
+    /// </summary>
+    /// <param name="pathExpression">The path expression to parse.</param>
+    /// <returns>True if the expression targets null segment, false otherwise.</returns>
+    public bool ContainsNullSegmentFilter(string pathExpression)
     {
-        if (string.IsNullOrWhiteSpace(pathExpression))
+        if (!PatchPathParser.IsValid(pathExpression))
         {
-            return new HashSet<string>();
+            return false;
         }
 
-        var segments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        var matches = SegmentPattern.Matches(pathExpression);
-        foreach (Match match in matches)
+        PatchPathSegment[] segments = PatchPathParser.Parse(pathExpression);
+        foreach (PatchPathSegment segment in segments)
         {
-            if (match.Success && match.Groups.Count > 1)
+            if (segment is FilterSegment filter)
             {
-                segments.Add(match.Groups[1].Value);
+                foreach (FilterCondition condition in filter.Conditions)
+                {
+                    if (string.Equals(condition.Key, "segment", StringComparison.OrdinalIgnoreCase)
+                        && condition.Value is null)
+                    {
+                        return true;
+                    }
+                }
             }
         }
 
-        return segments;
+        return false;
     }
 
     /// <summary>
-    /// Checks if a JSONPath expression explicitly filters for null culture (invariant).
+    /// Extracts all cultures from a collection of path expressions.
     /// </summary>
-    /// <param name="pathExpression">The JSONPath expression to parse.</param>
-    /// <returns>True if the expression contains "@.culture == null", false otherwise.</returns>
-    public bool ContainsInvariantCultureFilter(string pathExpression)
-    {
-        if (string.IsNullOrWhiteSpace(pathExpression))
-        {
-            return false;
-        }
-
-        return CultureNullPattern.IsMatch(pathExpression);
-    }
-
-    /// <summary>
-    /// Checks if a JSONPath expression explicitly filters for null segment.
-    /// </summary>
-    /// <param name="pathExpression">The JSONPath expression to parse.</param>
-    /// <returns>True if the expression contains "@.segment == null", false otherwise.</returns>
-    public bool ContainsNullSegmentFilter(string pathExpression)
-    {
-        if (string.IsNullOrWhiteSpace(pathExpression))
-        {
-            return false;
-        }
-
-        return SegmentNullPattern.IsMatch(pathExpression);
-    }
-
-    /// <summary>
-    /// Extracts all cultures from a collection of JSONPath expressions.
-    /// </summary>
-    /// <param name="pathExpressions">Collection of JSONPath expressions.</param>
+    /// <param name="pathExpressions">Collection of path expressions.</param>
     /// <returns>A set of all unique cultures across all expressions.</returns>
     public ISet<string> ExtractCulturesFromOperations(IEnumerable<string> pathExpressions)
     {
-        if (pathExpressions == null)
-        {
-            return new HashSet<string>();
-        }
-
         var allCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var path in pathExpressions)
         {
-            var cultures = ExtractCultures(path);
+            ISet<string> cultures = ExtractCultures(path);
             foreach (var culture in cultures)
             {
                 allCultures.Add(culture);
@@ -132,15 +87,8 @@ public class JsonPathCultureExtractor
     /// <summary>
     /// Checks if any of the path expressions target invariant content (null culture).
     /// </summary>
-    /// <param name="pathExpressions">Collection of JSONPath expressions.</param>
+    /// <param name="pathExpressions">Collection of path expressions.</param>
     /// <returns>True if any expression contains invariant culture filter.</returns>
     public bool AnyOperationTargetsInvariantCulture(IEnumerable<string> pathExpressions)
-    {
-        if (pathExpressions == null)
-        {
-            return false;
-        }
-
-        return pathExpressions.Any(ContainsInvariantCultureFilter);
-    }
+        => pathExpressions.Any(ContainsInvariantCultureFilter);
 }

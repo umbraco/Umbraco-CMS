@@ -23,7 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonPatch.Net" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
