@@ -30,7 +30,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			pathName: 'table2',
 			columns: [
 				{
-					field: 'isoCode',
+					field: 'unique',
 					headerName: 'ISO Code',
 				},
 				{
