@@ -23,8 +23,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			this.#value = undefined;
 		} else {
 			this.crops = [...value.crops];
-			// Preserve null values - use nullish coalescing instead of logical OR
-			this.focalPoint = value.focalPoint ?? null;
+			this.focalPoint = value.focalPoint;
 			this.src = value.src;
 			this.#value = value;
 		}
@@ -61,7 +60,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	fileDataUrl?: string;
 
 	@state()
-	focalPoint: UmbImageCropperFocalPoint | null = null;
+	focalPoint: UmbImageCropperFocalPoint = null;
 
 	@property({ type: Boolean })
 	hideFocalPoint = false;
@@ -154,7 +153,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		if (this.currentCrop) {
 			return html`
 				<umb-image-cropper
-					.focalPoint=${this.focalPoint ?? { left: 0.5, top: 0.5 }}
+					.focalPoint=${this.focalPoint}
 					.src=${this.source}
 					.value=${this.currentCrop}
 					?hideFocalPoint=${this.hideFocalPoint}
@@ -165,9 +164,9 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 
 		return html`
 			<umb-image-cropper-focus-setter
-				.focalPoint=${this.focalPoint ?? { left: 0.5, top: 0.5 }}
+				.focalPoint=${this.focalPoint}
 				.src=${this.source}
-				?hideFocalPoint=${this.hideFocalPoint || this.focalPoint === null}
+				?hideFocalPoint=${this.hideFocalPoint}
 				@focalpoint-change=${this.#onFocalPointChange}>
 			</umb-image-cropper-focus-setter>
 			<div id="actions">${this.renderActions()}</div>
@@ -178,7 +177,9 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		return html`
 			<slot name="actions"></slot>
 			${when(
-				!this.hideFocalPoint && this.focalPoint !== null && (this.focalPoint.left !== 0.5 || this.focalPoint.top !== 0.5),
+				!this.hideFocalPoint &&
+					this.focalPoint !== null &&
+					(this.focalPoint.left !== 0.5 || this.focalPoint.top !== 0.5),
 				() => html`
 					<uui-button compact label=${this.localize.term('content_resetFocalPoint')} @click=${this.onResetFocalPoint}>
 						<uui-icon name="icon-axis-rotation"></uui-icon>

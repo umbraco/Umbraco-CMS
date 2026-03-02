@@ -122,7 +122,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			...this.value,
 			src: item.url,
 			crops,
-			focalPoint: this.value.focalPoint ?? { left: 0.5, top: 0.5 },
+			focalPoint: this.value.focalPoint,
 		};
 		this._imageCropperValue = value;
 	}
@@ -163,7 +163,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			key: this._key,
 			unique: this._unique,
 			crops: value.crops,
-			focalPoint: value.focalPoint ?? null,
+			focalPoint: value.focalPoint,
 		};
 	}
 

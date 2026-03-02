@@ -26,7 +26,7 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 		return this.#focalPoint;
 	}
 
-	#focalPoint: UmbImageCropperFocalPoint | null = null;
+	#focalPoint: UmbImageCropperFocalPoint = null;
 
 	override connectedCallback() {
 		super.connectedCallback();
