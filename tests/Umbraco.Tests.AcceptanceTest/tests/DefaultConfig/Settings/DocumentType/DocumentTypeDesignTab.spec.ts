@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 import {expect} from "@playwright/test";
 
 const documentTypeName = 'TestDocumentType';
@@ -159,7 +159,7 @@ test('can create a document type with multiple groups', {tag: '@release'}, async
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickAddGroupButton();
   await umbracoUi.documentType.enterGroupName(secondGroupName, 1);
-  await umbracoUi.documentType.addPropertyEditor(secondDataTypeName, 1);
+  await umbracoUi.documentType.addPropertyEditor(secondDataTypeName, 2);
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert

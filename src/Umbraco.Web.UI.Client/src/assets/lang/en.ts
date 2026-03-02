@@ -20,6 +20,7 @@ export default {
 		chooseWhereToCopy: 'Choose where to copy',
 		chooseWhereToImport: 'Choose where to import',
 		chooseWhereToMove: 'Choose where to move',
+		clear: 'Clear',
 		copy: 'Duplicate',
 		copyTo: 'Duplicate to',
 		create: 'Create',
@@ -1457,6 +1458,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab Title',
 		tabs: 'Tabs',
+		changeIcon: 'Change icon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
@@ -2047,6 +2049,7 @@ export default {
 		noLockouts: "hasn't been locked out",
 		noPasswordChange: "The password hasn't been changed",
 		confirmNewPassword: 'Confirm new password',
+		confirmPassword: 'Confirm password',
 		changePasswordDescription:
 			"You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button",
 		contentChannel: 'Content Channel',
@@ -2151,7 +2154,7 @@ export default {
 		userNotInGroup: "The user is not in group '%0%'",
 		userPermissions: 'User permissions',
 		usergroup: 'User group',
-		usergroups: 'User groups',
+		usergroups: 'User Groups',
 		userInvited: 'has been invited',
 		userInvitedSuccessHelp: 'An invitation has been sent to the new user with details about how to log in to Umbraco.',
 		userinviteWelcomeMessage:

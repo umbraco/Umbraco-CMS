@@ -88,9 +88,16 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 				this.#makeArgsFor(propertyType.alias, variantId.culture, variantId.segment),
 			);
 			if (value) {
-				value.culture = variantId.culture;
-				value.segment = variantId.segment;
-				values.push(value);
+				// Reconstruct with consistent key ordering (editorAlias, culture, segment, alias, value)
+				// to match the data source format. JSON.stringify respects insertion order, so mismatched
+				// key ordering causes false-positive pending change detection.
+				values.push({
+					editorAlias: value.editorAlias,
+					culture: variantId.culture,
+					segment: variantId.segment,
+					alias: value.alias,
+					value: value.value,
+				} as ReturnType);
 			}
 		}
 		return values;
@@ -120,6 +127,10 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 		return this.#variantOptions.filter((variantId) => {
 			// If property doesn't vary by culture, only use culture-invariant options
 			if (!variesByCulture && variantId.culture !== null) {
+				return false;
+			}
+			// If property does vary by culture, exclude culture-invariant options
+			if (variesByCulture && variantId.culture === null) {
 				return false;
 			}
 			// If property doesn't vary by segment, only use segment-invariant options

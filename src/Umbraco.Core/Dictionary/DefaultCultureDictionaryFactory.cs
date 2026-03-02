@@ -16,15 +16,22 @@ public class DefaultCultureDictionaryFactory : ICultureDictionaryFactory
     private readonly AppCaches _appCaches;
     private readonly ILocalizationService _localizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultCultureDictionaryFactory"/> class.
+    /// </summary>
+    /// <param name="localizationService">The localization service for accessing dictionary items.</param>
+    /// <param name="appCaches">The application caches containing the request cache.</param>
     public DefaultCultureDictionaryFactory(ILocalizationService localizationService, AppCaches appCaches)
     {
         _localizationService = localizationService;
         _appCaches = appCaches;
     }
 
+    /// <inheritdoc />
     public ICultureDictionary CreateDictionary() =>
         new DefaultCultureDictionary(_localizationService, _appCaches.RequestCache);
 
+    /// <inheritdoc />
     public ICultureDictionary CreateDictionary(CultureInfo specificCulture) =>
         new DefaultCultureDictionary(specificCulture, _localizationService, _appCaches.RequestCache);
 }

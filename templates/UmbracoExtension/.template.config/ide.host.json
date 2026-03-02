@@ -12,6 +12,14 @@
       "isVisible": true
     },
     {
+      "id": "PackageManagement",
+      "isVisible": true,
+      "defaultValue": "Central",
+      "description": {
+        "text": "Choose how to manage NuGet package versions"
+      }
+    },
+    {
       "id": "SupportPagesAndViews",
       "isVisible": true,
       "persistenceScope": "templateGroup"

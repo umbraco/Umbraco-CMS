@@ -21,5 +21,7 @@ public class ByKeyDocumentBlueprintFolderController : DocumentBlueprintFolderCon
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a document blueprint folder.")]
+    [EndpointDescription("Gets a document blueprint folder identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id) => await GetFolderAsync(id);
 }

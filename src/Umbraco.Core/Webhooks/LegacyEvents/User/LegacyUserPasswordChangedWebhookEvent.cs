@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a user's password is changed, using the legacy payload format.
+/// </summary>
 [WebhookEvent("User Password Changed")]
 public class LegacyUserPasswordChangedWebhookEvent : WebhookEventBase<UserPasswordChangedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyUserPasswordChangedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyUserPasswordChangedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,6 +28,6 @@ public class LegacyUserPasswordChangedWebhookEvent : WebhookEventBase<UserPasswo
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserPasswordChanged;
-
 }

@@ -613,6 +613,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(sourceBlockEditorValues.Layout));
 
         TValue mergeResult = MergeBlockEditorDataForCulture(sourceBlockEditorValues.BlockValue, targetBlockEditorValues.BlockValue, culture);
+        SortBlockItemValuesByCulture(mergeResult);
         return _jsonSerializer.Serialize(mergeResult);
     }
 
@@ -701,6 +702,25 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 var propertyValueIsCultureVariant = value.Culture is not null;
                 return propertyValueIsCultureVariant != value.PropertyType.VariesByCulture();
             });
+        }
+    }
+
+    /// <summary>
+    /// Sorts block item values by culture to ensure consistent JSON serialization order.
+    /// This prevents false positives in edited state detection where PublishedValue and EditedValue
+    /// differ only in culture order.
+    /// </summary>
+    protected static void SortBlockItemValuesByCulture(TValue blockValue)
+    {
+        SortBlockItemValuesByCulture(blockValue.ContentData);
+        SortBlockItemValuesByCulture(blockValue.SettingsData);
+    }
+
+    private static void SortBlockItemValuesByCulture(List<BlockItemData> blockItemData)
+    {
+        foreach (BlockItemData item in blockItemData)
+        {
+            item.Values = [.. item.Values.OrderBy(v => v.Culture, StringComparer.OrdinalIgnoreCase)];
         }
     }
 }

@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Service for tracking references between entities in Umbraco.
+/// </summary>
 public interface ITrackedReferencesService
 {
     /// <summary>
@@ -95,5 +98,13 @@ public interface ITrackedReferencesService
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take, bool filterMustBeIsDependency);
 
+    /// <summary>
+    ///     Gets a paged result of entity keys that have dependent references.
+    /// </summary>
+    /// <param name="keys">The set of entity keys to check for dependent references.</param>
+    /// <param name="nodeObjectTypeId">The object type identifier of the nodes.</param>
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <returns>A paged result of entity keys that have dependent references.</returns>
     Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid nodeObjectTypeId, long skip, long take);
 }

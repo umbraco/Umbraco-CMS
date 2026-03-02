@@ -7,6 +7,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class IntegerConfigurationEditor : ConfigurationEditor
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IntegerConfigurationEditor"/> class.
+    /// </summary>
     public IntegerConfigurationEditor()
     {
         Fields.Add(new ConfigurationField(new IntegerValidator())
