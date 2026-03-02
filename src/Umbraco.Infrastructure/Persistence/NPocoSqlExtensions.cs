@@ -1052,6 +1052,7 @@ namespace Umbraco.Extensions
             return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: withAlias)));
         }
 
+
         /// <summary>
         /// Adds columns to a SELECT Sql statement.
         /// </summary>
