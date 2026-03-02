@@ -1,10 +1,6 @@
 import { getQuerySnippet } from '../../utils/index.js';
 import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
-import {
-	UMB_TEMPLATING_WORKSPACE_EDITOR_STYLES,
-	UMB_PRODUCTION_MODE_WARNING_STYLES,
-} from '../../workspace-editor-styles.js';
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -87,15 +83,16 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	#renderProductionModeWarning() {
+	#renderProductionModeTag() {
 		if (!this._isConfirmedProductionMode) return nothing;
 		return html`
-			<div id="production-mode-warning">
-				<uui-icon name="icon-alert"></uui-icon>
-				<umb-localize key="speechBubbles_runtimeModeNotEditable">
-					Content is not editable when using Production runtime mode.
-				</umb-localize>
-			</div>
+			<uui-tag
+				id="production-mode-tag"
+				look="primary"
+				color="warning"
+				title=${this.localize.term('speechBubbles_runtimeModeNotEditable')}>
+				<umb-localize key="speechBubbles_productionMode">Production Mode</umb-localize>
+			</uui-tag>
 		`;
 	}
 
@@ -105,7 +102,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				<umb-workspace-header-name-editable
 					slot="header"
 					?readonly=${this._isNew === false || this._isRestricted}></umb-workspace-header-name-editable>
-				${this.#renderProductionModeWarning()}
+				${this.#renderProductionModeTag()}
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu
@@ -144,9 +141,29 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static override styles = [
-		UMB_TEMPLATING_WORKSPACE_EDITOR_STYLES,
-		UMB_PRODUCTION_MODE_WARNING_STYLES,
 		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			umb-code-editor {
+				--editor-height: calc(100dvh - 300px);
+			}
+
+			uui-box {
+				min-height: calc(100dvh - 300px);
+				margin: var(--uui-size-layout-1);
+				--uui-box-default-padding: 0;
+				/* remove header border bottom as code editor looks better in this box */
+				--uui-color-divider-standalone: transparent;
+			}
+
+			#code-editor-menu-container uui-icon:not([name='icon-delete']) {
+				margin-right: var(--uui-size-space-3);
+			}
+
 			#insert-menu {
 				margin: 0;
 				padding: 0;
@@ -168,8 +185,15 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#code-editor-menu-container {
+				display: flex;
 				justify-content: flex-end;
+				gap: var(--uui-size-space-3);
 				width: 100%;
+			}
+
+			#production-mode-tag {
+				margin: var(--uui-size-layout-1);
+				margin-bottom: 0;
 			}
 		`,
 	];

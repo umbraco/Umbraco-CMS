@@ -4,10 +4,6 @@ import { UMB_TEMPLATING_SECTION_PICKER_MODAL } from '../../modals/templating-sec
 import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/insert-menu.element.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../modals/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context-token.js';
-import {
-	UMB_TEMPLATING_WORKSPACE_EDITOR_STYLES,
-	UMB_PRODUCTION_MODE_WARNING_STYLES,
-} from '../../workspace-editor-styles.js';
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -198,15 +194,16 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderProductionModeWarning() {
+	#renderProductionModeTag() {
 		if (!this._isConfirmedProductionMode) return nothing;
 		return html`
-			<div id="production-mode-warning">
-				<uui-icon name="icon-alert"></uui-icon>
-				<umb-localize key="speechBubbles_runtimeModeNotEditable">
-					Content is not editable when using Production runtime mode.
-				</umb-localize>
-			</div>
+			<uui-tag
+				id="production-mode-tag"
+				look="primary"
+				color="warning"
+				title=${this.localize.term('speechBubbles_runtimeModeNotEditable')}>
+				<umb-localize key="speechBubbles_productionMode">Production Mode</umb-localize>
+			</uui-tag>
 		`;
 	}
 
@@ -230,13 +227,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					${umbFocus()}>
 				</umb-input-with-alias>
 
-				${this.#renderProductionModeWarning()}
+				${this.#renderProductionModeTag()}
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
 					<div slot="header-actions">
 						<umb-templating-insert-menu
 							@insert=${this.#insertSnippet}
-							?disabled=${this._isRestricted}></umb-templating-insert-menu>
+							?disabled=${this._isRestricted}>
+						</umb-templating-insert-menu>
 						<uui-button
 							look="secondary"
 							id="query-builder-button"
@@ -273,8 +271,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static override styles = [
-		UMB_TEMPLATING_WORKSPACE_EDITOR_STYLES,
-		UMB_PRODUCTION_MODE_WARNING_STYLES,
 		css`
 			#loader-container {
 				display: grid;
@@ -282,8 +278,24 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				min-height: calc(100dvh - 360px);
 			}
 
+			umb-code-editor {
+				--editor-height: calc(100dvh - 300px);
+			}
+
+			uui-box {
+				min-height: calc(100dvh - 300px);
+				margin: var(--uui-size-layout-1);
+				--uui-box-default-padding: 0;
+				/* remove header border bottom as code editor looks better in this box */
+				--uui-color-divider-standalone: transparent;
+			}
+
 			umb-input-with-alias {
 				width: 100%;
+			}
+
+			#code-editor-menu-container uui-icon:not([name='icon-delete']) {
+				margin-right: var(--uui-size-space-3);
 			}
 
 			#insert-menu {
@@ -307,7 +319,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#code-editor-menu-container {
+				display: flex;
 				justify-content: space-between;
+				gap: var(--uui-size-space-3);
+			}
+
+			#production-mode-tag {
+				margin: var(--uui-size-layout-1);
+				margin-bottom: 0;
 			}
 		`,
 	];
