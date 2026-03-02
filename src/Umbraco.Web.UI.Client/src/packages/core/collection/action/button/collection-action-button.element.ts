@@ -1,5 +1,5 @@
-import type { ManifestCollectionAction } from '../extensions/types.js';
-import type { UmbCollectionAction } from './collection-action-base.js';
+import type { ManifestCollectionAction } from '../../extensions/types.js';
+import type { UmbCollectionAction } from '../collection-action-base.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbCreateCollectionActionApi } from './collection-create-action.api';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
@@ -24,6 +25,14 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 
 	#createLabel = this.localize.term('general_create');
 	#entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;
+
+	private _api: UmbCreateCollectionActionApi | undefined;
+	public get api(): UmbCreateCollectionActionApi | undefined {
+		return this._api;
+	}
+	public set api(value: UmbCreateCollectionActionApi | undefined) {
+		this._api = value;
+	}
 
 	#onPopoverToggle(event: PointerEvent) {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
