@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbCreateCollectionActionApi } from './collection-create-action.api';
+import type { UmbCreateCollectionActionApi } from './collection-create-action.api.js';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
