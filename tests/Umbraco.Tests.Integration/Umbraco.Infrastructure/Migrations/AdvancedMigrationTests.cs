@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Our.Umbraco.PostgreSql.Services;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
@@ -241,7 +242,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 Assert.NotNull(columnInfo);
-                Assert.IsTrue(sqlSyntax.StringLengthUnicodeColumnDefinitionFormat.InvariantContains(columnInfo.DataType));
+                Assert.IsTrue(((PostgreSqlSyntaxProvider)sqlSyntax).StringLengthUnicodeColumnDefinitionFormat.InvariantContains(columnInfo.DataType));
             });
         }
     }
@@ -330,7 +331,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 
         protected override void Migrate()
         {
-            var sql = string.Format(SqlSyntax.StringLengthUnicodeColumnDefinitionFormat, 255);
+            var sql = string.Format(((PostgreSqlSyntaxProvider)SqlSyntax).StringLengthUnicodeColumnDefinitionFormat, 255);
             Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo {sql}");
         }
     }

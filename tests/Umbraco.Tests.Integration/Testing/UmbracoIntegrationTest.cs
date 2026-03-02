@@ -8,6 +8,7 @@ using NPoco.DatabaseTypes;
 using NUnit.Framework;
 using Our.Umbraco.PostgreSql;
 using Our.Umbraco.PostgreSql.EFCore;
+using Our.Umbraco.PostgreSql.Services;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -79,7 +80,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
     protected string GetDBTypeNameForTextColumn(IScope scope, int size = 64)
     {
-        return string.Format(scope.Database.SqlContext.SqlSyntax.StringLengthUnicodeColumnDefinitionFormat, size);
+        return string.Format(((PostgreSqlSyntaxProvider)scope.Database.SqlContext.SqlSyntax).StringLengthUnicodeColumnDefinitionFormat, size);
     }
 
     [SetUp]

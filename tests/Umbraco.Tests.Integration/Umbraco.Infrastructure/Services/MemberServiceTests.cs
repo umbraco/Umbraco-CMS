@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -513,6 +514,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [NUnit.Framework.Ignore("This test requires SqlLite or SQL Server as only these platforms are expected to support case insensitivity.")]
     public async Task Associate_Members_To_Roles_With_Member_Id_Casing()
     {
         MemberService.AddRole("MyTestRole1");
@@ -529,7 +531,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(MemberService.GetById(member2.Id));
 
         var allRoles = MemberService.GetAllRoles();
-        var role = allRoles.Single(r => r.Name.Equals("mytestrole1", StringComparison.InvariantCultureIgnoreCase)); // ensure the role lookup is case-insensitive, but the role name has correct casing
+        var role = allRoles.Single(r => r.Name.Equals("mytestrole1", StringComparison.InvariantCultureIgnoreCase));
 
         MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { role.Name }); // Why is this test needed? In production you should ensure the role exists and is correct casing, but this is to ensure that the role lookup is case-insensitive
 
