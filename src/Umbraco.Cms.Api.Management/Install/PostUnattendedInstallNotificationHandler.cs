@@ -82,7 +82,7 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
             return;
         }
 
-        // Generate an imaging HMAC secret key if one is not already configured
+        // Generate an imaging HMAC secret key if one is not already configured.
         await _hmacSecretKeyService.TryCreateHmacSecretKeyAsync();
 
         var unattendedName = unattendedSettings.UnattendedUserName;

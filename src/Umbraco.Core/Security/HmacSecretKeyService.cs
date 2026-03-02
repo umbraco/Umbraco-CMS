@@ -41,6 +41,7 @@ internal sealed class HmacSecretKeyService : IHmacSecretKeyService
     {
         if (HasHmacSecretKey())
         {
+            _logger.LogInformation("Imaging HMAC secret key already exists, skipping generation.");
             return false;
         }
 
@@ -57,6 +58,7 @@ internal sealed class HmacSecretKeyService : IHmacSecretKeyService
             return false;
         }
 
+        _logger.LogInformation("Imaging HMAC secret key has been generated and saved to configuration.");
         return true;
     }
 }
