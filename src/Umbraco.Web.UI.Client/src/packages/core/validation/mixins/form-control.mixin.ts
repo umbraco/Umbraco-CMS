@@ -144,7 +144,6 @@ export function UmbFormControlMixin<
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
-				this._runValidators();
 			}
 		}
 		public get pristine(): boolean {
