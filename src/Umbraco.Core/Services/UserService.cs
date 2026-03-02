@@ -2018,7 +2018,8 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MediaNodeNotFound, Enumerable.Empty<NodePermissions>());
         }
 
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions = await GetPermissionsAsync(userKey, idAttempt.Result);
+        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
+            await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Media]);
         scope.Complete();
 
         return permissions;
@@ -2035,7 +2036,8 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.ContentNodeNotFound, Enumerable.Empty<NodePermissions>());
         }
 
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions = await GetPermissionsAsync(userKey, idAttempt.Result);
+        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
+            await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Document]);
         scope.Complete();
 
         return permissions;
@@ -2046,29 +2048,60 @@ internal partial class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="userKey">The key of the user to get permissions for.</param>
     /// <param name="nodes">A dictionary mapping node keys to node IDs.</param>
+    /// <param name="objectTypes">The object types of the nodes.</param>
     /// <returns>An attempt containing the permissions or an error status.</returns>
-    private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(Guid userKey, Dictionary<Guid, int> nodes)
+    private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(
+        Guid userKey,
+        Dictionary<Guid, int> nodes,
+        IEnumerable<UmbracoObjectTypes> objectTypes)
     {
         IUser? user = await GetAsync(userKey);
-
         if (user is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, Enumerable.Empty<NodePermissions>());
         }
 
-        EntityPermissionCollection permissionsCollection = _userGroupRepository.GetPermissions(
-            user.Groups.ToArray(),
-            true,
-            nodes.Select(x => x.Value).ToArray());
+        var nodeIds = nodes.Values.ToArray();
 
-        var results = new List<NodePermissions>();
-        foreach (KeyValuePair<Guid, int> node in nodes)
+        // Use GetAllPaths (lighter query returning only Id, Path, Key) instead of GetAll (full IEntitySlim).
+        TreeEntityPath[] entityPaths = objectTypes
+            .SelectMany(objectType => _entityService.GetAllPaths(objectType, nodeIds))
+            .DistinctBy(entity => entity.Key)
+            .ToArray();
+
+        if (entityPaths.Length == 0)
         {
-            ISet<string> permissions = permissionsCollection.GetAllPermissions(node.Value);
-            results.Add(new NodePermissions { NodeKey = node.Key, Permissions = permissions });
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
         }
 
-        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.Success, results);
+        // Collect all unique node IDs from all entity paths for a single batch query.
+        var pathDataByKey = new Dictionary<Guid, int[]>();
+        var allUniqueNodeIds = new HashSet<int>();
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            int[] pathIds = entityPath.Path.GetIdsFromPathReversed();
+            pathDataByKey[entityPath.Key] = pathIds;
+            allUniqueNodeIds.UnionWith(pathIds);
+        }
+
+        // Single batch permission query for all unique node IDs.
+        EntityPermissionCollection allPermissions = GetPermissions(user, [.. allUniqueNodeIds]);
+
+        // Per-entity in-memory resolution using the batch results.
+        var results = new NodePermissions[entityPaths.Length];
+        for (var i = 0; i < entityPaths.Length; i++)
+        {
+            int[] pathIds = pathDataByKey[entityPaths[i].Key];
+            var pathNodeIdSet = new HashSet<int>(pathIds);
+            EntityPermission[] relevantPermissions = allPermissions
+                .Where(p => pathNodeIdSet.Contains(p.EntityId))
+                .ToArray();
+
+            EntityPermissionSet permissionSet = CalculatePermissionsForPathForUser(relevantPermissions, pathIds);
+            results[i] = new NodePermissions { NodeKey = entityPaths[i].Key, Permissions = permissionSet.GetAllPermissions() };
+        }
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, results.AsEnumerable());
     }
 
     /// <summary>
@@ -2200,10 +2233,10 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         // collect all permissions structures for all nodes for all groups belonging to the user
-        EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
+        EntityPermission[] groupPermissions =
+            GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
-
     }
 
     /// <inheritdoc/>

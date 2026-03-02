@@ -166,7 +166,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			return html`
 				<div id="header">
 					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
-					<p>${this.property.description}</p>
+					<p>${this.property.description ?? ''}</p>
 				</div>
 				<div id="editor">
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
@@ -212,9 +212,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						<uui-textarea
 							label="description"
 							name="description"
+							data-mark="input:description"
 							id="description-input"
 							placeholder=${this.localize.term('placeholders_enterDescription')}
-							.value=${this.property.description}
+							.value=${this.property.description ?? ''}
 							@input=${(e: CustomEvent) => {
 								if (e.target) this.#singleValueUpdate('description', (e.target as HTMLInputElement).value);
 							}}
@@ -225,11 +226,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					id="editor"
 					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
+					data-mark="action:editor-settings"
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.unique })}>
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
 					<uui-action-bar>
-						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+						<uui-button label="${this.localize.term('actions_delete')}" data-mark="action:delete" @click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
@@ -253,6 +255,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				type="number"
 				?disabled=${this._inherited}
 				label="sort order"
+				data-mark="input:sort-order"
 				@change=${this.#onPropertyOrderChanged}
 				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
 		`;

@@ -53,6 +53,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#searchItemNavIndex = 0;
 
+	#searchRequestNumber = 0;
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 300;
 
@@ -164,6 +165,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		if (this._currentGlobalSearcher === searcher) return;
 
 		this._currentGlobalSearcher = searcher;
+		this.#searchRequestNumber++;
 
 		this.#focusInput();
 		this._loading = true;
@@ -172,8 +174,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	async #updateSearchResults() {
+		const requestNumber = this.#searchRequestNumber;
+
 		if (this._search && this._currentGlobalSearcher?.api) {
 			const { data } = await this._currentGlobalSearcher.api.search({ query: this._search });
+			if (requestNumber !== this.#searchRequestNumber) return; // stale response, discard
 			if (!data) return;
 			this._searchResults = data.items;
 		} else {
@@ -198,6 +203,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		const target = event.target as HTMLInputElement;
 		this._search = target.value.trim();
 
+		this.#searchRequestNumber++;
 		clearTimeout(this.#inputTimer);
 		if (!this._search) {
 			this._loading = false;

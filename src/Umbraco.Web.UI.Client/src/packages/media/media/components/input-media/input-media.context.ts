@@ -7,7 +7,7 @@ import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { isMediaTreeItem } from '../../tree/utils.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
+import { isUmbracoFolder, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 interface UmbMediaPickerInputContextOpenArgs {
@@ -61,6 +61,10 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	): boolean => {
 		// Check if the user has no access to this item (tree items only)
 		if (isMediaTreeItem(item) && item.noAccess) {
+			return false;
+		}
+		// Exclude folders - they don't have URLs
+		if (isUmbracoFolder(item.mediaType.unique)) {
 			return false;
 		}
 		if (allowedContentTypes && allowedContentTypes.length > 0) {

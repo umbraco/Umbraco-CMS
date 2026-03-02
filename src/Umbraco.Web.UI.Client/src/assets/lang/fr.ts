@@ -1142,6 +1142,7 @@ export default {
 		tab: 'Onglet',
 		tabname: "Titre de l'onglet",
 		tabs: 'Onglets',
+		changeIcon: "Changer l'icône",
 		contentTypeEnabled: 'Type de contenu de base activé',
 		contentTypeUses: 'Ce type de contenu utilise',
 		noPropertiesDefinedOnTab:
@@ -1613,6 +1614,7 @@ export default {
 		noLockouts: "n'a pas été bloqué",
 		noPasswordChange: "Le mot de passe n'a pas été modifié",
 		confirmNewPassword: 'Confirmez votre nouveau mot de passe',
+		confirmPassword: 'Confirmer le mot de passe',
 		changePasswordDescription:
 			'Vous pouvez changer votre mot de passe d\'accès au backoffice Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"',
 		contentChannel: 'Canal de contenu',
