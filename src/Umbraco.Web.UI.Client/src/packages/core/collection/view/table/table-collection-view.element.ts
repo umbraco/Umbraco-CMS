@@ -1,6 +1,6 @@
 import { UmbCollectionViewElementBase } from '../umb-collection-view-element-base.js';
-import type { UmbCollectionItemModel } from '../../types.js';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestCollectionViewTableKind, MetaCollectionViewTableKindColumn } from './types.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbTableSelectedEvent,
@@ -14,25 +14,54 @@ import './entity-name-table-column-layout.element.js';
 
 @customElement('umb-table-collection-view')
 export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase {
+	#manifest: ManifestCollectionViewTableKind | undefined;
+
+	@property({ attribute: false })
+	public set manifest(value: ManifestCollectionViewTableKind | undefined) {
+		this.#manifest = value;
+		this._manifestColumns = value?.meta?.columns ?? [];
+		this.#buildTableColumns();
+	}
+	public get manifest() {
+		return this.#manifest;
+	}
+
 	@state()
-	private _tableColumns: Array<UmbTableColumn> = [
-		{
-			name: 'Name',
-			alias: 'name',
-			elementName: 'umb-entity-name-table-column-layout',
-		},
-		{
-			name: '',
-			alias: 'entityActions',
-			align: 'right',
-		},
-	];
+	private _tableColumns: Array<UmbTableColumn> = [];
+
+	@state()
+	private _manifestColumns: Array<MetaCollectionViewTableKindColumn> = [];
 
 	@state()
 	private _tableRows: Array<UmbTableItem> = [];
 
+	#buildTableColumns() {
+		const nameColumn: UmbTableColumn = {
+			name: 'Name',
+			alias: 'name',
+			elementName: 'umb-entity-name-table-column-layout',
+		};
+
+		const manifestColumns: Array<UmbTableColumn> = this._manifestColumns.map((col) => ({
+			name: col.headerName,
+			alias: col.field,
+		}));
+
+		const entityActionsColumn: UmbTableColumn = {
+			name: '',
+			alias: 'entityActions',
+			align: 'right',
+		};
+
+		this._tableColumns = [nameColumn, ...manifestColumns, entityActionsColumn];
+	}
+
 	override updated(changedProperties: any) {
-		if (changedProperties.has('_items') || changedProperties.has('_itemHrefs')) {
+		if (
+			changedProperties.has('_items') ||
+			changedProperties.has('_itemHrefs') ||
+			changedProperties.has('_manifestColumns')
+		) {
 			this.#createTableRows();
 		}
 	}
@@ -40,6 +69,11 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 	#createTableRows() {
 		this._tableRows = this._items.map((item) => {
 			const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
+
+			const manifestColumnData = this._manifestColumns.map((col) => ({
+				columnAlias: col.field,
+				value: (item as Record<string, unknown>)[col.field],
+			}));
 
 			return {
 				id: item.unique,
@@ -50,6 +84,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 						columnAlias: 'name',
 						value: { name: item.name, href },
 					},
+					...manifestColumnData,
 					{
 						columnAlias: 'entityActions',
 						value: html`<umb-entity-actions-table-column-view
@@ -105,12 +140,6 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 				@selected="${this.#onSelected}"
 				@deselected="${this.#onDeselected}"></umb-table>
 		`;
-	}
-
-	#renderRow(item: UmbCollectionItemModel) {
-		const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
-		return html` <umb-entity-collection-item-card .item=${item} href=${href ?? nothing}>
-		</umb-entity-collection-item-card>`;
 	}
 
 	static override styles = [

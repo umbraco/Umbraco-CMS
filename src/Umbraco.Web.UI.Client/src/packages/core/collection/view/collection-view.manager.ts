@@ -86,7 +86,8 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				return {
 					path: `${view.meta.pathName}`,
 					component: () => createExtensionElement(view),
-					setup: () => {
+					setup: (component: HTMLElement) => {
+						(component as any).manifest = view;
 						this.setCurrentView(view);
 					},
 				};
@@ -97,7 +98,8 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 					unique: fallbackView.alias,
 					path: '',
 					component: () => createExtensionElement(fallbackView),
-					setup: () => {
+					setup: (component: HTMLElement) => {
+						(component as any).manifest = fallbackView;
 						this.setCurrentView(fallbackView);
 					},
 				});
