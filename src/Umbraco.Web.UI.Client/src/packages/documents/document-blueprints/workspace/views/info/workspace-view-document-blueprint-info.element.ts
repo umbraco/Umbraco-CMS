@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_BLUEPRINT_PROPERTY_DATASET_CONTEXT } from '../../../proper
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-workspace-view-document-blueprint-info')
@@ -126,6 +126,42 @@ export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement 
 			</div>
 		`;
 	}
+	static override styles = [
+		css`
+			:host {
+				display: grid;
+				gap: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
+				grid-template-columns: 1fr 350px;
+			}
+
+			div.container {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-layout-1);
+			}
+
+			#general-section {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.general-item {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-1);
+			}
+
+			.general-item:not(:last-child) {
+				margin-bottom: var(--uui-size-space-6);
+			}
+
+			uui-ref-node-document-type[readonly] {
+				padding-top: 7px;
+				padding-bottom: 7px;
+			}
+		`,
+	];
 }
 export default UmbWorkspaceViewDocumentBlueprintInfoElement;
 declare global {
