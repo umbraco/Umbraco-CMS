@@ -1,4 +1,4 @@
-import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const languageName = 'Arabic';
