@@ -14,7 +14,7 @@ public class HmacSecretKeyServiceTests
     [Test]
     public void HasHmacSecretKey_ReturnsFalse_WhenEmpty()
     {
-        HmacSecretKeyService sut = CreateService(Array.Empty<byte>());
+        HmacSecretKeyService sut = CreateService([]);
 
         Assert.IsFalse(sut.HasHmacSecretKey());
     }
@@ -22,7 +22,7 @@ public class HmacSecretKeyServiceTests
     [Test]
     public void HasHmacSecretKey_ReturnsTrue_WhenSet()
     {
-        HmacSecretKeyService sut = CreateService(new byte[] { 1, 2, 3 });
+        HmacSecretKeyService sut = CreateService([1, 2, 3]);
 
         Assert.IsTrue(sut.HasHmacSecretKey());
     }
@@ -31,7 +31,7 @@ public class HmacSecretKeyServiceTests
     public async Task TryCreateHmacSecretKeyAsync_GeneratesAndPersists()
     {
         var configManipulatorMock = new Mock<IConfigManipulator>();
-        HmacSecretKeyService sut = CreateService(Array.Empty<byte>(), configManipulatorMock);
+        HmacSecretKeyService sut = CreateService([], configManipulatorMock);
 
         var result = await sut.TryCreateHmacSecretKeyAsync();
 
@@ -43,6 +43,20 @@ public class HmacSecretKeyServiceTests
     }
 
     [Test]
+    public async Task TryCreateHmacSecretKeyAsync_ReturnsFalse_WhenKeyAlreadyExists()
+    {
+        var configManipulatorMock = new Mock<IConfigManipulator>();
+        HmacSecretKeyService sut = CreateService([1, 2, 3], configManipulatorMock);
+
+        var result = await sut.TryCreateHmacSecretKeyAsync();
+
+        Assert.IsFalse(result);
+        configManipulatorMock.Verify(
+            x => x.SetImagingHmacSecretKeyAsync(It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Test]
     public async Task TryCreateHmacSecretKeyAsync_ReturnsFalse_OnException()
     {
         var configManipulatorMock = new Mock<IConfigManipulator>();
@@ -50,7 +64,7 @@ public class HmacSecretKeyServiceTests
             .Setup(x => x.SetImagingHmacSecretKeyAsync(It.IsAny<string>()))
             .ThrowsAsync(new InvalidOperationException("Test exception"));
 
-        HmacSecretKeyService sut = CreateService(Array.Empty<byte>(), configManipulatorMock);
+        HmacSecretKeyService sut = CreateService([], configManipulatorMock);
 
         var result = await sut.TryCreateHmacSecretKeyAsync();
 

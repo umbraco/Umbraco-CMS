@@ -11,8 +11,10 @@ public interface IHmacSecretKeyService
     bool HasHmacSecretKey();
 
     /// <summary>
-    ///     Generates a new cryptographic HMAC secret key and persists it to the configuration file.
+    ///     Generates a new cryptographic HMAC secret key and persists it to the configuration file
+    ///     if one is not already configured. No-ops when a key already exists to avoid rotating
+    ///     the key and invalidating previously generated signed URLs.
     /// </summary>
-    /// <returns><c>true</c> if the key was successfully created and persisted; otherwise <c>false</c>.</returns>
+    /// <returns><c>true</c> if the key was successfully created and persisted; <c>false</c> if a key already exists or persistence failed.</returns>
     Task<bool> TryCreateHmacSecretKeyAsync();
 }

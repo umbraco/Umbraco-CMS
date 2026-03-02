@@ -39,6 +39,11 @@ internal sealed class HmacSecretKeyService : IHmacSecretKeyService
     /// <inheritdoc />
     public async Task<bool> TryCreateHmacSecretKeyAsync()
     {
+        if (HasHmacSecretKey())
+        {
+            return false;
+        }
+
         byte[] key = RandomNumberGenerator.GetBytes(KeySizeInBytes);
         var base64Key = Convert.ToBase64String(key);
 

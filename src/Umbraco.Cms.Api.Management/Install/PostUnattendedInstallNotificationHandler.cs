@@ -73,12 +73,6 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
     /// <param name="cancellationToken"></param>
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
-        // Generate an imaging HMAC secret key if one is not already configured
-        if (_hmacSecretKeyService.HasHmacSecretKey() is false)
-        {
-            await _hmacSecretKeyService.TryCreateHmacSecretKeyAsync();
-        }
-
         UnattendedSettings? unattendedSettings = _unattendedSettings.Value;
 
         // Ensure we have the setting enabled (Sanity check)
@@ -87,6 +81,9 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
         {
             return;
         }
+
+        // Generate an imaging HMAC secret key if one is not already configured
+        await _hmacSecretKeyService.TryCreateHmacSecretKeyAsync();
 
         var unattendedName = unattendedSettings.UnattendedUserName;
         var unattendedEmail = unattendedSettings.UnattendedUserEmail;
