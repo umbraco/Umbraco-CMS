@@ -268,11 +268,19 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             .From<NodeDto>()
             .InnerJoin<MemberDto>().On<NodeDto, MemberDto>((n, m) => n.NodeId == m.NodeId);
 
-        if (memberFilter.MemberTypeId.HasValue)
+        var needsMemberTypeJoin = memberFilter.MemberTypeId.HasValue
+            || string.Equals(ordering?.OrderBy, "memberType", StringComparison.OrdinalIgnoreCase);
+
+        if (needsMemberTypeJoin)
         {
             sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((memberNode, memberContent) => memberContent.NodeId == memberNode.NodeId)
-                .InnerJoin<NodeDto>("mtn").On<NodeDto, ContentDto>((memberTypeNode, memberContent) => memberContent.ContentTypeId == memberTypeNode.NodeId && memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
+                .InnerJoin<NodeDto>("mtn").On<ContentDto, NodeDto>((memberContent, memberTypeNode) => memberContent.ContentTypeId == memberTypeNode.NodeId, aliasRight: "mtn");
+
+            if (memberFilter.MemberTypeId.HasValue)
+            {
+                sql = sql.Where<NodeDto>(memberTypeNode => memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
+            }
         }
 
         if (memberFilter.MemberGroupName.IsNullOrWhiteSpace() is false)
@@ -325,7 +333,21 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         // shortcut so our join is not too big, but we also hope these are cached, so we don't have to map them again.
         var nodeIds = pageResult.Items.Select(x => x.NodeId).ToArray();
 
-        return new PagedModel<IMember>(pageResult.TotalItems, nodeIds.Any() ? GetMany(nodeIds) : Array.Empty<IMember>());
+        if (nodeIds.Length == 0)
+        {
+            return new PagedModel<IMember>(pageResult.TotalItems, Array.Empty<IMember>());
+        }
+
+        // GetMany uses WHERE IN which does not preserve order, so we must
+        // re-sort the results to match the ordering returned by the paged query.
+        IEnumerable<IMember> members = GetMany(nodeIds);
+        if (ordering is not null && ordering.IsEmpty is false)
+        {
+            var orderMap = nodeIds.Select((id, index) => (id, index)).ToDictionary(x => x.id, x => x.index);
+            members = members.OrderBy(m => orderMap.GetValueOrDefault(m.Id, int.MaxValue));
+        }
+
+        return new PagedModel<IMember>(pageResult.TotalItems, members);
     }
 
     private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
@@ -343,6 +365,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             "username" => sql.GetAliasedField(SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName)),
             "name" => sql.GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text)),
             "email" => sql.GetAliasedField(SqlSyntax.GetFieldName<MemberDto>(x => x.Email)),
+            "membertype" => SqlSyntax.GetFieldName<NodeDto>(x => x.Text, "mtn"),
             _ => throw new NotSupportedException("Ordering not supported"),
         };
 
@@ -353,6 +376,21 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         else
         {
             sql.OrderByDescending(orderBy);
+        }
+
+        // When sorting by member type, add a secondary sort by name so members
+        // within the same type are in a deterministic, useful order.
+        if (ordering.OrderBy.InvariantEquals("memberType"))
+        {
+            var nameField = sql.GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text));
+            if (ordering.Direction == Direction.Ascending)
+            {
+                sql.OrderBy(nameField);
+            }
+            else
+            {
+                sql.OrderByDescending(nameField);
+            }
         }
     }
 
