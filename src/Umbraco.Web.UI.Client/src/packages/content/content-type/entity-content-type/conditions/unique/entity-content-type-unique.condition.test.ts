@@ -31,7 +31,7 @@ describe('UmbEntityContentTypeUniqueCondition', () => {
 	});
 
 	afterEach(() => {
-		condition.hostDisconnected();
+		condition?.hostDisconnected();
 		document.body.innerHTML = '';
 	});
 
