@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using OpenIddict.Abstractions;
 using OpenIddict.Server;
 using OpenIddict.Validation;
 using Umbraco.Cms.Core;
@@ -178,7 +179,7 @@ internal sealed class HideBackOfficeTokensHandler
         HttpContext httpContext = GetHttpContext();
 
         // Determine which cookie to read based on the token type hint.
-        var cookieName = context.Request.TokenTypeHint == "refresh_token"
+        var cookieName = context.Request.TokenTypeHint == OpenIddictConstants.TokenTypeHints.RefreshToken
             ? RefreshTokenCookieName
             : AccessTokenCookieName;
 
