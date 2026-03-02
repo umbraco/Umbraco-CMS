@@ -1261,6 +1261,7 @@ export default {
 			'Non ci sono proprietà definite per questa tab. Clicca sul link "aggiungi una nuova proprietà" in cima per creare una nuova proprietà.',
 		createMatchingTemplate: 'Crea un template corrispondente',
 		addIcon: 'Aggiungi icona',
+		changeIcon: 'Cambia icona',
 	},
 	sort: {
 		sortOrder: 'Ordinamento',
