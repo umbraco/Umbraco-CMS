@@ -8,6 +8,7 @@ using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Testing;
 
@@ -28,14 +29,21 @@ public abstract class TestOptionAttributeBase : Attribute
         where TOptions : TestOptionAttributeBase, new()
     {
         var test = TestContext.CurrentContext.Test;
-        var methodName = test.MethodName;
         var type = TestExecutionContext.CurrentContext.TestObject.GetType();
-        var methodInfo = type.GetMethod(methodName); // what about overloads?
-        var options = GetTestOptions<TOptions>(methodInfo);
-        return options;
+
+        var methodInfo = test.MethodName is not null
+            ? type.GetMethod(test.MethodName)
+            : null;
+        if (methodInfo is not null)
+        {
+            var options = GetTestOptions<TOptions>(methodInfo);
+            return options;
+        }
+
+        return Get<TOptions>(type, null);
     }
 
-    private static TOptions Get<TOptions>(Type type, TOptions attr)
+    private static TOptions Get<TOptions>(Type type, TOptions? attr)
         where TOptions : TestOptionAttributeBase, new()
     {
         while (type != null && type != typeof(object))
