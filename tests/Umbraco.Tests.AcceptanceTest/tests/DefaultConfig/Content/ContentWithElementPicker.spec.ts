@@ -144,7 +144,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   expect(contentData.values[0].value).toContain(elementId);
 });
 
-// Currenlty there is no validation message displayed
+// Currently there is no validation message displayed
 test.fixme('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 2;
@@ -171,7 +171,7 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
   // Arrange
   const maxAmount = 1;
   const secondElementName = 'TestElement2';
-  const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, undefined,maxAmount);
+  const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, undefined, maxAmount);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create element type and elements

@@ -92,7 +92,6 @@ test('can publish element with an element picker selected', {tag: '@smoke'}, asy
 test('can select multiple elements in the element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementPickerName = 'SecondElementPicker';
-  // Arrange
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   const elementTypeId = await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
@@ -146,8 +145,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   expect(elementData.values[0].value).toContain(elementPickerId);
 });
 
-// Currenlty there is no validation message displayed
-test.fixme('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
+// Currently there is no validation message displayed
   // Arrange
   const minAmount = 2;
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, minAmount);
@@ -173,7 +171,7 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
   // Arrange
   const maxAmount = 1;
   const secondElementPickerName = 'SecondElementPicker';
-  const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, undefined,maxAmount);
+  const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, undefined, maxAmount);
   const elementTypeId = await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   // Create element picker type and element pickers
