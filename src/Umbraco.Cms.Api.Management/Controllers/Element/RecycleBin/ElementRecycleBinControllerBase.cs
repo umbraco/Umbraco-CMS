@@ -45,7 +45,7 @@ public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementR
 
         if (entity is IElementEntitySlim elementEntitySlim)
         {
-            responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
+            responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(elementEntitySlim).GetAwaiter().GetResult();
             responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
             responseModel.IsFolder = false;
         }

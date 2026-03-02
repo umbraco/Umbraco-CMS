@@ -37,7 +37,7 @@ public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<Documen
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
-            responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
+            responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(documentEntitySlim).GetAwaiter().GetResult();
             responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
         }
 

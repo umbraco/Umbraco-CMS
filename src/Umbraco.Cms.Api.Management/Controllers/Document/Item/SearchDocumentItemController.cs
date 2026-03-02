@@ -91,9 +91,12 @@ public class SearchDocumentItemController : DocumentItemControllerBase
             take,
             ignoreUserStartNodes);
 
+        DocumentItemResponseModel[] items = await Task.WhenAll(
+            searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModelAsync));
+
         var result = new PagedModel<DocumentItemResponseModel>
         {
-            Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
+            Items = items,
             Total = searchResult.Total,
         };
 

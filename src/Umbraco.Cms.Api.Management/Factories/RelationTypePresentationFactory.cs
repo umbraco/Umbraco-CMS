@@ -65,7 +65,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
+    public async Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
         IEnumerable<RelationItemModel> relationItemModels)
     {
         IReadOnlyCollection<RelationItemModel> relationItemModelsCollection = relationItemModels.ToArray();
@@ -81,33 +81,36 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             Constants.UdiEntityType.Element,
             Constants.ObjectTypes.Element);
 
-        IReferenceResponseModel[] result = relationItemModelsCollection.Select<RelationItemModel, IReferenceResponseModel?>(relationItemModel =>
-            relationItemModel.NodeType switch
-            {
-                Constants.ReferenceType.Document => MapReference<DocumentReferenceResponseModel, DocumentEntitySlim>(
-                    relationItemModel,
-                    documentSlimEntities,
-                    (r, e) => r.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(e)),
-                Constants.ReferenceType.Element => MapReference<ElementReferenceResponseModel, IElementEntitySlim>(
-                    relationItemModel,
-                    elementSlimEntities,
-                    (r, e) => r.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(e)),
-                Constants.ReferenceType.ElementContainer => _umbracoMapper.Map<ElementContainerReferenceResponseModel>(relationItemModel),
-                Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
-                Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
-                Constants.ReferenceType.DocumentTypePropertyType => _umbracoMapper.Map<DocumentTypePropertyTypeReferenceResponseModel>(relationItemModel),
-                Constants.ReferenceType.MediaTypePropertyType => _umbracoMapper.Map<MediaTypePropertyTypeReferenceResponseModel>(relationItemModel),
-                Constants.ReferenceType.MemberTypePropertyType => _umbracoMapper.Map<MemberTypePropertyTypeReferenceResponseModel>(relationItemModel),
-                _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
-            }).WhereNotNull().ToArray();
+        IReferenceResponseModel?[] results = await Task.WhenAll(
+            relationItemModelsCollection.Select<RelationItemModel, Task<IReferenceResponseModel?>>(async relationItemModel =>
+                relationItemModel.NodeType switch
+                {
+                    Constants.ReferenceType.Document => await MapReference<DocumentReferenceResponseModel, DocumentEntitySlim>(
+                        relationItemModel,
+                        documentSlimEntities,
+                        async (r, e) => r.Variants
+                            = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
+                    Constants.ReferenceType.Element => await MapReference<ElementReferenceResponseModel, IElementEntitySlim>(
+                        relationItemModel,
+                        elementSlimEntities,
+                        async (r, e) => r.Variants
+                            = await _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
+                    Constants.ReferenceType.ElementContainer => _umbracoMapper.Map<ElementContainerReferenceResponseModel>(relationItemModel),
+                    Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
+                    Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
+                    Constants.ReferenceType.DocumentTypePropertyType => _umbracoMapper.Map<DocumentTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                    Constants.ReferenceType.MediaTypePropertyType => _umbracoMapper.Map<MediaTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                    Constants.ReferenceType.MemberTypePropertyType => _umbracoMapper.Map<MemberTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                    _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
+                }));
 
-        return Task.FromResult<IEnumerable<IReferenceResponseModel>>(result);
+        return results.WhereNotNull().ToArray();
     }
 
-    private TResponse? MapReference<TResponse, TEntity>(
+    private async Task<TResponse?> MapReference<TResponse, TEntity>(
         RelationItemModel relationItemModel,
         List<IEntitySlim> slimEntities,
-        Action<TResponse, TEntity> enrichResponse)
+        Func<TResponse, TEntity, Task> enrichResponse)
         where TResponse : class
         where TEntity : class, IEntitySlim
     {
@@ -118,7 +121,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             return responseModel;
         }
 
-        enrichResponse(responseModel, matchingEntity);
+        await enrichResponse(responseModel, matchingEntity);
         return responseModel;
     }
 
