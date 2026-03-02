@@ -21,6 +21,6 @@ export class UmbEntityNameTableColumnLayoutElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-table-name-column-layout': UmbLanguageTableNameColumnLayoutElement;
+		'umb-entity-name-table-column-layout': UmbEntityNameTableColumnLayoutElement;
 	}
 }
