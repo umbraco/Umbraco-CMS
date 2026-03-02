@@ -86,8 +86,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        IPublishedContent? content = GetContent(propertyType, inter);
-        return content ?? inter;
+        return GetContent(propertyType, inter, preview);
     }
 
     /// <inheritdoc />
@@ -102,7 +101,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
-        IPublishedContent? content = GetContent(propertyType, inter);
+        IPublishedContent? content = GetContent(propertyType, inter, preview);
         if (content == null)
         {
             return null;
@@ -111,7 +110,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         return _apiContentBuilder.Build(content);
     }
 
-    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)
+    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter, bool preview)
     {
         if (inter == null)
         {
@@ -124,7 +123,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
             IPublishedContent? content;
             if (inter is int id)
             {
-                content = _publishedContentCache.GetById(id);
+                content = _publishedContentCache.GetById(preview, id);
                 if (content != null)
                 {
                     return content;
@@ -137,7 +136,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
                     return null;
                 }
 
-                content = _publishedContentCache.GetById(udi.Guid);
+                content = _publishedContentCache.GetById(preview, udi.Guid);
                 if (content != null && content.ContentType.ItemType == PublishedItemType.Content)
                 {
                     return content;
