@@ -1,7 +1,8 @@
 import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from '../modal/types.js';
+import { UMB_CONTENT_ROLLBACK_MODAL } from '../modal/constants.js';
 import type { MetaEntityActionContentRollbackKind } from './types.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbModalToken, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
@@ -9,14 +10,12 @@ export class UmbContentRollbackEntityAction extends UmbEntityActionBase<MetaEnti
 	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
-		const token = new UmbModalToken<UmbContentRollbackModalData, UmbContentRollbackModalValue>(this.args.meta.rollbackModalAlias, {
-			modal: {
-				type: 'sidebar',
-				size: 'full',
+		await umbOpenModal(this, UMB_CONTENT_ROLLBACK_MODAL, {
+			data: {
+				rollbackRepositoryAlias: this.args.meta.rollbackRepositoryAlias,
+				detailRepositoryAlias: this.args.meta.detailRepositoryAlias,
 			},
 		});
-
-		await umbOpenModal(this, token, {});
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		if (!notificationContext) {

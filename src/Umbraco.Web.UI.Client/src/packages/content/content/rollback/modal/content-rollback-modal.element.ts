@@ -1,6 +1,6 @@
 import type { UmbContentRollbackRepository } from '../rollback-repository.interface.js';
 import type { UmbContentDetailModel } from '../../types.js';
-import type { ManifestModalContentRollbackKind, UmbContentRollbackModalData, UmbContentRollbackModalValue } from './types.js';
+import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from './types.js';
 import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -27,8 +27,7 @@ type ContentVersion = {
 @customElement('umb-content-rollback-modal')
 export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	UmbContentRollbackModalData,
-	UmbContentRollbackModalValue,
-	ManifestModalContentRollbackKind
+	UmbContentRollbackModalValue
 > {
 	@state()
 	private _versions: Array<ContentVersion> = [];
@@ -96,17 +95,17 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				throw new Error('Entity unique is not set');
 			}
 
-			if (!this.manifest?.meta?.detailRepositoryAlias) {
-				throw new Error('detailRepositoryAlias is not configured in the modal manifest meta.');
+			if (!this.data?.detailRepositoryAlias) {
+				throw new Error('detailRepositoryAlias is not configured in the modal data.');
 			}
 
-			if (!this.manifest?.meta?.rollbackRepositoryAlias) {
-				throw new Error('rollbackRepositoryAlias is not configured in the modal manifest meta.');
+			if (!this.data?.rollbackRepositoryAlias) {
+				throw new Error('rollbackRepositoryAlias is not configured in the modal data.');
 			}
 
 			const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<UmbContentDetailModel>>(
 				this,
-				this.manifest.meta.detailRepositoryAlias,
+				this.data!.detailRepositoryAlias,
 			);
 
 			const { data } = await detailRepository.requestByUnique(unique);
@@ -135,7 +134,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 			this.#rollbackRepository = await createExtensionApiByAlias<UmbContentRollbackRepository>(
 				this,
-				this.manifest.meta.rollbackRepositoryAlias,
+				this.data!.rollbackRepositoryAlias,
 			);
 
 			this.#requestVersions();

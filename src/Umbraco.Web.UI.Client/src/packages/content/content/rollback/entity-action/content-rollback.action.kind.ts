@@ -17,7 +17,8 @@ export const UMB_ENTITY_ACTION_ROLLBACK_KIND_MANIFEST: UmbExtensionManifestKind 
 			icon: 'icon-history',
 			label: '#actions_rollback',
 			additionalOptions: true,
-			rollbackModalAlias: '',
+			rollbackRepositoryAlias: '',
+			detailRepositoryAlias: '',
 		},
 	},
 };
