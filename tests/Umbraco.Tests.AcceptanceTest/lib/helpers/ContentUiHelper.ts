@@ -1771,17 +1771,17 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickAddBlockListElementWithName(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).getByLabel('Create new');
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).getByLabel('Add content');
     await this.click(createNewButtonLocator);
   }
 
   async isAddBlockListElementWithNameDisabled(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Create new'});
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add content'});
     await expect(createNewButtonLocator).toHaveAttribute('disabled');
   }
 
   async isAddBlockListElementWithNameVisible(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Create new'});
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add content'});
     await this.waitForVisible(createNewButtonLocator);
     await expect(createNewButtonLocator).not.toHaveAttribute('disabled');
   }
