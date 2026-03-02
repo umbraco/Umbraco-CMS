@@ -1,4 +1,3 @@
-import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from '../modal/types.js';
 import { UMB_CONTENT_ROLLBACK_MODAL } from '../modal/constants.js';
 import type { MetaEntityActionContentRollbackKind } from './types.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
