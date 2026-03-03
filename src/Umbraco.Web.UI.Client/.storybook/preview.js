@@ -1,6 +1,6 @@
-import lightCss from '@umbraco-ui/uui/dist/themes/light.css?inline';
-import darkCss from '@umbraco-ui/uui/dist/themes/dark.css?inline';
-import highContrastCss from '@umbraco-ui/uui/dist/themes/high-contrast.css?inline';
+import lightCss from '@umbraco-ui/uui/themes/light.css?inline';
+import darkCss from '@umbraco-ui/uui/themes/dark.css?inline';
+import highContrastCss from '@umbraco-ui/uui/themes/high-contrast.css?inline';
 import '../src/css/umb-css.css';
 
 import 'element-internals-polyfill';
