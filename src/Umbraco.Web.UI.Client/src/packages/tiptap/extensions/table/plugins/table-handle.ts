@@ -111,8 +111,8 @@ class TableHandlePluginView implements PluginView {
 			return;
 		}
 
-		// Get cell indices
-		const cellIndices = this.#getCellIndicesFromDOM(cellElement);
+		// Get cell indices using TableMap for correct handling of merged cells
+		const cellIndices = this.#getCellIndices(cellElement, tableInfo);
 		if (!cellIndices) {
 			this.#hideGrips();
 			return;
@@ -172,19 +172,29 @@ class TableHandlePluginView implements PluginView {
 		return null;
 	}
 
-	#getCellIndicesFromDOM(cell: HTMLTableCellElement): { rowIndex: number; colIndex: number } | null {
-		const row = cell.parentElement as HTMLTableRowElement | null;
-		if (!row) return null;
+	#getCellIndices(
+		cell: HTMLTableCellElement,
+		tableInfo: { node: ProseMirrorNode; pos: number },
+	): { rowIndex: number; colIndex: number } | null {
+		try {
+			const pos = this.#view.posAtDOM(cell, 0);
+			const $pos = this.#view.state.doc.resolve(pos);
+			const tableStart = tableInfo.pos + 1;
+			const map = TableMap.get(tableInfo.node);
 
-		const tbody = row.parentElement;
-		if (!tbody) return null;
+			// Walk up from the resolved position to find the cell node
+			for (let d = $pos.depth; d >= 0; d--) {
+				const name = $pos.node(d).type.name;
+				if (name === 'tableCell' || name === 'tableHeader') {
+					const rect = map.findCell($pos.before(d) - tableStart);
+					return { rowIndex: rect.top, colIndex: rect.left };
+				}
+			}
+		} catch {
+			// Position resolution or cell lookup failed
+		}
 
-		const rowIndex = Array.from(tbody.children).indexOf(row);
-		const colIndex = Array.from(row.children).indexOf(cell);
-
-		if (rowIndex === -1 || colIndex === -1) return null;
-
-		return { rowIndex, colIndex };
+		return null;
 	}
 
 	#hideGrips() {
