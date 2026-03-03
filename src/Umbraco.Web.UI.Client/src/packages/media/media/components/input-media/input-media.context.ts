@@ -37,9 +37,14 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 			...pickerData,
 		};
 
-		// transform allowedContentTypes to a pickable filter
-		combinedPickerData.pickableFilter = (item) =>
-			this.#pickableFilter(item, args?.allowedContentTypes, args?.folderFilter);
+		// transform allowedContentTypes to a pickable filter, composing with user-supplied pickableFilter if provided
+		const userPickableFilter = pickerData?.pickableFilter;
+		combinedPickerData.pickableFilter = (item) => {
+			if (!this.#pickableFilter(item, args?.allowedContentTypes, args?.folderFilter)) {
+				return false;
+			}
+			return userPickableFilter ? userPickableFilter(item) : true;
+		};
 
 		// set default search data
 		if (!pickerData?.search) {

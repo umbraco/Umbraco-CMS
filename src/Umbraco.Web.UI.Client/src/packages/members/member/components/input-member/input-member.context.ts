@@ -31,8 +31,14 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 			...pickerData,
 		};
 
-		// transform allowedContentTypes to a pickable filter
-		combinedPickerData.pickableFilter = (item) => this.#pickableFilter(item, args?.allowedContentTypes);
+		// transform allowedContentTypes to a pickable filter, composing with user-supplied pickableFilter if provided
+		const userPickableFilter = pickerData?.pickableFilter;
+		combinedPickerData.pickableFilter = (item) => {
+			if (!this.#pickableFilter(item, args?.allowedContentTypes)) {
+				return false;
+			}
+			return userPickableFilter ? userPickableFilter(item) : true;
+		};
 
 		// set default search data
 		if (!pickerData?.search) {
