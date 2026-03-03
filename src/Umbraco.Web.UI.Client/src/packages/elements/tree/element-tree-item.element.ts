@@ -18,7 +18,7 @@ export class UmbElementTreeItemElement extends UmbTreeItemElementBase<
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
-			this.observe(this.#api.flags, (flags) => (this._flags = flags || ''));
+			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
 		}
 
 		super.api = value;
