@@ -16,12 +16,15 @@ namespace Umbraco.Cms.Core.Scoping;
 public class CoreScope : ICoreScope
 {
     /// <summary>
-    ///     Indicates whether the scope has been completed.
+    ///     Gets or sets a value indicating whether the scope has been completed.
     /// </summary>
-    /// <remarks>
-    ///     TODO (V18): Rename to _completed to comply with SA1306 (field names should begin with lowercase), or consider converting to a property.
-    /// </remarks>
-    protected bool? Completed;
+    protected bool? Completed
+    {
+        get => _completed;
+        set => _completed = value;
+    }
+
+    private bool? _completed;
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
     private IsolatedCaches? _isolatedCaches;
@@ -235,12 +238,12 @@ public class CoreScope : ICoreScope
     /// <returns>A value indicating whether the scope is completed or not.</returns>
     public bool Complete()
     {
-        if (Completed.HasValue == false)
+        if (_completed.HasValue == false)
         {
-            Completed = true;
+            _completed = true;
         }
 
-        return Completed.Value;
+        return _completed.Value;
     }
 
     /// <inheritdoc />
@@ -279,7 +282,7 @@ public class CoreScope : ICoreScope
         }
         else
         {
-            ParentScope.ChildCompleted(Completed);
+            ParentScope.ChildCompleted(_completed);
         }
 
         _disposed = true;
@@ -294,7 +297,7 @@ public class CoreScope : ICoreScope
         // if child did not complete we cannot complete
         if (completed.HasValue == false || completed.Value == false)
         {
-            Completed = false;
+            _completed = false;
         }
     }
 
@@ -305,7 +308,7 @@ public class CoreScope : ICoreScope
     {
         if (_shouldScopeFileSystems == true)
         {
-            if (Completed.HasValue && Completed.Value)
+            if (_completed.HasValue && _completed.Value)
             {
                 _scopedFileSystem?.Complete();
             }
@@ -332,7 +335,7 @@ public class CoreScope : ICoreScope
     /// <summary>
     ///     Handles the scoped notifications when the scope exits.
     /// </summary>
-    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
+    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
 
     /// <summary>
     ///     Ensures that this scope and all ancestor scopes have not been disposed.
