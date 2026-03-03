@@ -18,3 +18,5 @@ export const UmbTable = Table.extend({
 export const UmbTableRow = TableRow.extend();
 export const UmbTableHeader = TableHeader.extend();
 export const UmbTableCell = TableCell.extend();
+
+export { UmbTableView };
