@@ -1731,4 +1731,22 @@ export class DocumentApiHelper {
     const document = documentBuilder.build();
     return await this.create(document);
   }
+
+  async createDocumentWithElementPickers(documentName: string, documentTypeId: string, dataTypeName: string, elementPickerIds: string[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(elementPickerIds)
+        .done()
+      .build();
+
+    // Create document
+    return await this.create(document);
+  }
 }
