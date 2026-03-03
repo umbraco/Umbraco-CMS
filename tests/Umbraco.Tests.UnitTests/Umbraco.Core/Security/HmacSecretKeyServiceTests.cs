@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
@@ -28,14 +29,15 @@ public class HmacSecretKeyServiceTests
     }
 
     [Test]
-    public async Task TryCreateHmacSecretKeyAsync_GeneratesAndPersists()
+    public async Task CreateHmacSecretKeyAsync_GeneratesAndPersists()
     {
         var configManipulatorMock = new Mock<IConfigManipulator>();
         HmacSecretKeyService sut = CreateService([], configManipulatorMock);
 
-        var result = await sut.TryCreateHmacSecretKeyAsync();
+        Attempt<HmacSecretKeyOperationStatus> result = await sut.CreateHmacSecretKeyAsync();
 
-        Assert.IsTrue(result);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(HmacSecretKeyOperationStatus.Success, result.Result);
         configManipulatorMock.Verify(
             x => x.SetImagingHmacSecretKeyAsync(It.Is<string>(key =>
                 Convert.FromBase64String(key).Length == 64)),
@@ -43,21 +45,22 @@ public class HmacSecretKeyServiceTests
     }
 
     [Test]
-    public async Task TryCreateHmacSecretKeyAsync_ReturnsFalse_WhenKeyAlreadyExists()
+    public async Task CreateHmacSecretKeyAsync_ReturnsKeyExists_WhenKeyAlreadyExists()
     {
         var configManipulatorMock = new Mock<IConfigManipulator>();
         HmacSecretKeyService sut = CreateService([1, 2, 3], configManipulatorMock);
 
-        var result = await sut.TryCreateHmacSecretKeyAsync();
+        Attempt<HmacSecretKeyOperationStatus> result = await sut.CreateHmacSecretKeyAsync();
 
-        Assert.IsFalse(result);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(HmacSecretKeyOperationStatus.KeyExists, result.Result);
         configManipulatorMock.Verify(
             x => x.SetImagingHmacSecretKeyAsync(It.IsAny<string>()),
             Times.Never);
     }
 
     [Test]
-    public async Task TryCreateHmacSecretKeyAsync_ReturnsFalse_OnException()
+    public async Task CreateHmacSecretKeyAsync_ReturnsError_OnException()
     {
         var configManipulatorMock = new Mock<IConfigManipulator>();
         configManipulatorMock
@@ -66,9 +69,11 @@ public class HmacSecretKeyServiceTests
 
         HmacSecretKeyService sut = CreateService([], configManipulatorMock);
 
-        var result = await sut.TryCreateHmacSecretKeyAsync();
+        Attempt<HmacSecretKeyOperationStatus> result = await sut.CreateHmacSecretKeyAsync();
 
-        Assert.IsFalse(result);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(HmacSecretKeyOperationStatus.Error, result.Result);
+        Assert.IsNotNull(result.Exception);
     }
 
     private static HmacSecretKeyService CreateService(

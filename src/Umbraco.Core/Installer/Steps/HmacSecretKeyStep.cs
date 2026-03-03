@@ -20,8 +20,11 @@ public class HmacSecretKeyStep : StepBase, IInstallStep
     /// <inheritdoc />
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _)
     {
-        await _hmacSecretKeyService.TryCreateHmacSecretKeyAsync();
-        return Success();
+        Attempt<HmacSecretKeyOperationStatus> result = await _hmacSecretKeyService.CreateHmacSecretKeyAsync();
+
+        return result.Result is HmacSecretKeyOperationStatus.Error
+            ? FailWithMessage("Failed to generate and persist the imaging HMAC secret key. Check the logs for details.")
+            : Success();
     }
 
     /// <inheritdoc />

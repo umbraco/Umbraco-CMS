@@ -37,12 +37,12 @@ internal sealed class HmacSecretKeyService : IHmacSecretKeyService
         => _imagingSettings.HMACSecretKey.Length > 0;
 
     /// <inheritdoc />
-    public async Task<bool> TryCreateHmacSecretKeyAsync()
+    public async Task<Attempt<HmacSecretKeyOperationStatus>> CreateHmacSecretKeyAsync()
     {
         if (HasHmacSecretKey())
         {
             _logger.LogInformation("Imaging HMAC secret key already exists, skipping generation.");
-            return false;
+            return Attempt<HmacSecretKeyOperationStatus>.Fail(HmacSecretKeyOperationStatus.KeyExists);
         }
 
         byte[] key = RandomNumberGenerator.GetBytes(KeySizeInBytes);
@@ -55,10 +55,10 @@ internal sealed class HmacSecretKeyService : IHmacSecretKeyService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Couldn't update config files with an imaging HMAC secret key");
-            return false;
+            return Attempt<HmacSecretKeyOperationStatus>.Fail(HmacSecretKeyOperationStatus.Error, ex);
         }
 
         _logger.LogInformation("Imaging HMAC secret key has been generated and saved to configuration.");
-        return true;
+        return Attempt<HmacSecretKeyOperationStatus>.Succeed(HmacSecretKeyOperationStatus.Success);
     }
 }

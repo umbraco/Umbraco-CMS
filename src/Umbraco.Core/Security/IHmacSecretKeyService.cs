@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core;
+
 namespace Umbraco.Cms.Core.Security;
 
 /// <summary>
@@ -15,6 +17,10 @@ public interface IHmacSecretKeyService
     ///     if one is not already configured. No-ops when a key already exists to avoid rotating
     ///     the key and invalidating previously generated signed URLs.
     /// </summary>
-    /// <returns><c>true</c> if the key was successfully created and persisted; <c>false</c> if a key already exists or persistence failed.</returns>
-    Task<bool> TryCreateHmacSecretKeyAsync();
+    /// <returns>
+    ///     An <see cref="Attempt{TResult}" /> with status <see cref="HmacSecretKeyOperationStatus.Success" /> if the key was
+    ///     generated and persisted, <see cref="HmacSecretKeyOperationStatus.KeyExists" /> if a key already exists, or
+    ///     <see cref="HmacSecretKeyOperationStatus.Error" /> if persistence failed.
+    /// </returns>
+    Task<Attempt<HmacSecretKeyOperationStatus>> CreateHmacSecretKeyAsync();
 }
