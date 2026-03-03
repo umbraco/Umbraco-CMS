@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -20,15 +19,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentTypeTreeItemResponseModel>
 {
     private readonly IContentTypeService _contentTypeService;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentTypeTreeControllerBase(IEntityService entityService, IContentTypeService contentTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              contentTypeService)
-    {
-    }
 
     public DocumentTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
         : base(entityService, flagProviders) =>

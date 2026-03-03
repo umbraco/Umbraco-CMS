@@ -9,7 +9,6 @@ using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
@@ -26,25 +25,6 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public MediaTreeControllerBase(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              userStartNodeEntitiesService,
-              dataTypeService,
-              appCaches,
-              backofficeSecurityAccessor,
-              mediaPresentationFactory)
-    {
-    }
 
     [ActivatorUtilitiesConstructor]
     public MediaTreeControllerBase(

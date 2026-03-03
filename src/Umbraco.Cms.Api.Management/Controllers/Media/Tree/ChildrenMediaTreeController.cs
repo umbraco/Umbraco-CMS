@@ -16,18 +16,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 [ApiVersion("1.0")]
 public class ChildrenMediaTreeController : MediaTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ChildrenMediaTreeController(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public ChildrenMediaTreeController(
         IEntityService entityService,

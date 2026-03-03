@@ -16,12 +16,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberGroups)]
 public class MemberGroupTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberGroupTreeControllerBase(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
     public MemberGroupTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {

@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -17,8 +15,6 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     private readonly Guid _folderObjectTypeId;
     private bool _foldersOnly;
 
-
-
     protected override Ordering ItemOrdering
     {
         get
@@ -29,14 +25,6 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
             return ordering;
         }
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected FolderTreeControllerBase(IEntityService entityService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     protected FolderTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)

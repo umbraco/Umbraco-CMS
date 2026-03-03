@@ -11,12 +11,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 [ApiVersion("1.0")]
 public class AncestorsStaticFileTreeController : StaticFileTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public AncestorsStaticFileTreeController(IPhysicalFileSystem physicalFileSystem)
-        : base(physicalFileSystem)
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public AncestorsStaticFileTreeController(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
         : base(physicalFileSystem, fileSystemTreeService)

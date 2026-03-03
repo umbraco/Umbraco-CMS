@@ -12,12 +12,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 [ApiVersion("1.0")]
 public class RootTemplateTreeController : TemplateTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootTemplateTreeController(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public RootTemplateTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
