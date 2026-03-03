@@ -3,7 +3,7 @@ import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
 export class PreviewUiHelper extends UiBaseLocators {
-  private previewPage: Page | null = null;
+  private previewPage: Page;
   private exitBtn: Locator;
   private previewWebsiteBtn: Locator;
   private previewIframe: Locator;
@@ -11,30 +11,21 @@ export class PreviewUiHelper extends UiBaseLocators {
   private devicePopover: Locator;
   private cultureBtn: Locator;
   private culturePopover: Locator;
-  private saveAndPreviewBtn: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.saveAndPreviewBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.SaveAndPreview');
-    this.initPreviewLocators(page);
   }
 
-  async clickSaveAndPreviewButton() {
-    const popupPromise = this.page.waitForEvent('popup');
-    await this.click(this.saveAndPreviewBtn);
-    this.previewPage = await popupPromise;
+  async waitForPreviewPage() {
+    this.previewPage = await this.page.context().waitForEvent('page', {timeout: ConstantHelper.timeout.long});
     await this.previewPage.waitForLoadState('load');
-    this.initPreviewLocators(this.previewPage);
-  }
-
-  private initPreviewLocators(page: Page) {
-    this.exitBtn = page.locator('umb-preview-exit').locator('uui-button');
-    this.previewWebsiteBtn = page.locator('umb-preview-open-website').locator('uui-button');
-    this.previewIframe = page.locator('umb-preview iframe');
-    this.deviceBtn = page.locator('umb-preview-device').locator('uui-button');
-    this.devicePopover = page.locator('umb-preview-device').locator('uui-popover-container');
-    this.cultureBtn = page.locator('umb-preview-culture').locator('uui-button');
-    this.culturePopover = page.locator('umb-preview-culture').locator('uui-popover-container');
+    this.exitBtn = this.previewPage.locator('umb-preview-exit').locator('uui-button');
+    this.previewWebsiteBtn = this.previewPage.locator('umb-preview-open-website').locator('uui-button');
+    this.previewIframe = this.previewPage.locator('umb-preview iframe');
+    this.deviceBtn = this.previewPage.locator('umb-preview-device').locator('uui-button');
+    this.devicePopover = this.previewPage.locator('umb-preview-device').locator('uui-popover-container');
+    this.cultureBtn = this.previewPage.locator('umb-preview-culture').locator('uui-button');
+    this.culturePopover = this.previewPage.locator('umb-preview-culture').locator('uui-popover-container');
   }
 
   async isExitButtonVisible(isVisible: boolean = true) {
@@ -54,7 +45,7 @@ export class PreviewUiHelper extends UiBaseLocators {
   }
 
   async clickPreviewWebsiteButtonAndWaitForWebsite(): Promise<Page> {
-    const websitePromise = this.previewPage!.waitForEvent('popup');
+    const websitePromise = this.previewPage.waitForEvent('popup');
     await this.click(this.previewWebsiteBtn);
     const websitePage = await websitePromise;
     await websitePage.waitForLoadState('load');
@@ -66,7 +57,7 @@ export class PreviewUiHelper extends UiBaseLocators {
       console.error('Preview page was never opened. Call waitForPreviewPage() first.');
     }
     await expect(async () => {
-      expect(this.previewPage!.isClosed()).toBeTruthy();
+      expect(this.previewPage.isClosed()).toBeTruthy();
     }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
