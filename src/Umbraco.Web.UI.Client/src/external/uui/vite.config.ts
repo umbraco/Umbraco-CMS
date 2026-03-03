@@ -9,12 +9,12 @@ const distAssets = '../../../dist-cms';
 rmSync(dist, { recursive: true, force: true });
 
 // copy css
-cpSync('../../../node_modules/@umbraco-ui/uui-css/dist/uui-css.css', `${distAssets}/css/uui-css.css`, {
+cpSync('../../../node_modules/@umbraco-ui/uui/dist/themes', `${distAssets}/css`, {
 	recursive: true,
 });
 
 // copy fonts
-cpSync('../../../node_modules/@umbraco-ui/uui-css/assets/fonts', `${distAssets}/assets/fonts`, {
+cpSync('../../../node_modules/@umbraco-ui/uui/dist/assets/fonts', `${distAssets}/assets/fonts`, {
 	recursive: true,
 });
 

@@ -18,11 +18,11 @@ export const plugins: PluginOption[] = [
 				dest: 'umbraco/backoffice/css',
 			},
 			{
-				src: 'node_modules/@umbraco-ui/uui-css/dist/uui-css.css',
+				src: 'node_modules/@umbraco-ui/uui/dist/themes',
 				dest: 'umbraco/backoffice/css',
 			},
 			{
-				src: 'node_modules/@umbraco-ui/uui-css/assets/fonts/*',
+				src: 'node_modules/@umbraco-ui/uui/dist/assets/fonts/*',
 				dest: 'umbraco/backoffice/assets/fonts',
 			},
 			{
