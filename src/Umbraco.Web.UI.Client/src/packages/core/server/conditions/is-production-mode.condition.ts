@@ -1,16 +1,19 @@
-import type { UmbIsProductionModeConditionConfig } from './types.js';
 import { UMB_SERVER_CONTEXT } from '../server.context-token.js';
+import type { UmbIsServerProductionModeConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const ObserveSymbol = Symbol();
 
-export class UmbIsProductionModeCondition
-	extends UmbConditionBase<UmbIsProductionModeConditionConfig>
+export class UmbIsServerProductionModeCondition
+	extends UmbConditionBase<UmbIsServerProductionModeConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbIsProductionModeConditionConfig>) {
+	constructor(
+		host: UmbControllerHost,
+		args: UmbConditionControllerArguments<UmbIsServerProductionModeConditionConfig>,
+	) {
 		super(host, args);
 
 		// Default to not permitted until we know the server's runtime mode (safe default).

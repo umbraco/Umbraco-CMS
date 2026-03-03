@@ -20,8 +20,8 @@ export class UmbServerContext extends UmbContextBase {
 	 * false when not in Production mode, or undefined until server information is loaded.
 	 * UI consumers should treat undefined as restricted (safe default).
 	 */
-	public readonly isProductionMode = this.#serverInformation.asObservablePart(
-		(info) => (info ? info.runtimeMode === RuntimeModeModel.PRODUCTION : undefined),
+	public readonly isProductionMode = this.#serverInformation.asObservablePart((info) =>
+		info ? info.runtimeMode === RuntimeModeModel.PRODUCTION : undefined,
 	);
 
 	/**

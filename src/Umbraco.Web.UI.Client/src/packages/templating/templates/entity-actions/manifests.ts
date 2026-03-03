@@ -1,7 +1,7 @@
 import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS, UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_TEMPLATE_ALLOW_DELETE_ACTION_CONDITION_ALIAS } from '../conditions/allow-delete/constants.js';
-import { UMB_IS_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -19,7 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_PRODUCTION_MODE_CONDITION_ALIAS,
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
 				match: false,
 			},
 		],
@@ -37,7 +37,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{ alias: UMB_TEMPLATE_ALLOW_DELETE_ACTION_CONDITION_ALIAS },
 			{
-				alias: UMB_IS_PRODUCTION_MODE_CONDITION_ALIAS,
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
 				match: false,
 			},
 		],

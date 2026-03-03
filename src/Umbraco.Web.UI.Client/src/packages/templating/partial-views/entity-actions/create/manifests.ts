@@ -1,5 +1,5 @@
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_IS_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -17,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_PRODUCTION_MODE_CONDITION_ALIAS,
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
 				match: false,
 			},
 		],
