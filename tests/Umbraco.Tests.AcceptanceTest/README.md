@@ -4,6 +4,8 @@ End-to-end acceptance tests for Umbraco CMS using [Playwright](https://playwrigh
 
 You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.
 
+> **npm package**: This project is also published to npm as [`@umbraco/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the package documentation.
+
 ---
 
 ## Prerequisites
@@ -81,78 +83,6 @@ npx playwright test --ui tests/DefaultConfig
 
 ---
 
-## Test Helpers and Fixtures
-
-Tests use the `@umbraco/playwright-testhelpers` package which provides three main fixtures:
-
-### `umbracoUi` - UI Interaction Helper
-
-For browser interactions organized by section:
-
-```typescript
-// Navigation
-await umbracoUi.goToBackOffice();
-await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-// Interactions
-await umbracoUi.content.enterContentName('My Content');
-await umbracoUi.content.clickSaveButton();
-await umbracoUi.content.clickSaveAndPublishButton();
-
-// Assertions
-await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-await umbracoUi.content.doesSuccessNotificationHaveText('Content saved');
-```
-
-### `umbracoApi` - REST API Helper
-
-For server-side operations (setup/teardown):
-
-```typescript
-// Create test data
-const docTypeId = await umbracoApi.documentType.createDefaultDocumentType('TestType');
-const dataTypeId = await umbracoApi.dataType.createTextstringDataType('TestDataType');
-
-// Query data
-const exists = await umbracoApi.document.doesNameExist('MyContent');
-const data = await umbracoApi.document.getByName('MyContent');
-
-// Cleanup (idempotent - won't fail if not exists)
-await umbracoApi.documentType.ensureNameNotExists('TestType');
-
-// Publishing
-await umbracoApi.document.publish(documentId);
-```
-
-### `page` - Raw Playwright Page
-
-Direct access to Playwright's Page object for custom interactions:
-
-```typescript
-await page.pause();  // Pause for debugging
-await page.screenshot({ path: 'debug.png' });
-```
-
-### Helper Constants
-
-```typescript
-import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco/playwright-testhelpers';
-
-// Section names
-ConstantHelper.sections.content
-ConstantHelper.sections.media
-ConstantHelper.sections.settings
-
-// Notification messages
-NotificationConstantHelper.success.published
-NotificationConstantHelper.success.saved
-
-// String utilities
-AliasHelper.toAlias('Test Document Type')  // → 'testDocumentType'
-```
-
----
-
 ## Writing Tests
 
 ### Test Structure (AAA Pattern)
@@ -160,7 +90,7 @@ AliasHelper.toAlias('Test Document Type')  // → 'testDocumentType'
 All tests follow the Arrange-Act-Assert pattern:
 
 ```typescript
-import { ConstantHelper, test } from '@umbraco/playwright-testhelpers';
+import { ConstantHelper, test } from '@umbraco/acceptance-test-helpers';
 import { expect } from '@playwright/test';
 
 const documentTypeName = 'TestDocumentType';
@@ -313,5 +243,4 @@ Key settings in `playwright.config.ts`:
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)
 - [Umbraco Documentation](https://docs.umbraco.com/)
-- [@umbraco/playwright-testhelpers](https://www.npmjs.com/package/@umbraco/playwright-testhelpers)
-- [@umbraco/json-models-builders](https://www.npmjs.com/package/@umbraco/json-models-builders)
+- [@umbraco/acceptance-test-helpers](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers) (published from this project)

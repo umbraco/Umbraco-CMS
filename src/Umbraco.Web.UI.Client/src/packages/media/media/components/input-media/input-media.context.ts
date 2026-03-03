@@ -7,12 +7,19 @@ import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { isMediaTreeItem } from '../../tree/utils.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
+import { isUmbracoFolder, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+
+export enum UmbMediaPickerFolderFilter {
+	FILES_ONLY = 'filesOnly',
+	FOLDERS_ONLY = 'foldersOnly',
+	FILES_AND_FOLDERS = 'filesAndFolders',
+}
 
 interface UmbMediaPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>;
 	includeTrashed?: boolean;
+	folderFilter?: UmbMediaPickerFolderFilter;
 }
 
 export class UmbMediaPickerInputContext extends UmbPickerInputContext<
@@ -31,7 +38,8 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		};
 
 		// transform allowedContentTypes to a pickable filter
-		combinedPickerData.pickableFilter = (item) => this.#pickableFilter(item, args?.allowedContentTypes);
+		combinedPickerData.pickableFilter = (item) =>
+			this.#pickableFilter(item, args?.allowedContentTypes, args?.folderFilter);
 
 		// set default search data
 		if (!pickerData?.search) {
@@ -58,11 +66,24 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	#pickableFilter = (
 		item: UmbMediaItemModel | UmbMediaTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
+		folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY,
 	): boolean => {
 		// Check if the user has no access to this item (tree items only)
 		if (isMediaTreeItem(item) && item.noAccess) {
 			return false;
 		}
+
+		const isFolder = isUmbracoFolder(item.mediaType.unique);
+
+		// Apply folder filter
+		if (folderFilter === UmbMediaPickerFolderFilter.FILES_ONLY && isFolder) {
+			return false;
+		}
+		if (folderFilter === UmbMediaPickerFolderFilter.FOLDERS_ONLY && !isFolder) {
+			return false;
+		}
+		// FILES_AND_FOLDERS — no folder-level filtering
+
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
 			return allowedContentTypes
 				.map((contentTypeReference) => contentTypeReference.unique)

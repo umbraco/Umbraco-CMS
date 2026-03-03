@@ -31,8 +31,24 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentBlueprintTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, flagProviders)
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            documentPresentationFactory)
+    {
+    }
+
+    public DocumentBlueprintTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap)
         => _documentPresentationFactory = documentPresentationFactory;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentBlueprint;

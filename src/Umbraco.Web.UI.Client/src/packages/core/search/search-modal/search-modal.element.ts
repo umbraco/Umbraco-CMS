@@ -17,13 +17,14 @@ import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/b
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-
 import '../search-result/search-result-item.element.js';
+import { UMB_BACKOFFICE_CONTEXT } from '../../../../apps/backoffice/backoffice.context.js';
 
 type GlobalSearchers = {
 	name: string;
 	api?: UmbSearchProvider<UmbSearchResultItemModel>;
 	alias: string;
+	sectionAlias?: string;
 };
 
 @customElement('umb-search-modal')
@@ -53,11 +54,22 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#searchItemNavIndex = 0;
 
+	#searchRequestNumber = 0;
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 300;
 
+	#currentSectionAlias?: string;
+
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (backofficeContext) => {
+			if (!backofficeContext) return;
+			this.observe(backofficeContext.activeSectionAlias, (alias) => {
+				this.#currentSectionAlias = alias;
+				this.#updateDefaultSearcher();
+			});
+		});
 
 		this.#observeGlobalSearchers();
 	}
@@ -114,6 +126,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 						name: controller.manifest.meta?.label || controller.manifest.name,
 						api: searchApi,
 						alias: controller.alias,
+						sectionAlias: controller.manifest.meta?.sectionAlias,
 					};
 
 					globalSearch.push(searcher);
@@ -121,11 +134,24 @@ export class UmbSearchModalElement extends UmbLitElement {
 			}
 
 			this._globalSearchers = globalSearch;
-
-			if (this._globalSearchers.length > 0) {
-				this._currentGlobalSearcher = this._globalSearchers[0];
-			}
+			this.#updateDefaultSearcher();
 		});
+	}
+
+	#updateDefaultSearcher() {
+		if (this._globalSearchers.length === 0) return;
+
+		// Try to find a searcher matching the current section
+		if (this.#currentSectionAlias) {
+			const matchingSearcher = this._globalSearchers.find((s) => s.sectionAlias === this.#currentSectionAlias);
+			if (matchingSearcher) {
+				this._currentGlobalSearcher = matchingSearcher;
+				return;
+			}
+		}
+
+		// Fall back to first searcher
+		this._currentGlobalSearcher = this._globalSearchers[0];
 	}
 
 	async #setSearchItemNavIndex(index: number) {
@@ -164,6 +190,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		if (this._currentGlobalSearcher === searcher) return;
 
 		this._currentGlobalSearcher = searcher;
+		this.#searchRequestNumber++;
 
 		this.#focusInput();
 		this._loading = true;
@@ -172,8 +199,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	async #updateSearchResults() {
+		const requestNumber = this.#searchRequestNumber;
+
 		if (this._search && this._currentGlobalSearcher?.api) {
 			const { data } = await this._currentGlobalSearcher.api.search({ query: this._search });
+			if (requestNumber !== this.#searchRequestNumber) return; // stale response, discard
 			if (!data) return;
 			this._searchResults = data.items;
 		} else {
@@ -198,6 +228,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		const target = event.target as HTMLInputElement;
 		this._search = target.value.trim();
 
+		this.#searchRequestNumber++;
 		clearTimeout(this.#inputTimer);
 		if (!this._search) {
 			this._loading = false;
