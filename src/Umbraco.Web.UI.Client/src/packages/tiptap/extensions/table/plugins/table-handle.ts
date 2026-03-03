@@ -47,6 +47,11 @@ class TableHandlePluginView implements PluginView {
 	}
 
 	#handleMouseMove = (event: MouseEvent) => {
+		if (!this.#editor.isEditable) {
+			this.#hideGrips();
+			return;
+		}
+
 		const target = event.target as HTMLElement;
 		if (!target) return;
 
@@ -257,7 +262,7 @@ class TableHandlePluginView implements PluginView {
 	}
 
 	#handleGripClick(context: 'row' | 'column') {
-		if (!this.#state) return;
+		if (!this.#state || !this.#editor.isEditable) return;
 
 		const index = context === 'row' ? this.#state.rowIndex : this.#state.colIndex;
 		if (index === undefined) return;
@@ -282,25 +287,26 @@ class TableHandlePluginView implements PluginView {
 	}
 
 	#positionGrips() {
-		if (!this.#state?.referencePosCell || !this.#state?.referencePosTable) return;
+		if (!this.#state?.referencePosCell || !this.#state?.referencePosTable || !this.#state?.controlsContainer) return;
 
-		const { referencePosCell, referencePosTable } = this.#state;
+		const { referencePosCell, referencePosTable, controlsContainer } = this.#state;
 
-		// The .table-controls container is offset by -1rem from the table
-		// We need to add 1rem (16px) to compensate for this offset
-		const containerOffset = 16; // 1rem in pixels
+		// Compute the offset dynamically from the controls container's position
+		const controlsRect = controlsContainer.getBoundingClientRect();
+		const containerOffsetTop = referencePosTable.top - controlsRect.top;
+		const containerOffsetLeft = referencePosTable.left - controlsRect.left;
 
 		// Position row grip (left side of cell)
 		if (this.#rowGrip) {
 			this.#rowGrip.style.display = 'flex';
-			this.#rowGrip.style.top = `${referencePosCell.top - referencePosTable.top + containerOffset}px`;
+			this.#rowGrip.style.top = `${referencePosCell.top - referencePosTable.top + containerOffsetTop}px`;
 			this.#rowGrip.style.height = `${referencePosCell.height}px`;
 		}
 
 		// Position column grip (top of cell)
 		if (this.#colGrip) {
 			this.#colGrip.style.display = 'flex';
-			this.#colGrip.style.left = `${referencePosCell.left - referencePosTable.left + containerOffset}px`;
+			this.#colGrip.style.left = `${referencePosCell.left - referencePosTable.left + containerOffsetLeft}px`;
 			this.#colGrip.style.width = `${referencePosCell.width}px`;
 		}
 	}
