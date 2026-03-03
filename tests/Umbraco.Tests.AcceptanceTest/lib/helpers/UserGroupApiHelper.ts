@@ -82,7 +82,7 @@ export class UserGroupApiHelper {
     }
     return false;
   }
-  
+
   async doesUserGroupContainLanguage(userGroupName: string, languageName: string) {
     const userGroup = await this.getByName(userGroupName);
     return userGroup.languages.includes(languageName);
@@ -157,7 +157,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithDocumentStartNode(name: string, startNodeId: string) {
     await this.ensureNameNotExists(name);
 
@@ -173,7 +173,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithMediaStartNode(name: string, startNodeId: string) {
     await this.ensureNameNotExists(name);
 
@@ -203,7 +203,7 @@ export class UserGroupApiHelper {
 
   async createUserGroupWithLanguageAndContentSection(name: string, languageName: string) {
     await this.ensureNameNotExists(name);
-    
+
     const userGroup = new UserGroupBuilder()
       .withName(name)
       .addSection(ConstantHelper.sectionAliases.content)
@@ -230,7 +230,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithPermissionsForSpecificDocumentWithRead(name: string, documentId: string) {
     await this.ensureNameNotExists(name);
 
@@ -248,7 +248,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithReadDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -263,7 +263,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithCreateDocumentBlueprintPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -279,7 +279,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithDeleteDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -295,7 +295,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithCreateDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -311,7 +311,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithNotificationsDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -327,7 +327,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithPublishDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -343,7 +343,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithSetPermissionsDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -359,7 +359,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithUnpublishDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -375,7 +375,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithUpdateDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -391,7 +391,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithDuplicateDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -408,7 +408,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithMoveToDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -425,7 +425,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithSortChildrenDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -441,7 +441,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithCultureAndHostnamesDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -457,7 +457,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithPublicAccessDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -474,7 +474,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithRollbackDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -491,7 +491,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithDeleteDocumentPermissionAndCreateDocumentPermission(name: string, deleteEnabled: boolean = true, createEnabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -508,7 +508,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async doesUserGroupContainContentStartNodeId(userGroupName: string, documentStartNodeId: string) {
     const userGroup = await this.getByName(userGroupName);
     if (userGroup.documentStartNode === null) {
@@ -735,7 +735,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithNotificationsPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -756,7 +756,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithPublishPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -777,7 +777,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithSetPermissionsPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -798,7 +798,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithUnpublishPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -819,7 +819,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithUpdatePermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -843,7 +843,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithDuplicatePermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -867,7 +867,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithMoveToPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -891,7 +891,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithSortChildrenPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -912,7 +912,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithCultureAndHostnamesPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -933,7 +933,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithPublicAccessPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -955,7 +955,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createUserGroupWithRollbackPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -1347,6 +1347,7 @@ export class UserGroupApiHelper {
       .withElementRootAccess(true)
       .addFallbackPermission()
         .withCreateElementPermission(true)
+        .withReadElementPermission(true)
         .done()
       .addPermissions()
         .addElementPermission()
@@ -1403,7 +1404,7 @@ export class UserGroupApiHelper {
 
     return await this.create(userGroup);
   }
-  
+
   async createSimpleUserGroupWithLibrarySection(name: string) {
     await this.ensureNameNotExists(name);
 

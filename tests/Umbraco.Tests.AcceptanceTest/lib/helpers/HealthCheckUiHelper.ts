@@ -43,7 +43,7 @@ export class HealthCheckUiHelper extends UiBaseLocators {
     await this.waitForVisible(this.healthCheckResultTag.first());
   }
 
-  async clickHeathCheckGroupByName(groupName: string) {
+  async clickHealthCheckGroupByName(groupName: string) {
     await this.click(this.page.getByRole('link', {name: groupName}));
   }
 
@@ -51,15 +51,15 @@ export class HealthCheckUiHelper extends UiBaseLocators {
     await this.isVisible(this.healthCheckGroupBox.getByText(groupName));
   }
 
-  async doesHeathCheckGroupHaveSuccessItemsCount(healthCheckGroupName: string, count: number) {
+  async doesHealthCheckGroupHaveSuccessItemsCount(healthCheckGroupName: string, count: number) {
     return expect(this.healthCheckGroupBox.filter({has: this.page.getByText(healthCheckGroupName)}).locator(this.positiveTag)).toHaveText(count.toString());
   }
 
-  async doesHeathCheckGroupHaveWarningItemsCount(healthCheckGroupName: string, count: number) {
+  async doesHealthCheckGroupHaveWarningItemsCount(healthCheckGroupName: string, count: number) {
     return expect(this.healthCheckGroupBox.filter({has: this.page.getByText(healthCheckGroupName)}).locator(this.warningTag)).toHaveText(count.toString());
   }
 
-  async doesHeathCheckGroupHaveErrorItemsCount(healthCheckGroupName: string, count: number) {
+  async doesHealthCheckGroupHaveErrorItemsCount(healthCheckGroupName: string, count: number) {
     return expect(this.healthCheckGroupBox.filter({has: this.page.getByText(healthCheckGroupName)}).locator(this.dangerTag)).toHaveText(count.toString());
   }
 
