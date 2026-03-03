@@ -30,6 +30,24 @@ public class ImagingHMACSecretKeyCheckTests
     }
 
     [Test]
+    public async Task GetStatusAsync_WhenHMACKeyIsNull_ReturnsWarning()
+    {
+        var settings = new ImagingSettings { HMACSecretKey = null! };
+        var optionsMonitor = Mock.Of<IOptionsMonitor<ImagingSettings>>(x => x.CurrentValue == settings);
+        var check = new ImagingHMACSecretKeyCheck(MockTextService(), optionsMonitor);
+
+        IEnumerable<HealthCheckStatus> statuses = await check.GetStatusAsync();
+
+        HealthCheckStatus status = statuses.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Warning));
+            Assert.That(status.Message, Is.EqualTo("imagingHMACSecretKeyCheckWarningMessage"));
+            Assert.That(status.ReadMoreLink, Is.Not.Null.And.Not.Empty);
+        });
+    }
+
+    [Test]
     public async Task GetStatusAsync_WhenHMACKeyIsEmpty_ReturnsWarning()
     {
         var settings = new ImagingSettings { HMACSecretKey = [] };

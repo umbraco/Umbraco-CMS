@@ -37,7 +37,7 @@ public class ImagingHMACSecretKeyCheck : HealthCheck
     /// <inheritdoc />
     public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
     {
-        bool isConfigured = _imagingSettings.CurrentValue.HMACSecretKey.Length > 0;
+        bool isConfigured = _imagingSettings.CurrentValue.HMACSecretKey?.Length > 0;
 
         HealthCheckStatus status = isConfigured
             ? new HealthCheckStatus(_textService.Localize("healthcheck", "imagingHMACSecretKeyCheckSuccessMessage"))
