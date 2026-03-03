@@ -1,4 +1,5 @@
 import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const UMB_TEMPLATE_WORKSPACE_ALIAS = 'Umb.Workspace.Template';
 
@@ -29,6 +30,30 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_TEMPLATE_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
+	},
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.Template.ProductionMode',
+		name: 'Template Production Mode',
+		api: () =>
+			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
+		element: () =>
+			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
+		weight: 60,
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_TEMPLATE_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: true,
 			},
 		],
 	},
