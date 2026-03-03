@@ -4,9 +4,9 @@ import {expect} from "@playwright/test";
 const customDataTypeName = 'Custom Content Picker Dynamic Root';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -15,7 +15,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can configure content root as dynamic root origin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
@@ -47,7 +46,6 @@ test('can add a query step to content root dynamic root', async ({umbracoApi, um
   // Arrange
   const documentTypeName = 'TestDocumentType';
   await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
   await umbracoUi.dataType.clickDefineDynamicRootButton();
   await umbracoUi.dataType.chooseDynamicRootOrigin('Content Root');

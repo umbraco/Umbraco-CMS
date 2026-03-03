@@ -8,13 +8,8 @@ const rootDocumentTypeName = 'RootDocumentType';
 const firstRootContentName = 'FirstRootContent';
 const secondRootContentName = 'SecondRootContent';
 
-test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.document.ensureNameNotExists(firstRootContentName);
-  await umbracoApi.document.ensureNameNotExists(secondRootContentName);
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
+  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -34,7 +29,6 @@ test('can see all root nodes when using content root dynamic root origin', async
   const customDataTypeId = await umbracoApi.dataType.createContentPickerSourceDataTypeWithDynamicRoot(customDataTypeName, 'ContentRoot');
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
