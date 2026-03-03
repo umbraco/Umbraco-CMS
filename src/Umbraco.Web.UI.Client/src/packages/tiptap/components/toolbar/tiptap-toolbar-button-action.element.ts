@@ -4,6 +4,9 @@ import { customElement, html, when } from '@umbraco-cms/backoffice/external/lit'
 
 @customElement('umb-tiptap-toolbar-button-action')
 export class UmbTiptapToolbarButtonActionElement extends UmbTiptapToolbarButtonElement<ManifestTiptapToolbarExtensionActionButtonKind> {
+	// Note: This element does not use the inherited `isActive` @state in its template,
+	// but relies on it being set by the base class `#onEditorUpdate` to trigger Lit re-renders
+	// so that `api.isDisabled(editor)` is re-evaluated.
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
 		return html`
