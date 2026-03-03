@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -22,7 +23,22 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
     public DocumentBlueprintTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, flagProviders)
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            documentPresentationFactory)
+    {
+    }
+
+    public DocumentBlueprintTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap)
         => _documentPresentationFactory = documentPresentationFactory;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentBlueprint;

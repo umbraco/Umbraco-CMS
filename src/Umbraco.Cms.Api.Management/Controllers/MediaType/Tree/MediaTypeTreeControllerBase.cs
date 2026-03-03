@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -22,7 +23,22 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
     private readonly IMediaTypeService _mediaTypeService;
 
     public MediaTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            mediaTypeService)
+    {
+    }
+
+    public MediaTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IMediaTypeService mediaTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _mediaTypeService = mediaTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MediaType;

@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -21,7 +22,22 @@ public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeT
     private readonly IMemberTypeService _memberTypeService;
 
     public MemberTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            memberTypeService)
+    {
+    }
+
+    public MemberTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IMemberTypeService memberTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _memberTypeService = memberTypeService;
 
 

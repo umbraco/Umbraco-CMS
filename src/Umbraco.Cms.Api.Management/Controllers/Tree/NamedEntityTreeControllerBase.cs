@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 

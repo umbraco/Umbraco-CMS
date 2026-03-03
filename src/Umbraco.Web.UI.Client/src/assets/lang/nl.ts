@@ -1185,6 +1185,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab titel',
 		tabs: 'Tabs',
+		changeIcon: 'Pictogram wijzigen',
 		contentTypeEnabled: 'Basis inhoudstype ingeschakeld',
 		contentTypeUses: 'Dit inhoudstype gebruikt',
 		noPropertiesDefinedOnTab:

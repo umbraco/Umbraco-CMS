@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -21,8 +22,24 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
 {
     private readonly IDataTypeService _dataTypeService;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DataTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            dataTypeService)
+    {
+    }
+
+    public DataTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IDataTypeService dataTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _dataTypeService = dataTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DataType;

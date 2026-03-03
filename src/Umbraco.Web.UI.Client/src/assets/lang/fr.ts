@@ -1142,6 +1142,7 @@ export default {
 		tab: 'Onglet',
 		tabname: "Titre de l'onglet",
 		tabs: 'Onglets',
+		changeIcon: "Changer l'icône",
 		contentTypeEnabled: 'Type de contenu de base activé',
 		contentTypeUses: 'Ce type de contenu utilise',
 		noPropertiesDefinedOnTab:
