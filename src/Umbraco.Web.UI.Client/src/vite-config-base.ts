@@ -19,6 +19,7 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 			outDir: args.dist,
 			emptyOutDir: true,
 			sourcemap: true,
+			minify: 'esbuild',
 			rollupOptions: {
 				external: args.external || [/^@umbraco-cms/],
 			},
