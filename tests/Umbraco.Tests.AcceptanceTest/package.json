@@ -23,7 +23,7 @@
     "testSqlite": "npm run build && npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npm run build && npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npm run build && npx playwright test tests/DefaultConfig/DataType/ContentPickerDynamicRoot.spec.ts tests/DefaultConfig/Content/ContentWithContentPickerDynamicRoot.spec.ts",
+    "smokeTest": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\"",
     "smokeTestSqlite": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
     "releaseTest": "npm run build && npx playwright test DefaultConfig --grep \"@release\"",
     "testWindows": "npm run build && npx playwright test DefaultConfig --grep-invert \"RelationType\""
