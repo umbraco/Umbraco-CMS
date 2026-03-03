@@ -43,6 +43,7 @@ class TableHandlePluginView implements PluginView {
 
 		// Setup event listeners
 		this.#view.dom.addEventListener('mousemove', this.#handleMouseMove);
+		this.#view.dom.addEventListener('mouseleave', this.#handleMouseLeave);
 	}
 
 	#handleMouseMove = (event: MouseEvent) => {
@@ -58,6 +59,10 @@ class TableHandlePluginView implements PluginView {
 		if (!this.#view.dom.contains(target)) return;
 
 		this.#updateStateFromMousePosition(event);
+	};
+
+	#handleMouseLeave = () => {
+		this.#hideGrips();
 	};
 
 	#isOverGripOrPopover(target: HTMLElement): boolean {
@@ -333,6 +338,7 @@ class TableHandlePluginView implements PluginView {
 
 	destroy() {
 		this.#view.dom.removeEventListener('mousemove', this.#handleMouseMove);
+		this.#view.dom.removeEventListener('mouseleave', this.#handleMouseLeave);
 		this.#cleanupGrips();
 	}
 }
