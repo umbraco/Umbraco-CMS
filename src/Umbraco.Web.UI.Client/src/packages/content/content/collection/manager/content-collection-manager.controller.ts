@@ -58,19 +58,6 @@ export class UmbContentCollectionManager<
 			},
 			null,
 		);
-
-		// Observe the workspace unique so the collection config stays in sync
-		// when unique is set after initial config creation (e.g. during createScaffold).
-		this.observe(
-			this.#host.unique,
-			(unique) => {
-				const currentConfig = this.#collectionConfig.getValue();
-				if (currentConfig) {
-					this.#collectionConfig.setValue({ ...currentConfig, unique });
-				}
-			},
-			'_observeHostUnique',
-		);
 	}
 
 	getCollectionAlias() {
@@ -81,6 +68,7 @@ export class UmbContentCollectionManager<
 		if (!dataType) {
 			this.#collectionConfig.setValue(undefined);
 			this.#manifestOverrides.setValue(undefined);
+			this.removeUmbControllerByAlias('_observeHostUnique');
 			return;
 		}
 
@@ -95,6 +83,17 @@ export class UmbContentCollectionManager<
 			pageSize: isNaN(pageSize) ? 50 : pageSize,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		});
+
+		// Observe the workspace unique so the collection config stays in sync
+		// when unique is set after initial config creation (e.g. during createScaffold).
+		// Only observing when a config is set.
+		this.observe(
+			this.#host.unique,
+			(unique) => {
+				this.#collectionConfig.update({ unique });
+			},
+			'_observeHostUnique',
+		);
 
 		const overrides: partialManifestWorkspaceView = {
 			alias: 'Umb.WorkspaceView.Content.Collection',
