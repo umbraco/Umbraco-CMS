@@ -212,7 +212,7 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 					.props=${{ path: fullUrl, file: this.temporaryFile?.file }}
 					.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
 				</umb-extension-slot>
-				<div id="file-info">
+				<div id="file-info" class="uui-text">
 					${this.#renderFileName(fileName, isBlob, fullUrl)}
 					<uui-button @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
 						<uui-icon name="icon-trash"></uui-icon>
@@ -286,13 +286,8 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 				min-width: 0;
 			}
 
-			a#file-name {
-				color: inherit;
+			a#file-name:not(:hover) {
 				text-decoration: none;
-			}
-
-			a#file-name:hover {
-				text-decoration: underline;
 			}
 		`,
 	];
