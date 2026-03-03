@@ -71,6 +71,7 @@
     </Compile>
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Umbraco.Api.Delivery\OpenApi\ExpectedContracts\**" CopyToOutputDirectory="PreserveNewest" />
     <Compile Update="Umbraco.Infrastructure\Services\ContentTypeServiceTests.GetAllAllowedInLibrary.cs">
       <DependentUpon>ContentTypeServiceTests.cs</DependentUpon>
     </Compile>

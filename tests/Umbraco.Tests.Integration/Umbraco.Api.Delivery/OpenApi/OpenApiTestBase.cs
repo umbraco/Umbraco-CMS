@@ -88,23 +88,30 @@ internal abstract class OpenApiTestBase : UmbracoTestServerTestBase
 
     /// <summary>
     /// Validates that the generated OpenAPI spec matches the expected contract file.
-    /// If the expected contract file doesn't exist, saves the generated spec to that location.
+    /// If the expected contract file doesn't exist, saves the generated spec to the source directory (local dev only).
     /// </summary>
     protected static async Task ValidateContractAsync(string generatedSpec, string expectedContractFileName)
     {
-        var expectedContractPath = GetExpectedContractPath(expectedContractFileName);
+        // Read from the output directory - contract files are copied there via CopyToOutputDirectory.
+        // This is reliable on both local and CI environments.
+        var runtimePath = GetRuntimeContractPath(expectedContractFileName);
 
-        if (!File.Exists(expectedContractPath))
+        if (!File.Exists(runtimePath))
         {
-            // Expected contract doesn't exist - save the generated one
-            Directory.CreateDirectory(Path.GetDirectoryName(expectedContractPath)!);
-            await File.WriteAllTextAsync(expectedContractPath, generatedSpec);
-            Assert.Inconclusive($"Expected contract file did not exist. Generated contract saved to: {expectedContractPath}");
+            var savedPath = TrySaveContractToSource(generatedSpec, expectedContractFileName);
+            if (savedPath is not null)
+            {
+                Assert.Inconclusive($"Expected contract file did not exist. Generated contract saved to: {savedPath}");
+            }
+            else
+            {
+                Assert.Fail("Expected contract file not found. Please generate it locally by running this test and commit it to source control.");
+            }
+
             return;
         }
 
-        // Compare against existing expected contract
-        var expectedContract = await File.ReadAllTextAsync(expectedContractPath);
+        var expectedContract = await File.ReadAllTextAsync(runtimePath);
         var generatedOpenApiJson = JsonNode.Parse(generatedSpec);
         var expectedOpenApiJson = JsonNode.Parse(expectedContract);
 
@@ -117,10 +124,29 @@ internal abstract class OpenApiTestBase : UmbracoTestServerTestBase
             "Generated API does not respect the contract.");
     }
 
-    private static string GetExpectedContractPath(string fileName, [CallerFilePath] string callerFilePath = "")
+    private static string GetRuntimeContractPath(string fileName) =>
+        Path.Combine(TestContext.CurrentContext.TestDirectory, "Umbraco.Api.Delivery", "OpenApi", "ExpectedContracts", fileName);
+
+    private static string? TrySaveContractToSource(string spec, string fileName, [CallerFilePath] string callerFilePath = "")
     {
-        // Use the source directory (where this file lives) so that saved files go to source control
-        var sourceDirectory = Path.GetDirectoryName(callerFilePath)!;
-        return Path.Combine(sourceDirectory, "ExpectedContracts", fileName);
+        // [CallerFilePath] points to the source file at compile time, corresponding to the source
+        // directory on a developer's local machine. On CI this path may not exist or be writable.
+        try
+        {
+            var sourceDirectory = Path.GetDirectoryName(callerFilePath);
+            if (sourceDirectory is null)
+            {
+                return null;
+            }
+
+            var targetPath = Path.Combine(sourceDirectory, "ExpectedContracts", fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
+            File.WriteAllText(targetPath, spec);
+            return targetPath;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
