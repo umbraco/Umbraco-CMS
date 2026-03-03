@@ -213,18 +213,24 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 					.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
 				</umb-extension-slot>
 				<div id="file-info">
-					${fileName
-						? isBlob
-							? html`<span id="file-name" title=${fileName}>${fileName}</span>`
-							: html`<a id="file-name" href=${fullUrl} target="_blank" title=${fileName}>${fileName}</a>`
-						: nothing}
-					<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
+					${this.#renderFileName(fileName, isBlob, fullUrl)}
+					<uui-button @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
 						<uui-icon name="icon-trash"></uui-icon>
-						<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
+						${this.localize.term('content_uploadClear')}
 					</uui-button>
 				</div>
 			</div>
 		`;
+	}
+
+	#renderFileName(fileName: string | undefined, isBlob: boolean, fullUrl: string) {
+		if (!fileName) {
+			return nothing;
+		}
+		if (isBlob) {
+			return html`<span id="file-name" title=${fileName}>${fileName}</span>`;
+		}
+		return html`<a id="file-name" href=${fullUrl} target="_blank" title=${fileName}>${fileName}</a>`;
 	}
 
 	#handleRemove() {
@@ -254,14 +260,12 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 				position: relative;
 			}
 
-			uui-icon {
-				vertical-align: sub;
-				margin-right: var(--uui-size-space-4);
-			}
-
 			#wrapper {
 				display: flex;
 				flex-direction: column;
+				width: fit-content;
+				min-width: 400px;
+				max-width: 100%;
 			}
 
 			#file-info {
@@ -270,8 +274,8 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 				align-items: center;
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
-				padding: 0 var(--uui-size-space-4);
-				margin-top: var(--uui-size-space-3);
+				padding-left: var(--uui-size-space-4);
+				margin-top: var(--uui-size-space-2);
 			}
 
 			#file-name {
