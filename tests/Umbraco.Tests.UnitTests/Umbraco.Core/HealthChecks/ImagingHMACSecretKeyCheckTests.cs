@@ -2,12 +2,11 @@
 // See LICENSE for more details.
 
 using System.Globalization;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.Checks.Security;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.HealthChecks;
@@ -30,11 +29,10 @@ public class ImagingHMACSecretKeyCheckTests
     }
 
     [Test]
-    public async Task GetStatusAsync_WhenHMACKeyIsNull_ReturnsWarning()
+    public async Task GetStatusAsync_WhenHMACKeyIsNotConfigured_ReturnsWarning()
     {
-        var settings = new ImagingSettings { HMACSecretKey = null! };
-        var optionsMonitor = Mock.Of<IOptionsMonitor<ImagingSettings>>(x => x.CurrentValue == settings);
-        var check = new ImagingHMACSecretKeyCheck(MockTextService(), optionsMonitor);
+        var hmacSecretKeyService = Mock.Of<IHmacSecretKeyService>(x => x.HasHmacSecretKey() == false);
+        var check = new ImagingHMACSecretKeyCheck(MockTextService(), hmacSecretKeyService);
 
         IEnumerable<HealthCheckStatus> statuses = await check.GetStatusAsync();
 
@@ -48,29 +46,10 @@ public class ImagingHMACSecretKeyCheckTests
     }
 
     [Test]
-    public async Task GetStatusAsync_WhenHMACKeyIsEmpty_ReturnsWarning()
+    public async Task GetStatusAsync_WhenHMACKeyIsConfigured_ReturnsSuccess()
     {
-        var settings = new ImagingSettings { HMACSecretKey = [] };
-        var optionsMonitor = Mock.Of<IOptionsMonitor<ImagingSettings>>(x => x.CurrentValue == settings);
-        var check = new ImagingHMACSecretKeyCheck(MockTextService(), optionsMonitor);
-
-        IEnumerable<HealthCheckStatus> statuses = await check.GetStatusAsync();
-
-        HealthCheckStatus status = statuses.Single();
-        Assert.Multiple(() =>
-        {
-            Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Warning));
-            Assert.That(status.Message, Is.EqualTo("imagingHMACSecretKeyCheckWarningMessage"));
-            Assert.That(status.ReadMoreLink, Is.Not.Null.And.Not.Empty);
-        });
-    }
-
-    [Test]
-    public async Task GetStatusAsync_WhenHMACKeyIsSet_ReturnsSuccess()
-    {
-        var settings = new ImagingSettings { HMACSecretKey = [1, 2, 3, 4, 5] };
-        var optionsMonitor = Mock.Of<IOptionsMonitor<ImagingSettings>>(x => x.CurrentValue == settings);
-        var check = new ImagingHMACSecretKeyCheck(MockTextService(), optionsMonitor);
+        var hmacSecretKeyService = Mock.Of<IHmacSecretKeyService>(x => x.HasHmacSecretKey() == true);
+        var check = new ImagingHMACSecretKeyCheck(MockTextService(), hmacSecretKeyService);
 
         IEnumerable<HealthCheckStatus> statuses = await check.GetStatusAsync();
 

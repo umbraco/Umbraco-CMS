@@ -1,8 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -19,25 +18,25 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 public class ImagingHMACSecretKeyCheck : HealthCheck
 {
     private readonly ILocalizedTextService _textService;
-    private readonly IOptionsMonitor<ImagingSettings> _imagingSettings;
+    private readonly IHmacSecretKeyService _hmacSecretKeyService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImagingHMACSecretKeyCheck" /> class.
     /// </summary>
     /// <param name="textService">The localized text service.</param>
-    /// <param name="imagingSettings">The imaging settings monitor.</param>
+    /// <param name="hmacSecretKeyService">The HMAC secret key service.</param>
     public ImagingHMACSecretKeyCheck(
         ILocalizedTextService textService,
-        IOptionsMonitor<ImagingSettings> imagingSettings)
+        IHmacSecretKeyService hmacSecretKeyService)
     {
         _textService = textService;
-        _imagingSettings = imagingSettings;
+        _hmacSecretKeyService = hmacSecretKeyService;
     }
 
     /// <inheritdoc />
     public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
     {
-        bool isConfigured = _imagingSettings.CurrentValue.HMACSecretKey?.Length > 0;
+        bool isConfigured = _hmacSecretKeyService.HasHmacSecretKey();
 
         HealthCheckStatus status = isConfigured
             ? new HealthCheckStatus(_textService.Localize("healthcheck", "imagingHMACSecretKeyCheckSuccessMessage"))
