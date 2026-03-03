@@ -1301,7 +1301,11 @@ export default {
 		paSelectMembers: 'Select the members who have access to the page <strong>%0%</strong>',
 		paMembers: 'Specific members protection',
 		paMembersHelp: 'If you wish to grant access to specific members',
-		paProtectedByAncestor: 'Public access settings are inherited from an ancestor page.'
+		paProtectedByAncestor: 'Public access settings are inherited from an ancestor page.',
+		psHeadlineSetup: 'Setup public access',
+		psHeadlineEdit: 'Edit public access',
+		psActionSetup: 'Setup',
+		psActionEdit: 'Edit',
 	},
 	publish: {
 		contentPublishedFailedIsTrashed: '%0% could not be published because the item is in the recycle bin.',

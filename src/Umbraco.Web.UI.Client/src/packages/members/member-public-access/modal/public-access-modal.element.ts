@@ -141,7 +141,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	// Modal events
 
 	#handleNext() {
-		if(this._specific != this._initalSpecific) {
+		if (this._specific != this._initalSpecific) {
 			// Clear selection if changing between specific and groups as the selection is not compatible.
 			this._selection = [];
 		}
@@ -229,7 +229,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${`${ this.#isNew ? this.localize.term('content_saveModalTitle') : this.localize.term('actions_update') } ${this.localize.term('actions_protect')}`}>
+			<umb-body-layout
+				headline=${this.#isNew
+					? this.localize.term('publicAccess_psHeadlineSetup')
+					: this.localize.term('publicAccess_psHeadlineEdit')}>
 				<uui-box>${this.#renderContent()}</uui-box> ${this.renderActions()}
 			</umb-body-layout>
 		`;
@@ -327,7 +330,9 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					id="save"
 					look="primary"
 					color="positive"
-					label=${this.#isNew ? this.localize.term('buttons_save') : this.localize.term('actions_update')}
+					label=${this.#isNew
+						? this.localize.term('publicAccess_psActionSetup')
+						: this.localize.term('publicAccess_psActionEdit')}
 					?disabled=${!this._loginDocumentId || !this._errorDocumentId || this._selection.length === 0}
 					@click="${this.#handleSave}"></uui-button>`
 			: html`<uui-button
