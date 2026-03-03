@@ -251,6 +251,17 @@ internal class PublishedContent : PublishedContentBase
         // if there is no 'published' published content, no culture can be published
         if (!_contentNode.HasPublished)
         {
+            // In preview mode, the ContentNode only has draft data loaded (published data
+            // is stored in a separate cache entry). Fall back to IPublishStatusQueryService
+            // which is an in-memory service that tracks actual document publish status.
+            if (IsPreviewing && ItemType == PublishedItemType.Content)
+            {
+                culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
+                IPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>();
+                return publishStatusQueryService.IsDocumentPublished(Key, culture);
+            }
+
             return false;
         }
 
