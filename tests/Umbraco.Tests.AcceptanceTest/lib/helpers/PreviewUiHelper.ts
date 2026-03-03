@@ -16,13 +16,7 @@ export class PreviewUiHelper extends UiBaseLocators {
   constructor(page: Page) {
     super(page);
     this.saveAndPreviewBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.SaveAndPreview');
-    this.exitBtn = page.locator('umb-preview-exit').locator('uui-button');
-    this.previewWebsiteBtn = page.locator('umb-preview-open-website').locator('uui-button');
-    this.previewIframe = page.locator('umb-preview iframe');
-    this.deviceBtn = page.locator('umb-preview-device').locator('uui-button');
-    this.devicePopover = page.locator('umb-preview-device').locator('uui-popover-container');
-    this.cultureBtn = page.locator('umb-preview-culture').locator('uui-button');
-    this.culturePopover = page.locator('umb-preview-culture').locator('uui-popover-container');
+    this.initPreviewLocators(page);
   }
 
   async clickSaveAndPreviewButton() {
@@ -30,13 +24,17 @@ export class PreviewUiHelper extends UiBaseLocators {
     await this.click(this.saveAndPreviewBtn);
     this.previewPage = await popupPromise;
     await this.previewPage.waitForLoadState('load');
-    this.exitBtn = this.previewPage.locator('umb-preview-exit').locator('uui-button');
-    this.previewWebsiteBtn = this.previewPage.locator('umb-preview-open-website').locator('uui-button');
-    this.previewIframe = this.previewPage.locator('umb-preview iframe');
-    this.deviceBtn = this.previewPage.locator('umb-preview-device').locator('uui-button');
-    this.devicePopover = this.previewPage.locator('umb-preview-device').locator('uui-popover-container');
-    this.cultureBtn = this.previewPage.locator('umb-preview-culture').locator('uui-button');
-    this.culturePopover = this.previewPage.locator('umb-preview-culture').locator('uui-popover-container');
+    this.initPreviewLocators(this.previewPage);
+  }
+
+  private initPreviewLocators(page: Page) {
+    this.exitBtn = page.locator('umb-preview-exit').locator('uui-button');
+    this.previewWebsiteBtn = page.locator('umb-preview-open-website').locator('uui-button');
+    this.previewIframe = page.locator('umb-preview iframe');
+    this.deviceBtn = page.locator('umb-preview-device').locator('uui-button');
+    this.devicePopover = page.locator('umb-preview-device').locator('uui-popover-container');
+    this.cultureBtn = page.locator('umb-preview-culture').locator('uui-button');
+    this.culturePopover = page.locator('umb-preview-culture').locator('uui-popover-container');
   }
 
   async isExitButtonVisible(isVisible: boolean = true) {
@@ -56,8 +54,7 @@ export class PreviewUiHelper extends UiBaseLocators {
   }
 
   async clickPreviewWebsiteButtonAndWaitForWebsite(): Promise<Page> {
-    const targetPage = this.previewPage ?? this.page;
-    const websitePromise = targetPage.waitForEvent('popup');
+    const websitePromise = this.previewPage!.waitForEvent('popup');
     await this.click(this.previewWebsiteBtn);
     const websitePage = await websitePromise;
     await websitePage.waitForLoadState('load');
@@ -88,13 +85,12 @@ export class PreviewUiHelper extends UiBaseLocators {
 
   async isDeviceActive(deviceName: string) {
     const menuItem = this.devicePopover.locator('uui-menu-item', {hasText: deviceName});
-    await expect(menuItem).toHaveAttribute('active', '', {timeout: ConstantHelper.timeout.long});
+    await this.hasAttribute(menuItem, 'active', '', ConstantHelper.timeout.long);
   }
 
   async doesIframeContainText(text: string) {
-    const targetPage = this.previewPage ?? this.page;
-    const frame = targetPage.frameLocator('umb-preview iframe');
-    await expect(frame.locator('body')).toContainText(text, {timeout: ConstantHelper.timeout.long});
+    const frame = this.previewPage!.frameLocator('umb-preview iframe');
+    await this.containsText(frame.locator('body'), text, ConstantHelper.timeout.long);
   }
 
   async clickCultureButton() {
@@ -108,6 +104,6 @@ export class PreviewUiHelper extends UiBaseLocators {
 
   async isCultureActive(cultureName: string) {
     const menuItem = this.culturePopover.locator('uui-menu-item', {hasText: cultureName});
-    await expect(menuItem).toHaveAttribute('active', '', {timeout: ConstantHelper.timeout.long});
+    await this.hasAttribute(menuItem, 'active', '', ConstantHelper.timeout.long);
   }
 }

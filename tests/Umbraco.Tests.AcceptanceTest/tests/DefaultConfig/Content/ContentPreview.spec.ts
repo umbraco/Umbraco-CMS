@@ -80,7 +80,6 @@ test('can open published URL from preview using preview button', async ({umbraco
 
 test('can switch culture in preview with multiple languages', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.language.ensureNameNotExists('Danish');
   await umbracoApi.language.createDanishLanguage();
 
   // Act
