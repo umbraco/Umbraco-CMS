@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -140,6 +141,32 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         // Assert
         AssertPublishedTextPage(textPage);
         Assert.IsFalse(textPage.IsPublished());
+    }
+
+    [Test]
+    public async Task Filtering_By_IsPublished_In_Preview_Mode_Returns_Published_Content()
+    {
+        // Arrange - Initialize the publish status service to simulate production state
+        // (in production, this runs at startup via PostRuntimePremigrationsUpgradeNotification)
+        var publishStatusManagementService = GetRequiredService<IPublishStatusManagementService>();
+        await publishStatusManagementService.InitializeAsync(CancellationToken.None);
+
+        // PublishedTextPage is published, Textpage is draft-only (from base class setup)
+        // Load both in preview mode (simulating a backoffice user viewing the frontend)
+        var publishedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, true);
+        var unpublishedPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
+
+        Assert.IsNotNull(publishedPage);
+        Assert.IsNotNull(unpublishedPage);
+
+        var allPages = new[] { publishedPage!, unpublishedPage! };
+
+        // Act - filter by IsPublished (the exact pattern that fails in Razor templates)
+        var filteredPages = allPages.Where(x => x.IsPublished()).ToList();
+
+        // Assert - only the published page should pass the filter
+        Assert.AreEqual(1, filteredPages.Count);
+        Assert.AreEqual(PublishedTextPage.Key!.Value, filteredPages[0].Key);
     }
 
     [Test]
