@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 [ApiVersion("1.0")]
 public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public RootMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : base(entityService, flagProviders, memberTypeService)
     {

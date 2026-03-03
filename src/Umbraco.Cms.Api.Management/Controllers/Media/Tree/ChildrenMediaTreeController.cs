@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 [ApiVersion("1.0")]
 public class ChildrenMediaTreeController : MediaTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public ChildrenMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

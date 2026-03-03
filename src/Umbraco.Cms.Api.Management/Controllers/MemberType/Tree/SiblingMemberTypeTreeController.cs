@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
 public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public SiblingMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : base(entityService, flagProviders, memberTypeService)
     {

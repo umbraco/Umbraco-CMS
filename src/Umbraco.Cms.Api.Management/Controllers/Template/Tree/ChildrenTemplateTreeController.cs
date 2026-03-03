@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 [ApiVersion("1.0")]
 public class ChildrenTemplateTreeController : TemplateTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public ChildrenTemplateTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {

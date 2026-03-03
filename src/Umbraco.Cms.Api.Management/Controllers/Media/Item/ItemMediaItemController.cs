@@ -20,7 +20,6 @@ public class ItemMediaItemController : MediaItemControllerBase
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly FlagProviderCollection _flagProviders;
 
-    [ActivatorUtilitiesConstructor]
     public ItemMediaItemController(
         IEntityService entityService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -29,12 +28,6 @@ public class ItemMediaItemController : MediaItemControllerBase
         _entityService = entityService;
         _mediaPresentationFactory = mediaPresentationFactory;
         _flagProviders = flagProviders;
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18")]
-    public ItemMediaItemController(IEntityService entityService, IMediaPresentationFactory mediaPresentationFactory)
-        : this(entityService, mediaPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     [HttpGet]

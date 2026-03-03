@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
 public class SiblingsDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public SiblingsDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
         : base(entityService, flagProviders, contentTypeService)
     {

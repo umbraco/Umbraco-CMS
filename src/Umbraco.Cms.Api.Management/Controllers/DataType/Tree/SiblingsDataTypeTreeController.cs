@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
 public class SiblingsDataTypeTreeController : DataTypeTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public SiblingsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
         : base(entityService, flagProviders, dataTypeService)
     {

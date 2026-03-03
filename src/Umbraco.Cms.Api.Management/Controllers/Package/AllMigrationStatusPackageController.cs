@@ -19,19 +19,6 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     private readonly IPackagingService _packagingService;
     private readonly IPackagePresentationFactory _packagePresentationFactory;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper)
-        : this(packagingService, StaticServiceProvider.Instance.GetRequiredService<IPackagePresentationFactory>())
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper, IPackagePresentationFactory packagePresentationFactory)
-        : this(packagingService, packagePresentationFactory)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IPackagePresentationFactory packagePresentationFactory)
     {
         _packagingService = packagingService;

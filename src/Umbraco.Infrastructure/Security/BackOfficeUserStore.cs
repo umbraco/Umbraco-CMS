@@ -46,7 +46,6 @@ public class BackOfficeUserStore :
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
     /// </summary>
-    [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
         IEntityService entityService,

@@ -18,7 +18,6 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
 
-    [ActivatorUtilitiesConstructor]
     public SearchDocumentItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IDocumentPresentationFactory documentPresentationFactory,

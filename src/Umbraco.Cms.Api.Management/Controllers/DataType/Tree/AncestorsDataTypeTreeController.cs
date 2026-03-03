@@ -11,7 +11,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 [ApiVersion("1.0")]
 public class AncestorsDataTypeTreeController : DataTypeTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public AncestorsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
     : base(entityService, flagProviders, dataTypeService)
     {

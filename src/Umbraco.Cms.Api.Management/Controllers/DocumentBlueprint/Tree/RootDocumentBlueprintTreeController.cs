@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 [ApiVersion("1.0")]
 public class RootDocumentBlueprintTreeController : DocumentBlueprintTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public RootDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
         : base(entityService, flagProviders, documentPresentationFactory)
     {

@@ -11,7 +11,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 [ApiVersion("1.0")]
 public class AncestorsStaticFileTreeController : StaticFileTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public AncestorsStaticFileTreeController(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
         : base(physicalFileSystem, fileSystemTreeService)
     {

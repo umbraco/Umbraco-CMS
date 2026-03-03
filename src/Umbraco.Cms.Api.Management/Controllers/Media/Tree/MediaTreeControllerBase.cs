@@ -26,7 +26,6 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
-    [ActivatorUtilitiesConstructor]
     public MediaTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

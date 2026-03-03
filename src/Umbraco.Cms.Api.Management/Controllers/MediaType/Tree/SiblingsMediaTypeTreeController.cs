@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 
 public class SiblingsMediaTypeTreeController : MediaTypeTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public SiblingsMediaTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
         : base(entityService, flagProviders, mediaTypeService)
     {

@@ -23,7 +23,6 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaCollectionPresentationFactory _mediaCollectionPresentationFactory;
 
-    [ActivatorUtilitiesConstructor]
     public ByKeyMediaCollectionController(
         IMediaListViewService mediaListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -35,21 +34,6 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
         _mediaListViewService = mediaListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _mediaCollectionPresentationFactory = mediaCollectionPresentationFactory;
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in Umbraco 18")]
-    public ByKeyMediaCollectionController(
-        IMediaListViewService mediaListViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper,
-        IMediaCollectionPresentationFactory mediaCollectionPresentationFactory)
-        : this(
-            mediaListViewService,
-            backOfficeSecurityAccessor,
-            mapper,
-            mediaCollectionPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     [HttpGet]

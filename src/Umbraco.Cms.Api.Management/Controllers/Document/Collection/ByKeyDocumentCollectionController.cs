@@ -22,7 +22,6 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDocumentCollectionPresentationFactory _documentCollectionPresentationFactory;
 
-    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

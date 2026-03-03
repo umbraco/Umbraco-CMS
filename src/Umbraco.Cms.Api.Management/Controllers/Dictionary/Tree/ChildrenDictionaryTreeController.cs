@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 [ApiVersion("1.0")]
 public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public ChildrenDictionaryTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders, dictionaryItemService)
     {

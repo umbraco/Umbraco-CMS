@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 [ApiVersion("1.0")]
 public class RootDataTypeTreeController : DataTypeTreeControllerBase
 {
-    [ActivatorUtilitiesConstructor]
     public RootDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
     : base(entityService, flagProviders, dataTypeService)
     {
