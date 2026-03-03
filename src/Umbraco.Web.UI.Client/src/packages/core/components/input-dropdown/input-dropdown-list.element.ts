@@ -2,7 +2,7 @@ import { css, customElement, html, property } from '@umbraco-cms/backoffice/exte
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-dropdown-list')
 export class UmbInputDropdownListElement extends UmbFormControlMixin<
@@ -11,7 +11,7 @@ export class UmbInputDropdownListElement extends UmbFormControlMixin<
 	undefined
 >(UmbLitElement, undefined) {
 	@property({ type: Array })
-	public set options(value: Array<Option> | undefined) {
+	public set options(value: Array<UUISelectOption> | undefined) {
 		this.#options = value;
 
 		this.value =
@@ -20,10 +20,10 @@ export class UmbInputDropdownListElement extends UmbFormControlMixin<
 				.map((option) => option.value)
 				.join(', ') ?? undefined;
 	}
-	public get options(): Array<Option> | undefined {
+	public get options(): Array<UUISelectOption> | undefined {
 		return this.#options;
 	}
-	#options?: Array<Option> | undefined;
+	#options?: Array<UUISelectOption> | undefined;
 
 	@property({ type: String })
 	public placeholder?: string;
