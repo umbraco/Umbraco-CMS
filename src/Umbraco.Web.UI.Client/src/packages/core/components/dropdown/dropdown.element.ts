@@ -43,6 +43,9 @@ export class UmbDropdownElement extends UmbLitElement {
 	@property({ type: Boolean })
 	compact = false;
 
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
+
 	@property({ type: Boolean, attribute: 'hide-expand' })
 	hideExpand = false;
 
@@ -87,7 +90,8 @@ export class UmbDropdownElement extends UmbLitElement {
 				.look=${this.look}
 				.color=${this.color}
 				.label=${this.label ?? ''}
-				.compact=${this.compact}>
+				.compact=${this.compact}
+				?disabled=${this.disabled}>
 				<slot name="label"></slot>
 				${when(
 					!this.hideExpand,

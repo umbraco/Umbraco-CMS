@@ -3,8 +3,8 @@ import { html, customElement, state, css } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-@customElement('example-content-type-alias-condition-workspace-view')
-export class ExampleContentTypeAliasConditionWorkspaceViewElement extends UmbLitElement {
+@customElement('example-workspace-content-type-alias-condition-workspace-view')
+export class ExampleWorkspaceContentTypeAliasConditionWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _contentTypeAliases: string[] = [];
 
@@ -39,10 +39,10 @@ export class ExampleContentTypeAliasConditionWorkspaceViewElement extends UmbLit
 	];
 }
 
-export { ExampleContentTypeAliasConditionWorkspaceViewElement as element };
+export { ExampleWorkspaceContentTypeAliasConditionWorkspaceViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-content-type-alias-condition-workspace-view': ExampleContentTypeAliasConditionWorkspaceViewElement;
+		'example-workspace-content-type-alias-condition-workspace-view': ExampleWorkspaceContentTypeAliasConditionWorkspaceViewElement;
 	}
 }
