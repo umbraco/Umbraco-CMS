@@ -331,6 +331,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	override render() {
+		const inputLabel = this.localize.term('placeholders_search');
 		return html`
 			<div id="top">
 				<div id="search-icon">
@@ -346,8 +347,8 @@ export class UmbSearchModalElement extends UmbLitElement {
 						name="search-input"
 						type="text"
 						autocomplete="off"
-						placeholder=${this.localize.term('placeholders_search')}
-						aria-label=${this.localize.term('placeholders_search')}
+						placeholder=${inputLabel}
+						aria-label=${inputLabel}
 						value=${this._search}
 						@input=${this.#onSearchChange}
 						@blur=${() => this.#setShowFakeCursor(true)}
