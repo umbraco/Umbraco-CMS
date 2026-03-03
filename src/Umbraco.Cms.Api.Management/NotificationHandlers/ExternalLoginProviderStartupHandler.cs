@@ -39,6 +39,6 @@ internal sealed class ExternalLoginProviderStartupHandler : INotificationAsyncHa
             return;
         }
 
-        await _backOfficeExternalLoginProviders.InvalidateSessionsIfExternalLoginProvidersChanged();
+        await _backOfficeExternalLoginProviders.InvalidateSessionsIfExternalLoginProvidersChangedAsync();
     }
 }

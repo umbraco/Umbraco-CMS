@@ -77,7 +77,7 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
     }
 
     /// <inheritdoc />
-    public async Task InvalidateSessionsIfExternalLoginProvidersChanged()
+    public async Task InvalidateSessionsIfExternalLoginProvidersChangedAsync()
     {
         var previousExternalLoginProvidersValue = await _keyValueService.GetValueAsync(ExternalLoginProvidersKey);
         var currentExternalLoginProvidersValue = string.Join("|", _externalLogins.Keys.OrderBy(key => key));

@@ -29,5 +29,5 @@ public interface IBackOfficeExternalLoginProviders
     ///     If they are different, this will invalidate backoffice sessions and clear external logins for removed providers
     ///     if the external login provider setup has changed.
     /// </summary>
-    Task InvalidateSessionsIfExternalLoginProvidersChanged();
+    Task InvalidateSessionsIfExternalLoginProvidersChangedAsync();
 }
