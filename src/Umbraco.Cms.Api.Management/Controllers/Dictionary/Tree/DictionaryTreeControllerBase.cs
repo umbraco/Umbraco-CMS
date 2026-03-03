@@ -30,7 +30,10 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     {
     }
 
-    public DictionaryTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
+    public DictionaryTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders) =>
         DictionaryItemService = dictionaryItemService;
 

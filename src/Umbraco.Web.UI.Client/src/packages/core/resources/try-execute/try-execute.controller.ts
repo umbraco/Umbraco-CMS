@@ -11,6 +11,14 @@ import type { UmbApiError } from '../umb-error.js';
  */
 const IGNORED_ERROR_CODES = [401, 403, 404];
 
+/**
+ * Operation statuses that are ignored for notifications.
+ * These are operation statuses where the server already sends a notification
+ * via the Umb-Notifications response header, so we avoid showing a duplicate
+ * notification from the ProblemDetails body.
+ */
+const IGNORED_OPERATION_STATUSES = ['CancelledByNotification'];
+
 export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 	#abortSignal?: AbortSignal;
 
@@ -60,6 +68,15 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 			if (IGNORED_ERROR_CODES.includes(apiError.problemDetails.status)) {
 				// Non-fatal errors that the UI can handle gracefully
 				// so we avoid showing a notification
+				return;
+			}
+
+			if (
+				apiError.problemDetails.operationStatus &&
+				IGNORED_OPERATION_STATUSES.includes(apiError.problemDetails.operationStatus)
+			) {
+				// These operation statuses are already handled by the Umb-Notifications header interceptor
+				// so we avoid showing a duplicate notification
 				return;
 			}
 

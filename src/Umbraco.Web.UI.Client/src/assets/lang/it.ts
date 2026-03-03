@@ -1261,6 +1261,7 @@ export default {
 			'Non ci sono proprietà definite per questa tab. Clicca sul link "aggiungi una nuova proprietà" in cima per creare una nuova proprietà.',
 		createMatchingTemplate: 'Crea un template corrispondente',
 		addIcon: 'Aggiungi icona',
+		changeIcon: 'Cambia icona',
 	},
 	sort: {
 		sortOrder: 'Ordinamento',
@@ -1739,6 +1740,7 @@ export default {
 		noLockouts: 'non è stato bloccato',
 		noPasswordChange: 'La password non è stata modificata',
 		confirmNewPassword: 'Conferma la nuova password',
+		confirmPassword: 'Conferma password',
 		changePasswordDescription:
 			"È possibile modificare la password di accesso al backoffice Umbraco compilando il form sottostante e clicca sul pulsante 'Modifica password'",
 		contentChannel: 'Contenuto del canale',

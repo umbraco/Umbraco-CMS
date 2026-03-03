@@ -84,7 +84,7 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
 
         if (_expires)
         {
-            Cache.Insert(key, () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
+            Cache.Insert(key, () => new DeepCloneableList<TEntity>(entities), RepositoryCacheConstants.DefaultCacheDuration, true);
         }
         else
         {
