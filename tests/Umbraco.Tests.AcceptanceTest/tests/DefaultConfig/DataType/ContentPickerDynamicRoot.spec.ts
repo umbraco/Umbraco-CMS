@@ -28,7 +28,6 @@ test('can configure content root as dynamic root origin', async ({umbracoApi, um
 
 test('can change dynamic root origin from root to content root', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
   await umbracoUi.dataType.clickDefineDynamicRootButton();
   await umbracoUi.dataType.chooseDynamicRootOrigin('Root');
@@ -72,7 +71,6 @@ test('can add a query step to content root dynamic root', async ({umbracoApi, um
 
 test('can see content root origin in the origin picker modal', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
