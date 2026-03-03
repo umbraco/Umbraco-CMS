@@ -1,4 +1,5 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbContentTypeStructureDataSourceConstructor<ItemType> {
@@ -10,4 +11,5 @@ export interface UmbContentTypeStructureDataSource<ItemType> {
 		unique: string | null,
 		parentContentUnique: string | null,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>>;
+	getAllowedParentsOf?(unique: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>>;
 }

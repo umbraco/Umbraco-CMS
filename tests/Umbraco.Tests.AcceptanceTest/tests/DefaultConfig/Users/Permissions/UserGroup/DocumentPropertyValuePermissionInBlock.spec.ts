@@ -1,5 +1,5 @@
-import { expect } from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {expect} from '@playwright/test';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -49,7 +49,7 @@ test('can see property values in block list with UI read but not UI write permis
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready. 
+// Remove .skip when the front-end is ready.
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
 test.skip('can edit property values in block list with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
@@ -108,7 +108,7 @@ test('can see property values in block grid with UI read but not UI write permis
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready. 
+// Remove .skip when the front-end is ready.
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
 test.skip('can edit property values in block grid with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange

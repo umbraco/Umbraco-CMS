@@ -249,6 +249,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				position: relative;
 				display: block;
 				width: 100%;
+				margin-bottom: 1px;
 
 				box-sizing: border-box;
 				border-radius: var(--uui-border-radius);
