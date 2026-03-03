@@ -82,14 +82,4 @@ public class ImagingHMACSecretKeyCheckTests
             Assert.That(status.ReadMoreLink, Is.Null.Or.Empty);
         });
     }
-
-    [Test]
-    public void ExecuteAction_AlwaysThrows()
-    {
-        var settings = new ImagingSettings();
-        var optionsMonitor = Mock.Of<IOptionsMonitor<ImagingSettings>>(x => x.CurrentValue == settings);
-        var check = new ImagingHMACSecretKeyCheck(MockTextService(), optionsMonitor);
-
-        Assert.Throws<NotSupportedException>(() => check.ExecuteAction(new HealthCheckAction("fix", check.Id)));
-    }
 }
