@@ -26,13 +26,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _isRestricted = true;
 
-	/**
-	 * Whether we have confirmed the server is running in production mode.
-	 * Used to show the warning message only after confirmation.
-	 */
-	@state()
-	private _isConfirmedProductionMode = false;
-
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
@@ -45,8 +38,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			this.observe(context?.isProductionMode, (isProductionMode) => {
 				// Restricted until we confirm it's NOT production mode (safe default).
 				this._isRestricted = isProductionMode !== false;
-				// Only show the warning when we've confirmed production mode.
-				this._isConfirmedProductionMode = isProductionMode === true;
 			});
 		});
 
@@ -83,26 +74,12 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	#renderProductionModeTag() {
-		if (!this._isConfirmedProductionMode) return nothing;
-		return html`
-			<uui-tag
-				id="production-mode-tag"
-				look="primary"
-				color="warning"
-				title=${this.localize.term('speechBubbles_runtimeModeNotEditable')}>
-				<umb-localize key="speechBubbles_productionMode">Production Mode</umb-localize>
-			</uui-tag>
-		`;
-	}
-
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor>
 				<umb-workspace-header-name-editable
 					slot="header"
 					?readonly=${this._isNew === false || this._isRestricted}></umb-workspace-header-name-editable>
-				${this.#renderProductionModeTag()}
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu
@@ -189,11 +166,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				justify-content: flex-end;
 				gap: var(--uui-size-space-3);
 				width: 100%;
-			}
-
-			#production-mode-tag {
-				margin: var(--uui-size-layout-1);
-				margin-bottom: 0;
 			}
 		`,
 	];

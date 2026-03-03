@@ -36,4 +36,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.PartialView.ProductionMode',
+		name: 'Partial View Production Mode',
+		api: () =>
+			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
+		element: () =>
+			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
+		weight: 60,
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: true,
+			},
+		],
+	},
 ];
