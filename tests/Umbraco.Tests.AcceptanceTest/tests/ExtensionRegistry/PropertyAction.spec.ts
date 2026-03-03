@@ -1,5 +1,5 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import { expect } from '@playwright/test';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {expect} from '@playwright/test';
 
 // Content
 const contentName = 'TestContent';
@@ -22,7 +22,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can read value from textstring editor using read property action', async ({umbracoApi, umbracoUi}) => {
-  // Arrange 
+  // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, readTextValue, dataTypeName);
@@ -39,7 +39,7 @@ test('can read value from textstring editor using read property action', async (
 });
 
 test('can write value to textstring editor using write property action', async ({umbracoApi, umbracoUi}) => {
-  // Arrange 
+  // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
   const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, '', dataTypeName);

@@ -14,4 +14,23 @@
     <UmbracoJsonSchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Cms.json" Weight="-90" />
     <UmbracoPackageSchemaFiles Include="$(MSBuildThisFileDirectory)..\umbraco-package-schema.json" Weight="-90" />
   </ItemGroup>
+
+  <!--
+    The Razor editor in VS2026 and the C# extension for VS Code uses the Razor source generator
+    for IDE functionality. We need to add some things to make sure it works correctly, but we
+    only do them for design time builds, so that we don't impact regular builds or CI.
+    We also have an escape hatch in case it does cause issues, users can set the appropriate property
+    in their project file to disable this.
+  -->
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true' and '$(EnableCohostEditorCompatibility)' != 'false'">
+    <!-- 
+      We have to make sure the source generator can see the .cshtml files, so make them AdditionalFiles.
+    -->
+    <AdditionalFiles Include="**\*.cshtml" />
+
+    <!--
+      Make sure the source generator knows where the project is, so it can compute target paths.
+    -->
+    <CompilerVisibleProperty Include="MSBuildProjectDirectory" />
+  </ItemGroup>
 </Project>

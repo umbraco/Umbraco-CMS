@@ -5,7 +5,6 @@ import type {
 	UmbLinkPickerModalValue,
 } from './link-picker-modal.token.js';
 import { css, customElement, html, nothing, query, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import {
 	umbBindToValidation,
 	UmbObserveValidationStateController,
@@ -31,9 +30,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#propertyLayoutOrientation: 'horizontal' | 'vertical' = 'vertical';
 
 	#validationContext = new UmbValidationContext(this);
-
-	@state()
-	private _allowedMediaTypeUniques?: Array<string>;
 
 	@state()
 	private _config: UmbLinkPickerConfig = {
@@ -73,16 +69,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			});
 		}
 
-		this.#getMediaTypes();
 		this.populateLinkUrl();
-	}
-
-	async #getMediaTypes() {
-		// Get all the media types, excluding the folders, so that files are selectable media items.
-		const mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
-		const { data: mediaTypes } = await mediaTypeStructureRepository.requestAllowedChildrenOf(null, null);
-		this._allowedMediaTypeUniques =
-			(mediaTypes?.items.map((x) => x.unique).filter((x) => x && !isUmbracoFolder(x)) as Array<string>) ?? [];
 	}
 
 	async populateLinkUrl() {
@@ -353,7 +340,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				label=${this.localize.term('general_media')}>
 				<umb-input-media
 					slot="editor"
-					.allowedContentTypeIds=${this._allowedMediaTypeUniques}
 					.max=${1}
 					.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
 					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>

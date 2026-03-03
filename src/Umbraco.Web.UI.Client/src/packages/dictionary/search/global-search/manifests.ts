@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Dictionary',
 			searchProviderAlias: UMB_DICTIONARY_SEARCH_PROVIDER_ALIAS,
+			sectionAlias: UMB_TRANSLATION_SECTION_ALIAS,
 		},
 		conditions: [
 			{

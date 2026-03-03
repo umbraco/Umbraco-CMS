@@ -1,10 +1,8 @@
-import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
+import { UmbTiptapToolbarActionButtonApiBase } from '../tiptap-toolbar-action-button-api-base.js';
 import type { Editor } from '../../externals.js';
 
-export default class UmbTiptapToolbarRedoExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapToolbarRedoExtensionApi extends UmbTiptapToolbarActionButtonApiBase {
 	override isActive = (editor?: Editor) => editor?.can().redo() === true;
-
-	override isDisabled = (editor?: Editor) => !this.isActive(editor);
 
 	override execute(editor?: Editor) {
 		editor?.chain().focus().redo().run();
