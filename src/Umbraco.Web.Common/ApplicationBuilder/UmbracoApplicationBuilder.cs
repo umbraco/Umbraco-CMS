@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -73,7 +74,11 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseUmbracoMediaFileProvider();
 
-        AppBuilder.UseUmbracoBackOfficeRewrites();
+        // Only use backoffice rewrites if backoffice is enabled
+        if (ApplicationServices.GetService<IBackOfficeEnabledMarker>() is not null)
+        {
+            AppBuilder.UseUmbracoBackOfficeRewrites();
+        }
 
         AppBuilder.UseStaticFiles();
 

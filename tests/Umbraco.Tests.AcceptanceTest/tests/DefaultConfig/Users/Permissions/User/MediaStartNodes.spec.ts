@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { ConstantHelper, test } from "@umbraco/playwright-testhelpers";
+import { ConstantHelper, test } from "@umbraco/acceptance-test-helpers";
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = { cookie: "", accessToken: "", refreshToken: "" };
@@ -19,20 +19,19 @@ test.beforeEach(async ({ umbracoApi }) => {
   await umbracoApi.media.ensureNameNotExists(rootFolderName);
   await umbracoApi.media.ensureNameNotExists(childFolderOneName);
   await umbracoApi.media.ensureNameNotExists(childFolderTwoName);
-  rootFolderId = await umbracoApi.media.createDefaultMediaFolder(
-    rootFolderName
-  );
+  rootFolderId =
+    await umbracoApi.media.createDefaultMediaFolder(rootFolderName);
   childFolderOneId = await umbracoApi.media.createDefaultMediaFolderAndParentId(
     childFolderOneName,
-    rootFolderId
+    rootFolderId,
   );
   await umbracoApi.media.createDefaultMediaFolderAndParentId(
     childFolderTwoName,
-    rootFolderId
+    rootFolderId,
   );
   userGroupId =
     await umbracoApi.userGroup.createSimpleUserGroupWithMediaSection(
-      userGroupName
+      userGroupName,
     );
 });
 
@@ -41,7 +40,7 @@ test.afterEach(async ({ umbracoApi }) => {
   await umbracoApi.loginToAdminUser(
     testUserCookieAndToken.cookie,
     testUserCookieAndToken.accessToken,
-    testUserCookieAndToken.refreshToken
+    testUserCookieAndToken.refreshToken,
   );
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
@@ -62,12 +61,12 @@ test("can see root media start node and children", async ({
     userGroupId,
     [],
     false,
-    [rootFolderId]
+    [rootFolderId],
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 
@@ -93,12 +92,12 @@ test("can see parent of start node but not access it", async ({
     userGroupId!,
     [],
     false,
-    [childFolderOneId!]
+    [childFolderOneId!],
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 
@@ -106,7 +105,6 @@ test("can see parent of start node but not access it", async ({
   await umbracoUi.user.goToSection(ConstantHelper.sections.media, false);
 
   // Assert
-
   // Get initial URL (should be on media section)
   await umbracoUi.waitForTimeout(100); // Wait for workspace to load
   const initialUrl = umbracoUi.page.url();
@@ -124,7 +122,7 @@ test("can see parent of start node but not access it", async ({
   await umbracoUi.media.isChildMediaVisible(
     rootFolderName,
     childFolderTwoName,
-    false
+    false,
   );
 });
 
@@ -140,12 +138,12 @@ test("see no-access view when deep-linking to restricted media", async ({
     userGroupId!,
     [],
     false,
-    [childFolderOneId!]
+    [childFolderOneId!],
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 
@@ -155,7 +153,7 @@ test("see no-access view when deep-linking to restricted media", async ({
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.page.goto(
-    `${umbracoUi.page.url().replace('/collection', '')}/workspace/media/edit/${rootFolderId!}`
+    `${umbracoUi.page.url().replace("/collection", "")}/workspace/media/edit/${rootFolderId!}`,
   );
   await umbracoUi.waitForTimeout(100); // Wait for workspace to load
   await umbracoUi.media.doesMediaWorkspaceHaveText("Access denied");
@@ -170,12 +168,12 @@ test("can not see any media when no media start nodes specified", async ({
     testUser.name,
     testUser.email,
     testUser.password,
-    userGroupId
+    userGroupId,
   );
   testUserCookieAndToken = await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
-    testUser.password
+    testUser.password,
   );
   await umbracoUi.goToBackOffice();
 

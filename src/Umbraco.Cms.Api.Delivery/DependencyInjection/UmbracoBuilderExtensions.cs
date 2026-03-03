@@ -31,8 +31,20 @@ namespace Umbraco.Extensions;
 
 public static class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Add services for the Umbraco Delivery API (headless content delivery).
+    /// </summary>
+    /// <remarks>
+    /// This method assumes that either <c>AddBackOffice()</c> or <c>AddCore()</c> has already been called.
+    /// It registers Delivery API-specific services such as controllers, output caching, and member authentication.
+    /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddDeliveryApi(this IUmbracoBuilder builder)
     {
+        // Delivery API supports member authentication for protected content
+        builder.AddMembersIdentity();
+
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategy>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategyV2>();

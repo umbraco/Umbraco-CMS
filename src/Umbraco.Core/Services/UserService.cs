@@ -2053,7 +2053,7 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
-            await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Document]);
+            await GetPermissionsAsync(userKey, idAttempt.Result, objectTypes);
         scope.Complete();
 
         return permissions;
