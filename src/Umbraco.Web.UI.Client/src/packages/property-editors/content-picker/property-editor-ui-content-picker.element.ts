@@ -158,9 +158,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		// The backend expects null for CurrentKey when creating new content and falls back to ParentKey.
 		const isNewOrBlock =
 			workspaceContext?.getEntityType() === 'block' ||
-			workspaceContext && 'getIsNew' in workspaceContext
-				? (workspaceContext as unknown as { getIsNew(): boolean | undefined }).getIsNew() === true
-				: false;
+			workspaceContext && 'getIsNew' in workspaceContext &&
+			(workspaceContext as unknown as { getIsNew(): boolean | undefined }).getIsNew() === true;
 
 		// Use parent entity context to get the parent unique. Its observable starts as undefined,
 		// so asPromise() properly waits for the async structure loading to complete.
