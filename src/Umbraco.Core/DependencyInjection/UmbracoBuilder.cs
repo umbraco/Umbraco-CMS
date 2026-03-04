@@ -282,6 +282,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ISiteIdentifierService, SiteIdentifierService>();
+
+            // Register HMAC secret key service for imaging URL authentication
+            Services.AddUnique<IHmacSecretKeyService, HmacSecretKeyService>();
             Services.AddUnique<ITelemetryService, TelemetryService>();
 
             Services.AddUnique<IKeyValueService, KeyValueService>();
