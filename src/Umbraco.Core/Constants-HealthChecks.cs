@@ -127,6 +127,12 @@ public static partial class Constants
                 public const string CspHeaderCheck = "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP";
 
                 /// <summary>
+                ///     The documentation link for the imaging HMAC secret key check.
+                /// </summary>
+                public const string ImagingHMACSecretKeyCheck =
+                    "https://docs.umbraco.com/umbraco-cms/reference/configuration/imagingsettings";
+
+                /// <summary>
                 ///     Contains documentation links for HTTPS health checks.
                 /// </summary>
                 public static class HttpsCheck

@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // DocumentType
 const documentTypeName = 'TestDocumentType';
@@ -104,8 +104,7 @@ test('can copy and paste a single block into the same document but different gro
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
 });
 
-// Remove skip after this issue is resolved: https://github.com/umbraco/Umbraco-CMS/issues/20680
-test.skip('can copy and paste a single block into another document', async ({umbracoApi, umbracoUi}) => {
+test('can copy and paste a single block into another document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.ensureNameNotExists(secondContentName);
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditorAndBlockWithValue(contentName, documentTypeName, blockGridDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, richTextDataTypeUiAlias);

@@ -38,6 +38,10 @@ public class PartialViewControllerBase : FileSystemManagementControllerBase
                     .WithDetail("The partial view name is invalid.")
                     .Build()),
                 PartialViewOperationStatus.NotFound => PartialViewNotFound(),
+                PartialViewOperationStatus.NotAllowedInProductionMode => BadRequest(problemDetailsBuilder
+                    .WithTitle("Not allowed in production mode")
+                    .WithDetail("Partial view modifications are not allowed when running in production mode.")
+                    .Build()),
                 _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                     .WithTitle("Unknown partial view operation status.")
                     .Build()),
