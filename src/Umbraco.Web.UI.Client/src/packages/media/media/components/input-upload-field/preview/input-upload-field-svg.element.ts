@@ -17,11 +17,11 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement impleme
 		css`
 			:host {
 				height: 100%;
-				min-height: 240px;
+				min-height: 20px;
 				max-height: 400px;
 
 				width: fit-content;
-				min-width: 240px;
+				min-width: 320px;
 				max-width: 100%;
 			}
 

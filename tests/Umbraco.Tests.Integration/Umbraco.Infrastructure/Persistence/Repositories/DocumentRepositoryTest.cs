@@ -1237,4 +1237,34 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(_textpage.Id, content.Id);
         }
     }
+
+    /// <summary>
+    /// Verifies that retrieving all documents from the GUID-based repository returns all items when the cache is
+    /// populated.
+    /// </summary>
+    /// <remarks>
+    /// Verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/21756 as this test fails before
+    /// the fix is applied.
+    /// </remarks>
+    [Test]
+    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
+
+        var content = CreateContent(repository, contentTypeRepository);
+
+        var guidRepo = (IReadRepository<Guid, IContent>)repository;
+
+        var result = guidRepo.GetMany().ToArray();
+        Assert.IsNotEmpty(result);
+        Assert.That(result.Any(c => c.Key == content.Key));
+    }
 }

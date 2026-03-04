@@ -22,7 +22,6 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     private readonly ILocalizedTextService _localizedTextService;
     private readonly ILogger<PublishedUrlInfoProvider> _logger;
     private readonly UriUtility _uriUtility;
-    private readonly IVariationContextAccessor _variationContextAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedUrlInfoProvider" /> class.
@@ -43,7 +42,9 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         ILocalizedTextService localizedTextService,
         ILogger<PublishedUrlInfoProvider> logger,
         UriUtility uriUtility,
-        IVariationContextAccessor variationContextAccessor)
+#pragma warning disable IDE0060 // Remove unused parameter
+        IVariationContextAccessor variationContextAccessor) // TODO (V18): Remove this unused parameter.
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         _publishedUrlProvider = publishedUrlProvider;
         _languageService = languageService;
@@ -52,21 +53,16 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         _localizedTextService = localizedTextService;
         _logger = logger;
         _uriUtility = uriUtility;
-        _variationContextAccessor = variationContextAccessor;
     }
 
     /// <inheritdoc />
     public async Task<ISet<UrlInfo>> GetAllAsync(IContent content)
     {
         HashSet<UrlInfo> urlInfos = [];
+        var isInvariant = !content.ContentType.VariesByCulture();
 
-        // For invariant content, only return the URL for the default language.
-        // Invariant content doesn't vary by culture, so it only has one URL.
-        IEnumerable<string> cultures = content.ContentType.VariesByCulture()
-            ? await _languageService.GetAllIsoCodesAsync()
-            : [(await _languageService.GetDefaultIsoCodeAsync())];
+        IEnumerable<string> cultures = await GetCulturesForUrlLookupAsync(content);
 
-        // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
         foreach (var culture in cultures)
         {
             var url = _publishedUrlProvider.GetUrl(content.Key, culture: culture);
@@ -74,6 +70,13 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             // Handle "could not get URL"
             if (url is "#" or "#ex")
             {
+                // For invariant content, a missing URL just means there's no domain
+                // for this culture — not a problem worth reporting.
+                if (isInvariant)
+                {
+                    continue;
+                }
+
                 urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
                 continue;
             }
@@ -104,6 +107,33 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         }
 
         return urlInfos;
+    }
+
+    /// <summary>
+    /// Gets the cultures to query URLs for.
+    /// For invariant content, returns only cultures that have a domain assigned to the content
+    /// or one of its ancestors. If no domains exist, returns only the default culture.
+    /// For variant content, returns all cultures.
+    /// </summary>
+    private async Task<IEnumerable<string>> GetCulturesForUrlLookupAsync(IContent content)
+    {
+        if (content.ContentType.VariesByCulture())
+        {
+            return await _languageService.GetAllIsoCodesAsync();
+        }
+
+        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+        var ancestorOrSelfIds = content.AncestorIds().Append(content.Id).ToHashSet();
+        var domainCultures = umbracoContext.Domains.GetAll(true)
+            .Where(d => ancestorOrSelfIds.Contains(d.ContentId))
+            .Select(d => d.Culture)
+            .WhereNotNull()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return domainCultures.Count > 0
+            ? domainCultures
+            : [await _languageService.GetDefaultIsoCodeAsync()];
     }
 
     private async Task<Attempt<UrlInfo?>> VerifyCollisionAsync(IContent content, string url, string culture)
