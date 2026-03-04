@@ -408,7 +408,7 @@ internal sealed class ElementEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    protected override IElement? Copy(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override async Task<IElement?> CopyAsync(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         Guid? newParentKey;
         if (newParentId is Constants.System.Root)
@@ -435,7 +435,7 @@ internal sealed class ElementEditingService
         copy.ParentId = newParentId;
 
         var copyingNotification = new ElementCopyingNotification(element, copy, newParentId, newParentKey, eventMessages);
-        if (scope.Notifications.PublishCancelable(copyingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(copyingNotification))
         {
             scope.Complete();
             return null;
@@ -445,6 +445,7 @@ internal sealed class ElementEditingService
         copy.Published = false;
 
         // update creator and writer IDs
+        var userId = await GetUserIdAsync(userKey);
         copy.CreatorId = userId;
         copy.WriterId = userId;
 
@@ -457,6 +458,8 @@ internal sealed class ElementEditingService
         scope.Notifications.Publish(
             new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
+
+        await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());
 
         scope.Complete();
 

@@ -6,7 +6,8 @@ import { manifests as entityActionManifests } from './entity-action/manifests.js
 import { manifests as entityBulkActionManifests } from './entity-bulk-action/manifests.js';
 import { manifests as entityManifests } from './entity/manifests.js';
 import { manifests as entitySignManifests } from './entity-sign/manifests.js';
-import { manifests as extensionManifests } from './extension-registry/manifests.js';
+import { manifests as extensionManifests } from './extension/manifests.js';
+import { manifests as extensionRegistryManifests } from './extension-registry/manifests.js';
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
@@ -18,8 +19,10 @@ import { manifests as propertyEditorManifests } from './property-editor/manifest
 import { manifests as propertySortModeManifests } from './property-sort-mode/manifests.js';
 import { manifests as propertyManifests } from './property/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
+import { manifests as routerManifests } from './router/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
+import { manifests as serverManifests } from './server/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
 import { manifests as temporaryFileManifests } from './temporary-file/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
@@ -38,6 +41,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...entityManifests,
 	...entitySignManifests,
 	...extensionManifests,
+	...extensionRegistryManifests,
 	...iconRegistryManifests,
 	...localizationManifests,
 	...menuManifests,
@@ -49,8 +53,10 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertySortModeManifests,
 	...propertyManifests,
 	...recycleBinManifests,
+	...routerManifests,
 	...searchManifests,
 	...sectionManifests,
+	...serverManifests,
 	...serverFileSystemManifests,
 	...temporaryFileManifests,
 	...themeManifests,

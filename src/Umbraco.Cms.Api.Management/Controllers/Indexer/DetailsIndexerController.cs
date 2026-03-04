@@ -37,11 +37,11 @@ public class DetailsIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(IndexResponseModel), StatusCodes.Status200OK)]
     [EndpointSummary("Gets indexer details.")]
     [EndpointDescription("Gets detailed information about the indexer identified by the provided name.")]
-    public Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
+    public async Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
-            return Task.FromResult<ActionResult<IndexResponseModel?>>(_indexPresentationFactory.Create(index));
+            return await _indexPresentationFactory.CreateAsync(index);
         }
 
         var invalidModelProblem = new ProblemDetails
@@ -52,6 +52,6 @@ public class DetailsIndexerController : IndexerControllerBase
             Type = "Error",
         };
 
-        return Task.FromResult<ActionResult<IndexResponseModel?>>(NotFound(invalidModelProblem));
+        return NotFound(invalidModelProblem);
     }
 }

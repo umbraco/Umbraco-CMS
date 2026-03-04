@@ -8,6 +8,7 @@ import { UmbMemberGroupItemRepository, type UmbInputMemberGroupElement } from '@
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDocumentItemRepository, type UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-public-access-modal')
 export class UmbPublicAccessModalElement extends UmbModalBaseElement<
@@ -91,12 +92,18 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			const { data, error } = await this.#publicAccessRepository.read(this.#unique);
 
 			if (error) {
+				// A 404 means no direct public access entry exists on this node.
+				// This is expected for descendants of a protected document — they inherit
+				// protection from an ancestor. Let the user create a new entry via the setup wizard.
+				if (UmbApiError.isUmbApiError(error) && error.status === 404) {
+					return;
+				}
+
 				this._loadError = 'Failed to load public access settings';
 				return;
 			}
 
 			if (!data) {
-				this._loadError = 'No public access data returned';
 				return;
 			}
 

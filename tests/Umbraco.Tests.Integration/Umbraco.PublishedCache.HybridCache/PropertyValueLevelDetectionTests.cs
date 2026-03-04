@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
@@ -10,7 +11,6 @@ using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using PublishedElement = Umbraco.Cms.Core.PublishedCache.PublishedElement;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
@@ -107,15 +107,16 @@ internal sealed class PropertyValueLevelDetectionTests : UmbracoIntegrationTestW
         var elementType = ContentTypeBuilder.CreateSimpleContentType("umbElement");
         elementType.IsElement = true;
         await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
-        var publishedElementType = PublishedContentTypeFactory.CreateContentType(elementType);
+        var blockElementService = GetRequiredService<IBlockElementService>();
+        var element = await blockElementService.BuildElementAsync(
+            new BlockItemData(Guid.NewGuid(), elementType.Key, "umbElement")
+            {
+                Values = [new BlockPropertyValue { Alias = "title", Value = titleValue, }]
+            },
+            false);
 
-        var element = new PublishedElement(
-            publishedElementType,
-            Guid.NewGuid(),
-            new Dictionary<string, object> { { "title", titleValue } },
-            false,
-            new VariationContext());
 
+        Assert.IsNotNull(element);
         Assert.AreEqual(expectHasValue, element.HasValue("title"));
 
         // NOTE: the .Value() extensions always end up returning the source value, no matter if the property value

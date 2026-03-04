@@ -1,8 +1,10 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -13,6 +15,10 @@ internal sealed partial class ContentTypeEditingServiceTests
     [TestCase(true)]
     public async Task Can_Create_With_All_Basic_Settings(bool isElement)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
         createModel.Description = "This is the Test description";
         createModel.Icon = "icon icon-something";
@@ -33,6 +39,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("This is the Test description", contentType.Description);
         Assert.AreEqual("icon icon-something", contentType.Icon);
         Assert.IsTrue(contentType.AllowedAsRoot);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [TestCase(false, false)]
@@ -41,6 +49,10 @@ internal sealed partial class ContentTypeEditingServiceTests
     [TestCase(true, true)]
     public async Task Can_Create_With_Variation(bool variesByCulture, bool variesBySegment)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test");
         createModel.VariesByCulture = variesByCulture;
         createModel.VariesBySegment = variesBySegment;
@@ -54,12 +66,18 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(variesByCulture, contentType.VariesByCulture());
         Assert.AreEqual(variesBySegment, contentType.VariesBySegment());
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Create_In_A_Folder(bool isElement)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var containerResult = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
         Assert.IsTrue(containerResult.Success);
         var container = containerResult.Result?.Entity;
@@ -74,12 +92,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsNotNull(contentType);
         Assert.AreEqual(container.Id, contentType.ParentId);
         Assert.AreEqual(isElement, contentType.IsElement);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [TestCase(false)]
     [TestCase(true)]
     public async Task Can_Create_With_Properties_In_A_Container(bool isElement)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
         var container = ContentTypePropertyContainerModel();
         createModel.Containers = new[] { container };
@@ -101,12 +125,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("testProperty", contentType.PropertyTypes.First().Alias);
         Assert.AreEqual("testProperty", contentType.PropertyGroups.First().PropertyTypes!.First().Alias);
         Assert.IsEmpty(contentType.NoGroupPropertyTypes);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [TestCase(false)]
     [TestCase(true)]
     public async Task Can_Create_With_Orphaned_Properties(bool isElement)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
 
         var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty");
@@ -125,11 +155,17 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("testProperty", contentType.PropertyTypes.First().Alias);
         Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
         Assert.AreEqual("testProperty", contentType.NoGroupPropertyTypes.First().Alias);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Can_Specify_Key()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var key = new Guid("33C326F6-CB5E-43D6-9730-E946AA5F9C7B");
         var createModel = ContentTypeCreateModel(key: key);
 
@@ -143,11 +179,17 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsNotNull(contentType);
             Assert.AreEqual(key, contentType.Key);
         });
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Can_Specify_PropertyType_Key()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var propertyTypeKey = new Guid("82DDEBD8-D2CA-423E-B88D-6890F26152B4");
 
         var propertyTypeContainer = ContentTypePropertyContainerModel();
@@ -169,11 +211,17 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsNotNull(propertyType);
             Assert.AreEqual(propertyTypeKey, propertyType.Key);
         });
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Can_Assign_Allowed_Types()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var allowedOne = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Allowed One", "allowedOne"), Constants.Security.SuperUserKey)).Result;
         var allowedTwo = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Allowed Two", "allowedTwo"), Constants.Security.SuperUserKey)).Result;
         Assert.IsNotNull(allowedOne);
@@ -197,11 +245,17 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(2, allowedContentTypes.Length);
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 0 && c.Alias == allowedOne.Alias));
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 1 && c.Alias == allowedTwo.Alias));
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Can_Assign_History_Cleanup()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test");
         createModel.Cleanup = new ContentTypeCleanup
         {
@@ -217,6 +271,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(contentType.HistoryCleanup.PreventCleanup);
         Assert.AreEqual(123, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
         Assert.AreEqual(456, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
@@ -226,6 +282,10 @@ internal sealed partial class ContentTypeEditingServiceTests
     // Wondering where the last case is? Look at the test below.
     public async Task Can_Create_Composite(bool compositionIsElement, bool contentTypeIsElement)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel(
             "Composition Base",
             "compositionBase",
@@ -267,11 +327,17 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(1, compositionType.CompositionPropertyTypes.Count());
             Assert.AreEqual(compositionProperty.Key, compositionType.CompositionPropertyTypes.First().Key);
         });
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Can_Create_Property_Container_Structure_Matching_Composition_Container_Structure()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel(
             "Composition Base",
             "compositionBase");
@@ -321,11 +387,17 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(propertyTypeKeys.Contains(property.Key));
         Assert.IsTrue(contentTypeGroup.PropertyTypes?.Contains("myProperty"));
         Assert.IsFalse(contentTypeGroup.PropertyTypes?.Contains("compositionProperty"));
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Property_Container_Aliases_Are_CamelCased_Names()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test");
         var tab = ContentTypePropertyContainerModel("My Tab", type: TabContainerType);
         var group1 = ContentTypePropertyContainerModel("My Group", type: GroupContainerType);
@@ -348,11 +420,17 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("myTab", contentType.PropertyGroups.First(g => g.Name == "My Tab").Alias);
         Assert.AreEqual("myTab/myGroup", contentType.PropertyGroups.First(g => g.Name == "My Group").Alias);
         Assert.AreEqual("anotherGroup", contentType.PropertyGroups.First(g => g.Name == "AnotherGroup").Alias);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Element_Types_Must_Not_Be_Composed_By_non_element_type()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         // This is a pretty interesting one, since it actually seems to be broken in the old backoffice,
         // since the client will always send the isElement flag as false to the GetAvailableCompositeContentTypes endpoint
         // Even if it's an element type, however if we look at the comment in GetAvailableCompositeContentTypes
@@ -365,6 +443,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionType.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var createModel = ContentTypeCreateModel(
             "Content Type Using Composition",
@@ -386,15 +467,25 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
             Assert.IsNull(result.Result);
         });
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task ContentType_Containing_Composition_Cannot_Be_Used_As_Composition()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel("CompositionBase");
 
         var baseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(baseResult.Success);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, baseResult.Result!.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var composition = ContentTypeCreateModel(
             "Composition",
@@ -408,6 +499,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var compositionResult = await ContentTypeEditingService.CreateAsync(composition, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionResult.Result!.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         // This is not allowed because the composition also has a composition (compositionBase).
         var invalidComposition = ContentTypeCreateModel(
@@ -429,12 +523,14 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, invalidAttempt.Status);
             Assert.IsNull(invalidAttempt.Result);
         });
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Can_Create_Child()
     {
-
         var parentProperty = ContentTypePropertyTypeModel("Parent Property", "parentProperty");
         var parentModel = ContentTypeCreateModel(
             "Parent",
@@ -452,6 +548,10 @@ internal sealed partial class ContentTypeEditingServiceTests
                 CompositionType = CompositionType.Inheritance, Key = parentKey,
             },
         };
+
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var childModel = ContentTypeCreateModel(
             "Child",
@@ -472,12 +572,18 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsTrue(contentType.CompositionPropertyTypes.Any(x => x.Alias == parentProperty.Alias));
             Assert.IsTrue(contentType.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
         });
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, result.Result!.Id, ContentTypeChangeTypes.Create);
     }
 
     // Unlike compositions, it is allowed to inherit on multiple levels
     [Test]
     public async Task Can_Create_Grandchild()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var rootProperty = ContentTypePropertyTypeModel("Root property");
         ContentTypeCreateModel rootModel = ContentTypeCreateModel(
             "Root",
@@ -485,6 +591,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var rootResult = await ContentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(rootResult.Success);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, rootResult.Result!.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var childProperty = ContentTypePropertyTypeModel("Child Property", "childProperty");
         var rootKey = rootResult.Result!.Key;
@@ -503,6 +612,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var childResult = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(childResult.Success);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, childResult.Result!.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var grandchildProperty = ContentTypePropertyTypeModel("Grandchild Property", "grandchildProperty");
         var childKey = childResult.Result!.Key;
@@ -542,17 +654,27 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsTrue(grandchild.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
             Assert.IsTrue(grandchild.CompositionPropertyTypes.Any(x => x.Alias == grandchildProperty.Alias));
         });
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, grandchild.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Can_Create_Child_To_Content_Type_With_Composition()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Composition"), Constants.Security.SuperUserKey)).Result!;
         var parentContentType = (await ContentTypeEditingService.CreateAsync(
                 ContentTypeCreateModel(
                     "Parent",
                     compositions: [new Composition { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]),
                 Constants.Security.SuperUserKey)).Result!;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, parentContentType.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
+
         var result = await ContentTypeEditingService.CreateAsync(
                 ContentTypeCreateModel(
                     "Child",
@@ -571,15 +693,24 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, childContentType.Id, ContentTypeChangeTypes.Create);
     }
 
     [Test]
     public async Task Cannot_Be_Both_Parent_And_Composition()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel("CompositionBase");
 
         var baseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(baseResult.Success);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, baseResult.Result!.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var createModel = ContentTypeCreateModel(
             compositions: new[]
@@ -600,18 +731,34 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
         });
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Have_Multiple_Inheritance()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var parentModel1 = ContentTypeCreateModel("Parent1");
         var parentModel2 = ContentTypeCreateModel("Parent2");
 
-        var parentKey1 = (await ContentTypeEditingService.CreateAsync(parentModel1, Constants.Security.SuperUserKey)).Result?.Key;
+        var parent1 = (await ContentTypeEditingService.CreateAsync(parentModel1, Constants.Security.SuperUserKey)).Result;
+        var parentKey1 = parent1?.Key;
         Assert.IsTrue(parentKey1.HasValue);
-        var parentKey2 = (await ContentTypeEditingService.CreateAsync(parentModel2, Constants.Security.SuperUserKey)).Result?.Key;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, parent1.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
+
+        var parent2 = (await ContentTypeEditingService.CreateAsync(parentModel2, Constants.Security.SuperUserKey)).Result;
+        var parentKey2 = parent2?.Key;
         Assert.IsTrue(parentKey2.HasValue);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, parent2.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var childProperty = ContentTypePropertyTypeModel("Child Property", "childProperty");
         Composition[] composition =
@@ -635,11 +782,18 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Specify_Duplicate_PropertyType_Alias_From_Compositions()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var propertyTypeAlias = "testproperty";
         var compositionPropertyType = ContentTypePropertyTypeModel("Test Property", propertyTypeAlias);
         var compositionBase = ContentTypeCreateModel(
@@ -648,6 +802,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var compositionBaseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionBaseResult.Success);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionBaseResult.Result!.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var createModel = ContentTypeCreateModel(
             compositions: new[]
@@ -667,11 +824,18 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
         });
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Specify_Non_Existent_DocType_As_Composition()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel(
             compositions: new[]
             {
@@ -687,14 +851,25 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
         });
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Mix_Inheritance_And_ParentKey()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var parentModel = ContentTypeCreateModel("Parent");
-        var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result;
+        var parentKey = parent?.Key;
         Assert.IsTrue(parentKey.HasValue);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, parent.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var containerResult = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
         Assert.IsTrue(containerResult.Success);
@@ -718,14 +893,24 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Have_Same_Key_For_Inheritance_And_Parent()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var parentModel = ContentTypeCreateModel("Parent");
         var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result;
         Assert.IsNotNull(parent);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, parent.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         Composition[] composition =
         {
@@ -744,14 +929,25 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Use_As_ParentKey()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var parentModel = ContentTypeCreateModel("Parent");
-        var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result;
+        var parentKey = parent?.Key;
         Assert.IsTrue(parentKey.HasValue);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, parent.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         var childModel = ContentTypeCreateModel(
             "Child",
@@ -761,6 +957,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase("")]
@@ -771,12 +970,19 @@ internal sealed partial class ContentTypeEditingServiceTests
     [TestCase("!\"#¤%&/()=)?`")]
     public async Task Cannot_Use_Invalid_PropertyType_Alias(string propertyTypeAlias)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var propertyType = ContentTypePropertyTypeModel("Test Property", propertyTypeAlias);
         var createModel = ContentTypeCreateModel("Test", propertyTypes: new[] { propertyType });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase("testProperty", "testProperty")]
@@ -785,6 +991,10 @@ internal sealed partial class ContentTypeEditingServiceTests
     [TestCase("testProperty", "testproperty")]
     public async Task Cannot_Use_Duplicate_PropertyType_Alias(string propertyTypeAlias1, string propertyTypeAlias2)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var propertyType1 = ContentTypePropertyTypeModel("Test Property", propertyTypeAlias1);
         var propertyType2 = ContentTypePropertyTypeModel("Test Property", propertyTypeAlias2);
         var createModel = ContentTypeCreateModel("Test", propertyTypes: new[] { propertyType1, propertyType2 });
@@ -792,6 +1002,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase("testAlias", "testAlias")]
@@ -802,39 +1015,64 @@ internal sealed partial class ContentTypeEditingServiceTests
     [TestCase("TESTALIAS", "testAlias")]
     public async Task Cannot_Use_Alias_As_PropertyType_Alias(string contentTypeAlias, string propertyTypeAlias)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var propertyType = ContentTypePropertyTypeModel("Test Property", propertyTypeAlias);
         var createModel = ContentTypeCreateModel("Test", contentTypeAlias, propertyTypes: new[] { propertyType });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Use_Non_Existing_DataType_For_PropertyType()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty", dataTypeKey: Guid.NewGuid());
         var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: new[] { propertyType });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DataTypeNotFound, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Use_Empty_Alias_For_PropertyType()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var propertyType = ContentTypePropertyTypeModel("Test Property", string.Empty);
         var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: new[] { propertyType });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Use_Empty_Name_For_PropertyType_Container()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var container = ContentTypePropertyContainerModel(string.Empty);
         var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: container.Key);
         var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: new[] { propertyType });
@@ -843,6 +1081,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerName, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase("")]
@@ -854,30 +1095,51 @@ internal sealed partial class ContentTypeEditingServiceTests
     [TestCaseSource(nameof(DifferentCapitalizedAlias), new object[] { "System" })]
     public async Task Cannot_Use_Invalid_Alias(string contentTypeAlias)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", contentTypeAlias);
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidAlias, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase("test")] // Matches alias case sensitively.
     [TestCase("Test")] // Matches alias case insensitively.
     public async Task Cannot_Use_Existing_Alias(string newAlias)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test");
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, result.Result!.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         createModel = ContentTypeCreateModel("Test 2", newAlias);
         result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateAlias, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Add_Container_From_Composition()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel(
             "Composition Base",
             "compositionBase");
@@ -892,6 +1154,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionType.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         // Create doc type using the composition
         var createModel = ContentTypeCreateModel(
@@ -908,11 +1173,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Duplicate_Container_Key_From_Composition()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel(
             "Composition Base",
             "compositionBase");
@@ -926,6 +1198,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionType.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         // Create doc type using the composition
         var createModel = ContentTypeCreateModel(
@@ -943,11 +1218,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Have_Duplicate_Container_Key()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         // Create doc type using the composition
         var createModel = ContentTypeCreateModel("Test", "test");
 
@@ -960,11 +1242,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Add_Property_To_Missing_Container()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel(
             "Composition Base",
             "compositionBase");
@@ -978,6 +1267,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionType.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         // Create doc type using the composition
         var createModel = ContentTypeCreateModel(
@@ -993,11 +1285,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Add_Property_Container_To_Missing_Container()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         // Create doc type using the composition
         var createModel = ContentTypeCreateModel();
 
@@ -1012,11 +1311,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Create_Property_In_Composition_Container()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel(
             "Composition Base",
             "compositionBase");
@@ -1031,6 +1337,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionType.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         // Create doc type using the composition
         var createModel = ContentTypeCreateModel(
@@ -1046,11 +1355,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Create_Property_Container_In_Composition_Container()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = ContentTypeCreateModel(
             "Composition Base",
             "compositionBase");
@@ -1065,6 +1381,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, compositionType.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         // Create doc type using the composition
         var createModel = ContentTypeCreateModel(
@@ -1083,11 +1402,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
     public async Task Cannot_Create_Composite_With_MediaType()
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var compositionBase = MediaTypeCreateModel("Composition Base");
 
         // Let's add a property to ensure that it passes through
@@ -1111,6 +1437,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+
+        // no changes should have been notified (media type creation succeeds, but we are listening for content type change notifications)
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase("something")]
@@ -1118,6 +1447,10 @@ internal sealed partial class ContentTypeEditingServiceTests
     [TestCase("group")]
     public async Task Cannot_Create_Container_With_Unknown_Type(string containerType)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var createModel = ContentTypeCreateModel("Test", "test");
         var container = ContentTypePropertyContainerModel(name: containerType, type: containerType);
         createModel.Containers = new[] { container };
@@ -1128,16 +1461,27 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase(false, true)]
     [TestCase(true, false)]
     public async Task Cannot_Have_Element_Type_Mismatched_Inheritance(bool parentIsElement, bool childIsElement)
     {
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var parentModel = ContentTypeCreateModel("Parent1", isElement: parentIsElement);
 
-        var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result;
+        var parentKey = parent?.Key;
         Assert.IsTrue(parentKey.HasValue);
+
+        AssertContentTypeRefreshPayload(refreshedPayloads, parent.Id, ContentTypeChangeTypes.Create);
+        refreshedPayloads = null;
 
         Composition[] composition =
         {
@@ -1156,5 +1500,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagComparedToParent, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 }

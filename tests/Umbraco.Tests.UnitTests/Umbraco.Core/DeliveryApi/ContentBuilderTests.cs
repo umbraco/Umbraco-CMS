@@ -5,9 +5,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -18,14 +17,17 @@ public class ContentBuilderTests : DeliveryApiTests
     [Test]
     public void ContentBuilder_MapsContentDataAndPropertiesCorrectly()
     {
-        var content = new Mock<IPublishedContent>();
-
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
-
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
         contentType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+
+        var content = new Mock<IPublishedContent>();
+        content.SetupGet(c => c.ContentType).Returns(contentType.Object);
+
+        var propertyData = new PropertyData { Value = "n/a", Culture = "abc", Segment = string.Empty };
+
+        var prop1 = new PublishedProperty(DeliveryApiPropertyType, content.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop2 = new PublishedProperty(DefaultPropertyType, content.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         var key = Guid.NewGuid();
         var urlSegment = "url-segment";
@@ -107,7 +109,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
 
-        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", "the-page", contentType.Object, Array.Empty<PublishedElementPropertyBase>());
+        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", "the-page", contentType.Object, Array.Empty<PublishedPropertyBase>());
 
         var customNameProvider = new Mock<IApiContentNameProvider>();
         customNameProvider.Setup(n => n.GetName(content.Object)).Returns($"Custom name for: {content.Object.Name}");
@@ -132,7 +134,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
 
-        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", "the-page", contentType.Object, Array.Empty<PublishedElementPropertyBase>());
+        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", "the-page", contentType.Object, Array.Empty<PublishedPropertyBase>());
 
         var routeBuilder = new Mock<IApiContentRouteBuilder>();
         routeBuilder

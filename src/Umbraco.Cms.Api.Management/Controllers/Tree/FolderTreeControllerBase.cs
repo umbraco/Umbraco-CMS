@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -17,7 +19,11 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     private readonly Guid _folderObjectTypeId;
     private bool _foldersOnly;
 
+    protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
+    protected IEntitySearchService EntitySearchService { get; }
+
+    protected IIdKeyMap IdKeyMap { get; }
 
     protected override Ordering ItemOrdering
     {
@@ -39,11 +45,28 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected FolderTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
-        : base(entityService, flagProviders) =>
-        _folderObjectTypeId = FolderObjectType.GetGuid();
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
+    }
 
-    protected abstract UmbracoObjectTypes FolderObjectType { get; }
+    protected FolderTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap)
+        : base(entityService, flagProviders)
+    {
+        EntitySearchService = entitySearchService;
+        IdKeyMap = idKeyMap;
+        _folderObjectTypeId = FolderObjectType.GetGuid();
+    }
+
 
     /// <inheritdoc/>
     protected override Guid? GetParentKey(IEntitySlim? entity)
@@ -160,4 +183,72 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     }
 
     private UmbracoObjectTypes[] GetObjectTypes() => _foldersOnly ? [FolderObjectType] : [FolderObjectType, ItemObjectType];
+
+    protected async Task<ActionResult<PagedViewModel<TItem>>> SearchTreeEntities(
+        string? query,
+        int skip,
+        int take,
+        TreeItemKind itemKind)
+    {
+        PagedModel<IEntitySlim> itemSearchResult =
+            query.IsNullOrWhiteSpace()
+                ? EntitySearchService.Search(GetItemObjectTypes(itemKind), skip, take)
+                : EntitySearchService.Search(GetItemObjectTypes(itemKind), query, skip, take);
+
+        (IEntitySlim[] entities, long totalItems) =
+            await FilterTreeEntities(itemSearchResult.Items.ToArray(), itemSearchResult.Total);
+
+        TItem[] treeItemViewModels = MapSearchTreeItemViewModels(entities);
+
+        await PopulateFlags(treeItemViewModels);
+
+        PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
+
+        return Ok(result);
+    }
+
+    protected virtual TItem[] MapSearchTreeItemViewModels(IEntitySlim[] entities)
+        => entities.Select(entity => MapTreeItemViewModel(GetSearchResultParentKey(entity), entity)).ToArray();
+
+    private Guid? GetSearchResultParentKey(IEntitySlim entity)
+    {
+        if (entity.ParentId == Constants.System.Root)
+        {
+            return null;
+        }
+
+        if (FolderObjectType != UmbracoObjectTypes.Unknown)
+        {
+            Attempt<Guid> getKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType);
+            if (getKeyAttempt.Success)
+            {
+                return getKeyAttempt.Result;
+            }
+        }
+
+        Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, ItemObjectType);
+        if (itemKeyAttempt.Success)
+        {
+            return itemKeyAttempt.Result;
+        }
+
+        return null;
+    }
+
+    private IEnumerable<UmbracoObjectTypes> GetItemObjectTypes(TreeItemKind itemKind)
+    {
+        var types = new List<UmbracoObjectTypes>();
+
+        if (itemKind.HasFlag(TreeItemKind.Item))
+        {
+            types.Add(ItemObjectType);
+        }
+
+        if (itemKind.HasFlag(TreeItemKind.Folder) && FolderObjectType != UmbracoObjectTypes.Unknown)
+        {
+            types.Add(FolderObjectType);
+        }
+
+        return types;
+    }
 }

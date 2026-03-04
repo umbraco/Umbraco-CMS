@@ -234,6 +234,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
             $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} WHERE {uniqueId} IN
               (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
         ];
+
     }
 
     #endregion

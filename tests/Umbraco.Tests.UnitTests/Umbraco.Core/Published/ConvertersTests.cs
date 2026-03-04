@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -11,8 +9,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published;
@@ -43,16 +42,22 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
+        var elementsCache = new ElementsDictionaryAppCache();
+        var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+
+        var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "1234" } });
+        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
 
         Assert.AreEqual(1234, element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
 
         // 'null' would be considered a 'missing' value by the default, magic logic
-        var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } }, false, new VariationContext());
+        contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", null } });
+        var e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
         Assert.IsFalse(e.HasValue("prop1"));
 
         // '0' would not - it's a valid integer - but the converter knows better
-        e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "0" } }, false, new VariationContext());
+        contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "0" } });
+        e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
         Assert.IsFalse(e.HasValue("prop1"));
     }
 
@@ -120,7 +125,11 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
+        var elementsCache = new ElementsDictionaryAppCache();
+        var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+
+        var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "1234" } });
+        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
 
         var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
         var cnt1 = new InternalPublishedContent(cntType1) { Id = 1234 };
@@ -177,5 +186,23 @@ public class ConvertersTests
             object inter,
             bool preview)
             => ((int)inter).ToString();
+    }
+
+    private ContentNode CreateContentNode(string name, int id, IPublishedContentType contentType, Dictionary<string, object> properties)
+    {
+        var contentData = new ContentData(
+            name: name,
+            urlSegment: name.ToLowerInvariant().Replace(" ", "-"),
+            versionId: 1,
+            versionDate: DateTime.Today,
+            writerId: -1,
+            templateId: null,
+            published: true,
+            properties: properties
+                .ToDictionary(
+                    p => p.Key,
+                    p => new PropertyData[] { new() { Value = p.Value, Culture = string.Empty, Segment = string.Empty } }),
+            cultureInfos: null);
+        return new ContentNode(id, Guid.NewGuid(), 1, DateTime.Today, -1, contentType, contentData, contentData);
     }
 }
