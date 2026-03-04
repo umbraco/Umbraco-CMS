@@ -1,6 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
