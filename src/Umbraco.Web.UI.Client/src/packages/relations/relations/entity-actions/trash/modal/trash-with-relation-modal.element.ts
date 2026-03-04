@@ -20,6 +20,8 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-trash-with-relation-confirm-modal')
@@ -67,11 +69,12 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 			this._name = item.name;
 		}
 
-		// Enter the loading state: button disabled, but normal confirmation message
-		// shown (not the "cannot trash" error). The references component fires a
-		// single @change event after all its loads complete, which resolves this
-		// to either true (no references) or false (blocked).
-		if (this.data.disableWhenReferenced) {
+		// DisableDeleteWhenReferenced is a global content setting (shared by documents
+		// and media), so we fetch it from the document configuration endpoint.
+		// Enter loading state: button disabled, normal message shown (not the error).
+		// Resolved to true/false when the references component fires @change.
+		const { data: config } = await tryExecute(this, DocumentService.getDocumentConfiguration());
+		if (config?.disableDeleteWhenReferenced) {
 			this._canTrash = undefined;
 		}
 
@@ -84,11 +87,10 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	#onReferencesChange(event: UmbChangeEvent) {
 		event.stopPropagation();
+		if (this._canTrash !== undefined) return;
 		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
 		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
-		if (this.data?.disableWhenReferenced) {
-			this._canTrash = total === 0;
-		}
+		this._canTrash = total === 0;
 	}
 
 	override render() {
