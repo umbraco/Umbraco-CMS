@@ -72,7 +72,7 @@ for (const mediaFileType of mediaFileTypes) {
     if (mediaFileType.fileName === 'Image') {
       await umbracoUi.media.isImageCropperFieldVisible();
     } else {
-      await umbracoUi.media.isInputUploadFieldVisible();
+      await umbracoUi.media.doesInputUploadFileHaveName(mediaFileType.filePath);
     }
     const mediaId = await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeCreated();
 
