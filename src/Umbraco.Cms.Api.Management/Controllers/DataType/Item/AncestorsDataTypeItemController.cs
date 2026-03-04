@@ -32,11 +32,7 @@ public class AncestorsDataTypeItemController : DatatypeItemControllerBase
         IEnumerable<ItemAncestorsResponseModel<NamedItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            ids,
-            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, NamedItemResponseModel>>(
-                ancestors.ToDictionary(
-                    a => a.Key,
-                    a => new NamedItemResponseModel { Id = a.Key, Name = a.Name ?? string.Empty })));
+            ids);
 
         return Ok(result);
     }

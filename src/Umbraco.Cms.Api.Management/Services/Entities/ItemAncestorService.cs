@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -11,20 +12,37 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 internal sealed class ItemAncestorService : IItemAncestorService
 {
     private readonly IEntityService _entityService;
+    private readonly IUmbracoMapper _umbracoMapper;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ItemAncestorService"/> class.
     /// </summary>
     /// <param name="entityService">The entity service.</param>
-    public ItemAncestorService(IEntityService entityService)
-        => _entityService = entityService;
+    /// <param name="umbracoMapper">The mapper to handle entity mapping.</param>
+    public ItemAncestorService(IEntityService entityService, IUmbracoMapper umbracoMapper)
+    {
+        _entityService = entityService;
+        _umbracoMapper = umbracoMapper;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<ItemAncestorsResponseModel<NamedItemResponseModel>>> GetAncestorsAsync(
+        UmbracoObjectTypes itemObjectType,
+        UmbracoObjectTypes? folderObjectType,
+        ISet<Guid> entityKeys)
+    {
+        return await GetAncestorsAsync(itemObjectType, folderObjectType, entityKeys, AncestorMapper);
+
+        Task<IEnumerable<NamedItemResponseModel>> AncestorMapper(IEnumerable<IEntitySlim> entities)
+            => Task.FromResult(_umbracoMapper.MapEnumerable<IEntitySlim, NamedItemResponseModel>(entities).AsEnumerable());
+    }
 
     /// <inheritdoc />
     public async Task<IEnumerable<ItemAncestorsResponseModel<TAncestorItem>>> GetAncestorsAsync<TAncestorItem>(
         UmbracoObjectTypes itemObjectType,
         UmbracoObjectTypes? folderObjectType,
         ISet<Guid> entityKeys,
-        Func<IEnumerable<IEntitySlim>, Task<IReadOnlyDictionary<Guid, TAncestorItem>>> ancestorMapper)
+        Func<IEnumerable<IEntitySlim>, Task<IEnumerable<TAncestorItem>>> ancestorMapper)
         where TAncestorItem : ItemResponseModelBase
     {
         // Batch fetch all requested entities by Guid key (trying both item + folder types).
@@ -82,7 +100,7 @@ internal sealed class ItemAncestorService : IItemAncestorService
         }
 
         // Call the mapping delegate with all ancestor entities to produce rich models.
-        IReadOnlyDictionary<Guid, TAncestorItem> mappedAncestors = await ancestorMapper(ancestorById.Values);
+        var mappedAncestors = (await ancestorMapper(ancestorById.Values)).ToDictionary(ancestor => ancestor.Id);
 
         // Map per-entity: entity key -> ordered ancestor chain (root-first).
         return entities.Select(entity =>

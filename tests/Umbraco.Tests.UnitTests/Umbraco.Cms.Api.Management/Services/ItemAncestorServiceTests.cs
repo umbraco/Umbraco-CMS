@@ -2,6 +2,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -17,8 +18,15 @@ internal class ItemAncestorServiceTests
     [SetUp]
     public void SetUp()
     {
+        var mapper = new Mock<IUmbracoMapper>();
+        mapper
+            .Setup(m => m.MapEnumerable<IEntitySlim, NamedItemResponseModel>(It.IsAny<IEnumerable<IEntitySlim>>()))
+            .Returns((IEnumerable<IEntitySlim> entities) => entities
+                .Select(entity => new NamedItemResponseModel { Id = entity.Key, Name = entity.Name ?? string.Empty })
+                .ToList());
+
         _entityServiceMock = new Mock<IEntityService>();
-        _sut = new ItemAncestorService(_entityServiceMock.Object);
+        _sut = new ItemAncestorService(_entityServiceMock.Object, mapper.Object);
     }
 
     [Test]
@@ -172,11 +180,10 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(100, UmbracoObjectTypes.DataTypeContainer))
             .Returns(folderAncestor);
 
-        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = (await _sut.GetAncestorsAsync(
+        List<ItemAncestorsResponseModel<NamedItemResponseModel>> result = (await _sut.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { entityKey },
-            TestMapper)).ToList();
+            new HashSet<Guid> { entityKey })).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(entityKey, result[0].Id);
@@ -218,11 +225,10 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(100, UmbracoObjectTypes.DataTypeContainer))
             .Returns(parentFolder);
 
-        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = (await _sut.GetAncestorsAsync(
+        List<ItemAncestorsResponseModel<NamedItemResponseModel>> result = (await _sut.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { folderKey },
-            TestMapper)).ToList();
+            new HashSet<Guid> { folderKey })).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(folderKey, result[0].Id);
@@ -397,11 +403,10 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.DataType, It.Is<int[]>(ids => ids.SequenceEqual(new[] { 100 }))))
             .Returns([parent]);
 
-        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = (await _sut.GetAncestorsAsync(
+        List<ItemAncestorsResponseModel<NamedItemResponseModel>> result = (await _sut.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { entityKey },
-            TestMapper)).ToList();
+            new HashSet<Guid> { entityKey })).ToList();
 
         Assert.AreEqual(1, result.Count);
         var ancestors = result[0].Ancestors.ToList();
@@ -443,11 +448,10 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(It.IsAny<int>(), UmbracoObjectTypes.DataTypeContainer))
             .Returns((IEntitySlim?)null);
 
-        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = (await _sut.GetAncestorsAsync(
+        List<ItemAncestorsResponseModel<NamedItemResponseModel>> result = (await _sut.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { entityKey },
-            TestMapper)).ToList();
+            new HashSet<Guid> { entityKey })).ToList();
 
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(entityKey, result[0].Id);
@@ -502,11 +506,10 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(unknownKey, UmbracoObjectTypes.DataTypeContainer))
             .Returns((IEntitySlim?)null);
 
-        IEnumerable<ItemAncestorsResponseModel<TestItemResponseModel>> result = await _sut.GetAncestorsAsync(
+        IEnumerable<ItemAncestorsResponseModel<NamedItemResponseModel>> result = await _sut.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { unknownKey },
-            TestMapper);
+            new HashSet<Guid> { unknownKey });
 
         Assert.IsEmpty(result);
     }
@@ -530,11 +533,10 @@ internal class ItemAncestorServiceTests
             .Setup(x => x.Get(folderKey, UmbracoObjectTypes.DataTypeContainer))
             .Returns(folder);
 
-        List<ItemAncestorsResponseModel<TestItemResponseModel>> result = (await _sut.GetAncestorsAsync(
+        List<ItemAncestorsResponseModel<NamedItemResponseModel>> result = (await _sut.GetAncestorsAsync(
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.DataTypeContainer,
-            new HashSet<Guid> { itemKey, folderKey },
-            TestMapper)).ToList();
+            new HashSet<Guid> { itemKey, folderKey })).ToList();
 
         Assert.AreEqual(2, result.Count);
 
@@ -587,9 +589,8 @@ internal class ItemAncestorServiceTests
     /// <summary>
     /// Simple test mapper that creates a <see cref="TestItemResponseModel"/> from each ancestor entity.
     /// </summary>
-    private static Task<IReadOnlyDictionary<Guid, TestItemResponseModel>> TestMapper(IEnumerable<IEntitySlim> ancestors)
-        => Task.FromResult<IReadOnlyDictionary<Guid, TestItemResponseModel>>(
-            ancestors.ToDictionary(a => a.Key, a => new TestItemResponseModel { Id = a.Key }));
+    private static Task<IEnumerable<TestItemResponseModel>> TestMapper(IEnumerable<IEntitySlim> ancestors)
+        => Task.FromResult(ancestors.Select(a => new TestItemResponseModel { Id = a.Key }));
 
     /// <summary>
     /// Concrete test implementation of <see cref="ItemResponseModelBase"/> for use in tests.

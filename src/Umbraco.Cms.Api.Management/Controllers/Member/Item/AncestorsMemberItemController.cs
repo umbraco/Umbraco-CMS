@@ -42,10 +42,10 @@ public class AncestorsMemberItemController : MemberItemControllerBase
             UmbracoObjectTypes.Member,
             null,
             ids,
-            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, MemberItemResponseModel>>(
+            ancestors => Task.FromResult(
                 ancestors
                     .OfType<IMemberEntitySlim>()
-                    .ToDictionary(e => e.Key, _memberPresentationFactory.CreateItemResponseModel)));
+                    .Select(_memberPresentationFactory.CreateItemResponseModel)));
 
         return Ok(result);
     }

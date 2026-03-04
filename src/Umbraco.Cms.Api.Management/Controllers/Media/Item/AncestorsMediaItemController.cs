@@ -42,10 +42,10 @@ public class AncestorsMediaItemController : MediaItemControllerBase
             UmbracoObjectTypes.Media,
             null,
             ids,
-            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, MediaItemResponseModel>>(
+            ancestors => Task.FromResult(
                 ancestors
                     .OfType<IMediaEntitySlim>()
-                    .ToDictionary(e => e.Key, _mediaPresentationFactory.CreateItemResponseModel)));
+                    .Select(_mediaPresentationFactory.CreateItemResponseModel)));
 
         return Ok(result);
     }

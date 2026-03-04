@@ -42,10 +42,10 @@ public class AncestorsDocumentItemController : DocumentItemControllerBase
             UmbracoObjectTypes.Document,
             null,
             ids,
-            ancestors => Task.FromResult<IReadOnlyDictionary<Guid, DocumentItemResponseModel>>(
+            ancestors => Task.FromResult(
                 ancestors
                     .OfType<IDocumentEntitySlim>()
-                    .ToDictionary(e => e.Key, _documentPresentationFactory.CreateItemResponseModel)));
+                    .Select(_documentPresentationFactory.CreateItemResponseModel)));
 
         return Ok(result);
     }
