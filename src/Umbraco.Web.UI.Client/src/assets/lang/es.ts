@@ -922,6 +922,7 @@ export default {
 		noPropertiesDefinedOnTab:
 			'No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.',
 		addIcon: 'Añadir icono',
+		changeIcon: 'Cambiar icono',
 	},
 	sort: {
 		sortOrder: 'Ordenar',
