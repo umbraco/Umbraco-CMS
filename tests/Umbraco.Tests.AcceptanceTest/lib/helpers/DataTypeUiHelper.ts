@@ -324,7 +324,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     // Date Time with Time Zone Picker
     this.addTimeZoneBtn = page.locator('#add-time-zone [name="icon-add"] svg');
     this.timeZoneDropDown = page.locator('umb-input-time-zone-picker uui-combobox');
-    
+
     // Entity Picker Source
     this.dataSourceChooseBtn = page.locator('[label="Data Source"]').locator(this.chooseBtn);
 
@@ -441,7 +441,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async addMediaStartNode(mediaName: string) {
-    await this.click(this.mediaCardItems.filter({hasText: mediaName}));
+    await this.click(this.mediaCardItems.filter({hasText: mediaName}).locator('#select-checkbox'));
     await this.clickChooseModalButton();
   }
 
