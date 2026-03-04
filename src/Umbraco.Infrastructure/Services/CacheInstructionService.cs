@@ -291,6 +291,7 @@ namespace Umbraco.Cms
                     }
 
                     List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
+                    jsonInstructions?.Dispose();
 
                     // Process as per-normal.
                     var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
