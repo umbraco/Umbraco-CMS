@@ -2,7 +2,6 @@ import { umbMockManager } from '../mock-manager.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const AVAILABLE_MOCK_SETS = ['default', 'kenn', 'test'] as const;
 const MOCK_SET_STORAGE_KEY = 'umb:mockSet';
 
 @customElement('mock-set-header-app')
@@ -25,7 +24,7 @@ export class MockSetHeaderAppElement extends UmbLitElement {
 			<uui-popover-container id="mock-set-popover" placement="bottom-start">
 				<umb-popover-layout>
 					<div class="mock-set-list">
-						${AVAILABLE_MOCK_SETS.map(
+						${umbMockManager.availableSetNames.map(
 							(setName) => html`
 								<uui-menu-item
 									label=${setName}

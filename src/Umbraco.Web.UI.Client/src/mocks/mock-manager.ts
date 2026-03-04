@@ -25,6 +25,13 @@ class UmbMockManager {
 	}
 
 	/**
+	 * Get all available mock set names.
+	 */
+	get availableSetNames(): Array<string> {
+		return Object.keys(this.#mockSetLoaders);
+	}
+
+	/**
 	 * Get current data set. Throws if not initialized.
 	 */
 	getDataSet(): UmbMockDataSet {
