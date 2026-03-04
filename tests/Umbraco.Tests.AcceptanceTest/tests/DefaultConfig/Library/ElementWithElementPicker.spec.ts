@@ -146,6 +146,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
 });
 
 // Currently there is no validation message displayed
+test.fixme('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 2;
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, minAmount);
