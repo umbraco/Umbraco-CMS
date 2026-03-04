@@ -11,6 +11,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -36,6 +37,12 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 	@state()
 	private _totalPages = 1;
+
+	@state()
+	private _unique?: UmbEntityUnique;
+
+	@state()
+	private _entityType?: string;
 
 	constructor() {
 		super();
@@ -63,11 +70,14 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 	async #requestAuditLogs() {
 		if (!this.#workspaceContext) return;
-		const unique = this.#workspaceContext.getUnique();
-		if (!unique) throw new Error('Document unique is required');
+
+		this._unique = this.#workspaceContext.getUnique();
+		if (!this._unique) throw new Error('Document unique is required');
+
+		this._entityType = this.#workspaceContext.getEntityType();
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
-			unique,
+			unique: this._unique,
 			skip: this.#pagination.getSkip(),
 			take: this.#pagination.getPageSize(),
 		});
@@ -104,6 +114,9 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 				<umb-extension-with-api-slot
 					slot="header-actions"
 					type="entityAction"
+					.apiArgs=${(manifest: ManifestEntityAction) => [
+						{ entityType: this._entityType, unique: this._unique, meta: manifest.meta },
+					]}
 					.filter=${(manifest: ManifestEntityAction) =>
 						this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
 
