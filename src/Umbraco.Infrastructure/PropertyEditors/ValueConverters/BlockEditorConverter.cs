@@ -4,7 +4,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -14,23 +13,23 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public sealed class BlockEditorConverter
 {
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
-    private readonly ICacheManager _cacheManager;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+    private readonly IBlockElementService _blockElementService;
 
     public BlockEditorConverter(
         IPublishedContentTypeCache publishedContentTypeCache,
-        ICacheManager cacheManager,
         IPublishedModelFactory publishedModelFactory,
         IVariationContextAccessor variationContextAccessor,
-        BlockEditorVarianceHandler blockEditorVarianceHandler)
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IBlockElementService blockElementService)
     {
         _publishedContentTypeCache = publishedContentTypeCache;
-        _cacheManager = cacheManager;
         _publishedModelFactory = publishedModelFactory;
         _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
+        _blockElementService = blockElementService;
     }
 
     public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
@@ -48,7 +47,8 @@ public sealed class BlockEditorConverter
             .PropertyTypes
             .ToDictionary(propertyType => propertyType.Alias);
 
-        var propertyValues = new Dictionary<string, object?>();
+        var alignedProperties = new List<BlockPropertyValue>();
+
         foreach (BlockPropertyValue property in data.Values)
         {
             if (!propertyTypesByAlias.TryGetValue(property.Alias, out IPublishedPropertyType? propertyType))
@@ -65,36 +65,18 @@ public sealed class BlockEditorConverter
                 continue;
             }
 
-            var expectedCulture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
-                ? variationContext.Culture
-                : null;
-            var expectedSegment = owner.ContentType.VariesBySegment() && publishedContentType.VariesBySegment() && propertyType.VariesBySegment()
-                ? variationContext.Segment
-                : null;
-
-            if (alignedProperty.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
-                && alignedProperty.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
-            {
-                propertyValues[alignedProperty.Alias] = alignedProperty.Value;
-            }
+            alignedProperties.Add(alignedProperty);
         }
 
-        // Get the key from the deserialized object. If this is empty, we can fallback to checking the 'key' if there is one
-        Guid key = data.Key;
-        if (key == Guid.Empty && propertyValues.TryGetValue("key", out var keyo))
+        var alignedData = new BlockItemData
         {
-            Guid.TryParse(keyo!.ToString(), out key);
-        }
+            Values = alignedProperties,
+            ContentTypeAlias = data.ContentTypeAlias,
+            ContentTypeKey = data.ContentTypeKey,
+            Key = data.Key,
+        };
 
-        if (key == Guid.Empty)
-        {
-            return null;
-        }
-
-        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, variationContext, _cacheManager);
-        element = _publishedModelFactory.CreateModel(element);
-
-        return element;
+        return _blockElementService.BuildElementAsync(alignedData, preview).GetAwaiter().GetResult();
     }
 
     public Type GetModelType(Guid contentTypeKey)

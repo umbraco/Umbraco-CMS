@@ -108,7 +108,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
     {
         var content = new Mock<IPublishedContent>();
         var urlSegment = "url-segment";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType, Array.Empty<PublishedElementPropertyBase>());
+        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType, Array.Empty<PublishedPropertyBase>());
         content.SetupGet(c => c.ItemType).Returns(itemType);
         return content;
     }
