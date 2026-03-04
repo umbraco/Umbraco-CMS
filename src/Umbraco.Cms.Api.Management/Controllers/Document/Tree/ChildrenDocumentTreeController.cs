@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -17,27 +18,25 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [ApiVersion("1.0")]
 public class ChildrenDocumentTreeController : DocumentTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    [ActivatorUtilitiesConstructor]
     public ChildrenDocumentTreeController(
         IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
+        FlagProviderCollection flagProviders,
+        IDocumentStartNodeTreeFilterService treeFilterService,
         IPublicAccessService publicAccessService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentPermissionFilterService documentPermissionFilterService)
         : base(
             entityService,
-            userStartNodeEntitiesService,
-            dataTypeService,
+            flagProviders,
+            treeFilterService,
             publicAccessService,
-            appCaches,
-            backofficeSecurityAccessor,
-            documentPresentationFactory)
+            documentPresentationFactory,
+            documentPermissionFilterService)
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ChildrenDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -47,19 +46,17 @@ public class ChildrenDocumentTreeController : DocumentTreeControllerBase
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory)
-        : base(
+        : this(
             entityService,
             flagProviders,
-            userStartNodeEntitiesService,
-            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>(),
             publicAccessService,
-            appCaches,
-            backofficeSecurityAccessor,
-            documentPresentationFactory)
+            documentPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPermissionFilterService>())
     {
     }
 
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ChildrenDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -70,14 +67,11 @@ public class ChildrenDocumentTreeController : DocumentTreeControllerBase
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory,
         IDocumentPermissionFilterService documentPermissionFilterService)
-        : base(
+        : this(
             entityService,
             flagProviders,
-            userStartNodeEntitiesService,
-            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>(),
             publicAccessService,
-            appCaches,
-            backofficeSecurityAccessor,
             documentPresentationFactory,
             documentPermissionFilterService)
     {
