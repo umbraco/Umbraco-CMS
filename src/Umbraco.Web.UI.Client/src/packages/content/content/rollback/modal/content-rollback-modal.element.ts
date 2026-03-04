@@ -1,8 +1,6 @@
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../constants.js';
-import { UmbRollbackRepository } from '../repository/rollback.repository.js';
-import { UmbDocumentDetailRepository } from '../../repository/index.js';
-import type { UmbDocumentDetailModel } from '../../types.js';
-import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
+import type { UmbContentRollbackRepository } from '../rollback-repository.interface.js';
+import type { UmbContentDetailModel } from '../../types.js';
+import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from './types.js';
 import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -13,12 +11,12 @@ import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-
-import '../../modals/shared/document-variant-language-picker.element.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
-type DocumentVersion = {
+type ContentVersion = {
 	id: string;
 	date: string;
 	user: string;
@@ -26,11 +24,13 @@ type DocumentVersion = {
 	preventCleanup: boolean;
 };
 
-/** @deprecated Use `umb-content-rollback-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
-@customElement('umb-rollback-modal')
-export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
+@customElement('umb-content-rollback-modal')
+export class UmbContentRollbackModalElement extends UmbModalBaseElement<
+	UmbContentRollbackModalData,
+	UmbContentRollbackModalValue
+> {
 	@state()
-	private _versions: DocumentVersion[] = [];
+	private _versions: Array<ContentVersion> = [];
 
 	@state()
 	private _selectedVersion?: {
@@ -51,15 +51,15 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	private _isInvariant = true;
 
 	@state()
-	private _availableVariants: Option[] = [];
+	private _availableVariants: Array<Option> = [];
 
 	@state()
-	private _diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
+	private _diffs: Array<{ alias: string; diff: Array<UmbDiffChange> }> = [];
 
 	@state()
 	private _showDiff = false;
 
-	#rollbackRepository = new UmbRollbackRepository(this);
+	#rollbackRepository?: UmbContentRollbackRepository;
 	#userItemRepository = new UmbUserItemRepository(this);
 
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
@@ -69,7 +69,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		minute: '2-digit',
 	};
 
-	#currentDocument: UmbDocumentDetailModel | undefined;
+	#currentDocument: UmbContentDetailModel | undefined;
 	#currentAppCulture: string | undefined;
 	#currentDatasetCulture: string | undefined;
 
@@ -88,17 +88,27 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, async (instance) => {
 			if (!instance) return;
-			if (instance.getEntityType() !== UMB_DOCUMENT_ENTITY_TYPE) {
-				throw new Error(`Entity type is not ${UMB_DOCUMENT_ENTITY_TYPE}`);
-			}
 
 			const unique = instance.getUnique();
 
 			if (!unique) {
-				throw new Error('Document unique is not set');
+				throw new Error('Entity unique is not set');
 			}
 
-			const { data } = await new UmbDocumentDetailRepository(this).requestByUnique(unique);
+			if (!this.data?.detailRepositoryAlias) {
+				throw new Error('detailRepositoryAlias is not configured in the modal data.');
+			}
+
+			if (!this.data?.rollbackRepositoryAlias) {
+				throw new Error('rollbackRepositoryAlias is not configured in the modal data.');
+			}
+
+			const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<UmbContentDetailModel>>(
+				this,
+				this.data!.detailRepositoryAlias,
+			);
+
+			const { data } = await detailRepository.requestByUnique(unique);
 			if (!data) return;
 
 			this.#currentDocument = data;
@@ -107,7 +117,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			this._isInvariant = itemVariants.length === 1 && new UmbVariantId(itemVariants[0].culture).isInvariant();
 			this.#selectCulture();
 
-			const cultures = itemVariants.map((x) => x.culture).filter((x) => x !== null) as string[];
+			const cultures = itemVariants.map((x) => x.culture).filter((x) => x !== null) as Array<string>;
 			const { data: languageItems } = await new UmbLanguageItemRepository(this).requestItems(cultures);
 
 			if (languageItems) {
@@ -122,6 +132,11 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				this._availableVariants = [];
 			}
 
+			this.#rollbackRepository = await createExtensionApiByAlias<UmbContentRollbackRepository>(
+				this,
+				this.data!.rollbackRepositoryAlias,
+			);
+
 			this.#requestVersions();
 		});
 	}
@@ -133,22 +148,26 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	async #requestVersions() {
 		if (!this.#currentDocument?.unique) {
-			throw new Error('Document unique is not set');
+			throw new Error('Entity unique is not set');
 		}
 
-		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(
-			this.#currentDocument?.unique,
+		if (!this.#rollbackRepository) {
+			throw new Error('Rollback repository is not set');
+		}
+
+		const { data } = await this.#rollbackRepository.requestVersionsByEntityId(
+			this.#currentDocument.unique,
 			this._selectedCulture ?? undefined,
 		);
 		if (!data) return;
 
-		const tempItems: DocumentVersion[] = [];
+		const tempItems: Array<ContentVersion> = [];
 
 		const uniqueUserIds = [...new Set(data?.items.map((item) => item.user.id))];
 
 		const { data: userItems } = await this.#userItemRepository.requestItems(uniqueUserIds);
 
-		data?.items.forEach((item: any) => {
+		data?.items.forEach((item) => {
 			if (item.isCurrentDraftVersion) return;
 
 			tempItems.push({
@@ -178,6 +197,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			return;
 		}
 
+		if (!this.#rollbackRepository) {
+			throw new Error('Rollback repository is not set');
+		}
+
 		const { data } = await this.#rollbackRepository.requestVersionById(id);
 
 		if (!data) {
@@ -193,10 +216,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			id: data.id,
 			properties: data.values
 				.filter((x) => x.culture === this._selectedCulture || !x.culture) // When invariant, culture is undefined or null.
-				.map((value: any) => {
+				.map((value) => {
 					return {
 						alias: value.alias,
-						value: value.value,
+						value: value.value as string,
 					};
 				}),
 		};
@@ -209,6 +232,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	async #onRollback() {
 		if (!this._selectedVersion) return;
 
+		if (!this.#rollbackRepository) {
+			throw new Error('Rollback repository is not set');
+		}
+
 		const id = this._selectedVersion.id;
 		const culture = this._selectedCulture ?? undefined;
 
@@ -219,7 +246,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const entityType = this.#currentDocument?.entityType;
 
 		if (!unique || !entityType) {
-			throw new Error('Document unique or entity type is not set');
+			throw new Error('Entity unique or entity type is not set');
 		}
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -249,7 +276,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	#onPreventCleanup(event: Event, id: string, preventCleanup: boolean) {
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		this.#rollbackRepository.setPreventCleanup(id, preventCleanup);
+		this.#rollbackRepository?.setPreventCleanup(id, preventCleanup);
 
 		const version = this._versions.find((item) => item.id === id);
 		if (!version) return;
@@ -348,7 +375,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			throw new Error('Current name is not set');
 		}
 
-		const diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
+		const diffs: Array<{ alias: string; diff: Array<UmbDiffChange> }> = [];
 
 		const nameDiff = diffWords(currentName, this._selectedVersion.name);
 		diffs.push({ alias: 'name', diff: nameDiff });
@@ -579,10 +606,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	];
 }
 
-export default UmbRollbackModalElement;
+export default UmbContentRollbackModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-rollback-modal': UmbRollbackModalElement;
+		'umb-content-rollback-modal': UmbContentRollbackModalElement;
 	}
 }
