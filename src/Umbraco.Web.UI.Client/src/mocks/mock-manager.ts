@@ -37,6 +37,7 @@ class UmbMockManager {
 	/**
 	 * Initialize with a specific mock set.
 	 * This loads the data set and populates all registered DBs.
+	 * @param setName
 	 */
 	async initialize(setName: string = 'default'): Promise<void> {
 		await this.#loadSet(setName);
@@ -51,6 +52,7 @@ class UmbMockManager {
 	/**
 	 * Switch to a different mock set at runtime.
 	 * Loads the new set and updates all DBs with the new data.
+	 * @param setName
 	 */
 	async useMockSet(setName: string): Promise<void> {
 		await this.#loadSet(setName);
@@ -70,6 +72,7 @@ class UmbMockManager {
 
 	/**
 	 * Load a mock set by name.
+	 * @param setName
 	 */
 	async #loadSet(setName: string): Promise<void> {
 		const loader = this.#mockSetLoaders[setName];
@@ -88,10 +91,17 @@ class UmbMockManager {
 export const umbMockManager = new UmbMockManager();
 
 // Convenience functions for tests
+/**
+ *
+ * @param setName
+ */
 export async function useMockSet(setName: string): Promise<void> {
 	return umbMockManager.useMockSet(setName);
 }
 
+/**
+ *
+ */
 export function clearMockData(): void {
 	umbMockManager.clearAll();
 }

@@ -12,12 +12,23 @@ async function bootstrap() {
 	//#region Vite Mock Setup
 	if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
 		appElement.bypassAuth = true;
+		const mockSet = localStorage.getItem('umb:mockSet') || import.meta.env.VITE_MOCK_SET || 'default';
 		await startMockServiceWorker({
-			mockSet: import.meta.env.VITE_MOCK_SET || 'default',
+			mockSet,
 			useCustomServiceWorker: true,
 		});
 	} else {
 		appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;
+	}
+	//#endregion
+
+	document.body.append(appElement);
+
+	//#region Dev-mode extensions (registered after app element is mounted)
+	if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
+		// Register mock set switcher header app
+		const { manifests } = await import('./src/mocks/app-extension/manifests.js');
+		umbExtensionsRegistry.registerMany(manifests);
 	}
 
 	// Example injector:
@@ -37,8 +48,6 @@ async function bootstrap() {
 		});
 	}
 	//#endregion
-
-	document.body.append(appElement);
 }
 
 bootstrap();
