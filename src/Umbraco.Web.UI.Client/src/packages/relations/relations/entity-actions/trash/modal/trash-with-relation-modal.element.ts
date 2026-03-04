@@ -33,8 +33,12 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
+	// Three-state model for reference-aware trashing:
+	//   undefined = loading references (button disabled, normal message)
+	//   false     = blocked (button disabled, "cannot trash" message)
+	//   true      = allowed (button enabled, normal confirmation message)
 	@state()
-	private _canTrash = true;
+	private _canTrash: boolean | undefined = true;
 
 	#itemRepository?: UmbItemRepository<any>;
 
@@ -63,11 +67,12 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 			this._name = item.name;
 		}
 
-		// Pessimistically disable trashing. The references component fires a single
-		// @change event after all its loads complete, so _canTrash is correctly
-		// updated once the final combined total is known — no transient flicker.
+		// Enter the loading state: button disabled, but normal confirmation message
+		// shown (not the "cannot trash" error). The references component fires a
+		// single @change event after all its loads complete, which resolves this
+		// to either true (no references) or false (blocked).
 		if (this.data.disableWhenReferenced) {
-			this._canTrash = false;
+			this._canTrash = undefined;
 		}
 
 		this._referencesConfig = {
@@ -88,9 +93,10 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	override render() {
 		const headline = this.localize.string('#actions_trash');
-		const content = this._canTrash
-			? this.localize.string('#defaultdialogs_confirmTrash', this._name)
-			: this.localize.string('#defaultdialogs_cannotTrashWhenReferenced', this._name);
+		const content =
+			this._canTrash === false
+				? this.localize.string('#defaultdialogs_cannotTrashWhenReferenced', this._name)
+				: this.localize.string('#defaultdialogs_confirmTrash', this._name);
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
