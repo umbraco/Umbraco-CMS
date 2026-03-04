@@ -15,8 +15,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbError } from '@umbraco-cms/backoffice/resources';
-import { umbPeekError } from 'src/packages/core/notification/controllers/peek-error/index.js';
 
 type ContentVersion = {
 	id: string;
@@ -282,13 +280,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 			throw new Error('Rollback repository is not set');
 		}
 
-		const { error } = await this.#rollbackRepository.setPreventCleanup(id, preventCleanup);
-		if (error) {
-			await umbPeekError(this, {
-				headline: error.name,
-				message: error.message,
-			});
-		}
+		await this.#rollbackRepository.setPreventCleanup(id, preventCleanup);
 
 		const version = this._versions.find((item) => item.id === id);
 		if (!version) return;

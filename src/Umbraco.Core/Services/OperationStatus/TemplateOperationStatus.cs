@@ -44,4 +44,6 @@ public enum TemplateOperationStatus
     ///     The operation failed because the master template cannot be deleted while it has child templates.
     /// </summary>
     MasterTemplateCannotBeDeleted,
+    NotAllowedInProductionMode,
+    ContentChangeNotAllowedInProductionMode,
 }

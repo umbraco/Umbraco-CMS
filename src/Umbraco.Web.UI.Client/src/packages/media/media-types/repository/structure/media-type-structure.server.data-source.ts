@@ -1,20 +1,23 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
-import type { UmbAllowedMediaTypeModel } from './types.js';
+import type { UmbAllowedMediaTypeModel, UmbMediaTypeStructureDataSource } from './types.js';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * @class UmbMediaTypeStructureServerDataSource
  * @augments {UmbContentTypeStructureServerDataSourceBase}
  */
-export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructureServerDataSourceBase<
-	AllowedMediaTypeModel,
-	UmbAllowedMediaTypeModel
-> {
+export class UmbMediaTypeStructureServerDataSource
+	extends UmbContentTypeStructureServerDataSourceBase<AllowedMediaTypeModel, UmbAllowedMediaTypeModel>
+	implements UmbMediaTypeStructureDataSource
+{
+	#host: UmbControllerHost;
 	constructor(host: UmbControllerHost) {
 		super(host, { getAllowedChildrenOf, mapper });
+		this.#host = host;
 	}
 
 	getMediaTypesOfFileExtension({ fileExtension, skip, take }: { fileExtension: string; skip: number; take: number }) {
@@ -23,6 +26,24 @@ export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructu
 
 	getMediaTypesOfFolders({ skip, take }: { skip: number; take: number }) {
 		return getAllowedMediaTypesOfFolders({ skip, take });
+	}
+
+	async getAllowedParentsOf(unique: string) {
+		const { data, error } = await tryExecute(
+			this.#host,
+			MediaTypeService.getMediaTypeByIdAllowedParents({
+				path: { id: unique },
+			}),
+		);
+		if (error) {
+			return { error };
+		}
+		const mappedData =
+			data?.allowedParentIds.map((item) => ({
+				unique: item.id,
+				entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+			})) ?? [];
+		return { data: mappedData };
 	}
 }
 
