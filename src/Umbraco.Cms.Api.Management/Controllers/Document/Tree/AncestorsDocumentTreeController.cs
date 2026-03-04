@@ -85,6 +85,8 @@ public class AncestorsDocumentTreeController : DocumentTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor document items.")]
+    [EndpointDescription("Gets a collection of document items that are ancestors to the provided Id.")]
     public async Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Ancestors(CancellationToken cancellationToken, Guid descendantId)
         => await GetAncestors(descendantId);
 }

@@ -28,6 +28,8 @@ public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Creates a template for a document type.")]
+    [EndpointDescription("Creates a new template associated with the document type identified by the provided Id.")]
     public async Task<IActionResult> CreateTemplate(
         CancellationToken cancellationToken,
         Guid id,

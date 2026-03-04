@@ -23,6 +23,8 @@ public class ItemMediaTypeItemController : MediaTypeItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of media type items.")]
+    [EndpointDescription("Gets a collection of media type items identified by the provided Ids.")]
     public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

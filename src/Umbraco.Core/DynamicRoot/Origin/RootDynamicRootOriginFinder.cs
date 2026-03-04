@@ -4,10 +4,18 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
+/// <summary>
+///     An origin finder that locates the content tree root (first content item below the system root) for the current or parent content.
+///     This finder handles the "Root" origin type and traverses the content path to find the topmost document node.
+/// </summary>
 public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
 {
     private readonly IEntityService _entityService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RootDynamicRootOriginFinder"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service used to retrieve entities and traverse the content tree.</param>
     public RootDynamicRootOriginFinder(IEntityService entityService)
     {
         _entityService = entityService;
@@ -18,8 +26,12 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
         Constants.ObjectTypes.Document, Constants.ObjectTypes.SystemRoot
     });
 
+    /// <summary>
+    ///     Gets or sets the origin type alias that this finder supports.
+    /// </summary>
     protected virtual string SupportedOriginType { get; set; } = "Root";
 
+    /// <inheritdoc/>
     public virtual Guid? FindOriginKey(DynamicRootNodeQuery query)
     {
         if (query.OriginAlias != SupportedOriginType)
@@ -55,6 +67,11 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
         return root.Key;
     }
 
+    /// <summary>
+    ///     Gets the root content ID from the path, skipping the system root and recycle bin.
+    /// </summary>
+    /// <param name="path">The path segments as an array of ID strings.</param>
+    /// <returns>The root content ID, or <c>null</c> if no valid root is found.</returns>
     private static int? GetRootId(string[] path)
     {
         foreach (var contentId in path)

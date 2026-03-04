@@ -48,7 +48,7 @@ public sealed class RelateOnTrashNotificationHandler :
         _userIdKeyResolver = userIdKeyResolver;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,
         IEntityService entityService,
@@ -131,7 +131,7 @@ public sealed class RelateOnTrashNotificationHandler :
         }
     }
 
-    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(ContentMovedToRecycleBinNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -196,7 +196,7 @@ public sealed class RelateOnTrashNotificationHandler :
         }
     }
 
-    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in Umbraco 19.")]
     public void Handle(MediaMovedToRecycleBinNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 }

@@ -25,9 +25,21 @@ public struct CompositeTypeTypeKey : IEquatable<CompositeTypeTypeKey>
     /// </summary>
     public Type Type2 { get; }
 
+    /// <summary>
+    ///     Determines whether two <see cref="CompositeTypeTypeKey" /> instances are equal.
+    /// </summary>
+    /// <param name="key1">The first key to compare.</param>
+    /// <param name="key2">The second key to compare.</param>
+    /// <returns><c>true</c> if the two keys are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(CompositeTypeTypeKey key1, CompositeTypeTypeKey key2) =>
         key1.Type1 == key2.Type1 && key1.Type2 == key2.Type2;
 
+    /// <summary>
+    ///     Determines whether two <see cref="CompositeTypeTypeKey" /> instances are not equal.
+    /// </summary>
+    /// <param name="key1">The first key to compare.</param>
+    /// <param name="key2">The second key to compare.</param>
+    /// <returns><c>true</c> if the two keys are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(CompositeTypeTypeKey key1, CompositeTypeTypeKey key2) =>
         key1.Type1 != key2.Type1 || key1.Type2 != key2.Type2;
 

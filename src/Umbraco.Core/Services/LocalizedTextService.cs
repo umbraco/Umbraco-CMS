@@ -17,10 +17,10 @@ public class LocalizedTextService : ILocalizedTextService
     private readonly Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, string>>>> _noAreaDictionarySourceLazy;
 
     /// <summary>
-    ///     Initializes with a file sources instance
+    ///     Initializes a new instance of the <see cref="LocalizedTextService"/> class with file sources.
     /// </summary>
-    /// <param name="fileSources"></param>
-    /// <param name="logger"></param>
+    /// <param name="fileSources">The lazy-loaded file sources for localized text.</param>
+    /// <param name="logger">The logger instance.</param>
     public LocalizedTextService(
         Lazy<LocalizedTextServiceFileSources> fileSources,
         ILogger<LocalizedTextService> logger)
@@ -41,10 +41,10 @@ public class LocalizedTextService : ILocalizedTextService
     }
 
     /// <summary>
-    ///     Initializes with an XML source
+    ///     Initializes a new instance of the <see cref="LocalizedTextService"/> class with an XML source.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="logger"></param>
+    /// <param name="source">A dictionary mapping cultures to lazy-loaded XML documents containing translations.</param>
+    /// <param name="logger">The logger instance.</param>
     public LocalizedTextService(
         IDictionary<CultureInfo, Lazy<XDocument>> source,
         ILogger<LocalizedTextService> logger)
@@ -64,12 +64,12 @@ public class LocalizedTextService : ILocalizedTextService
                 XmlSourceToNoAreaDictionary(source));
     }
 
-        /// <summary>
-        /// Initializes with a source of a dictionary of culture -> areas -> sub dictionary of keys/values
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="logger"></param>
-        public LocalizedTextService(
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LocalizedTextService"/> class with a dictionary source.
+    /// </summary>
+    /// <param name="source">A dictionary mapping cultures to lazy-loaded area dictionaries containing key/value translations.</param>
+    /// <param name="logger">The logger instance.</param>
+    public LocalizedTextService(
             IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> source,
             ILogger<LocalizedTextService> logger)
         {
@@ -101,6 +101,7 @@ public class LocalizedTextService : ILocalizedTextService
     private IDictionary<CultureInfo, Lazy<IDictionary<string, string>>> NoAreaDictionarySource =>
         _noAreaDictionarySourceLazy.Value;
 
+    /// <inheritdoc/>
     public string Localize(string? area, string? alias, CultureInfo? culture, IDictionary<string, string?>? tokens = null)
     {
         if (culture == null)
@@ -227,6 +228,13 @@ public class LocalizedTextService : ILocalizedTextService
         return valueForCulture.Value;
     }
 
+    /// <summary>
+    ///     Localizes a key by parsing the area and alias from the key string.
+    /// </summary>
+    /// <param name="key">The key in the format "area/alias" or just "alias".</param>
+    /// <param name="culture">The culture to localize for.</param>
+    /// <param name="tokens">Optional token replacements. This can be null.</param>
+    /// <returns>The localized string, or the key wrapped in brackets if not found.</returns>
     public string Localize(string key, CultureInfo culture, IDictionary<string, string?>? tokens = null)
     {
         if (culture == null)

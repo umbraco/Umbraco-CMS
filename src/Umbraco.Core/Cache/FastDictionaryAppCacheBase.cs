@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 public abstract class FastDictionaryAppCacheBase : IAppCache
 {
-    // prefix cache keys so we know which one are ours
+    /// <summary>
+    ///     The prefix used for all cache keys to distinguish them from other cache entries.
+    /// </summary>
     protected const string CacheItemPrefix = "umbrtmche";
 
     #region IAppCache
@@ -264,26 +266,53 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
 
     #region Dictionary
 
-    // manipulate the underlying cache entries
-    // these *must* be called from within the appropriate locks
-    // and use the full prefixed cache keys
+    /// <summary>
+    ///     Gets all dictionary entries from the underlying cache.
+    /// </summary>
+    /// <returns>The dictionary entries.</returns>
+    /// <remarks>Must be called from within the appropriate locks.</remarks>
     protected abstract IEnumerable<KeyValuePair<object, object>> GetDictionaryEntries();
 
+    /// <summary>
+    ///     Removes an entry from the underlying cache.
+    /// </summary>
+    /// <param name="key">The full prefixed cache key.</param>
+    /// <remarks>Must be called from within the appropriate locks.</remarks>
     protected abstract void RemoveEntry(string key);
 
+    /// <summary>
+    ///     Gets an entry from the underlying cache.
+    /// </summary>
+    /// <param name="key">The full prefixed cache key.</param>
+    /// <returns>The cached value, or <c>null</c> if not found.</returns>
+    /// <remarks>Must be called from within the appropriate locks.</remarks>
     protected abstract object? GetEntry(string key);
 
-    // read-write lock the underlying cache
-    // protected abstract IDisposable ReadLock { get; }
-    // protected abstract IDisposable WriteLock { get; }
+    /// <summary>
+    ///     Enters a read lock on the underlying cache.
+    /// </summary>
     protected abstract void EnterReadLock();
 
+    /// <summary>
+    ///     Exits the read lock on the underlying cache.
+    /// </summary>
     protected abstract void ExitReadLock();
 
+    /// <summary>
+    ///     Enters a write lock on the underlying cache.
+    /// </summary>
     protected abstract void EnterWriteLock();
 
+    /// <summary>
+    ///     Exits the write lock on the underlying cache.
+    /// </summary>
     protected abstract void ExitWriteLock();
 
+    /// <summary>
+    ///     Gets the prefixed cache key.
+    /// </summary>
+    /// <param name="key">The public cache key.</param>
+    /// <returns>The full prefixed cache key.</returns>
     protected string GetCacheKey(string key) => $"{CacheItemPrefix}-{key}";
 
     #endregion

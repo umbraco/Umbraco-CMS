@@ -34,6 +34,8 @@ public class ChildrenScriptTreeController : ScriptTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of script tree child items.")]
+    [EndpointDescription("Gets a paginated collection of script tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> Children(
         CancellationToken cancellationToken,
         string parentPath,

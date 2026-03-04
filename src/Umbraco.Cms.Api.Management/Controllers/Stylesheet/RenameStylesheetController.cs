@@ -34,6 +34,8 @@ public class RenameStylesheetController : StylesheetControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Renames a stylesheet.")]
+    [EndpointDescription("Renames a stylesheet file to the specified new name.")]
     public async Task<IActionResult> Rename(
         CancellationToken cancellationToken,
         string path,

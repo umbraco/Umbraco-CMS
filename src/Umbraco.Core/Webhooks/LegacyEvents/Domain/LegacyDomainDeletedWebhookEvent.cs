@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a domain is deleted, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Domain Deleted")]
 public class LegacyDomainDeletedWebhookEvent : WebhookEventBase<DomainDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyDomainDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyDomainDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class LegacyDomainDeletedWebhookEvent : WebhookEventBase<DomainDeletedNot
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.DomainDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(DomainDeletedNotification notification)
         => notification.DeletedEntities;
 }

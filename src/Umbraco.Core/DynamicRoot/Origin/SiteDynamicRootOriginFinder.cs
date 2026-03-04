@@ -5,19 +5,31 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
+/// <summary>
+///     An origin finder that locates the nearest ancestor content item with an assigned domain (site root).
+///     This finder handles the "Site" origin type and extends <see cref="RootDynamicRootOriginFinder"/>,
+///     falling back to the content tree root if no domain is found.
+/// </summary>
 public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
 {
     private readonly IEntityService _entityService;
     private readonly IDomainService _domainService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SiteDynamicRootOriginFinder"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service used to retrieve entities and traverse the content tree.</param>
+    /// <param name="domainService">The domain service used to check for assigned domains on content items.</param>
     public SiteDynamicRootOriginFinder(IEntityService entityService, IDomainService domainService) : base(entityService)
     {
         _entityService = entityService;
         _domainService = domainService;
     }
 
+    /// <inheritdoc/>
     protected override string SupportedOriginType { get; set; } = "Site";
 
+    /// <inheritdoc/>
     public override Guid? FindOriginKey(DynamicRootNodeQuery query)
     {
         if (query.OriginAlias != SupportedOriginType)

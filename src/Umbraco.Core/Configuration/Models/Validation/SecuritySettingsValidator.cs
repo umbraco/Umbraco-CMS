@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Cms.Core.Configuration.Models.Validation;
 
+/// <summary>
+///     Validator for configuration represented as <see cref="SecuritySettings" />.
+/// </summary>
 public class SecuritySettingsValidator : ConfigurationValidatorBase, IValidateOptions<SecuritySettings>
 {
+    /// <inheritdoc />
     public ValidateOptionsResult Validate(string? name, SecuritySettings options)
     {
         if (options.BackOfficeHost != null)

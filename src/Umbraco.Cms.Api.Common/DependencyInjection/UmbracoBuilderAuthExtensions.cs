@@ -145,6 +145,12 @@ public static class UmbracoBuilderAuthExtensions
                         .UseSingletonHandler<HideBackOfficeTokensHandler>()
                         .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
                 });
+                options.AddEventHandler<OpenIddictServerEvents.ExtractRevocationRequestContext>(configuration =>
+                {
+                    configuration
+                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractRevocationRequestContext>.Descriptor.Order + 1);
+                });
             })
 
             // Register the OpenIddict validation components.
