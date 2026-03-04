@@ -282,6 +282,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ISiteIdentifierService, SiteIdentifierService>();
+
+            // Register HMAC secret key service for imaging URL authentication
+            Services.AddUnique<IHmacSecretKeyService, HmacSecretKeyService>();
             Services.AddUnique<ITelemetryService, TelemetryService>();
 
             Services.AddUnique<IKeyValueService, KeyValueService>();
@@ -328,11 +331,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentTypeEditingService, ContentTypeEditingService>();
             Services.AddUnique<IMediaTypeEditingService, MediaTypeEditingService>();
             Services.AddUnique<IFileService, FileService>();
-            Services.AddUnique<ITemplateService, TemplateService>();
+            Services.AddUnique<ITemplateService>(sp => ActivatorUtilities.CreateInstance<TemplateService>(sp));
             Services.AddUnique<IScriptService, ScriptService>();
             Services.AddUnique<IStylesheetService, StylesheetService>();
             Services.AddUnique<IStylesheetFolderService, StylesheetFolderService>();
-            Services.AddUnique<IPartialViewService, PartialViewService>();
+            Services.AddUnique<IPartialViewService>(sp => ActivatorUtilities.CreateInstance<PartialViewService>(sp));
             Services.AddUnique<IScriptFolderService, ScriptFolderService>();
             Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();
             Services.AddUnique<ITemporaryFileService, TemporaryFileService>();
