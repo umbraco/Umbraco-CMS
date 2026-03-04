@@ -38,6 +38,8 @@ public class ValidateCreateDocumentController : CreateDocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates creating a document.")]
+    [EndpointDescription("Validates the request model for creating a new document without actually creating it.")]
     public async Task<IActionResult> Validate(CancellationToken cancellationToken, CreateDocumentRequestModel requestModel)
         => await HandleRequest(requestModel, async () =>
         {

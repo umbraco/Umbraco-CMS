@@ -10,6 +10,7 @@ export * from './folder/index.js';
 export * from './tree-item/index.js';
 export * from './tree-menu-item/index.js';
 export * from './tree.element.js';
+export * from './entity-actions/move/index.js';
 export type * from './types.js';
 
 export type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal/index.js';

@@ -4,11 +4,21 @@ using Umbraco.Cms.Core.Models.TemplateQuery;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for building query condition expressions.
+/// </summary>
 public static class QueryConditionExtensions
 {
     private static Lazy<MethodInfo> StringContainsMethodInfo =>
         new(() => typeof(string).GetMethod("Contains", new[] { typeof(string) })!);
 
+    /// <summary>
+    ///     Builds a lambda expression predicate from a query condition.
+    /// </summary>
+    /// <typeparam name="T">The type of the entity being queried.</typeparam>
+    /// <param name="condition">The query condition to convert.</param>
+    /// <param name="parameterAlias">The alias to use for the parameter in the expression.</param>
+    /// <returns>A lambda expression that can be used to filter entities.</returns>
     public static Expression<Func<T, bool>> BuildCondition<T>(this QueryCondition condition, string parameterAlias)
     {
         object constraintValue;

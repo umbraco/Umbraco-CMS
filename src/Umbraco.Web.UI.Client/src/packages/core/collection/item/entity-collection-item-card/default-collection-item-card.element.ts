@@ -4,9 +4,11 @@ import { getItemFallbackName, getItemFallbackIcon } from '@umbraco-cms/backoffic
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWithOptionalThumbnailModel } from '@umbraco-cms/backoffice/models';
+import type { UmbWithOptionalDescriptionModel, UmbWithOptionalThumbnailModel } from '@umbraco-cms/backoffice/models';
 
-type UmbDefaultCollectionItemCardItemModel = UmbCollectionItemModel & UmbWithOptionalThumbnailModel;
+type UmbDefaultCollectionItemCardItemModel = UmbCollectionItemModel &
+	UmbWithOptionalThumbnailModel &
+	UmbWithOptionalDescriptionModel;
 
 @customElement('umb-default-collection-item-card')
 export class UmbDefaultCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
@@ -46,6 +48,7 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 		return html`
 			<umb-figure-card
 				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+				description=${ifDefined(this.item.description ?? undefined)}
 				href=${ifDefined(this.href)}
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}

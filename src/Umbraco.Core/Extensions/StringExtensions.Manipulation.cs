@@ -14,6 +14,8 @@ public static partial class StringExtensions
 {
     private const char DefaultEscapedStringEscapeChar = '\\';
 
+    // Match valid HTML tags: must start with letter, /, or ! after <.
+    // This avoids matching empty <> or mathematical expressions like "5 < 10 > 3".
     [GeneratedRegex(@"<[a-zA-Z/!][\s\S]*?>")]
     private static partial Regex StringHtmlRegex();
 
@@ -393,11 +395,44 @@ public static partial class StringExtensions
     /// <param name="text">The text to strip HTML from.</param>
     /// <returns>The string with all HTML tags removed.</returns>
     public static string StripHtml(this string text)
+        => StripHtml(text, string.Empty);
+
+    /// <summary>
+    /// Strips all HTML tags from a string, replacing them with the specified character and ensuring that
+    /// no more than one instance of the replacement string appears in a row.
+    /// </summary>
+    /// <param name="text">The text to strip HTML from.</param>
+    /// <param name="replacement">The string to replace the HTML tags with.</param>
+    /// <returns>The string with all HTML tags removed.</returns>
+    public static string StripHtml(this string text, string replacement)
     {
-        // Match valid HTML tags: must start with letter, /, or ! after <.
-        // This avoids matching empty <> or mathematical expressions like "5 < 10 > 3".
-        const string pattern = @"<[a-zA-Z/!][\s\S]*?>";
-        return StringHtmlRegex().Replace(text, string.Empty);
+        var stripped = StringHtmlRegex().Replace(text, replacement);
+        if (string.IsNullOrEmpty(replacement))
+        {
+            return stripped;
+        }
+
+        // Collapse consecutive replacements into a single instance (e.g. "</p><p>" produces two
+        // adjacent replacements).
+        var doubled = replacement + replacement;
+        while (stripped.Contains(doubled))
+        {
+            stripped = stripped.Replace(doubled, replacement);
+        }
+
+        // Remove the leading/trailing replacement left over from outer tags (e.g. the opening
+        // <p> and closing </p> that wrap the entire content).
+        if (stripped.StartsWith(replacement))
+        {
+            stripped = stripped[replacement.Length..];
+        }
+
+        if (stripped.EndsWith(replacement))
+        {
+            stripped = stripped[..^replacement.Length];
+        }
+
+        return stripped.Trim();
     }
 
     /// <summary>
@@ -447,6 +482,31 @@ public static partial class StringExtensions
         truncatedString += suffix;
 
         return truncatedString;
+    }
+
+    /// <summary>
+    /// Truncates a string to the specified maximum length and appends a hash-based suffix to preserve uniqueness.
+    /// </summary>
+    /// <param name="text">The text to truncate.</param>
+    /// <param name="maxLength">The maximum length of the resulting string including the hash suffix.</param>
+    /// <returns>
+    /// The original string if it does not exceed <paramref name="maxLength"/>;
+    /// otherwise a truncated string with a deterministic 8-character hex hash suffix (e.g. "-a1b2c3d4")
+    /// derived from the full original text, guaranteeing that different inputs produce different results.
+    /// </returns>
+    public static string TruncateWithUniqueHash(this string text, int maxLength)
+    {
+        if (text.Length <= maxLength)
+        {
+            return text;
+        }
+
+        // 9 chars reserved for "-" + 8 hex digits from a SHA-256 hash.
+        const int HashSuffixLength = 9;
+
+        var hash = Convert.ToHexStringLower(
+            System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(text)))[..(HashSuffixLength - 1)];
+        return $"{text[..(maxLength - HashSuffixLength)]}-{hash}";
     }
 
     /// <summary>

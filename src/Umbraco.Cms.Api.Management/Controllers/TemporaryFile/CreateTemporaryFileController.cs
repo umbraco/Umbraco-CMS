@@ -26,6 +26,8 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Creates a temporary file.")]
+    [EndpointDescription("Uploads and creates a temporary file that can be used in subsequent operations.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         [FromForm] CreateTemporaryFileRequestModel model)

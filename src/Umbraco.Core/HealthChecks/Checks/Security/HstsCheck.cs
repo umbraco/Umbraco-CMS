@@ -47,9 +47,9 @@ public class HstsCheck : BaseHttpHeaderCheck
         new HealthCheckStatus[] { await CheckForHeader() };
 
     /// <summary>
-    /// The health check task.
+    ///     The health check task that verifies the HSTS header.
     /// </summary>
-    /// <returns>A <see cref="Task{HealthCheckStatus}"/> with the result type reversed on localhost.</returns>
+    /// <returns>A <see cref="Task{HealthCheckStatus}" /> with the result type reversed on localhost.</returns>
     protected new async Task<HealthCheckStatus> CheckForHeader()
     {
         HealthCheckStatus checkHeaderResult = await base.CheckForHeader();

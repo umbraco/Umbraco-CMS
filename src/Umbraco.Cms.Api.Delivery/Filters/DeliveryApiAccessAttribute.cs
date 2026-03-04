@@ -4,7 +4,11 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-internal sealed class DeliveryApiAccessAttribute : TypeFilterAttribute
+/// <summary>
+/// An action filter attribute that verifies public or preview access to the Delivery API, returning
+/// a <c>401 Unauthorized</c> result if access is denied.
+/// </summary>
+public sealed class DeliveryApiAccessAttribute : TypeFilterAttribute
 {
     public DeliveryApiAccessAttribute()
         : base(typeof(DeliveryApiAccessFilter))
