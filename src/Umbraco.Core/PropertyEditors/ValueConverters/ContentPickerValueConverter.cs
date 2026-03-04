@@ -118,12 +118,12 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     }
 
     private static bool IsExcludedProperty(IPublishedPropertyType propertyType)
-        => propertyType.Alias != null
+        => propertyType.Alias is not null
            && PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture));
 
     private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter, bool preview)
     {
-        if (inter == null || IsExcludedProperty(propertyType))
+        if (inter is null || IsExcludedProperty(propertyType))
         {
             return null;
         }
