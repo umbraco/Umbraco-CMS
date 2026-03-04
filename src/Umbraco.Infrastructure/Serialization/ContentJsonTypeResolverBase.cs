@@ -1,7 +1,5 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Umbraco.Cms.Core.Models.DeliveryApi;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
@@ -20,36 +18,15 @@ public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
         return jsonTypeInfo;
     }
 
-    public virtual Type[] GetDerivedTypes(JsonTypeInfo jsonTypeInfo)
-    {
-        if (jsonTypeInfo.Type == typeof(IApiContent))
-        {
-            return new[] { typeof(ApiContent) };
-        }
-
-        if (jsonTypeInfo.Type == typeof(IApiContentResponse))
-        {
-            return new[] { typeof(ApiContentResponse) };
-        }
-
-        if (jsonTypeInfo.Type == typeof(IRichTextElement))
-        {
-            return new[] { typeof(RichTextRootElement), typeof(RichTextGenericElement), typeof(RichTextTextElement) };
-        }
-
-        return Array.Empty<Type>();
-    }
+    public virtual Type[] GetDerivedTypes(JsonTypeInfo jsonTypeInfo) => [];
 
     public void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, params Type[] derivedTypes)
     {
-        jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
-        {
-            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
-        };
+        jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions();
 
         foreach (Type derivedType in derivedTypes)
         {
-            jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType));
+            jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType, derivedType.Name));
         }
     }
 }

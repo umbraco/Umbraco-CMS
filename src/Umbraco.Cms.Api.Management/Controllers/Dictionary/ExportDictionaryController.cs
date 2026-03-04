@@ -24,7 +24,7 @@ public class ExportDictionaryController : DictionaryControllerBase
 
     [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK, MediaTypeNames.Application.Octet)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Exports a dictionary.")]
     [EndpointDescription("Exports the dictionary identified by the provided Id to a downloadable format.")]

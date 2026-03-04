@@ -39,7 +39,7 @@ Umbraco.Cms.Api.Delivery/
 ├── Services/                  # Business logic and query building
 ├── Caching/                   # Output cache policies
 ├── Rendering/                 # Output expansion strategies
-├── Configuration/             # Swagger configuration
+├── Configuration/             # OpenAPI configuration
 └── Filters/                   # Action filters (access, validation)
 ```
 
@@ -200,10 +200,9 @@ context.EnableOutputCaching = requestPreviewService.IsPreview() is false
 
 ### Technical Debt (TODOs in codebase)
 
-1. **V1 Removal Pending** (4 locations):
+1. **V1 Removal Pending** (2 locations):
    - `DependencyInjection/UmbracoBuilderExtensions.cs:98` - FIXME: remove matcher policy
    - `Routing/DeliveryApiItemsEndpointsMatcherPolicy.cs:11` - FIXME: remove class
-   - `Filters/SwaggerDocumentationFilterBase.cs:79,83` - FIXME: remove V1 swagger docs
 
 2. **Obsolete Reference Warnings** (csproj:9-13):
    - `ASP0019` - IHeaderDictionary.Append usage

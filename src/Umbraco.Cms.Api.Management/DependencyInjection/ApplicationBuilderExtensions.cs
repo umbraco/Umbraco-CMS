@@ -1,14 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
@@ -53,24 +51,17 @@ internal static class ApplicationBuilderExtensions
                 }));
             });
 
-internal static IApplicationBuilder UseEndpoints(this IApplicationBuilder applicationBuilder)
+internal static void MapManagementApiEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        IServiceProvider provider = applicationBuilder.ApplicationServices;
+        var backOfficePath = endpoints.ServiceProvider.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
 
-        applicationBuilder.UseEndpoints(endpoints =>
+        // Maps attribute routed controllers.
+        endpoints.MapControllers();
+
+        // Serve contract
+        endpoints.MapGet($"{backOfficePath}{Constants.Web.ManagementApiPath}openapi.json", async context =>
         {
-            var backOfficePath = provider.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
-
-            // Maps attribute routed controllers.
-            endpoints.MapControllers();
-
-            // Serve contract
-            endpoints.MapGet($"{backOfficePath}{Constants.Web.ManagementApiPath}openapi.json", async context =>
-            {
-                await context.Response.SendFileAsync(new EmbeddedFileProvider(typeof(ManagementApiComposer).Assembly).GetFileInfo("OpenApi.json"));
-            });
+            await context.Response.SendFileAsync(new EmbeddedFileProvider(typeof(ManagementApiComposer).Assembly).GetFileInfo("OpenApi.json"));
         });
-
-        return applicationBuilder;
     }
 }

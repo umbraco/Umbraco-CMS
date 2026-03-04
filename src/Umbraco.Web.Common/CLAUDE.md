@@ -316,8 +316,7 @@ Multiple analyzer warnings suppressed:
 1. **MVC Global State** (UmbracoBuilderExtensions.cs:210-211): `AddControllersWithViews` modifies global app, order matters
 2. **OptionsMonitor Hack** (AspNetCore/OptionsMonitorAdapter.cs:6): Temporary workaround for TypeLoader during ConfigureServices
 3. **DisposeResources TODO** (UmbracoContext.cs:168-171): Empty dispose method marked for removal
-4. **Pipeline Default Implementations** (IUmbracoPipelineFilter.cs:36,45): Default methods to remove in Umbraco 13
-5. **SignIn Manager Sharing** (MemberSignInManager.cs:319,325): Could share code with backoffice sign-in
+4. **SignIn Manager Sharing** (MemberSignInManager.cs:319,325): Could share code with backoffice sign-in
 
 ### Session Configuration
 
