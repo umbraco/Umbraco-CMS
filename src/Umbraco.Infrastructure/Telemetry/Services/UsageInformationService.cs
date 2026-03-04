@@ -16,9 +16,10 @@ internal sealed class UsageInformationService : IUsageInformationService
         _providers = providers;
     }
 
-    public IEnumerable<UsageInformation>? GetDetailed()
+    /// <inheritdoc/>
+    public async Task<IEnumerable<UsageInformation>?> GetDetailedAsync()
     {
-        if (_metricsConsentService.GetConsentLevel() != TelemetryLevel.Detailed)
+        if (await _metricsConsentService.GetConsentLevelAsync() != TelemetryLevel.Detailed)
         {
             return null;
         }

@@ -153,11 +153,15 @@ public class UmbracoPlan : MigrationPlan
 
         // To 17.3.0
         To<V_17_3_0.IncreaseSizeOfLongRunningOperationTypeColumn>("{B2F4A1C3-8D5E-4F6A-9B7C-3E1D2A4F5B6C}");
+        To<V_17_3_0.RetrustForeignKeyAndCheckConstraints>("{0638E0E0-D914-4ACA-8A4B-9551A3AAB91F}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
         //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
+        To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
         To<V_18_0_0.AddWebhookDto>("{F3CC0076-0692-41E5-9B2B-C58D46E556D4}");
+        To<V_18_0_0.AddLastSyncedDto>("{5CFD4E2B-4024-42FE-9C70-295D0141ECAF}");
+        To<V_18_0_0.AddKeyValueDto>("{ABDB0A9C-7476-4E00-B4C2-638FDF347AA0}");
     }
 }

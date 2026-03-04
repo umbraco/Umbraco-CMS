@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.NotificationHandlers;
 /// Invalidates backoffice sessions and clears external logins for removed providers if the external login
 /// provider setup has changed.
 /// </summary>
-internal sealed class ExternalLoginProviderStartupHandler : INotificationHandler<UmbracoApplicationStartingNotification>
+internal sealed class ExternalLoginProviderStartupHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
 {
     private readonly IBackOfficeExternalLoginProviders _backOfficeExternalLoginProviders;
     private readonly IRuntimeState _runtimeState;
@@ -31,7 +31,7 @@ internal sealed class ExternalLoginProviderStartupHandler : INotificationHandler
     }
 
     /// <inheritdoc/>
-    public void Handle(UmbracoApplicationStartingNotification notification)
+    public async Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.Level != RuntimeLevel.Run ||
             _serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber)
@@ -39,6 +39,6 @@ internal sealed class ExternalLoginProviderStartupHandler : INotificationHandler
             return;
         }
 
-        _backOfficeExternalLoginProviders.InvalidateSessionsIfExternalLoginProvidersChanged();
+        await _backOfficeExternalLoginProviders.InvalidateSessionsIfExternalLoginProvidersChangedAsync();
     }
 }

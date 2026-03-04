@@ -25,6 +25,14 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly AsyncRepositoryCachePolicyOptions _options;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AsyncDefaultRepositoryCachePolicy{TEntity, TId}"/> class.
+    /// </summary>
+    /// <param name="cache">The application policy cache.</param>
+    /// <param name="scopeAccessor">The scope accessor for accessing the current scope.</param>
+    /// <param name="options">The cache policy options.</param>
+    /// <param name="repositoryCacheVersionService">The service for managing cache version synchronization.</param>
+    /// <param name="cacheSyncService">The service for synchronizing cache changes across servers.</param>
     public AsyncDefaultRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
@@ -34,6 +42,9 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
         : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
+    /// <summary>
+    ///     Gets the cache key prefix for this entity type.
+    /// </summary>
     protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />
@@ -129,7 +140,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet)
+    public override async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
 
@@ -175,9 +186,10 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists)
+    public override async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
+
         // if found in cache the return else check
         var cacheKey = GetEntityCacheKey(id);
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -188,6 +200,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     public override async Task<TEntity[]> GetAllAsync(Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
+
         // get everything we have
         TEntity?[] entities = Cache.GetCacheItemsByKeySearch<TEntity>(EntityTypeCacheKey)
             .ToArray(); // no need for null checks, we are not caching nulls
@@ -237,10 +250,10 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity[]> GetManyAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetMany)
+    public override async Task<TEntity[]> GetManyAsync(TId[] ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
-        if (ids?.Length > 0)
+        if (ids.Length > 0)
         {
             // try to get each entity from the cache
             // if we can find all of them, return
@@ -305,8 +318,18 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     /// <inheritdoc />
     public override async Task ClearAllAsync() => Cache.ClearByKey(EntityTypeCacheKey);
 
+    /// <summary>
+    ///     Gets the cache key for an entity with the specified integer identifier.
+    /// </summary>
+    /// <param name="id">The integer identifier.</param>
+    /// <returns>The cache key.</returns>
     protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
 
+    /// <summary>
+    ///     Gets the cache key for an entity with the specified identifier.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <returns>The cache key.</returns>
     protected string GetEntityCacheKey(TId? id)
     {
         if (EqualityComparer<TId>.Default.Equals(id, default))
@@ -322,9 +345,18 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
         return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
     }
 
+    /// <summary>
+    ///     Inserts an entity into the cache with a sliding expiration.
+    /// </summary>
+    /// <param name="cacheKey">The cache key.</param>
+    /// <param name="entity">The entity to cache.</param>
     protected virtual void InsertEntity(string cacheKey, TEntity entity)
         => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
 
+    /// <summary>
+    ///     Inserts a sentinel null value into the cache to represent a known missing entity.
+    /// </summary>
+    /// <param name="cacheKey">The cache key.</param>
     protected virtual void InsertNull(string cacheKey)
     {
         // We can't actually cache a null value, as in doing so wouldn't be able to distinguish between
@@ -334,6 +366,10 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
         Cache.Insert(cacheKey, () => Constants.Cache.NullRepresentationInCache, TimeSpan.FromMinutes(5), true);
     }
 
+    /// <summary>
+    ///     Inserts a set of entities individually into the cache, each with a sliding expiration.
+    /// </summary>
+    /// <param name="entities">The entities to cache, or <see langword="null"/> to cache nothing.</param>
     protected virtual void InsertEntities(TEntity[]? entities)
     {
         if (entities is not null)

@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Services.OperationStatus;
+
 namespace Umbraco.Cms.Core.Sync;
 
 /// <summary>
@@ -21,18 +23,18 @@ public interface ILastSyncedManager
     /// Saves the last synced Internal ID to the Database.
     /// </summary>
     /// <param name="id">The last synced internal ID.</param>
-    Task SaveLastSyncedInternalAsync(int id);
+    Task<Attempt<LastSyncedOperationStatus>> SaveLastSyncedInternalAsync(int id);
 
     /// <summary>
     /// Saves the last synced External ID to the Database.
     /// </summary>
     /// <param name="id">The last synced external ID.</param>
-    Task SaveLastSyncedExternalAsync(int id);
+    Task<Attempt<LastSyncedOperationStatus>> SaveLastSyncedExternalAsync(int id);
 
     /// <summary>
     /// Deletes entries older than the set parameter. This method also removes any entries where both
     /// IDs are higher than the lowest synced CacheInstruction ID.
     /// </summary>
     /// <param name="date">Any date entries in the DB before this parameter, will be removed from the Database.</param>
-    Task DeleteOlderThanAsync(DateTime date);
+    Task<Attempt<LastSyncedOperationStatus>> DeleteOlderThanAsync(DateTime date);
 }

@@ -1567,6 +1567,7 @@ export default {
 		noLockouts: 'nebyl uzamčen',
 		noPasswordChange: 'Heslo nebylo změněno',
 		confirmNewPassword: 'Potvrdit heslo',
+		confirmPassword: 'Potvrdit heslo',
 		changePasswordDescription:
 			"Můžete změnit své heslo pro přístup do administrace Umbraca vyplněním formuláře níže a kliknutím na tlačítko 'Změnit Heslo'",
 		contentChannel: 'Kanál obsahu',

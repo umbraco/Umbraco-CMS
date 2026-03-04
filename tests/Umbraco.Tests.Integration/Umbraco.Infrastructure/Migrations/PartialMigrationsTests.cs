@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -53,6 +54,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         var upgrader = new Upgrader(plan);
 
         var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
+        var stateValueKey = await KeyValueService.GetValueAsync(upgrader.StateValueKey);
 
         Assert.Multiple(() =>
         {
@@ -64,7 +66,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
             // Ensure that the partial success is saved in the keyvalue service so next plan execution starts correctly.
             using var scope = ScopeProvider.CreateScope(autoComplete: true);
-            Assert.AreEqual("a", KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.AreEqual("a", stateValueKey);
             // Ensure that the changes from the first migration is persisted
             Assert.IsTrue(scope.Database.HasTable(TableName));
             // But that the final migration wasn't run
@@ -75,7 +77,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         ErrorMigration.ShouldExplode = false;
         upgrader = new Upgrader(plan);
         result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
-
+        stateValueKey = await KeyValueService.GetValueAsync(upgrader.StateValueKey);
         Assert.Multiple(() =>
         {
             Assert.AreEqual("a", result.InitialState);
@@ -86,7 +88,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
             // Ensure that everything got updated in the database.
             using var scope = ScopeProvider.CreateScope(autoComplete: true);
-            Assert.AreEqual("c", KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.AreEqual("c", stateValueKey);
             Assert.IsTrue(scope.Database.HasTable(TableName));
             Assert.IsTrue(ColumnExists(TableName, ColumnName, scope));
         });
@@ -122,6 +124,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         var upgrader = new Upgrader(plan);
         var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
+        var stateValueKey = await KeyValueService.GetValueAsync(upgrader.StateValueKey);
 
         Assert.Multiple(() =>
         {
@@ -133,7 +136,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
             Assert.AreEqual(string.Empty, result.FinalState);
 
             using var scope = ScopeProvider.CreateCoreScope();
-            Assert.IsNull(KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.IsNull(stateValueKey);
         });
     }
 
@@ -152,6 +155,37 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Successful);
         Assert.AreEqual(2, result.CompletedTransitions.Count);
         Assert.AreEqual("b", result.FinalState);
+    }
+
+    [Test]
+    public async Task PackageMigrationPlan_ResumesFromSavedState_WhenNewStepIsAdded()
+    {
+        // Run a package migration plan with 2 steps.
+        var plan1 = new TwoStepTestPackageMigrationPlan();
+        var upgrader1 = new Upgrader(plan1);
+        var result1 = await upgrader1.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result1.Successful);
+            Assert.AreEqual(string.Empty, result1.InitialState);
+            Assert.AreEqual("b", result1.FinalState);
+            Assert.AreEqual(2, result1.CompletedTransitions.Count);
+        });
+
+        // Run an extended plan with 3 steps under the same plan name.
+        // Only the new step should execute.
+        var plan2 = new ThreeStepTestPackageMigrationPlan();
+        var upgrader2 = new Upgrader(plan2);
+        var result2 = await upgrader2.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result2.Successful);
+            Assert.AreEqual("b", result2.InitialState);
+            Assert.AreEqual("c", result2.FinalState);
+            Assert.AreEqual(1, result2.CompletedTransitions.Count);
+        });
     }
 
     [Test]
@@ -193,6 +227,48 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         await databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
 
         Assert.IsTrue(notificationPublished);
+    }
+
+    private class TwoStepTestPackageMigrationPlan : PackageMigrationPlan
+    {
+        public const string TestPlanName = "TestPackagePlan";
+
+        public TwoStepTestPackageMigrationPlan()
+            : base(TestPlanName)
+        {
+        }
+
+        protected override void DefinePlan()
+        {
+            To<NoOpMigration>("a");
+            To<NoOpMigration>("b");
+        }
+    }
+
+    private class ThreeStepTestPackageMigrationPlan : PackageMigrationPlan
+    {
+        public ThreeStepTestPackageMigrationPlan()
+            : base(TwoStepTestPackageMigrationPlan.TestPlanName)
+        {
+        }
+
+        protected override void DefinePlan()
+        {
+            To<NoOpMigration>("a");
+            To<NoOpMigration>("b");
+            To<NoOpMigration>("c");
+        }
+    }
+
+    private class NoOpMigration : MigrationBase
+    {
+        public NoOpMigration(IMigrationContext context) : base(context)
+        {
+        }
+
+        protected override void Migrate()
+        {
+        }
     }
 
     private bool ColumnExists(string tableName, string columnName, IScope scope) =>
@@ -333,6 +409,7 @@ internal class TestUmbracoPlan : UmbracoPlan
         To<AddColumnMigration>("c");
     }
 }
+
 
 internal class SimpleMigrationPlan : MigrationPlan
 {

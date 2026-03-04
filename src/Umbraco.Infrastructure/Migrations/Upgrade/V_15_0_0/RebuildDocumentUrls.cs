@@ -34,5 +34,5 @@ public class RebuildDocumentUrls : MigrationBase
         // This ensures URL generation runs when all services are fully initialized,
         // rather than during migration when variant content data may not be accessible.
         // See: https://github.com/umbraco/Umbraco-CMS/issues/21337
-        _keyValueService.SetValue(DocumentUrlService.RebuildKey, string.Empty);
+        _keyValueService.SetValueAsync(DocumentUrlService.RebuildKey, string.Empty);
 }

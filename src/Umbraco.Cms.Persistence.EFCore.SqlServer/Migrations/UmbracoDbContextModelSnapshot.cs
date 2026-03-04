@@ -233,6 +233,83 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoOpenIddictTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.CacheInstructionDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("InstructionCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1)
+                        .HasColumnName("instructionCount");
+
+                    b.Property<string>("Instructions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("jsonInstruction");
+
+                    b.Property<string>("OriginIdentity")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("originated");
+
+                    b.Property<DateTime>("UtcStamp")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("utcStamp");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("umbracoCacheInstruction", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.KeyValueDto", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("key");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("value");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("umbracoKeyValue", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LastSyncedDto", b =>
+                {
+                    b.Property<string>("MachineId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("machineId");
+
+                    b.Property<DateTime>("LastSyncedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("lastSyncedDate");
+
+                    b.Property<int?>("LastSyncedExternalId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LastSyncedInternalId")
+                        .HasColumnType("int")
+                        .HasColumnName("lastSyncedInternalId");
+
+                    b.HasKey("MachineId");
+
+                    b.ToTable("umbracoLastSynced", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
                 {
                     b.Property<int>("WebhookId")

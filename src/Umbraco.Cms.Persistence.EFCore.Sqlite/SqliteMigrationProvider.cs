@@ -4,7 +4,6 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
@@ -53,6 +52,8 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.UpdateOpenIddictToV5 => typeof(Migrations.UpdateOpenIddictToV5),
             EFCoreMigration.UpdateOpenIddictToV7 => typeof(Migrations.UpdateOpenIddictToV7),
             EFCoreMigration.AddWebhookDto => typeof(Migrations.AddWebhookDto),
+            EFCoreMigration.AddLastSyncedDto => typeof(Migrations.AddLastSyncedDto),
+            EFCoreMigration.AddKeyValueDto => typeof(Migrations.AddKeyValueDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

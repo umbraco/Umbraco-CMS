@@ -240,16 +240,16 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private async Task<MigrationContext> RunUnscopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
-        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), () => OnComplete(plan, transition.TargetState));
+        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), async void () => await OnCompleteAsync(plan, transition.TargetState));
 
         await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
 
         return context;
     }
 
-    private void OnComplete(MigrationPlan plan, string targetState)
+    private async Task OnCompleteAsync(MigrationPlan plan, string targetState)
     {
-        _keyValueService.SetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, targetState);
+        await _keyValueService.SetValueAsync(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, targetState);
     }
 
     private async Task<MigrationContext> RunScopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
@@ -265,7 +265,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                 plan,
                 _scopeAccessor.AmbientScope?.Database,
                 _loggerFactory.CreateLogger<MigrationContext>(),
-                () => OnComplete(plan, transition.TargetState));
+                async void () => await OnCompleteAsync(plan, transition.TargetState));
 
             await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
 

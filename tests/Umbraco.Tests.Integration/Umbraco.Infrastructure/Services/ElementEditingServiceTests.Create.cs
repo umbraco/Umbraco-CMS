@@ -441,13 +441,39 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
-    [Ignore("We will get around to fixing this as part of the general Elements clean-up task.", Until = "2026-03-31")]
-    // TODO ELEMENTS: make ContentEditingServiceBase element aware so it can guard against this test case
-    // TODO ELEMENTS: create a similar test for content creation based on element types
     public async Task Cannot_Create_Element_Based_On_NonElement_ContentType()
     {
         var contentType = ContentTypeBuilder.CreateSimpleContentType();
         Assert.IsFalse(contentType.IsElement);
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Element_Based_On_ContentType_Not_Allowed_In_Library()
+    {
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.IsElement = true;
+        contentType.AllowedInLibrary = false;
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 

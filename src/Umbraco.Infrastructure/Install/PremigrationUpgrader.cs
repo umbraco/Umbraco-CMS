@@ -50,7 +50,7 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
         }
 
         var plan = new UmbracoPremigrationPlan();
-        if (HasMissingPremigrations(plan) is false)
+        if (await HasMissingPremigrations(plan) is false)
         {
             return;
         }
@@ -68,9 +68,9 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
         }
     }
 
-    private bool HasMissingPremigrations(UmbracoPremigrationPlan umbracoPremigrationPlan)
+    private async Task<bool> HasMissingPremigrations(UmbracoPremigrationPlan umbracoPremigrationPlan)
     {
-        var premigrationState = _keyValueService.GetValue(Constants.Conventions.Migrations.UmbracoUpgradePlanPremigrationsKey);
+        var premigrationState = await _keyValueService.GetValueAsync(Constants.Conventions.Migrations.UmbracoUpgradePlanPremigrationsKey);
 
         return umbracoPremigrationPlan.FinalState != premigrationState;
     }

@@ -759,6 +759,8 @@ export default {
 		changePassword: 'Change Your Password',
 		changePasswordDescription:
 			"You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button",
+		confirmNewPassword: '새 비밀번호 확인',
+		confirmPassword: '비밀번호 확인',
 		contentChannel: '컨텐츠 채널',
 		descriptionField: '설명 필드',
 		disabled: '사용자 비활성화',

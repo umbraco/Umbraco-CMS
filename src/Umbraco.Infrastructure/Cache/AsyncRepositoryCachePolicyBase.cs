@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Scoping.EFCore;
 
@@ -21,8 +20,13 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     private readonly IRepositoryCacheVersionService _cacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
 
-    protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
-
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AsyncRepositoryCachePolicyBase{TEntity, TId}"/> class.
+    /// </summary>
+    /// <param name="globalCache">The global application policy cache.</param>
+    /// <param name="scopeAccessor">The scope accessor for accessing the current scope.</param>
+    /// <param name="cacheVersionService">The service for managing cache version synchronization.</param>
+    /// <param name="cacheSyncService">The service for synchronizing cache changes across servers.</param>
     protected AsyncRepositoryCachePolicyBase(
         IAppPolicyCache globalCache,
         IScopeAccessor scopeAccessor,
@@ -35,6 +39,9 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
         _cacheSyncService = cacheSyncService ?? throw new ArgumentNullException(nameof(cacheSyncService));
     }
 
+    /// <summary>
+    ///     Gets the application policy cache, selecting global, scoped, or no-op based on the ambient scope's cache mode.
+    /// </summary>
     protected IAppPolicyCache Cache
     {
         get
@@ -56,13 +63,13 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     }
 
     /// <inheritdoc />
-    public abstract Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet);
+    public abstract Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
     public abstract Task<TEntity?> GetCachedAsync(TId id);
 
     /// <inheritdoc />
-    public abstract Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists);
+    public abstract Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
     public abstract Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNew);
@@ -77,7 +84,7 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     public abstract Task<TEntity[]> GetAllAsync(Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
-    public abstract Task<TEntity[]> GetManyAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetMany);
+    public abstract Task<TEntity[]> GetManyAsync(TId[] ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
     public abstract Task ClearAllAsync();
@@ -100,21 +107,4 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     /// Registers a change in the cache.
     /// </summary>
     protected async Task RegisterCacheChangeAsync() => await _cacheVersionService.SetCacheUpdatedAsync<TEntity>();
-
-    protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
-
-    protected string GetEntityCacheKey(TId? id)
-    {
-        if (EqualityComparer<TId>.Default.Equals(id, default))
-        {
-            return string.Empty;
-        }
-
-        if (typeof(TId).IsValueType)
-        {
-            return EntityTypeCacheKey + id;
-        }
-
-        return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
-    }
 }

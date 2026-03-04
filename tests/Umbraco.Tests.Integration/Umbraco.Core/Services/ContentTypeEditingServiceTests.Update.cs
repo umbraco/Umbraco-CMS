@@ -1,7 +1,9 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -19,7 +21,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.AllowedAsRoot = true;
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
-        var updateModel = ContentTypeUpdateModel("Test updated", "testUpdated", isElement: isElement);
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Test updated", "test", isElement: isElement);
         updateModel.Description = "This is the Test description updated";
         updateModel.Icon = "icon icon-something-updated";
         updateModel.AllowedAsRoot = false;
@@ -32,13 +38,42 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsNotNull(contentType);
 
         Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual("testUpdated", contentType.Alias);
+        Assert.AreEqual("test", contentType.Alias);
         Assert.AreEqual("Test updated", contentType.Name);
         Assert.AreEqual(result.Result.Id, contentType.Id);
         Assert.AreEqual(result.Result.Key, contentType.Key);
         Assert.AreEqual("This is the Test description updated", contentType.Description);
         Assert.AreEqual("icon icon-something-updated", contentType.Icon);
         Assert.IsFalse(contentType.AllowedAsRoot);
+
+        // expect RefreshOther when changing basic settings only
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Update_Alias(bool isElement)
+    {
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Test updated", "testUpdated", isElement: isElement);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+        Assert.IsNotNull(contentType);
+
+        Assert.AreEqual(isElement, contentType.IsElement);
+        Assert.AreEqual("testUpdated", contentType.Alias);
+
+        // expect RefreshMain when changing alias
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 
     [TestCase(false, false)]
@@ -53,6 +88,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.VariesByCulture = !variesByCulture;
         updateModel.VariesBySegment = !variesBySegment;
@@ -66,6 +105,76 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(!variesByCulture, contentType.VariesByCulture());
         Assert.AreEqual(!variesBySegment, contentType.VariesBySegment());
+
+        // expect RefreshMain when changing variation at content type level
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [TestCase(false, false)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    [TestCase(true, true)]
+    public async Task Can_Update_Property_Variation(bool variesByCulture, bool variesBySegment)
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+
+        var container = ContentTypePropertyContainerModel();
+        createModel.Containers = [container];
+
+        var propertyTypeModel = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: container.Key);
+        createModel.Properties = [propertyTypeModel];
+
+        createModel.VariesByCulture = variesByCulture;
+        createModel.VariesBySegment = variesBySegment;
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        var propertyType = contentType.PropertyTypes.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("testProperty", propertyType.Alias);
+            Assert.IsTrue(propertyType.VariesByNothing());
+        });
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.VariesByCulture = variesByCulture;
+        updateModel.VariesBySegment = variesBySegment;
+
+        updateModel.Containers = [container];
+
+        propertyTypeModel = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: container.Key);
+        propertyTypeModel.VariesByCulture = variesByCulture;
+        propertyTypeModel.VariesBySegment = variesBySegment;
+        updateModel.Properties = [propertyTypeModel];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+        Assert.IsNotNull(contentType);
+
+        propertyType = contentType.PropertyTypes.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("testProperty", propertyType.Alias);
+            Assert.AreEqual(variesByCulture, propertyType.VariesByCulture());
+            Assert.AreEqual(variesBySegment, propertyType.VariesBySegment());
+        });
+
+        if (variesByCulture || variesBySegment)
+        {
+            // expect RefreshMain when changing variation at property type level
+            AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        }
+        else
+        {
+            // expect RefreshOther when not property level variation (in effect, no real changes were made here)
+            AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+        }
     }
 
     [Test]
@@ -80,6 +189,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             new ContentTypeSort(allowedOne.Key, 10, allowedOne.Alias),
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
@@ -100,6 +213,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(2, allowedContentTypes.Length);
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 0 && c.Alias == allowedOne.Alias));
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 1 && c.Alias == allowedTwo.Alias));
+
+        // expect RefreshOther when changing allowed types
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -116,6 +232,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = Array.Empty<ContentTypeSort>();
 
@@ -129,6 +249,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var allowedContentTypes = contentType.AllowedContentTypes?.ToArray();
         Assert.IsNotNull(allowedContentTypes);
         Assert.AreEqual(0, allowedContentTypes.Length);
+
+        // expect RefreshOther when changing allowed types
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -144,6 +267,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             new ContentTypeSort(allowedTwo.Key, 1, allowedTwo.Alias),
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
@@ -164,6 +291,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(2, allowedContentTypes.Length);
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 1 && c.Alias == allowedOne.Alias));
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 0 && c.Alias == allowedTwo.Alias));
+
+        // expect RefreshOther when changing allowed types
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -172,6 +302,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel("Test", "test");
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
         var id = contentType.Id;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
@@ -190,6 +324,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsNotNull(allowedContentTypes);
         Assert.AreEqual(1, allowedContentTypes.Length);
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == contentType.Key && c.SortOrder == 0 && c.Alias == contentType.Alias));
+
+        // expect RefreshOther when changing allowed types
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [TestCase(false)]
@@ -204,6 +341,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.Properties = new[] { propertyType };
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
         updateModel.Containers = new[] { container };
@@ -234,6 +375,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("testProperty", propertyTypesInContainer.Last().Alias);
 
         Assert.IsEmpty(contentType.NoGroupPropertyTypes);
+
+        // expect RefreshOther when adding properties
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [TestCase(false)]
@@ -248,6 +392,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.Properties = new[] { propertyType };
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
         updateModel.Containers = new[] { container };
@@ -266,6 +414,57 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.PropertyTypes.Count());
 
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+
+        // expect RefreshMain when removing properties
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Remove_Single_Property_From_Container(bool isElement)
+    {
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
+        var container = ContentTypePropertyContainerModel();
+        createModel.Containers = [container];
+
+        createModel.Properties =
+        [
+            ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: container.Key),
+            ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: container.Key),
+        ];
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        Assert.AreEqual(1, contentType.PropertyGroups.Count);
+        Assert.AreEqual(2, contentType.PropertyTypes.Count());
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
+        updateModel.Containers = [container];
+        updateModel.Properties =
+        [
+            ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: container.Key),
+        ];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Result);
+
+        // Ensure it's actually persisted
+        contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.IsNotNull(contentType);
+        Assert.AreEqual(isElement, contentType.IsElement);
+        Assert.AreEqual(1, contentType.PropertyGroups.Count);
+        Assert.AreEqual(1, contentType.PropertyTypes.Count());
+        Assert.AreEqual("testProperty2", contentType.PropertyTypes.Single().Alias);
+
+        Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+
+        // expect RefreshMain when removing properties
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 
     [Test]
@@ -286,6 +485,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("testProperty", contentType.NoGroupPropertyTypes.Single().Alias);
         Assert.AreEqual(0, contentType.PropertyGroups.Count);
 
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         // Update the content type removing the property.
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
         updateModel.Properties = Array.Empty<ContentTypePropertyTypeModel>();
@@ -302,6 +505,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.PropertyGroups.Count);
         Assert.AreEqual(0, contentType.PropertyTypes.Count());
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+
+        // expect RefreshMain when removing properties
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 
     [TestCase(false)]
@@ -315,6 +521,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
         var originalPropertyTypeKey = contentType.PropertyTypes.First().Key;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
         propertyType = ContentTypePropertyTypeModel("Test Property 2", "testProperty", key: originalPropertyTypeKey);
@@ -340,6 +550,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(originalPropertyTypeKey, property.Key);
 
         Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
+
+        // expect RefreshOther when changing basic property info (not alias and not variance)
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     public enum PropertyMoveOperation
@@ -411,6 +624,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             propertyType1.ContainerKey = container2.Key;
         }
 
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel(
             "Test Content Type",
             containers: [container1, container2],
@@ -454,6 +671,9 @@ internal sealed partial class ContentTypeEditingServiceTests
                 Assert.AreEqual(property.Name, updatedContent?.Properties[property.Alias]?.GetValue());
             }
         });
+
+        // expect RefreshOther when changing moving properties around internally on the content type
+        AssertContentTypeRefreshPayload(refreshedPayloads, createAttempt.Result.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [TestCase(false)]
@@ -472,6 +692,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.Properties = new[] { propertyType1, propertyType2 };
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
         container2.SortOrder = 0;
@@ -493,6 +717,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var sortedPropertyGroups = contentType.PropertyGroups.OrderBy(g => g.SortOrder).ToArray();
         Assert.AreEqual("testProperty2", sortedPropertyGroups.First().PropertyTypes!.Single().Alias);
         Assert.AreEqual("testProperty1", sortedPropertyGroups.Last().PropertyTypes!.Single().Alias);
+
+        // expect RefreshOther when changing moving properties (containers) around internally on the content type
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [TestCase(false)]
@@ -509,6 +736,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.Properties = [propertyType1, propertyType2];
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
         updateModel.Containers = [container1];
@@ -531,6 +762,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual("testProperty1", contentType.PropertyGroups.First().PropertyTypes!.Single().Alias);
         Assert.AreEqual("testProperty2", contentType.NoGroupPropertyTypes.Single().Alias);
+
+        // expect RefreshOther when changing moving properties (containers) around internally on the content type
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -546,6 +780,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel("Test", "test");
         createModel.Properties = new[] { propertyType2 };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.Properties = new[] { propertyType2 };
@@ -568,6 +806,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(2, propertyTypeAliases.Length);
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
+
+        // expect RefreshOther when adding compositions (corresponds to adding properties)
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -588,6 +829,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.Properties = new[] { propertyType2 };
         updateModel.Compositions = new[]
@@ -609,6 +854,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(2, propertyTypeAliases.Length);
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
+
+        // expect RefreshOther when adding compositions (corresponds to adding properties)
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -629,6 +877,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.Properties = new[] { propertyType2 };
         updateModel.Compositions = Array.Empty<Composition>();
@@ -644,6 +896,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsEmpty(contentType.ContentTypeComposition);
         Assert.AreEqual(1, contentType.CompositionPropertyTypes.Count());
         Assert.AreEqual("testProperty2", contentType.CompositionPropertyTypes.Single().Alias);
+
+        // expect RefreshMain when removing compositions (corresponds to removing properties)
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 
     [Test]
@@ -660,6 +915,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
         var originalPath = contentType.Path;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel(
             "Child",
@@ -679,6 +938,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(parentContentType.Id, contentType.ParentId);
         Assert.AreEqual(originalPath, contentType.Path);
         Assert.AreEqual($"-1,{parentContentType.Id},{contentType.Id}", contentType.Path);
+
+        // expect RefreshOther when re-applying inheritance (in principle, nothing changes)
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -691,7 +953,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
-        var updateModel = ContentTypeUpdateModel("Test updated", "testUpdated");
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Test updated", "test");
         updateModel.Cleanup = new ContentTypeCleanup
         {
             PreventCleanup = false, KeepAllVersionsNewerThanDays = 234, KeepLatestVersionPerDayForDays = 567
@@ -708,6 +974,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsFalse(contentType.HistoryCleanup.PreventCleanup);
         Assert.AreEqual(234, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
         Assert.AreEqual(567, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
+
+        // expect RefreshOther when changing basic settings
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -725,8 +994,13 @@ internal sealed partial class ContentTypeEditingServiceTests
                     compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
                 Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel(
             "Parent Updated",
+            alias: parentContentType.Alias,
             compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
 
         var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
@@ -752,6 +1026,9 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
+
+        // expect RefreshOther when re-applying compositions (in principle, nothing changes)
+        AssertContentTypeRefreshPayload(refreshedPayloads, parentContentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -769,7 +1046,11 @@ internal sealed partial class ContentTypeEditingServiceTests
                     compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
                 Constants.Security.SuperUserKey)).Result!;
 
-        var updateModel = ContentTypeUpdateModel("Parent Updated", compositions: []);
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Parent Updated", alias: parentContentType.Alias, compositions: []);
 
         var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -793,6 +1074,13 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
+
+        // expect RefreshMain when removing compositions (corresponds to removing properties)
+        // - note that both parent and child content type are affected here
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.AreEqual(2, refreshedPayloads.Length);
+        AssertContentTypeRefreshPayload([refreshedPayloads.First()], parentContentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload([refreshedPayloads.Last()], childContentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 
     [TestCase(false)]
@@ -808,6 +1096,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
         property.ContainerKey = Guid.NewGuid();
         updateModel.Containers = new[] { container };
@@ -816,6 +1108,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase(false)]
@@ -831,6 +1126,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
         container.ParentKey = Guid.NewGuid();
         updateModel.Containers = new[] { container };
@@ -839,6 +1138,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -848,6 +1150,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel("Test", "test");
         createModel.Properties = new[] { property };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.Properties = new[] { property };
@@ -859,6 +1165,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -876,6 +1185,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel(
             "Child",
             compositions: new Composition[]
@@ -886,6 +1199,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -893,6 +1209,10 @@ internal sealed partial class ContentTypeEditingServiceTests
     {
         var parentContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
         var contentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Child"), Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel(
             "Child",
@@ -904,6 +1224,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -921,6 +1244,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel(
             "Child",
             compositions: new Composition[]
@@ -932,6 +1259,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -940,6 +1270,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel("Test", "test");
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.Compositions = new Composition[]
@@ -950,6 +1284,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -959,6 +1296,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var parentContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
         var contentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Child", containerKey: container.Key), Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel(
             "Child",
@@ -970,6 +1311,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase(CompositionType.Composition, CompositionType.Inheritance)]
@@ -986,6 +1330,10 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test");
         updateModel.Compositions = new[]
         {
@@ -995,6 +1343,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [TestCase("something")]
@@ -1011,6 +1362,10 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel("Test", "test");
         container.Type = containerType;
         updateModel.Containers = new[] { container };
@@ -1019,6 +1374,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
 
@@ -1032,6 +1390,10 @@ internal sealed partial class ContentTypeEditingServiceTests
                     "Child",
                     compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
                 Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel(
             "Parent Updated",
@@ -1059,6 +1421,9 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -1077,6 +1442,10 @@ internal sealed partial class ContentTypeEditingServiceTests
                 propertyTypes: [ContentTypePropertyTypeModel("Same Test Property Alias", "testProperty")]),
             Constants.Security.SuperUserKey)).Result!;
 
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
         var updateModel = ContentTypeUpdateModel(
             "Target",
             propertyTypes: [targetContentTypePropertyType],
@@ -1089,6 +1458,9 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
         });
+
+        // no changes should have been notified
+        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -1105,6 +1477,10 @@ internal sealed partial class ContentTypeEditingServiceTests
                 "Composition",
                 propertyTypes: [ContentTypePropertyTypeModel("Same Test Property Alias", "testProperty")]),
             Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
 
         var updateModel = ContentTypeUpdateModel(
             "Target",
@@ -1134,6 +1510,22 @@ internal sealed partial class ContentTypeEditingServiceTests
             var compositionProperty = updatedContentType.CompositionPropertyTypes.Single();
             Assert.AreEqual("testProperty", compositionProperty.Alias);
             Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
+        });
+
+        // expect RefreshMain, because a property was removed to "make room" for the new compositions
+        AssertContentTypeRefreshPayload(refreshedPayloads, targetContentType.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    private static void AssertContentTypeRefreshPayload(ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)
+    {
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.AreEqual(1, refreshedPayloads.Length);
+        Assert.Multiple(() =>
+        {
+            var payload = refreshedPayloads.First();
+            Assert.AreEqual(expectedContentTypeId, payload.Id);
+            Assert.AreEqual(expectedChangeTypes, payload.ChangeTypes);
+            Assert.AreEqual(nameof(IContentType), payload.ItemType);
         });
     }
 }
