@@ -1,6 +1,7 @@
 import type { UmbDocumentBlueprintVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_BLUEPRINT_PROPERTY_DATASET_CONTEXT } from '../../../property-dataset-context/document-blueprint-property-dataset-context.token.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from '../../constants.js';
+import { UMB_DATE_TIME_FORMAT_OPTIONS as TimeOptions } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { css, html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -193,12 +194,3 @@ declare global {
 		'umb-workspace-view-document-blueprint-info': UmbWorkspaceViewDocumentBlueprintInfoElement;
 	}
 }
-
-export const TimeOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: 'numeric',
-	second: 'numeric',
-};

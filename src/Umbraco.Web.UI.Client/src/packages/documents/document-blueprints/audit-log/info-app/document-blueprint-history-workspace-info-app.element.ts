@@ -1,11 +1,10 @@
 import { UmbDocumentBlueprintAuditLogRepository } from '../repository/document-blueprint-audit-log.repository.js';
 import { getDocumentHistoryTagStyleAndText } from '../../../documents/audit-log/info-app/utils.js';
 import type { UmbDocumentAuditLogModel } from '../../../documents/audit-log/types.js';
-import { TimeOptions } from '../../../documents/utils.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
@@ -114,7 +113,7 @@ export class UmbDocumentBlueprintHistoryWorkspaceInfoAppElement extends UmbLitEl
 						return html`
 							<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
-								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
 								<umb-user-avatar
 									slot="avatar"
 									.name=${user?.name}
