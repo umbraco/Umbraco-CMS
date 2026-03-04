@@ -162,6 +162,14 @@ export class UmbPickerInputContext<
 		this.#applyModalValue(modalValue);
 	}
 
+	protected _composePickableFilters<ItemType>(
+		internalFilter: (item: ItemType) => boolean,
+		userFilter?: (item: ItemType) => boolean,
+	): (item: ItemType) => boolean {
+		if (!userFilter) return internalFilter;
+		return (item) => internalFilter(item) && userFilter(item);
+	}
+
 	protected async _requestItemName(unique: string) {
 		return this.getSelectedItemByUnique(unique)?.name ?? '#general_notFound';
 	}
