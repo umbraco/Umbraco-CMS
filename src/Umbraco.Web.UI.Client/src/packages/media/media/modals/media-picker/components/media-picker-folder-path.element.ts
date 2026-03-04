@@ -7,6 +7,7 @@ import {
 	css,
 	html,
 	customElement,
+	nothing,
 	state,
 	repeat,
 	property,
@@ -14,7 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { getUmbracoFolderUnique } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -24,6 +25,7 @@ const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_M
 export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to create folders
+	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
 
 	@property({ attribute: false })
 	startNode?: UmbMediaPathModel = root;
@@ -49,6 +51,17 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	@state()
 	private _typingNewFolder = false;
 
+	@state()
+	private _allowedFolderTypes: Array<UmbAllowedMediaTypeModel> = [];
+
+	@state()
+	private _selectingFolderType = false;
+
+	#selectedFolderType: UmbAllowedMediaTypeModel | null = null;
+
+	// Cache for all folder media types to avoid repeated API calls
+	#folderTypesPromise: Promise<UmbAllowedMediaTypeModel[]> | null = null;
+
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
 		this.#loadPath();
@@ -70,6 +83,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			name: item.name,
 			unique: item.unique,
 			entityType: item.entityType,
+			mediaType: { unique: item.mediaType.unique },
 		}));
 
 		if (!this.startNode) {
@@ -77,6 +91,34 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		}
 
 		this._paths = [...paths];
+		this.#updateAllowedFolderTypes();
+	}
+
+	async #getAllFolderTypes(): Promise<UmbAllowedMediaTypeModel[]> {
+		if (!this.#folderTypesPromise) {
+			this.#folderTypesPromise = this.#mediaTypeStructureRepository.requestMediaTypesOfFolders();
+		}
+		return this.#folderTypesPromise;
+	}
+
+	async #updateAllowedFolderTypes() {
+		const currentPath = this._paths[this._paths.length - 1];
+		const mediaTypeUnique = currentPath?.mediaType?.unique ?? null;
+		const parentUnique = currentPath?.unique ?? null;
+
+		// Fetch allowed children of the current parent's media type
+		const { data: allowedChildrenData } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(
+			mediaTypeUnique,
+			parentUnique,
+		);
+		const allowedChildren = allowedChildrenData?.items ?? [];
+
+		// Fetch all folder media types
+		const allFolderTypes = await this.#getAllFolderTypes();
+
+		// Intersect: only folder types that are allowed children of this parent
+		const allowedFolderTypeUniques = new Set(allowedChildren.map((c) => c.unique));
+		this._allowedFolderTypes = allFolderTypes.filter((ft) => allowedFolderTypeUniques.has(ft.unique));
 	}
 
 	#goToFolder(entity: UmbMediaPathModel) {
@@ -85,7 +127,11 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#focusFolderInput() {
+	#focusFolderInput(folderType?: UmbAllowedMediaTypeModel) {
+		if (folderType) {
+			this.#selectedFolderType = folderType;
+		}
+		this._selectingFolderType = false;
 		this._typingNewFolder = true;
 		requestAnimationFrame(() => {
 			const element = this.getHostElement().shadowRoot!.querySelector('#new-folder') as UUIInputElement;
@@ -93,20 +139,34 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		});
 	}
 
+	#onAddFolderClick() {
+		if (this._allowedFolderTypes.length === 1) {
+			this.#selectedFolderType = this._allowedFolderTypes[0];
+			this.#focusFolderInput();
+		} else if (this._allowedFolderTypes.length > 1) {
+			this._selectingFolderType = true;
+		}
+	}
+
+	#cancelFolderTypeSelection() {
+		this._selectingFolderType = false;
+	}
+
 	async #addFolder(e: UUIInputEvent) {
 		e.stopPropagation();
 
 		const newName = e.target.value as string;
 		this._typingNewFolder = false;
-		if (!newName) return;
+		if (!newName || !this.#selectedFolderType?.unique) return;
 
 		const newUnique = UmbId.new();
 		const parentUnique = this._paths[this._paths.length - 1].unique;
+		const folderTypeUnique = this.#selectedFolderType.unique;
 
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: newUnique,
 			mediaType: {
-				unique: getUmbracoFolderUnique(),
+				unique: folderTypeUnique,
 				collection: null,
 			},
 			variants: [
@@ -129,9 +189,10 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		const name = data.variants[0].name;
 		const unique = data.unique;
 		const entityType = data.entityType;
+		const mediaType = { unique: folderTypeUnique };
 
-		this._paths = [...this._paths, { name, unique, entityType }];
-		this.currentMedia = { name, unique, entityType };
+		this._paths = [...this._paths, { name, unique, entityType, mediaType }];
+		this.currentMedia = { name, unique, entityType, mediaType };
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -156,21 +217,47 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 							?disabled=${this.currentMedia.unique === path.unique}
 							@click=${() => this.#goToFolder(path)}></uui-button
 						>/`,
-			)}${this._typingNewFolder
-				? html`<uui-input
-						id="new-folder"
-						label=${this.localize.term('create_enterFolderName')}
-						placeholder=${this.localize.term('create_enterFolderName')}
-						@blur=${this.#addFolder}
-						@keypress=${this.#onKeypress}
-						auto-width></uui-input>`
-				: html`<uui-button
-						label=${this.localize.term('visuallyHiddenTexts_createNewFolder')}
-						compact
-						@click=${this.#focusFolderInput}>
-						<uui-icon name="icon-add"></uui-icon>
-					</uui-button>`}
+			)}${this.#renderFolderCreation()}
 		</div>`;
+	}
+
+	#renderFolderCreation() {
+		if (this._typingNewFolder) {
+			return html`<uui-input
+				id="new-folder"
+				label=${this.localize.term('create_enterFolderName')}
+				placeholder=${this.localize.term('create_enterFolderName')}
+				@blur=${this.#addFolder}
+				@keypress=${this.#onKeypress}
+				auto-width></uui-input>`;
+		}
+
+		if (this._selectingFolderType) {
+			return html`<div id="folder-type-selection">
+				${repeat(
+					this._allowedFolderTypes,
+					(ft) => ft.unique,
+					(ft) =>
+						html`<uui-button compact look="outline" .label=${ft.name} @click=${() => this.#focusFolderInput(ft)}>
+							${ft.icon ? html`<umb-icon name=${ft.icon}></umb-icon>` : nothing} ${ft.name}
+						</uui-button>`,
+				)}
+				<uui-button compact .label=${this.localize.term('general_cancel')} @click=${this.#cancelFolderTypeSelection}>
+					<uui-icon name="icon-wrong"></uui-icon>
+				</uui-button>
+			</div>`;
+		}
+
+		if (this._allowedFolderTypes.length === 0) {
+			return nothing;
+		}
+
+		return html`<uui-button
+			label=${this.localize.term('visuallyHiddenTexts_createNewFolder')}
+			compact
+			@click=${this.#onAddFolderClick}>
+			<uui-icon name="icon-add"></uui-icon>
+		</uui-button>`;
 	}
 
 	static override styles = [
@@ -193,6 +280,21 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 			#path uui-button uui-icon {
 				--uui-icon-color: inherit;
+			}
+
+			#folder-type-selection {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-2);
+				margin-left: var(--uui-size-2);
+			}
+
+			#folder-type-selection uui-button {
+				font-weight: normal;
+			}
+
+			#folder-type-selection umb-icon {
+				margin-right: var(--uui-size-1);
 			}
 		`,
 	];
