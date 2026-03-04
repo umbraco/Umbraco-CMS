@@ -28,7 +28,7 @@ export class UmbDocumentBlueprintAuditLogServerDataSource implements UmbAuditLog
 		);
 
 		if (data) {
-			const mappedItems: Array<UmbDocumentAuditLogModel> = data.items.map((item) => {
+			const mappedItems: Array<UmbDocumentAuditLogModel> = (data.items ?? []).map((item) => {
 				return {
 					user: { unique: item.user.id },
 					timestamp: item.timestamp,

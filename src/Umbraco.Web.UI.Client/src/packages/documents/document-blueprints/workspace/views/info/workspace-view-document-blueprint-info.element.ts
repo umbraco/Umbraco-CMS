@@ -5,6 +5,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { css, html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-workspace-view-document-blueprint-info')
 export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -34,6 +39,15 @@ export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement 
 	constructor() {
 		super();
 
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('general/:entityType')
+			.onSetup((params) => {
+				return { data: { entityType: params.entityType, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._routeBuilder = routeBuilder;
+			});
+
 		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
 			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
@@ -46,12 +60,23 @@ export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement 
 				this._variant = currentVariant;
 			});
 		});
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
 	}
 
 	#observeContent() {
 		if (!this.#workspaceContext) return;
 
-        this.observe(
+		this.observe(
 			this.#workspaceContext.structure.ownerContentType,
 			(documentType) => {
 				this._documentTypeName = documentType?.name;
