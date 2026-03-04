@@ -21,8 +21,4 @@ public class ContentPatchModel
     /// </summary>
     public IEnumerable<string> AffectedSegments { get; set; } = Array.Empty<string>();
 
-    /// <summary>
-    /// Property aliases explicitly affected by this patch (extracted from operation paths).
-    /// </summary>
-    public IEnumerable<string> AffectedProperties { get; set; } = Array.Empty<string>();
 }

@@ -12,7 +12,7 @@ public enum ContentPatchingOperationStatus
     Success,
 
     /// <summary>
-    /// One or more PATCH operations were invalid (invalid JSONPath syntax, unsupported operation type, missing required value).
+    /// One or more PATCH operations were invalid (invalid path syntax, unsupported operation type, missing required value).
     /// </summary>
     InvalidOperation,
 

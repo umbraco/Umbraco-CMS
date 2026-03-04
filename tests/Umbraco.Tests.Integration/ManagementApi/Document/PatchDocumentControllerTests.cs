@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -785,10 +786,11 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
     {
         // Arrange - Authenticate as admin
         await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+        var suffix = Guid.NewGuid().ToString("N")[..8];
 
         // Create element type for blocks
         var elementType = new ContentTypeBuilder()
-            .WithAlias("heroBlock")
+            .WithAlias($"heroBlock{suffix}")
             .WithName("Hero Block")
             .AddPropertyType()
             .WithAlias("headline")
@@ -833,7 +835,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         // Create content type with Block List property
         var contentType = new ContentTypeBuilder()
-            .WithAlias("blockListPage")
+            .WithAlias($"blockListPage{suffix}")
             .WithName("Block List Page")
             .AddPropertyType()
             .WithAlias("contentBlocks")
@@ -993,10 +995,11 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
     {
         // Arrange - Authenticate as admin
         await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+        var suffix = Guid.NewGuid().ToString("N")[..8];
 
         // Create element type for blocks
         var elementType = new ContentTypeBuilder()
-            .WithAlias("heroBlock")
+            .WithAlias($"heroBlock{suffix}")
             .WithName("Hero Block")
             .AddPropertyType()
             .WithAlias("headline")
@@ -1041,7 +1044,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         // Create content type with Block List property
         var contentType = new ContentTypeBuilder()
-            .WithAlias("blockListPage")
+            .WithAlias($"blockListPage{suffix}")
             .WithName("Block List Page")
             .AddPropertyType()
             .WithAlias("contentBlocks")
@@ -1191,6 +1194,632 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         // Verify layout was also updated with the new block
         var layoutItems = updatedBlockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].ToList();
+        Assert.AreEqual(3, layoutItems.Count);
+    }
+
+    // ── Deeply nested block editor tests ──────────────────────────────────────
+    //
+    // Structure: Document → RTE → BlockGrid (with areas) → BlockList → textBlock
+    //
+    // These tests prove that PatchEngine can navigate through multiple layers of
+    // recursively-expanded block editor values (RTE > Block Grid > Block List).
+
+    /// <summary>
+    /// Builds the full deeply-nested block editor structure used by the deep nesting tests.
+    /// Returns all keys and identifiers needed to construct patch paths.
+    /// </summary>
+    private async Task<DeepNestedSetup> CreateDeeplyNestedBlockDocument()
+    {
+        var jsonSerializer = GetRequiredService<IJsonSerializer>();
+        var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();
+        var configEditorJsonSerializer = GetRequiredService<IConfigurationEditorJsonSerializer>();
+        var dataTypeService = GetRequiredService<IDataTypeService>();
+
+        // ── Languages ──
+        var langEnUs = new LanguageBuilder().WithCultureInfo("en-US").WithIsDefault(true).Build();
+        await LanguageService.CreateAsync(langEnUs, Constants.Security.SuperUserKey);
+        var langDaDk = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(langDaDk, Constants.Security.SuperUserKey);
+
+        // ── Element type: textBlock (culture-variant, has "text" property) ──
+        var suffix = Guid.NewGuid().ToString("N")[..8];
+        var textBlockType = new ContentTypeBuilder()
+            .WithAlias($"textBlock{suffix}")
+            .WithName("Text Block")
+            .AddPropertyType()
+                .WithAlias("text")
+                .WithName("Text")
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .Done()
+            .Build();
+        textBlockType.IsElement = true;
+        textBlockType.Variations = ContentVariation.Culture;
+        foreach (var pt in textBlockType.PropertyTypes)
+        {
+            pt.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.CreateAsync(textBlockType, Constants.Security.SuperUserKey);
+
+        // ── Element type: listContainerBlock (has "blockList" property) ──
+        // First create the Block List data type configured with textBlock
+        var blockListDataType = new UmbracoDataType(
+            propertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList],
+            configEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                { "blocks", new[] { new { contentElementTypeKey = textBlockType.Key } } }
+            },
+            Name = "Test Block List",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+        await dataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+
+        var listContainerType = new ContentTypeBuilder()
+            .WithAlias($"listContainerBlock{suffix}")
+            .WithName("List Container Block")
+            .AddPropertyType()
+                .WithAlias("blockList")
+                .WithName("Block List")
+                .WithDataTypeId(blockListDataType.Id)
+                .Done()
+            .Build();
+        listContainerType.IsElement = true;
+        await ContentTypeService.CreateAsync(listContainerType, Constants.Security.SuperUserKey);
+
+        // ── Element type: areaBlock (empty container, holds areas) ──
+        var areaBlockType = new ContentTypeBuilder()
+            .WithAlias($"areaBlock{suffix}")
+            .WithName("Area Block")
+            .Build();
+        areaBlockType.IsElement = true;
+        await ContentTypeService.CreateAsync(areaBlockType, Constants.Security.SuperUserKey);
+
+        // ── Block Grid data type ──
+        var areaKey = Guid.NewGuid();
+        var blockGridDataType = new UmbracoDataType(
+            propertyEditorCollection[Constants.PropertyEditors.Aliases.BlockGrid],
+            configEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                {
+                    "blocks", new object[]
+                    {
+                        new
+                        {
+                            contentElementTypeKey = areaBlockType.Key,
+                            allowAtRoot = true,
+                            allowInAreas = false,
+                            areaGridColumns = 12,
+                            areas = new[]
+                            {
+                                new
+                                {
+                                    key = areaKey,
+                                    alias = "content",
+                                    columnSpan = 12,
+                                    rowSpan = 1,
+                                    minAllowed = 0,
+                                    maxAllowed = 10
+                                }
+                            }
+                        },
+                        new
+                        {
+                            contentElementTypeKey = listContainerType.Key,
+                            allowAtRoot = false,
+                            allowInAreas = true,
+                            areas = Array.Empty<object>()
+                        }
+                    }
+                }
+            },
+            Name = "Test Block Grid",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+        await dataTypeService.CreateAsync(blockGridDataType, Constants.Security.SuperUserKey);
+
+        // ── Element type: gridContainerBlock (has "blockGrid" property) ──
+        var gridContainerType = new ContentTypeBuilder()
+            .WithAlias($"gridContainerBlock{suffix}")
+            .WithName("Grid Container Block")
+            .AddPropertyType()
+                .WithAlias("blockGrid")
+                .WithName("Block Grid")
+                .WithDataTypeId(blockGridDataType.Id)
+                .Done()
+            .Build();
+        gridContainerType.IsElement = true;
+        await ContentTypeService.CreateAsync(gridContainerType, Constants.Security.SuperUserKey);
+
+        // ── RTE data type ──
+        var rteDataType = new UmbracoDataType(
+            propertyEditorCollection[Constants.PropertyEditors.Aliases.RichText],
+            configEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                { "blocks", new[] { new { contentElementTypeKey = gridContainerType.Key } } }
+            },
+            Name = "Test RTE",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+        await dataTypeService.CreateAsync(rteDataType, Constants.Security.SuperUserKey);
+
+        // ── Document content type ──
+        var contentType = new ContentTypeBuilder()
+            .WithAlias($"deepNestedPage{suffix}")
+            .WithName("Deep Nested Page")
+            .AddPropertyType()
+                .WithAlias("rte")
+                .WithName("Rich Text")
+                .WithDataTypeId(rteDataType.Id)
+                .Done()
+            .Build();
+        contentType.AllowedAsRoot = true;
+        contentType.Variations = ContentVariation.Culture;
+        foreach (var pt in contentType.PropertyTypes)
+        {
+            pt.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // ── Build nested block values (inside-out) ──
+        var textBlock1Key = Guid.NewGuid();
+        var textBlock2Key = Guid.NewGuid();
+        var listContainerKey = Guid.NewGuid();
+        var areaBlockKey = Guid.NewGuid();
+        var gridContainerKey = Guid.NewGuid();
+
+        // Layer 1: Block List value with 2 text blocks (culture-variant)
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[]
+                    {
+                        new BlockListLayoutItem { ContentKey = textBlock1Key },
+                        new BlockListLayoutItem { ContentKey = textBlock2Key }
+                    }
+                }
+            },
+            ContentData = new List<BlockItemData>
+            {
+                new BlockItemData
+                {
+                    Key = textBlock1Key,
+                    ContentTypeKey = textBlockType.Key,
+                    ContentTypeAlias = textBlockType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "text", Culture = "en-US", Value = "original en" },
+                        new BlockPropertyValue { Alias = "text", Culture = "da-DK", Value = "original da" }
+                    }
+                },
+                new BlockItemData
+                {
+                    Key = textBlock2Key,
+                    ContentTypeKey = textBlockType.Key,
+                    ContentTypeAlias = textBlockType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "text", Culture = "en-US", Value = "second block en" },
+                        new BlockPropertyValue { Alias = "text", Culture = "da-DK", Value = "second block da" }
+                    }
+                }
+            },
+            SettingsData = new List<BlockItemData>(),
+            Expose = new List<BlockItemVariation>
+            {
+                new BlockItemVariation(textBlock1Key, "en-US", null),
+                new BlockItemVariation(textBlock1Key, "da-DK", null),
+                new BlockItemVariation(textBlock2Key, "en-US", null),
+                new BlockItemVariation(textBlock2Key, "da-DK", null)
+            }
+        };
+        var blockListJson = jsonSerializer.Serialize(blockListValue);
+
+        // Layer 2: Block Grid value with areaBlock (root) + listContainerBlock (in area)
+        var blockGridValue = new BlockGridValue(new[]
+        {
+            new BlockGridLayoutItem(areaBlockKey)
+            {
+                ColumnSpan = 12,
+                RowSpan = 1,
+                Areas = new[]
+                {
+                    new BlockGridLayoutAreaItem(areaKey)
+                    {
+                        Items = new[]
+                        {
+                            new BlockGridLayoutItem(listContainerKey)
+                            {
+                                ColumnSpan = 12,
+                                RowSpan = 1,
+                                Areas = Array.Empty<BlockGridLayoutAreaItem>()
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        {
+            ContentData = new List<BlockItemData>
+            {
+                new BlockItemData
+                {
+                    Key = areaBlockKey,
+                    ContentTypeKey = areaBlockType.Key,
+                    ContentTypeAlias = areaBlockType.Alias,
+                    Values = new List<BlockPropertyValue>()
+                },
+                new BlockItemData
+                {
+                    Key = listContainerKey,
+                    ContentTypeKey = listContainerType.Key,
+                    ContentTypeAlias = listContainerType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "blockList", Value = blockListJson }
+                    }
+                }
+            },
+            SettingsData = new List<BlockItemData>(),
+            Expose = new List<BlockItemVariation>
+            {
+                new BlockItemVariation(areaBlockKey, null, null),
+                new BlockItemVariation(listContainerKey, null, null)
+            }
+        };
+        var blockGridJson = jsonSerializer.Serialize(blockGridValue);
+
+        // Layer 3: RTE value with gridContainerBlock
+        var rteBlockValue = new RichTextBlockValue(new[]
+        {
+            new RichTextBlockLayoutItem(gridContainerKey)
+        })
+        {
+            ContentData = new List<BlockItemData>
+            {
+                new BlockItemData
+                {
+                    Key = gridContainerKey,
+                    ContentTypeKey = gridContainerType.Key,
+                    ContentTypeAlias = gridContainerType.Alias,
+                    Values = new List<BlockPropertyValue>
+                    {
+                        new BlockPropertyValue { Alias = "blockGrid", Value = blockGridJson }
+                    }
+                }
+            },
+            SettingsData = new List<BlockItemData>(),
+            Expose = new List<BlockItemVariation>
+            {
+                new BlockItemVariation(gridContainerKey, null, null)
+            }
+        };
+
+        var rteEditorValue = new RichTextEditorValue
+        {
+            Markup = "<p>Hello</p>",
+            Blocks = rteBlockValue
+        };
+        var rteJson = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(rteEditorValue, jsonSerializer);
+
+        // ── Create document ──
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = new List<VariantModel>
+            {
+                new() { Name = "English Page", Culture = "en-US" },
+                new() { Name = "Danish Page", Culture = "da-DK" },
+            },
+            Properties = new List<PropertyValueModel>
+            {
+                new() { Alias = "rte", Value = rteJson, Culture = "en-US" },
+                new() { Alias = "rte", Value = rteJson, Culture = "da-DK" }
+            }
+        };
+        var createResult = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
+        return new DeepNestedSetup
+        {
+            DocumentKey = createResult.Result.Content!.Key,
+            GridContainerKey = gridContainerKey,
+            ListContainerKey = listContainerKey,
+            TextBlock1Key = textBlock1Key,
+            TextBlock2Key = textBlock2Key,
+            TextBlockTypeKey = textBlockType.Key,
+            JsonSerializer = jsonSerializer
+        };
+    }
+
+    private record DeepNestedSetup
+    {
+        public Guid DocumentKey { get; init; }
+        public Guid GridContainerKey { get; init; }
+        public Guid ListContainerKey { get; init; }
+        public Guid TextBlock1Key { get; init; }
+        public Guid TextBlock2Key { get; init; }
+        public Guid TextBlockTypeKey { get; init; }
+        public IJsonSerializer JsonSerializer { get; init; } = null!;
+
+        /// <summary>
+        /// Builds the common path prefix to reach the nested block list value.
+        /// </summary>
+        public string BlockListPathPrefix(string culture) =>
+            $"/values[alias=rte,culture={culture},segment=null]/value/blocks" +
+            $"/contentData[key={GridContainerKey}]/values[alias=blockGrid]/value" +
+            $"/contentData[key={ListContainerKey}]/values[alias=blockList]/value";
+    }
+
+    [Test]
+    public async Task PatchDocument_DeeplyNestedBlocks_ReplacesPropertyAtDeepestLevel()
+    {
+        // Arrange
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+        var setup = await CreateDeeplyNestedBlockDocument();
+
+        // Path to the first text block's text property for en-US culture
+        var path = setup.BlockListPathPrefix("en-US")
+            + $"/contentData[key={setup.TextBlock1Key}]/values[alias=text,culture=en-US]/value";
+
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "replace",
+                    Path = path,
+                    Value = "updated deep value"
+                }
+            }
+        };
+
+        // Act
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{setup.DocumentKey}/patch", httpContent);
+
+        // Assert
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error response: {response.StatusCode}");
+            Console.WriteLine($"Error body: {errorContent}");
+        }
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        // Verify the deeply nested value was updated for en-US
+        var updatedContent = await ContentEditingService.GetAsync(setup.DocumentKey);
+        Assert.IsNotNull(updatedContent);
+
+        var rteValue = updatedContent.GetValue<string>("rte", "en-US");
+        Assert.IsNotNull(rteValue);
+
+        // Parse through the nested structure to verify the patched value
+        RichTextPropertyEditorHelper.TryParseRichTextEditorValue(rteValue, setup.JsonSerializer, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, out var parsedRte);
+        Assert.IsNotNull(parsedRte?.Blocks);
+
+        var gridContainerData = parsedRte!.Blocks!.ContentData.FirstOrDefault(b => b.Key == setup.GridContainerKey);
+        Assert.IsNotNull(gridContainerData);
+
+        var blockGridRaw = gridContainerData!.Values.FirstOrDefault(v => v.Alias == "blockGrid")?.Value?.ToString();
+        Assert.IsNotNull(blockGridRaw);
+
+        var blockGridVal = setup.JsonSerializer.Deserialize<BlockGridValue>(blockGridRaw!);
+        Assert.IsNotNull(blockGridVal);
+
+        var listContainerData = blockGridVal!.ContentData.FirstOrDefault(b => b.Key == setup.ListContainerKey);
+        Assert.IsNotNull(listContainerData);
+
+        var blockListRaw = listContainerData!.Values.FirstOrDefault(v => v.Alias == "blockList")?.Value?.ToString();
+        Assert.IsNotNull(blockListRaw);
+
+        var blockListVal = setup.JsonSerializer.Deserialize<BlockListValue>(blockListRaw!);
+        Assert.IsNotNull(blockListVal);
+
+        // Verify the patched text block
+        var textBlock1 = blockListVal!.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock1Key);
+        Assert.IsNotNull(textBlock1);
+        Assert.AreEqual("updated deep value",
+            textBlock1!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+
+        // Verify da-DK text was NOT changed
+        Assert.AreEqual("original da",
+            textBlock1.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "da-DK")?.Value?.ToString());
+
+        // Verify the second text block was NOT changed
+        var textBlock2 = blockListVal.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock2Key);
+        Assert.IsNotNull(textBlock2);
+        Assert.AreEqual("second block en",
+            textBlock2!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+    }
+
+    [Test]
+    public async Task PatchDocument_DeeplyNestedBlocks_AddsBlockToNestedBlockList()
+    {
+        // Arrange
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+        var setup = await CreateDeeplyNestedBlockDocument();
+
+        var prefix = setup.BlockListPathPrefix("en-US");
+        var newBlockKey = Guid.NewGuid();
+
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = $"{prefix}/contentData/-",
+                    Value = new
+                    {
+                        key = newBlockKey,
+                        contentTypeKey = setup.TextBlockTypeKey,
+                        values = new[]
+                        {
+                            new { alias = "text", culture = "en-US", value = "new block en" },
+                            new { alias = "text", culture = "da-DK", value = "new block da" }
+                        }
+                    }
+                },
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = $"{prefix}/layout/Umbraco.BlockList/-",
+                    Value = new { contentKey = newBlockKey }
+                },
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = $"{prefix}/expose/-",
+                    Value = new { contentKey = newBlockKey, culture = "en-US" }
+                }
+            }
+        };
+
+        // Act
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{setup.DocumentKey}/patch", httpContent);
+
+        // Assert
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error response: {response.StatusCode}");
+            Console.WriteLine($"Error body: {errorContent}");
+        }
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        // Parse through the nested structure to the block list
+        var updatedContent = await ContentEditingService.GetAsync(setup.DocumentKey);
+        Assert.IsNotNull(updatedContent);
+        var rteValue = updatedContent.GetValue<string>("rte", "en-US");
+        RichTextPropertyEditorHelper.TryParseRichTextEditorValue(rteValue, setup.JsonSerializer, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, out var parsedRte);
+        var gridContainerData = parsedRte!.Blocks!.ContentData.First(b => b.Key == setup.GridContainerKey);
+        var blockGridVal = setup.JsonSerializer.Deserialize<BlockGridValue>(gridContainerData.Values.First(v => v.Alias == "blockGrid").Value!.ToString()!);
+        var listContainerData = blockGridVal!.ContentData.First(b => b.Key == setup.ListContainerKey);
+        var blockListVal = setup.JsonSerializer.Deserialize<BlockListValue>(listContainerData.Values.First(v => v.Alias == "blockList").Value!.ToString()!);
+
+        // Verify 3 blocks in contentData
+        Assert.AreEqual(3, blockListVal!.ContentData.Count);
+
+        // Verify new block was appended
+        var newBlock = blockListVal.ContentData.FirstOrDefault(b => b.Key == newBlockKey);
+        Assert.IsNotNull(newBlock);
+        Assert.AreEqual("new block en", newBlock!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+
+        // Verify originals unchanged
+        Assert.AreEqual("original en", blockListVal.ContentData.First(b => b.Key == setup.TextBlock1Key).Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString());
+        Assert.AreEqual("second block en", blockListVal.ContentData.First(b => b.Key == setup.TextBlock2Key).Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString());
+
+        // Verify layout has 3 entries
+        var layoutItems = blockListVal.Layout[Constants.PropertyEditors.Aliases.BlockList].ToList();
+        Assert.AreEqual(3, layoutItems.Count);
+    }
+
+    [Test]
+    public async Task PatchDocument_DeeplyNestedBlocks_InsertsBlockAtSpecificPosition()
+    {
+        // Arrange
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+        var setup = await CreateDeeplyNestedBlockDocument();
+
+        var prefix = setup.BlockListPathPrefix("en-US");
+        var newBlockKey = Guid.NewGuid();
+
+        // Insert at index 1 (between the two existing blocks)
+        var patchModel = new PatchDocumentRequestModel
+        {
+            Operations = new[]
+            {
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = $"{prefix}/contentData/1",
+                    Value = new
+                    {
+                        key = newBlockKey,
+                        contentTypeKey = setup.TextBlockTypeKey,
+                        values = new[]
+                        {
+                            new { alias = "text", culture = "en-US", value = "inserted block en" },
+                            new { alias = "text", culture = "da-DK", value = "inserted block da" }
+                        }
+                    }
+                },
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = $"{prefix}/layout/Umbraco.BlockList/1",
+                    Value = new { contentKey = newBlockKey }
+                },
+                new PatchOperationRequestModel
+                {
+                    Op = "add",
+                    Path = $"{prefix}/expose/1",
+                    Value = new { contentKey = newBlockKey, culture = "en-US" }
+                }
+            }
+        };
+
+        // Act
+        var httpContent = JsonContent.Create(patchModel);
+        httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json-patch+json");
+        var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{setup.DocumentKey}/patch", httpContent);
+
+        // Assert
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error response: {response.StatusCode}");
+            Console.WriteLine($"Error body: {errorContent}");
+        }
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        // Parse through the nested structure to the block list
+        var updatedContent = await ContentEditingService.GetAsync(setup.DocumentKey);
+        var rteValue = updatedContent.GetValue<string>("rte", "en-US");
+        RichTextPropertyEditorHelper.TryParseRichTextEditorValue(rteValue, setup.JsonSerializer, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, out var parsedRte);
+        var gridContainerData = parsedRte!.Blocks!.ContentData.First(b => b.Key == setup.GridContainerKey);
+        var blockGridVal = setup.JsonSerializer.Deserialize<BlockGridValue>(gridContainerData.Values.First(v => v.Alias == "blockGrid").Value!.ToString()!);
+        var listContainerData = blockGridVal!.ContentData.First(b => b.Key == setup.ListContainerKey);
+        var blockListVal = setup.JsonSerializer.Deserialize<BlockListValue>(listContainerData.Values.First(v => v.Alias == "blockList").Value!.ToString()!);
+
+        // Verify 3 blocks in contentData
+        Assert.AreEqual(3, blockListVal!.ContentData.Count);
+
+        // Verify insertion order: original1, inserted, original2
+        Assert.AreEqual(setup.TextBlock1Key, blockListVal.ContentData[0].Key);
+        Assert.AreEqual(newBlockKey, blockListVal.ContentData[1].Key);
+        Assert.AreEqual(setup.TextBlock2Key, blockListVal.ContentData[2].Key);
+
+        // Verify inserted block values
+        Assert.AreEqual("inserted block en", blockListVal.ContentData[1].Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString());
+
+        // Verify layout order matches
+        var layoutItems = blockListVal.Layout[Constants.PropertyEditors.Aliases.BlockList].ToList();
         Assert.AreEqual(3, layoutItems.Count);
     }
 }

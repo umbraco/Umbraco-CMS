@@ -21,8 +21,6 @@ public class DocumentPatcher
 
     public DocumentPatcher(
         IContentEditingService contentEditingService,
-        IContentTypeService contentTypeService,
-        ILanguageService languageService,
         IJsonSerializer jsonSerializer,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory)
     {

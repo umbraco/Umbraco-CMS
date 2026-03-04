@@ -21,22 +21,19 @@ public class PatchDocumentController : PatchDocumentControllerBase
     private readonly DocumentPatcher _documentPatcher;
     private readonly IDocumentEditingPresentationFactory _presentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
 
     public PatchDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
         DocumentPatcher documentPatcher,
         IDocumentEditingPresentationFactory presentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDocumentEditingPresentationFactory documentEditingPresentationFactory)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : base(authorizationService)
     {
         _contentEditingService = contentEditingService;
         _documentPatcher = documentPatcher;
         _presentationFactory = presentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _documentEditingPresentationFactory = documentEditingPresentationFactory;
     }
 
     [HttpPatch("{id:guid}/patch")]
@@ -53,7 +50,6 @@ public class PatchDocumentController : PatchDocumentControllerBase
         => await HandleRequest(id, requestModel, async () =>
         {
             // Map request model to domain model
-            // todo: dont use intermitent model as patching happens in the api layer => make patcher work with PatchDocumentRequestModel directly
             ContentPatchModel patchModel = _presentationFactory.MapPatchModel(requestModel);
 
             // Apply PATCH operations to create an update request model
@@ -65,7 +61,7 @@ public class PatchDocumentController : PatchDocumentControllerBase
                 return ContentPatchingOperationStatusResult(patchResult.Status);
             }
 
-            ContentUpdateModel contentUpdateModel = _documentEditingPresentationFactory.MapUpdateModel(patchResult.Result);
+            ContentUpdateModel contentUpdateModel = _presentationFactory.MapUpdateModel(patchResult.Result);
 
             // Use the standard update method to save the patched content
             Attempt<ContentUpdateResult, ContentEditingOperationStatus> updateResult =
