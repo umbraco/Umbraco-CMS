@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Runtime
             _logger = logger;
             _mainDomLock = systemLock;
 
-            // This would have to be configured as > 24 days to overflow, so it's not going be a problem in
+            // This would have to be configured as > 24 days to overflow, so it's not going to be a problem in
             // practice, but just to be safe we'll clamp it to int.MaxValue.
             _lockTimeoutMilliseconds = (int)Math.Clamp(globalSettings.Value.MainDomAcquisitionTimeout.TotalMilliseconds, 0, int.MaxValue);
         }
