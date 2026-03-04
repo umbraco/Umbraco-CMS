@@ -463,8 +463,11 @@ namespace Umbraco.Cms.Core.Services
             string orderBy,
             Direction orderDirection,
             string? memberTypeAlias = null,
-            string filter = "") =>
-            GetAll(skip, take, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+            string filter = "")
+        {
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageIndex, out int pageSize);
+            return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+        }
 
         /// <inheritdoc />
         public IEnumerable<IMember> GetAll(
