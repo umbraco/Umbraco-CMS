@@ -7,8 +7,18 @@ namespace Umbraco.Extensions;
 
 public static class FriendlyPublishedElementExtensions
 {
-    private static IPublishedValueFallback PublishedValueFallback { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
+    private static IPublishedValueFallback? _publishedValueFallback;
+
+    private static IPublishedValueFallback PublishedValueFallback
+    {
+        get
+        {
+            _publishedValueFallback ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
+            return _publishedValueFallback;
+        }
+    }
+
+    internal static void Reset() => _publishedValueFallback = null;
 
     /// <summary>
     ///     Gets the value of a content's property identified by its alias.

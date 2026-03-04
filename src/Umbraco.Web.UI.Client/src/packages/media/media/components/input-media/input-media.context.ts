@@ -7,7 +7,7 @@ import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { isMediaTreeItem } from '../../tree/utils.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { isUmbracoFolder, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeStructureRepository, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 export enum UmbMediaPickerFolderFilter {
@@ -28,11 +28,18 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	UmbMediaPickerModalData,
 	UmbMediaPickerModalValue
 > {
+	#mediaTypeStructureRepository;
+	#folderTypeUniques = new Set<string>();
+	#folderTypesPromise: Promise<void> | null = null;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
+		this.#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(host);
 	}
 
 	override async openPicker(pickerData?: Partial<UmbMediaPickerModalData>, args?: UmbMediaPickerInputContextOpenArgs) {
+		// Load folder types before opening the picker so the filter is ready
+		await this.#loadFolderTypes();
 		const combinedPickerData = {
 			...pickerData,
 		};
@@ -63,6 +70,15 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		await super.openPicker(combinedPickerData);
 	}
 
+	async #loadFolderTypes() {
+		if (!this.#folderTypesPromise) {
+			this.#folderTypesPromise = this.#mediaTypeStructureRepository.requestMediaTypesOfFolders().then((folderTypes) => {
+				this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
+			});
+		}
+		return this.#folderTypesPromise;
+	}
+
 	#pickableFilter = (
 		item: UmbMediaItemModel | UmbMediaTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
@@ -73,7 +89,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 			return false;
 		}
 
-		const isFolder = isUmbracoFolder(item.mediaType.unique);
+		const isFolder = this.#folderTypeUniques.has(item.mediaType.unique);
 
 		// Apply folder filter
 		if (folderFilter === UmbMediaPickerFolderFilter.FILES_ONLY && isFolder) {

@@ -405,7 +405,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
     private Mock<IPublishedContent> CreatePublishedContentMock(IPublishedContentType publishedContentType, string name, Guid key, IPublishedContent? parent, bool published, Mock<IDocumentNavigationQueryService> navigationQueryServiceMock)
     {
         var content = new Mock<IPublishedContent>();
-        ConfigurePublishedContentMock(content, key, name, DefaultUrlSegment(name), publishedContentType, Array.Empty<PublishedElementPropertyBase>());
+        ConfigurePublishedContentMock(content, key, name, DefaultUrlSegment(name), publishedContentType, Array.Empty<PublishedPropertyBase>());
         content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(published);
 
         Guid? parentKey = parent?.Key;
