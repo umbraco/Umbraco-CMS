@@ -45,7 +45,9 @@ internal class HideBackOfficeTokensHandlerTests
 
         public Mock<IDataProtector> DataProtector { get; } = new();
 
+#pragma warning disable CS0618 // Type or member is obsolete
         private BackOfficeTokenCookieSettings BackOfficeTokenCookieSettings { get; set; } = new();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public GlobalSettings GlobalSettings { get; set; } = new();
 
@@ -444,6 +446,165 @@ internal class HideBackOfficeTokensHandlerTests
 
     #endregion
 
+    #region ExtractRevocationRequestContext Handler Tests
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_NonBackOfficeClient_DoesNothing()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateExtractRevocationRequestContext("other-client", RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - values should remain unchanged (handler skips non-back-office clients)
+        Assert.AreEqual(RedactedTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_RestoresAccessTokenFromCookie()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_RestoresRefreshTokenFromCookie()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { RefreshTokenCookieName, encryptedToken } });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "refresh_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(RefreshTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_DiscardsNonRedactedToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, "non-redacted-token", "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should be nullified for security
+        Assert.IsNull(context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_NoTokenTypeHint_TriesAccessTokenCookie()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, null);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - without a hint, it should default to access token cookie
+        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_RedactedTokenButCookieMissing_NullsToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false); // no cookies
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should be nullified to prevent IDX10400 errors downstream
+        Assert.IsNull(context.Request.Token);
+    }
+
+    [TestCase(true, false, TestName = "ExtractRevocationRequest_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
+    [TestCase(true, true, TestName = "ExtractRevocationRequest_UseHttpsTrue_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, true, TestName = "ExtractRevocationRequest_UseHttpsFalse_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, false, TestName = "ExtractRevocationRequest_UseHttpsFalse_HttpRequest_NoPrefix")]
+    public async Task ExtractRevocationRequest_AccessToken_CookiePrefix(bool useHttps, bool isHttps)
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = useHttps;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        var expectedCookieName = setup.GetExpectedCookieName(AccessTokenCookieName, useHttps, isHttps);
+        setup.SetupHttpContext(isHttps: isHttps, requestCookies: new Dictionary<string, string>
+        {
+            { expectedCookieName, encryptedToken }
+        });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+    }
+
+    [TestCase(true, false, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
+    [TestCase(true, true, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsTrue_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, true, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsFalse_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, false, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsFalse_HttpRequest_NoPrefix")]
+    public async Task ExtractRevocationRequest_RefreshToken_CookiePrefix(bool useHttps, bool isHttps)
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = useHttps;
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
+        var expectedCookieName = setup.GetExpectedCookieName(RefreshTokenCookieName, useHttps, isHttps);
+        setup.SetupHttpContext(isHttps: isHttps, requestCookies: new Dictionary<string, string>
+        {
+            { expectedCookieName, encryptedToken }
+        });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "refresh_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(RefreshTokenValue, context.Request.Token);
+    }
+
+    #endregion
+
     #region ProcessAuthenticationContext Handler Tests
 
     [Test]
@@ -581,13 +742,14 @@ internal class HideBackOfficeTokensHandlerTests
         string? refreshToken)
     {
         var transaction = new OpenIddictServerTransaction();
-        var context = new OpenIddictServerEvents.ApplyTokenResponseContext(transaction);
-
-        context.Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId };
-        context.Response = new OpenIddict.Abstractions.OpenIddictResponse
+        var context = new OpenIddictServerEvents.ApplyTokenResponseContext(transaction)
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
+            Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId },
+            Response = new OpenIddict.Abstractions.OpenIddictResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+            },
         };
 
         return context;
@@ -598,10 +760,11 @@ internal class HideBackOfficeTokensHandlerTests
         string? code)
     {
         var transaction = new OpenIddictServerTransaction();
-        var context = new OpenIddictServerEvents.ApplyAuthorizationResponseContext(transaction);
-
-        context.Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId };
-        context.Response = new OpenIddict.Abstractions.OpenIddictResponse { Code = code };
+        var context = new OpenIddictServerEvents.ApplyAuthorizationResponseContext(transaction)
+        {
+            Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId },
+            Response = new OpenIddict.Abstractions.OpenIddictResponse { Code = code },
+        };
 
         return context;
     }
@@ -612,13 +775,33 @@ internal class HideBackOfficeTokensHandlerTests
         string? refreshToken)
     {
         var transaction = new OpenIddictServerTransaction();
-        var context = new OpenIddictServerEvents.ExtractTokenRequestContext(transaction);
-
-        context.Request = new OpenIddict.Abstractions.OpenIddictRequest
+        var context = new OpenIddictServerEvents.ExtractTokenRequestContext(transaction)
         {
-            ClientId = clientId,
-            Code = code,
-            RefreshToken = refreshToken
+            Request = new OpenIddict.Abstractions.OpenIddictRequest
+            {
+                ClientId = clientId,
+                Code = code,
+                RefreshToken = refreshToken,
+            }
+        };
+
+        return context;
+    }
+
+    private static OpenIddictServerEvents.ExtractRevocationRequestContext CreateExtractRevocationRequestContext(
+        string? clientId,
+        string? token,
+        string? tokenTypeHint)
+    {
+        var transaction = new OpenIddictServerTransaction();
+        var context = new OpenIddictServerEvents.ExtractRevocationRequestContext(transaction)
+        {
+            Request = new OpenIddict.Abstractions.OpenIddictRequest
+            {
+                ClientId = clientId,
+                Token = token,
+                TokenTypeHint = tokenTypeHint,
+            },
         };
 
         return context;

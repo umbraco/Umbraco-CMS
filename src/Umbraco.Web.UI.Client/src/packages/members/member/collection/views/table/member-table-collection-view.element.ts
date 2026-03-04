@@ -3,10 +3,17 @@ import { UMB_MEMBER_COLLECTION_CONTEXT } from '../../member-collection.context-t
 import type { UmbMemberCollectionContext } from '../../member-collection.context.js';
 import { UmbMemberKind } from '../../../utils/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import type {
+	UmbTableColumn,
+	UmbTableConfig,
+	UmbTableElement,
+	UmbTableItem,
+	UmbTableOrderedEvent,
+} from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
+import { UmbDirection } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-member-table-collection-view')
 export class UmbMemberTableCollectionViewElement extends UmbLitElement {
@@ -20,18 +27,22 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 		{
 			name: this.localize.term('general_name'),
 			alias: 'memberName',
+			allowSorting: true,
 		},
 		{
 			name: this.localize.term('general_username'),
 			alias: 'memberUsername',
+			allowSorting: true,
 		},
 		{
 			name: this.localize.term('general_email'),
 			alias: 'memberEmail',
+			allowSorting: true,
 		},
 		{
 			name: this.localize.term('content_membertype'),
 			alias: 'memberType',
+			allowSorting: true,
 		},
 		{
 			name: this.localize.term('member_kind'),
@@ -47,6 +58,12 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
+	@state()
+	private _orderingColumn = 'memberUsername';
+
+	@state()
+	private _orderingDesc = false;
+
 	#collectionContext?: UmbMemberCollectionContext;
 	#memberTypeItemRepository = new UmbMemberTypeItemRepository(this);
 
@@ -57,6 +74,29 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 			this.#collectionContext = instance;
 			this.#observeCollectionItems();
 		});
+	}
+
+	readonly #columnAliasToOrderBy: Record<string, string> = {
+		memberName: 'name',
+		memberUsername: 'username',
+		memberEmail: 'email',
+		memberType: 'memberType',
+	};
+
+	#handleOrdering(event: UmbTableOrderedEvent) {
+		const table = event.target as UmbTableElement;
+		const orderingColumn = table.orderingColumn;
+		const orderingDesc = table.orderingDesc;
+		const orderBy = orderingColumn ? this.#columnAliasToOrderBy[orderingColumn] : undefined;
+
+		if (orderBy) {
+			this._orderingColumn = orderingColumn;
+			this._orderingDesc = orderingDesc;
+			this.#collectionContext?.setFilter({
+				orderBy,
+				orderDirection: orderingDesc ? UmbDirection.DESCENDING : UmbDirection.ASCENDING,
+			});
+		}
 	}
 
 	#observeCollectionItems() {
@@ -118,7 +158,13 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+			<umb-table
+				.config=${this._tableConfig}
+				.columns=${this._tableColumns}
+				.items=${this._tableItems}
+				.orderingColumn=${this._orderingColumn}
+				.orderingDesc=${this._orderingDesc}
+				@ordered=${this.#handleOrdering}></umb-table>
 		`;
 	}
 

@@ -418,6 +418,12 @@ export default {
 		clickToUpload: 'Click to upload',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
+		disallowedFileExtension: (extension: string) =>
+			`Cannot upload .${extension} files as no media type supports this file type`,
+		disallowedMediaTypeNotAllowedHere: (extension: string, mediaTypeName: string) =>
+			`Cannot upload .${extension} files here as the associated ${mediaTypeName} media type is not allowed at this location`,
+		disallowedMediaTypesNotAllowedHere: (extension: string, mediaTypeNames: string) =>
+			`Cannot upload .${extension} files here as the associated media types (${mediaTypeNames}) are not allowed at this location`,
 		disallowedMediaType: "Cannot upload this file, the media type with alias '%0%' is not allowed here",
 		invalidFileName: 'Cannot upload this file, it does not have a valid file name',
 		invalidFileSize: 'Cannot upload this file, it is too large',
@@ -1476,6 +1482,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab Title',
 		tabs: 'Tabs',
+		changeIcon: 'Change icon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
@@ -1636,6 +1643,7 @@ export default {
 		tabRules: 'Editor',
 	},
 	template: {
+		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
@@ -2176,7 +2184,7 @@ export default {
 		userNotInGroup: "The user is not in group '%0%'",
 		userPermissions: 'User permissions',
 		usergroup: 'User group',
-		usergroups: 'User groups',
+		usergroups: 'User Groups',
 		userInvited: 'has been invited',
 		userInvitedSuccessHelp: 'An invitation has been sent to the new user with details about how to log in to Umbraco.',
 		userinviteWelcomeMessage:
