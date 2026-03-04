@@ -673,6 +673,10 @@ export class UiBaseLocators extends BasePage {
     await this.clickConfirmToDeleteButton();
   }
 
+  async isConfirmTrashButtonDisabled() {
+    await this.isDisabled(this.confirmTrashBtn);
+  }
+
   // Folder Methods
   async clickCreateFolderButton() {
     await this.click(this.createFolderBtn);
@@ -792,6 +796,10 @@ export class UiBaseLocators extends BasePage {
 
   async isModalMenuItemWithNameVisible(name: string, isVisible: boolean = true) {
     await this.isVisible(this.sidebarModal.locator(`uui-menu-item[label="${name}"]`), isVisible);
+  }
+
+  async doesModalHaveText(text: string) {
+    await this.containsText(this.openedModal, text);
   }
 
   // Container Methods
