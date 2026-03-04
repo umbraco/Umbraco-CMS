@@ -20,8 +20,6 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
     private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;
     private readonly IDataTypeService _dataTypeService;
 
-    private Dictionary<Guid, bool> _accessMap = new();
-
     /// <summary>
     /// Initializes a new instance of the <see cref="UserStartNodeTreeFilterService"/> class.
     /// </summary>
@@ -49,33 +47,39 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
         => UserHasRootAccess() || IgnoreUserStartNodes(dataTypeKey);
 
     /// <inheritdoc />
-    public IEntitySlim[] GetFilteredRootEntities(out long totalItems)
-        => CalculateAccessMap(
-            () => _userStartNodeEntitiesService.RootUserAccessEntities(TreeObjectTypes, UserStartNodeIds),
-            out totalItems);
+    public UserAccessEntity[] GetFilteredRootEntities(out long totalItems)
+    {
+        UserAccessEntity[] result = _userStartNodeEntitiesService
+            .RootUserAccessEntities(TreeObjectTypes, UserStartNodeIds)
+            .ToArray();
+
+        totalItems = result.Length;
+        return result;
+    }
 
     /// <inheritdoc />
-    public IEntitySlim[] GetFilteredChildEntities(
+    public UserAccessEntity[] GetFilteredChildEntities(
         Guid parentKey,
         int skip,
         int take,
         Ordering ordering,
         out long totalItems)
     {
-        IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.ChildUserAccessEntities(
-            TreeObjectTypes,
-            UserStartNodePaths,
-            parentKey,
-            skip,
-            take,
-            ordering,
-            out totalItems);
+        UserAccessEntity[] result = _userStartNodeEntitiesService.ChildUserAccessEntities(
+                TreeObjectTypes,
+                UserStartNodePaths,
+                parentKey,
+                skip,
+                take,
+                ordering,
+                out totalItems)
+            .ToArray();
 
-        return CalculateAccessMap(() => userAccessEntities, out _);
+        return result;
     }
 
     /// <inheritdoc />
-    public IEntitySlim[] GetFilteredSiblingEntities(
+    public UserAccessEntity[] GetFilteredSiblingEntities(
         Guid target,
         int before,
         int after,
@@ -83,28 +87,30 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
         out long totalBefore,
         out long totalAfter)
     {
-        IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.SiblingUserAccessEntities(
-            TreeObjectTypes,
-            UserStartNodePaths,
-            target,
-            before,
-            after,
-            ordering,
-            out totalBefore,
-            out totalAfter);
+        UserAccessEntity[] result = _userStartNodeEntitiesService.SiblingUserAccessEntities(
+                TreeObjectTypes,
+                UserStartNodePaths,
+                target,
+                before,
+                after,
+                ordering,
+                out totalBefore,
+                out totalAfter)
+            .ToArray();
 
-        return CalculateAccessMap(() => userAccessEntities, out _);
+        return result;
     }
 
     /// <inheritdoc />
     public TItem[] MapWithAccessFiltering<TItem>(
         IEntitySlim[] entities,
+        Dictionary<Guid, bool> accessMap,
         Func<IEntitySlim, TItem> mapEntity,
         Func<IEntitySlim, TItem> mapEntityAsNoAccess)
         where TItem : class =>
         entities.Select(entity =>
             {
-                if (_accessMap.TryGetValue(entity.Key, out var hasAccess) is false)
+                if (accessMap.TryGetValue(entity.Key, out var hasAccess) is false)
                 {
                     return null;
                 }
@@ -131,16 +137,4 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
     private bool IgnoreUserStartNodes(Guid? dataTypeKey)
         => dataTypeKey.HasValue
            && _dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
-
-    private IEntitySlim[] CalculateAccessMap(Func<IEnumerable<UserAccessEntity>> getUserAccessEntities, out long totalItems)
-    {
-        UserAccessEntity[] userAccessEntities = getUserAccessEntities().ToArray();
-
-        _accessMap = userAccessEntities.ToDictionary(uae => uae.Entity.Key, uae => uae.HasAccess);
-
-        IEntitySlim[] entities = userAccessEntities.Select(uae => uae.Entity).ToArray();
-        totalItems = entities.Length;
-
-        return entities;
-    }
 }
