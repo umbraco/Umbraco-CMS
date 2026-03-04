@@ -47,6 +47,7 @@ public static class InstallerBuilderExtensions
         builder.InstallSteps()
             .Append<FilePermissionsStep>()
             .Append<TelemetryIdentifierStep>()
+            .Append<HmacSecretKeyStep>()
             .Append<DatabaseConfigureStep>()
             .Append<DatabaseInstallStep>()
             .Append<DatabaseUpgradeStep>()
