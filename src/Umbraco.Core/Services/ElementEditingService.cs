@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -402,6 +403,8 @@ internal sealed class ElementEditingService
             : null;
         await _auditService.AddAsync(AuditType.Move, userKey, toMove.Id, UmbracoObjectTypes.Element.GetName(), auditMessage);
 
+        scope.Notifications.Publish(new ElementTreeChangeNotification(toMove, TreeChangeTypes.RefreshBranch, eventMessages));
+
         IStatefulNotification movedNotification = movedNotificationFactory(toMove, eventMessages);
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
 
@@ -455,6 +458,7 @@ internal sealed class ElementEditingService
             return null;
         }
 
+        scope.Notifications.Publish(new ElementTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
         scope.Notifications.Publish(
             new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
