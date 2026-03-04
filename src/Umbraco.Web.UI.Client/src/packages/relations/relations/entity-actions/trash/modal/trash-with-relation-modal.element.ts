@@ -36,11 +36,11 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	// Three-state model for reference-aware trashing:
-	//   undefined = loading references (button disabled, normal message)
+	//   undefined = loading (button disabled, no message yet)
 	//   false     = blocked (button disabled, "cannot trash" message)
 	//   true      = allowed (button enabled, normal confirmation message)
 	@state()
-	private _canTrash: boolean | undefined = true;
+	private _canTrash: boolean | undefined = undefined;
 
 	#itemRepository?: UmbItemRepository<any>;
 
@@ -71,11 +71,11 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 		// DisableDeleteWhenReferenced is a global content setting (shared by documents
 		// and media), so we fetch it from the document configuration endpoint.
-		// Enter loading state: button disabled, normal message shown (not the error).
-		// Resolved to true/false when the references component fires @change.
+		// If the setting is off (or the fetch fails), allow trashing immediately.
+		// Otherwise stay in loading state until the references component reports totals.
 		const { data: config } = await tryExecute(this, DocumentService.getDocumentConfiguration());
-		if (config?.disableDeleteWhenReferenced) {
-			this._canTrash = undefined;
+		if (!config?.disableDeleteWhenReferenced) {
+			this._canTrash = true;
 		}
 
 		this._referencesConfig = {
@@ -95,14 +95,16 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	override render() {
 		const headline = this.localize.string('#actions_trash');
-		const content =
-			this._canTrash === false
-				? this.localize.string('#defaultdialogs_cannotTrashWhenReferenced', this._name)
-				: this.localize.string('#defaultdialogs_confirmTrash', this._name);
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
-				<p>${unsafeHTML(content)}</p>
+				${this._canTrash !== undefined
+					? html`<p>${unsafeHTML(
+							this._canTrash === false
+								? this.localize.string('#defaultdialogs_cannotTrashWhenReferenced', this._name)
+								: this.localize.string('#defaultdialogs_confirmTrash', this._name),
+						)}</p>`
+					: nothing}
 
 				${this._referencesConfig
 					? html`<umb-confirm-action-modal-entity-references
