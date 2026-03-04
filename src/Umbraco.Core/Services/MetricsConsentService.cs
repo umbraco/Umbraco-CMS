@@ -40,9 +40,9 @@ public class MetricsConsentService : IMetricsConsentService
     }
 
     /// <inheritdoc />
-    public TelemetryLevel GetConsentLevel()
+    public async Task<TelemetryLevel> GetConsentLevelAsync()
     {
-        var analyticsLevelString = _keyValueService.GetValue(Key);
+        var analyticsLevelString = await _keyValueService.GetValueAsync(Key);
 
         if (analyticsLevelString is null ||
             Enum.TryParse(analyticsLevelString, out TelemetryLevel analyticsLevel) is false)
@@ -54,10 +54,9 @@ public class MetricsConsentService : IMetricsConsentService
     }
 
     /// <inheritdoc />
-    public Task SetConsentLevelAsync(TelemetryLevel telemetryLevel)
+    public async Task SetConsentLevelAsync(TelemetryLevel telemetryLevel)
     {
         _logger.LogInformation("Telemetry level set to {telemetryLevel}", telemetryLevel);
-        _keyValueService.SetValue(Key, telemetryLevel.ToString());
-        return Task.CompletedTask;
+        await _keyValueService.SetValueAsync(Key, telemetryLevel.ToString());
     }
 }

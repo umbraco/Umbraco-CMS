@@ -31,11 +31,11 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GivenPackageMigrationsExist_WhenLatestStateIsRegistered_ThenLevelIsRun()
+    public async Task GivenPackageMigrationsExist_WhenLatestStateIsRegistered_ThenLevelIsRun()
     {
         // Add the final state to the keyvalue storage
         var keyValueService = Services.GetRequiredService<IKeyValueService>();
-        keyValueService.SetValue(
+        await keyValueService.SetValueAsync(
             Constants.Conventions.Migrations.KeyValuePrefix + TestMigrationPlan.TestMigrationPlanName,
             TestMigrationPlan.TestMigrationFinalState.ToString());
 

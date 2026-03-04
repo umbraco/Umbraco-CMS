@@ -118,7 +118,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
-        if (ShouldRebuildAliases())
+        if (await ShouldRebuildAliases())
         {
             _logger.LogInformation("Rebuilding all document aliases.");
             await RebuildAllAliasesAsync();
@@ -361,7 +361,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             _documentUrlAliasRepository.Save(toSave);
         }
 
-        _keyValueService.SetValue(RebuildKey, CurrentRebuildValue);
+        await _keyValueService.SetValueAsync(RebuildKey, CurrentRebuildValue);
 
         // Clear and repopulate the in-memory cache
         _aliasCache.Clear();
@@ -437,9 +437,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         return aliases;
     }
 
-    private bool ShouldRebuildAliases()
+    private async Task<bool> ShouldRebuildAliases()
     {
-        var persistedValue = _keyValueService.GetValue(RebuildKey);
+        var persistedValue = await _keyValueService.GetValueAsync(RebuildKey);
         return string.Equals(persistedValue, CurrentRebuildValue, StringComparison.Ordinal) is false;
     }
 

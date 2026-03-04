@@ -1,21 +1,20 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
+internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
 {
     public KeyValueRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         ILogger<KeyValueRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
@@ -29,82 +28,98 @@ internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValu
     }
 
     /// <inheritdoc />
-    public IReadOnlyDictionary<string, string?> FindByKeyPrefix(string keyPrefix)
-        => Get(Query<IKeyValue>().Where(entity => entity.Identifier.StartsWith(keyPrefix)))
-            .ToDictionary(x => x.Identifier, x => x.Value);
-
-    #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
-
-    public override void Save(IKeyValue entity)
+    public async Task<IReadOnlyDictionary<string, string?>?> FindByKeyPrefixAsync(string keyPrefix)
     {
-        if (Get(entity.Identifier) == null)
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            PersistNewItem(entity);
-        }
-        else
-        {
-            PersistUpdatedItem(entity);
-        }
+            Dictionary<string, string?> result = await db.KeyValue
+                .Where(x => x.Key.StartsWith(keyPrefix))
+                .ToDictionaryAsync(x => x.Key, x => x.Value);
+
+            return result;
+        });
     }
+
+    #region Overrides of AsyncEntityRepositoryBase<string, IKeyValue>
+
+    /// <inheritdoc/>
+    protected override async Task<IKeyValue?> PerformGetAsync(string? id) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            KeyValueDto? dto = await db.KeyValue
+                .Where(x => x.Key == id)
+                .FirstOrDefaultAsync();
+
+            return dto is null ? null : Map(dto);
+        });
+
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<IKeyValue>?> PerformGetAllAsync() =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<KeyValueDto> dtos = await db.KeyValue
+                .ToListAsync();
+
+            return dtos
+                .Select(Map)
+                .WhereNotNull()
+                .AsEnumerable();
+        });
+
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<IKeyValue>?> PerformGetManyAsync(string[]? ids)
+    {
+        if (ids is null)
+        {
+            return null;
+        }
+
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<KeyValueDto> dtos = await db.KeyValue
+                .Where(x => ids.Any(id => id == x.Key))
+                .ToListAsync();
+
+            return dtos
+                .Select(Map)
+                .WhereNotNull()
+                .AsEnumerable();
+        });
+    }
+
+    /// <inheritdoc/>
+    protected override async Task PersistNewItemAsync(IKeyValue entity) =>
+        await AmbientScope.ExecuteWithContextAsync<KeyValueDto>(async db =>
+        {
+            KeyValueDto? dto = Map(entity);
+            if (dto is not null)
+            {
+                await db.KeyValue
+                    .AddAsync(dto);
+
+                await db.SaveChangesAsync();
+            }
+        });
+
+    /// <inheritdoc/>
+    protected override async Task PersistUpdatedItemAsync(IKeyValue entity) =>
+        await AmbientScope.ExecuteWithContextAsync<KeyValueDto>(async db =>
+        {
+            KeyValueDto? dto = Map(entity);
+            if (dto is not null)
+            {
+                await db.UpsertAsync(dto, () =>
+                    db.KeyValue
+                        .Where(x => x.Key == dto.Key)
+                        .ExecuteUpdateAsync(setter => setter
+                            .SetProperty(x => x.Value, dto.Value)
+                            .SetProperty(x => x.UpdateDate, dto.UpdateDate)));
+            }
+        });
 
     #endregion
 
-    #region Overrides of EntityRepositoryBase<string, IKeyValue>
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        Sql<ISqlContext> sql = SqlContext.Sql();
-
-        sql = isCount
-            ? sql.SelectCount()
-            : sql.Select<KeyValueDto>();
-
-        sql
-            .From<KeyValueDto>();
-
-        return sql;
-    }
-
-    protected override string GetBaseWhereClause() => QuoteTableName(Constants.DatabaseSchema.Tables.KeyValue) + ".key = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
-
-    protected override IKeyValue? PerformGet(string? id)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false).Where<KeyValueDto>(x => x.Key == id);
-        KeyValueDto? dto = Database.Fetch<KeyValueDto>(sql).FirstOrDefault();
-        return dto == null ? null : Map(dto);
-    }
-
-    protected override IEnumerable<IKeyValue> PerformGetAll(params string[]? ids)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false).WhereIn<KeyValueDto>(x => x.Key, ids);
-        List<KeyValueDto>? dtos = Database.Fetch<KeyValueDto>(sql);
-        return dtos?.WhereNotNull().Select(Map)!;
-    }
-
-    protected override IEnumerable<IKeyValue> PerformGetByQuery(IQuery<IKeyValue> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<IKeyValue>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-        return Database.Fetch<KeyValueDto>(sql).Select(Map).WhereNotNull();
-    }
-
-    protected override void PersistNewItem(IKeyValue entity)
-    {
-        KeyValueDto? dto = Map(entity);
-        Database.Insert(dto);
-    }
-
-    protected override void PersistUpdatedItem(IKeyValue entity)
-    {
-        KeyValueDto? dto = Map(entity);
-        if (dto is not null)
-        {
-            Database.Update(dto);
-        }
-    }
+    #region Mapping
 
     private static KeyValueDto? Map(IKeyValue? keyValue)
     {

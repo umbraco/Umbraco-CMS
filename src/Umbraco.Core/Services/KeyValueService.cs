@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -10,90 +12,95 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class KeyValueService : IKeyValueService
 {
     private readonly IKeyValueRepository _repository;
-    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IScopeProvider _scopeProvider;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="KeyValueService" /> class.
     /// </summary>
     /// <param name="scopeProvider">The core scope provider.</param>
     /// <param name="repository">The key-value repository.</param>
-    public KeyValueService(ICoreScopeProvider scopeProvider, IKeyValueRepository repository)
+    public KeyValueService(IScopeProvider scopeProvider, IKeyValueRepository repository)
     {
         _scopeProvider = scopeProvider;
         _repository = repository;
     }
 
     /// <inheritdoc />
-    public string? GetValue(string key)
+    public async Task<string?> GetValueAsync(string key)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _repository.Get(key)?.Value;
-        }
+        using ICoreScope scope = _scopeProvider.CreateScope();
+
+        IKeyValue? value = await _repository.GetAsync(key, CancellationToken.None);
+
+        scope.Complete();
+        return value?.Value;
     }
 
     /// <inheritdoc />
-    public IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix)
+    public async Task<Attempt<IReadOnlyDictionary<string, string?>?, KeyValueOperationStatus>> FindByKeyPrefixAsync(string keyPrefix)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _repository.FindByKeyPrefix(keyPrefix);
-        }
+        using ICoreScope scope = _scopeProvider.CreateScope();
+
+        IReadOnlyDictionary<string, string?>? dict = await _repository.FindByKeyPrefixAsync(keyPrefix);
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus(KeyValueOperationStatus.Success, dict);
     }
 
     /// <inheritdoc />
-    public void SetValue(string key, string value)
+    public async Task<Attempt<KeyValueOperationStatus>> SetValueAsync(string key, string value)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        scope.WriteLock(Constants.Locks.KeyValues);
+
+        IKeyValue? keyValue = await _repository.GetAsync(key, CancellationToken.None);
+        if (keyValue == null)
         {
-            scope.WriteLock(Constants.Locks.KeyValues);
-
-            IKeyValue? keyValue = _repository.Get(key);
-            if (keyValue == null)
-            {
-                keyValue = new KeyValue { Identifier = key, Value = value, UpdateDate = DateTime.UtcNow };
-            }
-            else
-            {
-                keyValue.Value = value;
-                keyValue.UpdateDate = DateTime.UtcNow;
-            }
-
-            _repository.Save(keyValue);
-
-            scope.Complete();
+            keyValue = new KeyValue { Identifier = key, Value = value, UpdateDate = DateTime.UtcNow };
         }
-    }
-
-    /// <inheritdoc />
-    public void SetValue(string key, string originValue, string newValue)
-    {
-        if (!TrySetValue(key, originValue, newValue))
+        else
         {
-            throw new InvalidOperationException("Could not set the value.");
-        }
-    }
-
-    /// <inheritdoc />
-    public bool TrySetValue(string key, string originalValue, string newValue)
-    {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.KeyValues);
-
-            IKeyValue? keyValue = _repository.Get(key);
-            if (keyValue == null || keyValue.Value != originalValue)
-            {
-                return false;
-            }
-
-            keyValue.Value = newValue;
+            keyValue.Value = value;
             keyValue.UpdateDate = DateTime.UtcNow;
-            _repository.Save(keyValue);
-
-            scope.Complete();
         }
 
-        return true;
+        await _repository.SaveAsync(keyValue, CancellationToken.None);
+
+        scope.Complete();
+
+        return Attempt.Succeed(KeyValueOperationStatus.Success);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<KeyValueOperationStatus>> SetValueAsync(string key, string originValue, string newValue)
+    {
+        Attempt<bool, KeyValueOperationStatus> attempt = await TrySetValueAsync(key, originValue, newValue);
+        if (!attempt.Result)
+        {
+            return Attempt.Fail(KeyValueOperationStatus.NoValueSet);
+        }
+
+        return Attempt.Succeed(KeyValueOperationStatus.Success);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<bool, KeyValueOperationStatus>> TrySetValueAsync(string key, string originalValue, string newValue)
+    {
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        scope.WriteLock(Constants.Locks.KeyValues);
+
+        IKeyValue? keyValue = await _repository.GetAsync(key, CancellationToken.None);
+        if (keyValue == null || keyValue.Value != originalValue)
+        {
+            return Attempt.FailWithStatus(KeyValueOperationStatus.NoValueSet, false);
+        }
+
+        keyValue.Value = newValue;
+        keyValue.UpdateDate = DateTime.UtcNow;
+        await _repository.SaveAsync(keyValue, CancellationToken.None);
+
+        scope.Complete();
+
+        return Attempt.SucceedWithStatus(KeyValueOperationStatus.Success, true);
     }
 }

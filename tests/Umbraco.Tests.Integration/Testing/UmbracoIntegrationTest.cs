@@ -16,10 +16,9 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Persistence.EFCore.Sqlite;
-using Umbraco.Cms.Persistence.EFCore.SqlServer;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -47,6 +46,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     ///     Gets the <see cref="IScopeProvider" />
     /// </summary>
     protected IScopeProvider ScopeProvider => Services.GetRequiredService<IScopeProvider>();
+
+    /// <summary>
+    ///     Gets the <see cref="IEFCoreScopeProvider{TDbContext}"/>
+    /// </summary>
+    protected IEFCoreScopeProvider<UmbracoDbContext> NewScopeProvider => Services.GetRequiredService<IEFCoreScopeProvider<UmbracoDbContext>>();
 
     /// <summary>
     ///     Gets the <see cref="IScopeAccessor" />

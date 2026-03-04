@@ -61,7 +61,8 @@ public class PackageMigrationRunner
     /// <returns></returns>
     public async Task<IEnumerable<ExecutedMigrationPlan>> RunPackageMigrationsIfPendingAsync(string packageName)
     {
-        IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        var attempt = await _keyValueService.FindByKeyPrefixAsync(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?>? keyValues = attempt.Result;
         IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
         IEnumerable<string> packagePlans = _packageMigrationPlans.Values

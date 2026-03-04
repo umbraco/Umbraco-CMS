@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -18,19 +19,21 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
     private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
 
     [Test]
-    public void Can_Query_For_Key_Prefix()
+    public async Task Can_Query_For_Key_Prefix()
     {
         // Arrange
-        KeyValueService.SetValue("test1", "hello1");
-        KeyValueService.SetValue("test2", "hello2");
-        KeyValueService.SetValue("test3", "hello3");
-        KeyValueService.SetValue("test4", "hello4");
-        KeyValueService.SetValue("someotherprefix1", "helloagain1");
+        await KeyValueService.SetValueAsync("test1", "hello1");
+        await KeyValueService.SetValueAsync("test2", "hello2");
+        await KeyValueService.SetValueAsync("test3", "hello3");
+        await KeyValueService.SetValueAsync("test4", "hello4");
+        await KeyValueService.SetValueAsync("someotherprefix1", "helloagain1");
         // Act
-        var value = KeyValueService.FindByKeyPrefix("test");
+        var attempt = await KeyValueService.FindByKeyPrefixAsync("test");
+
+        Assert.AreEqual(attempt.Status, KeyValueOperationStatus.Success);
+        var value = attempt.Result;
 
         // Assert
-
         Assert.AreEqual(4, value.Count);
         Assert.AreEqual("hello1", value["test1"]);
         Assert.AreEqual("hello2", value["test2"]);
@@ -39,65 +42,65 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetValue_ForMissingKey_ReturnsNull()
+    public async Task GetValue_ForMissingKey_ReturnsNull()
     {
         // Act
-        var value = KeyValueService.GetValue("foo");
+        var value = await KeyValueService.GetValueAsync("foo");
 
         // Assert
         Assert.IsNull(value);
     }
 
     [Test]
-    public void GetValue_ForExistingKey_ReturnsValue()
+    public async Task GetValue_ForExistingKey_ReturnsValue()
     {
-        KeyValueService.SetValue("foo", "bar");
+        await KeyValueService.SetValueAsync("foo", "bar");
 
         // Act
-        var value = KeyValueService.GetValue("foo");
+        var value = await KeyValueService.GetValueAsync("foo");
 
         // Assert
         Assert.AreEqual("bar", value);
     }
 
     [Test]
-    public void SetValue_ForExistingKey_SavesValue()
+    public async Task SetValue_ForExistingKey_SavesValue()
     {
-        KeyValueService.SetValue("foo", "bar");
+        await KeyValueService.SetValueAsync("foo", "bar");
 
         // Act
-        KeyValueService.SetValue("foo", "buzz");
-        var value = KeyValueService.GetValue("foo");
+        await KeyValueService.SetValueAsync("foo", "buzz");
+        var value = await KeyValueService.GetValueAsync("foo");
 
         // Assert
         Assert.AreEqual("buzz", value);
     }
 
     [Test]
-    public void TrySetValue_ForExistingKeyWithProvidedValue_ReturnsTrueAndSetsValue()
+    public async Task TrySetValue_ForExistingKeyWithProvidedValue_ReturnsTrueAndSetsValue()
     {
-        KeyValueService.SetValue("foo", "bar");
+        await KeyValueService.SetValueAsync("foo", "bar");
 
         // Act
-        var result = KeyValueService.TrySetValue("foo", "bar", "buzz");
-        var value = KeyValueService.GetValue("foo");
+        var attempt = await KeyValueService.TrySetValueAsync("foo", "bar", "buzz");
+        var value = await KeyValueService.GetValueAsync("foo");
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.AreEqual(attempt.Status, KeyValueOperationStatus.Success);
         Assert.AreEqual("buzz", value);
     }
 
     [Test]
-    public void TrySetValue_ForExistingKeyWithoutProvidedValue_ReturnsFalseAndDoesNotSetValue()
+    public async Task TrySetValue_ForExistingKeyWithoutProvidedValue_ReturnsFalseAndDoesNotSetValue()
     {
-        KeyValueService.SetValue("foo", "bar");
+        await KeyValueService.SetValueAsync("foo", "bar");
 
         // Act
-        var result = KeyValueService.TrySetValue("foo", "bang", "buzz");
-        var value = KeyValueService.GetValue("foo");
+        var attempt = await KeyValueService.TrySetValueAsync("foo", "bang", "buzz");
+        var value = await KeyValueService.GetValueAsync("foo");
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.AreEqual(attempt.Status, KeyValueOperationStatus.NoValueSet);
         Assert.AreEqual("bar", value);
     }
 }
