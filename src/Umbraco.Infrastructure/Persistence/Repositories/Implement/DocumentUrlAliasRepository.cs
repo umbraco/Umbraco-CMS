@@ -39,10 +39,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
 
         var dtoDictionary = aliases
             .Select(BuildDto)
-            .ToDictionary(x => (x.UniqueId, x.NullableLanguageId, x.Alias));
+            .ToDictionary(x => (x.UniqueId, x.LanguageId, x.Alias));
 
         var toDelete = new List<int>();
-        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.NullableLanguageId, x.Alias));
+        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.LanguageId, x.Alias));
 
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
@@ -56,12 +56,12 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
 
             foreach (DocumentUrlAliasDto existing in existingAliasesInBatch)
             {
-                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.NullableLanguageId, existing.Alias), out DocumentUrlAliasDto? found))
+                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.Alias), out DocumentUrlAliasDto? found))
                 {
                     found.Id = existing.Id;
 
                     // If we found it, we know we should not insert it as a new record.
-                    toInsert.Remove((found.UniqueId, found.NullableLanguageId, found.Alias));
+                    toInsert.Remove((found.UniqueId, found.LanguageId, found.Alias));
                 }
                 else
                 {
@@ -128,7 +128,7 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         {
             Alias = dto.Alias,
             DocumentKey = dto.UniqueId,
-            NullableLanguageId = dto.NullableLanguageId,
+            NullableLanguageId = dto.LanguageId,
         };
 
     private DocumentUrlAliasDto BuildDto(PublishedDocumentUrlAlias model) =>
@@ -136,6 +136,6 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         {
             Alias = model.Alias,
             UniqueId = model.DocumentKey,
-            NullableLanguageId = model.NullableLanguageId,
+            LanguageId = model.NullableLanguageId,
         };
 }
