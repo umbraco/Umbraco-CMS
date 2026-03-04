@@ -23,6 +23,7 @@
     content: "Content",
     media: "Media",
     settings: "Settings",
+    library: "Library",
     packages: "Packages",
     members: "Members",
     dictionary: "Translation",
@@ -197,7 +198,7 @@
     1: ['Granular permissions', 'Assign permissions to Document property values'],
   }
 
-  public static readonly userGroupPermissionsSettings = {
+  public static readonly userGroupDocumentPermissionsSettings = {
     0: ['Read', 'Allow access to read a Document', 'Umb.Document.Read'],
     1: ['Create Document Blueprint', 'Allow access to create a Document Blueprint', 'Umb.Document.CreateBlueprint'],
     2: ['Delete', 'Allow access to delete a Document', 'Umb.Document.Delete'],
@@ -214,15 +215,27 @@
     13: ['Rollback', 'Allow access to roll back a Document to a previous state', 'Umb.Document.Rollback']
   }
 
+  public static readonly sectionAliases = {
+    content: 'Umb.Section.Content',
+    library: 'Umb.Section.Library',
+    media: 'Umb.Section.Media',
+    members: 'Umb.Section.Members',
+    packages: 'Umb.Section.Packages',
+    settings: 'Umb.Section.Settings',
+    translation: 'Umb.Section.Translation',
+    users: 'Umb.Section.Users',
+  }
+
   public static readonly userGroupSectionsSettings = {
     0: ['Content', 'Umb.Section.Content'],
     1: ['Forms', 'Umb.Section.Forms'],
-    2: ['Media', 'Umb.Section.Media'],
-    3: ['Members', 'Umb.Section.Members'],
-    4: ['Packages', 'Umb.Section.Packages'],
-    5: ['Settings', 'Umb.Section.Settings'],
-    6: ['Translation', 'Umb.Section.Translation'],
-    7: ['Users', 'Umb.Section.Users'],
+    2: ['Library', 'Umb.Section.Library'],
+    3: ['Media', 'Umb.Section.Media'],
+    4: ['Members', 'Umb.Section.Members'],
+    5: ['Packages', 'Umb.Section.Packages'],
+    6: ['Settings', 'Umb.Section.Settings'],
+    7: ['Translation', 'Umb.Section.Translation'],
+    8: ['Users', 'Umb.Section.Users'],
   }
 
   public static readonly trashDeleteDialogMessage = {
@@ -295,9 +308,14 @@
     webhook: '/umbraco/management/api/v1/webhook',
     recycleBinDocument: '/umbraco/management/api/v1/recycle-bin/document',
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
+    recycleBinElement: '/umbraco/management/api/v1/recycle-bin/element',
     domains: '/domains',
     notifications: '/notifications',
-    currentUser: '/umbraco/management/api/v1/user/current'
+    currentUser: '/umbraco/management/api/v1/user/current',
+    element: '/umbraco/management/api/v1/element',
+    elementFolder: '/umbraco/management/api/v1/element/folder',
+    treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
+    treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -306,5 +324,17 @@
     'Sensitive data': 'Users with the specific permission to be able to manage properties and data marked as sensitive',
     'Translators': 'Users with permission to manage dictionary entries',
     'Writers': 'Users with permission to create and update but not publish content'
+  }
+
+  public static readonly userGroupElementPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element', 'Umb.Element.Read'],
+    1: ['Create', 'Allow access to create an element', 'Umb.Element.Create'],
+    2: ['Delete', 'Allow access to delete an element', 'Umb.Element.Delete'],
+    3: ['Publish', 'Allow access to publish an element', 'Umb.Element.Publish'],
+    4: ['Unpublish', 'Allow access to unpublish an element', 'Umb.Element.Unpublish'],
+    5: ['Update', 'Allow access to save an element', 'Umb.Element.Update'],
+    6: ['Duplicate', 'Allow access to duplicate an element', 'Umb.Element.Duplicate'],
+    7: ['Move', 'Allow access to move an element', 'Umb.Element.Move'],
+    8: ['Rollback', 'Allow access to rollback an element to a previous state', 'Umb.Element.Rollback']
   }
 }

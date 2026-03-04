@@ -1,40 +1,54 @@
 import type { UmbEntityActionArgs } from './types.js';
 import type { ManifestEntityAction, MetaEntityAction } from './entity-action.extension.js';
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+
+const umbEntityActionListDeprecation = new UmbDeprecation({
+	deprecated: 'The `entityType` and `unique` properties on `<umb-entity-action-list>`.',
+	removeInVersion: '19',
+	solution: 'Provide the entity type and unique via the UMB_ENTITY_CONTEXT context instead.',
+});
 
 @customElement('umb-entity-action-list')
 export class UmbEntityActionListElement extends UmbLitElement {
+	/**
+	 * @deprecated Provide through the UMB_ENTITY_CONTEXT context instead. Will be removed in Umbraco 19.
+	 * @returns {string | undefined} The entity type.
+	 */
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string | undefined {
 		return this._props.entityType;
 	}
 	public set entityType(value: string | undefined) {
 		if (value === undefined || value === this._props.entityType) return;
+		umbEntityActionListDeprecation.warn();
 		this._props.entityType = value;
+		this.#ensureFallbackEntityContext().setEntityType(value);
 		this.#generateApiArgs();
-		this.requestUpdate('_props');
-		// Update filter:
-		//const oldValue = this._filter;
-		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) => extension.forEntityTypes.includes(value);
-		//this.requestUpdate('_filter', oldValue);
 	}
 
-	@state()
-	private _filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
-
+	/**
+	 * @deprecated Provide through the UMB_ENTITY_CONTEXT context instead. Will be removed in Umbraco 19.
+	 * @returns {string | null | undefined} The unique key.
+	 */
 	@property({ type: String })
 	public get unique(): string | null | undefined {
 		return this._props.unique;
 	}
 	public set unique(value: string | null | undefined) {
 		if (value === this._props.unique) return;
+		umbEntityActionListDeprecation.warn();
 		this._props.unique = value;
+		this.#ensureFallbackEntityContext().setUnique(value ?? null);
 		this.#generateApiArgs();
-		this.requestUpdate('_props');
 	}
+
+	@state()
+	private _filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
 
 	@state()
 	private _props: Partial<UmbEntityActionArgs<unknown>> = {};
@@ -45,14 +59,34 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		[UmbEntityActionArgs<MetaEntityAction>]
 	>;
 
-	// TODO: Ideally this is provided on a higher level, as in the Tree-item, Workspace, Collection-Row, etc [NL]
-	#entityContext = new UmbEntityContext(this);
+	#fallbackEntityContext?: UmbEntityContext;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			if (!context) return;
+			this.observe(observeMultiple([context.entityType, context.unique]), ([entityType, unique]) => {
+				this._props.entityType = entityType ?? undefined;
+				this._props.unique = unique;
+				this.#generateApiArgs();
+			});
+		});
+	}
+
+	// TODO: v19 remove when fallback context is no longer needed
+	#ensureFallbackEntityContext(): UmbEntityContext {
+		if (!this.#fallbackEntityContext) {
+			this.#fallbackEntityContext = new UmbEntityContext(this);
+		}
+		return this.#fallbackEntityContext;
+	}
 
 	#generateApiArgs() {
 		if (!this._props.entityType || this._props.unique === undefined) return;
 
-		this.#entityContext.setEntityType(this._props.entityType);
-		this.#entityContext.setUnique(this._props.unique);
+		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) =>
+			extension.forEntityTypes.includes(this._props.entityType!);
 		this.#hasRenderedOnce = false;
 
 		this._apiArgs = (manifest: ManifestEntityAction<MetaEntityAction>) => {

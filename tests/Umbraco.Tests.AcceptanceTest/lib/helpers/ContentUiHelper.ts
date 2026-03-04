@@ -134,7 +134,6 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly splitView: Locator;
   private readonly tiptapInput: Locator;
   private readonly rteBlockInline: Locator;
-  private readonly backofficeModalContainer: Locator;
   private readonly modalCreateBtn: Locator;
   private readonly modalUpdateBtn: Locator;
   private readonly rteBlock: Locator;
@@ -334,7 +333,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.blockWorkspace = page.locator('umb-block-workspace-editor');
     this.tiptapInput = page.locator('umb-input-tiptap');
     this.rteBlockInline = page.locator('umb-rte-block-inline');
-    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.modalCreateBtn = this.backofficeModalContainer.getByLabel('Create', {exact: true});
     this.modalUpdateBtn = this.backofficeModalContainer.getByLabel('Update', {exact: true});
     this.rteBlock = page.locator('umb-rte-block');
@@ -1872,5 +1870,17 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesTextAreaHaveExpectedValue(expectedValue: string) {
     await this.hasValue(this.textAreaTxt, expectedValue);
+  }
+
+  async addElementPicker(elementName: string) {
+    await this.clickChooseButton();
+    await this.click(this.sidebarModal.getByText(elementName, {exact: true}));
+    await this.click(this.chooseModalBtn);
+  }
+
+  async removeElementPicker(elementPickerName: string) {
+    const elementPickerLocator = this.entityItem.filter({has: this.page.locator(`[name="${elementPickerName}"]`)});
+    await this.hoverAndClick(elementPickerLocator, elementPickerLocator.getByLabel('Remove'));
+    await this.clickConfirmRemoveButton();
   }
 }
