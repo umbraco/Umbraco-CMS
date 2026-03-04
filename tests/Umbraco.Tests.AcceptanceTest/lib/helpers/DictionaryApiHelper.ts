@@ -135,7 +135,7 @@ export class DictionaryApiHelper {
   }
 
   async export(id: string, includeChildren: boolean) {
-    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/dictionary/' + id + '/export?includeChildren=' + includeChildren);
+    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/dictionary/' + id + '/export?includeChidren=' + includeChildren);
   }
 
   async import(temporaryFileId: string, parentId: string) {
