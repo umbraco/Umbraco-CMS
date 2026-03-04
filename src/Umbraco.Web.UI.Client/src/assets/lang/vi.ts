@@ -2423,6 +2423,8 @@ export default {
 		unpublishWarning:
 			'Mục này hoặc các phần tử con của nó đang được sử dụng. Việc hủy xuất bản có thể gây ra liên kết hỏng trên website của bạn. Vui lòng thực hiện các hành động phù hợp.',
 		deleteDisabledWarning: 'Mục này hoặc các phần tử con của nó đang được sử dụng. Do đó, việc xóa đã bị tắt.',
+		cannotBulkTrashWhenReferenced:
+			'Các mục đã chọn không thể được chuyển vào Thùng rác vì ít nhất một mục được tham chiếu bởi nội dung khác.',
 		listViewDialogWarning: 'Các mục sau mà bạn đang cố gắng %0% đang được sử dụng bởi nội dung khác.',
 		labelUsedByItems: 'Được liên kết từ các mục sau',
 		labelDependsOnThis: 'Các mục sau phụ thuộc vào mục này',

@@ -2421,6 +2421,8 @@ export default {
 			'Este item ou os seus descendentes estão a ser usados. A despublicação pode levar a links quebrados no seu website. Por favor, tome as medidas apropriadas.',
 		deleteDisabledWarning:
 			'Este item ou os seus descendentes estão a ser usados. Portanto, a eliminação foi desativada.',
+		cannotBulkTrashWhenReferenced:
+			'Os itens selecionados não podem ser movidos para a Reciclagem porque pelo menos um item é referenciado por outro conteúdo.',
 		listViewDialogWarning: 'Os seguintes itens que está a tentar %0% são usados por outro conteúdo.',
 		labelUsedByItems: 'Referenciado pelos seguintes itens',
 		labelDependsOnThis: 'Os seguintes itens dependem disto',

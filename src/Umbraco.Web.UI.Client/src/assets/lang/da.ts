@@ -2381,6 +2381,8 @@ export default {
 		unpublishWarning:
 			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
+		cannotBulkTrashWhenReferenced:
+			'De valgte elementer kan ikke flyttes til papirkurven, fordi mindst \u00e9t element refereres af andet indhold.',
 		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...og en mere';

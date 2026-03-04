@@ -2462,6 +2462,8 @@ export default {
 		unpublishWarning:
 			'This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being used. Therefore, deletion has been disabled.',
+		cannotBulkTrashWhenReferenced:
+			'The selected items cannot be moved to the Recycle Bin because at least one item is referenced by other content.',
 		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
