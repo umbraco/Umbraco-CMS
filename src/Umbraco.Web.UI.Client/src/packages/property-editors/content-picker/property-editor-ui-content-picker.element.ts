@@ -160,6 +160,7 @@ export class UmbPropertyEditorUIContentPickerElement
 			workspaceContext && 'getIsNew' in workspaceContext
 				? (workspaceContext as unknown as { getIsNew(): boolean | undefined }).getIsNew() === true
 				: false;
+		const isElement = workspaceContext?.getEntityType() === 'block';
 
 		// Use parent entity context to get the parent unique. Its observable starts as undefined,
 		// so asPromise() properly waits for the async structure loading to complete.
@@ -167,7 +168,7 @@ export class UmbPropertyEditorUIContentPickerElement
 		const parent = await this.observe(parentContext?.parent, () => {})?.asPromise();
 		const parentUnique = parent?.unique ?? null;
 
-		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, isNew ? null : unique, parentUnique);
+		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, isNew || isElement ? null : unique, parentUnique);
 		if (result && result.length > 0) {
 			this._rootUnique = result[0];
 		}
