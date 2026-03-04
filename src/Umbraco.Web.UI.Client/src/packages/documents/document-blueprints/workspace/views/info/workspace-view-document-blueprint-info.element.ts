@@ -17,7 +17,7 @@ export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement 
 	private _documentBlueprintUnique = '';
 
 	@state()
-	private _routeBuilder?: UmbModalRouteBuilder; // ???
+	private _routeBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _documentTypeUnique?: string = '';
@@ -81,7 +81,6 @@ export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement 
 			(documentType) => {
 				this._documentTypeName = documentType?.name;
 				this._documentTypeIcon = documentType?.icon;
-				//this._allowedTemplates = documentType?.allowedTemplates;
 			},
 			'_documentType',
 		);
