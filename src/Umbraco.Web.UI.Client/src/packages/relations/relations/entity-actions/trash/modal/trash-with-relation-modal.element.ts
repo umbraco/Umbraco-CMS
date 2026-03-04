@@ -1,4 +1,7 @@
-import type { UmbConfirmActionModalEntityReferencesConfig } from '../../../global-components/types.js';
+import type {
+	UmbConfirmActionModalEntityReferencesConfig,
+	UmbConfirmActionModalEntityReferencesElement,
+} from '../../../global-components/types.js';
 import type {
 	UmbTrashWithRelationConfirmModalData,
 	UmbTrashWithRelationConfirmModalValue,
@@ -17,6 +20,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-trash-with-relation-confirm-modal')
 export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement<
@@ -28,6 +32,9 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+
+	@state()
+	private _canTrash = true;
 
 	#itemRepository?: UmbItemRepository<any>;
 
@@ -56,6 +63,13 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 			this._name = item.name;
 		}
 
+		// Pessimistically disable trashing. The references component fires a single
+		// @change event after all its loads complete, so _canTrash is correctly
+		// updated once the final combined total is known — no transient flicker.
+		if (this.data.disableWhenReferenced) {
+			this._canTrash = false;
+		}
+
 		this._referencesConfig = {
 			unique: this.data.unique,
 			itemRepositoryAlias: this.data.itemRepositoryAlias,
@@ -63,9 +77,20 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 		};
 	}
 
+	#onReferencesChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
+		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
+		if (this.data?.disableWhenReferenced) {
+			this._canTrash = total === 0;
+		}
+	}
+
 	override render() {
 		const headline = this.localize.string('#actions_trash');
-		const content = this.localize.string('#defaultdialogs_confirmTrash', this._name);
+		const content = this._canTrash
+			? this.localize.string('#defaultdialogs_confirmTrash', this._name)
+			: this.localize.string('#defaultdialogs_cannotTrashWhenReferenced', this._name);
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
@@ -73,7 +98,8 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 				${this._referencesConfig
 					? html`<umb-confirm-action-modal-entity-references
-							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references>`
+							.config=${this._referencesConfig}
+							@change=${this.#onReferencesChange}></umb-confirm-action-modal-entity-references>`
 					: nothing}
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._rejectModal}></uui-button>
@@ -84,6 +110,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 					color="danger"
 					look="primary"
 					label=${this.localize.term('actions_trash')}
+					?disabled=${!this._canTrash}
 					@click=${this._submitModal}
 					${umbFocus()}></uui-button>
 			</uui-dialog-layout>

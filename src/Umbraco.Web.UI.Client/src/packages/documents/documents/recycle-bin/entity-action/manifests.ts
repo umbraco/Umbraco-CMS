@@ -22,6 +22,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.EntityAction.Document.RecycleBin.Trash',
 		name: 'Trash Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		api: () => import('../../entity-actions/trash/document-trash.action.js'),
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,

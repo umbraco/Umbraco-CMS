@@ -525,6 +525,7 @@ export default {
 		confirmremoveusageof: 'Tem a certeza que quer remover o uso de <strong>%0%</strong>',
 		confirmlogout: 'Tem a certeza?',
 		confirmSure: 'Tem a certeza?',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> não pode ser movido para a Reciclagem.`,
 		confirmTrash: (name: string) => `Tem a certeza que quer mover <strong>${name}</strong> para a Reciclagem?`,
 		confirmBulkTrash: (total: number) =>
 			`Tem a certeza que quer mover <strong>${total} ${total === 1 ? 'item' : 'itens'}</strong> para a Reciclagem?`,
