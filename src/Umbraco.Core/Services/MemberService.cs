@@ -485,7 +485,7 @@ namespace Umbraco.Cms.Core.Services
             IQuery<IMember>? query1 = memberTypeAlias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
             int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
             Guid.TryParse(filter, out Guid filterAsGuid);
-            IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
+            IQuery<IMember>? query2 = string.IsNullOrWhiteSpace(filter) ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
             return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, propertyAliases: null, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 
