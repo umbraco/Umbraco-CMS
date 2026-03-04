@@ -25,11 +25,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'tiptapToolbarExtension',
-		kind: 'button',
+		kind: 'actionButton',
 		alias: 'Umb.Tiptap.Toolbar.Unlink',
 		name: 'Unlink Tiptap Toolbar Extension',
 		api: () => import('./unlink.tiptap-toolbar-api.js'),
-		element: () => import('../../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
 		forExtensions: ['Umb.Tiptap.Link'],
 		meta: {
 			alias: 'unlink',
