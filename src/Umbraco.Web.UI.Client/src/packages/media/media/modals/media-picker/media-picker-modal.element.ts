@@ -22,6 +22,8 @@ import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbFileDropzoneItemStatus, type UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
@@ -46,6 +48,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
 	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
+	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+	#orderDirection: 'asc' | 'desc' = 'asc';
 
 	#folderTypeUniques = new Set<string>();
 
@@ -152,6 +156,20 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 		}
 
+		if (this.#dataType?.unique) {
+			await this.#dataTypeDetailRepository.requestByUnique(this.#dataType.unique);
+			this.observe(
+				await this.#dataTypeDetailRepository.byUnique(this.#dataType.unique),
+				(dataType) => {
+					if (dataType?.values) {
+						const config = new UmbPropertyEditorConfigCollection(dataType.values);
+						this.#orderDirection = config.getValueByAlias<'asc' | 'desc'>('orderDirection') ?? 'asc';
+					}
+				},
+				'observeDataTypeOrderDirection',
+			);
+		}
+
 		await this.#loadFolderTypes();
 		this.#loadChildrenOfCurrentMediaItem();
 	}
@@ -168,7 +186,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		if (!paginationManager) {
 			paginationManager = new UmbPaginationManager();
-			paginationManager.setPageSize(100);
+			paginationManager.setPageSize(4); // TODO: TESTING ONLY — revert page size to 100 before merging
 			this.#pagingMap.set(key, paginationManager);
 		}
 
@@ -202,8 +220,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			return;
 		}
 
-		// Navigate to the last page where new items appear (they get highest SortOrder)
-		await this.#navigateToLastPage();
+		await this.#navigateAfterUpload();
 
 		// Auto-select uploaded items based on picker mode (single vs multiple)
 		const completedUniques = completedItems.map((item) => item.unique);
@@ -221,15 +238,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		}
 	}
 
-	async #navigateToLastPage() {
-		// First reload to get fresh total from server (including newly uploaded items)
-		await this.#loadChildrenOfCurrentMediaItem();
+	async #navigateAfterUpload() {
+		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
+		const paginationManager = this.#pagingMap.get(key);
+		if (!paginationManager) return;
 
-		// If we're not on the last page, navigate there
-		if (this._currentPage < this._currentTotalPages) {
-			const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
-			const paginationManager = this.#pagingMap.get(key);
-			if (paginationManager) {
+		if (this.#orderDirection === 'desc') {
+			// DESC sort: new items have the highest value → appear at the top → page 1
+			paginationManager.setCurrentPageNumber(1);
+			await this.#loadChildrenOfCurrentMediaItem();
+		} else {
+			// ASC sort (default): new items have the highest value → appear at the bottom → last page
+			await this.#loadChildrenOfCurrentMediaItem();
+			if (this._currentPage < this._currentTotalPages) {
 				paginationManager.setCurrentPageNumber(this._currentTotalPages);
 				await this.#loadChildrenOfCurrentMediaItem();
 			}
