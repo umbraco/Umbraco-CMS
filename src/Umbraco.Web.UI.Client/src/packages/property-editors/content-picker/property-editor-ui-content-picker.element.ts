@@ -154,20 +154,13 @@ export class UmbPropertyEditorUIContentPickerElement
 		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
 		const unique = workspaceContext?.getUnique() ?? null;
 
-		// For new documents, the unique is a client-generated GUID that doesn't exist in the DB.
-		// The backend expects null for CurrentKey when creating new content and falls back to ParentKey.
-		const isNewOrBlock =
-			workspaceContext?.getEntityType() === 'block' ||
-			workspaceContext && 'getIsNew' in workspaceContext &&
-			(workspaceContext as unknown as { getIsNew(): boolean | undefined }).getIsNew() === true;
-
 		// Use parent entity context to get the parent unique. Its observable starts as undefined,
 		// so asPromise() properly waits for the async structure loading to complete.
 		const parentContext = await this.getContext(UMB_PARENT_ENTITY_CONTEXT);
 		const parent = await this.observe(parentContext?.parent, () => {})?.asPromise();
 		const parentUnique = parent?.unique ?? null;
 
-		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, isNewOrBlock ? null : unique, parentUnique);
+		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
 			this._rootUnique = result[0];
 		}
