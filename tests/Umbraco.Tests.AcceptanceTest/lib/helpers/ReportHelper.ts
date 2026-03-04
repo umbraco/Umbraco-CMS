@@ -1,7 +1,6 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {TestInfo} from "@playwright/test";
 
-
 export class ReportHelper {
   api: ApiHelpers
 

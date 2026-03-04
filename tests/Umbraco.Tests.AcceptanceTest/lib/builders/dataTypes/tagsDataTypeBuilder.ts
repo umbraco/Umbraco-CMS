@@ -28,7 +28,7 @@ export class TagsDataTypeBuilder extends DataTypeBuilder {
     });
     values.push({
       alias: 'storageType',
-      value: this.group || 'Json'
+      value: this.storageType || 'Json'
     });
     return values;
   }

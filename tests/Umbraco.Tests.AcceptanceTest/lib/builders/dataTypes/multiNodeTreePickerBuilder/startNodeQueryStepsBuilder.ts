@@ -10,7 +10,7 @@ export class StartNodeQueryStepsBuilder {
     this.parentBuilder = parentBuilder;
   }
 
-  wwithUnique(unique: string) {
+  withUnique(unique: string) {
     this.unique = unique;
     return this;
   }

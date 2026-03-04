@@ -74,7 +74,7 @@ export class MediaDeliveryApiHelper {
       const mediaWidth = mediaData.values.find(x => x.alias === 'umbracoWidth')?.value;
       const mediaHeight = mediaData.values.find(x => x.alias === 'umbracoHeight')?.value;
       expect(mediaItemJson.width).toBe(mediaWidth ? Number(mediaWidth) : null);
-      expect(mediaItemJson.height).toBe(mediaWidth ? Number(mediaHeight) : null);
+      expect(mediaItemJson.height).toBe(mediaHeight ? Number(mediaHeight) : null);
       expect(mediaItemJson.focalPoint).toBe(mediaData.values[0].value.focalPoint);
       expect(mediaItemJson.crops).toEqual(mediaData.values[0].value.crops);
     } else {
