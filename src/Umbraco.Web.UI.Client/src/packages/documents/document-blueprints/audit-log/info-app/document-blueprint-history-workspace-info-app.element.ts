@@ -1,7 +1,7 @@
 import { UmbDocumentBlueprintAuditLogRepository } from '../repository/document-blueprint-audit-log.repository.js';
-import { getDocumentHistoryTagStyleAndText } from '../../../documents/audit-log/info-app/utils.js';
-import type { UmbDocumentAuditLogModel } from '../../../documents/audit-log/types.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import type { UmbDocumentBlueprintAuditLogModel } from '../type.js';
+import { getDocumentBlueprintHistoryTagStyleAndText } from './utils.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
@@ -26,7 +26,7 @@ export class UmbDocumentBlueprintHistoryWorkspaceInfoAppElement extends UmbLitEl
 	private _currentPageNumber = 1;
 
 	@state()
-	private _items: Array<UmbDocumentAuditLogModel> = [];
+	private _items: Array<UmbDocumentBlueprintAuditLogModel> = [];
 
 	@state()
 	private _totalPages = 1;
@@ -107,7 +107,7 @@ export class UmbDocumentBlueprintHistoryWorkspaceInfoAppElement extends UmbLitEl
 					this._items,
 					(item) => item.timestamp,
 					(item) => {
-						const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
+						const { text, style } = getDocumentBlueprintHistoryTagStyleAndText(item.logType);
 						const user = this.#userMap.get(item.user.unique);
 
 						return html`
