@@ -5,7 +5,7 @@ const args = process.argv.slice(2);
 function generate(fileName) {
     fs.writeFileSync(
         `./tests/${fileName}.spec.ts`,
-        `import {test} from '@umbraco/playwright-testhelpers';
+        `import {test} from '@umbraco/acceptance-test-helpers';
 
 test.describe('New test file description', () => {
   test.beforeEach(async ({page, umbracoApi}) => {

@@ -90,7 +90,6 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		requestAnimationFrame(() => {
 			const element = this.getHostElement().shadowRoot!.querySelector('#new-folder') as UUIInputElement;
 			element.focus();
-			element.select();
 		});
 	}
 
@@ -136,6 +135,15 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	#onKeypress(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			requestAnimationFrame(() => {
+				const element = this.getHostElement().shadowRoot!.querySelector('#new-folder') as UUIInputElement;
+				element.blur();
+			});
+		}
+	}
+
 	override render() {
 		return html`<div id="path">
 			${repeat(
@@ -151,11 +159,17 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			)}${this._typingNewFolder
 				? html`<uui-input
 						id="new-folder"
-						label="enter a name"
-						value="new folder name"
+						label=${this.localize.term('create_enterFolderName')}
+						placeholder=${this.localize.term('create_enterFolderName')}
 						@blur=${this.#addFolder}
+						@keypress=${this.#onKeypress}
 						auto-width></uui-input>`
-				: html`<uui-button label="add folder" compact @click=${this.#focusFolderInput}>+</uui-button>`}
+				: html`<uui-button
+						label=${this.localize.term('visuallyHiddenTexts_createNewFolder')}
+						compact
+						@click=${this.#focusFolderInput}>
+						<uui-icon name="icon-add"></uui-icon>
+					</uui-button>`}
 		</div>`;
 	}
 
@@ -171,6 +185,14 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			}
 			#path uui-input {
 				height: 100%;
+			}
+
+			#new-folder {
+				margin-left: var(--uui-size-2);
+			}
+
+			#path uui-button uui-icon {
+				--uui-icon-color: inherit;
 			}
 		`,
 	];
