@@ -204,7 +204,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					},
 					value: {
 						crops: item.crops ?? [],
-						focalPoint: item.focalPoint,
+						focalPoint: item.focalPoint ?? null,
 						src: '',
 						key,
 						unique: item.mediaKey,

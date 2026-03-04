@@ -122,7 +122,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			...this.value,
 			src: item.url,
 			crops,
-			focalPoint: this.value.focalPoint,
+			focalPoint: this.value.focalPoint ?? null,
 		};
 		this._imageCropperValue = value;
 	}
