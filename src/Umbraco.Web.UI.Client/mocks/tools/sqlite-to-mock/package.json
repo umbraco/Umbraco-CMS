@@ -1,0 +1,17 @@
+{
+	"name": "sqlite-to-mock",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Transform Umbraco SQLite databases into TypeScript mock data sets",
+	"type": "module",
+	"scripts": {
+		"generate": "tsx index.ts"
+	},
+	"dependencies": {
+		"sql.js": "^1.10.0"
+	},
+	"devDependencies": {
+		"@types/sql.js": "^1.4.9",
+		"tsx": "^4.7.0"
+	}
+}

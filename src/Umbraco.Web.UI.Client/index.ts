@@ -19,7 +19,7 @@ async function bootstrap() {
 		});
 
 		// Register mock set switcher header app
-		const { manifests } = await import('./mocks/app-extension/manifests.js');
+		const { manifests } = await import('./mocks/backoffice-extensions/manifests.js');
 		umbExtensionsRegistry.registerMany(manifests);
 	} else {
 		appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;

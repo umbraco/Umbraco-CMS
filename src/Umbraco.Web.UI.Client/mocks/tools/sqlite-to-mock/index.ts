@@ -3,7 +3,7 @@
  * Main orchestrator for SQLite to mock data transformation.
  * Runs all transformation scripts to generate a new mock data set.
  *
- * Usage: npm run sqlite-to-mock -- <db-path> <set-alias>
+ * Usage: npm run generate -- <db-path> <set-alias>
  *   db-path:   Path to Umbraco SQLite database file
  *   set-alias: Name for the mock data set folder
  */
@@ -29,7 +29,7 @@ const __dirname = path.dirname(__filename);
 // Parse and validate CLI arguments
 const args = process.argv.slice(2);
 if (args.length < 2) {
-	console.error('Usage: npm run sqlite-to-mock -- <db-path> <set-alias>');
+	console.error('Usage: npm run generate -- <db-path> <set-alias>');
 	console.error('  db-path:   Path to Umbraco SQLite database file');
 	console.error('  set-alias: Name for the mock data set folder');
 	process.exit(1);
@@ -122,7 +122,7 @@ console.log('Running eslint to fix formatting...');
 try {
 	execSync(`npx eslint --fix --no-warn-ignored "mocks/data/sets/${setAlias}/*.ts"`, {
 		stdio: 'inherit',
-		cwd: path.resolve(__dirname, '../..'),
+		cwd: path.resolve(__dirname, '../../..'),
 	});
 	console.log('Eslint formatting complete.');
 } catch {
