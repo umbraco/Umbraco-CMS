@@ -24,14 +24,14 @@ public class MaintenanceModeActionFilterAttributeTests
     private const string CustomUpgradingViewPath = "~/Views/CustomUpgrading.cshtml";
 
     [Test]
-    public void OnActionExecuting_WhenUpgradingAndMaintenanceEnabled_SetsMaintenanceResultWithUpgradingViewPath()
+    public void OnActionExecuting_MvcController_WhenUpgradingAndMaintenanceEnabled_SetsMaintenanceResultWithUpgradingViewPath()
     {
         var settings = new GlobalSettings
         {
             ShowMaintenancePageWhenInUpgradeState = true,
             UpgradingViewPath = CustomUpgradingViewPath,
         };
-        var context = CreateContext();
+        var context = CreateMvcControllerContext();
 
         InvokeFilter(RuntimeLevel.Upgrading, settings, context);
 
@@ -39,10 +39,10 @@ public class MaintenanceModeActionFilterAttributeTests
     }
 
     [Test]
-    public void OnActionExecuting_WhenUpgradingAndMaintenanceDisabled_DoesNotSetResult()
+    public void OnActionExecuting_MvcController_WhenUpgradingAndMaintenanceDisabled_DoesNotSetResult()
     {
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = false };
-        var context = CreateContext();
+        var context = CreateMvcControllerContext();
 
         InvokeFilter(RuntimeLevel.Upgrading, settings, context);
 
@@ -50,10 +50,10 @@ public class MaintenanceModeActionFilterAttributeTests
     }
 
     [Test]
-    public void OnActionExecuting_WhenUpgradeAndMaintenanceEnabled_SetsMaintenanceResult()
+    public void OnActionExecuting_MvcController_WhenUpgradeAndMaintenanceEnabled_SetsMaintenanceResult()
     {
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
-        var context = CreateContext();
+        var context = CreateMvcControllerContext();
 
         InvokeFilter(RuntimeLevel.Upgrade, settings, context);
 
@@ -61,10 +61,10 @@ public class MaintenanceModeActionFilterAttributeTests
     }
 
     [Test]
-    public void OnActionExecuting_WhenUpgradeAndMaintenanceDisabled_DoesNotSetResult()
+    public void OnActionExecuting_MvcController_WhenUpgradeAndMaintenanceDisabled_DoesNotSetResult()
     {
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = false };
-        var context = CreateContext();
+        var context = CreateMvcControllerContext();
 
         InvokeFilter(RuntimeLevel.Upgrade, settings, context);
 
@@ -75,10 +75,82 @@ public class MaintenanceModeActionFilterAttributeTests
     [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Boot)]
     [TestCase(RuntimeLevel.UpgradeFailed)]
-    public void OnActionExecuting_WhenLevelIsNotUpgradeOrUpgrading_DoesNotSetResult(RuntimeLevel level)
+    public void OnActionExecuting_MvcController_WhenLevelIsNotUpgradeOrUpgrading_DoesNotSetResult(RuntimeLevel level)
     {
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
-        var context = CreateContext();
+        var context = CreateMvcControllerContext();
+
+        InvokeFilter(level, settings, context);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [Test]
+    public void OnActionExecuting_ApiController_WhenUpgradingAndMaintenanceEnabled_SetsProblemDetailsResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateApiControllerContext();
+
+        InvokeFilter(RuntimeLevel.Upgrading, settings, context);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Result, Is.InstanceOf<ObjectResult>());
+            var result = (ObjectResult)context.Result!;
+            Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+            Assert.That(result.Value, Is.InstanceOf<ProblemDetails>());
+            Assert.That(((ProblemDetails)result.Value!).Status, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+        });
+    }
+
+    [Test]
+    public void OnActionExecuting_ApiController_WhenUpgradeAndMaintenanceEnabled_SetsProblemDetailsResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateApiControllerContext();
+
+        InvokeFilter(RuntimeLevel.Upgrade, settings, context);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Result, Is.InstanceOf<ObjectResult>());
+            var result = (ObjectResult)context.Result!;
+            Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+            Assert.That(result.Value, Is.InstanceOf<ProblemDetails>());
+            Assert.That(((ProblemDetails)result.Value!).Status, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+        });
+    }
+
+    [Test]
+    public void OnActionExecuting_ApiController_WhenUpgradingAndMaintenanceDisabled_DoesNotSetResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = false };
+        var context = CreateApiControllerContext();
+
+        InvokeFilter(RuntimeLevel.Upgrading, settings, context);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [Test]
+    public void OnActionExecuting_ApiController_WhenUpgradeAndMaintenanceDisabled_DoesNotSetResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = false };
+        var context = CreateApiControllerContext();
+
+        InvokeFilter(RuntimeLevel.Upgrade, settings, context);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [TestCase(RuntimeLevel.Run)]
+    [TestCase(RuntimeLevel.Install)]
+    [TestCase(RuntimeLevel.Boot)]
+    [TestCase(RuntimeLevel.UpgradeFailed)]
+    public void OnActionExecuting_ApiController_WhenLevelIsNotUpgradeOrUpgrading_DoesNotSetResult(RuntimeLevel level)
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateApiControllerContext();
 
         InvokeFilter(level, settings, context);
 
@@ -97,12 +169,23 @@ public class MaintenanceModeActionFilterAttributeTests
         filter.OnActionExecuting(context);
     }
 
-    private static ActionExecutingContext CreateContext()
+    private static ActionExecutingContext CreateMvcControllerContext()
+        => CreateContext(endpointMetadata: []);
+
+    private static ActionExecutingContext CreateApiControllerContext()
+        => CreateContext(endpointMetadata: [new ApiControllerAttribute()]);
+
+    private static ActionExecutingContext CreateContext(IList<object> endpointMetadata)
     {
+        var actionDescriptor = new ActionDescriptor
+        {
+            EndpointMetadata = new List<object>(endpointMetadata),
+        };
+
         var actionContext = new ActionContext(
             new DefaultHttpContext(),
             new RouteData(),
-            new ActionDescriptor());
+            actionDescriptor);
 
         return new ActionExecutingContext(
             actionContext,

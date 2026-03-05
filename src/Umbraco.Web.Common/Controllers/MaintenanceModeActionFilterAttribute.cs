@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -34,16 +35,29 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (_runtimeState.Level == RuntimeLevel.Upgrade
-                && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState)
+            bool shouldBlock = _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading
+                               && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState;
+
+            if (shouldBlock is false)
             {
-                context.Result = new MaintenanceResult();
+                return;
             }
-            else if (_runtimeState.Level == RuntimeLevel.Upgrading
-                     && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState)
+
+            if (context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any())
             {
-                context.Result = new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath);
+                var problem = new ProblemDetails
+                {
+                    Status = StatusCodes.Status503ServiceUnavailable,
+                    Title = "Service Unavailable",
+                    Detail = "The application is currently being upgraded. Please try again later.",
+                };
+                context.Result = new ObjectResult(problem) { StatusCode = StatusCodes.Status503ServiceUnavailable };
+                return;
             }
+
+            context.Result = _runtimeState.Level == RuntimeLevel.Upgrading
+                ? new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath)
+                : new MaintenanceResult();
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
