@@ -20,7 +20,7 @@ const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
 const mediaPickerDocumentName = ['MediaTestPicker', 'DocumentTypeForMediaPicker'];
 // Warning message
 const warningMessage = ' cannot be moved to the Recycle Bin because it is referenced by other items.';
-const warningMessageForBulk = 'The selected items cannot be moved to the Recycle Bin because at least one item is referenced by other content.';
+const warningMessageForBulk = (itemCount) => `The selected ${itemCount} cannot be moved to the Recycle Bin because at least one item is referenced by other content.`;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -148,9 +148,9 @@ test('cannot bulk trash content nodes when at least one has references', async (
   // Assert
   await umbracoUi.content.isConfirmTrashButtonDisabled();
   await umbracoUi.content.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.bulkReferenceHeadline);
-  await umbracoUi.content.doesModalHaveText(warningMessageForBulk);
+  await umbracoUi.content.doesModalHaveText(warningMessageForBulk('2 items'));
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.isReferenceItemNameVisible(firstChildContentName);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeTruthy();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeTruthy();
@@ -293,10 +293,10 @@ test('cannot bulk trash media items when at least one has references', async ({u
 
   // Assert
   await umbracoUi.media.isConfirmTrashButtonDisabled();
-  await umbracoUi.media.doesModalHaveText(warningMessageForBulk);
+  await umbracoUi.media.doesModalHaveText(warningMessageForBulk('2 items'));
   await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.bulkReferenceHeadline);
   await umbracoUi.media.doesReferenceItemsHaveCount(1);
-  await umbracoUi.media.isReferenceItemNameVisible(mediaPickerDocumentName[0]);
+  await umbracoUi.media.isReferenceItemNameVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeTruthy();
 
