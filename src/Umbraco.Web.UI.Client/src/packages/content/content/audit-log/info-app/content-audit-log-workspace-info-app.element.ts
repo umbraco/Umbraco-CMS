@@ -1,3 +1,4 @@
+import type { ManifestAuditLogAction } from '../audit-log-action/audit-log-action.extension.js';
 import type { ManifestWorkspaceInfoAppAuditLogKind } from './types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -8,7 +9,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbAuditLogModel, UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -145,8 +145,8 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 						<umb-extension-with-api-slot
 							slot="header-actions"
 							type="auditLogAction"
-							.apiArgs=${(manifest: ManifestEntityAction) => [manifest]}
-							.filter=${(manifest: ManifestEntityAction) => manifest.forEntityTypes.includes(entityType)}>
+							.apiArgs=${(manifest: ManifestAuditLogAction) => [manifest]}
+							.filter=${(manifest: ManifestAuditLogAction) => manifest.forEntityTypes.includes(entityType)}>
 						</umb-extension-with-api-slot>
 					`,
 				)}
