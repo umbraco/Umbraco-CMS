@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.HybridCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -71,10 +71,17 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void ContentPickerValueConverter_RendersContentProperties()
     {
-        var content = new Mock<IPublishedContent>();
+        var contentType = new Mock<IPublishedContentType>();
+        contentType.SetupGet(c => c.Alias).Returns("thePageType");
+        contentType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
 
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
+        var content = new Mock<IPublishedContent>();
+        content.SetupGet(c => c.ContentType).Returns(contentType.Object);
+
+        var propertyData = new PropertyData { Value = "n/a", Culture = "abc", Segment = string.Empty };
+
+        var prop1 = new PublishedProperty(DeliveryApiPropertyType, content.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop2 = new PublishedProperty(DefaultPropertyType, content.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
@@ -88,7 +95,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             .Setup(p => p.GetUrl(content.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns(content.Object.UrlSegment);
         PublishedContentCacheMock
-            .Setup(pcc => pcc.GetById(key))
+            .Setup(pcc => pcc.GetById(false, key))
             .Returns(content.Object);
 
         var valueConverter = CreateValueConverter();
@@ -109,5 +116,99 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual("Delivery API value", result.Properties[DeliveryApiPropertyType.Alias]);
         Assert.AreEqual("Default value", result.Properties[DefaultPropertyType.Alias]);
+    }
+
+    [Test]
+    public void ContentPickerValueConverter_WithPreview_BuildsDeliveryApiOutputForDraftContent()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+
+        var valueConverter = CreateValueConverter();
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key),
+            true,
+            false) as IApiContent;
+
+        Assert.NotNull(result);
+        Assert.AreEqual("The page (draft)", result.Name);
+        Assert.AreEqual(DraftContent.Key, result.Id);
+    }
+
+    [Test]
+    public void ContentPickerValueConverter_WithoutPreview_ReturnsNullForDraftOnlyContent()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+
+        var valueConverter = CreateValueConverter();
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key),
+            false,
+            false);
+
+        Assert.Null(result);
+    }
+
+    [Test]
+    public void ContentPickerValueConverter_WithPreview_ConvertIntermediateToObject_ReturnsDraftContent()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+
+        var valueConverter = CreateValueConverter();
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key),
+            true);
+
+        Assert.NotNull(result);
+        Assert.IsInstanceOf<IPublishedContent>(result);
+        Assert.AreEqual(DraftContent.Key, ((IPublishedContent)result).Key);
+    }
+
+    [Test]
+    public void ContentPickerValueConverter_WithoutPreview_ConvertIntermediateToObject_ReturnsNullForDraftOnlyContent()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+
+        var valueConverter = CreateValueConverter();
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key),
+            false);
+
+        Assert.Null(result);
+    }
+
+    [TestCase(Constants.Conventions.Content.InternalRedirectId)]
+    [TestCase(Constants.Conventions.Content.Redirect)]
+    public void ContentPickerValueConverter_ExcludedRoutingProperty_ReturnsRawIntermediateValue(string alias)
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns(alias);
+
+        var inter = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
+
+        var valueConverter = CreateValueConverter();
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            inter,
+            false);
+
+        Assert.AreEqual(inter, result);
     }
 }

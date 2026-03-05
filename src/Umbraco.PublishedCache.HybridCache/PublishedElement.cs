@@ -1,5 +1,8 @@
-﻿using Umbraco.Cms.Core.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -12,6 +15,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
     private readonly IReadOnlyDictionary<string, CultureVariation>? _cultureInfos;
     private readonly string _contentName;
     private readonly bool _published;
+    private readonly bool _isPreviewing;
 
     public PublishedElement(
         ContentNode contentNode,
@@ -44,6 +48,8 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         }
 
         _properties = properties;
+
+        _isPreviewing = preview;
 
         Id = contentNode.Id;
         Key = contentNode.Key;
@@ -167,6 +173,17 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         // if there is no 'published' published content, no culture can be published
         if (!ContentNode.HasPublished)
         {
+            // In preview mode, the ContentNode only has draft data loaded (published data
+            // is stored in a separate cache entry). Fall back to IPublishStatusQueryService
+            // which is an in-memory service that tracks actual document publish status.
+            if (_isPreviewing && ItemType == PublishedItemType.Content)
+            {
+                culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
+                IPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>();
+                return publishStatusQueryService.IsDocumentPublished(Key, culture);
+            }
+
             return false;
         }
 
