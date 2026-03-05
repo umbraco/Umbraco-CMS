@@ -9,16 +9,16 @@ namespace Umbraco.Cms.Core.PublishedCache;
 /// </summary>
 public class DefaultCultureAccessor : IDefaultCultureAccessor
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly IRuntimeState _runtimeState;
     private GlobalSettings _options;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DefaultCultureAccessor" /> class.
     /// </summary>
-    public DefaultCultureAccessor(ILocalizationService localizationService, IRuntimeState runtimeState, IOptionsMonitor<GlobalSettings> options)
+    public DefaultCultureAccessor(ILanguageService languageService, IRuntimeState runtimeState, IOptionsMonitor<GlobalSettings> options)
     {
-        _localizationService = localizationService;
+        _languageService = languageService;
         _runtimeState = runtimeState;
         _options = options.CurrentValue;
         options.OnChange(x => _options = x);
@@ -26,6 +26,6 @@ public class DefaultCultureAccessor : IDefaultCultureAccessor
 
     /// <inheritdoc />
     public string DefaultCulture => _runtimeState.Level == RuntimeLevel.Run
-        ? _localizationService.GetDefaultLanguageIsoCode() ?? string.Empty // fast
+        ? _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult()
         : _options.DefaultUILanguage; // default for install and upgrade, when the service is n/a
 }
