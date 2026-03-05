@@ -30,4 +30,14 @@ export const treeHandlers = [
 		const response = umbDocumentMockDb.tree.getAncestorsOf({ descendantId });
 		return HttpResponse.json<GetTreeDocumentAncestorsResponse>(response);
 	}),
+
+	http.get(umbracoPath(`/tree${UMB_SLUG}/siblings`), ({ request }) => {
+		const url = new URL(request.url);
+		const targetId = url.searchParams.get('target');
+		if (!targetId) return;
+		const before = Number(url.searchParams.get('before'));
+		const after = Number(url.searchParams.get('after'));
+		const response = umbDocumentMockDb.tree.getSiblingsOf({ targetId, before, after });
+		return HttpResponse.json(response);
+	}),
 ];

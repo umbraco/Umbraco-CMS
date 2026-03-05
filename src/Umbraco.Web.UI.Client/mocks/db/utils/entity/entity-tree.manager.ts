@@ -56,6 +56,35 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return { items: treeItemsHasChildren, total: paged.total };
 	}
 
+	getSiblingsOf({ targetId, before = 0, after = 100 }: { targetId: string; before?: number; after?: number }) {
+		const target = this.#db.read(targetId);
+		if (!target) return { items: [], totalBefore: 0, totalAfter: 0 };
+
+		const parentId = target.parent?.id ?? null;
+		const allSiblings = this.#db.getAll().filter((item) =>
+			parentId === null ? item.parent === null || item.parent === undefined : item.parent?.id === parentId,
+		);
+
+		const targetIndex = allSiblings.findIndex((item) => item.id === targetId);
+		if (targetIndex === -1) return { items: [], totalBefore: 0, totalAfter: 0 };
+
+		const startIndex = Math.max(0, targetIndex - before);
+		const endIndex = Math.min(allSiblings.length, targetIndex + after + 1);
+		const slicedItems = allSiblings.slice(startIndex, endIndex);
+
+		// totalBefore/totalAfter represent items outside the returned window, so the client knows if there are more items to paginate to.
+		const totalBefore = startIndex;
+		const totalAfter = allSiblings.length - endIndex;
+
+		const treeItems = slicedItems.map((item) => this.#treeItemMapper(item));
+		const treeItemsHasChildren = treeItems.map((item) => {
+			const children = this.#db.getAll().filter((child) => child.parent?.id === item.id);
+			return { ...item, hasChildren: children.length > 0 };
+		});
+
+		return { items: treeItemsHasChildren, totalBefore, totalAfter };
+	}
+
 	move(ids: Array<string>, destinationId: string) {
 		if (!this.#db.update) throw new Error('move() requires a DB with update() method');
 
