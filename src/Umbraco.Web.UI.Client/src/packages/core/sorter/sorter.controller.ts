@@ -856,7 +856,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	#handleMouseOut = (event: MouseEvent) => {
 		if (event.buttons === 0) {
 			this.#handleMoveEnd();
