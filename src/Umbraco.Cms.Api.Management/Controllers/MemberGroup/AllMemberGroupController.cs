@@ -31,7 +31,7 @@ public class AllMemberGroupController : MemberGroupControllerBase
         int skip = 0,
         int take = 100)
     {
-        IMemberGroup[] memberGroups = (await _memberGroupService.GetAllAsync()).ToArray();
+        IMemberGroup[] memberGroups = (await _memberGroupService.GetAllAsync()).OrderBy(g => g.Name).ToArray();
         var viewModel = new PagedViewModel<MemberGroupResponseModel>
         {
             Total = memberGroups.Length,

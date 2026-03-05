@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Security;
@@ -22,8 +23,9 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
         IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IElementPresentationFactory elementPresentationFactory)
-        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService, appCaches, backOfficeSecurityAccessor, elementPresentationFactory)
+        IElementPresentationFactory elementPresentationFactory,
+        IElementPermissionFilterService elementPermissionFilterService)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService, appCaches, backOfficeSecurityAccessor, elementPresentationFactory, elementPermissionFilterService)
     {
     }
 

@@ -297,7 +297,5 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
 
-
-
     #endregion
 }

@@ -204,7 +204,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					},
 					value: {
 						crops: item.crops ?? [],
-						focalPoint: item.focalPoint ?? { left: 0.5, top: 0.5 },
+						focalPoint: item.focalPoint ?? null,
 						src: '',
 						key,
 						unique: item.mediaKey,
@@ -412,7 +412,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 
 		return html`
-			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
+			<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
 				<umb-imaging-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}
