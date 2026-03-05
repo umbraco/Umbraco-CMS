@@ -1,4 +1,49 @@
 /**
+ * Returns true when every cell in a row is a `<th>`.
+ * @param {Element} row - A `<tr>` element to inspect.
+ * @returns {boolean} Whether the row is a header row.
+ */
+function isHeaderRow(row: Element): boolean {
+	const cells = row.querySelectorAll(':scope > td, :scope > th');
+	return cells.length > 0 && Array.from(cells).every((cell) => cell.tagName === 'TH');
+}
+
+/**
+ * Collects leading consecutive header rows from a `<tbody>`.
+ * Stops at the first row that contains any `<td>` cell.
+ * @param {HTMLTableSectionElement} tbody - The table body to scan.
+ * @returns {Array<Element>} The leading rows whose cells are all `<th>`.
+ */
+function collectLeadingHeaderRows(tbody: HTMLTableSectionElement): Element[] {
+	const rows = Array.from(tbody.querySelectorAll(':scope > tr'));
+	const headerRows: Element[] = [];
+
+	for (const row of rows) {
+		if (!isHeaderRow(row)) break;
+		headerRows.push(row);
+	}
+	return headerRows;
+}
+
+/**
+ * Moves leading `<th>`-only rows from `<tbody>` into a new `<thead>` on a single table.
+ * @param {HTMLTableElement} table - The table element to process.
+ * @returns {boolean} Whether the table was modified.
+ */
+function wrapHeaderRows(table: HTMLTableElement): boolean {
+	const tbody = table.querySelector(':scope > tbody') as HTMLTableSectionElement | null;
+	if (!tbody || table.querySelector(':scope > thead')) return false;
+
+	const headerRows = collectLeadingHeaderRows(tbody);
+	if (headerRows.length === 0) return false;
+
+	const thead = table.ownerDocument.createElement('thead');
+	headerRows.forEach((row) => thead.appendChild(row));
+	table.insertBefore(thead, tbody);
+	return true;
+}
+
+/**
  * Ensures that table HTML has proper `<thead>` and `<tbody>` sections for WCAG 2.2 compliance.
  * ProseMirror's table schema stores all rows in a flat structure without `<thead>`/`<tbody>` section
  * grouping. When serializing to HTML via `getHTML()`, all rows are placed in a single `<tbody>`.
@@ -11,50 +56,17 @@
  * @returns {string} The HTML string with proper `<thead>` and `<tbody>` table sections.
  */
 export function ensureTableSections(html: string): string {
-	// Quick check — if no table elements exist, return unchanged.
 	if (!html.includes('<table')) return html;
 
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(`<body>${html}</body>`, 'text/html');
+	const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html');
 	const tables = doc.querySelectorAll('table');
 
 	if (tables.length === 0) return html;
 
 	let modified = false;
-
 	tables.forEach((table) => {
-		// ProseMirror always renders rows inside a <tbody>.
-		const tbody = table.querySelector(':scope > tbody');
-		if (!tbody) return;
-
-		// If a <thead> already exists, nothing to do for this table.
-		if (table.querySelector(':scope > thead')) return;
-
-		const rows = Array.from(tbody.querySelectorAll(':scope > tr'));
-		const headerRows: Element[] = [];
-
-		// Collect leading consecutive rows where every direct cell child is a <th>.
-		for (const row of rows) {
-			const cells = row.querySelectorAll(':scope > td, :scope > th');
-			if (cells.length === 0) break;
-
-			const allTh = Array.from(cells).every((cell) => cell.tagName === 'TH');
-			if (allTh) {
-				headerRows.push(row);
-			} else {
-				break; // Stop at the first non-header row.
-			}
-		}
-
-		if (headerRows.length > 0) {
-			const thead = doc.createElement('thead');
-			headerRows.forEach((row) => thead.appendChild(row));
-			table.insertBefore(thead, tbody);
-			modified = true;
-		}
+		modified = wrapHeaderRows(table) || modified;
 	});
 
-	if (!modified) return html;
-
-	return doc.body.innerHTML;
+	return modified ? doc.body.innerHTML : html;
 }
