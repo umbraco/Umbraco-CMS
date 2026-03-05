@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Persistence;
@@ -227,6 +226,34 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(),
             .Select<Dto1>(x => x.Id)
             .AndSelect<Dto2>(x => Alias(x.Id, "id2"));
         Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id] AS [id2]".NoCrLf(), sql.SQL.NoCrLf());
+    }
+
+    [Test]
+    public void AndSelectWithAliasTests()
+    {
+        // without withAlias parameter - alias is included by default
+        var sql = Sql()
+            .Select<Dto1>(x => x.Id)
+            .AndSelect<Dto2>(x => x.Id);
+        Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id] AS [Id]".NoCrLf(), sql.SQL.NoCrLf());
+
+        // withAlias: true - explicit, same result as default
+        sql = Sql()
+            .Select<Dto1>(x => x.Id)
+            .AndSelect<Dto2>(withAlias: true, x => x.Id);
+        Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id] AS [Id]".NoCrLf(), sql.SQL.NoCrLf());
+
+        // withAlias: false - column name only, no alias
+        sql = Sql()
+            .Select<Dto1>(x => x.Id)
+            .AndSelect<Dto2>(withAlias: false, x => x.Id);
+        Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id]".NoCrLf(), sql.SQL.NoCrLf());
+
+        // withAlias: false with multiple fields - none have aliases
+        sql = Sql()
+            .Select<Dto1>(x => x.Id)
+            .AndSelect<Dto2>(withAlias: false, x => x.Id, x => x.Name);
+        Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id], [dto2].[name]".NoCrLf(), sql.SQL.NoCrLf());
     }
 
     [Test]
