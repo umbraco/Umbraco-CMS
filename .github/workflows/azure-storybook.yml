@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - v*/dev
-      - v*/main
     paths:
       - src/Umbraco.Web.UI.Client/package.json
       - src/Umbraco.Web.UI.Client/package-lock.json
@@ -16,7 +15,6 @@ on:
     branches:
       - main
       - v*/dev
-      - v*/main
   workflow_dispatch:
 
 env:
