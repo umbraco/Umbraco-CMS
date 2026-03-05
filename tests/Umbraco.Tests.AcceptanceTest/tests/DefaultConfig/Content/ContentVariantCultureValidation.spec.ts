@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
 const contentName = 'TestContent';
