@@ -565,12 +565,14 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         Database.Execute(sql);
     }
 
+    // TODO: Await this properly when adjusting this to our new EF Core approach.
     private IDictionary<int, ILanguage> GetLanguagesById() => _languageRepository
-        .GetMany()
+        .GetAllAsync(CancellationToken.None).GetAwaiter().GetResult()
         .ToDictionary(language => language.Id);
 
+    // TODO: Await this properly when adjusting this to our new EF Core approach.
     private IDictionary<string, ILanguage> GetLanguagesByIsoCode() => _languageRepository
-        .GetMany()
+        .GetAllAsync(CancellationToken.None).GetAwaiter().GetResult()
         .ToDictionary(language => language.IsoCode);
 
     #endregion

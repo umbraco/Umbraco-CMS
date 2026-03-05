@@ -100,9 +100,10 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
         foreach (ContentScheduleDto? scheduleDto in scheduleDtos)
         {
+            // TODO: Await this properly when adjusting this to our new EF Core approach.
             result.Add(new ContentSchedule(
                 scheduleDto.Id,
-                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
+                LanguageRepository.GetIsoCodeByIdAsync(scheduleDto.LanguageId).GetAwaiter().GetResult() ?? Constants.System.InvariantCulture,
                 scheduleDto.Date,
                 scheduleDto.Action == ContentScheduleAction.Release.ToString()
                     ? ContentScheduleAction.Release
@@ -420,7 +421,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
             variation.Add(new ContentVariation
             {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
+                // TODO: Await this properly when adjusting this to our new EF Core approach.
+                Culture = LanguageRepository.GetIsoCodeByIdAsync(dto.LanguageId).GetAwaiter().GetResult(),
                 Name = dto.Name,
                 Date = dto.UpdateDate
             });
@@ -453,7 +455,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
             variation.Add(new EntityVariation
             {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
+                // TODO: Await this properly when adjusting this to our new EF Core approach.
+                Culture = LanguageRepository.GetIsoCodeByIdAsync(dto.LanguageId).GetAwaiter().GetResult(),
                 Edited = dto.Edited
             });
         }
@@ -473,7 +476,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 {
                     VersionId = content.VersionId,
                     LanguageId =
-                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
+                        // TODO: Await this properly when adjusting this to our new EF Core approach.
+                        LanguageRepository.GetIdByIsoCodeAsync(cultureInfo.Culture).GetAwaiter().GetResult() ??
                         throw new InvalidOperationException("Not a valid culture."),
                     Culture = cultureInfo.Culture,
                     Name = cultureInfo.Name,
@@ -500,7 +504,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 {
                     VersionId = content.PublishedVersionId,
                     LanguageId =
-                        LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ??
+                        // TODO: Await this properly when adjusting this to our new EF Core approach.
+                        LanguageRepository.GetIdByIsoCodeAsync(cultureInfo.Culture).GetAwaiter().GetResult() ??
                         throw new InvalidOperationException("Not a valid culture."),
                     Culture = cultureInfo.Culture,
                     Name = cultureInfo.Name,
@@ -523,7 +528,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             {
                 NodeId = content.Id,
                 LanguageId =
-                    LanguageRepository.GetIdByIsoCode(culture) ??
+                    // TODO: Await this properly when adjusting this to our new EF Core approach.
+                    LanguageRepository.GetIdByIsoCodeAsync(culture).GetAwaiter().GetResult() ??
                     throw new InvalidOperationException("Not a valid culture."),
                 Culture = culture,
                 Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
@@ -1761,7 +1767,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 group => group.Key,
                 group => group.Select(scheduleDto => new ContentSchedule(
                     scheduleDto.Id,
-                    LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
+                    // TODO: Await this properly when adjusting this to our new EF Core approach.
+                    LanguageRepository.GetIsoCodeByIdAsync(scheduleDto.LanguageId).GetAwaiter().GetResult() ?? Constants.System.InvariantCulture,
                     scheduleDto.Date,
                     scheduleDto.Action == ContentScheduleAction.Release.ToString()
                         ? ContentScheduleAction.Release
@@ -1825,7 +1832,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
             // and then, we need to set the invariant name implicitly,
             // using the default culture if it has a name, otherwise anything we can
-            var defaultCulture = LanguageRepository.GetDefaultIsoCode();
+            // TODO: Await this properly when adjusting this to our new EF Core approach.
+            var defaultCulture = LanguageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
             content.Name = defaultCulture != null &&
                            (content.CultureInfos?.TryGetValue(defaultCulture, out ContentCultureInfos cultureName) ??
                             false)
@@ -1890,7 +1898,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
         foreach (ContentCultureInfos cultureInfo in content.CultureInfos)
         {
-            var langId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture);
+            // TODO: Await this properly when adjusting this to our new EF Core approach.
+            var langId = LanguageRepository.GetIdByIsoCodeAsync(cultureInfo.Culture).GetAwaiter().GetResult();
             if (!langId.HasValue)
             {
                 continue;

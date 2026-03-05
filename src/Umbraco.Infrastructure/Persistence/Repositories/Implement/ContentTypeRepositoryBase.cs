@@ -1327,7 +1327,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         IReadOnlyCollection<int> propertyTypeIds,
         IReadOnlyCollection<int>? contentTypeIds = null)
     {
-        var defaultLang = LanguageRepository.GetDefaultId();
+        // TODO: Await this properly when adjusting this to our new EF Core approach.
+        var defaultLang = LanguageRepository.GetDefaultIdAsync().GetAwaiter().GetResult();
 
         // This will build up a query to get the property values of both the current and the published version so that we can check
         // based on the current variance of each item to see if it's 'edited' value should be true/false.
