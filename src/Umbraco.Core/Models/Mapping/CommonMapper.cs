@@ -28,7 +28,7 @@ public class CommonMapper
     /// <param name="context">The mapper context.</param>
     /// <returns>The name of the owner, or null if not found.</returns>
     public string? GetOwnerName(IContentBase source, MapperContext context)
-        => source.GetCreatorProfile(_userService)?.Name;
+        => GetUserName(source.CreatorId, context, () => source.GetCreatorProfile(_userService));
 
     /// <summary>
     ///     Gets the name of the creator (last writer) of the content.
@@ -37,5 +37,16 @@ public class CommonMapper
     /// <param name="context">The mapper context.</param>
     /// <returns>The name of the creator, or null if not found.</returns>
     public string? GetCreatorName(IContent source, MapperContext context)
-        => source.GetWriterProfile(_userService)?.Name;
+        => GetUserName(source.WriterId, context, () => source.GetWriterProfile(_userService));
+
+    private static string? GetUserName(int userId, MapperContext context, Func<IProfile?> fallback)
+    {
+        Dictionary<int, string?>? userNames = context.GetUserNameDictionary();
+        if (userNames is not null && userNames.TryGetValue(userId, out var name))
+        {
+            return name;
+        }
+
+        return fallback()?.Name;
+    }
 }

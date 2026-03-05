@@ -331,7 +331,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         }
 
         /// <inheritdoc />
-        [Obsolete("Will be removed in 14, please use notifications instead")]
+        [Obsolete("Please use notifications instead. Scheduled for removal in Umbraco 18.")]
         public IEventDispatcher Events
         {
             get

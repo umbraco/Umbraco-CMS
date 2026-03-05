@@ -305,14 +305,7 @@ export abstract class UmbTreeItemElementBase<
 	#renderActions() {
 		if (this.hideActions) return nothing;
 		if (!this.#api || !this._item) return nothing;
-		return html`
-			<umb-entity-actions-bundle
-				slot="actions"
-				.entityType=${this.#api.entityType}
-				.unique=${this.#api.unique}
-				.label=${this._label}>
-			</umb-entity-actions-bundle>
-		`;
+		return html`<umb-entity-actions-bundle slot="actions" .label=${this._label}> </umb-entity-actions-bundle>`;
 	}
 
 	#renderChildItems() {

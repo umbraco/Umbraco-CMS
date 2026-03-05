@@ -24,6 +24,8 @@ public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<MemberTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets sibling member types in the tree.")]
+    [EndpointDescription("Gets a collection of member type tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<MemberTypeTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,

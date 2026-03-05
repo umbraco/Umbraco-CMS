@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
@@ -19,6 +20,8 @@ public class BackOfficeDefaultController : Controller
 
     [HttpGet]
     [AllowAnonymous]
+    [EndpointSummary("Gets the back office default configuration.")]
+    [EndpointDescription("Gets the default configuration and settings for the Umbraco back office.")]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         // force authentication to occur since this is not an authorized endpoint

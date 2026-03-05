@@ -92,7 +92,7 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
     /// <param name="shortStringHelper">The short string helper (no longer used).</param>
     /// <param name="globalSettings">The global settings options (no longer used).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public FileService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -139,7 +139,7 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
     /// <param name="shortStringHelper">The short string helper (no longer used).</param>
     /// <param name="globalSettings">The global settings options (no longer used).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public FileService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -173,7 +173,7 @@ public class FileService : RepositoryService, IFileService
     #region Stylesheets
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IStylesheet> GetStylesheets(params string[] paths)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -212,7 +212,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public IStylesheet? GetStylesheet(string? path)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -222,7 +222,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public void SaveStylesheet(IStylesheet? stylesheet, int? userId = null)
     {
         if (stylesheet is null)
@@ -251,7 +251,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public void DeleteStylesheet(string path, int? userId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -283,7 +283,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public void CreateStyleSheetFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -294,7 +294,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations. Scheduled for removal in Umbraco 18.")]
     public void DeleteStyleSheetFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -305,7 +305,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public Stream GetStylesheetFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -315,7 +315,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public void SetStylesheetFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -326,7 +326,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
     public long GetStylesheetFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -340,7 +340,7 @@ public class FileService : RepositoryService, IFileService
     #region Scripts
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IScript> GetScripts(params string[] names)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -350,7 +350,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     public IScript? GetScript(string? name)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -360,7 +360,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     public void SaveScript(IScript? script, int? userId)
     {
         if (userId is null)
@@ -393,7 +393,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     public void DeleteScript(string path, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -424,7 +424,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptFolderService for script folder operations. Scheduled for removal in Umbraco 18.")]
     public void CreateScriptFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -435,7 +435,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptFolderService for script folder operations. Scheduled for removal in Umbraco 18.")]
     public void DeleteScriptFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -446,7 +446,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     public Stream GetScriptFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -456,7 +456,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     public void SetScriptFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -467,7 +467,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     public long GetScriptFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -489,7 +489,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>
     ///     The template created
     /// </returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
     {
@@ -518,7 +518,7 @@ public class FileService : RepositoryService, IFileService
     /// <param name="masterTemplate"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public ITemplate CreateTemplateWithIdentity(
         string? name,
         string? alias,
@@ -543,7 +543,7 @@ public class FileService : RepositoryService, IFileService
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
         => _templateService.GetAllAsync(aliases).GetAwaiter().GetResult();
 
@@ -551,7 +551,7 @@ public class FileService : RepositoryService, IFileService
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
         => _templateService.GetChildrenAsync(masterTemplateId).GetAwaiter().GetResult();
 
@@ -560,7 +560,7 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the alias, or null.</returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public ITemplate? GetTemplate(string? alias)
         => _templateService.GetAsync(alias).GetAwaiter().GetResult();
 
@@ -569,7 +569,7 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="id">The identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public ITemplate? GetTemplate(int id)
         => _templateService.GetAsync(id).GetAwaiter().GetResult();
 
@@ -578,7 +578,7 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="id">The guid identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public ITemplate? GetTemplate(Guid id)
         => _templateService.GetAsync(id).GetAwaiter().GetResult();
 
@@ -587,7 +587,7 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="masterTemplateId"></param>
     /// <returns></returns>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
         => _templateService.GetDescendantsAsync(masterTemplateId).GetAwaiter().GetResult();
 
@@ -596,7 +596,7 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="template"><see cref="Template" /> to save</param>
     /// <param name="userId"></param>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
     {
         // mimic old service behavior
@@ -627,7 +627,7 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="templates">List of <see cref="Template" /> to save</param>
     /// <param name="userId">Optional id of the user</param>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
     {
         ITemplate[] templatesA = templates.ToArray();
@@ -659,7 +659,7 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
     /// <param name="userId"></param>
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
     {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
@@ -667,17 +667,17 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public Stream GetTemplateFileContentStream(string filepath)
         => _templateService.GetFileContentStreamAsync(filepath).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public void SetTemplateFileContent(string filepath, Stream content)
         => _templateService.SetFileContentAsync(filepath, content).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public long GetTemplateFileSize(string filepath)
         => _templateService.GetFileSizeAsync(filepath).GetAwaiter().GetResult();
 
@@ -686,7 +686,7 @@ public class FileService : RepositoryService, IFileService
     #region Partial Views
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations. Scheduled for removal in Umbraco 18.")]
     public void DeletePartialViewFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -697,7 +697,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IPartialView> GetPartialViews(params string[] names)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -707,7 +707,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public IPartialView? GetPartialView(string path)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -717,7 +717,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId)
     {
         string? partialViewContent = null;
@@ -773,7 +773,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -800,7 +800,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public bool DeletePartialView(string path, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -833,7 +833,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations. Scheduled for removal in Umbraco 18.")]
     public void CreatePartialViewFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -875,7 +875,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public Stream GetPartialViewFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -885,7 +885,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public void SetPartialViewFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -896,7 +896,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public long GetPartialViewFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

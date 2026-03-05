@@ -83,14 +83,17 @@ export class UmbUserWorkspaceContext
 		return response;
 	}
 
-	/* TODO: some properties are allowed to update without saving.
-		For a user properties like state will be updated when one of the entity actions are executed.
+	/* Some properties are allowed to update without saving.
+		For a user, properties like state will be updated when one of the entity actions are executed.
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
+		We update both current and persisted so these server-applied changes do not trigger dirty state.
 		There might be a less manual way to do this.
 	*/
 	onUserStoreChanges(user: EntityType | undefined) {
 		if (user) {
-			this._data.updateCurrent({ state: user.state, avatarUrls: user.avatarUrls });
+			const serverAppliedChanges: Partial<EntityType> = { state: user.state, avatarUrls: user.avatarUrls };
+			this._data.updateCurrent(serverAppliedChanges);
+			this._data.updatePersisted(serverAppliedChanges);
 		}
 	}
 

@@ -37,6 +37,8 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     [HttpPost("{id:guid}/public-access")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates public access rules for a document.")]
+    [EndpointDescription("Creates public access protection for the document identified by the provided Id.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         Guid id,

@@ -13,8 +13,6 @@ internal sealed class ExternalLoginTokenDto
     public const string TableName = Constants.DatabaseSchema.Tables.ExternalLoginToken;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    internal const string ReferenceMemberName = "ExternalLoginId"; // should be ExternalLoginIdColumnName, but for database compatibility we keep it like this
-
     private const string ExternalLoginIdColumnName = "externalLoginId";
     private const string NameColumnName = "name";
 
@@ -42,6 +40,6 @@ internal sealed class ExternalLoginTokenDto
     public DateTime CreateDate { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceMemberName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(ExternalLoginId))]
     public ExternalLoginDto ExternalLoginDto { get; set; } = null!;
 }

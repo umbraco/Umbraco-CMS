@@ -6,11 +6,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
-[TableName(Constants.DatabaseSchema.Tables.Webhook2ContentTypeKeys)]
+[TableName(TableName)]
+[PrimaryKey([WebhookIdColumnName, ContentTypeKeyColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 public class Webhook2ContentTypeKeysDto
 {
-    internal const string ReferenceMemberName = "WebhookId"; // should be WebhookIdColumnName, but for database compatibility we keep it like this
+    public const string TableName = Constants.DatabaseSchema.Tables.Webhook2ContentTypeKeys;
 
     private const string WebhookIdColumnName = "webhookId";
     private const string ContentTypeKeyColumnName = "entityKey";
