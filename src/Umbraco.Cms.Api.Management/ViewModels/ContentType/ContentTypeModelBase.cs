@@ -27,6 +27,8 @@ public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer
 
     public bool IsElement { get; set; }
 
+    public bool AllowedInLibrary { get; set; }
+
     [Required]
     public IEnumerable<TPropertyType> Properties { get; set; } = Enumerable.Empty<TPropertyType>();
 

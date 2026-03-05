@@ -509,12 +509,19 @@
     </key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
+    <key alias="imagingHMACSecretKeyCheckSuccessMessage">The HMAC secret key for image URL signing is configured.</key>
+    <key alias="imagingHMACSecretKeyCheckWarningMessage">
+      <![CDATA[No HMAC secret key is configured for image URL signing. It is recommended to set
+      <strong>Umbraco:CMS:Imaging:HMACSecretKey</strong> to prevent unauthorized image manipulation requests.]]>
+    </key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
     <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
+    <key alias="elementTrashed">Trashed element with Id: {0} related to original parent container with Id: {1}</key>
+    <key alias="elementContainerTrashed">Trashed element container with Id: {0} related to original parent container with Id: {1}</key>
   </area>
   <area alias="permissions">
     <key alias="FolderCreation">Folder creation</key>

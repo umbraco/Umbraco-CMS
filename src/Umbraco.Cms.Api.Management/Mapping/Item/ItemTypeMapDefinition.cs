@@ -1,13 +1,14 @@
 using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Folder.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Item;
-using Umbraco.Cms.Api.Management.ViewModels.User.Item;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook.Item;
 using Umbraco.Cms.Core.Mapping;
@@ -33,6 +34,8 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
         mapper.Define<IWebhook, WebhookItemResponseModel>((_, _) => new WebhookItemResponseModel(), Map);
+        mapper.Define<IEntitySlim, NamedItemResponseModel>((_, _) => new NamedItemResponseModel(), Map);
+        mapper.Define<IEntitySlim, FolderItemResponseModel>((_, _) => new FolderItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -66,6 +69,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Icon = source.Icon;
         target.IsElement = source.IsElement;
+        target.AllowedInLibrary = source.AllowedInLibrary;
         target.Description = source.Description;
     }
 
@@ -126,5 +130,18 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Enabled = source.Enabled;
         target.Events = string.Join(",", source.Events);
         target.Types = string.Join(",", source.ContentTypeKeys);
+    }
+
+    private static void Map(IEntitySlim source, NamedItemResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll -Flags
+    private static void Map(IEntitySlim source, FolderItemResponseModel target, MapperContext context)
+    {
+        target.Name = source.Name ?? string.Empty;
+        target.Id = source.Key;
     }
 }

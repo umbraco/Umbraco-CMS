@@ -69,11 +69,17 @@ public class TrackedReferencesService : ITrackedReferencesService
         {
             UmbracoObjectTypes.Document => Constants.ObjectTypes.Document,
             UmbracoObjectTypes.Media => Constants.ObjectTypes.Media,
-            _ => throw new ArgumentOutOfRangeException(nameof(objectType), "Only documents and media have recycle bin support."),
+            UmbracoObjectTypes.Element => Constants.ObjectTypes.Element,
+            _ => throw new ArgumentOutOfRangeException(nameof(objectType), "Only documents, media and elements have recycle bin support."),
         };
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedRelationsForRecycleBin(objectTypeKey, skip, take, filterMustBeIsDependency, out var totalItems);
+        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedRelationsForRecycleBin(
+            objectTypeKey,
+            skip,
+            take,
+            filterMustBeIsDependency,
+            out var totalItems);
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
         return Task.FromResult(pagedModel);
     }

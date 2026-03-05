@@ -82,6 +82,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
+  public readonly propertyEditorChangeBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -178,7 +179,7 @@ export class UiBaseLocators extends BasePage {
   public readonly clickToUploadBtn: Locator;
   public readonly inputDropzone: Locator;
   public readonly imageCropperField: Locator;
-  public readonly inputUploadField: Locator;
+  public readonly inputUploadFileName: Locator;
   public readonly chooseMediaInputBtn: Locator;
 
   // Embedded Media
@@ -230,6 +231,11 @@ export class UiBaseLocators extends BasePage {
   
   // Block
   public readonly blockTypeCard: Locator;
+  public readonly backofficeModalContainer: Locator;
+
+  // User & User Group
+  public readonly allowAccessToAllElementsBtn: Locator;
+  public readonly elementStartNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -243,7 +249,7 @@ export class UiBaseLocators extends BasePage {
     this.createBtn = page.getByRole('button', {name: /^Create(…)?$/});
     this.addBtn = page.getByRole('button', {name: 'Add', exact: true});
     this.updateBtn = page.getByLabel('Update');
-    this.changeBtn = page.getByLabel('Change', {exact: true});
+    this.changeBtn = page.getByLabel('Change');
     this.deleteBtn = page.getByRole('button', {name: /^Delete(…)?$/});
     this.deleteExactBtn = page.getByRole('button', {name: 'Delete', exact: true});
     this.removeExactBtn = page.getByLabel('Remove', {exact: true});
@@ -303,6 +309,7 @@ export class UiBaseLocators extends BasePage {
     this.containerChooseBtn = page.locator('#container').getByLabel('Choose');
     this.containerSaveAndPublishBtn = page.locator('#container').getByLabel('Save and Publish');
     this.createModalBtn = page.locator('uui-modal-sidebar').getByLabel('Create', {exact: true});
+    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
   
     // Document Type & Property Editor
     this.documentTypeNode = page.locator('uui-ref-node-document-type');
@@ -313,6 +320,7 @@ export class UiBaseLocators extends BasePage {
     this.property = page.locator('umb-property');
     this.addPropertyBtn = page.getByLabel('Add property', {exact: true});
     this.labelAboveBtn = page.locator('.appearance-option').filter({hasText: 'Label above'});
+    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
   
     // Group & Tab Management
     this.addGroupBtn = page.getByLabel('Add group', {exact: true});
@@ -409,7 +417,7 @@ export class UiBaseLocators extends BasePage {
     this.clickToUploadBtn = page.locator('#splitViews').getByRole('button', {name: 'Click to upload'});
     this.inputDropzone = page.locator('umb-input-dropzone');
     this.imageCropperField = page.locator('umb-image-cropper-field');
-    this.inputUploadField = page.locator('umb-input-upload-field').locator('#wrapperInner');
+    this.inputUploadFileName = page.locator('umb-input-upload-field').locator('#file-name');
     this.chooseMediaInputBtn = page.locator('umb-input-media').getByLabel('Choose');
 
     // Embedded Media
@@ -440,7 +448,7 @@ export class UiBaseLocators extends BasePage {
     // Reference & Entity
     this.confirmActionModalEntityReferences = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references');
     this.referenceHeadline = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references').locator('#reference-headline').first();
-    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references').locator('uui-ref-list').first().getByTestId('entity-item-ref');
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.entityItem = page.locator('umb-entity-item-ref');
   
     // Workspace & Action
@@ -461,6 +469,10 @@ export class UiBaseLocators extends BasePage {
 
     // Block
     this.blockTypeCard = page.locator('uui-card-block-type');
+
+    // User & User Group
+    this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
+    this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
   }
 
   // Helper Methods
@@ -916,7 +928,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.clickChangeButton();
+    await this.click(this.propertyEditorChangeBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, {exact: true}));
     await this.enterAPropertyName(propertyEditorName);
@@ -1288,8 +1300,8 @@ export class UiBaseLocators extends BasePage {
     await this.isVisible(this.imageCropperField, isVisible);
   }
 
-  async isInputUploadFieldVisible(isVisible: boolean = true) {
-    await this.isVisible(this.inputUploadField, isVisible);
+  async doesInputUploadFileHaveName(name: string) {
+    await this.hasText(this.inputUploadFileName, name);
   }
 
   // Upload Methods
@@ -1619,5 +1631,17 @@ export class UiBaseLocators extends BasePage {
     await this.enterText(this.searchTxt, keyword);
     await this.pressKey(this.searchTxt, 'Enter');
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
+  }
+
+  async clickAllowAccessToAllElements() {
+    await this.click(this.allowAccessToAllElementsBtn);
+  }
+
+  async clickChooseElementStartNodeButton() {
+    await this.click(this.elementStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
+    await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
   }
 }

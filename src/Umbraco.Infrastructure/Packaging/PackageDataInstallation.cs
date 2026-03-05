@@ -944,12 +944,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 throw new InvalidOperationException("Content type was null");
             }
-            contentType.Key = key;
-            contentType.Name = infoElement!.Element("Name")!.Value;
-            if (infoElement.Element("Key") != null)
+
+            // Only set Key on new entities - existing entities already have their Key from the database
+            // and it should not be changed (Key is immutable once persisted).
+            if (contentType.HasIdentity is false)
             {
-                contentType.Key = new Guid(infoElement.Element("Key")!.Value);
+                contentType.Key = key;
             }
+
+            contentType.Name = infoElement!.Element("Name")!.Value;
 
             contentType.Icon = infoElement.Element("Icon")?.Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail")?.Value;
@@ -1134,7 +1137,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 contentType.AddPropertyGroup(alias, name);
                 PropertyGroup propertyGroup = contentType.PropertyGroups[alias];
 
-                if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out Guid key))
+                // Only set Key on new property groups - existing ones already have their Key from the database
+                if (propertyGroup.HasIdentity is false &&
+                    Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out Guid key))
                 {
                     propertyGroup.Key = key;
                 }

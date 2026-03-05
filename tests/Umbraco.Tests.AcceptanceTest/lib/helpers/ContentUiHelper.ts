@@ -134,7 +134,6 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly splitView: Locator;
   private readonly tiptapInput: Locator;
   private readonly rteBlockInline: Locator;
-  private readonly backofficeModalContainer: Locator;
   private readonly modalCreateBtn: Locator;
   private readonly modalUpdateBtn: Locator;
   private readonly rteBlock: Locator;
@@ -187,11 +186,13 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly confirmToResetBtn: Locator;
   private readonly saveModal: Locator;
   private readonly expandSegmentBtn: Locator;
-  
+  private readonly saveAndPreviewBtn: Locator;
+
   constructor(page: Page) {
     super(page);
     this.saveContentBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.Save');
     this.saveAndPublishBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.SaveAndPublish');
+    this.saveAndPreviewBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.SaveAndPreview');
     this.closeBtn = page.getByRole('button', {name: 'Close', exact: true});
     this.linkPickerModal = page.locator('umb-link-picker-modal');
     this.contentNameTxt = page.locator('#name-input input');
@@ -334,7 +335,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.blockWorkspace = page.locator('umb-block-workspace-editor');
     this.tiptapInput = page.locator('umb-input-tiptap');
     this.rteBlockInline = page.locator('umb-rte-block-inline');
-    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.modalCreateBtn = this.backofficeModalContainer.getByLabel('Create', {exact: true});
     this.modalUpdateBtn = this.backofficeModalContainer.getByLabel('Update', {exact: true});
     this.rteBlock = page.locator('umb-rte-block');
@@ -401,6 +401,10 @@ export class ContentUiHelper extends UiBaseLocators {
   async isSuccessStateVisibleForSaveAndPublishButton (isVisible: boolean = true){
     const saveAndPublishBtn = this.workspaceAction.filter({has: this.saveAndPublishBtn});
     await this.isVisible(saveAndPublishBtn.locator(this.successState), isVisible, ConstantHelper.timeout.long);
+  }
+
+  async clickSaveAndPreviewButton() {
+    await this.click(this.saveAndPreviewBtn);
   }
 
   async clickPublishButton() {
@@ -1872,5 +1876,17 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesTextAreaHaveExpectedValue(expectedValue: string) {
     await this.hasValue(this.textAreaTxt, expectedValue);
+  }
+
+  async addElementPicker(elementName: string) {
+    await this.clickChooseButton();
+    await this.click(this.sidebarModal.getByText(elementName, {exact: true}));
+    await this.click(this.chooseModalBtn);
+  }
+
+  async removeElementPicker(elementPickerName: string) {
+    const elementPickerLocator = this.entityItem.filter({has: this.page.locator(`[name="${elementPickerName}"]`)});
+    await this.hoverAndClick(elementPickerLocator, elementPickerLocator.getByLabel('Remove'));
+    await this.clickConfirmRemoveButton();
   }
 }

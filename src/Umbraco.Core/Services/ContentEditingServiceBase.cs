@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
@@ -33,6 +35,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly IContentValidationServiceBase<TContentType> _validationService;
     private readonly IRelationService _relationService;
     private readonly ContentTypeFilterCollection _contentTypeFilters;
+    private readonly ILanguageService _languageService;
+    private readonly IUserService _userService;
+    private readonly ILocalizationService _localizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
@@ -59,7 +64,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         IContentValidationServiceBase<TContentType> validationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService,
+        ILocalizationService localizationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
@@ -77,6 +85,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         ContentService = contentService;
         ContentTypeService = contentTypeService;
         _contentTypeFilters = contentTypeFilters;
+        _languageService = languageService;
+        _userService = userService;
+        _localizationService = localizationService;
     }
 
     /// <summary>
@@ -104,9 +115,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="newParentId">The new parent identifier.</param>
     /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>The copied content, or null if the operation failed.</returns>
-    protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId);
+    protected abstract Task<TContent?> CopyAsync(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
 
     /// <summary>
     /// Moves content to the recycle bin.
@@ -221,6 +232,21 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
         => await _validationService.ValidateCulturesAsync(contentEditingModelBase);
 
+    protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey,
+        IEnumerable<string?>? cultures,
+        Guid userKey)
+    {
+        if (await ValidateCulturesAsync(contentEditingModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult());
+        }
+
+        IEnumerable<string?>? culturesToValidate = await GetCulturesToValidate(cultures, userKey);
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
+    }
+
     /// <summary>
     /// Validates the properties in the content editing model against the content type.
     /// </summary>
@@ -251,6 +277,24 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return result.ValidationErrors.Any() is false
             ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
             : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
+    }
+
+    protected async Task<IEnumerable<string?>?> GetCulturesToValidate(IEnumerable<string?>? cultures, Guid userKey)
+    {
+        // Cultures to validate can be provided by the calling code, but if the editor is restricted to only have
+        // access to certain languages, we don't want to validate by any they aren't allowed to edit.
+        HashSet<string> allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        if (cultures == null)
+        {
+            // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
+            // should only validate the ones they do.
+            IEnumerable<string> allCultures = await _languageService.GetAllIsoCodesAsync();
+            return allowedCultures.Count == allCultures.Count() ? null : allowedCultures;
+        }
+
+        // If explicit cultures are provided, we should only validate the ones the user has access to.
+        return cultures.Where(x => !string.IsNullOrEmpty(x) && allowedCultures.Contains(x)).ToList();
     }
 
     /// <summary>
@@ -429,8 +473,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
-        var userId = await GetUserIdAsync(userKey);
-        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
+        TContent? copy = await CopyAsync(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userKey);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
@@ -472,7 +515,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <returns>The user ID.</returns>
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
-    private TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
+    protected virtual TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
     {
         TContentType? contentType = ContentTypeService.Get(contentTypeKey);
         if (contentType == null)
@@ -719,6 +762,16 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     private static Dictionary<string, IPropertyType> GetPropertyTypesByAlias(TContentType contentType)
         => contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
+
+    protected async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
+    {
+        IUser user = await _userService.GetAsync(userKey)
+                      ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
+
+        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
+
+        return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+    }
 
     /// <summary>
     /// Should never be made public, serves the purpose of a nullable bool but more readable.

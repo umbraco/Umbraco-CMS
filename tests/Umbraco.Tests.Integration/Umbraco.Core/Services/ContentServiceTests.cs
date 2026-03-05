@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
+internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -4086,5 +4086,24 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentTypeService.Save(contentType);
 
         return (langEn, langDa, contentType);
+    }
+
+    [Test]
+    public void Cannot_Change_Key_Of_Persisted_Content()
+    {
+        // Arrange - get a persisted content item
+        var content = ContentService.GetById(Textpage.Id);
+        Assert.That(content, Is.Not.Null);
+
+        var originalKey = content!.Key;
+        var newKey = Guid.NewGuid();
+
+        // Act & Assert - attempting to change the Key should throw
+        var exception = Assert.Throws<InvalidOperationException>(() => content.Key = newKey);
+        Assert.That(exception!.Message, Does.Contain("Cannot change the Key"));
+        Assert.That(exception.Message, Does.Contain("Content"));
+
+        // Verify the Key was not changed
+        Assert.That(content.Key, Is.EqualTo(originalKey));
     }
 }

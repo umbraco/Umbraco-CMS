@@ -53,8 +53,10 @@ internal sealed class MemberContentEditingService
         IUserService userService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        ILocalizationService localizationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService, localizationService)
     {
         _logger = logger;
         _userService = userService;
@@ -114,7 +116,7 @@ internal sealed class MemberContentEditingService
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
-    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override Task<IMember?> CopyAsync(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />

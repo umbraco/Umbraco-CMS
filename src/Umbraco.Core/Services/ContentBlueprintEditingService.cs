@@ -47,8 +47,11 @@ internal sealed class ContentBlueprintEditingService
         IContentBlueprintContainerService containerService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService,
+        ILocalizationService localizationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService, localizationService)
         => _containerService = containerService;
 
     /// <inheritdoc />
@@ -279,10 +282,15 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="newParentId">The ID of the new parent.</param>
     /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override Task<IContent?> CopyAsync(
+        IContent content,
+        int newParentId,
+        bool relateToOriginal,
+        bool includeDescendants,
+        Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Moves the specified content to the recycle bin. Not supported for blueprints.

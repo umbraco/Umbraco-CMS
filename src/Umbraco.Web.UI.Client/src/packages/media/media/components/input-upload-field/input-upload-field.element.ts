@@ -201,31 +201,36 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 	}
 
 	#renderFile(src: string) {
-		if (!src.startsWith('blob:')) {
-			src = this._serverUrl + src;
-		}
+		const isBlob = src.startsWith('blob:');
+		const fullUrl = isBlob ? src : this._serverUrl + src;
+		const fileName = isBlob ? this.temporaryFile?.file?.name : src.split('/').pop();
 
 		return html`
 			<div id="wrapper">
-				<div id="wrapperInner">
-					<umb-extension-slot
-						type="fileUploadPreview"
-						.props=${{ path: src, file: this.temporaryFile?.file }}
-						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
-					</umb-extension-slot>
+				<umb-extension-slot
+					type="fileUploadPreview"
+					.props=${{ path: fullUrl, file: this.temporaryFile?.file }}
+					.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
+				</umb-extension-slot>
+				<div id="file-info" class="uui-text">
+					${this.#renderFileName(fileName, isBlob, fullUrl)}
+					<uui-button @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
+						<uui-icon name="icon-trash"></uui-icon>
+						${this.localize.term('content_uploadClear')}
+					</uui-button>
 				</div>
 			</div>
-			${this.#renderButtonRemove()}
 		`;
 	}
 
-	#renderButtonRemove() {
-		return html`
-			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>
-				<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
-			</uui-button>
-		`;
+	#renderFileName(fileName: string | undefined, isBlob: boolean, fullUrl: string) {
+		if (!fileName) {
+			return nothing;
+		}
+		if (isBlob) {
+			return html`<span id="file-name" title=${fileName}>${fileName}</span>`;
+		}
+		return html`<a id="file-name" href=${fullUrl} target="_blank" title=${fileName}>${fileName}</a>`;
 	}
 
 	#handleRemove() {
@@ -254,29 +259,35 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 			:host {
 				position: relative;
 			}
-			uui-icon {
-				vertical-align: sub;
-				margin-right: var(--uui-size-space-4);
-			}
 
 			#wrapper {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-				gap: var(--uui-size-space-4);
-				box-sizing: border-box;
-				margin-bottom: var(--uui-size-space-3);
+				display: flex;
+				flex-direction: column;
+				width: fit-content;
+				min-width: 400px;
+				max-width: 100%;
 			}
 
-			#wrapper:has(umb-input-upload-field-file) {
-				padding: var(--uui-size-space-4);
+			#file-info {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
+				padding-left: var(--uui-size-space-4);
+				margin-top: var(--uui-size-space-2);
 			}
 
-			#wrapperInner {
-				position: relative;
-				display: flex;
-				width: 100%;
+			#file-name {
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+			}
+
+			a#file-name:not(:hover) {
+				text-decoration: none;
 			}
 		`,
 	];

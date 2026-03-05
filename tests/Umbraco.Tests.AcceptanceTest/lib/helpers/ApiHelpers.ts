@@ -36,6 +36,7 @@ import {WebhookApiHelper} from "./WebhookApiHelper";
 import {MediaDeliveryApiHelper} from './differentAppSettingsHelpers/MediaDeliveryApiHelper';
 import {ContentDeliveryApiHelper} from "./differentAppSettingsHelpers/ContentDeliveryApiHelper";
 import {SmtpApiHelper} from './SmtpApiHelper';
+import {ElementApiHelper} from "./ElementApiHelper";
 
 export class ApiHelpers {
   baseUrl: string = umbracoConfig.environment.baseUrl;
@@ -75,6 +76,7 @@ export class ApiHelpers {
   mediaDeliveryApi: MediaDeliveryApiHelper;
   contentDeliveryApi: ContentDeliveryApiHelper;
   smtp: SmtpApiHelper;
+  element: ElementApiHelper;
 
   constructor(page: Page) {
     this.page = page;
@@ -113,6 +115,7 @@ export class ApiHelpers {
     this.mediaDeliveryApi = new MediaDeliveryApiHelper(this);
     this.contentDeliveryApi = new ContentDeliveryApiHelper(this);
     this.smtp = new SmtpApiHelper(this);
+    this.element = new ElementApiHelper(this);
   }
 
   async getAccessToken() {
@@ -266,7 +269,7 @@ export class ApiHelpers {
 
     if (response.status() === 200) {
       const jsonStorageCookie = response.headers()['set-cookie'];
-      // We get multiple cookies, so we have to split them and then update each of the cookies in our localstorage 
+      // We get multiple cookies, so we have to split them and then update each of the cookies in our localstorage
       let cookies = this.splitCookies(jsonStorageCookie);
       for (const cookie of cookies) {
         await this.updateCookie(cookie);
@@ -291,7 +294,7 @@ export class ApiHelpers {
     const storageStateValues = await this.login.login(userEmail, userPassword);
     await this.updateCookie(storageStateValues.cookie)
 
-    // We get multiple set cookies, so we have to split them and then update each of the cookies in our localstorage 
+    // We get multiple set cookies, so we have to split them and then update each of the cookies in our localstorage
     let cookies = this.splitCookies(storageStateValues.setCookies);
     for (const cookie of cookies) {
       await this.updateCookie(cookie);

@@ -119,14 +119,32 @@ public static class UserExtensions
             Constants.System.RecycleBinMedia);
 
     /// <summary>
-    ///     Determines whether the user has path access to the specified media item.
+    ///     Determines whether the user has access to the elements root.
+    /// </summary>
+    internal static bool HasElementRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccess(
+            Constants.System.RootString,
+            user.CalculateElementStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinElement);
+
+    /// <summary>
+    ///     Determines whether the user has access to the elements recycle bin.
+    /// </summary>
+    internal static bool HasElementBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccess(
+            Constants.System.RecycleBinElementString,
+            user.CalculateElementStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinElement);
+
+    /// <summary>
+    ///     Determines whether the user has content path access to the specified entity.
     /// </summary>
     /// <param name="user">The user to check.</param>
-    /// <param name="media">The media item to check access for.</param>
+    /// <param name="entity">The entity to check access for.</param>
     /// <param name="entityService">The entity service.</param>
     /// <param name="appCaches">The application caches.</param>
-    /// <returns><c>true</c> if the user has access to the media path; otherwise, <c>false</c>.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="media" /> is null.</exception>
+    /// <returns><c>true</c> if the user has access to the content path; otherwise, <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="entity" /> is null.</exception>
     public static bool HasPathAccess(this IUser user, IMedia? media, IEntityService entityService, AppCaches appCaches)
     {
         if (media == null)
@@ -176,6 +194,19 @@ public static class UserExtensions
         }
 
         return ContentPermissions.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
+    }
+
+    public static bool HasElementPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
+    {
+        if (entity == null)
+        {
+            throw new ArgumentNullException(nameof(entity));
+        }
+
+        return ContentPermissions.HasPathAccess(
+            entity.Path,
+            user.CalculateElementStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinElement);
     }
 
     /// <summary>
@@ -271,6 +302,38 @@ public static class UserExtensions
     }
 
     /// <summary>
+    ///     Gets the element start node paths for the user.
+    /// </summary>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of element start node paths, or <c>null</c> if no start nodes are defined.</returns>
+    public static int[]? CalculateElementStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+    {
+        var cacheKey = user.UserCacheKey(CacheKeys.UserAllElementStartNodesPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
+        var result = runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
+        {
+            var gsn = user.Groups.Where(x => x.StartElementId.HasValue).Select(x => x.StartElementId!.Value).Distinct()
+                .ToArray();
+            var usn = user.StartElementIds;
+            if (usn is not null)
+            {
+                var vals = CombineStartNodes(UmbracoObjectTypes.ElementContainer, gsn, usn, entityService);
+                return vals;
+            }
+
+            return null;
+        },
+            TimeSpan.FromMinutes(2),
+            true);
+
+        return result;
+    }
+
+    /// <summary>
     ///     Gets the media start node paths for the user.
     /// </summary>
     /// <param name="user">The user to get paths for.</param>
@@ -313,6 +376,31 @@ public static class UserExtensions
             var startNodeIds = user.CalculateContentStartNodeIds(entityService, appCaches);
             var vals = entityService.GetAllPaths(UmbracoObjectTypes.Document, startNodeIds).Select(x => x.Path)
                 .ToArray();
+            return vals;
+        },
+            TimeSpan.FromMinutes(2),
+            true);
+
+        return result;
+    }
+
+    /// <summary>
+    ///     Gets the element start node paths for the user.
+    /// </summary>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of content start node paths, or <c>null</c> if no start nodes are defined.</returns>
+    public static string[]? GetElementStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
+    {
+        var cacheKey = user.UserCacheKey(CacheKeys.UserElementStartNodePathsPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
+        var result = runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
+        {
+            var startNodeIds = user.CalculateElementStartNodeIds(entityService, appCaches);
+            var vals = entityService.GetAllPaths(UmbracoObjectTypes.ElementContainer, startNodeIds).Select(x => x.Path).ToArray();
             return vals;
         },
             TimeSpan.FromMinutes(2),
@@ -428,6 +516,10 @@ public static class UserExtensions
                 break;
             case UmbracoObjectTypes.Media:
                 binPath += Constants.System.RecycleBinMediaString;
+                break;
+            case UmbracoObjectTypes.Element:
+            case UmbracoObjectTypes.ElementContainer:
+                binPath += Constants.System.RecycleBinElementString;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(objectType));

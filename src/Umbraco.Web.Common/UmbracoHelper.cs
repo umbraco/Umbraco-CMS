@@ -105,8 +105,8 @@ public class UmbracoHelper
     ///     Returns the dictionary value for the key specified
     /// </summary>
     /// <param name="key">Key of dictionary item.</param>
-    /// <returns>The dictionary value, should one exist.</returns>
-    public string? GetDictionaryValue(string key) => GetDictionaryValue(key, Thread.CurrentThread.CurrentUICulture);
+    /// <returns>The dictionary value, should one exist. If not, an empty string is returned.</returns>
+    public string GetDictionaryValue(string key) => GetDictionaryValue(key, Thread.CurrentThread.CurrentUICulture);
 
 
     /// <summary>
@@ -114,8 +114,8 @@ public class UmbracoHelper
     /// </summary>
     /// <param name="key">Key of dictionary item.</param>
     /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
-    /// <returns>The dictionary value, should one exist.</returns>
-    public string? GetDictionaryValue(string key, CultureInfo specificCulture)
+    /// <returns>The dictionary value, should one exist. If not, an empty string is returned.</returns>
+    public string GetDictionaryValue(string key, CultureInfo specificCulture)
     {
         ICultureDictionary cultureDictionary = GetCultureDictionary(specificCulture);
         return cultureDictionary[key];

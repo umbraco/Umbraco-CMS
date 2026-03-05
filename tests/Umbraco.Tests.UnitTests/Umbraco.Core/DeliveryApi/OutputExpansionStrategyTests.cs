@@ -26,7 +26,7 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(
             content,
             CreateNumberProperty(content.Object, 444, "number"),
@@ -69,7 +69,7 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(
             content,
             CreateNumberProperty(content.Object, 444, "number"),
@@ -126,7 +126,7 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPickerValue = CreateMultiLevelPickedContent(987, nestedContentPickerValue, "contentPicker", apiContentBuilder);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(content, CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);

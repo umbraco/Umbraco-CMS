@@ -155,9 +155,12 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_3_0.IncreaseSizeOfLongRunningOperationTypeColumn>("{B2F4A1C3-8D5E-4F6A-9B7C-3E1D2A4F5B6C}");
         To<V_17_3_0.RetrustForeignKeyAndCheckConstraints>("{0638E0E0-D914-4ACA-8A4B-9551A3AAB91F}");
         To<V_17_3_0.RebuildHybridCache>("{E4A7C2D1-5F38-4B96-A1D3-8E2F6C9B0A74}");
+        To<V_17_3_0.OptimizeInvariantUrlRecords>("{B8C9D0E1-F2A3-4B5C-8D7E-9F0A1B2C3D4E}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
         //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
+        To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
+        To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
     }
 }

@@ -51,6 +51,11 @@ public interface IReadOnlyUserGroup
     int? StartMediaId { get; }
 
     /// <summary>
+    ///     Gets the starting element node identifier for this user group.
+    /// </summary>
+    int? StartElementId { get; }
+
+    /// <summary>
     ///     Gets a value indicating whether this user group has access to all languages.
     /// </summary>
     /// <remarks>

@@ -23,6 +23,11 @@ public static partial class Constants
         public static readonly Guid MediaRecycleBin = new(Strings.MediaRecycleBin);
 
         /// <summary>
+        ///     The GUID identifier for the element recycle bin object type.
+        /// </summary>
+        public static readonly Guid ElementRecycleBin = new(Strings.ElementRecycleBin);
+
+        /// <summary>
         ///     The GUID identifier for the data type container object type.
         /// </summary>
         public static readonly Guid DataTypeContainer = new(Strings.DataTypeContainer);
@@ -68,7 +73,17 @@ public static partial class Constants
         public static readonly Guid DocumentType = new(Strings.DocumentType);
 
         /// <summary>
-        ///     The GUID identifier for the media object type.
+        ///     The GUID identifier for the element object type.
+        /// </summary>
+        public static readonly Guid Element = new(Strings.Element);
+
+        /// <summary>
+        ///     The GUID identifier for the element container object type.
+        /// </summary>
+        public static readonly Guid ElementContainer = new(Strings.ElementContainer);
+
+        /// <summary>
+        ///     The GUID identifier for the media type object type.
         /// </summary>
         public static readonly Guid Media = new(Strings.Media);
 
@@ -212,6 +227,21 @@ public static partial class Constants
             ///     The string GUID for the document type (content type) object type.
             /// </summary>
             public const string DocumentType = "A2CB7800-F571-4787-9638-BC48539A0EFB";
+
+            /// <summary>
+            ///     The string GUID for the element object type.
+            /// </summary>
+            public const string Element = "3D7B623C-94B1-487D-8554-A46EC37568BE";
+
+            /// <summary>
+            ///     The string GUID for the element container object type.
+            /// </summary>
+            public const string ElementContainer = "2815B0CF-9706-499F-AA2A-8A4C7AEF005D";
+
+            /// <summary>
+            ///     The string GUID for the element recycle bin object type.
+            /// </summary>
+            public const string ElementRecycleBin = "A1EE71EB-659C-4EEE-BC97-6243E721CC0D";
 
             /// <summary>
             ///     The string GUID for the media object type.

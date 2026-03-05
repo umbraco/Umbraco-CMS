@@ -5,26 +5,22 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
+[PrimaryKey(IPublishableContentDto<DocumentVersionDto>.Columns.NodeId, AutoIncrement = false)]
 [ExplicitColumns]
-public class DocumentDto
+public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
-    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-    // Public constants to bind properties between DTOs
-    public const string PublishedColumnName = "published";
-
-    [Column(PrimaryKeyColumnName)]
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.NodeId)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
 
-    [Column(PublishedColumnName)]
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Published)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 
-    [Column("edited")]
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Edited)]
     public bool Edited { get; set; }
 
     // [Column("publishDate")]
@@ -51,7 +47,7 @@ public class DocumentDto
     // so this here is a OneToOne reference
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]
-    public DocumentVersionDto DocumentVersionDto { get; set; } = null!;
+    public DocumentVersionDto ContentVersionDto { get; set; } = null!;
 
     // same
     [ResultColumn]

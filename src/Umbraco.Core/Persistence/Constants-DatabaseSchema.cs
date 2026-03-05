@@ -157,11 +157,25 @@ public static partial class Constants
             public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
 
             /// <summary>
-            ///     The document URL alias.
+            ///     The document URL alias table name.
             /// </summary>
             public const string DocumentUrlAlias = TableNamePrefix + "DocumentUrlAlias";
-          
-          
+
+            /// <summary>
+            ///     The elements table name.
+            /// </summary>
+            public const string Element = TableNamePrefix + "Element";
+
+            /// <summary>
+            ///     The elements culture variation table name.
+            /// </summary>
+            public const string ElementCultureVariation = TableNamePrefix + "ElementCultureVariation";
+
+            /// <summary>
+            ///     The elements version table name.
+            /// </summary>
+            public const string ElementVersion = TableNamePrefix + "ElementVersion";
+
             /// <summary>
             ///     The media version table name.
             /// </summary>

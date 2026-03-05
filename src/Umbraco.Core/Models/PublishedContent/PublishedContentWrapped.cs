@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 ///     wrap and extend another <c>IPublishedContent</c>.
 /// </summary>
 [DebuggerDisplay("{Id}: {Name} ({ContentType?.Alias})")]
+// TODO ELEMENTS: this should probably inherit PublishedElementWrapped, instead of all this code duplication
 public abstract class PublishedContentWrapped : IPublishedContent
 {
     private readonly IPublishedContent _content;

@@ -189,4 +189,5 @@ public enum UserOperationStatus
     ///     The operation failed because the username is invalid.
     /// </summary>
     InvalidUserName,
+    ElementNodeNotFound,
 }

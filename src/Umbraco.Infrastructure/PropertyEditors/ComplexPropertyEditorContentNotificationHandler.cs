@@ -17,7 +17,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class ComplexPropertyEditorContentNotificationHandler :
     INotificationHandler<ContentSavingNotification>,
     INotificationHandler<ContentCopyingNotification>,
-    INotificationHandler<ContentScaffoldedNotification>
+    INotificationHandler<ContentScaffoldedNotification>,
+    INotificationHandler<ElementSavingNotification>,
+    INotificationHandler<ElementCopyingNotification>
 {
     protected abstract string EditorAlias { get; }
 
@@ -40,6 +42,21 @@ public abstract class ComplexPropertyEditorContentNotificationHandler :
     {
         IEnumerable<IProperty> props = notification.Scaffold.GetPropertiesByEditor(EditorAlias);
         UpdatePropertyValues(props, false);
+    }
+
+    public void Handle(ElementCopyingNotification notification)
+    {
+        IEnumerable<IProperty> props = notification.Copy.GetPropertiesByEditor(EditorAlias);
+        UpdatePropertyValues(props, false);
+    }
+
+    public void Handle(ElementSavingNotification notification)
+    {
+        foreach (IElement entity in notification.SavedEntities)
+        {
+            IEnumerable<IProperty> props = entity.GetPropertiesByEditor(EditorAlias);
+            UpdatePropertyValues(props, true);
+        }
     }
 
     protected abstract string FormatPropertyValue(string rawJson, bool onlyMissingKeys);

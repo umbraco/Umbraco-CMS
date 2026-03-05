@@ -2008,36 +2008,52 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(Guid userKey, IEnumerable<Guid> mediaKeys)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(mediaKeys, UmbracoObjectTypes.Media);
-
-        if (idAttempt.Success is false || idAttempt.Result is null)
-        {
-            return Attempt.FailWithStatus(UserOperationStatus.MediaNodeNotFound, Enumerable.Empty<NodePermissions>());
-        }
-
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
-            await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Media]);
-        scope.Complete();
-
-        return permissions;
-    }
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> mediaKeys)
+        => await GetContentPermissionsAsync(
+            userKey,
+            mediaKeys,
+            UserOperationStatus.MediaNodeNotFound,
+            UmbracoObjectTypes.Media);
 
     /// <inheritdoc/>
-    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(Guid userKey, IEnumerable<Guid> contentKeys)
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> contentKeys)
+        => await GetContentPermissionsAsync(
+            userKey,
+            contentKeys,
+            UserOperationStatus.ContentNodeNotFound,
+            UmbracoObjectTypes.Document);
+
+    /// <inheritdoc/>
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetElementPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> elementKeys)
+        => await GetContentPermissionsAsync(
+            userKey,
+            elementKeys,
+            UserOperationStatus.ElementNodeNotFound,
+            UmbracoObjectTypes.Element,
+            UmbracoObjectTypes.ElementContainer);
+
+    private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetContentPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> contentKeys,
+        UserOperationStatus failedOperationStatus,
+        params UmbracoObjectTypes[] objectTypes)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(contentKeys, UmbracoObjectTypes.Document);
+        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(contentKeys, objectTypes);
 
         if (idAttempt.Success is false || idAttempt.Result is null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.ContentNodeNotFound, Enumerable.Empty<NodePermissions>());
+            return Attempt.FailWithStatus(failedOperationStatus, Enumerable.Empty<NodePermissions>());
         }
 
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
-            await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Document]);
+            await GetPermissionsAsync(userKey, idAttempt.Result, objectTypes);
         scope.Complete();
 
         return permissions;
@@ -2110,20 +2126,32 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="nodeKeys">The keys of the nodes.</param>
     /// <param name="objectType">The type of Umbraco object.</param>
     /// <returns>An attempt containing the key-to-ID mapping or <c>null</c> if any key was not found.</returns>
-    private Attempt<Dictionary<Guid, int>?> CreateIdKeyMap(IEnumerable<Guid> nodeKeys, UmbracoObjectTypes objectType)
+    private Attempt<Dictionary<Guid, int>?> CreateIdKeyMap(IEnumerable<Guid> nodeKeys, params UmbracoObjectTypes[] objectTypes)
     {
         // We'll return this as a dictionary we can link the id and key again later.
         Dictionary<Guid, int> idKeys = new();
 
         foreach (Guid key in nodeKeys)
         {
-            Attempt<int> idAttempt = _entityService.GetId(key, objectType);
-            if (idAttempt.Success is false)
+            Attempt<int>? successfulAttempt = null;
+            foreach (UmbracoObjectTypes objectType in objectTypes)
+            {
+                Attempt<int> idAttempt = _entityService.GetId(key, objectType);
+                if (idAttempt.Success is false)
+                {
+                    continue;
+                }
+
+                successfulAttempt = idAttempt;
+                break;
+            }
+
+            if (successfulAttempt is null)
             {
                 return Attempt.Fail<Dictionary<Guid, int>?>(null);
             }
 
-            idKeys[key] = idAttempt.Result;
+            idKeys[key] = successfulAttempt.Value.Result;
         }
 
         return Attempt.Succeed<Dictionary<Guid, int>?>(idKeys);

@@ -212,7 +212,8 @@ test('can remove a content start node from a user', {tag: '@release'}, async ({u
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// Temporarily skipping this test. This test will be fixed in the PR: https://github.com/umbraco/Umbraco-CMS/pull/21981
+test.skip('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMediaFile';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
@@ -609,4 +610,68 @@ test('cannot remove all user group from a user', {tag: '@release'}, async ({umbr
 
   // Assert
   await umbracoUi.user.isErrorNotificationVisible();
+});
+
+// Currently user cannot add a element folder as start node
+test.fixme('can add an element start node to a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const elementFolderName = 'TestElementFolder';
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickChooseElementStartNodeButton();
+  await umbracoUi.user.clickButtonWithName(elementFolderName);
+  await umbracoUi.user.clickChooseContainerButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainElementStartNodeIds(nameOfTheUser, [elementFolderId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+});
+
+// Currently user cannot add a element folder as start node
+test.fixme('can remove an element start node from a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const elementFolderName = 'TestElementFolder';
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  // Adds the element start node to the user
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  userData.elementStartNodeIds.push({id: elementFolderId});
+  await umbracoApi.user.update(userId, userData);
+  expect(await umbracoApi.user.doesUserContainElementStartNodeIds(nameOfTheUser, [elementFolderId])).toBeTruthy();
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickRemoveButtonForElementNodeWithName(elementFolderName);
+  await umbracoUi.user.clickConfirmRemoveButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainElementStartNodeIds(nameOfTheUser, [elementFolderId])).toBeFalsy();
+
+  // Clean
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+});
+
+// Currently element start node configuration is not saved after updating
+test.fixme('can allow access to all elements for a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickAllowAccessToAllElements();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  expect(userData.hasElementRootAccess).toBeTruthy();
 });

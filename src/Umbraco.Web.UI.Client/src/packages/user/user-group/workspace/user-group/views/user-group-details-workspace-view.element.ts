@@ -1,12 +1,12 @@
 import type { UmbUserGroupDetailModel } from '../../../types.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
-import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/user-group-entity-type-permission-groups.element.js';
@@ -30,6 +30,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 	@state()
 	private _documentRootAccess: UmbUserGroupDetailModel['documentRootAccess'] = false;
+
+	@state()
+	private _elementStartNode?: UmbUserGroupDetailModel['elementStartNode'];
+
+	@state()
+	private _elementRootAccess: UmbUserGroupDetailModel['elementRootAccess'] = false;
 
 	@state()
 	private _mediaStartNode?: UmbUserGroupDetailModel['mediaStartNode'];
@@ -68,6 +74,18 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			this.#workspaceContext?.documentStartNode,
 			(value) => (this._documentStartNode = value),
 			'_observeDocumentStartNode',
+		);
+
+		this.observe(
+			this.#workspaceContext?.elementRootAccess,
+			(value) => (this._elementRootAccess = value ?? false),
+			'_observeElementRootAccess',
+		);
+
+		this.observe(
+			this.#workspaceContext?.elementStartNode,
+			(value) => (this._elementStartNode = value),
+			'_observeElementStartNode',
 		);
 
 		this.observe(
@@ -122,6 +140,23 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 		this.#workspaceContext?.updateProperty('documentStartNode', selected ? { unique: selected } : null);
 	}
 
+	#onAllowAllElementsChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('elementRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('elementStartNode', null);
+	}
+
+	#onElementStartNodeChange(event: CustomEvent & { target: { selection: Array<string> } }) {
+		event.stopPropagation();
+		// TODO: get back to this when elements have been decoupled from users.
+		const target = event.target;
+		const selected = target.selection?.[0];
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('elementStartNode', selected ? { unique: selected } : null);
+	}
+
 	#onAllowAllMediaChange(event: UUIBooleanInputEvent) {
 		event.stopPropagation();
 		const target = event.target;
@@ -159,6 +194,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 						</umb-property-layout>
 
 						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
+						${this.#renderElementAccess()}
 					</uui-box>
 
 					${this.#renderPermissionGroups()}
@@ -175,17 +211,18 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 				<div slot="editor">
 					<uui-toggle
 						style="margin-bottom: var(--uui-size-space-3);"
-						label="${this.localize.term('user_allowAccessToAllLanguages')}"
+						label=${this.localize.term('user_allowAccessToAllLanguages')}
 						.checked=${this._hasAccessToAllLanguages}
 						@change=${this.#onAllowAllLanguagesChange}></uui-toggle>
 
-					${this._hasAccessToAllLanguages === false
-						? html`
-								<umb-input-language
-									.selection=${this._languages}
-									@change=${this.#onLanguagePermissionChange}></umb-input-language>
-							`
-						: nothing}
+					${when(
+						this._hasAccessToAllLanguages === false,
+						() => html`
+							<umb-input-language
+								.selection=${this._languages}
+								@change=${this.#onLanguagePermissionChange}></umb-input-language>
+						`,
+					)}
 				</div>
 			</umb-property-layout>
 		`;
@@ -199,20 +236,49 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 				<div slot="editor">
 					<uui-toggle
 						style="margin-bottom: var(--uui-size-space-3);"
-						label="${this.localize.term('user_allowAccessToAllDocuments')}"
+						label=${this.localize.term('user_allowAccessToAllDocuments')}
 						.checked=${this._documentRootAccess}
 						@change=${this.#onAllowAllDocumentsChange}></uui-toggle>
 				</div>
+				${when(
+					this._documentRootAccess === false,
+					() => html`
+						<umb-input-document
+							slot="editor"
+							max="1"
+							.selection=${this._documentStartNode?.unique ? [this._documentStartNode.unique] : []}
+							@change=${this.#onDocumentStartNodeChange}>
+						</umb-input-document>
+					`,
+				)}
+			</umb-property-layout>
+		`;
+	}
 
-				${this._documentRootAccess === false
-					? html`
-							<umb-input-document
-								slot="editor"
-								max="1"
-								.selection=${this._documentStartNode?.unique ? [this._documentStartNode.unique] : []}
-								@change=${this.#onDocumentStartNodeChange}></umb-input-document>
-						`
-					: nothing}
+	#renderElementAccess() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('user_selectElementStartNode')}
+				description=${this.localize.term('user_selectElementStartNodeDescription')}>
+				<div slot="editor">
+					<uui-toggle
+						style="margin-bottom: var(--uui-size-space-3);"
+						label=${this.localize.term('user_allowAccessToAllElements')}
+						.checked=${this._elementRootAccess}
+						@change=${this.#onAllowAllElementsChange}></uui-toggle>
+				</div>
+				${when(
+					this._elementRootAccess === false,
+					() => html`
+						<umb-input-element
+							slot="editor"
+							max="1"
+							.selection=${this._elementStartNode?.unique ? [this._elementStartNode.unique] : []}
+							?folderOnly=${true}
+							@change=${this.#onElementStartNodeChange}>
+						</umb-input-element>
+					`,
+				)}
 			</umb-property-layout>
 		`;
 	}
@@ -225,26 +291,28 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 				<div slot="editor">
 					<uui-toggle
 						style="margin-bottom: var(--uui-size-space-3);"
-						label="${this.localize.term('user_allowAccessToAllMedia')}"
+						label=${this.localize.term('user_allowAccessToAllMedia')}
 						.checked=${this._mediaRootAccess}
 						@change=${this.#onAllowAllMediaChange}></uui-toggle>
 				</div>
-
-				${this._mediaRootAccess === false
-					? html`
-							<umb-input-media
-								slot="editor"
-								max="1"
-								.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
-								@change=${this.#onMediaStartNodeChange}></umb-input-media>
-						`
-					: nothing}
+				${when(
+					this._mediaRootAccess === false,
+					() => html`
+						<umb-input-media
+							slot="editor"
+							max="1"
+							folder-filter="foldersOnly"
+							.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
+							@change=${this.#onMediaStartNodeChange}>
+						</umb-input-media>
+					`,
+				)}
 			</umb-property-layout>
 		`;
 	}
 
 	#renderPermissionGroups() {
-		return html`<umb-user-group-entity-type-permission-groups></umb-user-group-entity-type-permission-groups> `;
+		return html`<umb-user-group-entity-type-permission-groups></umb-user-group-entity-type-permission-groups>`;
 	}
 
 	static override styles = [
