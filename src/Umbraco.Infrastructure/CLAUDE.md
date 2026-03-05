@@ -718,6 +718,256 @@ using (var outer = ScopeProvider.CreateCoreScope())
 
 ---
 
+## 12. EF Core DTO Migration Guide
+
+When migrating a NPoco repository to EF Core, the DTO layer must be created first. This section covers DTOs, configurations, DbContext registration, provider customizers, and migration generation. Repository implementation is out of scope (handled by developers case-by-case).
+
+### Quick Reference Table
+
+| Artifact | Location |
+|----------|----------|
+| EF Core DTO | `Persistence/Dtos/EFCore/{Name}Dto.cs` |
+| DTO Configuration | `Persistence/Dtos/EFCore/Configurations/{Name}DtoConfiguration.cs` |
+| DbContext DbSets | `Persistence/EFCore/UmbracoDbContext.cs` |
+| SQL Server Customizer | `Umbraco.Cms.Persistence.EFCore.SqlServer/DtoCustomization/` |
+| SQLite Customizer | `Umbraco.Cms.Persistence.EFCore.Sqlite/` (collation; see Step 4) |
+| EF Core Migrations | Both provider projects' `Migrations/` folders |
+
+### Step 1: Create the EF Core DTO
+
+Create in `Persistence/Dtos/EFCore/{Name}Dto.cs`.
+
+**Rules**:
+- Namespace: `Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore`
+- Must have `[EntityTypeConfiguration(typeof({Name}DtoConfiguration))]` attribute
+- Define `TableName` constant referencing `Constants.DatabaseSchema.Tables.*`
+- Define `PrimaryKeyColumnName` constant referencing `Constants.DatabaseSchema.Columns.*`
+- Define additional column name constants as needed (used in configurations and customizers)
+- Properties must map 1-1 with the NPoco DTO (same columns, same types)
+- No NPoco attributes (`[Column]`, `[TableName]`, etc.) — clean properties only
+- Add navigation properties for relationships (e.g., `List<ChildDto>`)
+- Preserve any property logic from the NPoco DTO (e.g., null coalescing on `NodeDto.UserId`)
+
+**Example** (`KeyValueDto.cs` — simple entity):
+```csharp
+using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
+
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+
+[EntityTypeConfiguration(typeof(KeyValueDtoConfiguration))]
+public class KeyValueDto
+{
+    public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
+
+    public required string Key { get; set; }
+    public string? Value { get; set; }
+    public DateTime UpdateDate { get; set; }
+}
+```
+
+**Example** (`WebhookDto.cs` — entity with navigation properties):
+```csharp
+[EntityTypeConfiguration(typeof(WebhookDtoConfiguration))]
+public sealed class WebhookDto
+{
+    public const string TableName = Constants.DatabaseSchema.Tables.Webhook;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    public int Id { get; set; }
+    public Guid Key { get; set; }
+    public string? Name { get; set; }
+    public string Url { get; set; } = string.Empty;
+    public bool Enabled { get; set; }
+
+    // Navigation properties for child/junction tables
+    public List<Webhook2EventsDto> Webhook2Events { get; set; } = new();
+    public List<Webhook2HeadersDto> Webhook2Headers { get; set; } = new();
+}
+```
+
+**Example** (`Webhook2EventsDto.cs` — junction/child table with back-reference):
+```csharp
+[EntityTypeConfiguration(typeof(Webhook2EventsDtoConfiguration))]
+public class Webhook2EventsDto
+{
+    public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Events;
+    internal const string WebhookIdColumnName = "webhookId";
+    internal const string EventColumnName = "event";
+
+    public int WebhookId { get; set; }
+    public string Event { get; set; } = string.Empty;
+    public WebhookDto? Webhook { get; set; } // back-reference for EF navigation
+}
+```
+
+### Step 2: Create the Configuration
+
+Create in `Persistence/Dtos/EFCore/Configurations/{Name}DtoConfiguration.cs`.
+
+**Rules**:
+- Namespace: `Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations`
+- One `IEntityTypeConfiguration<TDto>` per DTO
+- `builder.ToTable(Dto.TableName)` and `builder.HasKey(...)` always required
+- Every property mapped with `.HasColumnName()` matching the actual database column name
+- Use `.HasMaxLength()`, `.IsRequired()`, `.ValueGeneratedOnAdd()` / `.ValueGeneratedNever()` as appropriate
+- Index naming convention: `IX_{TableName}_{description}` via `.HasDatabaseName()`
+- Indexes defined **WITHOUT** `.IncludeProperties()` — that is SQL Server-specific, goes in a customizer
+- Composite keys: `builder.HasKey(x => new { x.Col1, x.Col2 }).HasName("PK_...")`
+- Foreign keys: `.HasOne().WithMany().HasForeignKey().OnDelete()`
+- Must replicate ALL indexes from the NPoco DTO attributes
+
+**Example** (`KeyValueDtoConfiguration.cs` — simple):
+```csharp
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
+
+public class KeyValueDtoConfiguration : IEntityTypeConfiguration<KeyValueDto>
+{
+    public void Configure(EntityTypeBuilder<KeyValueDto> builder)
+    {
+        builder.ToTable(KeyValueDto.TableName);
+        builder.HasKey(x => x.Key);
+
+        builder.Property(x => x.Key)
+            .HasColumnName(KeyValueDto.PrimaryKeyColumnName)
+            .HasMaxLength(256)
+            .ValueGeneratedNever();
+
+        builder.Property(x => x.Value)
+            .HasColumnName("value");
+
+        builder.Property(x => x.UpdateDate)
+            .HasColumnName("updated");
+    }
+}
+```
+
+**Example** (`NodeDtoConfiguration.cs` — with indexes and comment for SQL Server customizer):
+```csharp
+// IX_umbracoNode_UniqueId
+// Note: SQL Server included columns are added by SqlServerNodeDtoModelCustomizer.
+builder.HasIndex(x => x.UniqueId)
+    .IsUnique()
+    .HasDatabaseName($"IX_{NodeDto.TableName}_UniqueId");
+
+// Composite index
+builder.HasIndex(x => new { x.ParentId, x.NodeObjectType })
+    .HasDatabaseName($"IX_{NodeDto.TableName}_parentId_nodeObjectType");
+```
+
+**Example** (`WebhookDtoConfiguration.cs` — with foreign keys):
+```csharp
+builder
+    .HasMany(x => x.Webhook2Events)
+    .WithOne(x => x.Webhook)
+    .HasForeignKey(x => x.WebhookId)
+    .OnDelete(DeleteBehavior.Cascade);
+```
+
+### Step 3: Register in UmbracoDbContext
+
+File: `Persistence/EFCore/UmbracoDbContext.cs`
+
+**Rules**:
+- **Only add DbSets for primary entity DTOs** that repositories query directly
+- **Do NOT add DbSets for junction/reference tables** (e.g., `Webhook2EventsDto`, `Webhook2HeadersDto`) — these are discovered via navigation properties or accessed via `db.Set<T>()`
+- Pattern: `public required DbSet<FooDto> Foos { get; set; }`
+
+**Example**:
+```csharp
+// YES — primary entity queried directly by repository
+public required DbSet<WebhookDto> Webhooks { get; set; }
+public required DbSet<KeyValueDto> KeyValue { get; set; }
+
+// NO — junction table, discovered via WebhookDto.Webhook2Events navigation property
+// Do NOT add: DbSet<Webhook2EventsDto>
+```
+
+### Step 4: Create Provider Customizers (if needed)
+
+Only needed when the NPoco DTO has SQL Server-specific index features (included columns via `[IncludeColumns]`).
+
+**SQL Server**: Create `DtoCustomization/SqlServer{Name}DtoModelCustomizer.cs` in `Umbraco.Cms.Persistence.EFCore.SqlServer`.
+
+**Rules**:
+- Implement `IEFCoreModelCustomizer<TDto>` (defined in `Umbraco.Infrastructure/Persistence/EFCore/`)
+- Re-declare the same index from the shared Configuration but add `.IncludeProperties()`
+- Register in the provider's `UmbracoBuilderExtensions.cs` via `builder.AddEFCoreModelCustomizer<T>()`
+
+**Example** (`SqlServerDocumentVersionDtoModelCustomizer.cs`):
+```csharp
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+
+namespace Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
+
+public class SqlServerDocumentVersionDtoModelCustomizer : IEFCoreModelCustomizer<DocumentVersionDto>
+{
+    public void Customize(EntityTypeBuilder<DocumentVersionDto> builder)
+    {
+        builder
+            .HasIndex(x => new { x.Id, x.Published })
+            .HasDatabaseName($"IX_{DocumentVersionDto.TableName}_id_published")
+            .IncludeProperties(x => new { x.TemplateId });
+    }
+}
+```
+
+**Registration** (in `Umbraco.Cms.Persistence.EFCore.SqlServer/UmbracoBuilderExtensions.cs`):
+```csharp
+private static void AddCustomizers(IUmbracoBuilder builder) =>
+    builder.AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>()
+        .AddEFCoreModelCustomizer<SqlServerDocumentVersionDtoModelCustomizer>();
+```
+
+**SQLite collation**: SQLite requires a global `COLLATE NOCASE` customizer. NPoco's `SqliteSyntaxProvider` creates ALL string columns as `TEXT COLLATE NOCASE` (case-insensitive), matching SQL Server's default `CI_AS` collation. EF Core's SQLite provider creates plain `TEXT` columns (case-sensitive by default). Without a SQLite customizer that applies `NOCASE` collation to all string properties, string comparisons (lookups by alias, email, login, etc.) would silently break. See `Umbraco.Cms.Persistence.EFCore.Sqlite/CLAUDE.md` for details.
+
+### Step 5: Generate EF Core Migrations
+
+Migrations must be generated in **BOTH** provider projects. These migrations are **NO-OPs** (empty `Up`/`Down` methods) because NPoco creates the actual tables. They exist only to update the EF Core model snapshot.
+
+**Commands** (run from repository root):
+```bash
+# SQL Server
+dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -c UmbracoDbContext
+
+# SQLite
+dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -c UmbracoDbContext
+```
+
+**After generation**:
+1. Open the generated migration files in both provider projects
+2. **Delete all content** from the `Up()` and `Down()` methods (leave them empty)
+3. Keep the `UmbracoDbContextModelSnapshot.cs` changes — these track the model state
+4. Verify the snapshot includes all new tables, columns, indexes, and relationships
+
+**To remove the last migration** (if something went wrong):
+```bash
+dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer
+dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite
+```
+
+**Prerequisites**: `src/Umbraco.Web.UI/appsettings.json` must have a valid connection string with the matching provider.
+
+### Common Pitfalls
+
+1. **Forgetting `[EntityTypeConfiguration]`** — EF Core won't discover the configuration, causing missing table errors
+2. **Adding DbSets for junction tables** — causes duplicate tracking; only add for primary entities
+3. **Using `.IncludeProperties()` in shared Configuration** — SQLite doesn't support included columns; put these in SQL Server customizer only
+4. **Forgetting to clear `Up()`/`Down()`** — migration would try to create tables that NPoco already created
+5. **Mismatched column names** — `.HasColumnName()` must exactly match the actual database column name, not the C# property name
+6. **Missing indexes** — compare the NPoco DTO's `[Index]` attributes and replicate all of them in the Configuration
+7. **Generating migration for only one provider** — always generate for BOTH SQL Server and SQLite
+8. **Forgetting to register customizer** — if you create a SQL Server customizer, add it to `UmbracoBuilderExtensions.AddCustomizers()`
+9. **SQLite collation gap** — NPoco creates all SQLite string columns as `TEXT COLLATE NOCASE` (case-insensitive). EF Core's SQLite provider defaults to plain `TEXT` (case-sensitive). A global SQLite collation customizer is required to preserve case-insensitive behavior when EF Core manages table creation. See `Umbraco.Cms.Persistence.EFCore.Sqlite/CLAUDE.md`
+
+---
+
 ## Quick Reference
 
 ### Essential Commands

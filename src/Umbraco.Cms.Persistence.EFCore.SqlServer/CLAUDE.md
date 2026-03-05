@@ -129,6 +129,20 @@ Prefixed with `umbraco`: Applications, Authorizations, Scopes, Tokens (see SQLit
 3. **Critical**: Also add equivalent migration to `Umbraco.Cms.Persistence.EFCore.Sqlite`
 4. Update `SqlServerMigrationProvider.GetMigrationType()` switch if adding named migrations
 
+### Model Customizers (`DtoCustomization/`)
+
+SQL Server-specific EF Core model customizations (e.g., indexes with included columns via `.IncludeProperties()`) live in `DtoCustomization/`. These extend the shared configurations in `Umbraco.Infrastructure/Persistence/Dtos/EFCore/Configurations/`.
+
+**Pattern**: Implement `IEFCoreModelCustomizer<TDto>` and register via `builder.AddEFCoreModelCustomizer<T>()` in `UmbracoBuilderExtensions.AddCustomizers()`.
+
+**Current customizers**:
+- `SqlServerNodeDtoModelCustomizer` — adds `.IncludeProperties()` to `NodeDto` indexes
+- `SqlServerDocumentVersionDtoModelCustomizer` — adds `.IncludeProperties()` to `DocumentVersionDto` indexes
+
+**When to add a new customizer**: Only when the NPoco DTO has SQL Server-specific index features (included columns via `[IncludeColumns]`). If the DTO has no included columns, no customizer is needed.
+
+**Full migration guide**: See `/src/Umbraco.Infrastructure/CLAUDE.md` → "Section 12: EF Core DTO Migration Guide".
+
 ---
 
 ## 5. Project-Specific Notes

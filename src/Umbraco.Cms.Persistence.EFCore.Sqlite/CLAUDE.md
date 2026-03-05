@@ -135,6 +135,18 @@ All tables prefixed with `umbraco`:
 3. **Critical**: Also add equivalent migration to `Umbraco.Cms.Persistence.EFCore.SqlServer`
 4. Update `SqliteMigrationProvider.GetMigrationType()` switch if adding named migrations
 
+### Model Customizers
+
+SQLite does **NOT** need per-DTO customizers for index features like `.IncludeProperties()` — those are SQL Server-specific.
+
+However, SQLite **does** need a global collation customizer. NPoco's `SqliteSyntaxProvider` creates ALL string columns as `TEXT COLLATE NOCASE` (case-insensitive), matching SQL Server's typical `CI_AS` database-level collation. EF Core's SQLite provider creates plain `TEXT` columns, which default to `BINARY` (case-sensitive). Without a customizer, string comparisons (lookups by alias, email, login, ISO code, dictionary keys, etc.) would silently break when EF Core takes over table creation.
+
+**Recommended approach**: Implement a global `IEFCoreModelCustomizer` (non-generic) in this project that iterates all entity types and applies `.UseCollation("NOCASE")` to all string properties. Register it via `builder.AddEFCoreModelCustomizer<T>()` in `UmbracoBuilderExtensions`. This mirrors the SQL Server pattern where provider-specific customizers are registered only in the provider package.
+
+**Why not per-property in shared configurations?** Adding `.UseCollation("NOCASE")` to every string property in every `IEntityTypeConfiguration` would be verbose (80+ DTOs), error-prone, and would affect SQL Server unnecessarily. A single SQLite-specific customizer is cleaner.
+
+**Full migration guide**: See `/src/Umbraco.Infrastructure/CLAUDE.md` → "Section 12: EF Core DTO Migration Guide".
+
 ---
 
 ## 5. Project-Specific Notes
