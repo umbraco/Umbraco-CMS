@@ -273,10 +273,14 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		this.#selectVersion(id);
 	}
 
-	#onPreventCleanup(event: Event, id: string, preventCleanup: boolean) {
+	async #onPreventCleanup(event: Event, id: string, preventCleanup: boolean) {
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		this.#rollbackRepository?.setPreventCleanup(id, preventCleanup);
+		if (!this.#rollbackRepository) {
+			throw new Error('Rollback repository is not set');
+		}
+
+		await this.#rollbackRepository.setPreventCleanup(id, preventCleanup);
 
 		const version = this._versions.find((item) => item.id === id);
 		if (!version) return;
