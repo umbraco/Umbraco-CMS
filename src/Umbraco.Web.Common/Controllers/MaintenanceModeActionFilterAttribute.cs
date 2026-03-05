@@ -8,10 +8,18 @@ using Umbraco.Cms.Web.Common.ActionsResults;
 
 namespace Umbraco.Cms.Web.Common.Controllers;
 
+/// <summary>
+/// Represents an action filter attribute that enforces maintenance mode by displaying a maintenance page during
+/// application upgrades.
+/// </summary>
 internal sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 {
 
-    public MaintenanceModeActionFilterAttribute() : base(typeof(MaintenanceModeActionFilter)) => Order = int.MinValue; // Ensures this run as the first filter.
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MaintenanceModeActionFilterAttribute"/> class.
+    /// </summary>
+    public MaintenanceModeActionFilterAttribute()
+        : base(typeof(MaintenanceModeActionFilter)) => Order = int.MinValue; // Ensures this run as the first filter.
 
     private sealed class MaintenanceModeActionFilter : IActionFilter
     {
@@ -26,16 +34,20 @@ internal sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (_runtimeState.Level == RuntimeLevel.Upgrade && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState)
+            if (_runtimeState.Level == RuntimeLevel.Upgrade
+                && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState)
             {
                 context.Result = new MaintenanceResult();
             }
-
+            else if (_runtimeState.Level == RuntimeLevel.Upgrading
+                     && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState)
+            {
+                context.Result = new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath);
+            }
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-
         }
     }
 }

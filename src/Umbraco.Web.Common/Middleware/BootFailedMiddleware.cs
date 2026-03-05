@@ -55,6 +55,21 @@ public class BootFailedMiddleware : IMiddleware
                 }
             }
         }
+        else if (_runtimeState.Level == RuntimeLevel.UpgradeFailed)
+        {
+            // Unattended upgrade failed: serve a 503 error page so container probes fail and
+            // the operator is alerted to check the logs.
+            context.Response.Clear();
+            context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            context.Response.ContentType = MediaTypeNames.Text.Html;
+
+            IFileInfo? fileInfo = GetUpgradeErrorFileInfo();
+            if (fileInfo is not null)
+            {
+                using var sr = new StreamReader(fileInfo.CreateReadStream(), Encoding.UTF8);
+                await context.Response.WriteAsync(await sr.ReadToEndAsync(), Encoding.UTF8);
+            }
+        }
         else
         {
             await next(context);
@@ -70,6 +85,23 @@ public class BootFailedMiddleware : IMiddleware
         }
 
         fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo("umbraco/views/errors/BootFailed.html");
+        if (fileInfo.Exists)
+        {
+            return fileInfo;
+        }
+
+        return null;
+    }
+
+    private IFileInfo? GetUpgradeErrorFileInfo()
+    {
+        IFileInfo? fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo("config/errors/UpgradeFailed.html");
+        if (fileInfo.Exists)
+        {
+            return fileInfo;
+        }
+
+        fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo("umbraco/views/errors/UpgradeFailed.html");
         if (fileInfo.Exists)
         {
             return fileInfo;

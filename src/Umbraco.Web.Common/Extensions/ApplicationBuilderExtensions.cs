@@ -1,5 +1,6 @@
 using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
@@ -101,6 +102,15 @@ public static class ApplicationBuilderExtensions
         }
         else
         {
+            // BootFailedMiddleware also handles the UpgradeFailed state, which can occur at
+            // runtime after the UnattendedUpgradeBackgroundService finishes with an error.
+            app.UseMiddleware<BootFailedMiddleware>();
+
+            // Health probes are registered before other middleware so they are reachable
+            // during Upgrading state. They run after BootFailedMiddleware so they return
+            // 503 when the state transitions to UpgradeFailed.
+            app.UseUmbracoHealthChecks();
+
             app.UseMiddleware<PreviewAuthenticationMiddleware>();
             app.UseMiddleware<UmbracoRequestMiddleware>();
             app.UseMiddleware<MiniProfilerMiddleware>();
@@ -155,6 +165,37 @@ public static class ApplicationBuilderExtensions
                     new PrependBasePathFileProvider(Constants.SystemDirectories.AppPlugins, pluginFileProvider));
             }
         }
+
+        return app;
+    }
+
+    /// <summary>
+    ///     Registers Umbraco health probe endpoints.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <c>GET /umbraco/api/health/live</c> — always 200 while the process is alive.
+    ///     </para>
+    ///     <para>
+    ///         <c>GET /umbraco/api/health/ready</c> — 200 only when <see cref="RuntimeLevel.Run"/>,
+    ///         503 Degraded during <see cref="RuntimeLevel.Upgrading"/> and other non-Run states.
+    ///     </para>
+    /// </remarks>
+    public static IApplicationBuilder UseUmbracoHealthChecks(this IApplicationBuilder app)
+    {
+        // Liveness — always 200 if the process responds (no custom checks).
+        app.UseHealthChecks("/umbraco/api/health/live", new HealthCheckOptions
+        {
+            Predicate = _ => false,
+            AllowCachingResponses = false,
+        });
+
+        // Readiness — 200 only when RuntimeLevel.Run.
+        app.UseHealthChecks("/umbraco/api/health/ready", new HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("ready"),
+            AllowCachingResponses = false,
+        });
 
         return app;
     }

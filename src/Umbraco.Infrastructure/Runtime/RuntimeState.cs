@@ -207,11 +207,17 @@ public class RuntimeState : IRuntimeState
 
                 // although the files version matches the code version, the database version does not
                 // which means the local files have been upgraded but not the database - need to upgrade
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    if (_logger.IsEnabled(LogLevel.Debug))
                     {
                         _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
                     }
-                    Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
+
+                    // When unattended upgrade is enabled, set Upgrading so that CoreRuntime returns early and
+                    // UnattendedUpgradeBackgroundService runs the migrations after the HTTP server has
+                    // started (allowing health probes to respond).
+                    // When unattended upgrade is disabled, set Upgrade so that the operator can trigger the migration
+                    // manually via the back office.
+                    Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Upgrading : RuntimeLevel.Upgrade;
                     Reason = RuntimeLevelReason.UpgradeMigrations;
                 }
                 break;
@@ -223,14 +229,22 @@ public class RuntimeState : IRuntimeState
 
                 if (_unattendedSettings.Value.PackageMigrationsUnattended)
                 {
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    if (_logger.IsEnabled(LogLevel.Debug))
                     {
                         _logger.LogDebug("Package migrations need to execute.");
                     }
+
+                    // Upgrading signals CoreRuntime to return early so the HTTP server starts immediately;
+                    // UnattendedUpgradeBackgroundService then runs the package migrations in the background
+                    // while health probes remain reachable.
+                    Level = RuntimeLevel.Upgrading;
                     Reason = RuntimeLevelReason.UpgradePackageMigrations;
                 }
                 else
                 {
+                    // Package migrations are pending but unattended execution is disabled.
+                    // Keep Level = Run so the site stays operational; the operator must trigger the package
+                    // migrations manually from the back office.
                     _logger.LogInformation("Package migrations need to execute but unattended package migrations is disabled. They will need to be run from the back office.");
                     Reason = RuntimeLevelReason.Run;
                 }
@@ -239,8 +253,6 @@ public class RuntimeState : IRuntimeState
             case UmbracoDatabaseState.Ok:
             default:
                 {
-
-
                     // the database version matches the code & files version, all clear, can run
                     Level = RuntimeLevel.Run;
                     Reason = RuntimeLevelReason.Run;

@@ -98,6 +98,11 @@ public class GlobalSettings
     private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
 
     /// <summary>
+    ///     The default value for the <see cref="UpgradingViewPath" /> setting.
+    /// </summary>
+    internal const string StaticUpgradingViewPath = "~/umbraco/UmbracoWebsite/Upgrading.cshtml";
+
+    /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
     /// </summary>
     [DefaultValue(StaticReservedUrls)]
@@ -303,4 +308,10 @@ public class GlobalSettings
     /// </summary>
     [DefaultValue(StaticShowMaintenancePageWhenInUpgradeState)]
     public bool ShowMaintenancePageWhenInUpgradeState { get; set; } = StaticShowMaintenancePageWhenInUpgradeState;
+
+    /// <summary>
+    ///     Gets or sets the view path shown during an unattended background upgrade (<see cref="RuntimeLevel.Upgrading"/>).
+    /// </summary>
+    [DefaultValue(StaticUpgradingViewPath)]
+    public string UpgradingViewPath { get; set; } = StaticUpgradingViewPath;
 }
