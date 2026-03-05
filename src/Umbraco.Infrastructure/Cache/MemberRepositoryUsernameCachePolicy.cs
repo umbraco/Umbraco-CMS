@@ -1,4 +1,4 @@
-﻿using System.Runtime.Versioning;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -21,20 +21,6 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
             options,
             repositoryCacheVersionService,
             cacheSyncService)
-    {
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberRepositoryUsernameCachePolicy(
-        IAppPolicyCache cache,
-        IScopeAccessor scopeAccessor,
-        RepositoryCachePolicyOptions options)
-        : this(
-            cache,
-            scopeAccessor,
-            options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 

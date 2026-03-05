@@ -33,19 +33,6 @@ public abstract class CopyingNotification<T> : CancelableObjectNotification<T>
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="CopyingNotification{T}"/> class.
-    /// </summary>
-    /// <param name="original">The original entity being copied.</param>
-    /// <param name="copy">The copy of the entity.</param>
-    /// <param name="parentId">The ID of the new parent.</param>
-    /// <param name="messages">The event messages collection.</param>
-    [Obsolete("Please use constructor that takes a parent key. Scheduled for removal in Umbraco 18.")]
-    protected CopyingNotification(T original, T copy, int parentId, EventMessages messages)
-        : this(original, copy, parentId, null, messages)
-    {
-    }
-
-    /// <summary>
     ///     Gets the original entity being copied.
     /// </summary>
     public T Original => Target;

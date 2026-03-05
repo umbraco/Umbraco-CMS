@@ -13,10 +13,4 @@ public class MediaCollectionPresentationFactory : ContentCollectionPresentationF
         : base(mapper, flagProviders, userService)
     {
     }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public MediaCollectionPresentationFactory(IUmbracoMapper mapper)
-        : base(mapper)
-    {
-    }
 }

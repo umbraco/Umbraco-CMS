@@ -31,25 +31,6 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
         _userService = userService;
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected ContentCollectionPresentationFactory(
-        IUmbracoMapper mapper,
-        FlagProviderCollection flagProviderCollection)
-        : this(
-            mapper,
-            flagProviderCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
-    {
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
-        : this(
-            mapper,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
-
     public async Task<List<TCollectionResponseModel>> CreateCollectionModelAsync(ListViewPagedModel<TContent> contentCollection)
     {
         PagedModel<TContent> collectionItemsResult = contentCollection.Items;

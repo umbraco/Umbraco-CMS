@@ -18,15 +18,6 @@ public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueResp
     {
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public MemberMapDefinition(
-        PropertyEditorCollection propertyEditorCollection)
-        : this(
-            propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMember, MemberResponseModel>((_, _) => new MemberResponseModel(), Map);
 

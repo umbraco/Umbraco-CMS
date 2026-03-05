@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -16,18 +16,6 @@ internal sealed class ServerEventRouter : IServerEventRouter
     private readonly IUserConnectionManager _connectionManager;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<ServerEventRouter> _logger;
-
-    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 18.")]
-    public ServerEventRouter(
-        IHubContext<ServerEventHub, IServerEventHub> eventHub,
-        IUserConnectionManager connectionManager)
-        : this(
-            eventHub,
-            connectionManager,
-            StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<ServerEventRouter>>())
-    {
-    }
 
     public ServerEventRouter(
         IHubContext<ServerEventHub, IServerEventHub> eventHub,

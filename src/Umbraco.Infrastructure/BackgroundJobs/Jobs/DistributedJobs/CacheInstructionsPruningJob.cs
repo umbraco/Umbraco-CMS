@@ -42,21 +42,6 @@ internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
         _lastSyncedManager = lastSyncedManager;
     }
 
-    [Obsolete("Use the constructor with ILastSyncedManager parameter instead. Scheduled for removal in Umbraco 18.")]
-    public CacheInstructionsPruningJob(
-        IOptions<GlobalSettings> globalSettings,
-        ICacheInstructionRepository cacheInstructionRepository,
-        ICoreScopeProvider scopeProvider,
-        TimeProvider timeProvider)
-        : this(
-            globalSettings,
-            cacheInstructionRepository,
-            scopeProvider,
-            timeProvider,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
-    {
-    }
-
     public string Name => "CacheInstructionsPruningJob";
 
     /// <inheritdoc />

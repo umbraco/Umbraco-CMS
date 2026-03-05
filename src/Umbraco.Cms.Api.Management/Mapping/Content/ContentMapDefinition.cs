@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.DependencyInjection;

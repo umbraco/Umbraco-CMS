@@ -38,17 +38,6 @@ internal sealed class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : Defau
     {
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public SingleItemsOnlyRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
-        : this(
-            cache,
-            scopeAccessor,
-            options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
-
     protected override void InsertEntities(TId[]? ids, TEntity[]? entities)
     {
         // nop

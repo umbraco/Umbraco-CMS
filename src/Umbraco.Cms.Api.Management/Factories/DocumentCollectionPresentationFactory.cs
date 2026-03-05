@@ -22,22 +22,6 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         _entityService = entityService;
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService)
-        : base(mapper, flagProviders)
-    {
-        _publicAccessService = publicAccessService;
-        _entityService = entityService;
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
-        : base(mapper)
-    {
-        _publicAccessService = publicAccessService;
-        _entityService = entityService;
-    }
-
     /// <inheritdoc/>
     protected override Task SetUnmappedProperties(ListViewPagedModel<IContent> contentCollection, List<DocumentCollectionResponseModel> collectionResponseModels)
     {

@@ -20,21 +20,6 @@ public class BlockItemData
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockItemData" /> class.
     /// </summary>
-    /// <param name="udi">The UDI.</param>
-    /// <param name="contentTypeKey">The content type key.</param>
-    /// <param name="contentTypeAlias">The content type alias.</param>
-    [Obsolete("Use constructor that accepts GUID key instead. Scheduled for removal in Umbraco 18.")]
-    public BlockItemData(Udi udi, Guid contentTypeKey, string contentTypeAlias)
-        : this(
-            (udi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(udi)),
-            contentTypeKey,
-            contentTypeAlias)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BlockItemData" /> class.
-    /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="contentTypeKey">The content type key.</param>
     /// <param name="contentTypeAlias">The content type alias.</param>

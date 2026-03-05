@@ -26,24 +26,6 @@ public class ContentFinderByUrlNew : IContentFinder
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public ContentFinderByUrlNew(
-        ILogger<ContentFinderByUrlNew> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IDocumentUrlService documentUrlService,
-        IPublishedContentCache publishedContentCache)
-        : this(
-              logger,
-              umbracoContextAccessor,
-              documentUrlService,
-              publishedContentCache,
-              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<WebRoutingSettings>>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
-    /// </summary>
     public ContentFinderByUrlNew(
         ILogger<ContentFinderByUrlNew> logger,
         IUmbracoContextAccessor umbracoContextAccessor,

@@ -117,18 +117,6 @@ public class RichTextBlockItem<T> : RichTextBlockItem
     /// <summary>
     ///     Initializes a new instance of the <see cref="RichTextBlockItem{T}" /> class.
     /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings UDI.</param>
-    /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public RichTextBlockItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
-        : base(contentUdi, content, settingsUdi, settings) =>
-        Content = content;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RichTextBlockItem{T}" /> class.
-    /// </summary>
     /// <param name="contentKey">The content key.</param>
     /// <param name="content">The content.</param>
     /// <param name="settingsKey">The settings key.</param>
@@ -156,18 +144,6 @@ public class RichTextBlockItem<TContent, TSettings> : RichTextBlockItem<TContent
     where TContent : IPublishedElement
     where TSettings : IPublishedElement
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RichTextBlockItem{TContent, TSettings}" /> class.
-    /// </summary>
-    /// <param name="contentUdi">The content udi.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings udi.</param>
-    /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public RichTextBlockItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
-        : base(contentUdi, content, settingsUdi, settings) =>
-        Settings = settings;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="RichTextBlockItem{TContent, TSettings}" /> class.
     /// </summary>

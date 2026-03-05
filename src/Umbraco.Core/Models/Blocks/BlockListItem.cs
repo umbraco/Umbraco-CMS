@@ -16,28 +16,6 @@ public class BlockListItem : IBlockReference<IPublishedElement, IPublishedElemen
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockListItem" /> class.
     /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings UDI.</param>
-    /// <param name="settings">The settings.</param>
-    /// <exception cref="System.ArgumentNullException">
-    ///     contentUdi
-    ///     or
-    ///     content
-    /// </exception>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public BlockListItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
-        : this(
-            (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
-            content,
-            (settingsUdi as GuidUdi)?.Guid,
-            settings)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BlockListItem" /> class.
-    /// </summary>
     /// <param name="contentKey">The content key.</param>
     /// <param name="content">The content.</param>
     /// <param name="settingsKey">The settings key.</param>
@@ -111,18 +89,6 @@ public class BlockListItem<T> : BlockListItem
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockListItem{T}" /> class.
     /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings UDI.</param>
-    /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public BlockListItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
-        : base(contentUdi, content, settingsUdi, settings) =>
-        Content = content;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BlockListItem{T}" /> class.
-    /// </summary>
     /// <param name="contentKey">The content key.</param>
     /// <param name="content">The content.</param>
     /// <param name="settingsKey">The settings key.</param>
@@ -150,18 +116,6 @@ public class BlockListItem<TContent, TSettings> : BlockListItem<TContent>
     where TContent : IPublishedElement
     where TSettings : IPublishedElement
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BlockListItem{TContent, TSettings}" /> class.
-    /// </summary>
-    /// <param name="contentUdi">The content udi.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings udi.</param>
-    /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public BlockListItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
-        : base(contentUdi, content, settingsUdi, settings) =>
-        Settings = settings;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockListItem{TContent, TSettings}" /> class.
     /// </summary>
