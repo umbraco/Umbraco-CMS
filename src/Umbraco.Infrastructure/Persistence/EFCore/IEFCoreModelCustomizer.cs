@@ -9,11 +9,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 public interface IEFCoreModelCustomizer
 {
     /// <summary>
-    /// Gets the entity type this customizer applies to.
-    /// </summary>
-    Type EntityType { get; }
-
-    /// <summary>
     /// Applies provider-specific model configuration.
     /// </summary>
     void Apply(ModelBuilder modelBuilder);
@@ -36,10 +31,7 @@ public interface IEFCoreModelCustomizer<TEntity> : IEFCoreModelCustomizer
     /// </summary>
     void Customize(EntityTypeBuilder<TEntity> builder);
 
-    // Default implementations — providers do not override these
-    /// <inheritdoc/>
-    Type IEFCoreModelCustomizer.EntityType => typeof(TEntity);
-
+    // Default implementation — providers do not override this
     /// <inheritdoc/>
     void IEFCoreModelCustomizer.Apply(ModelBuilder modelBuilder)
     {
