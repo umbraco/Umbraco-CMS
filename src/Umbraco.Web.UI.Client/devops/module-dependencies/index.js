@@ -4,7 +4,7 @@ import { createImportMap } from '../importmap/index.js';
 
 const ILLEGAL_CORE_IMPORTS_THRESHOLD = 5;
 const SELF_IMPORTS_THRESHOLD = 0;
-const BIDIRECTIONAL_IMPORTS_THRESHOLD = 16;
+const BIDIRECTIONAL_IMPORTS_THRESHOLD = 15;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
