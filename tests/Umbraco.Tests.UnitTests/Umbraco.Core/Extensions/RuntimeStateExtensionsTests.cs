@@ -27,7 +27,6 @@ public class RuntimeStateExtensionsTests
     [TestCase(RuntimeLevel.Upgrading, RuntimeLevelReason.Run)]
     [TestCase(RuntimeLevel.Upgrade, RuntimeLevelReason.UpgradeMigrations)]
     [TestCase(RuntimeLevel.BootFailed, RuntimeLevelReason.UpgradeMigrations)]
-    [TestCase(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.UpgradeMigrations)]
     public void RunUnattendedBootLogic_WhenLevelOrReasonDoNotIndicateUnattendedUpgrade_ReturnsFalse(
         RuntimeLevel level, RuntimeLevelReason reason)
     {
@@ -36,7 +35,6 @@ public class RuntimeStateExtensionsTests
     }
 
     [TestCase(RuntimeLevel.Upgrading)]
-    [TestCase(RuntimeLevel.UpgradeFailed)]
     [TestCase(RuntimeLevel.Run)]
     public void UmbracoCanBoot_WhenLevelIsAboveBootFailed_ReturnsTrue(RuntimeLevel level)
     {
@@ -61,7 +59,6 @@ public class RuntimeStateExtensionsTests
     }
 
     [TestCase(RuntimeLevel.Upgrading)]
-    [TestCase(RuntimeLevel.UpgradeFailed)]
     [TestCase(RuntimeLevel.Run)]
     [TestCase(RuntimeLevel.Boot)]
     public void EnableInstaller_WhenLevelIsNeitherInstallNorUpgrade_ReturnsFalse(RuntimeLevel level)

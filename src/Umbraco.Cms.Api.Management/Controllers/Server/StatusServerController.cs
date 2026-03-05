@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Server;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
 [ApiVersion("1.0")]
+[SkipMaintenanceModeFilter]
 public class StatusServerController : ServerControllerBase
 {
     private readonly IRuntimeState _runtimeState;

@@ -66,12 +66,12 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unattended upgrade failed.");
-            _runtimeState.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, ex);
+            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
             return;
         }
 
-        // RunMigrationsAsync may have set UpgradeFailed via a non-throwing error path (HasErrors result).
-        if (_runtimeState.Level == RuntimeLevel.UpgradeFailed)
+        // RunMigrationsAsync may have set BootFailed via a non-throwing error path (HasErrors result).
+        if (_runtimeState.Level == RuntimeLevel.BootFailed)
         {
             return;
         }
@@ -92,7 +92,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unattended upgrade post-migration initialization failed.");
-            _runtimeState.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, ex);
+            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
         }
     }
 
@@ -111,7 +111,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
                         $"Premigration upgrade result was {RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered.");
                 }
 
-                _runtimeState.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException);
+                _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException);
                 _logger.LogError(_runtimeState.BootFailedException, "Premigration upgrade failed.");
                 return;
 
@@ -123,7 +123,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
                 break;
         }
 
-        if (_runtimeState.Level == RuntimeLevel.UpgradeFailed)
+        if (_runtimeState.Level == RuntimeLevel.BootFailed)
         {
             return;
         }
@@ -144,7 +144,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
                         $"Unattended upgrade result was {RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered.");
                 }
 
-                _runtimeState.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException);
+                _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException);
                 _logger.LogError(_runtimeState.BootFailedException, "Unattended upgrade failed.");
                 return;
 
@@ -161,7 +161,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     private void DetermineRuntimeLevel()
     {
         // If a boot failure was already registered (e.g. by a premigration handler), there is
-        // nothing more to determine — preserve the existing UpgradeFailed state and return early,
+        // nothing more to determine — preserve the existing BootFailed state and return early,
         // matching the equivalent guard in CoreRuntime.DetermineRuntimeLevel().
         if (_runtimeState.BootFailedException is not null)
         {
@@ -174,7 +174,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         }
         catch (Exception ex)
         {
-            _runtimeState.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, ex);
+            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
             _logger.LogError(ex, "Failed to determine runtime level during unattended upgrade.");
         }
     }

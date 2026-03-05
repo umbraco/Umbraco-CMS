@@ -22,7 +22,6 @@ public class UmbracoReadinessHealthCheckTests
     }
 
     [TestCase(RuntimeLevel.Upgrading)]
-    [TestCase(RuntimeLevel.UpgradeFailed)]
     [TestCase(RuntimeLevel.Boot)]
     [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Upgrade)]

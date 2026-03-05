@@ -24,7 +24,7 @@ public class UnattendedUpgradeBackgroundServiceTests
     [TestCase(RuntimeLevel.Upgrade)]
     [TestCase(RuntimeLevel.Run)]
     [TestCase(RuntimeLevel.BootFailed)]
-    [TestCase(RuntimeLevel.UpgradeFailed)]
+    [TestCase(RuntimeLevel.BootFailed)]
     public async Task ExecuteAsync_WhenLevelIsNotUpgrading_DoesNothing(RuntimeLevel level)
     {
         var runtimeState = CreateMockRuntimeState(level);
@@ -63,8 +63,8 @@ public class UnattendedUpgradeBackgroundServiceTests
         // DetermineRuntimeLevel must NOT be called when results are NotRequired.
         runtimeState.Verify(x => x.DetermineRuntimeLevel(), Times.Never);
 
-        // UpgradeFailed must NOT be set.
-        runtimeState.Verify(x => x.Configure(RuntimeLevel.UpgradeFailed, It.IsAny<RuntimeLevelReason>(), It.IsAny<Exception?>()), Times.Never);
+        // BootFailed must NOT be set.
+        runtimeState.Verify(x => x.Configure(RuntimeLevel.BootFailed, It.IsAny<RuntimeLevelReason>(), It.IsAny<Exception?>()), Times.Never);
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class UnattendedUpgradeBackgroundServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_WhenPremigrationsHasErrorsAndBootFailedExceptionExists_SetsUpgradeFailed()
+    public async Task ExecuteAsync_WhenPremigrationsHasErrorsAndBootFailedExceptionExists_SetsBootFailed()
     {
         var bootEx = new BootFailedException("db error");
         var runtimeState = CreateMockRuntimeState(initialBootFailedException: bootEx);
@@ -97,7 +97,7 @@ public class UnattendedUpgradeBackgroundServiceTests
         await sut.StartAsync(CancellationToken.None);
         await sut.ExecuteTask!;
 
-        runtimeState.Verify(x => x.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, null), Times.Once);
+        runtimeState.Verify(x => x.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, null), Times.Once);
 
         // Execution stops after premigrations: post-premigrations and main upgrade must NOT fire.
         eventAggregator.Verify(x => x.PublishAsync(It.IsAny<PostRuntimePremigrationsUpgradeNotification>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -105,7 +105,7 @@ public class UnattendedUpgradeBackgroundServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_WhenPremigrationsHasErrorsAndBootFailedExceptionIsNull_SetsUpgradeFailed()
+    public async Task ExecuteAsync_WhenPremigrationsHasErrorsAndBootFailedExceptionIsNull_SetsBootFailed()
     {
         var runtimeState = CreateMockRuntimeState(); // BootFailedException starts null
         var eventAggregator = new Mock<IEventAggregator>();
@@ -120,12 +120,12 @@ public class UnattendedUpgradeBackgroundServiceTests
         // The InvalidOperationException thrown inside RunMigrationsAsync is caught by ExecuteAsync,
         // which then calls Configure with the caught exception.
         runtimeState.Verify(
-            x => x.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
+            x => x.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
             Times.Once);
     }
 
     [Test]
-    public async Task ExecuteAsync_WhenUnattendedUpgradeHasErrorsAndBootFailedExceptionExists_SetsUpgradeFailed()
+    public async Task ExecuteAsync_WhenUnattendedUpgradeHasErrorsAndBootFailedExceptionExists_SetsBootFailed()
     {
         var bootEx = new BootFailedException("migration error");
         var runtimeState = CreateMockRuntimeState(initialBootFailedException: bootEx);
@@ -138,7 +138,7 @@ public class UnattendedUpgradeBackgroundServiceTests
         await sut.StartAsync(CancellationToken.None);
         await sut.ExecuteTask!;
 
-        runtimeState.Verify(x => x.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, null), Times.Once);
+        runtimeState.Verify(x => x.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, null), Times.Once);
 
         // Components must NOT be initialized.
         eventAggregator.Verify(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -163,7 +163,7 @@ public class UnattendedUpgradeBackgroundServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_WhenPublishAsyncThrows_SetsUpgradeFailed()
+    public async Task ExecuteAsync_WhenPublishAsyncThrows_SetsBootFailed()
     {
         var runtimeState = CreateMockRuntimeState();
         var eventAggregator = new Mock<IEventAggregator>();
@@ -178,7 +178,7 @@ public class UnattendedUpgradeBackgroundServiceTests
         await sut.ExecuteTask!;
 
         runtimeState.Verify(
-            x => x.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
+            x => x.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
             Times.Once);
     }
 
@@ -206,7 +206,7 @@ public class UnattendedUpgradeBackgroundServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_WhenDetermineRuntimeLevelThrows_SetsUpgradeFailed()
+    public async Task ExecuteAsync_WhenDetermineRuntimeLevelThrows_SetsBootFailed()
     {
         var runtimeState = CreateMockRuntimeState();
         runtimeState
@@ -224,7 +224,7 @@ public class UnattendedUpgradeBackgroundServiceTests
         await sut.ExecuteTask!;
 
         runtimeState.Verify(
-            x => x.Configure(RuntimeLevel.UpgradeFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
+            x => x.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
             Times.Once);
     }
 

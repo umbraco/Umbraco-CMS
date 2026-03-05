@@ -17,56 +17,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Middleware;
 [TestFixture]
 public class BootFailedMiddlewareTests
 {
-    private const string UpgradeFailedHtml = "<html><body>UpgradeFailed</body></html>";
     private const string BootFailedHtml = "<html><body>BootFailed</body></html>";
-
-    [Test]
-    public async Task InvokeAsync_WhenUpgradeFailed_Returns503()
-    {
-        var context = CreateHttpContext();
-        var middleware = CreateMiddleware(RuntimeLevel.UpgradeFailed);
-
-        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
-
-        Assert.That(context.Response.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
-    }
-
-    [Test]
-    public async Task InvokeAsync_WhenUpgradeFailed_WritesUpgradeFailedContent()
-    {
-        var context = CreateHttpContext();
-        var middleware = CreateMiddleware(RuntimeLevel.UpgradeFailed, upgradeFailedContent: UpgradeFailedHtml);
-
-        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
-
-        context.Response.Body.Seek(0, SeekOrigin.Begin);
-        var body = await new StreamReader(context.Response.Body, Encoding.UTF8).ReadToEndAsync();
-        Assert.That(body, Is.EqualTo(UpgradeFailedHtml));
-    }
-
-    [Test]
-    public async Task InvokeAsync_WhenUpgradeFailed_DoesNotCallNext()
-    {
-        var context = CreateHttpContext();
-        var nextCalled = false;
-        var middleware = CreateMiddleware(RuntimeLevel.UpgradeFailed);
-
-        await middleware.InvokeAsync(context, _ => { nextCalled = true; return Task.CompletedTask; });
-
-        Assert.That(nextCalled, Is.False);
-    }
-
-    [Test]
-    public async Task InvokeAsync_WhenUpgradeFailed_AndNoFileExists_Still503()
-    {
-        // When UpgradeFailed.html is absent, still respond 503 (no content body).
-        var context = CreateHttpContext();
-        var middleware = CreateMiddleware(RuntimeLevel.UpgradeFailed, upgradeFailedContent: null);
-
-        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
-
-        Assert.That(context.Response.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
-    }
 
     [Test]
     public async Task InvokeAsync_WhenBootFailed_NonDebug_Returns500()
@@ -92,7 +43,7 @@ public class BootFailedMiddlewareTests
     [TestCase(RuntimeLevel.Run)]
     [TestCase(RuntimeLevel.Upgrading)]
     [TestCase(RuntimeLevel.Upgrade)]
-    public async Task InvokeAsync_WhenLevelIsNeitherBootFailedNorUpgradeFailed_CallsNext(RuntimeLevel level)
+    public async Task InvokeAsync_WhenLevelIsNotBootFailed_CallsNext(RuntimeLevel level)
     {
         var context = CreateHttpContext();
         var nextCalled = false;
@@ -112,7 +63,6 @@ public class BootFailedMiddlewareTests
 
     private static BootFailedMiddleware CreateMiddleware(
         RuntimeLevel level,
-        string? upgradeFailedContent = null,
         string? bootFailedContent = null,
         bool isDebug = false,
         BootFailedException? bootFailedException = null)
@@ -130,7 +80,6 @@ public class BootFailedMiddlewareTests
             .Setup(x => x.GetFileInfo(It.Is<string>(p => p.StartsWith("config/"))))
             .Returns(Mock.Of<IFileInfo>(f => f.Exists == false));
 
-        SetupFile(fileProvider, "umbraco/views/errors/UpgradeFailed.html", upgradeFailedContent);
         SetupFile(fileProvider, "umbraco/views/errors/BootFailed.html", bootFailedContent);
 
         var webHostEnv = Mock.Of<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>(

@@ -9,9 +9,12 @@ using Umbraco.Cms.Api.Management.ViewModels.Server;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Web.Common.Controllers;
+
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
 [ApiVersion("1.0")]
+[SkipMaintenanceModeFilter]
 public class ConfigurationServerController : ServerControllerBase
 {
     private readonly SecuritySettings _securitySettings;

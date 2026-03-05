@@ -102,13 +102,13 @@ public static class ApplicationBuilderExtensions
         }
         else
         {
-            // BootFailedMiddleware also handles the UpgradeFailed state, which can occur at
-            // runtime after the UnattendedUpgradeBackgroundService finishes with an error.
+            // BootFailedMiddleware handles both startup failures and unattended upgrade failures
+            // (RuntimeLevel.BootFailed). All requests are short-circuited with an error page.
             app.UseMiddleware<BootFailedMiddleware>();
 
             // Health probes are registered before other middleware so they are reachable
-            // during Upgrading state. They run after BootFailedMiddleware so they return
-            // 503 when the state transitions to UpgradeFailed.
+            // during Upgrading state. They are intercepted by BootFailedMiddleware when
+            // the runtime transitions to BootFailed after an upgrade failure.
             app.UseUmbracoHealthChecks();
 
             app.UseMiddleware<PreviewAuthenticationMiddleware>();

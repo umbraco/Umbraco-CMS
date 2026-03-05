@@ -35,15 +35,32 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            bool shouldBlock = _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading
-                               && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState;
+            if (context.ActionDescriptor.EndpointMetadata.OfType<SkipMaintenanceModeFilterAttribute>().Any())
+            {
+                return;
+            }
+
+            if (_globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState is false)
+            {
+                return;
+            }
+
+            bool isApiController = context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any();
+
+            // API controllers (Management/Delivery API) are only blocked during an unattended upgrade
+            // (RuntimeLevel.Upgrading). During an attended upgrade (RuntimeLevel.Upgrade) the operator
+            // needs API access to log in and trigger the upgrade from the backoffice.
+            // MVC controllers (website, surface) are blocked during both Upgrade and Upgrading.
+            bool shouldBlock = isApiController
+                ? _runtimeState.Level == RuntimeLevel.Upgrading
+                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading;
 
             if (shouldBlock is false)
             {
                 return;
             }
 
-            if (context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any())
+            if (isApiController)
             {
                 var problem = new ProblemDetails
                 {

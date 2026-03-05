@@ -74,7 +74,6 @@ public class MaintenanceModeActionFilterAttributeTests
     [TestCase(RuntimeLevel.Run)]
     [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Boot)]
-    [TestCase(RuntimeLevel.UpgradeFailed)]
     public void OnActionExecuting_MvcController_WhenLevelIsNotUpgradeOrUpgrading_DoesNotSetResult(RuntimeLevel level)
     {
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
@@ -104,21 +103,16 @@ public class MaintenanceModeActionFilterAttributeTests
     }
 
     [Test]
-    public void OnActionExecuting_ApiController_WhenUpgradeAndMaintenanceEnabled_SetsProblemDetailsResult()
+    public void OnActionExecuting_ApiController_WhenUpgradeAndMaintenanceEnabled_DoesNotSetResult()
     {
+        // During an attended upgrade (Upgrade), API controllers are NOT blocked — the operator
+        // needs API access to log in and trigger the upgrade from the backoffice.
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
         var context = CreateApiControllerContext();
 
         InvokeFilter(RuntimeLevel.Upgrade, settings, context);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(context.Result, Is.InstanceOf<ObjectResult>());
-            var result = (ObjectResult)context.Result!;
-            Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
-            Assert.That(result.Value, Is.InstanceOf<ProblemDetails>());
-            Assert.That(((ProblemDetails)result.Value!).Status, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
-        });
+        Assert.That(context.Result, Is.Null);
     }
 
     [Test]
@@ -132,27 +126,28 @@ public class MaintenanceModeActionFilterAttributeTests
         Assert.That(context.Result, Is.Null);
     }
 
-    [Test]
-    public void OnActionExecuting_ApiController_WhenUpgradeAndMaintenanceDisabled_DoesNotSetResult()
-    {
-        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = false };
-        var context = CreateApiControllerContext();
-
-        InvokeFilter(RuntimeLevel.Upgrade, settings, context);
-
-        Assert.That(context.Result, Is.Null);
-    }
-
     [TestCase(RuntimeLevel.Run)]
     [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Boot)]
-    [TestCase(RuntimeLevel.UpgradeFailed)]
-    public void OnActionExecuting_ApiController_WhenLevelIsNotUpgradeOrUpgrading_DoesNotSetResult(RuntimeLevel level)
+    [TestCase(RuntimeLevel.Upgrade)]
+    public void OnActionExecuting_ApiController_WhenLevelIsNotUpgrading_DoesNotSetResult(RuntimeLevel level)
     {
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
         var context = CreateApiControllerContext();
 
         InvokeFilter(level, settings, context);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [Test]
+    public void OnActionExecuting_WhenSkipAttributePresent_DoesNotSetResult()
+    {
+        // SkipMaintenanceModeFilterAttribute bypasses blocking even during Upgrading.
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateContext(endpointMetadata: [new ApiControllerAttribute(), new SkipMaintenanceModeFilterAttribute()]);
+
+        InvokeFilter(RuntimeLevel.Upgrading, settings, context);
 
         Assert.That(context.Result, Is.Null);
     }
