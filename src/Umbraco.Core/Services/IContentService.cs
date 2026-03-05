@@ -75,7 +75,8 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <param name="content">The blueprint to move.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
-    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+    // TODO (V19): Remove the default implementation from this
+    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>
     ///     Deletes a blueprint.
