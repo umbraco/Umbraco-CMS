@@ -6,23 +6,25 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using ScopeProvider = Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider;
 
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 ///     Service for managing languages in Umbraco, including CRUD operations and validation.
 /// </summary>
-internal sealed class LanguageService : RepositoryService, ILanguageService
+internal sealed class LanguageService : AsyncRepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly IAuditService _auditService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IIsoCodeValidator _isoCodeValidator;
+    private readonly ScopeProvider _scopeProvider;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="LanguageService" /> class.
     /// </summary>
-    /// <param name="provider">The core scope provider.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="languageRepository">The language repository.</param>
@@ -30,63 +32,65 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="isoCodeValidator">The ISO code validator.</param>
     public LanguageService(
-        ICoreScopeProvider provider,
+        ScopeProvider scopeProvider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         ILanguageRepository languageRepository,
         IAuditService auditService,
         IUserIdKeyResolver userIdKeyResolver,
         IIsoCodeValidator isoCodeValidator)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : base(scopeProvider, loggerFactory, eventMessagesFactory)
     {
         _languageRepository = languageRepository;
         _auditService = auditService;
         _userIdKeyResolver = userIdKeyResolver;
         _isoCodeValidator = isoCodeValidator;
+        _scopeProvider = scopeProvider;
     }
 
     /// <inheritdoc />
     public async Task<ILanguage?> GetAsync(string isoCode)
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return await _languageRepository.GetByIsoCodeAsync(isoCode);
-        }
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        var result = await _languageRepository.GetByIsoCodeAsync(isoCode);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
     public async Task<ILanguage?> GetDefaultLanguageAsync()
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return await _languageRepository.GetByIsoCodeAsync(await _languageRepository.GetDefaultIsoCodeAsync());
-        }
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        var result = await _languageRepository.GetByIsoCodeAsync(await _languageRepository.GetDefaultIsoCodeAsync());
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
     public async Task<string> GetDefaultIsoCodeAsync()
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return await _languageRepository.GetDefaultIsoCodeAsync();
-        }
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        var result = await _languageRepository.GetDefaultIsoCodeAsync();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<ILanguage>> GetAllAsync()
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return await _languageRepository.GetAllAsync(CancellationToken.None);
-        }
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        var result = await _languageRepository.GetAllAsync(CancellationToken.None);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
     public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
-
-        return await _languageRepository.GetIsoCodesByIdsAsync(ids, throwOnNotFound: true);
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        var result = await _languageRepository.GetIsoCodesByIdsAsync(ids, throwOnNotFound: true);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -168,7 +172,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     /// <inheritdoc />
     public async Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, Guid userKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using (ICoreScope scope = _scopeProvider.CreateScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
@@ -221,7 +225,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallbackIsoCode, language);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using (ICoreScope scope = _scopeProvider.CreateScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
