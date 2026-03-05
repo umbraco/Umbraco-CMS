@@ -1,6 +1,7 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
 import { writeFileSync } from 'fs';
-import { format, resolveConfig } from 'prettier';
 import { createImportMap } from '../importmap/index.js';
+import { format, resolveConfig } from 'prettier';
 
 const tsconfigPath = 'tsconfig.json';
 const tsconfigComment = `
@@ -41,7 +42,15 @@ const tsConfigBase = {
 		noFallthroughCasesInSwitch: true,
 		noImplicitReturns: true,
 	},
-	include: ['src/**/*.ts', 'apps/**/*.ts', 'e2e/**/*.ts', 'index.ts', 'storybook/stories/**/*.ts', 'examples/**/*.ts'],
+	include: [
+		'src/**/*.ts',
+		'mocks/**/*.ts',
+		'apps/**/*.ts',
+		'e2e/**/*.ts',
+		'index.ts',
+		'storybook/stories/**/*.ts',
+		'examples/**/*.ts',
+	],
 	references: [
 		{
 			path: './tsconfig.node.json',
