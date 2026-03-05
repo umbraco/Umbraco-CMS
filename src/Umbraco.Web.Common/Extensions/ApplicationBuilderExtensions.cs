@@ -102,8 +102,9 @@ public static class ApplicationBuilderExtensions
         }
         else
         {
-            // BootFailedMiddleware handles both startup failures and unattended upgrade failures
-            // (RuntimeLevel.BootFailed). All requests are short-circuited with an error page.
+            // BootFailedMiddleware must also be registered on the boot-success path because
+            // RuntimeLevel.BootFailed can be set at runtime by UnattendedUpgradeBackgroundService
+            // if a background migration fails after the HTTP server has already started.
             app.UseMiddleware<BootFailedMiddleware>();
 
             // Health probes are registered before other middleware so they are reachable
