@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Web.Common.HealthChecks;
 using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Common.Media;
 using Umbraco.Cms.Web.Common.Middleware;
@@ -194,7 +195,7 @@ public static class ApplicationBuilderExtensions
         // Readiness — 200 only when RuntimeLevel.Run.
         app.UseHealthChecks("/umbraco/api/health/ready", new HealthCheckOptions
         {
-            Predicate = check => check.Tags.Contains("ready"),
+            Predicate = check => check.Tags.Contains(UmbracoReadinessHealthCheck.ReadyTag),
             AllowCachingResponses = false,
         });
 

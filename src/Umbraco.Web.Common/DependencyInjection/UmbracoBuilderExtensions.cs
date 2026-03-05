@@ -327,7 +327,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ProtectRecycleBinMediaMiddleware>();
 
         builder.Services.AddHealthChecks()
-            .AddCheck<UmbracoReadinessHealthCheck>("umbraco-ready", tags: ["ready"]);
+            .AddCheck<UmbracoReadinessHealthCheck>("umbraco-ready", tags: [UmbracoReadinessHealthCheck.ReadyTag]);
 
         builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
         builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();

@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Web.Common.HealthChecks;
 /// </summary>
 internal sealed class UmbracoReadinessHealthCheck : IHealthCheck
 {
+    internal const string ReadyTag = "umbraco-ready";
+
     private readonly IRuntimeState _runtimeState;
 
     public UmbracoReadinessHealthCheck(IRuntimeState runtimeState)
