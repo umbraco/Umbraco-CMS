@@ -80,10 +80,7 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 			throw new Error('Audit log repository alias is required');
 		}
 
-		this.#auditLogRepository = await createExtensionApiByAlias<UmbAuditLogRepository>(
-			this,
-			auditLogRepositoryAlias,
-		);
+		this.#auditLogRepository = await createExtensionApiByAlias<UmbAuditLogRepository>(this, auditLogRepositoryAlias);
 
 		this.#requestAuditLogs();
 	}
@@ -179,14 +176,8 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 		const user = this.#userMap.get(item.user.unique);
 
 		return html`
-			<umb-history-item
-				.name=${user?.name ?? 'Unknown'}
-				.detail=${this.localize.date(item.timestamp, TimeOptions)}>
-				<umb-user-avatar
-					slot="avatar"
-					.name=${user?.name}
-					.kind=${user?.kind}
-					.imgUrls=${user?.avatarUrls ?? []}>
+			<umb-history-item .name=${user?.name ?? 'Unknown'} .detail=${this.localize.date(item.timestamp, TimeOptions)}>
+				<umb-user-avatar slot="avatar" .name=${user?.name} .kind=${user?.kind} .imgUrls=${user?.avatarUrls ?? []}>
 				</umb-user-avatar>
 				<div class="log-type">
 					<uui-tag look=${tagData?.style.look ?? 'placeholder'} color=${tagData?.style.color ?? 'default'}>

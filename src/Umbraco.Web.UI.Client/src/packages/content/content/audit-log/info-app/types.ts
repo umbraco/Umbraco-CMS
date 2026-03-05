@@ -1,6 +1,10 @@
 import type { ManifestWorkspaceInfoApp, MetaWorkspaceInfoApp } from '@umbraco-cms/backoffice/workspace';
 
-export type { UmbAuditLogTagData, UmbAuditLogTagLocalizeKeys, UmbAuditLogTagStyleMap } from '@umbraco-cms/backoffice/audit-log';
+export type {
+	UmbAuditLogTagData,
+	UmbAuditLogTagLocalizeKeys,
+	UmbAuditLogTagStyleMap,
+} from '@umbraco-cms/backoffice/audit-log';
 
 export interface MetaWorkspaceInfoAppAuditLogKind extends MetaWorkspaceInfoApp {
 	auditLogRepositoryAlias: string;
