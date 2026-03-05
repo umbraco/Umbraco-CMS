@@ -106,8 +106,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(!variesByCulture, contentType.VariesByCulture());
         Assert.AreEqual(!variesBySegment, contentType.VariesBySegment());
 
-        // expect RefreshMain when changing variation at content type level
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect RefreshMain | VariationChanged when changing variation at content type level
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.VariationChanged);
     }
 
     [TestCase(false, false)]
