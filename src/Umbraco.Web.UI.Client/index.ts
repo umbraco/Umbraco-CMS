@@ -1,4 +1,4 @@
-import { startMockServiceWorker } from './src/mocks/index.js';
+import { startMockServiceWorker } from './mocks/index.js';
 import { UmbAppElement } from '@umbraco-cms/backoffice/app';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -19,7 +19,7 @@ async function bootstrap() {
 		});
 
 		// Register mock set switcher header app
-		const { manifests } = await import('./src/mocks/app-extension/manifests.js');
+		const { manifests } = await import('./mocks/app-extension/manifests.js');
 		umbExtensionsRegistry.registerMany(manifests);
 	} else {
 		appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;

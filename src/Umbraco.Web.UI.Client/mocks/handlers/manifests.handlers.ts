@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 
-import type { UmbPackageManifestResponse } from '../../packages/packages/types.js';
+import type { UmbPackageManifestResponse } from '../../src/packages/packages/types.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const privateManifests: UmbPackageManifestResponse = [

@@ -120,7 +120,7 @@ console.log('');
 // Run eslint to fix formatting on generated files
 console.log('Running eslint to fix formatting...');
 try {
-	execSync(`npx eslint --fix --no-warn-ignored "src/mocks/data/sets/${setAlias}/*.ts"`, {
+	execSync(`npx eslint --fix --no-warn-ignored "mocks/data/sets/${setAlias}/*.ts"`, {
 		stdio: 'inherit',
 		cwd: path.resolve(__dirname, '../..'),
 	});

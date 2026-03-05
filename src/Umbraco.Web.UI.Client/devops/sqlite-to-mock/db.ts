@@ -34,7 +34,7 @@ export function getOutputDir(): string {
 	if (!_setAlias) {
 		throw new Error('db.ts not configured. Call configure() first.');
 	}
-	return path.resolve(__dirname, `../../src/mocks/data/sets/${_setAlias}`);
+	return path.resolve(__dirname, `../../mocks/data/sets/${_setAlias}`);
 }
 
 /**

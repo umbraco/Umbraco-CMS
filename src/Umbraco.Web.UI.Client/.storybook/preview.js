@@ -7,7 +7,7 @@ import '@umbraco-ui/uui';
 import { html } from 'lit';
 import { setCustomElements } from '@storybook/web-components-vite';
 
-import { startMockServiceWorker } from '../src/mocks';
+import { startMockServiceWorker } from '../mocks';
 
 import '../src/libs/controller-api/controller-host-provider.element';
 import { UmbExtensionsApiInitializer } from '../src/libs/extension-api/index';

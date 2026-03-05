@@ -30,7 +30,7 @@ export const plugins: PluginOption[] = [
 				dest: 'umbraco/backoffice/assets',
 			},
 			{
-				src: 'src/mocks/handlers/backoffice/assets/*',
+				src: 'mocks/handlers/backoffice/assets/*',
 				dest: 'umbraco/backoffice/assets',
 			},
 			{

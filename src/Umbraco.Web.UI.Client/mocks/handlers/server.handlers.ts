@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { version } from '../../../package.json';
+import { version } from '../../package.json';
 import {
 	RuntimeLevelModel,
 	RuntimeModeModel,
