@@ -7,15 +7,65 @@
           <Property Name="Project" Value="Umbraco.Tests.Integration" />
           <Rule Match="Any">
             <Rule Match="All">
-              <Property Name="Namespace" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.SyntaxProvider" />
+              <Property Name="Namespace" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations" />
               <Rule Match="Any">
                 <Rule Match="All">
-                  <Property Name="Class" Value="SqlServerSyntaxProviderTests" />
+                  <Property Name="Class" Value="AdvancedMigrationTests" />
                   <Rule Match="Any">
                     <Rule Match="All">
-                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.SyntaxProvider.SqlServerSyntaxProviderTests.Can_Generate_Delete_SubQuery_Statement" />
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.AdvancedMigrationTests.AddColumnAsync" />
                       <Rule Match="Any">
-                        <Property Name="DisplayName" Value="Can_Generate_Delete_SubQuery_Statement" />
+                        <Property Name="DisplayName" Value="AddColumnAsync" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+            <Rule Match="All">
+              <Property Name="Namespace" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="ScopeTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping.ScopeTests.NestedTransactionComplete" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="NestedTransactionComplete" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping.ScopeTests.NestedTransactionInnerFail" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="NestedTransactionInnerFail" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping.ScopeTests.NestedTransactionOuterFail" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="NestedTransactionOuterFail" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping.ScopeTests.Transaction" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Transaction" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+            <Rule Match="All">
+              <Property Name="Namespace" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="ContentPublishingServiceTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentPublishingServiceTests.Can_Publish_Variant_Content" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Can_Publish_Variant_Content" />
                       </Rule>
                     </Rule>
                   </Rule>

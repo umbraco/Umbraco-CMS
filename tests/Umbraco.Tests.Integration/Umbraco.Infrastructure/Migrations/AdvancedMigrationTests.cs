@@ -243,9 +243,9 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 Assert.NotNull(columnInfo);
-                if (db.DatabaseType == DatabaseType.PostgreSQL)
+                if (sqlSyntax is PostgreSqlSyntaxProvider provider)
                 {
-                    Assert.IsTrue(((PostgreSqlSyntaxProvider)sqlSyntax).StringLengthUnicodeColumnDefinitionFormat.InvariantContains(columnInfo.DataType));
+                    Assert.IsTrue(provider.StringLengthUnicodeColumnDefinitionFormat.InvariantContains(columnInfo.DataType));
                 }
                 else
                 {
@@ -339,8 +339,8 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 
         protected override void Migrate()
         {
-            var sql = Context.Database.DatabaseType == DatabaseType.PostgreSQL
-                ? string.Format(((PostgreSqlSyntaxProvider)SqlSyntax).StringLengthUnicodeColumnDefinitionFormat, 255)
+            var sql = Context.Database.SqlContext.SqlSyntax is PostgreSqlSyntaxProvider provider
+                ? string.Format(provider.StringLengthUnicodeColumnDefinitionFormat, 255)
                 : "nvarchar(255)";
 
             Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo {sql}");
