@@ -42,9 +42,10 @@ public class UnattendedUpgradeBackgroundServiceTests
     [Test]
     public async Task ExecuteAsync_WhenAllNotificationsAreNotRequired_InitializesComponentsAndRegistersLifetimeCallbacks()
     {
+        // Simulates the multi-instance scenario where a second instance finds no migrations to run
+        // (because the first instance already completed them). Both notifications return NotRequired,
+        // but DetermineRuntimeLevel() must still be called so the level transitions from Upgrading to Run.
         var runtimeState = CreateMockRuntimeState();
-        runtimeState.Setup(x => x.DetermineRuntimeLevel()).Callback(() => { /* level stays Upgrading – not called for NotRequired */ });
-
         var eventAggregator = new Mock<IEventAggregator>();
         SetupPublishAsync(eventAggregator);
 
@@ -60,8 +61,8 @@ public class UnattendedUpgradeBackgroundServiceTests
         eventAggregator.Verify(x => x.PublishAsync(It.IsAny<RuntimeUnattendedUpgradeNotification>(), It.IsAny<CancellationToken>()), Times.Once);
         eventAggregator.Verify(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()), Times.Once);
 
-        // DetermineRuntimeLevel must NOT be called when results are NotRequired.
-        runtimeState.Verify(x => x.DetermineRuntimeLevel(), Times.Never);
+        // DetermineRuntimeLevel must be called unconditionally after migrations complete.
+        runtimeState.Verify(x => x.DetermineRuntimeLevel(), Times.Once);
 
         // BootFailed must NOT be set.
         runtimeState.Verify(x => x.Configure(RuntimeLevel.BootFailed, It.IsAny<RuntimeLevelReason>(), It.IsAny<Exception?>()), Times.Never);

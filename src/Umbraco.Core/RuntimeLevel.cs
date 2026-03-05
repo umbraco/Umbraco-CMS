@@ -39,12 +39,6 @@ public enum RuntimeLevel
     Upgrading = 4,
 
     /// <summary>
-    ///     The runtime attempted an unattended background upgrade which failed.
-    ///     The HTTP server is up but all requests are intercepted with a 503 error page.
-    /// </summary>
-    UpgradeFailed = 5,
-
-    /// <summary>
     ///     The runtime has detected an up-to-date Umbraco install and is running.
     /// </summary>
     Run = 100,

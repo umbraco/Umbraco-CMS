@@ -70,6 +70,12 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
             return;
         }
 
+        // Re-evaluate runtime level after migrations complete. This handles all result cases:
+        // - CoreUpgradeComplete / PackageMigrationComplete: confirms the new Run level.
+        // - NotRequired: another instance may have already run migrations; re-check to get Run level.
+        // - HasErrors: BootFailedException is set, so DetermineRuntimeLevel() returns early (no-op).
+        DetermineRuntimeLevel();
+
         // RunMigrationsAsync may have set BootFailed via a non-throwing error path (HasErrors result).
         if (_runtimeState.Level == RuntimeLevel.BootFailed)
         {
@@ -116,9 +122,6 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
                 return;
 
             case RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.CoreUpgradeComplete:
-                DetermineRuntimeLevel();
-                break;
-
             case RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.NotRequired:
                 break;
         }
@@ -150,9 +153,6 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
 
             case RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete:
             case RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete:
-                DetermineRuntimeLevel();
-                break;
-
             case RuntimeUnattendedUpgradeNotification.UpgradeResult.NotRequired:
                 break;
         }
