@@ -1,5 +1,7 @@
 # SQLite to Mock
 
+> **Experimental**: This tool is experimental and may change or be removed without notice.
+
 Transforms an Umbraco SQLite database into a TypeScript mock data set for use with the backoffice Mock Service Worker (MSW) setup.
 
 ## What it does
