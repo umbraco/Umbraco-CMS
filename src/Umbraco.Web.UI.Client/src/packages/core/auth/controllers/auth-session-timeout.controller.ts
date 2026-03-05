@@ -5,7 +5,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
-	#tokenCheckWorker?: SharedWorker;
+	#tokenCheckWorker?: SharedWorker | Worker;
 	#host: UmbAuthContext;
 	#keepUserLoggedIn = false;
 	#hasCheckedKeepUserLoggedIn = false;
@@ -15,16 +15,21 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		this.#host = host;
 
-		this.#tokenCheckWorker = new SharedWorker(new URL('../workers/token-check.worker.js', import.meta.url), {
-			name: 'TokenCheckWorker',
-			type: 'module',
-		});
+		const workerUrl = new URL('../workers/token-check.worker.js', import.meta.url);
+		const workerOptions: WorkerOptions = { name: 'TokenCheckWorker', type: 'module' };
 
-		// Ensure the worker is ready to receive messages
-		this.#tokenCheckWorker.port.start();
+		// SharedWorker is not supported on all platforms (e.g. Chrome on Android).
+		// Fall back to a dedicated Worker when SharedWorker is unavailable.
+		if (typeof SharedWorker !== 'undefined') {
+			const sharedWorker = new SharedWorker(workerUrl, workerOptions);
+			sharedWorker.port.start();
+			this.#tokenCheckWorker = sharedWorker;
+		} else {
+			this.#tokenCheckWorker = new Worker(workerUrl, workerOptions);
+		}
 
 		// Listen for messages from the token check worker
-		this.#tokenCheckWorker.port.onmessage = async (event) => {
+		this.#onWorkerMessage(async (event) => {
 			// If the user has chosen to stay logged in, we ignore the logout command and instead request a new token
 			if (this.#keepUserLoggedIn) {
 				console.log(
@@ -41,7 +46,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				// If the worker signals a token refresh, we let the user decide whether to continue or logout
 				this.#openTimeoutModal(event.data.secondsUntilLogout);
 			}
-		};
+		});
 
 		// Initialize the token check worker with the current token response
 		this.observe(
@@ -50,7 +55,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				// Inform the token check worker about the new token response
 				console.log('[Auth Context] Informing token check worker about new token response.');
 				// Post the new
-				this.#tokenCheckWorker?.port.postMessage({
+				this.#postWorkerMessage({
 					command: 'init',
 					tokenResponse,
 				});
@@ -63,7 +68,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			host.timeoutSignal,
 			async () => {
 				// Stop the token check worker when the user has timed out
-				this.#tokenCheckWorker?.port.postMessage({
+				this.#postWorkerMessage({
 					command: 'init',
 				});
 
@@ -86,8 +91,38 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 	override destroy(): void {
 		super.destroy();
-		this.#tokenCheckWorker?.port.close();
+		if (this.#tokenCheckWorker instanceof SharedWorker) {
+			this.#tokenCheckWorker.port.close();
+		} else {
+			this.#tokenCheckWorker?.terminate();
+		}
 		this.#tokenCheckWorker = undefined;
+	}
+
+	/**
+	 * Post a message to the worker, abstracting the difference between
+	 * SharedWorker (port-based) and dedicated Worker (direct) communication.
+	 */
+	#postWorkerMessage(data: unknown): void {
+		if (!this.#tokenCheckWorker) return;
+		if (this.#tokenCheckWorker instanceof SharedWorker) {
+			this.#tokenCheckWorker.port.postMessage(data);
+		} else {
+			this.#tokenCheckWorker.postMessage(data);
+		}
+	}
+
+	/**
+	 * Set an onmessage handler on the worker, abstracting the difference between
+	 * SharedWorker (port-based) and dedicated Worker (direct) communication.
+	 */
+	#onWorkerMessage(handler: (event: MessageEvent) => void): void {
+		if (!this.#tokenCheckWorker) return;
+		if (this.#tokenCheckWorker instanceof SharedWorker) {
+			this.#tokenCheckWorker.port.onmessage = handler;
+		} else {
+			this.#tokenCheckWorker.onmessage = handler;
+		}
 	}
 
 	/**
