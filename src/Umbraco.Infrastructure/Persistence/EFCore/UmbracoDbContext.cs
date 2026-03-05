@@ -52,6 +52,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<CacheInstructionDto> CacheInstructions { get; set; }
 
+    public required DbSet<KeyValueDto> KeyValue { get; set; }
+
     public required DbSet<TemplateDto> Templates { get; set; }
 
     public required DbSet<User2NodeNotifyDto> User2NodeNotifies { get; set; }
@@ -62,8 +64,8 @@ public class UmbracoDbContext : DbContext
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
-        var extensions = options.Extensions.FirstOrDefault() as Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension;
-        IServiceProvider? serviceProvider = extensions?.ApplicationServiceProvider;
+        var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();
+        IServiceProvider? serviceProvider = coreExtensions?.ApplicationServiceProvider;
         serviceProvider ??= StaticServiceProvider.Instance;
         if (serviceProvider == null)
         {

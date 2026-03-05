@@ -222,7 +222,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (ShouldRebuildUrls())
+        if (await ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
@@ -264,15 +264,15 @@ public class DocumentUrlService : IDocumentUrlService
         scope.Complete();
     }
 
-    private bool ShouldRebuildUrls()
+    private async Task<bool> ShouldRebuildUrls()
     {
-        var persistedValue = GetPersistedRebuildValue();
+        var persistedValue = await GetPersistedRebuildValue();
         var currentValue = GetCurrentRebuildValue();
 
         return string.Equals(persistedValue, currentValue) is false;
     }
 
-    private string? GetPersistedRebuildValue() => _keyValueService.GetValue(RebuildKey);
+    private async Task<string?> GetPersistedRebuildValue() => await _keyValueService.GetValueAsync(RebuildKey);
 
     private string GetCurrentRebuildValue() => string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
 
@@ -286,7 +286,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
 
-        _keyValueService.SetValue(RebuildKey, GetCurrentRebuildValue());
+        await _keyValueService.SetValueAsync(RebuildKey, GetCurrentRebuildValue());
 
         scope.Complete();
     }

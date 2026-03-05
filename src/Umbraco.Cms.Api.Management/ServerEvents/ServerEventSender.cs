@@ -7,6 +7,8 @@ using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
 
@@ -60,7 +62,10 @@ internal sealed class ServerEventSender :
     INotificationAsyncHandler<UserDeletedNotification>,
     INotificationAsyncHandler<WebhookDeletedNotification>,
     INotificationAsyncHandler<ContentMovedToRecycleBinNotification>,
-    INotificationAsyncHandler<MediaMovedToRecycleBinNotification>
+    INotificationAsyncHandler<MediaMovedToRecycleBinNotification>,
+    INotificationAsyncHandler<ContentTypeChangedNotification>,
+    INotificationAsyncHandler<MediaTypeChangedNotification>,
+    INotificationAsyncHandler<MemberTypeChangedNotification>
 {
     private readonly IServerEventRouter _serverEventRouter;
     private readonly IIdKeyMap _idKeyMap;
@@ -365,4 +370,40 @@ internal sealed class ServerEventSender :
     /// <inheritdoc/>
     public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken) =>
         await NotifyTrashedAsync(notification, Constants.ServerEvents.EventSource.Media);
+
+    /// <inheritdoc/>
+    public async Task HandleAsync(ContentTypeChangedNotification notification, CancellationToken cancellationToken) =>
+        await RouteContentTypeChangedEventsAsync(notification, Constants.ServerEvents.EventSource.DocumentType);
+
+    /// <inheritdoc/>
+    public async Task HandleAsync(MediaTypeChangedNotification notification, CancellationToken cancellationToken) =>
+        await RouteContentTypeChangedEventsAsync(notification, Constants.ServerEvents.EventSource.MediaType);
+
+    /// <inheritdoc/>
+    public async Task HandleAsync(MemberTypeChangedNotification notification, CancellationToken cancellationToken) =>
+        await RouteContentTypeChangedEventsAsync(notification, Constants.ServerEvents.EventSource.MemberType);
+
+    private async Task RouteContentTypeChangedEventsAsync<T>(ContentTypeChangeNotification<T> notification, string source)
+        where T : class, IContentTypeComposition
+    {
+        foreach (ContentTypeChange<T> change in notification.Changes)
+        {
+            // Skip created and removed types as these are already handled by the Deleted
+            // and Saved notification handler respectively.
+            if (change.ChangeTypes.HasType(ContentTypeChangeTypes.Create)
+                || change.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
+            {
+                continue;
+            }
+
+            var eventModel = new ServerEvent
+            {
+                EventType = Constants.ServerEvents.EventType.Updated,
+                Key = change.Item.Key,
+                EventSource = source,
+            };
+
+            await _serverEventRouter.RouteEventAsync(eventModel);
+        }
+    }
 }

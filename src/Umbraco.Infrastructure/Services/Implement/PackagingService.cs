@@ -219,7 +219,8 @@ public class PackagingService : IPackagingService
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
-        IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        var attempt = await _keyValueService.FindByKeyPrefixAsync(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?>? keyValues = attempt.Result;
 
         var installedPackages = new List<InstalledPackage>();
 
@@ -329,11 +330,12 @@ public class PackagingService : IPackagingService
     #endregion
 
     /// <inheritdoc/>
-    public Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
+    public async Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
+        var attempt = await _keyValueService.FindByKeyPrefixAsync(Constants.Conventions.Migrations.KeyValuePrefix);
+
         IReadOnlyDictionary<string, string?> keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix)
-            ?? new Dictionary<string, string?>();
+            attempt.Result ?? new Dictionary<string, string?>();
 
         InstalledPackage[] installedPackages = _packageMigrationPlans
             .GroupBy(plan => (plan.PackageName, plan.PackageId))
@@ -364,11 +366,11 @@ public class PackagingService : IPackagingService
                 return package;
             }).ToArray();
 
-        return Task.FromResult(new PagedModel<InstalledPackage>
+        return new PagedModel<InstalledPackage>
         {
             Total = installedPackages.Count(),
             Items = installedPackages.Skip(skip).Take(take),
-        });
+        };
     }
 
     /// <inheritdoc/>

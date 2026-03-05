@@ -162,5 +162,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
         To<V_18_0_0.AddWebhookDto>("{F3CC0076-0692-41E5-9B2B-C58D46E556D4}");
         To<V_18_0_0.AddLastSyncedDto>("{5CFD4E2B-4024-42FE-9C70-295D0141ECAF}");
+        To<V_18_0_0.AddKeyValueDto>("{ABDB0A9C-7476-4E00-B4C2-638FDF347AA0}");
     }
 }

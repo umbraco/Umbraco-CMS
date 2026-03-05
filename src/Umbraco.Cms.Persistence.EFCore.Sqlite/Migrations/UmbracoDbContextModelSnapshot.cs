@@ -258,6 +258,26 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.ToTable("umbracoCacheInstruction", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.KeyValueDto", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("key");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("value");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("umbracoKeyValue", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LastSyncedDto", b =>
                 {
                     b.Property<string>("MachineId")

@@ -202,7 +202,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <summary>
     ///     Get the entity id for the <typeparamref name="TEntity"/>.
     /// </summary>
-    protected virtual TId GetEntityId(TEntity entity)
+    protected virtual TId GetEntityId(TEntity entity) // TODO: change TId into Guid, as all entities should be using Guid keys
         => (TId)(object)entity.Key;
 
     /// <summary>

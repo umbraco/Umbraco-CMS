@@ -31,9 +31,11 @@ public class DatabaseUpgradeStep : StepBase, IInstallStep, IUpgradeStep
         _keyValueService = keyValueService;
     }
 
-    public Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => ExecuteInternalAsync();
+    /// <inheritdoc />
+    public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => await ExecuteInternalAsync();
 
-    public Task<Attempt<InstallationResult>> ExecuteAsync() => ExecuteInternalAsync();
+    /// <inheritdoc />
+    public async Task<Attempt<InstallationResult>> ExecuteAsync() => await ExecuteInternalAsync();
 
     private async Task<Attempt<InstallationResult>> ExecuteInternalAsync()
     {
@@ -42,7 +44,7 @@ public class DatabaseUpgradeStep : StepBase, IInstallStep, IUpgradeStep
         var plan = new UmbracoPlan(_umbracoVersion);
         // TODO: Clear CSRF cookies with notification.
 
-        DatabaseBuilder.Result? result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
+        DatabaseBuilder.Result? result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan);
 
         if (result?.Success == false)
         {
@@ -52,26 +54,28 @@ public class DatabaseUpgradeStep : StepBase, IInstallStep, IUpgradeStep
         return Success();
     }
 
-    public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();
+    /// <inheritdoc />
+    public async Task<bool> RequiresExecutionAsync(InstallData model) => await ShouldExecute();
 
-    public Task<bool> RequiresExecutionAsync() => ShouldExecute();
+    /// <inheritdoc />
+    public async Task<bool> RequiresExecutionAsync() => await ShouldExecute();
 
-    private Task<bool> ShouldExecute()
+    private async Task<bool> ShouldExecute()
     {
         // Don't do anything if RunTimeLevel is not Install/Upgrade
         if (_runtime.Level == RuntimeLevel.Run)
         {
-            return Task.FromResult(false);
+            return false;
         }
 
         // Check the upgrade state, if it matches we dont have to upgrade.
         var plan = new UmbracoPlan(_umbracoVersion);
-        var currentState = _keyValueService.GetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name);
+        var currentState = await _keyValueService.GetValueAsync(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name);
         if (currentState != plan.FinalState)
         {
-            return Task.FromResult(true);
+            return true;
         }
 
-        return Task.FromResult(false);
+        return false;
     }
 }

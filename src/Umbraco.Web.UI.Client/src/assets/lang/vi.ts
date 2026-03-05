@@ -2019,6 +2019,7 @@ export default {
 		noLockouts: 'không bị khóa',
 		noPasswordChange: 'Mật khẩu chưa được thay đổi',
 		confirmNewPassword: 'Xác nhận mật khẩu mới',
+		confirmPassword: 'Xác nhận mật khẩu',
 		changePasswordDescription:
 			"Bạn có thể thay đổi mật khẩu của mình để truy cập vào Umbraco backoffice bằng cách điền vào mẫu dưới đây và nhấp vào nút 'Đổi mật khẩu'",
 		contentChannel: 'Kênh nội dung',

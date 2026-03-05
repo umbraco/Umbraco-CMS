@@ -47,20 +47,20 @@ internal sealed class TelemetryService : ITelemetryService
         return new TelemetryReportData
         {
             Id = telemetryId,
-            Version = GetVersion(),
+            Version = await GetVersion(),
             Packages = await GetPackageTelemetryAsync().ConfigureAwait(false),
-            Detailed = _usageInformationService.GetDetailed(),
+            Detailed = await _usageInformationService.GetDetailedAsync(),
         };
     }
 
-    private string? GetVersion()
-        => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+    private async Task<string?> GetVersion()
+        => await _metricsConsentService.GetConsentLevelAsync() == TelemetryLevel.Minimal
         ? null
         : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
 
     private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
-        if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+        if (await _metricsConsentService.GetConsentLevelAsync() == TelemetryLevel.Minimal)
         {
             return null;
         }

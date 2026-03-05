@@ -223,7 +223,7 @@ internal sealed class AsyncFullDataSetRepositoryCachePolicy<TEntity, TId> : Asyn
         {
             // Double-check inside lock - another thread may have populated the cache.
             all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
-            if (all != null)
+            if (all is not null)
             {
                 return all.ToArray();
             }

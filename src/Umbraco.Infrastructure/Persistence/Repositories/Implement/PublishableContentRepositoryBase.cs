@@ -1322,7 +1322,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         // The ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is Key));
         // GUID-keyed read repository uses a separate "uRepoGuid_" prefix.
-        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(entity.Key));
+        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<TEntity>(entity.Key));
 
         // troubleshooting
         //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
@@ -1662,7 +1662,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             }
         }
 
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<TEntity>() + key;
+        private static string GetCacheKey(Guid key) => GuidReadRepositoryCachePolicy<TEntity>.GetCacheKey(key);
     }
 
     #endregion
@@ -1672,7 +1672,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     /// <inheritdoc />
     public void ClearSchedule(DateTime date)
     {
-        Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>().Where<ContentScheduleDto>(x => x.Date <= date);
+        Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>()
+            .Where<ContentScheduleDto>(x => x.Date <= date)
+            .WhereIn<ContentScheduleDto>(x => x.NodeId, Sql()
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId));
         Database.Execute(sql);
     }
 
@@ -1681,7 +1686,11 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     {
         var a = action.ToString();
         Sql<ISqlContext> sql = Sql().Delete<ContentScheduleDto>()
-            .Where<ContentScheduleDto>(x => x.Date <= date && x.Action == a);
+            .Where<ContentScheduleDto>(x => x.Date <= date && x.Action == a)
+            .WhereIn<ContentScheduleDto>(x => x.NodeId, Sql()
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId));
         Database.Execute(sql);
     }
 
@@ -1692,10 +1701,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             tsql => tsql
                 .SelectCount()
                 .From<ContentScheduleDto>()
+                .InnerJoin<NodeDto>().On<ContentScheduleDto, NodeDto>((cs, n) => cs.NodeId == n.NodeId)
                 .Where<ContentScheduleDto>(x =>
-                    x.Action == SqlTemplate.Arg<string>("action") && x.Date <= SqlTemplate.Arg<DateTime>("date")));
+                    x.Action == SqlTemplate.Arg<string>("action") && x.Date <= SqlTemplate.Arg<DateTime>("date"))
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));
 
-        Sql<ISqlContext> sql = template.Sql(action.ToString(), date);
+        Sql<ISqlContext> sql = template.Sql(action.ToString(), date, NodeObjectTypeId);
         return sql;
     }
 
@@ -1730,12 +1741,19 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     /// <inheritdoc />
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] contentIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentScheduleDto>()
-            .From<ContentScheduleDto>()
-            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, contentIds);
+        var contentScheduleDtos = contentIds
+            .Distinct()
+            .InGroupsOf(Constants.Sql.MaxParameterCount)
+            .SelectMany(group =>
+            {
+                Sql<ISqlContext> sql = Sql()
+                    .Select<ContentScheduleDto>()
+                    .From<ContentScheduleDto>()
+                    .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, group);
 
-        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
+                return Database.Fetch<ContentScheduleDto>(sql);
+            })
+            .ToList();
 
         IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
             .GroupBy(contentSchedule => contentSchedule.NodeId)

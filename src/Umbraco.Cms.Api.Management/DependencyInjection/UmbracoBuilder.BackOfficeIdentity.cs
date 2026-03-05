@@ -77,7 +77,7 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped<IBackOfficeExternalLoginService, BackOfficeExternalLoginService>();
 
         // Register a notification handler to interrogate the registered external login providers at startup.
-        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, ExternalLoginProviderStartupHandler>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, ExternalLoginProviderStartupHandler>();
 
         return builder;
     }
