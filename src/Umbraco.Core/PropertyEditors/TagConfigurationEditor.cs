@@ -11,6 +11,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class TagConfigurationEditor : ConfigurationEditor<TagConfiguration>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TagConfigurationEditor"/> class.
+    /// </summary>
+    /// <param name="ioHelper">The IO helper.</param>
     public TagConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {

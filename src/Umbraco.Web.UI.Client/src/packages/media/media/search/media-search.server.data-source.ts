@@ -41,6 +41,8 @@ export class UmbMediaSearchServerDataSource
 					query: args.query,
 					trashed: args.includeTrashed,
 					dataTypeId: args.dataTypeUnique,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
 				},
 			}),
 		);
@@ -66,6 +68,7 @@ export class UmbMediaSearchServerDataSource
 							name: variant.name,
 						};
 					}),
+					flags: item.flags,
 				};
 			});
 

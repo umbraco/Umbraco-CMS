@@ -11,8 +11,19 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class HealthChecksNotificationMethodSettings
 {
+    /// <summary>
+    ///     The default value for whether the notification method is enabled.
+    /// </summary>
     internal const bool StaticEnabled = false;
+
+    /// <summary>
+    ///     The default verbosity level for health check notifications.
+    /// </summary>
     internal const string StaticVerbosity = "Summary"; // Enum
+
+    /// <summary>
+    ///     The default value for sending notifications only on failure.
+    /// </summary>
     internal const bool StaticFailureOnly = false;
 
     /// <summary>

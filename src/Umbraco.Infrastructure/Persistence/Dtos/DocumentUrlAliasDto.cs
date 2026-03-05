@@ -18,12 +18,13 @@ internal class DocumentUrlAliasDto
     // Unique index on (uniqueId, languageId, alias) - prevents duplicate entries
     [Index(IndexTypes.UniqueNonClustered, ForColumns = "uniqueId, languageId, alias", Name = "IX_" + TableName + "_Unique")]
     [Column("uniqueId")]
-    [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
+    [ForeignKey(typeof(NodeDto), Column = NodeDto.KeyColumnName)]
     public Guid UniqueId { get; set; }
 
     [Column("languageId")]
+    [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(LanguageDto))]
-    public int LanguageId { get; set; }
+    public int? LanguageId { get; set; }
 
     // Lookup index on (alias, languageId) for fast retrieval
     [Index(IndexTypes.NonClustered, ForColumns = "alias, languageId", Name = "IX_" + TableName + "_Lookup")]

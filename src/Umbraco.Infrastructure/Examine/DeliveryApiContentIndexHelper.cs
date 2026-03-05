@@ -18,7 +18,7 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
 
     private IndexingSettings _indexingSettings;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public DeliveryApiContentIndexHelper(
         IContentService contentService,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,

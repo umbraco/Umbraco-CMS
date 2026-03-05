@@ -32,6 +32,8 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of health check groups.")]
+    [EndpointDescription("Gets a collection of health check groups with their associated health checks.")]
     public Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,

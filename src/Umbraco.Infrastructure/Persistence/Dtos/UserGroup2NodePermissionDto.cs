@@ -4,11 +4,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[Obsolete("Will be removed in Umbraco 18.")]
-[TableName(Constants.DatabaseSchema.Tables.UserGroup2NodePermission)]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
+[TableName(TableName)]
+[PrimaryKey([UserGroupIdColumnName, NodeIdColumnName, PermissionColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 internal class UserGroup2NodePermissionDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2NodePermission;
+
     private const string UserGroupIdColumnName = "userGroupId";
     private const string NodeIdColumnName = "nodeId";
     private const string PermissionColumnName = "permission";

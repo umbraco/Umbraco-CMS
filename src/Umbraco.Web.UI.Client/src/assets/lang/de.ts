@@ -1297,6 +1297,7 @@ export default {
 		tab: 'Registerkarte',
 		tabname: 'Registerkartenbeschriftung',
 		tabs: 'Registerkarten',
+		changeIcon: 'Symbol ändern',
 		contentTypeEnabled: 'Masterdokumenttyp aktiviert',
 		contentTypeUses: 'Dieser Dokumenttyp verwendet',
 		noPropertiesDefinedOnTab:
@@ -1741,6 +1742,7 @@ export default {
 		noLockouts: 'wurde nicht ausgeschlossen',
 		noPasswordChange: 'Das Kennwort wurde nicht geändert',
 		confirmNewPassword: 'Neues Kennwort (Bestätigung)',
+		confirmPassword: 'Kennwort bestätigen',
 		changePasswordDescription:
 			"Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf 'Kennwort ändern' klicken",
 		contentChannel: 'Schnittstelle für externe Editoren',
@@ -1931,7 +1933,8 @@ export default {
 		emptyDictionaryTree: 'Das Wörterbuch ist leer',
 	},
 	textbox: {
-		characters_left: 'Buchstaben verbleiben',
+		characters_left: '<strong>%0%</strong> Zeichen verbleiben.',
+		characters_exceed: 'Maximal %0% Zeichen, <strong>%1%</strong> zu viele.',
 	},
 	recycleBin: {
 		contentTrashed: 'Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen',

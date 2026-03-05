@@ -1673,10 +1673,10 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName(User2NodeNotifyDto.NodeIdColumnName)} = @id",
             $@"DELETE FROM {QuoteTableName(UserGroup2GranularPermissionDto.TableName)} WHERE {QuoteColumnName(UserGroup2GranularPermissionDto.UniqueIdColumnName)} IN
                 (SELECT {QuoteColumnName("uniqueId")} FROM {QuoteTableName(NodeDto.TableName)} WHERE {QuoteColumnName(NodeDto.PrimaryKeyColumnName)} = @id)",
-            $"DELETE FROM {QuoteTableName(TagRelationshipDto.TableName)} WHERE {QuoteColumnName(TagRelationshipDto.PrimaryKeyColumnName)} = @id",
-            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(TagRelationshipDto.TableName)} WHERE {QuoteColumnName(TagRelationshipDto.NodeIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.IdKeyColumnName)} = @id",
             $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.AllowedIdColumnName)} = @id",
-            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.PrimaryKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.ParentIdColumnName)} = @id",
             $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.ChildIdColumnName)} = @id",
             $@"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName(PropertyDataDto.PropertyTypeIdColumnName)} IN
                 (SELECT id FROM {QuoteTableName(PropertyTypeDto.TableName)} WHERE {QuoteColumnName(PropertyTypeDto.ContentTypeIdColumnName)} = @id)",
@@ -1704,6 +1704,29 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         //       the 0 based sort order, so they will be returned as [0, 1, 2]).
         return PerformGetAll(allowedContentTypeKeys)?.Select(c => (c, allowedContentTypeKeys.IndexOf(c.Key))).ToArray()
             ?? Array.Empty<(TEntity, int)>();
+    }
+
+
+    /// <summary>
+    /// Retrieves a collection of allowed parent keys for the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the key for which to retrieve allowed parent keys.</param>
+    /// <returns>An enumerable collection of GUIDs representing the allowed parent keys.</returns>
+    public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
+    {
+        Sql<ISqlContext> childNodeIdQuery = Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key);
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<ContentTypeAllowedContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeAllowedContentTypeDto, NodeDto>((allowed, node) => allowed.Id == node.NodeId)
+            .WhereIn<ContentTypeAllowedContentTypeDto>(x => x.AllowedId, childNodeIdQuery);
+
+        return Database.Fetch<Guid>(sql);
     }
 
     private sealed class NameCompareDto

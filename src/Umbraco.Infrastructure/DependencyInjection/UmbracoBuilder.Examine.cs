@@ -72,8 +72,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
 
-        builder.Services.AddTransient<IIndexRebuilder, ExamineIndexRebuilder>();
-
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();

@@ -182,9 +182,17 @@ export class UmbBlockGridEntriesContext
 				const config = propertyContext.getConfig() as UmbBlockGridPropertyEditorConfig;
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
+				const blockTypes = this.#allowedBlockTypes.getValue();
+				/*
+				modal size logic:
+				If more than 8 block types, medium modal, more than 12 large modal:
+				*/
+				const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
+
 				return {
+					modal: { size: modalSize },
 					data: {
-						blocks: this.#allowedBlockTypes.getValue(),
+						blocks: blockTypes,
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						clipboardFilter: async (clipboardEntryDetail) => {
@@ -218,6 +226,7 @@ export class UmbBlockGridEntriesContext
 							areaKey: this.#areaKey,
 							parentUnique: this.#parentUnique,
 						} as UmbBlockGridWorkspaceOriginData,
+						// TODO: Check if we use this for anything. I think its not possible to configure inline editing for block grid? [NL]
 						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,
 					},
 				};
@@ -432,7 +441,23 @@ export class UmbBlockGridEntriesContext
 	}
 
 	getPathForCreateBlock(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
+		const pathBuilder = this._catalogueRouteBuilderState.getValue();
+		if (!pathBuilder) return undefined;
+
+		const blockTypes = this.#allowedBlockTypes.getValue();
+		if (blockTypes?.length === 1) {
+			const elementKey = blockTypes[0].contentElementTypeKey;
+
+			if (!this._manager) return undefined;
+			// does the Block have any Content properties?
+			const contentTypeKey = this._manager.getContentTypeKeyOfContentKey(elementKey);
+			if (contentTypeKey && this._manager.getContentTypeHasProperties(contentTypeKey) === false) {
+				return undefined;
+			}
+			return pathBuilder({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		}
+
+		return pathBuilder({ view: 'create', index: index });
 	}
 
 	getPathForClipboard(index: number) {

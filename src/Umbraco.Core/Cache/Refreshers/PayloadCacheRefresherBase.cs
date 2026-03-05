@@ -30,6 +30,7 @@ public abstract class
 
     #region Refresher
 
+    /// <inheritdoc />
     public override void Refresh(string json)
     {
         TPayload[]? payload = Deserialize(json);
@@ -56,6 +57,10 @@ public abstract class
     public virtual void Refresh(TPayload[] payloads) =>
         OnCacheUpdated(NotificationFactory.Create<TNotification>(payloads, MessageType.RefreshByPayload));
 
+    /// <summary>
+    ///     Performs internal cache refresh operations for the specified payloads.
+    /// </summary>
+    /// <param name="payloads">The payloads to process.</param>
     public virtual void RefreshInternal(TPayload[] payloads)
     {
     }
