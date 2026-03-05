@@ -16,6 +16,7 @@ import type {
 	MediaTypeSortModel,
 	MediaTypeTreeItemResponseModel,
 	PagedAllowedMediaTypeModel,
+	ReferenceByIdModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
@@ -45,6 +46,13 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedMediaTypeMapper(item));
 		return { items: mappedItems, total: mappedItems.length };
+	}
+
+	getAllowedParents(id: string) {
+		const allowedParentIds = this.data
+			.filter((item) => item.allowedMediaTypes?.some((allowed: MediaTypeSortModel) => allowed.mediaType.id === id))
+			.map((item) => allowedParentMediaTypeMapper(item));
+		return { allowedParentIds };
 	}
 
 	getAllowedByFileExtension(fileExtension: string): GetItemMediaTypeAllowedResponse {
@@ -167,6 +175,12 @@ const allowedMediaTypeMapper = (item: UmbMockMediaTypeModel): AllowedMediaTypeMo
 		name: item.name,
 		description: item.description,
 		icon: item.icon,
+	};
+};
+
+const allowedParentMediaTypeMapper = (item: UmbMockMediaTypeModel): ReferenceByIdModel => {
+	return {
+		id: item.id,
 	};
 };
 

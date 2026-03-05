@@ -15,4 +15,11 @@ export const structureHandlers = [
 		const response = umbMediaTypeMockDb.getAllowedAtRoot();
 		return HttpResponse.json(response);
 	}),
+
+	http.get(umbracoPath(`${UMB_SLUG}/:id/allowed-parents`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
+		const response = umbMediaTypeMockDb.getAllowedParents(id);
+		return HttpResponse.json(response);
+	}),
 ];

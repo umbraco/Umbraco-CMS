@@ -11,12 +11,14 @@ import {
 	type AllowedDocumentTypeModel,
 	type CreateDocumentTypeRequestModel,
 	type CreateFolderRequestModel,
+	type DocumentTypeAllowedParentsResponseModel,
 	type DocumentTypeConfigurationResponseModel,
 	type DocumentTypeItemResponseModel,
 	type DocumentTypeResponseModel,
 	type DocumentTypeSortModel,
 	type DocumentTypeTreeItemResponseModel,
 	type PagedAllowedDocumentTypeModel,
+	type ReferenceByIdModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 const defaultConfiguration: DocumentTypeConfigurationResponseModel = {
@@ -53,6 +55,15 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
 		return { items: mappedItems, total: mappedItems.length };
+	}
+
+	getAllowedParents(id: string): DocumentTypeAllowedParentsResponseModel {
+		const allowedParentIds = this.data
+			.filter((item) =>
+				item.allowedDocumentTypes?.some((allowed: DocumentTypeSortModel) => allowed.documentType.id === id),
+			)
+			.map((item) => allowedParentDocumentTypeMapper(item));
+		return { allowedParentIds };
 	}
 
 	getConfiguration(): DocumentTypeConfigurationResponseModel {
@@ -167,6 +178,12 @@ const allowedDocumentTypeMapper = (item: UmbMockDocumentTypeModel): AllowedDocum
 		name: item.name,
 		description: item.description,
 		icon: item.icon,
+	};
+};
+
+const allowedParentDocumentTypeMapper = (item: UmbMockDocumentTypeModel): ReferenceByIdModel => {
+	return {
+		id: item.id,
 	};
 };
 
