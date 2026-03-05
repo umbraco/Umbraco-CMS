@@ -80,7 +80,9 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
     protected string GetDBTypeNameForTextColumn(IScope scope, int size = 64)
     {
-        return string.Format(((PostgreSqlSyntaxProvider)scope.Database.SqlContext.SqlSyntax).StringLengthUnicodeColumnDefinitionFormat, size);
+        return scope.Database.DatabaseType == NPoco.DatabaseType.PostgreSQL
+            ? string.Format(((PostgreSqlSyntaxProvider)scope.Database.SqlContext.SqlSyntax).StringLengthUnicodeColumnDefinitionFormat, size)
+            : "nvarchar(255)";
     }
 
     [SetUp]
