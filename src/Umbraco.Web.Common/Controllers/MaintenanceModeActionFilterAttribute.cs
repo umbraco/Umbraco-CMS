@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 /// Represents an action filter attribute that enforces maintenance mode by displaying a maintenance page during
 /// application upgrades.
 /// </summary>
-internal sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
+public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 {
 
     /// <summary>
