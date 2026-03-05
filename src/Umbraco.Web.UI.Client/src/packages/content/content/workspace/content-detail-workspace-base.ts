@@ -16,7 +16,7 @@ import {
 	observeMultiple,
 	UmbArrayState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { filter, firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
