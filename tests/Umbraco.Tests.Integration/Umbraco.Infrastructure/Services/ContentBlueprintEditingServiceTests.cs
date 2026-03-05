@@ -18,6 +18,8 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
 
     private IEntityService EntityService => GetRequiredService<IEntityService>();
 
+    private IAuditService AuditService => GetRequiredService<IAuditService>();
+
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     private async Task<IContent> CreateInvariantContentBlueprint()

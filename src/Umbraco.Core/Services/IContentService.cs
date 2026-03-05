@@ -71,6 +71,13 @@ public interface IContentService : IContentServiceBase<IContent>
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
+    ///     Moves a blueprint.
+    /// </summary>
+    /// <param name="content">The blueprint to move.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Deletes a blueprint.
     /// </summary>
     /// <param name="content">The blueprint to delete.</param>
