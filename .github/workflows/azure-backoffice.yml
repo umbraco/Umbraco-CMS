@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - main
-      - release/*
       - v*/dev
-      - v*/main
     paths:
       - src/Umbraco.Web.UI.Client/package.json
       - src/Umbraco.Web.UI.Client/package-lock.json
@@ -16,9 +14,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
-      - release/*
       - v*/dev
-      - v*/main
   workflow_dispatch:
 
 jobs:
