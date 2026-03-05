@@ -152,11 +152,10 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
-		// TODO: revisit this when getContext supports passContextAliasMatches
-		const workspaceContext = await this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, () => {})
-			.passContextAliasMatches()
-			.asPromise()
-			.catch(() => undefined);
+		// Use passContextAliasMatches to skip past block element workspaces and find the document workspace.
+		const workspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
+			passContextAliasMatches: true,
+		}).catch(() => undefined);
 
 		// For new documents, the unique is a client-generated GUID that doesn't exist in the DB.
 		// The backend expects null for CurrentKey when creating new content and falls back to ParentKey.
