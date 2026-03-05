@@ -178,7 +178,7 @@ export class UiBaseLocators extends BasePage {
   public readonly clickToUploadBtn: Locator;
   public readonly inputDropzone: Locator;
   public readonly imageCropperField: Locator;
-  public readonly inputUploadField: Locator;
+  public readonly inputUploadFileName: Locator;
   public readonly chooseMediaInputBtn: Locator;
 
   // Embedded Media
@@ -409,7 +409,7 @@ export class UiBaseLocators extends BasePage {
     this.clickToUploadBtn = page.locator('#splitViews').getByRole('button', {name: 'Click to upload'});
     this.inputDropzone = page.locator('umb-input-dropzone');
     this.imageCropperField = page.locator('umb-image-cropper-field');
-    this.inputUploadField = page.locator('umb-input-upload-field').locator('#wrapperInner');
+    this.inputUploadFileName = page.locator('umb-input-upload-field').locator('#file-name');
     this.chooseMediaInputBtn = page.locator('umb-input-media').getByLabel('Choose');
 
     // Embedded Media
@@ -1288,8 +1288,8 @@ export class UiBaseLocators extends BasePage {
     await this.isVisible(this.imageCropperField, isVisible);
   }
 
-  async isInputUploadFieldVisible(isVisible: boolean = true) {
-    await this.isVisible(this.inputUploadField, isVisible);
+  async doesInputUploadFileHaveName(name: string) {
+    await this.hasText(this.inputUploadFileName, name);
   }
 
   // Upload Methods

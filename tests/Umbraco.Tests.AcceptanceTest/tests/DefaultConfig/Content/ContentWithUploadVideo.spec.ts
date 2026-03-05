@@ -77,7 +77,7 @@ for (const uploadVideo of uploadVideos) {
     await umbracoUi.content.uploadFile(uploadVideoPath + uploadVideo.fileName);
     // Wait for the upload to complete
     await umbracoUi.content.isInputDropzoneVisible(false);
-    await umbracoUi.content.isInputUploadFieldVisible();
+    await umbracoUi.content.doesInputUploadFileHaveName(uploadVideo.fileName);
     await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
     // Assert
