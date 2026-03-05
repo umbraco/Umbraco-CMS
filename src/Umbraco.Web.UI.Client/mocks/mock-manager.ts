@@ -8,7 +8,6 @@ import { umbMockDbRegistry } from './db/mock-db-registry.js';
 class UmbMockManager {
 	#currentSetName: string = 'default';
 	#currentDataSet: UmbMockDataSet | null = null;
-	#initialized: boolean = false;
 
 	// Lazy loaders for mock sets
 	#mockSetLoaders: Record<string, () => Promise<UmbMockDataSet>> = {
@@ -47,7 +46,6 @@ class UmbMockManager {
 	 */
 	async initialize(setName: string = 'default'): Promise<void> {
 		await this.#loadSet(setName);
-		this.#initialized = true;
 
 		// Load data into all registered DBs
 		umbMockDbRegistry.loadAll(this.#currentDataSet!);
